@@ -1,0 +1,8 @@
+To convert html in posts to text:
+
+[1] Export the posts_html_subset view from Mysql Workbench to a csv file; name it in.csv
+	I'm not currently automating this, b/c I can't extract the exact sql code that is run
+	for this to happen. Because the code through the workbench is more robust than the 
+	automated solutions that I've found online.
+[2] Run make convert to convert the in.csv to an out.csv that has no html
+[3] Run make load to load the results into the posts_nohtml table

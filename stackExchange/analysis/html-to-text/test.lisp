@@ -5,8 +5,14 @@
 (defparameter *csv* nil)
 (defparameter *processed-csv* nil)
 
+(cl-interpol:enable-interpol-syntax)
+
+(setf cl-csv::*always-quote* t)
+(setf cl-csv::*newline* #?"\n")
+
 (defun csv->lst (csv)
-  (cl-csv:read-csv csv))
+  (rest 
+    (cl-csv:read-csv csv)))
 
 (defun load-csv (path)
   (file-string path))
@@ -27,6 +33,7 @@
         (format nil "~a~a" *_DIR_* *csv-name*)))
 
 (setf *csv* (csv->lst *txt*))
+(setf *csv* (subseq *csv* 0 100))
 
 (setf *processed-csv* (html->text *csv*))
 
