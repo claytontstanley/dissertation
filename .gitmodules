@@ -1,0 +1,6 @@
+[submodule "submodules/python-boilerpipe"]
+	path = submodules/python-boilerpipe
+	url = https://github.com/misja/python-boilerpipe.git
+[submodule "submodules/lisp-dev"]
+	path = submodules/lisp-dev
+	url = ssh://raid@cstanley.no-ip.biz/~/F/root/clayton.stanley/srv/git/lisp-dev
