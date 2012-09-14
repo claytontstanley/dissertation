@@ -1,7 +1,5 @@
 (defparameter *_DIR_* (directory-namestring *load-truename*))
 
-(setf cl-csv::*always-quote* nil)
-
 (defparameter *csv-name* "in.csv")
 (defparameter *txt* nil)
 (defparameter *csv* nil)
@@ -19,10 +17,11 @@
           for count from 1
           do (let ((tmp-file "/tmp/tmp.txt"))
                (with-open-file (strm tmp-file :direction :output :if-exists :supersede)
-                 (format strm body))
-               (format t "converting line ~a~%" count)
+                 (format strm "~a" body))
+               (format  t "converting line ~a~%" count)
                (setf body [python html-to-text.py ?tmp-file ]))
           collect (list posts_id body))))
+
 (setf *txt*
       (load-csv 
         (format nil "~a~a" *_DIR_* *csv-name*)))
