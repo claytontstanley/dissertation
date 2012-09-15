@@ -4,36 +4,27 @@ decimal trans = trackBar1.Value / 5000 this.Opacity = trans
 When I try to build it, I get this error:
 Cannot implicitly convert type 'decimal' to 'double'
 I tried making trans a double, but then the control doesn't work. This code worked fine for me in VB.NET.
-What do I need to do differently?
-"
+What do I need to do differently?"
 "6","I have an absolutely positioned div containing several children, one of which is a relatively positioned div. When I use a percentage-based width on the child div, it collapses to 0 width on IE7, but not on Firefox or Safari.
 If I use pixel width, it works. If the parent is relatively positioned, the percentage width on the child works.
 Is there something I'm missing here?
 Is there an easy fix besides the pixel-based width on the child?
-Is there an area of the CSS specification that covers this?
-"
-"8","Are there any conversion tools for porting Visual J# code to C#?
-"
-"9","Given a DateTime representing their birthday, how do I calculate someone's age?
-"
+Is there an area of the CSS specification that covers this?"
+"8","Are there any conversion tools for porting Visual J# code to C#?"
+"9","Given a DateTime representing their birthday, how do I calculate someone's age?"
 "11","Given a specific DateTime value, how do I display relative time, like
 2 hours ago
 3 days ago
 a month ago
-etc, etc...?
-"
+etc, etc...?"
 "13","Is there a standard way for a web server to determine what time zone offset a user is in?
-From an HTTP header or part of the user-agent description, perhaps?
-"
-"14","What is the difference between Math.Floor() and Math.Truncate() in C#?
-"
+From an HTTP header or part of the user-agent description, perhaps?"
+"14","What is the difference between Math.Floor() and Math.Truncate() in C#?"
 "16","How do you expose a LINQ query as an ASMX web service? Usually, from the business tier, I can return a typed DataSet or DataTable which can be serialized for transport over ASMX.
 How can I do the same for a LINQ query? Is there a way to populate a typed DataSet or DataTable via a LINQ query?:
 public static MyDataTable CallMySproc()     {     string conn = ...;  MyDatabaseDataContext db = new MyDatabaseDataContext(conn);     MyDataTable dt = new MyDataTable();  // execute a sproc via LINQ var query = from dr in db.MySproc().AsEnumerable select dr;  // copy LINQ query resultset into a DataTable -this does not work !     dt = query.CopyToDataTable();  return dt; }
-How can I get the resultset of a LINQ query into a DataSet or DataTable? Alternatively, is the LINQ query serializeable so that I can expose it as an ASMX web service?
-"
-"17","How do I store binary data in MySQL ?
-"
+How can I get the resultset of a LINQ query into a DataSet or DataTable? Alternatively, is the LINQ query serializeable so that I can expose it as an ASMX web service?"
+"17","How do I store binary data in MySQL ?"
 "19","Solutions welcome in any language. :-) I'm looking for the fastest way to obtain the value of pi, as a personal challenge. More specifically I'm using ways that don't involve using #defined constants like M_PI, or hard-coding the number in.
 The program below tests the various ways I know of. The inline assembly version is, in theory, the fastest option, though clearly not portable; I've included it as a baseline to compare the other versions against. In my tests, with built-ins, the 4 * atan(1) version is fastest on GCC 4.2, because it auto-folds the atan(1) into a constant. With -fno-builtin specified, the atan2(0, -1) version is fastest.
 Here's the main testing program (pitimes.c):
@@ -43,16 +34,12 @@ double fldpi() {     double pi;     asm(""fldpi"" : ""=t"" (pi));     return pi;
 And a build script that builds all the configurations I'm testing (build.sh):
 #!/bin/sh gcc -O3 -Wall -c           -m32 -o fldpi-32.o fldpi.c gcc -O3 -Wall -c           -m64 -o fldpi-64.o fldpi.c  gcc -O3 -Wall -ffast-math  -m32 -o pitimes1-32 pitimes.c fldpi-32.o gcc -O3 -Wall              -m32 -o pitimes2-32 pitimes.c fldpi-32.o -lm gcc -O3 -Wall -fno-builtin -m32 -o pitimes3-32 pitimes.c fldpi-32.o -lm gcc -O3 -Wall -ffast-math  -m64 -o pitimes1-64 pitimes.c fldpi-64.o -lm gcc -O3 -Wall              -m64 -o pitimes2-64 pitimes.c fldpi-64.o -lm gcc -O3 -Wall -fno-builtin -m64 -o pitimes3-64 pitimes.c fldpi-64.o -lm
 Apart from testing between various compiler flags (I've compared 32-bit against 64-bit too, because the optimisations are different), I've also tried switching the order of the tests around. The atan2(0, -1) version still comes out top every time, though.
-I'm keen to hear what results you have, as well as improvements to the testing process. :-)
-"
+I'm keen to hear what results you have, as well as improvements to the testing process. :-)"
 "23","I'm trying to track the progress of PHP 5.3 and PHP 6 and I occassionally see blogs posting information but there doesn't seem to be an authoritative source.  Does anybody know where there is an official summary of possible new features?
 EDIT: There are some meeting notes that have been around for years... as far as I can tell this meeting has long since been superceded and nearly all of the other information out there is based entirely on that meeting.
-I'm more looking for where the PHP developers themselves record the changes that they are currently making rather than the long-term vision.
-"
-"24","If I have a trigger BEFORE UPDATE on a table. How can I throw an error that prevents the update on that table?
-"
-"25","I've been having issues getting the C sockets API to work properly in C++. Specifically, although I am including sys/socket.h, I still get compile time errors telling me that AF_INET is not defined. Am I missing something obvious, or could this be related to the fact that I'm doing this coding on z/OS and my problems are much more complicated? ;)
-"
+I'm more looking for where the PHP developers themselves record the changes that they are currently making rather than the long-term vision."
+"24","If I have a trigger BEFORE UPDATE on a table. How can I throw an error that prevents the update on that table?"
+"25","I've been having issues getting the C sockets API to work properly in C++. Specifically, although I am including sys/socket.h, I still get compile time errors telling me that AF_INET is not defined. Am I missing something obvious, or could this be related to the fact that I'm doing this coding on z/OS and my problems are much more complicated? ;)"
 "34","Does anyone know how to forcefully unload a ByteArray from memory in AS3?
 I have tried (without success):
 byteArray.length = 0;
@@ -61,22 +48,18 @@ and
 for ( var i:int=0; i<byteArray.length; i++ ) {
 byteArray[i] = null;
 }
-Any ideas?
-"
+Any ideas?"
 "36","How can I monitor a MSSQL database for changes to a table without using triggers or modifying the structure of the database in any way?  My preferred programming environment is .Net and C#
 (edits)
 I'd like to support MS SQL 2000 SP4 or higher
 by ""changes to a table"" I mean changes to table data, not changes to table structure.
-Ultimately, I would like the change to trigger an event in my application, instead of having to check for changes at an interval.
-"
+Ultimately, I would like the change to trigger an event in my application, instead of having to check for changes at an interval."
 "39","I am aware in dot net there are three timer types (see http://msdn.microsoft.com/en-us/magazine/cc164015.aspx ). I have chosen a the threaded timer as the other types can drift if the main thread is busy and I need this to be reliable.
 The way this timer works in the control of the timer is put on another thread so it can always tick along with the work begin completed on the parent thread when it is not busy.
 The issue I have is that with this timer in a console application is that while the timer is ticking along on another thread the main thread is not doing anything so the app closes.
 I tried adding a while true loop but then the main thread is too busy when the timer does go off.
-Any ideas welcome.
-"
-"42","I am starting a new web application in PHP and I this time around I want to create something that people can extend by using a plug-in interface.  I am a very confident PHP developer however I have never done this before so I'm not really sure where to start.  How does one go about writing 'hooks' into their code so that plug-ins can attach to specific events?
-"
+Any ideas welcome."
+"42","I am starting a new web application in PHP and I this time around I want to create something that people can extend by using a plug-in interface.  I am a very confident PHP developer however I have never done this before so I'm not really sure where to start.  How does one go about writing 'hooks' into their code so that plug-ins can attach to specific events?"
 "48","Let's say you create a Wizard in an HTML form.  One button goes back and one goes forward.  Since the ""back"" button appears first in the markup, when you press Enter it will use that button to submit the form.
 Ex:
 <form>
@@ -84,20 +67,15 @@ Ex:
 <input type=""submit"" name=""prev"" value=""Previous Page"" /> <!-- This is the button that will submit -->
 <input type=""submit"" name=""next"" value=""Next Page"" /> <!-- But this is the button that I WANT to submit -->
 </form>
-What I would LIKE to do, is get to decide which button is used to submit the form when a user presses Enter.  That way, when you press Enter the Wizard will move to the next page, not the previous.  Do you have to use tabindex to do this?
-"
+What I would LIKE to do, is get to decide which button is used to submit the form when a user presses Enter.  That way, when you press Enter the Wizard will move to the next page, not the previous.  Do you have to use tabindex to do this?"
 "59","Lets say I have a DataTable with a Name column. I want to have a collection of the unique names ordered alphabetically. The following query ignores the order by clause.
 var names = (from DataRow dr in dataTable.Rows
 orderby (string)dr[""Name""]
 select (string)dr[""Name""]).Distinct();
-Why does the orderby not get enforced?
-"
-"61","Where could I find a list of mime types and identifying characters for office 2007 files. I have an upload form that is restricting uploads based on extension and identifying characters but I cannot seem to find the Office 2007 mime types.
-"
-"66","How do you page through a collection in LINQ given that you have a startIndex and a count?
-"
-"72","I've got all these comments that I want to make into 'RDoc comments' so they can be formatted appropriately and viewed using 'Ri.'  Can anyone get me started on understanding how to use RDoc?
-"
+Why does the orderby not get enforced?"
+"61","Where could I find a list of mime types and identifying characters for office 2007 files. I have an upload form that is restricting uploads based on extension and identifying characters but I cannot seem to find the Office 2007 mime types."
+"66","How do you page through a collection in LINQ given that you have a startIndex and a count?"
+"72","I've got all these comments that I want to make into 'RDoc comments' so they can be formatted appropriately and viewed using 'Ri.'  Can anyone get me started on understanding how to use RDoc?"
 "79","The version of Subclipse (1.2.4) currently available through Aptana's automagic Plugins Manager does not work with the newest version of Subversion.
 I see on the Subclipse website however that they have 1.4.2 out for Eclipse. So I added a new remote update site:
 http://subclipse.tigris.org/update_1.4.x
@@ -106,8 +84,7 @@ http://download.eclipse.org/tools/mylyn/update/e3.3
 to my update manager. Then when I tried to install that, it told me I needed org.eclipse.ui 3.3.0 or equivalent.
 Looking at the configuration details for Aptana, it looks like it is built against eclipse 3.2.2.
 Does anyone know if there is a way to upgrade the version of Eclipse Aptana is built against to 3.3.0? Or if there is some other way to get Subclipse to work with the very newest version of Subversion?
-I know this isn't necessarily a ""programming"" question, but I hope it's ok since it's highly relevant to the programming experience...
-"
+I know this isn't necessarily a ""programming"" question, but I hope it's ok since it's highly relevant to the programming experience..."
 "80","I've written a database generation script in sql, and want to execute it in my Adobe air application:
 Create Table tRole (
 roleID integer Primary Key
@@ -159,29 +136,23 @@ catch (error:SQLError)
 Alert.show(error.toString());
 }
 }
-No errors are generated, however only tRole exists. It seems that it only looks at the first query (up to the semicolon- if I remove it, the query fails). Is there anyway to call multiple queries in one statement?
-"
+No errors are generated, however only tRole exists. It seems that it only looks at the first query (up to the semicolon- if I remove it, the query fails). Is there anyway to call multiple queries in one statement?"
 "85","What are your best practices around creating flat file database structures in PHP?  A lot of the more mature PHP flat file frameworks I see out there attempt to implement SQL-like query syntax, which is over the top for my purposes in most cases (I would just use a database at that point).
-Are there any elegant tricks out there to get good performance and features with the small code overhead one would want by taking on this problem in the first place?
-"
+Are there any elegant tricks out there to get good performance and features with the small code overhead one would want by taking on this problem in the first place?"
 "88","So I find myself porting a game that was originally written for the Win32 API to Linux (well, porting the OS X port of the Win32 port to Linux), and have implemented QueryPerformanceCounter by giving the uSeconds since the process start up:
 BOOL QueryPerformanceCounter(LARGE_INTEGER* performanceCount) {     gettimeofday(&currentTimeVal, NULL);     performanceCount->QuadPart = (currentTimeVal.tv_sec - startTimeVal.tv_sec);     performanceCount->QuadPart *= (1000 * 1000);     performanceCount->QuadPart += (currentTimeVal.tv_usec - startTimeVal.tv_usec);      return true; }
-This, coupled with QueryPerformanceFrequency() giving a constant 1000000 as the frequency works well on my machine, giving me a 64 bit variable that contains uSeconds since the program's start up. So is this portable? I don't want to discover it works differently if the kernel was compiled in a certain way or anything like that. I am fine with it being non-portable to something other than Linux, however.
-"
-"90","Anyone know of any really good tutorials explaining branching and merging with Subversion? All the better if it's specific to Tortoise SVN
-"
+This, coupled with QueryPerformanceFrequency() giving a constant 1000000 as the frequency works well on my machine, giving me a 64 bit variable that contains uSeconds since the program's start up. So is this portable? I don't want to discover it works differently if the kernel was compiled in a certain way or anything like that. I am fine with it being non-portable to something other than Linux, however."
+"90","Anyone know of any really good tutorials explaining branching and merging with Subversion? All the better if it's specific to Tortoise SVN"
 "104","In .NET perspective:
 What is a Memory Leak ?
 How to understand whether your application leaks? What are the effects?
 How to prevent a memory leak?
 If your application has memory leak, does it go away when the process exits or killed? Or do memory leaks in your application affects other processes on the system even after process completion?
 And what about unmanaged code accessed via COM Interop and/or P/Invoke?
-These are the questions that I have some answers myself but not complete. What do you think?
-"
+These are the questions that I have some answers myself but not complete. What do you think?"
 "108","I've been using TortoiseSVN in a Windows environment for quite some time.  It seems very feature-complete and nicely integrated into the Windows shell, and more importantly, it's fairly painless to teach to colleagues with little or no experience with source control. However, since we have moved to Windows Vista 64bit, Tortoise has been very buggy and has seemed to cause lots of explorer.exe abnormalities and crashes.  This has happened both with older versions of the software and the latest version (1.5.1 build 13563).
 I was curious if anyone has suggestions for other Subversion clients that will run on Windows (specifically Vista 64bit).  Developers here use a variety of text editors so using Visual Studio or Dreamweaver for SVN is not ideal.
-I have heard great things about Cornerstone , and would love something similar for Windows if it exists.
-"
+I have heard great things about Cornerstone , and would love something similar for Windows if it exists."
 "109","Recently our site has been deluged with the resurgence of the ASPRox bot SQL Injection attack. Without going into details, the attack attempts to execute SQL code by encoding the T-SQL commands in an ASCII encoded BINARY string. It looks something like this:
 DECLARE%20@S%20NVARCHAR(4000);SET%20@S=CAST(0x44004500...06F007200%20AS%20NVARCHAR(4000));EXEC(@S);--
 I was able to decode this in SQL, but I was a little wary of doing this since I didn't know exactly what was happening at the time.
@@ -189,14 +160,11 @@ I tried to write a simple decode tool so I could decode this type of text withou
 CAST(0x44004500...06F007200 AS NVARCHAR(4000))
 I've tried all of the following commands with no luck:
 txtDecodedText.Text =      System.Web.HttpUtility.UrlDecode(txtURLText.Text);              txtDecodedText.Text =     Encoding.ASCII.GetString(Encoding.ASCII.GetBytes(txtURLText.Text));     txtDecodedText.Text =     Encoding.Unicode.GetString(Encoding.Unicode.GetBytes(txtURLText.Text));              txtDecodedText.Text =     Encoding.ASCII.GetString(Encoding.Unicode.GetBytes(txtURLText.Text));     txtDecodedText.Text =     Encoding.Unicode.GetString(Convert.FromBase64String(txtURLText.Text));
-Can anybody suggest the proper way to translate this encoding without using SQL Server. Is is possible? I'll take VB.net code since I'm familiar with that too.
-"
+Can anybody suggest the proper way to translate this encoding without using SQL Server. Is is possible? I'll take VB.net code since I'm familiar with that too."
 "120","Has anyone got experience creating SQL-based ASP.NET site-map providers?
 I've got the default XML web.sitemap file working properly with my Menu and SiteMapPath controls.  But I'll need a way for the users of my site to create and modify pages dynamically.  I'll need to tie page viewing permissions into the standard ASP.NET membership system as well.
-I'd like some advice on articles to read or video clips to watch.
-"
-"123","Is there an existing application or library in Java which will allow me to take CSV data and create an XML file?  The XML tags would be provided through maybe the first row containing column headings.
-"
+I'd like some advice on articles to read or video clips to watch."
+"123","Is there an existing application or library in Java which will allow me to take CSV data and create an XML file?  The XML tags would be provided through maybe the first row containing column headings."
 "126","What is the ""purist"" or ""correct"" way to access an object's properties from within an object method that is not a getter/setter method?
 I know that from outside of the object you should use a getter/setter, but from within would you just do:
 Java:
@@ -210,12 +178,10 @@ PHP:
 $property = $this->getProperty();
 Forgive me if my Java is a little off, it's been a year since I programmed in Java...
 EDIT:
-It seems people are assuming I am talking about private or protected variables/properties only. When I learned OO I was taught to use getters/setters for every single property even if it was public (and actually I was told never to make any variable/property public). So, I may be starting off from a false assumption from the get go. It appears that people answering this question are maybe saying that you should have public properties and that those don't need getters and setters, which goes against what I was taught, and what I was talking about, although maybe that needs to be discussed as well. That's probably a good topic for a different question though...
-"
+It seems people are assuming I am talking about private or protected variables/properties only. When I learned OO I was taught to use getters/setters for every single property even if it was public (and actually I was told never to make any variable/property public). So, I may be starting off from a false assumption from the get go. It appears that people answering this question are maybe saying that you should have public properties and that those don't need getters and setters, which goes against what I was taught, and what I was talking about, although maybe that needs to be discussed as well. That's probably a good topic for a different question though..."
 "129","I've been banging my head against SQL Server 2005 trying to get a lot of data out.  I've been given a database with nearly 300 tables in it and I need to turn this into a MySQL database.  My first call was to use bcp but unfortunately it doesn't produce valid CSV - strings aren't encapsulated so you can't deal with any row that has a string with a comma in it (or whatever you use as a delimiter) and I would still have to hand write all of the create table statements as obviously CSV doesn't tell you anything about the data types.
 What would be better is if there was some tool that could connect to both SQL Server and MySQL and then do a copy.  You lose views, stored procedures, trigger, etc. but it isn't hard to copy a table that only uses base types from one DB to another... is it?
-Does anybody know of such a tool?  I don't mind how many assumptions it makes or what simplifications occur, as long as it supports integer, float, datetime and string.  I have to do a lot of pruning, normalising, etc. anyway so I don't care about keeping keys, relationships or anything like that but I need the initial set of data in fast!
-"
+Does anybody know of such a tool?  I don't mind how many assumptions it makes or what simplifications occur, as long as it supports integer, float, datetime and string.  I have to do a lot of pruning, normalising, etc. anyway so I don't care about keeping keys, relationships or anything like that but I need the initial set of data in fast!"
 "134","I have and pretty standard table setup in a current application using the .net XSD DataSet and TableAdapter features. My contracts table consists of some standard contract information, with a column for the primary department. This column is a foreign key to my Departments table, where I store the basic department name, id, notes. This is all setup and functioning in my SQL Server.
 When I use the XSD tool, I can drag both tables in at once and it auto detects/creates the foreign key I have between these two tables. This works great when I'm on my main page and am viewing contract data.
 However, when I go to my administrative page to modify the department data. I typically do something like this:
@@ -223,46 +189,35 @@ Dim dtDepartment As New DepartmentDataTable()
 Dim taDepartment As New DepartmentTableAdapter()
 taDepartment.Fill(dtDepartment)
 However, at this point an exception is thrown saying to the effect that there is a foreign key reference broken here, I'm guessing since I don't have the Contract DataTable filled.
-Has anybody encountered this before? I know I can simply remove the foreign key from the XSD to make things work fine, but having the additional integrity check there and having the XSD schema match the SQL schema in the database is nice.
-"
+Has anybody encountered this before? I know I can simply remove the foreign key from the XSD to make things work fine, but having the additional integrity check there and having the XSD schema match the SQL schema in the database is nice."
 "146","I have a website that plays mp3's in a flash player. If a user clicks 'play' the flash player automatically downloads an mp3 and starts playing it.
-Is there an easy way to track how many times a particular song clip (or any binary file) is downloaded?
-"
+Is there an easy way to track how many times a particular song clip (or any binary file) is downloaded?"
 "163","stackoverflow.com has a version number at the bottom: ""svn revision: 679""
-I want to use such automatic versioning with my .NET web, win forms, wpf projects/solutions.
-"
+I want to use such automatic versioning with my .NET web, win forms, wpf projects/solutions."
 "164","Hello,
 we are using WMV Videos on an internal sites, and we are embedding them into web sites. Now, this works quite good on Internet Explorer, but not on Firefox. I've found ways to make it work in Firefox, but then it stops working in Internet Explorer.
-We do not want to use Silverlight just yet, especially we can be sure that all clients will be Windows XP with installed Windows Media Player. I just wonder: Is there some sort of Universal Code that embeds WMP into both IE and Firefox, or do we need to implement some user-agent-detection and deliver different HTML for different Browsers?
-"
+We do not want to use Silverlight just yet, especially we can be sure that all clients will be Windows XP with installed Windows Media Player. I just wonder: Is there some sort of Universal Code that embeds WMP into both IE and Firefox, or do we need to implement some user-agent-detection and deliver different HTML for different Browsers?"
 "173","I've been wanting to get my databases under version control.  Does anyone have any advice or recommended articles to get me started?
-I'll always want to have at least some data in there (as alumb mentions: user types and administrators).  And I'll probably often want a large collection of generated test data for performance measurement.
-"
+I'll always want to have at least some data in there (as alumb mentions: user types and administrators).  And I'll probably often want a large collection of generated test data for performance measurement."
 "174","I want to print HTML from a C# web service.  The Web Browser control is overkill, and does not function well in a service-environment, nor does it function well on a system with very tight security constraints.  Is there any sort of free .NET library that will support the printing of a basic HTML page?  Here is the code I have so far, that is not running properly.
 public void PrintThing(string document) {     if (Thread.CurrentThread.GetApartmentState() != ApartmentState.STA)     {         Thread thread =             new Thread((ThreadStart) delegate { PrintDocument(document); });         thread.SetApartmentState(ApartmentState.STA);         thread.Start();     }     else     {         PrintDocument(document);     } }  protected void PrintDocument(string document) {     WebBrowser browser = new WebBrowser();     browser.DocumentText = document;     while (browser.ReadyState != WebBrowserReadyState.Complete)     {         Application.DoEvents();     }     browser.Print(); }
 This works fine when called from UI-type threads, but nothing happens when called from a service-type thread.  Changing Print() to ShowPrintPreviewDialog() yields the following IE script error:
 Error: 'dialogArguments.___IE_PrintType' is null or not an object URL: res://ieframe.dll/preview.dlg
-And a small empty print preview dialog appears.
-"
+And a small empty print preview dialog appears."
 "175","I want to be able to display a normal youtube video with overlaid annotations. This consists of colored rectangles for each frame. The only requirement is that this be done programatically. Youtube has annotations now, but require you use their front end to create them by hand. I want to be able to generate them. What's the best way of doing this?
 Some ideas:
 Build your own flash player (ew?)
 Somehow draw over the youtube flash player. Will this work?
 Reverse engineer & hijack youtube's annotation system. Either messing with the local files or redirecting it's attempt to download the annotations. (using greasemonkey? Firefox plugin?)
-Ideas that don't count: download the video, edit it, re-encode it, and upload it :P
-"
+Ideas that don't count: download the video, edit it, re-encode it, and upload it :P"
 "176","On one Linux Server running Apache and PHP 5, we got multiple Virtual Hosts with separate logfiles and everything. The only thing we cannot seem to separate between virtual hosts is the php error_log. Overriding this setting in the <Location> of the httpd.conf does not seem to do anything.
-Did I overlook something? Is there a way to have separate php error_logs for each Virtual Host?
-"
-"177","Please recommend a good library for programmatically creating PDF documents in .NET applications.
-"
-"180","This is something I've pseudo-solved many times and never quite found a solution that's stuck with me. The problem is to come up with a way to generate N colors that are as distinguishable as possible where N is a parameter.
-"
+Did I overlook something? Is there a way to have separate php error_logs for each Virtual Host?"
+"177","Please recommend a good library for programmatically creating PDF documents in .NET applications."
+"180","This is something I've pseudo-solved many times and never quite found a solution that's stuck with me. The problem is to come up with a way to generate N colors that are as distinguishable as possible where N is a parameter."
 "192","One of the fun parts of multi-cultural programming are numbers formats.
 Americans use 10,000.50, Germans use 10.000,50, French use 10 000,50 etc. My first approach would be: Take the string, parse it backwards, until I encounter a separator and use this as my decimal separator. The obvious flaw with that: 10.000 would be interpreted as 10. Another approach: if the string contains 2 different non-numeric characters, use the last one as the decimal separator and discard the others. If I only have one, check if it occurs more than once and discard it if it does. It it only appears once, check if it has 3 digits after it. If yes, discard it, otherwise use it as decimal separator.
 The obvious ""best solution"" would be to detect the User's culture or Browser, but that does not work if you have a Frenchman an an en-US Windows/Browser.
-I just wonder: does the .net Framework contain some mythical black magic floating point parser that is better than Double.(Try)Parse() in trying to auto-detect the number format?
-"
+I just wonder: does the .net Framework contain some mythical black magic floating point parser that is better than Double.(Try)Parse() in trying to auto-detect the number format?"
 "194","Yes, I know.  The existence of a running copy of SQL Server 6.5 in 2008 is absurd.
 That stipulated, what is the best way to migrate from 6.5 to 2005?  Is there any direct path?  Most of the documentation I've found deals with upgrading 6.5 to 7.
 Should I forget about the native SQL Server upgrade utilities, script out all of the objects and data, and try to recreate from scratch?
@@ -278,35 +233,27 @@ Execute that .sql file against the 2005 database.  Several dozen sprocs had issu
 Corrected all of those issues and re-executed the .sql file.
 Recreated the 6.5's logins in 2005 and gave them appropriate permissions.
 There was a bit of rinse/repeat when correcting the stored procedures (there were hundreds of them to correct), but the upgrade went great otherwise.
-Being able to use Management Studio instead of Query Analyzer and Enterprise Manager 6.5 is such an amazing difference.  A few report queries that took 20-30 seconds on the 6.5 database are now running in 1-2 seconds, without any modification, new indexes, or anything.  I didn't expect that kind of immediate improvement.
-"
+Being able to use Management Studio instead of Query Analyzer and Enterprise Manager 6.5 is such an amazing difference.  A few report queries that took 20-30 seconds on the 6.5 database are now running in 1-2 seconds, without any modification, new indexes, or anything.  I didn't expect that kind of immediate improvement."
 "227","Lets say i have an array like such
 $artist = array(""the roots"",""michael jackson"",""billy idol"",""more"",""and more"",""and_YET_MORE""); $count = array(5,3,9,1,1,3);
 and i want to generate a tag clound that will have artist with a higher number in count be a H6 tag and the lowest being H1?
-any ideas?
-"
+any ideas?"
 "231","How do I make it so mailto: links will be registered with my program?
 And then how would I handle that event in my program?
 Most of the solutions I found from a quick Google search are how to do this manually, but I need to do this automatically for users of my program if they click a button such as ""set as default email client"".
-Edit: Removed reference to Delphi, because the answer is independent of your language.
-"
+Edit: Removed reference to Delphi, because the answer is independent of your language."
 "234","MySQL has this incredibly useful yet properitary REPLACE INTO SQL Command. I wonder: Can this easily be emulated in SQL Server 2005? Starting a new Transaction, doing a Select() and then either UPDATE or INSERT and Commit is always a little bit a pain in the a.., especially when doing it in the application and therefore always keeping 2 versions of the statement.
-I wonder if there is an easy and universal way to implement such a function into SQL Server 2005?
-"
+I wonder if there is an easy and universal way to implement such a function into SQL Server 2005?"
 "237","I've been interested in Git, but the last time I looked the Windows support was essentially ""run Linux"".
-Are there any distributed source control tools that run well on Windows?
-"
-"246","Does anybody know if there is a way to create a SQLite database based on an XSD DataSet? In the past I've just used a basic SQLite manager, but want to fuse things a bit more with my .NET development if possible.
-"
-"249","I want to gather info from a user on a local php page (that I control), and use that info to query a form on another site (that I don't control) - how do I do that?
-"
+Are there any distributed source control tools that run well on Windows?"
+"246","Does anybody know if there is a way to create a SQLite database based on an XSD DataSet? In the past I've just used a basic SQLite manager, but want to fuse things a bit more with my .NET development if possible."
+"249","I want to gather info from a user on a local php page (that I control), and use that info to query a form on another site (that I don't control) - how do I do that?"
 "260","I have a little game written in C#. It uses a database as back-end. It's  a trading card game , and I wanted to implement the function of the cards as a script.
 What I mean is that I essentially have an interface, ICard, which a card class implements (public class Card056 : ICard) and which contains function that are called by the game.
 Now, to make the thing maintainable/moddable, I would like to have the class for each card as source code in the database and essentially compile it on first use. So when I have to add/change a card, I'll just add it to the database and tell my application to refresh, without needing any assembly deployment (especially since we would be talking about 1 assembly per card which means hundreds of assemblies).
 Is that possible? Register a class from a source file and then instantiate it, etc.
 ICard Cards[current] = new MyGame.CardLibrary.Card056(); Cards[current].OnEnterPlay(ref currentGameState);
-The language is C#, but extra bonus if it's possible to write the script in any .NET language.
-"
+The language is C#, but extra bonus if it's possible to write the script in any .NET language."
 "263","I have been trying to implement Win32's MessageBox using GTK. The app using SDL/OpenGL, so this isn't a GTK app.
 I handle the initialisation (gtk_init) sort of stuff inside the MessageBox function as follows:
 int MessageBox(HWND hwnd, const char* text, const char* caption, UINT type)
@@ -343,23 +290,18 @@ break;
 return IDOK;
 }
 Now, I am by no means an experienced GTK programmer, and I realise that I'm probably doing something(s) horribly wrong.
-However, my problem is that the last dialog popped up with this function stays around until the process exits. Any ideas?
-"
+However, my problem is that the last dialog popped up with this function stays around until the process exits. Any ideas?"
 "264","This isn't a question, just more seeking expert advice.
 What's the optimal level of concurrency that the C++ implementation of BerkeleyDB can reasonably support?  How many threads can I have hammering away at the DB before throughput starts to suffer because of resource contention?  I've read the manual and know how to set the number of locks, lockers, database page size, etc., but I'd just like some advice from someone who has real-world experience with BDB concurrency.
-My application is pretty simple, I'll be doing gets and puts of records that are about 1kb each.  No cursors, no deleting.
-"
+My application is pretty simple, I'll be doing gets and puts of records that are about 1kb each.  No cursors, no deleting."
 "265","What are the best practices for checking in BIN directories in a collaborative development environment using SVN?  Should project level references be excluded from checkin?  Is it easier to just add all bin directories?
 I develop a lot of DotNetNuke sites and it seems that in a multi-developer environment, it's always a huge task to get the environment setup correctly.
-The ultimate goal (of course) is to have a new developer checkout the trunk from SVN, restore the DNN database and have it all just 'work'...
-"
+The ultimate goal (of course) is to have a new developer checkout the trunk from SVN, restore the DNN database and have it all just 'work'..."
 "279","I use AnkhSVN and Visual Studio 2005 and 2008. Now, one thing that bugs me is that Ankh does not really work with ASP.NET sites. I cannot add them properly to a repository and it won't detect changes, especially because the site is on a remote server accessed through Frontpage Extensions (File => Open Site).
-What are the alternatives? Does a better plug-in exist? Manually downloading the files through FTP and using TortoiseSVN or svn.exe is not really the level of integration I want :) I want to stay within the Visual Studio IDE when possible. Also, I do not control the remote Server, so I can not install anything on it, which means the whole change tracking/comparison to repository has to be done on my machine.
-"
+What are the alternatives? Does a better plug-in exist? Manually downloading the files through FTP and using TortoiseSVN or svn.exe is not really the level of integration I want :) I want to stay within the Visual Studio IDE when possible. Also, I do not control the remote Server, so I can not install anything on it, which means the whole change tracking/comparison to repository has to be done on my machine."
 "289","I often have a Dictionary of keys & values and need to sort it by value. For example, I have a hash of words and their frequencies, and want to order them by frequency.
 There's SortedList which is good for a single value (frequency), but I want to map it back to the word.
-SortedDictionary orders by key, not value. Some resort to a custom class , but what's the cleanest way?
-"
+SortedDictionary orders by key, not value. Some resort to a custom class , but what's the cleanest way?"
 "296","Original Question: Should I Learn C?
 In the theme of the stackoverflow podcast, here's a fun question: should I learn C?  I expect Jeff & Joel will have something to say on this.
 Some info on my background:
@@ -374,36 +316,28 @@ Lots of folks recomending Assembler, so add on question: Is it better to learn C
 Recommended assemblers so far:
 Motorolla 68000
 Intel Assembler (does he mean x86?)
-MASM32
-"
+MASM32"
 "308","I often run into the following problem.
 I work on some changes to a project that require new tables or columns in the database. I make the database modifications and continue my work. Usually, I remember to write down the changes so that they can be replicated on the live system. However, I don't always remember what I've changed and I don't always remember to write it down.
 So, I make a push to the live system and get a big, obvious error that there is no NewColumnX. Ugh.
-Regardless of the fact that this may not be the best practice for this situation, is there a version control system for databases? I don't care about the specific database technology. I just want to know if one exists. If it happens to work with MS SQL Server, then great.
-"
+Regardless of the fact that this may not be the best practice for this situation, is there a version control system for databases? I don't care about the specific database technology. I just want to know if one exists. If it happens to work with MS SQL Server, then great."
 "313","I was once under the belief that Microsoft was working on an official, ruby-like, Migration framework. However, I haven't been able to find any additional information (or even the original source of my belief).
-Does anyone know any information about an official migration framework? or possibly an open source one?
-"
-"328","What are some guidelines for maintaining responsible session security with PHP?  There's information all over the web, so it's about time it all landed in one place!
-"
+Does anyone know any information about an official migration framework? or possibly an open source one?"
+"328","What are some guidelines for maintaining responsible session security with PHP?  There's information all over the web, so it's about time it all landed in one place!"
 "330","I am working on a collection of classes used for video playback and recording. I have one main class which acts like the public interface, with methods like play(), stop(), pause(), record()...etc. Then I have workhorse classes which do the video decoding and video encoding.
 I just learned about the existence of nested classes in C++, and I'm curious to know what programmers think about using them. I'm a little wary and not really sure what the benefits/drawbacks are, but they seem (according to the book I'm reading) to be used in cases such as mine.
-The book suggests that in a scenario like mine, a good solution would be to nest the workhorse classes inside the interface class, so there are no separate files for classes the client is not meant to use, and to avoid any possible naming conflicts? I don't know about these justifications. Nested classes are a new concept to me. Just want to see what programmers think about the issue.
-"
+The book suggests that in a scenario like mine, a good solution would be to nest the workhorse classes inside the interface class, so there are no separate files for classes the client is not meant to use, and to avoid any possible naming conflicts? I don't know about these justifications. Nested classes are a new concept to me. Just want to see what programmers think about the issue."
 "336","So I hear a lot of opinions about this, and I wanted to see if there was anything resembling a consensus. When is it appropriate to use an unsigned variable over a signed one? What about in a for loop?
 for (unsigned int i = 0; i < someThing.length(); i++) {
 SomeThing var = someThing.at(i);
 // You get the idea.
 }
 As I said, I hear a lot of opinions, but not a lot of consensus. I know Java doesn't have unsigned values, and that must have been a concious decision on Sun's part.
-Looking forward to hearing everybody's opinion.
-"
+Looking forward to hearing everybody's opinion."
 "337","I'm about to build a piece of a project that will need to build and post an xml document to a web service, and I'd like to do it in Python as a means to expand my skills there.  Unfortunately, while I know the XML model fairly well in .Net, I'm uncertain what the pros and cons are of the XML models in Python.
-Anyone have experience doing XML processing in Python?  Where would you suggest I start.  The XML files I'll be building will be fairly simple.
-"
+Anyone have experience doing XML processing in Python?  Where would you suggest I start.  The XML files I'll be building will be fairly simple."
 "361","How would I go about generating a list of all possible permutations of a string between x and y characters in length, containing a variable list of characters.
-Any language would work but it should be portable.
-"
+Any language would work but it should be portable."
 "369","And what is your system of choice?
 Off the top of my head I would say that for a real one step web 'build' the following steps would have take place:
 Take a source snapshot
@@ -414,29 +348,23 @@ Take a database snapshot [without test data]
 Move the source to the server
 Import a clean, current version of the database into the server
 Automatically confirm the 'build' was successful
-Has anyone got a system that does all of these steps?
-"
+Has anyone got a system that does all of these steps?"
 "371","This is a tricky one - and I've always relied on techniques such as permission-based emails (i.e. only sending to people you have permission to send to) and not using blatantly spamish terminology.
 Of late, some of the emails I send out programmatically have started being shuffled into people's spam folder automatically - and I'm wondering what i can do about it.
 This is despite the fact that these particular emails are not ones that humans would mark as spam (specifically, they are emails that contain license keys that people have paid good money for, so I don't think they're going to consider them spam)
-I figure this is a big topic in which I am essentially an ignorant simpleton.
-"
+I figure this is a big topic in which I am essentially an ignorant simpleton."
 "382","What is the meaning of the Java warning ""Type safety: The cast from Object to List is actually checking against the erased type List""?  I get it when I try to cast an Object to a type with generic information, such as in the following code:
 Object object = getMyList();
-List<Integer> list = (List<Integer>) object;
-"
+List<Integer> list = (List<Integer>) object;"
 "387","In Lucene if you had an multiple indexes that covered only one partition each. Why does the same search on different indexes return results with different scores? The results from the different servers match exactly. i.e If I searched for:
 Name - John Smith
 DOB - 11/11/1934
 Partition 0 would return a score of 0.345 Partition 1 would return a score of 0.337
-Both matched exactly on the name and dob.
-"
+Both matched exactly on the name and dob."
 "395","My company makes a monolithic piece of software that our customers use to run their car dealerships. The original app was written in VB6, and it has grown substantially over the last few years. Until now, there hasn't really been a business case for switching to the .net framework. Sure, it's newer, considerably better at certain things, and when used correctly speeds development time, but there's nothing we can't do in VB6 that we need to be able to do. Getting things done is harder in VB6, but almost nothing is impossible. Recently though, Microsoft dropped support for VB6, and it seems obvious to me that switching to a new platform is inevitable.
 The way VB .net works and requires you to think is so fundamentally different (heck, even the way you pass variables into subs has changed), and as far as I can tell, switching to .net would require a complete re-design and re-write of the app.
-My question(s): Have any of you been in this position? Of the tools available to smooth the transition, which ones work and which should be avoided? And how do I sell our customers and my boss on this? As the suits like to say, where's the ROI?
-"
-"402","What's the best way to create an iPhone application that runs in landscape mode from the start, regardless of the position of the device? Both programmatically and using the Interface Builder.
-"
+My question(s): Have any of you been in this position? Of the tools available to smooth the transition, which ones work and which should be avoided? And how do I sell our customers and my boss on this? As the suits like to say, where's the ROI?"
+"402","What's the best way to create an iPhone application that runs in landscape mode from the start, regardless of the position of the device? Both programmatically and using the Interface Builder."
 "403","For our small team of 20 developers, we used do code review like:
 Make a label in svn and publish the label to the reviewers
 Reviewers checkout the code and add comments in line (with marker like: // REVIEWER_NAME::REVIEW COMMENT:)
@@ -446,26 +374,20 @@ Developer keeps an excel sheet report for considered changes and reasons for ign
 Problem: Developer needs to keep track of multiple labels which might have same comments
 Sometimes we even do One on One review and if we really have time, even do Table review (team of reviewers looks at the code on projector, on the fly, and pass comment)
 I was wondering: Are you guys using any specific tool which helps to do code reviews smoother?
-I have heard of Code Collaborator . But have anyone used that? Is it worth the money?
-"
+I have heard of Code Collaborator . But have anyone used that? Is it worth the money?"
 "409","What is your favorite Coding Guidelines Checklist?
 I don't think one list will satisfy everyone. So the ""favorite"" part :)
-I was about to ask for Embedded programming and C at first. But you can post your favorite in other languages / areas as well.
-"
+I was about to ask for Embedded programming and C at first. But you can post your favorite in other languages / areas as well."
 "415","I suppose, Gravatar generates the image from email address. If so, the reverse should be possible. How difficult would be to get the email associated with the image? Isnt it a potential spam threat?
-What are your thoughts? (other than calling me paranoid ;) i did that already)
-"
+What are your thoughts? (other than calling me paranoid ;) i did that already)"
 "419","Part of my everyday work is maintaining and extending legacy VB6 applications. A common engine is written in C/C++ and VB6 uses these functions in order to improve performance.
 When it comes to asynchronous programming, a C interface is not enough and we rely on COM controls to fire events to VB6.
 My problem is that when I register the control in VB6, VB loads this control in memory and does not unload it until I quit the VB6 IDE. As the control is loaded the whole time, I am unable to recompile it in VC6, because the DLL file is locked.
 A solution I found is not to enable the control in VB but use the CreateObject() with the full name of my control. The problem then is that I must declare my control as an Object because VB6 knows nothing of the interface I am using and I do not have access to IntelliSense, which is a pain.
-Any idea how I can tell VB6 to unload controls after quitting the application? Or directly in the IDE?
-"
-"427","Is there any way to launch IEMobile's Favorites screen directly by specifying any command line parameter?
-"
+Any idea how I can tell VB6 to unload controls after quitting the application? Or directly in the IDE?"
+"427","Is there any way to launch IEMobile's Favorites screen directly by specifying any command line parameter?"
 "429","I run into a situation every couple of months where I need to develop a solution that's scheduled to run periodically, but I haven't found a way to handle this in Windows that I'm entirely happy with.  Every time I do it, I end up feeling corralled into using a Windows Service, which seems to be an unacceptable amount of overhead for something I could do with a cron job in Unix.
-Am I missing something here?  What have you used to schedule an application in Windows?
-"
+Am I missing something here?  What have you used to schedule an application in Windows?"
 "438","My Rails-app has a sign in box with a ""remember me"" checkbox. Users who check that box should remain logged in even after closing their browser. I'm keeping track of whether users are logged in by storing their id in the user's session.
 But sessions are implemented in Rails as session cookies, which are not persistent. I can make them persistent:
 class ApplicationController < ActionController::Base
@@ -480,40 +402,32 @@ end
 end
 But that seems like a hack, which is surprising for such common functionality. Is there a better way?
 Edit
-Gareth's answer is pretty good, but I would still like an answer from someone familiar with Rails 2 (because of its unique CookieSessionStore).
-"
+Gareth's answer is pretty good, but I would still like an answer from someone familiar with Rails 2 (because of its unique CookieSessionStore)."
 "469","I am using the Photoshop's javascript API to find the fonts in a given PSD.
 Given a font name returned by the API, I want to find the actual physical font file that that corresponds to on the disc.
 This is all happening in a python program running on OSX so I guess I'm looking for one of:
 Some Photoshop javascript
 A Python function
-An OSX API that I can call from python
-"
-"470","I've been writing a few web services for a .net app and now I'm ready to consume them. I've seen numerous examples where there is homegrown code for consing the service as opposed to using the auto generated methods Visisl Studio creates when adding the web reference. Is there some advantage to this?
-"
+An OSX API that I can call from python"
+"470","I've been writing a few web services for a .net app and now I'm ready to consume them. I've seen numerous examples where there is homegrown code for consing the service as opposed to using the auto generated methods Visisl Studio creates when adding the web reference. Is there some advantage to this?"
 "482","Ok, I'm a web developer, but I find myself dabbling in windows forms projects every now and then. One thing that confounds me to this day is the following.
 Assume you are doing something like the following
 List<string> myitems = new List<string> {     ""Item 1"",     ""Item 2"",     ""Item 3"" };  ComboBox box = new ComboBox(); box.DataSource = myitems;  ComboBox box2 = new ComboBox(); box2.DataSource = myitems
 So now we have 2 combo boxes bound to that array, and everything works fine. But when you change the value of one combo box, it changes BOTH combo boxes to the one you just selected.
 Now, I know that Arrays are always passed by reference (learned that when i learned C :D), but why on earth would the combo boxes change together? I don't believe the combo box control is modifying the collection at all.
 As a work around, don't this would achieve the funcionality that is expected / desired
-ComboBox box = new ComboBox(); box.DataSource = myitems.ToArray();
-"
-"484","What is a good method for testing website layout designs across multiple browsers and operating systems?
-"
+ComboBox box = new ComboBox(); box.DataSource = myitems.ToArray();"
+"484","What is a good method for testing website layout designs across multiple browsers and operating systems?"
 "502","I have a cross platform (python) application which needs to generate a jpeg preview of the first page of a PDF.
-On the mac I am spawning sips .  Is there something similarly simple I can do on Windows?
-"
+On the mac I am spawning sips .  Is there something similarly simple I can do on Windows?"
 "514","I have a Ruby on Rails Website that makes HTTP calls to an external Web Service.
 About once a day I get a SystemExit (stacktrace below) error email where a call to the service has failed.  If I then try the exact same query on my site moments later it works fine. It's been happening since the site went live and I've had no luck tracking down what causes it.
 Ruby is version 1.8.6 and rails is version 1.2.6.
 Anyone else have this problem?
 This is the error and stacktrace.
-A SystemExit occurred /usr/local/lib/ruby/gems/1.8/gems/rails-1.2.6/lib/fcgi_handler.rb:116:in `exit' /usr/local/lib/ruby/gems/1.8/gems/rails-1.2.6/lib/fcgi_handler.rb:116:in `exit_now_handler' /usr/local/lib/ruby/gems/1.8/gems/activesupport-1.4.4/lib/active_support/inflector.rb:250:in `to_proc' /usr/local/lib/ruby/1.8/net/protocol.rb:133:in `call' /usr/local/lib/ruby/1.8/net/protocol.rb:133:in `sysread' /usr/local/lib/ruby/1.8/net/protocol.rb:133:in `rbuf_fill' /usr/local/lib/ruby/1.8/timeout.rb:56:in `timeout' /usr/local/lib/ruby/1.8/timeout.rb:76:in `timeout' /usr/local/lib/ruby/1.8/net/protocol.rb:132:in `rbuf_fill' /usr/local/lib/ruby/1.8/net/protocol.rb:116:in `readuntil' /usr/local/lib/ruby/1.8/net/protocol.rb:126:in `readline' /usr/local/lib/ruby/1.8/net/http.rb:2017:in `read_status_line' /usr/local/lib/ruby/1.8/net/http.rb:2006:in `read_new' /usr/local/lib/ruby/1.8/net/http.rb:1047:in `request' /usr/local/lib/ruby/1.8/net/http.rb:945:in `request_get' /usr/local/lib/ruby/1.8/net/http.rb:380:in `get_response' /usr/local/lib/ruby/1.8/net/http.rb:543:in `start' /usr/local/lib/ruby/1.8/net/http.rb:379:in `get_response'
-"
+A SystemExit occurred /usr/local/lib/ruby/gems/1.8/gems/rails-1.2.6/lib/fcgi_handler.rb:116:in `exit' /usr/local/lib/ruby/gems/1.8/gems/rails-1.2.6/lib/fcgi_handler.rb:116:in `exit_now_handler' /usr/local/lib/ruby/gems/1.8/gems/activesupport-1.4.4/lib/active_support/inflector.rb:250:in `to_proc' /usr/local/lib/ruby/1.8/net/protocol.rb:133:in `call' /usr/local/lib/ruby/1.8/net/protocol.rb:133:in `sysread' /usr/local/lib/ruby/1.8/net/protocol.rb:133:in `rbuf_fill' /usr/local/lib/ruby/1.8/timeout.rb:56:in `timeout' /usr/local/lib/ruby/1.8/timeout.rb:76:in `timeout' /usr/local/lib/ruby/1.8/net/protocol.rb:132:in `rbuf_fill' /usr/local/lib/ruby/1.8/net/protocol.rb:116:in `readuntil' /usr/local/lib/ruby/1.8/net/protocol.rb:126:in `readline' /usr/local/lib/ruby/1.8/net/http.rb:2017:in `read_status_line' /usr/local/lib/ruby/1.8/net/http.rb:2006:in `read_new' /usr/local/lib/ruby/1.8/net/http.rb:1047:in `request' /usr/local/lib/ruby/1.8/net/http.rb:945:in `request_get' /usr/local/lib/ruby/1.8/net/http.rb:380:in `get_response' /usr/local/lib/ruby/1.8/net/http.rb:543:in `start' /usr/local/lib/ruby/1.8/net/http.rb:379:in `get_response'"
 "535","I'm starting work on a hobby project with a python codebase and would like to set up some form of continuous integration (i.e. running a battery of test-cases each time a check-in is made and sending nag e-mails to responsible persons when the tests fail) similar to CruiseControl or TeamCity.
-I realize I could do this with hooks in most VCSes, but that requires that the tests run on the same machine as the version control server, which isn't as elegant as I would like. Does anyone have any suggestions for a small, user-friendly, open-source continuous integration system suitable for a Python codebase?
-"
+I realize I could do this with hooks in most VCSes, but that requires that the tests run on the same machine as the version control server, which isn't as elegant as I would like. Does anyone have any suggestions for a small, user-friendly, open-source continuous integration system suitable for a Python codebase?"
 "549","Form Based Authentication For Websites
 Please help us create the definitive resource for this topic. We believe that stackoverflow should not just be a resource for very specific technical questions, but also for general guidelines on how to solve variations on common problems. ""Form Based Authentication For Websites"" should be a fine topic for such an experiment.
 It should include topics such as:
@@ -536,30 +450,24 @@ Please help us by
 Suggesting subtopics
 Submitting good articles about this subject
 Editing the official answer (as soon as you have enough karma)
-UPDATE: See the terrific 7-part series by Jens Roland below.
-"
+UPDATE: See the terrific 7-part series by Jens Roland below."
 "559","Post answers with the author/book pair. Let's keep it language-neutral.
 Here's the Coding Horror Recommended Reading list
 Edit: Related Stackoverflow Question
-What is the Single Most Influential Book Every Programmer Should Read
-"
+What is the Single Most Influential Book Every Programmer Should Read"
 "561","I'd like to be able to test a function with a tuple from a set of fringe cases and normal values. For example, in testing a function that returns true when given three lengths that form a valid triangle, I'd have specific cases, negative numbers, small numbers, large numbers, values close-to being overflowed, etcetera. Then generating combinations of these values, with or without repetition, to get a set of test data.
 (inf,0,-1), (5,10,1000), (10,5,5), (0,-1,5), (1000,inf,inf), ...
-(I actually know the answer to this, but it might be helpful for others, and a challenge for people here! --will post my answer(s) later on.)
-"
+(I actually know the answer to this, but it might be helpful for others, and a challenge for people here! --will post my answer(s) later on.)"
 "562","Uploading my first decently sized web app to my shared host provided me with a fresh set of challenges, by which I mean, sleepless nights. The issue was that I had most certainly not developed my application for medium trust (or had any clue what that was.)
 I mitigated all of the issues, save one.
-I had written an installer for the admin to be able to specify their connectionstring and other preferences, but I cannot find a way to write to a web.config in medium trust. Does anyone have a solution, or should I just be putting preferences in another file?
-"
-"564","I was just sitting at my local Borders sipping coffee and reading (for free) 'More Joel on Software' when I came across Joel saying something about a particular type of programmer knowing the difference between an int and an Integer in Java/C# (Object Oriented Programming Languages).  After a quick 'brain check,' I realized, to my dismay, that I didn't know the answer.  Please help.
-"
+I had written an installer for the admin to be able to specify their connectionstring and other preferences, but I cannot find a way to write to a web.config in medium trust. Does anyone have a solution, or should I just be putting preferences in another file?"
+"564","I was just sitting at my local Borders sipping coffee and reading (for free) 'More Joel on Software' when I came across Joel saying something about a particular type of programmer knowing the difference between an int and an Integer in Java/C# (Object Oriented Programming Languages).  After a quick 'brain check,' I realized, to my dismay, that I didn't know the answer.  Please help."
 "580","I wonder how you guys manage deployment of a database between 2 SQL Servers, specifically SQL Server 2005. Now, there is a development and a live one. As this should be part of a buildscript (standard windows batch, even do with current complexity of those scripts, i might switch to PowerShell or so later), Enterprise Manager/Management Studio Express do not count.
 Would you just copy the .mdf File and attach it? I am always a bit careful when working with binary data, as this seems to be a compatiblity issue (even though development and live should run the same version of the server at all time).
 Or - given the lack of ""EXPLAIN CREATE TABLE"" in T-SQL - do you do something that exports an existing database into SQL-Scripts which you can run on the target server? If yes, is there a tool that can automatically dump a given Database into SQL Queries and that runs off the command line? (Again, Enterprise Manager/Management Studio Express do not count).
 And lastly - given the fact that the live database already contains data, the deployment may not involve creating all tables but rather checking the difference in structure and ALTER TABLE the live ones instead, which may also need data verification/conversion when existing fields change.
 Now, i hear a lot of great stuff about the Red Gate products, but for hobby projects, the price is a bit steep.
-So, what are you using to automatically deploy SQL Server Databases from Test to Live?
-"
+So, what are you using to automatically deploy SQL Server Databases from Test to Live?"
 "588","I'm writing a CMS application in PHP and one of the requirements is that it must be able to interface with the customer's Exchange server.  I've written up this functionality a few times before and have always used WebDAV to do it, but now I'm leaning away from that.
 I will be running the site on IIS OR Apache (no preference) on Windows server 2008.  A few things I would need to do include adding contacts to a given user's address book, sending emails as a given user and running reports on contacts for a user.
 All of this is pretty easy to do with WebDAV, but if there is a better way that doesn't require any functionality that is likely to be deprecated any time soon.
@@ -568,31 +476,23 @@ Update:
 Justin, I love the idea of using com objects, I just worry about maintaining a 3rd product to make everything work...
 John, I can write a web service in C# to interface with for these functions and access it with my PHP app, but it's also a little bit out of the way.
 So far, I'm not 100% convinced that either of these is better than WebDAV... Can anyone show me where I'm being silly?
-Thanks, both of you.
-"
-"592","How do I get started?
-"
-"594","There are several ways, what is the best one?
-"
-"609","My research to date indicates that it is impossible to build an application for execution on Windows NT 4.0 using Visual Studio (C++, in this case) 2005. Is this really true? Is there any workaround available?
-"
+Thanks, both of you."
+"592","How do I get started?"
+"594","There are several ways, what is the best one?"
+"609","My research to date indicates that it is impossible to build an application for execution on Windows NT 4.0 using Visual Studio (C++, in this case) 2005. Is this really true? Is there any workaround available?"
 "610","Alright, this is a rather odd question that doesn't have one true answer:
 What is the * Best || Easiest to Use || Most Powerful || Cleanest * GUI API or library (tk, SWING, Qt, etc.) you have had the privilege to use?
-I've had conversations with friends about how annoying XYZ API was to deal with and how someone could build a better one, and I was curious what other's thoughts were on the subject.  Is there a good and straightforward way to implement a GUI from the programmer's standpoint, and has someone done it yet?
-"
+I've had conversations with friends about how annoying XYZ API was to deal with and how someone could build a better one, and I was curious what other's thoughts were on the subject.  Is there a good and straightforward way to implement a GUI from the programmer's standpoint, and has someone done it yet?"
 "622","I want to print the first 10000 prime numbers. Can anyone give me the most efficient code for this? Clarifications:
 It does not matter if your code is inefficient for n >10000.
 The size of the code does not matter.
-You cannot just hard code the values in any manner.
-"
+You cannot just hard code the values in any manner."
 "626","In Ruby 1.8, there are subtle differences between proc/lambda on the one hand, and Proc.new on the other.
 What are those differences?
 Can you give guidelines on how to decide which one to choose?
 In Ruby 1.9, proc and lambda are different. What's the deal?
 Edit
 @Mike Stone: there's no difference between 1.8 and 1.9 in this regard.
-@Accordeon Guy: that's the difference I had in mind, but I don't think it's the whole story. What about next/break/return in procs? What about Ruby 1.9? What about scopes, and returning procs from a method?
-"
+@Accordeon Guy: that's the difference I had in mind, but I don't think it's the whole story. What about next/break/return in procs? What about Ruby 1.9? What about scopes, and returning procs from a method?"
 "643","When I used Metacity, I could drag windows between workspaces using the small icon view of my workspaces.  I recently started using Compiz for all the cool desktop effects, however this drag and drop feature isn't working.  I use the cube effect for switching workspaces, but I noticed the wall effect doesn't allow it either.
-Is this just a missing feature from Compiz or is there a setting somewhere that I can enable it?  I know that I can enable dragging windows across edges to the next workspace, and the expose feature to drag windows between workspaces.  However, the drag and drop on the icon view is really powerful, and I would love to have it back along with all the great Compiz special effects.
-"
+Is this just a missing feature from Compiz or is there a setting somewhere that I can enable it?  I know that I can enable dragging windows across edges to the next workspace, and the expose feature to drag windows between workspaces.  However, the drag and drop on the icon view is really powerful, and I would love to have it back along with all the great Compiz special effects."

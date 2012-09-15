@@ -1,12 +1,38 @@
 import sys
+import os, errno
 from boilerpipe.extract import Extractor
 
-f = open(sys.argv[1])
-html = f.read()
-#html = "<p>I'm new to C#, and I want to use a track-bar to change a form's opacity.</p>"
+def convert(html):
+	extractor = Extractor(extractor='KeepEverythingExtractor', html=html)
+	extracted_text = extractor.getText()
+	extracted_html = extractor.getHTML()
+	return extracted_text.rstrip()
 
-extractor = Extractor(extractor='KeepEverythingExtractor', html=html)
-extracted_text = extractor.getText()
-extracted_html = extractor.getHTML()
+def mkdir_p(path):
+	try:
+		os.makedirs(path)
+	except OSError as exc: # Python >2.5
+		if exc.errno == errno.EEXIST:
+			pass
+		else: raise
 
-print extracted_text.rstrip()
+#f = open(sys.argv[1])
+#html = f.read()
+
+def convert_all():
+	cnt = 0
+	for dirname, dirnames, filenames in os.walk('html'):
+		for post_id in filenames:
+			cnt = cnt + 1
+			print "processing file " + str(cnt) + " with id " + str(post_id)
+			fname = os.path.join(dirname, post_id)
+			with open(fname) as f:
+				html = f.read()
+			txt = convert(html)
+			newdirname = dirname.replace('html','nohtml')
+			mkdir_p('nohtml')
+			mkdir_p(newdirname)	
+			with open(os.path.join(newdirname, post_id), "w") as text_file:
+				text_file.write(txt)
+
+convert_all()
