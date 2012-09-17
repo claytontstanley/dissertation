@@ -19,4 +19,4 @@ build: html-to-text
 	rlwrap ccl -l test.lisp -e '(build-csv)' -e '(quit)'
 
 clean-nohtml:
-	rm -rf nohtml
+	rm -rf body/nohtml

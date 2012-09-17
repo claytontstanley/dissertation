@@ -22,7 +22,7 @@
                 (format strm "~a" col-val)))))))))
 
 (let ((fun-lst (list 
-                 (write-col 'body "html")
+                 (write-col 'body "body/html")
                  (write-col 'title "title/raw")
                  (write-col 'tags "tags/raw"))))
   (defun write-all-cols (csv)
@@ -58,5 +58,5 @@
       (let ((posts-id (csv-val 'posts-id csv)))
         (with-open-file (strm out-file :direction :output :if-exists (if (= cnt 1) :supersede :append) :if-does-not-exist :create)
           (when (not (= cnt 1))
-            (let ((txt (file-string (format nil "~a/~a/~a" "nohtml" (get-dir posts-id) posts-id))))
+            (let ((txt (file-string (format nil "~a/~a/~a" "body/nohtml" (get-dir posts-id) posts-id))))
               (cl-csv:write-csv-row (list posts-id txt) :stream strm))))))))
