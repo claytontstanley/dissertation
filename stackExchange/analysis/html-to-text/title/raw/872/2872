@@ -1,0 +1,1 @@
+Possible to "spin off" several GUI threads? (Not halting the system at Application.Run)
