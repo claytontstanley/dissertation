@@ -1,0 +1,16 @@
+<p><a href="http://www.google.com/search?q=how%20to%20mock%20sealed%20class" rel="nofollow">Mocking sealed classes</a> can be quite a pain.  I currently favor an <a href="http://en.wikipedia.org/wiki/Adapter_pattern" rel="nofollow">Adapter pattern</a> to handle this, but something about just keeps feels weird.  </p>
+
+<p><strong>So, What is the best way you mock sealed classes?</strong></p>
+
+<p><em>Java answers are more than welcome</em>.  In fact, I would anticipate that the Java community has been dealing with this longer and has a great deal to offer.</p>
+
+<p>But here are some of the .NET opinions:</p>
+
+<ul>
+<li><a href="http://haacked.com/archive/2007/08/19/why-duck-typing-matters-to-c-developers.aspx" rel="nofollow">Why Duck Typing Matters for C#
+Develoepers</a> </li>
+<li><a href="http://cs.rthand.com/blogs/blog_with_righthand/archive/2008/07/22/Creating-wrappers-for-sealed-and-other-types-for-mocking.aspx" rel="nofollow">Creating wrappers
+for sealed and other types for
+mocking</a></li>
+<li><a href="http://weblogs.asp.net/cibrax/archive/2008/05/16/unit-tests-for-wcf.aspx" rel="nofollow">Unit tests for WCF (and Moq)</a></li>
+</ul>

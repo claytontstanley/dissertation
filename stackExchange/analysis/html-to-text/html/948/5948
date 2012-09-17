@@ -1,0 +1,5 @@
+<p>In my web application I have a file which hold the current revision number via $Rev$. This work fine except, if I don't make any changes to that file, it doesn't get committed.</p>
+
+<p><strong>Is there anyway I can force a single file to always get committed to the SVN server?</strong></p>
+
+<p><em>I'm using TortoiseSVN for Windows so any code or step-by-step instructions would be helpful.</em></p>

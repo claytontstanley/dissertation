@@ -1,0 +1,3 @@
+Is there an official convention for naming private fields in VB.NET?  For example, if I have a property called 'Foo', I normally call the private field '_Foo'.  This seems to be frowned upon in the Offical Guidelines :
+"Do not use a prefix for field names. For example, do not use g_ or s_ to distinguish static versus non-static fields."
+In C#, you could call the private field 'foo', the property 'Foo', and refer to the private field as 'this.foo' in the constructor.  As VB.NET is case insensitive you can't do this - any suggestions?

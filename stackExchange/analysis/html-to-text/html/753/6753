@@ -1,0 +1,7 @@
+<p>Okay, my first serious question. :-D</p>
+
+<p>I'm playing around with <a href="http://openjdk.java.net/" rel="nofollow">OpenJDK</a> (7, not 6), and am about to start trying to build <a href="http://icedtea.classpath.org/" rel="nofollow">IcedTea</a> on my Ubuntu system. I'm keen to hear from those who have played with IcedTea and have stories (successes, pitfalls, etc.) to tell. All stories welcome, whatever distribution you use.</p>
+
+<p>Chances are, I'll very soon have my own stories to add to the list…. :-)</p>
+
+<p>ETA: I now have FrankenIcedTea v1 working. (It's just IcedTea 7 + <a href="http://openjdk.java.net/projects/nio/" rel="nofollow">NIO2</a>.) Once I have a blog set up, I can blog about the procedures required, for anyone else who's interested in pursuing this. :-)</p>

@@ -1,0 +1,5 @@
+I'm wanting extra security for a particular point in my web app. So I want to lock the database (SQL Server 2005). Any suggestions or is this even necessary with SQL Server?
+Edit on question:
+The query is failing silently with no errors messages logged, and does not occur inside of a transaction.
+Final Solution:
+I never was able to solve the problem, however what I wound up doing was switching to MySQL and using a transactional level query here. This was not the main or even a primary reason to switch. I had been having problems with SQL Server and it allowed me to have our CMS and various other tools all running on the same database. Previous we had a SQL Server and a MySQL database running to run our site. The port was a bit on the time consuming however in the long run I feel it will work much better for the site and the business.

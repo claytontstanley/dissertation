@@ -1,0 +1,3 @@
+<p>What's the best way to do the semantic equivalent of the traditional sleep() system call from within an Informix SPL routine?  In other words, simply "pause" for N seconds (or milliseconds or whatever, but seconds are fine).  I'm looking for a solution that does <em>not</em> involve linking some new (perhaps written by me) C code or other library into the Informix server.  This has to be something I can do purely from SPL.  A solution for IDS 10 or 11 would be fine.</p>
+
+<p>@<a href="#80353" rel="nofollow">RET </a>- The "obvious" answer wasn't obvious to me!  I didn't know about the SYSTEM command.  Thank you!  (And yes, I'm the guy you think I am.)</p>

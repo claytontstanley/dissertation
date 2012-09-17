@@ -1,0 +1,3 @@
+<p>I'm looking for ideas on how to draw a skinnable "button" in a game application. If I use a fixed sprite non-vector image for the button background, then I can't size the button easily. If I write code to draw a resizable button (like Windows buttons are drawn), then the programmer has to get involved -- and it makes skinning difficult. Another option is to break the button into 9 smaller images (3x3) and stretch them all -- kindof like rounded corners are done in HTML. </p>
+
+<p>Is there another "easier" way? What's the best approach?</p>

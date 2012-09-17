@@ -1,0 +1,50 @@
+<p>The new extensions in .Net 3.5 allow functionality to be split out from interfaces.</p>
+
+<p>For instance in .Net 2.0</p>
+
+<pre><code>public interface IHaveChildren {
+    string ParentType { get; }
+    int ParentId { get; }
+
+    List&lt;IChild&gt; GetChildren()
+}
+</code></pre>
+
+<p>Can (in 3.5) become:</p>
+
+<pre><code>public interface IHaveChildren {
+    string ParentType { get; }
+    int ParentId { get; }
+}
+
+public static class HaveChildrenExtension {
+    public static List&lt;IChild&gt; GetChildren( this IHaveChildren ) {
+        //logic to get children by parent type and id
+        //shared for all classes implementing IHaveChildren 
+    }
+}
+</code></pre>
+
+<p>This seems to me to be a better mechanism for many interfaces.  They no longer need an abstract base to share this code, and functionally the code works the same. This could make code more maintainable and easier to test.</p>
+
+<p>The only disadvantage being that an abstract bases implementation can be virtual, but can that be worked around (would an instance method hide an extension method with the same name? would it be confusing code to do so?)</p>
+
+<p>Any other reasons not to regularly use this pattern?</p>
+
+<p><hr /></p>
+
+<p>Clarification:</p>
+
+<p>Yeah, I see the tendency with extension methods is to end up with them everywhere. I'd be particularly careful having any on .Net value types without a great deal of peer review (I think the only one we have on string is a <code>.SplitToDictionary()</code> - similar to <code>.Split()</code> but taking a key-value delimiter too)</p>
+
+<p>I think there's a whole best practice debate there ;-)</p>
+
+<p>(Incidentally: DannySmurf, your PM sounds scary.)</p>
+
+<p>I'm specifically asking here about using extension methods where previously we had interface methods.</p>
+
+<p><hr /></p>
+
+<p>I'm trying to avoid lots of levels of abstract base classes - the classes implementing these models mostly already have base classes. I think this model could be more maintainable and less overly-coupled than adding further object hierarchies.</p>
+
+<p>Is this what MS have done to IEnumerable and IQueryable for Linq?</p>

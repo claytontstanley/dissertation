@@ -1,0 +1,3 @@
+<p>I'm developing some cross platform software targeting Mono under Visual Studio and would like to be able to build the installers for Windows and Linux (Ubuntu specifically) with a single button click. I figure I could do it by calling cygwin from a post-build event, but I was hoping for at best a Visual Studio plugin or at worst a more Windows-native way of doing it. It seems like the package format is fairly simple and this must be a common need.</p>
+
+<p>edit: Re-asked question under other account due to duplicate login issue.</p>

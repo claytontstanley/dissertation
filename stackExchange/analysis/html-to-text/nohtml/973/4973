@@ -1,0 +1,41 @@
+Hi.  I am a CSS newbie trying to layout a table-like page with two columns.  I want the rightmost column to dock to the right of the page, and this column should have a distinct background color.  The content in the right side is almost always going to be smaller than that on the left.  I would like the div on the right to always be tall enough to reach the separator for the row below it.  How can I make my background color fill that space?
+<html>
+<body>
+<style type="text/css">
+.rightfloat
+{
+color: red;
+background-color: #BBBBBB;
+float: right;
+width: 200px;
+}
+.left {
+font-size: 20pt;
+}
+.separator {
+clear: both;
+width: 100%;
+border-top: 1px solid black;
+}
+</style>
+<div class="separator">
+<div class="rightfloat">
+Some really short content.
+</div>
+<div class="left">
+Some really really really really really really really really really really big content
+</div>
+</div>
+<div class="separator">
+<div class="rightfloat">
+Some more short content.
+</div>
+<div class="left">
+Some really really really really really really really really really really big content
+</div>
+</div>
+</body>
+</html>
+Edit:  I agree that this example is very table-like and an actual table would be a fine choice.  But my "real" page will eventually be less table-like, and I'd just like to first master this task!
+Also, for some reason, when I create/edit my posts in IE7, the code shows up correctly in the preview view, but when I actually post the message, the formatting gets removed.  Editing my post in Firefox 2 seems to have worked, FWIW.
+Another edit: Yeah, I unaccepted GateKiller's answer.  It does indeed work nicely on my simple page, but not in my actual heavier page.  I'll investigate some of the links y'all have pointed me to.  Thanks!

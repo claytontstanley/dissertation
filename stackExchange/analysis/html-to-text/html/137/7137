@@ -1,0 +1,7 @@
+<p>Every week I put up a bunch of .jpg screen captures on my project's wiki to show the difference between this week's status and last weeks.</p>
+
+<p>The files are called things like <code>ProgrammerAtasks_current.jpg</code> and <code>ProgrammerBtasks_lastweek.jpg</code> so there is a pair of <code>*_current.jpg</code> and <code>*_lastweek.jpg</code> for each status.</p>
+
+<p>Each week I delete the old <code>*_lastweek.jpg</code> and then rename the old <code>*current</code> to <code>*lastweek</code>.</p>
+
+<p>I can use <code>rm *_lastweek*</code> to do the first part of the task, but how do I automate renaming <code>*_current.jpg</code> to <code>*_lastweek.jpg</code>?</p>

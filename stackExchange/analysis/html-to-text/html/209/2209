@@ -1,0 +1,5 @@
+<p>I specifically want to add the style of background-color to the body tag of a master page from the code behind (C#) of a content page that uses that master page.  </p>
+
+<p>I have different content pages that need to make the master page have different colors depending on which content page is loaded in such that the master page matches the content page's theme.</p>
+
+<p>I have a solution below:</p>

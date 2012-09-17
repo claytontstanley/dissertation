@@ -1,0 +1,4 @@
+I'm writing a resource handling method where I control access to various files, and I'd like to be able to make use of the browser's cache.  My question is two-fold:
+Which are the definitive HTTP headers that I need to check in order to know for sure whether I should send a 304 response, and what am I looking for when I do check them?
+Additionally, are there any headers that I need to send when I initially send the file (like 'Last-Modified') as a 200 response?
+Some psuedo-code would probably be the most useful answer.  Thanks.

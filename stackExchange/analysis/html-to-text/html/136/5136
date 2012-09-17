@@ -1,0 +1,3 @@
+<p>A researcher has created a small simulation in MATLAB, and we want to make it accessible to others. My plan is to take the simulation, clean up a few things, and turn it into a set of functions. Then, I plan to compile it into a C library and use SWIG to create a Python wrapper. At that point, I should be able to call the simulation from a small Django app. At least, I hope so.</p>
+
+<p>Do I have the right plan? Has anyone else done something similar? Can you let me know if there are some serious pitfalls I'm not aware of at the moment?</p>

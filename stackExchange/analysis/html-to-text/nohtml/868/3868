@@ -1,0 +1,4 @@
+I'm downloading a web page (tag soup HTML) with XMLHttpRequest and I want to take the output and turn it into a DOM object that I can then run XPATH queries on. How do I convert from a string into DOM object?
+It appears that the general solution is to create a hidden iframe and throw the contents of the string into that. There has been talk of updating DOMParser to support text/html but as of Firefox 3.0.1 you still get an NS_ERROR_NOT_IMPLEMENTED if you try.
+Is there any option besides using the hidden iframe trick? And if not, what is the best way to do the iframe trick so that your code works outside the context of any currently open tabs (so that closing tabs won't screw up code, etc)?
+This is an example of why I'm looking for a solution other than the iframe hack, if I have to write all that code to have a robust solution, then I'd rather keep looking for something else.

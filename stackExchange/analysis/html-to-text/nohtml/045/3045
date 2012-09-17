@@ -1,0 +1,6 @@
+Problem:
+I have two spreadsheets that each serve different purposes but contain one particular piece of data that needs to be the same in both spreadsheets.  This piece of data (one of the columns) gets updated in spreadsheet A but needs to also be updated in spreadsheet B.
+Goal:
+A solution that would somehow link these two spreadsheets together (keep in mind that they exist on two separate LAN shares on the network) so that when A is updated, B is automatically updated for the corresponding record.
+*Note that I understand fully that a database would probably be a better plan for tasks such as these but unfortunately I have no say in that matter.
+**Note also that this needs to work for Office 2003 and Office 2007

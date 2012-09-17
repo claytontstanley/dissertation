@@ -1,0 +1,5 @@
+<p>I have primarily used Visual Studio 2003, and its tool for building an installer was pretty painful.  Files and folders had to be added manually, one by one.  I am looking at upgrading to VS 2008, and I'm not sure what its installer is like.  </p>
+
+<p>Also I'm interested in installers for non-.net applications.</p>
+
+<p>Are there good, open source options?  Is Visual Studio's installer any better in 2008?</p>

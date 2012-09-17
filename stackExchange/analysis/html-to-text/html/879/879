@@ -1,0 +1,3 @@
+<p>I had a Java developer new to PHP ask me this question the other day, so I thought I'd document the answer here.</p>
+
+<p>Question: are PHP variables passed by value or by reference?</p>

@@ -1,0 +1,15 @@
+<p>We have a simple utility class in-house for our database calls (a light wrapper around ADO.Net), but I am thinking of creating classes for each database/object.  Would it be smart to do so, or would it only benefit if we were using the full MVC framework for ASP.Net?</p>
+
+<p>So we have this:</p>
+
+<pre><code>SQLWrapper.GetRecordset(connstr-alias, sql-statement, parameters);<br>SQLWrapper.GetDataset(connstr-alias, sql-statement, parameters);<br>SQLWrapper.Execute(connstr-alias, sql-statement, parameters);<br></code></pre>
+
+<p>Thinking of doing this:</p>
+
+<pre><code>Person p = Person.get(id);<br>p.fname = "jon";<br>p.lname = "smith";<br>p.Save();<br></code></pre>
+
+<p>or for a new record -</p>
+
+<pre><code>Person p = new Person();<br>p.fname = "Jon";<br>p.lname = "Smith";<br>p.Save();<br>p.Delete();<br></code></pre>
+
+<p>Would this be smart, or would it be overkill.  I can see the benefit for reuse, changing database, and maintenance/readability.</p>

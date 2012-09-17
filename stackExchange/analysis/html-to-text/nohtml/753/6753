@@ -1,0 +1,4 @@
+Okay, my first serious question. :-D
+I'm playing around with OpenJDK (7, not 6), and am about to start trying to build IcedTea on my Ubuntu system. I'm keen to hear from those who have played with IcedTea and have stories (successes, pitfalls, etc.) to tell. All stories welcome, whatever distribution you use.
+Chances are, I'll very soon have my own stories to add to the list…. :-)
+ETA: I now have FrankenIcedTea v1 working. (It's just IcedTea 7 + NIO2 .) Once I have a blog set up, I can blog about the procedures required, for anyone else who's interested in pursuing this. :-)

@@ -1,0 +1,3 @@
+<p>I have read a lot that LISP can redefine syntax on the fly, presumably with macros.  I am curious how far does this actually go?  Can you redefine the language structure so much that it borderline becomes a compiler for another language?  For example, could you change the functional nature of LISP into a more object oriented syntax and semantics, maybe say having syntax closer to something like Ruby?</p>
+
+<p>Especially, is it possible to get rid of the parenthesis hell using macros?  I have learned enough (Emacs-)LISP to customize Emacs with my own micro-features, but I am very curious how far macros can go in customizing the language.</p>

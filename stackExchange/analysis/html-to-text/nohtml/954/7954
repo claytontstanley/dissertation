@@ -1,0 +1,6 @@
+When restoring a SQL Server Database, I notice that there are 3 different Recovery States to choose from:
+Restore with Recovery
+Restore with No Recovery
+Restore with Standby
+I've always left it at it's default value, but what do they all mean?
+(Preferably in layman's terms)

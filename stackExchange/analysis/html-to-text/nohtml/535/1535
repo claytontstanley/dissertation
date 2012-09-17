@@ -1,0 +1,29 @@
+I've never been completely happy with the way exception handling works, there's a lot exceptions and try/catch brings to the table (stack unwinding, etc.), but it seems to break a lot of the OO model in the process.
+Anyway, here's the problem:
+Let's say you have some class which wraps or includes networked file IO operations (e.g. reading and writing to some file at some particular UNC path somewhere). For various reasons you don't want those IO operations to fail, so if you detect that they fail you retry them and you keep retrying them until they succeed or you reach a timeout. I already have a convenient RetryTimer class which I can instantiate and use to sleep the current thread between retries and determine when the timeout period has elapsed, etc.
+The problem is that you have a bunch of IO operations in several methods of this class, and you need to wrap each of them in try-catch / retry logic.
+Here's an example code snippet:
+RetryTimer fileIORetryTimer = new RetryTimer(TimeSpan.FromHours(10));
+bool success = false;
+while (!success)
+{
+try
+{
+// do some file IO which may succeed or fail
+success = true;
+}
+catch (IOException e)
+{
+if (fileIORetryTimer.HasExceededRetryTimeout)
+{
+throw e;
+}
+fileIORetryTimer.SleepUntilNextRetry();
+}
+}
+So, how do you avoid duplicating most of this code for every file IO operation throughout the class? My solution was to use anonymous delegate blocks and a single method in the class which executed the delegate block passed to it. This allowed me to do things like this in other methods:
+this.RetryFileIO( delegate()
+{
+// some code block
+} );
+I like this somewhat, but it leaves a lot to be desired. I'd like to hear how other people would solve this sort of problem.

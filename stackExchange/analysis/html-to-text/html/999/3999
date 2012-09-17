@@ -1,0 +1,5 @@
+<p>I've often wondered, what is so great about .NET and MsSQL?</p>
+
+<p>I can see a downside being that you <strong>have</strong> to run it on Windows but I am unaware of any upsides besides it being quite fast, yet so many here use it.</p>
+
+<p>Edit: You are meant to run it on Windows but as Atrophius pointed out you can use <a href="http://www.mono-project.com/Main_Page" rel="nofollow">Mono</a></p>

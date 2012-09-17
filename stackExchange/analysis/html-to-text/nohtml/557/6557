@@ -1,0 +1,11 @@
+It seems that a List object cannot be stored in a List variable in C#, and can't even be explicitly cast that way.
+List<string> sl = new List<string>();
+List<object> ol;
+ol = sl;
+results in Cannot implicitly convert type ‘System.Collections.Generic.List’ to ‘System.Collections.Generic.List’
+And then...
+List<string> sl = new List<string>();
+List<object> ol;
+ol = (List<object>)sl;
+results in Cannot convert type ‘System.Collections.Generic.List’ to ‘System.Collections.Generic.List’
+Of course, you can do it by pulling everything out of the string list and putting it back in one at a time, but it is a rather convoluted solution.

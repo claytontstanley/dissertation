@@ -1,0 +1,2 @@
+If I have a Perl hash with a bunch of (key, value) pairs, what is the preferred method of iterating through all the keys?  I have heard that using each may in some way have unintended side effects.  So, is that true, and is one of the two following methods best, or is there a better way?
+# Method 1 while (my ($key, $value) = each(%hash)) {     # Something }  # Method 2 foreach my $key (keys(%hash)) {     # Something }

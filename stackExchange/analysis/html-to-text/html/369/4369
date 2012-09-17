@@ -1,0 +1,17 @@
+<p>I have a directory structure like the following;</p>
+
+<blockquote>
+  <p>/script.php</p>
+  
+  <p>/inc/include1.php<br>
+  /inc/include2.php</p>
+  
+  <p>/objects/object1.php<br>
+  /objects/object2.php</p>
+  
+  <p>/soap/soap.php</p>
+</blockquote>
+
+<p>Now, I use those objects in both script.php and /soap/soap.php, I could move them, but I want the directory structure like that for a different reason. When executing script.php the include path is inc/include.php and when executing /soap/soap.php it's ../inc, absolute paths work, /mnt/webdev/[project name]/inc/include1.php... But it's an ugly solution if I ever move the directory to a different location.</p>
+
+<p>So is there a way to use relative paths, or a way to programically generate the "/mnt/webdev/[project name]/"?</p>

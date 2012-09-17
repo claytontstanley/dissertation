@@ -1,0 +1,5 @@
+<p>I'm using IIS in Windows 2003 Server for a SharePoint intranet. External incoming requests will be using the host header <code>portal.mycompany.com</code> and be forced to use SSL.</p>
+
+<p>I was wondering if there's a way to set up an alternate host header such as <code>&lt;http://internalportal/&gt;</code> which only accepts requests from the internal network, but doesn't force the users to use SSL.</p>
+
+<p>Any recommendations for how to set this up?</p>

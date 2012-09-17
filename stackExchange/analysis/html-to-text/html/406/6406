@@ -1,0 +1,17 @@
+<p>Is it possible to access an element on a Master page from the page loaded within the ContentPlaceHolder for the master?</p>
+
+<p>I have a ListView that lists people's names in a navigation area on the Master page. I would like to update the ListView after a person has been added to the table that the ListView is data bound to. The ListView currently does not update it's values until the cache is reloaded. We have found that just re-running the ListView.DataBind() will update a listview's contents. We have not been able to run the ListView.DataBind() on a page that uses the Master page. </p>
+
+<p>Below is a sample of what I wanted to do but a compiler error says "PeopleListView does not exist in the current context".</p>
+
+<p>GIS.master - Where ListView resides</p>
+
+<pre><code>...&lt;asp:ListView ID="PeopleListView"...<br></code></pre>
+
+<p>GISInput_People.aspx - Uses GIS.master as it's master page</p>
+
+<p>GISInput_People.aspx.cs</p>
+
+<pre><code>AddNewPerson()<br>{<br>    // Add person to table<br>    ....<br><br>    // Update Person List<br>    PeopleListView.DataBind();<br>    ...<br>}<br></code></pre>
+
+<p>What would be the best way to resolve an issue like this in C# .Net?</p>

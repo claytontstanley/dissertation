@@ -1,0 +1,3 @@
+<p>I want to link to a specific slide in a an online PowerPoint file. For example, the presentation link may be <code>http://www.example.com/hello.ppt</code> and I want to link directly to slide #4, so when people click on my link, it goes straight to the 4th slide.</p>
+
+<p>Is this possible?</p>

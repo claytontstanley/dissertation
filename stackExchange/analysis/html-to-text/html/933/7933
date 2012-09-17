@@ -1,0 +1,1 @@
+<p>Is there some means of querying the system tables to establish which tables are using what locking schemes? I took a look at the columns in <strong>sysobjects</strong> but nothing jumped out.</p>

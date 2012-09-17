@@ -1,0 +1,5 @@
+<p>Can a LINQ enabled app run on a machine that only has the .NET 2.0 runtime installed?</p>
+
+<p>In theory, LINQ is nothing more than syntactic sugar, and the resulting IL code should look the same as it would have in .NET 2.0.</p>
+
+<p>How can I write LINQ without using the .NET 3.5 libraries? Will it run on .NET 2.0?</p>

@@ -1,0 +1,15 @@
+<p>In an application that heavily relies on .htaccess RewriteRules for its PrettyURLs (CakePHP in my case), how do I correctly set up directives to exclude certain directories from this rewriting? I.e.:</p>
+
+<pre><code>/appRoot/.htaccess<br>         app/<br>         static/<br></code></pre>
+
+<p>By default every request to /appRoot/* is being rewritten to be picked up by app/webroot/index.php, where it's being analysed and corresponding controller actions are being invoked. This is done by these directives in .htaccess:</p>
+
+<pre><code>RewriteBase /appRoot<br><br>RewriteRule ^$ app/webroot/     [L]<br>RewriteRule (.*) app/webroot/$1 [L]<br></code></pre>
+
+<p>I now want to exclude a few directories like static/ from this rewriting. I tried with this <em>before</em> the Cake RewriteRules:</p>
+
+<pre><code>RewriteCond $1 ^(static|otherDir).*$ [NC]<br>RewriteRule (.*) - [L]<br></code></pre>
+
+<p>It works in so far that requests are no longer rewritten, but now <strong>all</strong> requests are being skipped, even legitimate Cake requests which should not match ^(static|otherDir).*$.</p>
+
+<p>I tried several variations of these rules but can't get it to work the way I want.</p>

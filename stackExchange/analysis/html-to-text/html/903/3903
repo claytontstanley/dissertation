@@ -1,0 +1,7 @@
+<p>Since the WMI class Win32_OperatingSystem only includes OSArchitecture in Windows Vista, I quickly wrote up a method using the registry to try and determine whether or not the current system is a 32 or 64bit system.</p>
+
+<pre><code>private Boolean is64BitOperatingSystem()<br>{<br>    RegistryKey localEnvironment = Registry.LocalMachine.OpenSubKey("SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment");<br>    String processorArchitecture = (String) localEnvironment.GetValue("PROCESSOR_ARCHITECTURE");<br>    if (processorArchitecture.Equals("x86")) {<br>        return false;<br>    }<br>    else {<br>        return true;<br>    }<br>}<br></code></pre>
+
+<p>It's worked out pretty well for us so far, but I'm not sure how much I like looking through the registry. Is this a pretty standard practice or is there a better method?</p>
+
+<p><strong>Edit</strong>: Wow, that code looks a lot prettier in the preview. I'll consider linking to a pastebin or something, next time.</p>

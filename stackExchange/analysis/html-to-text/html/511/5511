@@ -1,0 +1,24 @@
+<P>How are you handling the entry of numeric values in WPF applications?</P>
+<P>Without a NumericUpDown control, I've been using a TextBox and handling its PreviewKeyDown event with the code below, but it's pretty ugly.</P>
+<P>Has anyone found a more graceful way to get numeric data from the user without relying on a third-party control?</P><PRE><CODE>private void NumericEditPreviewKeyDown(object sender, KeyEventArgs e)
+{
+    bool isNumPadNumeric = (e.Key &gt;= Key.NumPad0 &amp;&amp; e.Key &lt;= Key.NumPad9) || e.Key == Key.Decimal;
+    bool isNumeric = (e.Key &gt;= Key.D0 &amp;&amp; e.Key &lt;= Key.D9) || e.Key == Key.OemPeriod;
+
+    if ((isNumeric || isNumPadNumeric) &amp;&amp; Keyboard.Modifiers != ModifierKeys.None)
+    {
+        e.Handled = true;
+        return;
+    }
+
+    bool isControl = ((Keyboard.Modifiers != ModifierKeys.None &amp;&amp; Keyboard.Modifiers != ModifierKeys.Shift)
+        || e.Key == Key.Back || e.Key == Key.Delete || e.Key == Key.Insert
+        || e.Key == Key.Down || e.Key == Key.Left || e.Key == Key.Right || e.Key == Key.Up
+        || e.Key == Key.Tab
+        || e.Key == Key.PageDown || e.Key == Key.PageUp
+        || e.Key == Key.Enter || e.Key == Key.Return || e.Key == Key.Escape
+        || e.Key == Key.Home || e.Key == Key.End);
+
+    e.Handled = !isControl &amp;&amp; !isNumeric &amp;&amp; !isNumPadNumeric;
+}
+</CODE></PRE>

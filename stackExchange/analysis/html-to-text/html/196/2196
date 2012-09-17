@@ -1,0 +1,9 @@
+<p>I've got an web application that I'm trying to optimise.  Some of the controls are hidden in dialog-style DIVs, so I'd like to have them load in via AJAX only when the user wants to see them.  This is fine for controls that are mostly Literal-based (various menus and widgets), but when I have what I call "dirty" controls - ones that write extensive information to the ViewState, put tons of CSS or script on the page, require lots of references etc - these are seemingly impossible to move "out of page", especially considering how ASP.NET will react on postback.</p>
+
+<p>I was considering some kind of step where I override Render, find markers for the bits I want to move out and put AJAX placeholders in there, but not only does the server overhead seem extreme, it also feels like a complete hack.  Besides, the key element here is the dialog boxes that contain forms with validation controls on them, and I can't imagine how I would move the controls <em>and</em> their required scripts.</p>
+
+<p>In my fevered imagination, I want to do this:</p>
+
+<pre><code>AJAXifier.AJAXify(ctlEditForm);<br></code></pre>
+
+<p>Sadly, I know this is a dream.  How close can I really get to quick-and-easy AJAXification without causing too much load on the server?</p>

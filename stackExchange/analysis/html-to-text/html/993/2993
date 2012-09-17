@@ -1,0 +1,23 @@
+<p>I'm in an environment with a lot of computers that haven't been
+properly inventoried. Basically, no one knows which IP goes with which
+mac address and which hostname. So I wrote the following:</p>
+
+<pre><code># This script goes down the entire IP range and attempts to<br># retrieve the Hostname and mac address and outputs them<br># into a file. Yay!<br><br>require "socket"<br><br>TwoOctets = "10.26"<br><br>def computer_exists?(computerip)<br> system("ping -c 1 -W 1 #{computerip}")<br>end<br><br>def append_to_file(line)<br> file   = File.open("output.txt", "a")<br> file.puts(line)<br> file.close<br>end<br><br><br>def getInfo(current_ip)<br> begin<br>   if computer_exists?(current_ip)<br>     arp_output = `arp -v #{current_ip}`<br>     mac_addr = arp_output.to_s.match(/..:..:..:..:..:../)<br>     host_name = Socket.gethostbyname(current_ip)<br>     append_to_file("#{host_name[0]} - #{current_ip} - #{mac_addr}\n")<br>   end<br> rescue SocketError =&gt; mySocketError<br>   append_to_file("unknown - #{current_ip} - #{mac_addr}")<br> end<br>end<br><br><br>(6..8).each do |i|<br> case i<br>   when 6<br>     for j in (1..190)<br>       current_ip = "#{TwoOctets}.#{i}.#{j}"<br>       getInfo(current_ip)<br>     end<br>   when 7<br>     for j in (1..255)<br>       current_ip = "#{TwoOctets}.#{i}.#{j}"<br>       getInfo(current_ip)<br>     end<br>   when 8<br>     for j in (1..52)<br>       current_ip = "#{TwoOctets}.#{i}.#{j}"<br>       getInfo(current_ip)<br>     end<br> end<br>end<br></code></pre>
+
+<p>Everything works except it does not find a Reverse DNS.</p>
+
+<p>Sample output that I'm getting is this:</p>
+
+<p>10.26.6.12 - 10.26.6.12 - 00:11:11:9B:13:9F</p>
+
+<p>10.26.6.17 - 10.26.6.17 - 08:00:69:9A:97:C3</p>
+
+<p>10.26.6.18 - 10.26.6.18 - 08:00:69:93:2C:E2</p>
+
+<p>If I do <code>nslookup 10.26.6.12</code> then I get the correct reverse DNS so
+that shows that my machine is seeing the dns server.</p>
+
+<p>I have tried Socket.gethostbyname, gethostbyaddr, but it doesn't work :
+(</p>
+
+<p>Any guidance will be much appreciated. Thanks!</p>

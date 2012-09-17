@@ -1,0 +1,8 @@
+I would like to  implement an online ordering system for restaurants.  I am starting to research this a bit, and wanted to throw it out here.
+Is there any open source projects already started out there I could work with and contribute to?
+Would it be easier to just roll my own? -If so, any suggestions on where to start?  ASP.NET, Ruby on Rails, PHP???
+Payment processing?  I am pretty sure I would go through Google Checkout.  Any drawbacks to google checkout?
+EDIT2- Looking around online I feel most commerce sites are geared towards product and shipping them.  The few that are out there seem like it would be a chore to implement and high cost entry.  I may just have to look at developing something for now.  Any ideas/suggestions on where to start(Question #2 from above)???
+@Balloon - I don't think SMS would be a solution for getting the orders in.  The restaurant doesn't have a cellphone dedicated for itself.  I was looking towards making a phone call when a recorded message that there were orders queued, until they were acknowledged from the restaurant online that they were being processed.
+EDIT- superjoe30 gives a link to his online ordering system.  I took a quick look, and it looks great!   I want to clarify this is for a cafe, therefore the ordering must reach the cafe in almost real time.  Any delays in getting the order to the cooks, would slow things up, taking away the benefit of online ordering at a cafe.
+Any suggestions on getting the order to the cafe immediately after the payment is processed?  I think email would go unnoticed.  I believe there is a way in .NET to make a phone call to the cafe, that could alert them of an order and have them print it out.

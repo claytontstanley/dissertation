@@ -1,0 +1,9 @@
+<p>I want to write C/C++ programs that take input from a MIDI device. </p>
+
+<p>The MIDI device connects to my PC using a USB connector. </p>
+
+<p>I'm looking for a (C/C++ implemented) library that I can use to read the MIDI signals from the MIDI device through the USB port.</p>
+
+<p>I'm happy manipulating the MIDI data once I get it, I just don't want to have to implement the code for its capture.</p>
+
+<p>I'm planning on writing my code using the Bloodshed Dev-C++ IDE on Windows XP.</p>

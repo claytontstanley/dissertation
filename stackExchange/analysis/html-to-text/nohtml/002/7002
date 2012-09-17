@@ -1,0 +1,3 @@
+Lately I find myself frequently creating singletons using the module pattern :
+var singleton = (function(){      var _privateVariable = {};     var _privateMethod = function() {};      return {          publicVariable: {},         publicMethod: function() {}      } })();
+What is/are you favorite pattern/s for maintainable JavaScript?

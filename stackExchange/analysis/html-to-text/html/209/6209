@@ -1,0 +1,13 @@
+<p>Given a string like this:</p>
+
+<blockquote>
+  <p>a,"string, with",various,"values, and some",quoted</p>
+</blockquote>
+
+<p>What is a good algorithm to split this based on commas while ignoring the commas inside the quoted sections?</p>
+
+<p>The output should be an array:</p>
+
+<blockquote>
+  <p>[ "a", "string, with", "various", "values, and some", "quoted" ]</p>
+</blockquote>

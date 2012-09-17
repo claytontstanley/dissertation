@@ -1,0 +1,4 @@
+Are there any offline tools available for Wordpress theme development other than Dreamweaver extentions?
+I'm looking for something that renders a page in a Gecko (or related widget) window in response to my editing of the theme code so I don't need keep editing files on a web server.
+Any ideas?
+EDIT: Should have been more clear.  I have test servers in place I was just looking for an application that shows a representation of the standard wordpress views (index,archive,single post etc) and a basic syntax highlighting editor.

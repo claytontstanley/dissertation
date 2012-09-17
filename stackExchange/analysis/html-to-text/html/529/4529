@@ -1,0 +1,11 @@
+<p>Has anyone tried installing SQL Server 2008 Developer on a machine that already has 2005 Developer installed?</p>
+
+<p>I am unsure if I should do this, and I need to keep 2005 on this machine for the foreseeable future in order to test our application easily. Since I sometimes need to take backup files of databases and make available for other people in the company I cannot just replace 2005 with 2008 as I suspect (but do not know) that the databases aren't 100% backwards compatible.</p>
+
+<p>What kind of issues would arise? Do I need to install the new version with an instance name, will that work? Can I use a different port number to distinguish them?</p>
+
+<p>I found this entry on technet: <a href="http://forums.microsoft.com/TechNet/ShowPost.aspx?PostID=3496209&amp;SiteID=17" rel="nofollow">http://forums.microsoft.com/TechNet/ShowPost.aspx?PostID=3496209&amp;SiteID=17</a></p>
+
+<p>It doesn't say more than just <em>yes you can do this</em> and I kinda suspected that this was doable anyway, but I need to know if there are anything I need to know before I start installing.</p>
+
+<p>Anyone?</p>

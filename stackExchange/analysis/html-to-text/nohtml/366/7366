@@ -1,0 +1,3 @@
+Are there any good tutorials or guides on the web for creating PDF files programmatically? I am especially thinking of discussing best practices in a language-agnostic way, though something tied to a language could also be useful.
+Do PDF libraries tend to have multiple APIs for different languages or are they usually tied to one particular technology?
+I have used FPDF in the past and it served its purpose, but I would certain like to know if people have had success with other libraries and techniques.

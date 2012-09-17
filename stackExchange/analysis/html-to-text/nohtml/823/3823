@@ -1,0 +1,2 @@
+One simple method I've used in the past is basically just creating a second table whose structure mirrors the one I want to audit, and then create an update/delete trigger on the main table.  Before a record is updated/deleted, the current state is saved to the audit table via the trigger.
+While effective, the data in the audit table is not the most useful or simple to report off of.  I'm wondering if anyone has a better method for auditing data changes?

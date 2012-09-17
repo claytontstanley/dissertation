@@ -1,0 +1,6 @@
+Hey all,
+I've been trying to get pretty charts to work in GWT on our internal network.
+Playing around with GWT-Ext 's charts is nice, but it requires flash and is really messy to control (it seems buggy, in general).
+I'd like to hear about something that works with the least amount of dependencies and it also must work without a connection to the web (so, Google' charts API isn't a solution).
+Edit: Indeed, I would rather a library that is all client-side.
+Thank you all!

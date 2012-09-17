@@ -1,0 +1,2 @@
+When you subscribe to an event on an object from within a form, you are essentially handing over control of your callback method to the event source. You have no idea whether that event source will choose to trigger the event on a different thread.
+The problem is that when the callback is invoked, you cannot assume that you can make update controls on your form because sometimes those controls will throw an expection if the event callback was called on a thread different than the thread the form was run on.

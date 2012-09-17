@@ -1,0 +1,7 @@
+<p>Alright, so I've always wanted to write myself a nice little <strong>Game of Life</strong> program where you could play with the rules and adjust the number of cells and such; I've just never really had the time to mess around to do this (until recently).  I understand the basic algorithm and such (if you don't, go to the <a href="http://en.wikipedia.org/wiki/Conway%27s_Game_of_Life" rel="nofollow">Game of Life</a> Wikipedia page to check it out.) but only have a little experience with GUI programming.  I'm considering doing this in python, but I was really wanting to figure out how to go about doing this in general, so feel free to give code snippets in your language of choice.</p>
+
+<p>To summarise:</p>
+
+<ul>
+<li><strong>How would you go about programming a "Conway's Game of Life" simulation in your language of choice?</strong></li>
+</ul>

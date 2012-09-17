@@ -1,0 +1,5 @@
+Suppose I have the following CSS rule in my HTML.
+body { font-family:Calibri,Trebuchet MS,Helvetica,sans-serif; }
+How can I detect which one of the defined fonts was used in the user's browser?
+Edit for people wondering why I want to do this: The font I am detecting contains glyphs not available in other fonts and when the user does not have it I want to display a link asking the user to download that font so they can use my web application.
+Currently I am displaying the download font link for all users, now I can only display it for people who do not have the correct font installed.

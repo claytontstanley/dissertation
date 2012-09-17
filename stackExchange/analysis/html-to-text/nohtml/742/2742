@@ -1,0 +1,4 @@
+I'm interested in looking at Erlang and want to follow the path of least resistance in getting up and running.
+At present, I'm planning on installing Erlang R12B-3 and Erlide ( Eclipse plugin). This is largely a Google-result-based decision. Initially this will be on a Windows XP system, though I am likely to reproduce the environment on Ubuntu shortly after.
+Is there a significantly better choice? Even if it is tied to one platform.
+Please share your experiences.

@@ -1,0 +1,3 @@
+<p>I've played with CVS a little bit and am not the most familiar with all of its capabilities, but a huge annoyance for me is trying to add new directories that contain more directories in them. Running "<code>cvs add</code>" only adds the contents of the current directory, and using "<code>cvs import</code>" didn't look like the right thing either since it's still all code I'm producing (this howto claimed import is for <a href="http://www.thathost.com/wincvs-howto/cvsdoc/cvs_16.html#SEC136" rel="nofollow">3rd party sources</a>)</p>
+
+<p>Do you guys know any way to recursively add everything in a given directory to the current CVS project (or if SVN or git makes this notably easier)?</p>

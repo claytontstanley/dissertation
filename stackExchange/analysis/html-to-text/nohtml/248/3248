@@ -1,0 +1,4 @@
+Were defining a C# module to outsource (I dont like it either ...)
+maintaining and evolving it will be done inhouse.
+Is there any good way to define and autocheck the in-code documentation quality ?
+thanks.

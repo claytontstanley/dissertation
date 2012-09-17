@@ -1,0 +1,4 @@
+Over the past few years I've changed from having a long flowing page of controls that I hid/showed to using a lot of user controls. I've always had a bit of a discussion between co-workers on best practices.
+Should you have properties that you populate, or use paramterized sub's to load the information in your controls?
+Part of my fear of using paramteter's is the fact that I cannot make sure that everything will be populated.
+What is the basic rule's for using interfaces? I've never created one. And should I try this, or stay with a "sub load"?

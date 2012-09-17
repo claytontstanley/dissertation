@@ -1,0 +1,30 @@
+Howdy,
+I need to set the height of every textbox on my form, some of which are nested within other controls.  I thought I could do something like this:
+private static IEnumerator<TextBox> FindTextBoxes(Control rootControl)
+{
+foreach (Control control in rootControl.Controls)
+{
+if (control.Controls.Count > 0)
+{
+// Recursively search for any TextBoxes within each child control
+foreach (TextBox textBox in FindTextBoxes(control))
+{
+yield return textBox;
+}
+}
+TextBox textBox2 = control as TextBox;
+if (textBox2 != null)
+{
+yield return textBox2;
+}
+}
+}
+Using it like this:
+foreach(TextBox textBox in FindTextBoxes(this))
+{
+textBox.Height = height;
+}
+But of course the compiler spits its dummy, because foreach expects an IEnumerable rather than an IEnumerator.
+Is there a way to do this without having to create a separate class with a GetEnumerator() method?
+Am I mad?
+Anthony

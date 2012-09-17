@@ -1,0 +1,7 @@
+<p>I need to programmatically solve a system of linear equations in C, Objective C, or (if needed) C++.</p>
+
+<p>Here's an example of the equations:</p>
+
+<pre><code>-44.3940 = a * 50.0 + b * 37.0 + tx<br>-45.3049 = a * 43.0 + b * 39.0 + tx<br>-44.9594 = a * 52.0 + b * 41.0 + tx<br></code></pre>
+
+<p>From this, I'd like to get the best approximation for a, b, and tx.</p>

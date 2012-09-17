@@ -1,0 +1,5 @@
+<p>I'm wondering if there's a way to do what I can do below with Python, in Ruby:</p>
+
+<pre><code>sum = reduce(lambda x, y: x + y, map(lambda x, y: x * y, weights, data))<br></code></pre>
+
+<p>I have two arrays of equal sizes with the weights and data but I can't seem to find a function similar to map in Ruby, reduce I have working.</p>

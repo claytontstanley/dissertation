@@ -1,0 +1,14 @@
+Before reading anything else, please take time to read the original thread.
+A quick simple overview:  A .xfdl file is a is a gzipped .xml file which has then been encoded in base64.  I wish to de-encode the .xfdl into xml which I can then modify and then re-encode back into a .xfdl file.
+xfdl > xml.gz > xml > xml.gz > xfdl
+I have been able to take a .xfdl file and de-encode it from base64 using uudeview:
+uudeview -i yourform.xfdl
+Then decommpressed it using gunzip
+gunzip -S "" < UNKNOWN.001 > yourform-unpacked.xml
+The xml produced is 100% readable and looks wonderful.  Without modifying the xml then, i should be able to re-compress it using gzip:
+gzip yourform-unpacked.xml
+Then re-encoded in base-64:
+base64 -e yourform-unpacked.xml.gz yourform_reencoded.xfdl
+If my thinking is correct, the original file and the re-encoded file should be equal.  If I put yourform.xfdl and yourform_reencoded.xfdl into beyond compare, however, they do not match up.  Also, the original file can be viewed in an .xfdl viewer.  The viewer says that the re-encoded xfdl is unreadable.
+I have also tried uuenview to re-encode in base64, it also produces the same results. Any help would be appreciated.
+If you want to try it, Click Here to download a sample .xfdl file.

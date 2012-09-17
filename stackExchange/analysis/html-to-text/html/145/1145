@@ -1,0 +1,15 @@
+<p>I've tried to write a string replace function in C, which works on a char * which has been allocated using malloc().  It's a little different in that it will find and replace strings, rather than characters in the starting string.</p>
+
+<p>It's trivial to do if the search and replace strings are the same length (or the replace string is shorter than the search string), since I have enough space allocated.  If I try to use realloc(), I get an error that tells me I am doing a double free - which I don't see how I am, since I am only using realloc().</p>
+
+<p>Perhaps a little code will help:</p>
+
+<pre><code>void strrep(char *input, char *search, char *replace) {<br>    int searchLen = strlen(search);<br>    int replaceLen = strlen(replace);<br>    int delta = replaceLen - searchLen;<br>    char *find = input;<br>    while (find = strstr(find, search)) {<br>        if (delta > 0) {<br>            realloc(input, strlen(input) + delta);<br>            find = strstr(input, search);            <br>        }<br>        memmove(find + replaceLen, find + searchLen, strlen(input) - (find - input));<br>        memmove(find, replace, replaceLen);<br>    }<br>}<br></code></pre>
+
+<p>The program works, until I try to realloc() in an instance where the replaced string will be longer than the initial string.  (It still kind of works, it just spits out errors as well as the result).</p>
+
+<p>If it helps, the calling code looks liks:</p>
+
+<pre><code>#include &lt;stdio.h><br>#include &lt;string.h><br>#include &lt;stdlib.h><br><br>void strrep(char *input, char *search, char *replace);<br><br>int main(void) {<br>    char *input = malloc(81);<br>    while ((fgets(input, 81, stdin)) != NULL) {<br>        strrep(input, "Noel", "Christmas");<br>    }<br>}<br></code></pre>
+
+<p>[Edit: I'm not seeing any HTML-escaped chars.]</p>

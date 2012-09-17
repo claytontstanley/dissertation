@@ -1,0 +1,6 @@
+<p>Hi,</p>
+
+<p>I have an asp.net page with an asp:button that is not visible. I cant turn it visible with javascript because its not rendered to the page. What are my alternatives to solve this? </p>
+
+<p>Thanks in advance,
+Artur</p>

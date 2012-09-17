@@ -1,0 +1,42 @@
+My Goal
+I would like to have a main processing thread (non GUI), and be able to spin off GUIs in their own background threads as needed, and having my main non GUI thread keep working. Put another way, I want my main non GUI-thread to be the owner of the GUI-thread and not vice versa. I'm not sure this is even possible with Windows Forms(?)
+(Sorry for the big post here. I've had complaints about previous shorter versions of this question just isn't comprehensible. I'm a lousy writer)
+Background
+I have a component based system in which a controller dynamically load assemblies and instantiates and run classes implementing a common IComponent interface with a single method DoStuff() .
+Which components that gets loaded is configured via a xml configuration file and by adding new assemblies containing different implementations of IComponent . The components provides utility functions to the main application. While the main program is doing it's thing, e.g. controlling a nuclear plant, the components might be performing utility tasks (in their own threads), e.g. cleaning the database, sending emails, printing funny jokes on the printer, what have you. What I would like, is to have one of these components be able to display a GUI, e.g. with status information for the said email sending component.
+The lifetime of the complete system looks like this
+Application starts.
+Check configuration file for components to load. Load them.
+For each component, run DoStuff() to initialize it and make it live its own life in their own threads.
+Continue to do main application-thingy king of work, forever.
+I have not yet been able to successfully perform point 3 if the component fires up a GUI in DoStuff() . It simply just halts until the GUI is closed. And not until the GUI is closed does the program progress to point 4.
+It would be great if these components were allowed to start up their own Windows Forms GUIs.
+Problem
+When a component tries to fire up a GUI in DoStuff() (the exact line of code is when the component runs Application.Run(theForm)) , the component and hence our system "hangs" at the Application.Run() line until the GUI is closed. Well, the just fired up GUI works fine, as expected.
+Example of components. One hasn't nothing to do with GUI, whilst the second fires up a cute windows with pink fluffy bunnies in them.
+public class MyComponent1: IComponent
+{
+public string DoStuff(...) { // write something to the database  }
+}
+public class MyComponent2: IComponent
+public void DoStuff()
+{
+Application.EnableVisualStyles();
+Application.SetCompatibleTextRenderingDefault(false);
+Application.Run(new Form());
+// I want the thread to immediately return after the GUI
+// is fired up, so that my main thread can continue to work.
+}
+}
+I have tried this with no luck. Even when I try to fire up the GUI in it's own thread, the execution halts until the GUI as closed.
+public void DoStuff()
+{
+new Thread(ThreadedInitialize).Start()
+}
+private void ThreadedInitialize()
+{
+Application.EnableVisualStyles();
+Application.SetCompatibleTextRenderingDefault(false);
+Application.Run(new Form());
+}
+Is it possible to spin off a GUI and return after Application.Run()?

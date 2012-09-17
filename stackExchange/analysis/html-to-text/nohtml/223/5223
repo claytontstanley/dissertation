@@ -1,0 +1,4 @@
+If I have a javascript associative array say:
+var myArray = new Object(); myArray["firstname"] = "Gareth"; myArray["lastname"] = "Simpson"; myArray["age"] = 21;
+Is there a built in or accepted best practice way to get the length of this array?
+EDIT: JavaScript does not have associative arrays -- it only has objects.

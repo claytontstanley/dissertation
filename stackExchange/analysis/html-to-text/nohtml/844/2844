@@ -1,0 +1,10 @@
+#include <stdio.h>
+int main() {
+unsigned long long int num = 285212672; //FYI: fits in 29 bits
+int normalInt = 5;
+printf("My number is %d bytes wide and its value is %ul. A normal number is %d.\n", sizeof(num), num, normalInt);
+return 0;
+}
+Output:
+My number is 8 bytes wide and its value is 285212672l. A normal number is 0.
+I assume this unexpected result is from printing the unsigned long long int. How do you printf an unsigned long long int?

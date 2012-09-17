@@ -1,0 +1,2 @@
+Is CompileAssemblyFromDom faster than CompileAssemblyFromSource?
+It should be as it presumably bypasses the compiler front-end.

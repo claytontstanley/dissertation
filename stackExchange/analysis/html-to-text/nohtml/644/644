@@ -1,0 +1,4 @@
+I have a database table and one of the fields (not primary key) is having unique index on it. Now I want to swap values under this column for two rows. How could this be done? Two hack I know are:
+Delete both rows and re-insert them
+Update rows with some other value and swap and then update to actual value.
+But I don't want to go for these as they do not seem to be the appropriate solution to the problem. Could anyone help me out?

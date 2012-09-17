@@ -1,0 +1,22 @@
+<p>I've opened an old workspace that is a libray and its test harness. It used to work fine but now doesn't and older versions of the code don't work either with the same errors. I've tried recreating the project and that causes the same errors too. Nothing seems out of order in project settings and the code generated works in the main app.</p>
+
+<p>I've stripped out most of the files and got it down to the bare minimum to generate the error. Unfortunately I can't post the project as this is used in production code.</p>
+
+<p>The LNK2001 linker error I get usually means I've left off a library or forgot to implement a virtual function. However this is part of the standard template library - and is a header at that.</p>
+
+<p>The code that is listed as having the problem in IOCompletionPort.obj doesn't actually use std::string directly, but does call a class that does: Comms::Exception accepts a std::string and the value of GetLastError or WSAGetLastError.</p>
+
+<p>The function mentioned in the error (GetMessage) is implemented, but is a virtual function so other classes can override it if need be. However it appears that the compiler has made it as an Ansi version, but I can't find any options in the settings that would control that. I suspect that might be the problem but since there's very little in the way of options for the library I have no way of knowing for sure. However both projects to specify _MBCS in the compiler options.</p>
+
+<pre>--------------------Configuration: TestComms - Win32 Debug--------------------
+Linking... 
+Comms.lib(IOCompletionPort.obj) : error LNK2001: unresolved external symbol "public: virtual class std::basic_string,class std::allocator > __thiscall Comms::Exception::GetMessageA(void)const " (?GetMessageA@
+Exception@Comms@@UBE?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@XZ) 
+Debug/TestComms.exe : fatal error LNK1120: 1 unresolved externals 
+Error executing link.exe.
+
+TestComms.exe - 2 error(s), 0 warning(s)</pre>
+
+<p>Any suggestions? I've lost most of the morning to this and don't want to lose most of the afternoon too.</p>
+
+<p>Thanks, G.</p>

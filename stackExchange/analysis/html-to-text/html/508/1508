@@ -1,0 +1,5 @@
+<p>My office has a central Source Safe 2005 install that we use for source control. I can't change what the office uses on the server. </p>
+
+<p>I develop on a laptop and would like to have a different local source control repository that can sync with the central server (when available) regardless of the what that central provider is. The reason for the request is so I can maintain a local stable branch/build for client presentations while continuing to develop without having to jump through flaming hoops. Also, as a consultant, my clients may request that I use their source control provider and flexibility here would make life easier.</p>
+
+<p>Can any of the existing distributed source control clients handle that?</p>

@@ -1,0 +1,1 @@
+I'm creating a web application on Google App Engine for fun and I'd like to include graphs so users can see some stats. Are there any free (either as in beer or speech) JavaScript libraries that can take a table or make some AJAX call and display a graph?

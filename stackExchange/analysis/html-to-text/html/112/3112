@@ -1,0 +1,9 @@
+<p>I have a perl variable <code>$results</code> that gets returned from a service.  The value is supposed to be an array, and <code>$results</code> should be an array reference.  However, when the array has only one item in it, <code>$results</code> will be set to that value, and not a referenced array that contains that one item.</p>
+
+<p>I want to do a <code>foreach</code> loop on the expected array.  Without checking <code>ref($results) eq 'ARRAY'</code>, is there any way to have something equivalent to the following:</p>
+
+<pre><code>foreach my $result (@$results) {<br>    # Process $result<br>}<br></code></pre>
+
+<p>That particular code sample will work for the reference, but will complain for the simple scalar.</p>
+
+<p>EDIT: I should clarify that there is no way for me to change what is returned from the service.  The problem is that the value will be a scalar when there is only one value and it will be an array reference when there is more than one value.</p>

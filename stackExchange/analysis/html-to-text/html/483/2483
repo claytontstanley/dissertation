@@ -1,0 +1,5 @@
+<p>What is actually the difference between these two casts?</p>
+
+<pre><code>SomeClass sc = (SomeClass)SomeObject;<br>SomeClass sc2 = SomeObject as SomeClass;<br></code></pre>
+
+<p>Normally, they should both be explicit casts to the specified type?</p>

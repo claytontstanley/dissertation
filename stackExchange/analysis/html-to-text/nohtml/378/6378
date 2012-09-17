@@ -1,0 +1,8 @@
+http://en.wikipedia.org/wiki/ICalendar
+I'm working to implement an export feature for events. The link above lists tons of clients that support the ICalendar standard, but the "three big ones" I can see are Apple's iCal, Microsoft's Outlook, and Google's Gmail.
+I'm starting to get the feeling that each of these client implement different parts of the "standard", and I'm unsure of what pieces of information we should be trying to export from the application so that someone can put it on their calendar (especially around recurrence).
+For example, from what I understand Outlook doesn't support hourly recurrence.
+Could any of you provide guidance of the "happy medium" here from a features implementation standpoint?
+Secondary question, if we decide to cut features from the export (such as hourly recurrence) because it isn't supported in Outlook, should we support it in the application as well? (it is a general purpose event scheduling application, with no business specific use in mind...so we really are looking for the happy medium).
+Thanks,
+Ian

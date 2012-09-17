@@ -1,0 +1,3 @@
+When you data bind in C#, the thread that changes the data causes the control to change too. But if this thread is not the one on which the control was created, you'll get the above exception.
+I surfed the net and found no good answer.
+Anyone?

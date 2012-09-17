@@ -1,0 +1,38 @@
+<p>I often encounter the following scenario where I need to offer many different types of permissions. I primarily use ASP.NET / VB.NET with SQL Server 2000.</p>
+
+<p><strong>Scenario</strong></p>
+
+<p>I want to offer a dynamic permission system that can work on different parameters. Let's say that I want to give either a department or just a specific person access to an application. And pretend that we have a number of applications that keeps growing.</p>
+
+<p>In the past, I have chosen one of the following two ways that I know to do this.</p>
+
+<ol>
+<li><p>Use a single permission table with special columns that are used for determining a how to apply the parameters. The special columns in this example are TypeID and TypeAuxID. The SQL would look something like this. </p>
+
+<blockquote>
+  <p>SELECT COUNT(PermissionID) 
+  FROM application_permissions 
+  WHERE 
+  (TypeID = 1 AND TypeAuxID = @UserID) OR 
+  (TypeID = 2 AND TypeAuxID = @DepartmentID)
+  AND ApplicationID = 1</p>
+</blockquote></li>
+<li><p>Use a mapping table for each type of permission, then joining them all together.</p>
+
+<blockquote>
+  <p>SELECT COUNT(perm.PermissionID) 
+  FROM application_permissions perm
+  LEFT JOIN application_UserPermissions emp ON perm.ApplicationID = emp.ApplicationID
+  LEFT JOIN application_DepartmentPermissions dept ON perm.ApplicationID = dept.ApplicationID
+  WHERE q.SectionID=@SectionID 
+  AND (emp.UserID=@UserID OR dept.DeptID=@DeptID OR (emp.UserID IS NULL AND dept.DeptID IS NULL)) 
+  AND ApplicationID = 1
+  ORDER BY q.QID ASC</p>
+</blockquote></li>
+</ol>
+
+<p><strong>My Thoughts</strong></p>
+
+<p>I hope that the examples make sense. I cobbled them together.</p>
+
+<p>The first example requires less work, but neither of them feel like the best answer. Is there a better way to handle this?</p>

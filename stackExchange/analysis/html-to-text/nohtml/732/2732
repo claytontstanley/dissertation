@@ -1,0 +1,15 @@
+Can anyone explain this behavior? Running:
+#!/bin/sh
+echo "hello world" | read var1 var2
+echo $var1
+echo $var2
+results in nothing being ouput, while:
+#!/bin/sh
+echo "hello world" > test.file
+read var1 var2 < test.file
+echo $var1
+echo $var2
+produces the expected output:
+hello
+world
+Shouldn't the pipe do in one step what the redirection to test.file did in the second example?  I tried the same code with both the dash and bash shells and got the same behavior from both of them.

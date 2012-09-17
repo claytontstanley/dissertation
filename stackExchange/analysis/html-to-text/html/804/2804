@@ -1,0 +1,7 @@
+<p>I have an application that displays an image inside of a WinForms PictureBox control.  The SizeMode of the control is set to Zoom so that the image contained in the picture box will be displayed in an aspect-correct way regardless of the dimensions of the PictureBox.</p>
+
+<p>This is great for the visual appearance of the application because you can size the window however you want and the image will always be displayed using its best fit.  Unfortunately, I also need to handle mouse click events on the picture box and need to be able to translate from screen-space coordinates to image-space coordinates.</p>
+
+<p>It looks like it's easy to translate from screen space to control space, but I don't see any obvious way to translate from control space to image space (i.e. the pixel coordinate in the source image that has been scaled in the picture box).</p>
+
+<p>Is there an easy way to do this, or should I just duplicate the scaling math that they're using internally to position the image and do the translation myself?</p>

@@ -1,0 +1,9 @@
+Typical way of creating a CSV string (pseudocode):
+create a CSV container object (like a StringBuilder in C#)
+Loop through the strings you want to add appending a comma after each one
+After the loop, remove that last superfluous comma.
+Code sample:
+public string ReturnAsCSV(ContactList contactList)     {         StringBuilder sb = new StringBuilder();         foreach (Contact c in contactList)         {             sb.Append(c.Name + ",");         }         sb.Remove(sb.Length - 1, 1);         //sb.Replace(",", "", sb.Length - 1, 1)          return sb.ToString();     }
+I feel that there should be an easier / cleaner / more efficient way of removing that last comma. Any ideas?
+Update
+I like the idea of adding the comma by checking if the container is empty, but doesn't that mean more processing as it needs to check the length of the string on each occurrence?

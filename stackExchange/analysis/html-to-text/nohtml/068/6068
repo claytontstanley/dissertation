@@ -1,0 +1,3 @@
+I'm looking for good suggestions on how to implement version and source control for web projects.
+I've looked into subversion, but it seems to only take care of code.  I'm really looking for something that can do good version-ing, branching, archival, etc. with not only source code, but other web assets like art files, movie clips, and even database backups.
+We work in a mixed mac/pc environment, so Visual Source Safe or anything purely PC based would be a no go.  Any help?

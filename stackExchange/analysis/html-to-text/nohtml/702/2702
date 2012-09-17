@@ -1,0 +1,3 @@
+I know I need to have (although I don't know why) an Order By clause on the end of a SQL query that uses any aggregate functions like count, sum, avg, etc:
+select count(userID), userName from users group by userName
+When else would GROUP BY be useful, and what are the performance ramifications?

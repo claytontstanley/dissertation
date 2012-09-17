@@ -1,0 +1,9 @@
+<p>Is it possible to undo the changes caused by the following:</p>
+
+<pre><code>git reset --hard HEAD~1<br></code></pre>
+
+<p>?</p>
+
+<p>If so, how?</p>
+
+<p>Thanks.</p>

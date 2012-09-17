@@ -1,0 +1,12 @@
+How do you express an integer as a binary number with Python literals?
+I was easily able to find the answer for hex:
+>>> 0x12AF     4783 >>> 0x100     256
+and, octal:
+>>> 01267     695 >>> 0100     64
+How do you use literals to express binary in Python?
+Summary of Answers
+Python 2.5 and earlier: can express binary using int('01010101111',2) but not with a literal.
+Python 2.5 and earlier: there is no way to express binary literals.
+Python 2.6 beta: You can do like so: 0b1100111 or 0B1100111.
+Python 2.6 beta: will also allow 0o27 or 0O27 (second character is the letter O) to represent an octal.
+Python 3.0 beta: Same as 2.6, but will no longer allow the older 027 syntax for octals.

@@ -1,0 +1,9 @@
+I have come across the following type of code many a times, and I wonder if this is a good practice (from Performance perspective) or not:
+try {     ... // some code } catch (Exception ex) {     ... // Do something     throw new CustomException(ex); }
+Basically, what the coder is doing is that they are encompassing the exception in a custom exception and throwing that again.
+How does this differ in Performance from the following two:
+try {     ... // some code } catch (Exception ex) {     .. // Do something     throw ex; }
+or
+try {     ... // some code } catch (Exception ex) {     .. // Do something     throw; }
+Putting aside any functional or coding best practice arguments, is there any performance difference between the 3 approaches?
+Thanks.

@@ -1,0 +1,3 @@
+What's the best way to get the contents of the mixed "body" element in the code below?  The element might contain either XHTML or text, but I just want its contents in string form.  The XmlElement type has the InnerXml property which is exactly what I'm after.
+The code as written almost does what I want, but includes the surrounding <body>...</body> element, which I don't want.
+XDocument doc = XDocument.Load(new StreamReader(s)); var templates = from t in doc.Descendants("template")                 where t.Attribute("name").Value == templateName                 select new                 {                    Subject = t.Element("subject").Value,                    Body = t.Element("body").ToString()                 };

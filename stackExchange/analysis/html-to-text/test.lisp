@@ -13,7 +13,7 @@
   (defun write-html (csv)
     (incf cnt)
     (format  t "converting line ~a~%" cnt)
-    (destructuring-bind (posts-id body) csv
+    (destructuring-bind (posts-id body tags title) csv
       (when (not (= cnt 1))
         (let ((out-file (format nil "~a/~a/~a" "html" (get-dir posts-id) posts-id)))
           (with-open-file (strm out-file :direction :output :if-exists :supersede :if-does-not-exist :create)
@@ -31,7 +31,7 @@
   (defun write-csv (csv)
     (incf cnt)
     (format  t "converting line ~a~%" cnt)
-    (destructuring-bind (posts-id body) csv
+    (destructuring-bind (posts-id body tags title) csv
       (declare (ignore body))
       (let ((out-file "out.csv"))
         (with-open-file (strm out-file :direction :output :if-exists (if (= cnt 1) :supersede :append) :if-does-not-exist :create)

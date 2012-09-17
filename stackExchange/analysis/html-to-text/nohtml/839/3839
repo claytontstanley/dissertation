@@ -1,0 +1,7 @@
+I'm trying out the following query:
+SELECT A,B,C FROM table WHERE field LIKE 'query%' UNION SELECT A,B,C FROM table WHERE field LIKE '%query' UNION SELECT A,B,C FROM table WHERE field LIKE '%query%' GROUP BY B ORDER BY B ASC LIMIT 5
+That's three queries stuck together, kindasorta. However, the result set that comes back reflects results from query #3 BEFORE results from query #1 (undesired).
+Is there any way to prioritize these so that results come as all for query #1, then all for query #2 then all for query #3? I don't want to do this in PHP just yet (not to mention having to control for results that showed up in the first query not to show in the second and so forth).
+Cheers,
+edit: many thanks to all! the solution turned out to be a mix of all answers. worked beautifully!.
+/mp

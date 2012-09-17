@@ -1,0 +1,3 @@
+<p>Is there any way to use inheritance in database (Specifically in SQL Server 2005)?</p>
+
+<p>Suppose I have few field like <strong>CreatedOn</strong>, <strong>CreatedBy</strong> which I want to add on all of my entities. I looking for an alternative way instead of adding these fields to every table.</p>

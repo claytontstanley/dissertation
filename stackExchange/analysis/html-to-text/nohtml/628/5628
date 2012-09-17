@@ -1,0 +1,4 @@
+I want some links to include a fragment identifier. Like some of the URLs on this site:
+http://stackoverflow.com/questions/5619/ie6-ssl-ajax-post-form-404-error #5626
+Is there a way to do this with any of the builtin methods in MVC? Or would I have to roll my own HTML helpers?
+Thanks

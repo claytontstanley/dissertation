@@ -1,0 +1,1 @@
+<p>If I have managed to locate and verify the existence of a file using Server.MapPath and I now want to send the user directly to that file, what is the <strong>fastest</strong> way to convert that absolute path back into a relative web path?</p>

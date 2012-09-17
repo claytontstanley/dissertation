@@ -1,0 +1,5 @@
+There are two popular closure styles in javascript. The first I call anonymous constructor:
+new function() {    var code... }
+and the inline executed function:
+(function() {   var code... })();
+are there differences in behaviour between those two? Is one "better" over the other?

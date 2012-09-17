@@ -1,0 +1,58 @@
+<p><strong>Original Question</strong></p>
+
+<p>I am currently engaged in teaching my brother to program.  He is a total beginner, but very smart. (And he actually wants to learn).  I've noticed that some of our sessions have gotten bogged down in minor details, and I don't feel I've been very organized. (<em>But the answers to this post have helped a lot.</em>)</p>
+
+<p>What can I do better to teach him effectively?  Is there a logical order that I can use to run through concept by concept?  Are there complexities I should avoid till later?</p>
+
+<p>The language we are working with is <a href="http://www.python.org" rel="nofollow">Python</a>, but advice in any language is welcome.</p>
+
+<hr>
+
+<p><strong>How to Help</strong></p>
+
+<p>If you have good ones please add the following in your answer:</p>
+
+<ul>
+<li>Beginner Exercises and Project Ideas</li>
+<li>Resources for teaching beginners</li>
+<li>Screencasts / blog posts / free e-books</li>
+<li>Print books that are good for beginners</li>
+</ul>
+
+<p>Please describe the resource <em>with a link to it</em> so I can take a look.  I want everyone to know that I have definitely been using some of these ideas.  Your submissions will be aggregated in this post.</p>
+
+<hr>
+
+<p><strong>Online Resources</strong> for teaching beginners:</p>
+
+<ul>
+<li><a href="http://ocw.mit.edu/OcwWeb/Electrical-Engineering-and-Computer-Science/6-189January--IAP--2008/CourseHome/" rel="nofollow">A Gentle Introduction to Programming Using Python</a></li>
+<li><a href="http://openbookproject.net/thinkcs/python/english2e/index.html" rel="nofollow">How to Think Like a Computer Scientist</a></li>
+<li><a href="http://www.alice.org/" rel="nofollow">Alice: a 3d program for beginners</a></li>
+<li><a href="http://scratch.mit.edu/" rel="nofollow">Scratch (A system to develop programming skills)</a></li>
+<li><a href="http://www.htdp.org/" rel="nofollow">How To Design Programs</a></li>
+<li><a href="http://mitpress.mit.edu/sicp/full-text/book/book.html" rel="nofollow">Structure and Interpretation of Computer Programs</a></li>
+<li><a href="http://pine.fm/LearnToProgram/" rel="nofollow">Learn To Program</a></li>
+<li><a href="http://samizdat.mines.edu/howto/HowToBeAProgrammer.html" rel="nofollow">Robert Read's How To Be a Programmer</a></li>
+<li><a href="http://creators.xna.com/" rel="nofollow">Microsoft XNA</a></li>
+<li><a href="http://vodpod.com/watch/914464-inspirational-oscon-keynote" rel="nofollow">Spawning the Next Generation of Hackers</a></li>
+<li><a href="http://deimos3.apple.com/WebObjects/Core.woa/Browse/unsw.edu.au.1504975442.01504975444" rel="nofollow"><em>COMP1917 Higher Computing</em> lectures by Richard Buckland</a> (requires iTunes)</li>
+<li><a href="http://diveintopython.org/" rel="nofollow">Dive into Python</a></li>
+<li><a href="http://en.wikibooks.org/wiki/Programming%3aPython" rel="nofollow">Python Wikibook</a></li>
+<li><a href="http://projecteuler.net/" rel="nofollow">Project Euler</a> - sample problems (mostly mathematical)</li>
+<li><a href="http://www.pygame.org/" rel="nofollow">pygame</a> - an easy python library for creating games</li>
+<li><a href="http://pythonbook.coffeeghost.net/book1/IYOCGwP_book1.pdf" rel="nofollow">Create Your Own Games With Python ebook</a></li>
+<li><a href="http://codebetter.com/blogs/karlseguin/archive/2008/06/24/foundations-of-programming-ebook.aspx" rel="nofollow">Foundations of Programming</a> for a next step beyond basics.</li>
+<li><a href="http://www.iam.unibe.ch/~scg/SBE/" rel="nofollow">Squeak by Example</a> </li>
+<li><a href="http://www.briggs.net.nz/log/writing/snake-wrangling-for-kids/" rel="nofollow">Snake Wrangling For Kids</a> (It's not just for kids!)</li>
+</ul>
+
+<hr>
+
+<p><strong>Recommended Print Books</strong> for teaching beginners</p>
+
+<ul>
+<li><a href="http://www.acceleratedcpp.com/" rel="nofollow">Accelerated C++</a></li>
+<li><a href="http://rads.stackoverflow.com/amzn/click/1598631128" rel="nofollow">Python Programming for the Absolute Beginner</a></li>
+<li><a href="http://rads.stackoverflow.com/amzn/click/0735611319" rel="nofollow">Code by Charles Petzold</a></li>
+</ul>

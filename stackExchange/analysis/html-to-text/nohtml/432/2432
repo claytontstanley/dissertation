@@ -1,0 +1,12 @@
+Have you ever seen any of there error messages?
+-- SQL Server 2000
+Could not allocate ancillary table for view or function resolution.
+The maximum number of tables in a query (256) was exceeded.
+-- SQL Server 2005
+Too many table names in the query. The maximum allowable is 256.
+If yes, what have you done?
+Given up? Convinced the customer to simplify their demands? Denormalized the database?
+@(everyone wanting me to post the query):
+I'm not sure if I can paste 70 kilobytes of code in the answer editing window.
+Even if I can this this won't help since this 70 kilobytes of code will reference 20 or 30 views that I would also have to post since otherwise the code will be meaningless.
+I don't want to sound like I am boasting here but the problem is not in the queries. The queries are optimal (or at least almost optimal). I have spent countless hours optimizing them, looking for every single column and every single table that can be removed. Imagine a report that has 200 or 300 columns that has to be filled with a single SELECT statement (because that's how it was designed a few years ago when it was still a small report).

@@ -1,0 +1,42 @@
+<p><strong>Most recent edits in bold</strong>
+I am using the .net HttpListener class, but I'm won't be running on IIS and am not using ASP.net.  This <a href="http://www.leastprivilege.com/CommentView.aspx?guid=0c34094a-bdd4-4041-be6e-919f10fe1d31" rel="nofollow">web site</a> describes what code to actual use to implement SSL with asp.net and <a href="http://blogs.msdn.com/adarshk/archive/2004/11/10/255467.aspx" rel="nofollow">this site</a> describes how to set up the certificates (although I'm not sure if it works only for IIS or not).  </p>
+
+<p>When I the class documentation, it describes various types of authentication (basic, digest, Windows, etc.) - none of them refer to SSL.  It does say that if <a href="http://msdn.microsoft.com/en-us/library/system.net.httplistener.aspx" rel="nofollow">HTTPS is used, you will need to set a server certificate</a>.  Is this going to be a one line property setting and HttpListener figures out the rest?  </p>
+
+<p>In short, I need to know how to set up the certificates and how to modify the code to implement ssl.</p>
+
+<p>Although it doesn't occur when I'm trying to access HTTPS, I did notice an error in my System Event log - the source is "Schannel" and the content of the message is:</p>
+
+<blockquote>
+  <p>A fatal error occurred when attempting
+  to access the SSL server credential
+  private key. The error code returned
+  from the cryptographic module is
+  0x80090016.</p>
+</blockquote>
+
+<p>Edit: <br>
+<strong>Steps taken so far</strong></p>
+
+<ul>
+<li>Created a working HTTPListener in C# that works for HTTP connections (e.g. "http://localhost:8089/foldername/"</li>
+<li>Created a certificate using makecert.exe</li>
+<li>Added the certificate to be trusted using certmgr.exe</li>
+<li>Used Httpcfg.exe to listen for SSL connections on a test port (e.g. 8090)</li>
+<li>Added port 8080 to the HTTPListener via listener.Prefixes.Add(https://localhost:8090/foldername/");</li>
+<li>tested an HTTP client connection, e.g. (http://localhost:8089/foldername/") in a browser and receive correct return</li>
+<li>tested an HTTPS client connection, e.g. (http://localhost:8090/foldername/") in a browser and receive "Data Transfer Interrupted" (in Firefox)</li>
+<li>debugging in visual studio shows that the listener callback that receives the requests never gets hit when the HTTPS connection starts - I don't see any place that I could set a breakpoint to catch anything else earlier.</li>
+<li>netstat shows that listening ports are open for both HTTPS and HTTP.  the HTTPS port does go to TIME_WAIT after a connection is attempted.</li>
+<li><strong><a href="http://www.fiddlertool.com/fiddler/" rel="nofollow">Fiddler</a> and <a href="http://www.ieinspector.com/httpanalyzer/" rel="nofollow">HTTPAnalyzer</a> don't catch any of the traffic, I guess it doesn't get far enough in the process to show up in those HTTP analysis tools</strong></li>
+</ul>
+
+<p><strong>Questions</strong></p>
+
+<ul>
+<li>What could the problem be? </li>
+<li>Is there a piece of .Net code I am missing (meaning I have to do more in C# other than simply add a prefix to the listener that points to HTTPS, which is what i have done)</li>
+<li>Have a missed a configuration step somewhere? </li>
+<li>What else might I do to analyze the problem?</li>
+<li>Is the error message in the System Event log a sign of the problem?  If so how would it be fixed?</li>
+</ul>

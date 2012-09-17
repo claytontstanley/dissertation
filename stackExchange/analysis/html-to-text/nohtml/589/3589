@@ -1,0 +1,2 @@
+I need to create a backup of a SQL Server 2005 Database that's only the structure...no records, just the schema. Is there any way to do this?
+EDIT: I'm trying to create a backup file to use with old processes, so a script wouldn't work for my purposes, sorry

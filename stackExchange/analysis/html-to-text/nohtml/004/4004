@@ -1,0 +1,23 @@
+Most recent edits in bold I am using the .net HttpListener class, but I'm won't be running on IIS and am not using ASP.net.  This web site describes what code to actual use to implement SSL with asp.net and this site describes how to set up the certificates (although I'm not sure if it works only for IIS or not).
+When I the class documentation, it describes various types of authentication (basic, digest, Windows, etc.) - none of them refer to SSL.  It does say that if HTTPS is used, you will need to set a server certificate .  Is this going to be a one line property setting and HttpListener figures out the rest?
+In short, I need to know how to set up the certificates and how to modify the code to implement ssl.
+Although it doesn't occur when I'm trying to access HTTPS, I did notice an error in my System Event log - the source is "Schannel" and the content of the message is:
+A fatal error occurred when attempting   to access the SSL server credential   private key. The error code returned   from the cryptographic module is   0x80090016.
+Edit:
+Steps taken so far
+Created a working HTTPListener in C# that works for HTTP connections (e.g. "http://localhost:8089/foldername/"
+Created a certificate using makecert.exe
+Added the certificate to be trusted using certmgr.exe
+Used Httpcfg.exe to listen for SSL connections on a test port (e.g. 8090)
+Added port 8080 to the HTTPListener via listener.Prefixes.Add(https://localhost:8090/foldername/");
+tested an HTTP client connection, e.g. (http://localhost:8089/foldername/") in a browser and receive correct return
+tested an HTTPS client connection, e.g. (http://localhost:8090/foldername/") in a browser and receive "Data Transfer Interrupted" (in Firefox)
+debugging in visual studio shows that the listener callback that receives the requests never gets hit when the HTTPS connection starts - I don't see any place that I could set a breakpoint to catch anything else earlier.
+netstat shows that listening ports are open for both HTTPS and HTTP.  the HTTPS port does go to TIME_WAIT after a connection is attempted.
+Fiddler and HTTPAnalyzer don't catch any of the traffic, I guess it doesn't get far enough in the process to show up in those HTTP analysis tools
+Questions
+What could the problem be?
+Is there a piece of .Net code I am missing (meaning I have to do more in C# other than simply add a prefix to the listener that points to HTTPS, which is what i have done)
+Have a missed a configuration step somewhere?
+What else might I do to analyze the problem?
+Is the error message in the System Event log a sign of the problem?  If so how would it be fixed?

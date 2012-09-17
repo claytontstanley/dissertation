@@ -1,0 +1,5 @@
+Is it possible to undo the changes caused by the following:
+git reset --hard HEAD~1
+?
+If so, how?
+Thanks.

@@ -1,0 +1,24 @@
+<p>In C#, (and feel free to answer for other languages), what order does the runtime evaluate a logic statement?</p>
+
+<p>Example:</p>
+
+<pre><code>DataTable myDt = new DataTable();
+if (myDt != null &amp;&amp; myDt.Rows.Count &gt; 0)
+{
+    //do some stuff with myDt
+}
+</code></pre>
+
+<p>Which statement does the runtime evaluate first - </p>
+
+<pre><code>myDt != null
+</code></pre>
+
+<p>or:</p>
+
+<pre><code>myDt.Rows.Count &gt; 0
+</code></pre>
+
+<p>?</p>
+
+<p>Is there a time when the compiler would ever evaluate the statement backwards? Perhaps when an "OR" operator is involved?</p>

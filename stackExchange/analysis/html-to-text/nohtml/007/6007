@@ -1,0 +1,6 @@
+How do I make Log4net only log Info level logs? Is that even possible? Can you only set a threshold?
+This is what i have, and it logs Info and above as i would expect. Is there anything i can do to make it only log info.
+<logger name="BrokerCollection.Model.XmlDocumentCreationTask">
+<appender-ref ref="SubmissionAppender"/>
+<level value="Info" />
+</logger>

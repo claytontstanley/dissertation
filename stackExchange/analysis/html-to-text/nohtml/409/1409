@@ -1,0 +1,4 @@
+I am writing an application that downloads large files in the background. All clients are logged in locally, or through a VPN. When they are logged in locally, I do not want to throttle downloads. However, I would like to limit downloads to 10 KBps when the user is connected via VPN. I can differentiate between these users by IP Address range.
+Since this is an AIR Application, I figure I will throttle via server-side since I can do it from either the server itself (IIS 6) or the web service (asp.net / C#).
+Throttling through IIS 6 seems to work fine, but it seems like it has to be done across the entire web site. Is there anyway to do this via IP? Or will I have to rig this up in .NET?
+Thanks in advance...

@@ -1,0 +1,5 @@
+<p>So a windows exe file has access to the command string which invoked it, including its path and filename. eg. "C:\MyApp\MyApp.exe --help". </p>
+
+<p>But this is not so for a dll invoked via LoadLibrary. Does anyone know of a way for a dll to find out what its path and filename is?</p>
+
+<p>Specifically I'm interested in a Delphi solution, but I suspect that the answer would be pretty much the same for any language.</p>

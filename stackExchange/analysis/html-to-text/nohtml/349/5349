@@ -1,0 +1,1 @@
+Why is there a hardcoded chunk limit (.5 meg after compression) in memcached? Has anyone recompiled theirs to up it? I know I should not be sending big chunks like that around, but these extra heavy chunks happen for me from time to time and wreak havoc.

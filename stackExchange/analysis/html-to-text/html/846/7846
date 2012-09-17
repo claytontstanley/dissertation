@@ -1,0 +1,3 @@
+<p>I would like to use a language that I am familiar with - Java, C#, Ruby, PHP, C/C++, although examples in any language or pseudocode are more than welcome.</p>
+
+<p>What is the best way of splitting a large XML document into smaller sections that are still valid XML? For my purposes, I need to split them into roughly thirds or fourths, but for the sake of providing examples, splitting them into n components would be good.</p>

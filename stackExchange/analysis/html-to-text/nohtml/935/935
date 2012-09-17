@@ -1,0 +1,6 @@
+Attempting to insert an escape character into a table results in a warning. For example:
+create table EscapeTest (text varchar(50));  insert into EscapeTest (text) values ('This is the first part \n And this is the second');
+Produces the warning:
+WARNING:  nonstandard use of escape in a string literal
+(Using PSQL 8.2)
+Anyone know how to get around this?

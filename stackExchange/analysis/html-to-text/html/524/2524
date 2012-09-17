@@ -1,0 +1,7 @@
+<p>I get the following error pretty regularly when compiling in Visual Studio and running my web application:</p>
+
+<p>"Unable to start debugging on the web server. The web server did not respond in a timely manner.  This may be because another debugger is already attached to the web server."</p>
+
+<p>Normally this is after having debug the application once already. From the command line I run "iisreset /restart" and it fixes the problem.</p>
+
+<p>How do I prevent this from happening in the first place?</p>

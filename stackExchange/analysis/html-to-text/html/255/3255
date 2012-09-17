@@ -1,0 +1,6 @@
+<p>Most people with a degree in CS will certainly know what <a href="http://www.nist.gov/dads/HTML/bigOnotation.html" rel="nofollow">Big O stands for</a>.
+It helps us to measure how (in)efficient an algorithm really is and if you know in <a href="http://en.wikipedia.org/wiki/List_of_complexity_classes" rel="nofollow">what category the problem you are trying to solve lays in</a> you can figure out if it is still possible to squeeze out that little extra performance.<sup>1</sup></p>
+
+<p>But I'm curious, how do <em>you</em> calculate or approximate the complexity of your algorithms?</p>
+
+<p><sup>1</sup> <sub>but as they say, don't overdo it, <a href="http://en.wikipedia.org/wiki/Optimization_%28computer_science%29#When_to_optimize" rel="nofollow">premature optimization is the root of all evil</a>, and optimization without a justified cause should deserve that name as well.</sub></p>

@@ -1,0 +1,5 @@
+<p>There are a number of migration libraries for .NET.  Which one do you prefer and why?</p>
+
+<p>For those of you who haven't heard of migrations.  This is something that Ruby on Rails made popular.  It is a way to specify your database schema and version in code, and easily "migrate" between versions of your database.</p>
+
+<p>Here is an article on .NET Migration solutions <a href="http://www.flux88.com/DatabaseMigrationsForNET.aspx" rel="nofollow">http://www.flux88.com/DatabaseMigrationsForNET.aspx</a>.  I want to know what you have used and found helpful.</p>

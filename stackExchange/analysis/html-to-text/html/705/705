@@ -1,0 +1,9 @@
+<p>I was (and still am) looking for an embedded database to be used in a .net (c#) application. The caveat: The Application (or at least the database) is stored on a Network drive, but only used by 1 user at a time.</p>
+
+<p>Now, my first idea was <a href="http://www.microsoft.com/sql/editions/compact/default.mspx" rel="nofollow">SQL Server Compact edition</a>. That is really nicely integreated, but it can not run off a network.</p>
+
+<p><a href="http://www.firebirdsql.org/dotnetfirebird/" rel="nofollow">Firebird</a> seems to have the same issue, but the .net Integration seems to be not really first-class and is largely undocumented.</p>
+
+<p><a href="http://www.codegear.com/products/blackfish" rel="nofollow">Blackfish SQL</a> looks interesting, but there is no trial of the .net Version. Pricing is also OK.</p>
+
+<p>Any other suggestions of something that works well with .net <strong>and</strong> runs off a network without the need of actually installing a server software?</p>

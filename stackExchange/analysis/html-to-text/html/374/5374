@@ -1,0 +1,11 @@
+<p>I would have thought this would be an easy one to Google, but I've been unsucessful.</p>
+
+<p>I want to assign a variable the value out of an attribute (easy so far) then use that variable to select another node based on the value of that attribute.</p>
+
+<p>ex:</p>
+
+<pre><code>&lt;xsl:variable name="myId" select="@id" /&gt;<br>&lt;xsl value-of select="//Root/Some/Other/Path/Where[@id='{@myId}']/@Name /&gt;<br></code></pre>
+
+<p>That does not work.  If I replace the {@myId} with the value that is in the variable then it does find the right node, but doign it this way produces nothing.  I'm sure I'm missing something, or perhaps there is a different way to do it.</p>
+
+<p>The context is that there is related data under different top-level nodes that share the same id value so I need to get the related nodes in my template.</p>

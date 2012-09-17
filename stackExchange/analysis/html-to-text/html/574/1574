@@ -1,0 +1,5 @@
+<p>I realise purists would say "use the command-line" but this is the age of Ubuntu and since I spend most of my time behind a proxy server I find it easier to configure and use PuTTY on Windows than configure ssh with connect.c</p>
+
+<p>I also  realise PuTTY is available on Linux but it seems to use some weird GUI widget set that is rather nasty to use.</p>
+
+<p>So, is there a nice GtK front-end for ssh that I could download and use on Linux in Gnome?</p>

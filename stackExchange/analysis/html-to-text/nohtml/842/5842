@@ -1,0 +1,7 @@
+Two users wanted to share the same database, originally written in MS Access, without conflicting with one another over a single MDB file.
+I moved the tables from a simple MS Access database to MySQL using its Migration Toolkit (which works well, by the way) and set up Access to link to those tables via ODBC.
+So far, I've run into the following:
+You can't insert/update/delete rows in a table without a primary key (no surprise there).
+AutoNumber fields in MS Access must be the primary key or they'll just end up as integer columns in MySQL (natch, why wouldn't it be the PK?)
+The tables were migrated to MySQL's InnoDB table type, but the Access relationships didn't become MySQL foreign key constraints.
+Once the database is in use, can I expect any other issues? Particularly when both users are working in the same table?

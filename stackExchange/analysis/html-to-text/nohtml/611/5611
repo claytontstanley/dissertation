@@ -1,0 +1,5 @@
+I know that just using rand() is predictable, if you know what your doing, and have access to the server.
+I have a project that is HIGHLY dependent on choosing a random that is as unpredictable as possible. So I'm looking for suggestions, either other built in functions, or user functions that can generate a 'better' random number.
+I used this to do a little test:
+$i=0;     while($i<10000)      {       $rand = rand(0,100);      if(!isset($array[$rand]))       {       $array[$rand] = 1;       }      else        {       $array[$rand]++;       }      sort($array);      $i++;      }
+I found the results to be evenly distributed, and there is an odd pattern to the number of times each number is generated.

@@ -1,0 +1,5 @@
+<pre><code>&lt;!DOCTYPE html&gt;<br></code></pre>
+
+<p>It is supposed to be backwards compatible with HTML4 and XHTML. <a href="http://ejohn.org/blog/html5-doctype/" rel="nofollow">John Resig posted about some of the benefits</a>.</p>
+
+<p>As long as we don't use any of the new and not supported yet features, would there be any downside to start building sites with this doctype?</p>

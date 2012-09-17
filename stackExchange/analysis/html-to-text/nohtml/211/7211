@@ -1,0 +1,2 @@
+I currently have a relatively small (4 or 5 tables, 5000 rows) MySQL database that I would like to convert to an sqlite database.  As I'd potentially have to do this more than once, I'd be grateful if anyone could recommend any useful tools, or at least any easily-replicated method.
+(I have complete admin access to the database/machines involved.)

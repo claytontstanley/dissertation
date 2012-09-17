@@ -1,0 +1,3 @@
+<p>At work we are currently still using Junit3 to run our tests. We have been considering switching over to Junit4 for <strong>new</strong> tests being written but I have been keeping an eye on TestNG for a while now. What experiences have you all had with either Junit4 or TestNG and which seems to work better for very large numbers of tests. Having flexibility in writing tests is also important to us since our functional tests cover a wide aspect and need to be written in a variety of ways to get results.</p>
+
+<p>Old tests will not be re-written as they do their job just fine. What I would like to see in new tests though is flexibility in the way the test can be written, natural assertions, grouping, and easily distributed test executions.</p>

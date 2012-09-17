@@ -1,0 +1,5 @@
+<p>I've been using <a href="http://en.wikipedia.org/wiki/Apache_Subversion" rel="nofollow">Subversion</a> for a few years and after using <a href="http://en.wikipedia.org/wiki/Microsoft_Visual_SourceSafe" rel="nofollow">SourceSafe</a>, I just love Subversion.  Combined with <a href="http://en.wikipedia.org/wiki/TortoiseSVN" rel="nofollow">TortoiseSVN</a>, I can't really imagine how it could be any better.  </p>
+
+<p>Yet there's a growing number of developers claiming that Subversion has problems and that we should be moving to the new breed of distributed version control systems, such as <a href="http://git.or.cz/" rel="nofollow" title="Git Distributed Version Control System">Git</a>.  </p>
+
+<p>How does Git improve upon Subversion?</p>

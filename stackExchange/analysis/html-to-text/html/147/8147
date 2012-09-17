@@ -1,0 +1,37 @@
+<p>Using <a href="http://www.codeplex.com/aspnet" rel="nofollow" title="for Visual Studio 2005">preview 4</a> of <a href="http://asp.net/mvc" rel="nofollow" title="for Visual Studio 2008">ASP.NET MVC</a> 
+Code like:</p>
+
+<pre><code>&lt;%= Html.CheckBox( "myCheckBox", "Click Here", "True", false ) %&gt;
+</code></pre>
+
+<p>only outputs:</p>
+
+<pre><code>&lt;input type="checkbox"  value="True"  name="myCheckBox"  /&gt;
+</code></pre>
+
+<p>There is a <code>name</code> there for the form post back but no <code>id</code> for javascript or labels :-(</p>
+
+<p>I was hoping that changing it to:</p>
+
+<pre><code>Html.CheckBox( "myCheckBox", "Click Here", 
+               "True", false, new { id="myCheckBox" } )
+</code></pre>
+
+<p>would work - but instead I get an exception:</p>
+
+<pre><code>System.ArgumentException: An item with the same key has already been added.
+</code></pre>
+
+<p>As if there was already an id somewhere in a collection somewhere - I'm stumped!</p>
+
+<p>The full exception for anyone interested follows (hey - wouldn't it be nice to attach files in here):</p>
+
+<pre>System.ArgumentException: An item with the same key has already been added. 
+   at System.ThrowHelper.ThrowArgumentException(ExceptionResource resource)
+   at System.Collections.Generic.Dictionary`2.Insert(TKey key, TValue value, Boolean add)
+   at System.Web.Routing.RouteValueDictionary.Add(String key, Object value)
+   at System.Web.Mvc.TagBuilder2.CreateInputTag(HtmlInputType inputType, String name, RouteValueDictionary attributes)
+   at System.Web.Mvc.CheckBoxBuilder.CheckBox(String htmlName, RouteValueDictionary htmlAttributes)
+   at System.Web.Mvc.CheckBoxBuilder.CheckBox(String htmlName, String text, String value, Boolean isChecked, RouteValueDictionary htmlAttributes)
+   at System.Web.Mvc.CheckBoxExtensions.CheckBox(HtmlHelper helper, String htmlName, String text, String value, Boolean isChecked, Object htmlAttributes)
+   at ASP.views_account_termsandconditions_ascx.__Render__control1(HtmlTextWriter __w, Control parameterContainer) in c:\dev\myProject\Views\Account\Edit.ascx:line 108</pre>

@@ -1,0 +1,4 @@
+Firewall I'm behind is running Microsoft ISA server (NTLM only mode), anyone have success getting their Ruby gems to install/update via Ruby SSPI gem or other method?
+... or am I just being lazy?
+Edit: rubysspi-1.2.4 does not work
+UPDATE: This also works for "igem", part of the IronRuby project

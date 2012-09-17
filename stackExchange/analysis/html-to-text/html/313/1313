@@ -1,0 +1,8 @@
+<p><a href="http://stackoverflow.com/questions/180/function-for-creating-color-wheels" rel="nofollow">Original Question</a></p>
+
+<p>I am looking for a function that attempts to quantify how "distant" (or distinct) two colors are. This question is really in two parts: </p>
+
+<ol>
+<li>What color space best represents human vision?</li>
+<li>What distance metric in that space best represents human vision (euclidean?)</li>
+</ol>

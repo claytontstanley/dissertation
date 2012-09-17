@@ -1,0 +1,3 @@
+I have a asp.net application that we've written our own logging module for.
+My question is, where is the standard place to write a log file to? I.e. the website will be running as the anonymous user identity (e.g. IUSR on IIS7) and I need a place where I know it'll have permission to write to.
+Cheers,

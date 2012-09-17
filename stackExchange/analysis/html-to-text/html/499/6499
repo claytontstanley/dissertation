@@ -1,0 +1,9 @@
+<p>There are a few ways to get class-like behaviour in javascript, the most common seem to be prototype based like this:</p>
+
+<pre><code>function Vector(x, y, x) {<br>    this.x = x;<br>    this.y = y;<br>    this.z = z;<br>    return this;<br>}<br><br>Vector.prototype.length = function () { return Math.sqrt(this.x * this.x ... ); }<br></code></pre>
+
+<p>and closure based approaches similar to</p>
+
+<pre><code>function Vector(x, y, z) {<br>    this.length = function() { return Math.sqrt(x * x + ...); }<br>}<br></code></pre>
+
+<p>For various reasons the latter is faster, but i've seen (and i frequently do write) the prototype version and was curious as to what other people do.</p>

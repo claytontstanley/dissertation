@@ -1,0 +1,7 @@
+<p>I'm interested in looking at Erlang and want to follow the path of least resistance in getting up and running.</p>
+
+<p>At present, I'm planning on installing <a href="http://www.erlang.org/download.html" rel="nofollow">Erlang R12B-3</a> and <a href="http://erlide.sourceforge.net/" rel="nofollow">Erlide</a> (<a href="http://www.eclipse.org/" rel="nofollow">Eclipse</a> plugin). This is largely a Google-result-based decision. Initially this will be on a Windows XP system, though I am likely to reproduce the environment on Ubuntu shortly after.</p>
+
+<p>Is there a significantly better choice? Even if it is tied to one platform.</p>
+
+<p>Please share your experiences.</p>

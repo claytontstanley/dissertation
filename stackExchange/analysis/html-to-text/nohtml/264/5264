@@ -1,0 +1,2 @@
+Out of the box, in MS Reporting Services, the image element does not allow for the centering of the image itself, when the dimensions are unknown at design time. In other words, the image (if smaller than the dimensions allotted on the design surface) will be anchored to the top left corner, not in the center.
+My report will know the URL of the image at runtime, and I need to be able to center this image if it is smaller than the dimensions specified in my designer.

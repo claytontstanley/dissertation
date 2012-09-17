@@ -1,0 +1,8 @@
+First of all, congrats to Jeff, Joel and the guys for getting this thing up and running!
+OK, I've been developing a site using ASP.NET MVC, and have decided to use the new SQL Server 2008 FILESTREAM facility to store files 'within' the database rather than as separate entities. While initially working within VS2008 (using a trusted connection to the database), everything was fine and dandy. Issues arose, however, when I shifted the site to IIS7 and changed over to SQL authentication on the database.
+It seems that streaming a FILESTREAM doesn't work with SQL authentication, only with Windows authentication. Given this, what is the best practice to follow?
+Is there a way to force this wort of thing to work under SQL authentication?
+Should I add NETWORK SERVICE as a database user and then use Trusted authentication?
+Should I create another user, and run both the IIS site and the database connection under this?
+Any other suggestions?
+Thanks in advance.

@@ -1,0 +1,36 @@
+<p>Im trying to create a bookmarklet for posting del.icio.us bookmarks to a seperate account.</p>
+
+<p>I tested it from the command line like:</p>
+
+<pre><code>wget  -O - --no-check-certificate \
+"https://seconduser:thepassword@api.del.icio.us/v1/posts/add?url=http://seet.dk&amp;description=test"
+</code></pre>
+
+<p>and this works great</p>
+
+<p>I then wanted to create a bookmarklet in my firefox. I googled and found bits and pieces and ended up with:</p>
+
+<pre><code>javascript:void(
+    open('https://seconduser:password@api.del.icio.us/v1/posts/add?url='
+          +encodeURIComponent(location.href)
+          +'&amp;description='+encodeURIComponent(document.title),
+          'delicious','toolbar=no,width=500,height=250'
+        )
+    );
+</code></pre>
+
+<p>but all that happens is that i get this from del.icio.us:</p>
+
+<pre><code>&lt;?xml version="1.0" standalone="yes"?&gt;
+&lt;result code="access denied" /&gt;
+&lt;!-- fe04.api.del.ac4.yahoo.net uncompressed/chunked Thu Aug  7 02:02:54 PDT 2008 --&gt;  
+</code></pre>
+
+<p>If I then go to the address bar and presses enter, it changes to:</p>
+
+<pre><code>&lt;?xml version='1.0' standalone='yes'?&gt;
+&lt;result code="done" /&gt;
+&lt;!-- fe02.api.del.ac4.yahoo.net uncompressed/chunked Thu Aug  7 02:07:45 PDT 2008 --&gt;
+</code></pre>
+
+<p>Any ideas how to get it to work directly from the bookmarks?</p>

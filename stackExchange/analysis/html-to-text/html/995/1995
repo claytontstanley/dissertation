@@ -1,0 +1,9 @@
+<p>I have values stored as strings in a DataTable where each value could really represent an int, double, or string (they were all converted to strings during an import process from an external data source). I need to test and see what type each value really is.</p>
+
+<p>What is more efficient for the application (or is there no practical difference)?</p>
+
+<ol>
+<li>Try to convert to int (and then double). If conversion works, the return true. If an exception is thrown, return false.</li>
+<li>Regular expressions designed to match the pattern of an int or double</li>
+<li>Some other method?</li>
+</ol>

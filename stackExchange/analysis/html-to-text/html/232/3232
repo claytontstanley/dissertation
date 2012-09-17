@@ -1,0 +1,21 @@
+<p>I'm wondering how far people should take the validation of e-mail address. My field is primarily web-development, but this applies anywhere.</p>
+
+<p>I've seen a few approaches:</p>
+
+<ul>
+<li>simply checking if there is an "@" present, which is dead simply but of course not that reliable.</li>
+<li>a more complex regex test for standard e-mail formats</li>
+<li>a <a href="http://code.iamcal.com/php/rfc822/full_regexp.txt" rel="nofollow">full regex</a> against <a href="http://www.faqs.org/rfcs/rfc2822.html" rel="nofollow">RFC 2822</a> - the problem with this is that often an e-mail address might be valid but it is probably not what the user meant </li>
+<li>DNS validation</li>
+<li>SMTP validation</li>
+</ul>
+
+<p>As many people might know (but many don't), e-mail addresses can have a lot of strange variation that most people don't usually consider (see <a href="http://www.faqs.org/rfcs/rfc2822.html" rel="nofollow">RFC 2822 3.4.1</a>), but you have to think about the goals of your validation: are you simply trying to ensure that an e-mail address can be sent to an address, or that it is what the user probably meant to put in (which is unlikely in a lot of the more obscure cases of otherwise 'valid' addresses).</p>
+
+<p>An option I've considered is simply giving a warning with a more esoteric address but still allowing the request to go through, but this does add more complexity to a form and most users are likely to be confused.</p>
+
+<p>While DNS validation / SMTP validation seem like no-brainers, I foresee problems where the DNS server/SMTP server is temporarily down and a user is unable to register somewhere, or the user's SMTP server doesn't support the required features.</p>
+
+<p>How might some experienced developers out here handle this? Are there any other approaches than the ones I've listed?</p>
+
+<p>Edit: I completely forgot the most obvious of all, sending a confirmation e-mail! Thanks to answerers for pointing that one out. Yes, this one is pretty foolproof, but it does require extra hassle on the part of everyone involved. The user has to fetch some e-mail, and the developer needs to remember user data before they're even confirmed as valid. </p>

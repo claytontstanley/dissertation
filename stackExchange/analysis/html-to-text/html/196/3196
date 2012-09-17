@@ -1,0 +1,9 @@
+<p>if i have data like this:</p>
+
+<pre><code>Key Name<br>1   Dan<br>2   Tom<br>3   Jon<br>4   Tom <br>5   Sam<br>6   Dan<br></code></pre>
+
+<p>What is the sql query to bring back the records where the Name is repeated 2 or more times.</p>
+
+<p>So the result i would want is</p>
+
+<pre><code> Tom<br> Dan<br></code></pre>

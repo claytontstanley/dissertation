@@ -1,0 +1,10 @@
+<p>I'm getting for that error this help in <a href="http://www-1.ibm.com/support/docview.wss?rs=404&amp;uid=swg1PK06349" rel="nofollow">IBM's support site</a>:</p>
+
+<blockquote>
+<b>Problem</b>A JAAS LoginContext could not be created due to the unexpected exception. <br>
+<b>User response</b>The problem could be due to a configuration error. <br>
+</blockquote>
+
+<p>but I have not any other indication and can't determine the final reason for this error. </p>
+
+<p>Suggestions?</p>

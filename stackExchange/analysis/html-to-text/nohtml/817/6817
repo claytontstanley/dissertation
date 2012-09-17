@@ -1,0 +1,3 @@
+I'm working on a project were we need more performance. Over time we've continued to evolve the design to work more in parallel(both threaded and distributed). Then latest step has been to move part of it onto a new machine with 16 cores. I'm finding that we need to rethink how we do things to scale to that many cores in a shared memory model. For example the standard memory allocator isn't good enough.
+What resources would people recommend?
+So far I've found Sutter's column Dr. Dobbs to be a good start. I just got The Art of Multiprocessor Programming and The O'Reilly book on Intel Threading Building Blocks

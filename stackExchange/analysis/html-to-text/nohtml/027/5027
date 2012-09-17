@@ -1,0 +1,5 @@
+I have a fairly simple ASP.NET 2.0 menu control using a sitemap file and security trimmings. There are only 21 menu options, but the results HTML of the menu is a whopping 14k. The site is hosted on our company's intranet and must be serverd to people worldwide on limited bandwidth, so I'd like to reduce the size of the menus.
+What is the best way to do this? Does anybody have a good reference? I have the following constraints:
+The solution cannot reference any 3rd part DLL files (getting approval would be a nightmare)
+Must work with IE 6
+CSS and JavaScript are fine, as long as they work with IE 6.

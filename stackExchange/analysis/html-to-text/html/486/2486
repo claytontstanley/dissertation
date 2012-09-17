@@ -1,0 +1,11 @@
+<p>Jeff mentioned the concept of 'Progressive Enhancement' when talking about using JQuery to write stackoverflow.</p>
+
+<p>After a quick Google, I found a couple of high-level discussions about it.</p>
+
+<p>Can anyone recommend a good place to start as a programmer.</p>
+
+<p>Specifically, I have been writing web apps in PHP and would like to use YUI to improve the pages I am writing, but a lot of them seem very JavaScript based, with most of the donkey work being done using JavaScript. To me, that seems a bit overkill, since viewing the site without Javascript will probably break most of it.</p>
+
+<p>Anyone have some good places to start using this idea, I don't really care about the language.</p>
+
+<p>Ideally, I would like to see how you start creating the static HTML first, and then adding the YUI (or whatever Ajax framework) to it so that you get the benefits of a richer client?</p>

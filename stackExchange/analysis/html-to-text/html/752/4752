@@ -1,0 +1,41 @@
+<p>We've been having some issues with a SharePoint instance in a test
+environment. Thankfully this is not production ;) The problems started
+when the disk with the SQL Server databases and search index ran out
+of space. Following this, the search service would not run and search
+settings in the SSP were not accessible. Reclaiming the disk space did
+not resolve the issue. So rather than restoring the VM, we decided to
+try to fix the issue.</p>
+
+<p>We created a new SSP and changed the association of all services to
+the new SSP. The old SSP and it's databases were then deleted. Search
+results for PDF files are no longer appearing, but the search works
+fine otherwise. MySites also works OK.</p>
+
+<p>Following the implementation of this change, these problems occur:</p>
+
+<p>1) An audit failure message started appearing in the application event
+log, for 'DOMAIN\SPMOSSSvc' which is the MOSS farm account.</p>
+
+<p>Event Type: Failure Audit
+Event Source: MSSQLSERVER
+Event Category: (4)
+Event ID: 18456
+Date: 8/5/2008
+Time: 3:55:19 PM
+User: DOMAIN\SPMOSSSvc
+Computer: dastest01
+Description:
+Login failed for user 'DOMAIN\SPMOSSSvc'. [CLIENT: ]</p>
+
+<p>2) SQL Server profiler is showing queries from SharePoint that reference the old
+(deleted) SSP database.</p>
+
+<p>So...</p>
+
+<ul>
+<li>Where would these references to DOMAIN\SPMOSSSvc and the old SSP
+database exist?</li>
+<li>Is there a way to 'completely' remove the SSP from the server, and
+re-create? The option to delete was not available (greyed out) when a
+single SSP is in place.</li>
+</ul>

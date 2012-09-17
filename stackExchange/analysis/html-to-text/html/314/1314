@@ -1,0 +1,3 @@
+<p>We have been using CrusiseControl for quite a while with NUnit and NAnt.  For a recent project we decided to use the testing framework that comes with Visual Studio, which so far has been adequate.</p>
+
+<p>I'm attempting to get the solution running in Cruise Control.  I've finally got the build itself to work; however, I have been unable to get any tests to show up in the CruiseControl interface despite adding custom build tasks and components designed to do just that.  Does anyone have a definitive link out there to instructions on getting this set up?</p>

@@ -1,0 +1,2 @@
+I'm writing a few little bash scripts under Ubuntu linux. I want to be able to run them from the GUI without needing a terminal window to enter any input or view any output.
+So far the only input required is a password for sudo - and gksudo handles that fine. But I haven't found an easy way to show a message box yet. Is there some kind of 'gkmessage' command available? I'd prefer something present in a default Ubuntu install, but I don't mind installing a new package if necessary.

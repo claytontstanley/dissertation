@@ -1,0 +1,7 @@
+<p>I'm writing an app to help facilitate some research, and part of this involves doing some statistical calculations. Right now, the researchers are using a program called <a href="http://en.wikipedia.org/wiki/Spss" rel="nofollow">SPSS</a>. Part of the output that they care about looks like this:</p>
+
+<p><img src="http://img204.imageshack.us/img204/9596/spssfg1.png" alt="Part of the SPSS output" title=""></p>
+
+<p>They're really only concerned about the 'F' and 'Sig.' values. My problem is that I have no background in stats, and I can't figure out what the tests are called, or how to calculate them.</p>
+
+<p>I thought the 'F' value might be the result of the <a href="http://en.wikipedia.org/wiki/F-test#Table_on_F-test" rel="nofollow">F-test</a>, but after following the steps given on Wikipedia, I got a result that was different from what SPSS gives.</p>

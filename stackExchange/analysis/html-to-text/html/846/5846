@@ -1,0 +1,17 @@
+<p>How do I turn the following 2 queries into 1 query</p>
+
+<pre><code>$sql = "SELECT level FROM skills WHERE id = $id LIMIT 1;";
+$result  = $db-&gt;sql_query($sql);
+$level  = (int) $db-&gt;sql_fetchfield('level');
+$db-&gt;sql_freeresult($result);
+
+++$level;
+
+$sql = "UPDATE skills SET level = $level WHERE id = $id;";
+$result = $db-&gt;sql_query($sql);
+$db-&gt;sql_freeresult($result);
+</code></pre>
+
+<p>I'm using it in a phbBB mod but the gist is that I grab the level, add one to it then update, it seems that it'd be much easier and faster if I could do it as one query.</p>
+
+<p>Edit: $id has already been forced to be an integer, thus no escaping is needed this time.</p>

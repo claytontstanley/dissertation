@@ -1,0 +1,7 @@
+<p>We've got two developers on the same closed (ugh, stupid gov) network, Another developer a couple minutes drive down the road, and a fourth developer half-way across the country. E-Mail, ftp, and removal media are all possible methods of transfer for the people not on the same network.</p>
+
+<p>I am one of the two closed network developers, consider us the "master" location.</p>
+
+<p>What is the best Mercurial setup/pattern for group? What is the best way to trasmit changes to/from the remote developers? As I am in charge, I figured that I would have to keep at least one master repo with another local repo in which I can develop. Each other person should just need a clone of the master. Is this right? I guess this also makes me responsible for the merging? </p>
+
+<p>As you can see, I'm still trying to wrap my head around distributed version control. I don't think there is any other way to do this with the connectivity situation.</p>

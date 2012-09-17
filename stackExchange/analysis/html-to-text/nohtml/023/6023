@@ -1,0 +1,6 @@
+I've seen a number of places recently that offer online HTML API documentation and also offer downloadable (usually .chm) help files.
+I really love using .chm help files, mainly because of the index tree on the left.
+What are the best tools for creating those types of files?  Is there something that would allow me to have a bunch of HTML files that can be put online and also compiled into a .chm?
+edit (expanding the scope of my original question)
+All of the tools below look interesting, especially sandcastle which I'm downloading now.
+Are there any command-line tools for Linux that do this?

@@ -1,0 +1,4 @@
+We all have different needs due to the platform and/or stack we work with, and simple programmer preference is famous for starting religious wars.
+However, in each area there is usually a set of tools that get recommended over and over, even though people might individually prefer one member over the others.  Unix text mode code editors, for example, is an extremely contentious issue but no one can deny that most people will choose either vi or emacs.
+So, without criticising the alternatives, recommend me developement tools.  Text editors for different platforms, version control systems, bug trackers, database engines, templating systems... whatever!  What do you enjoy using every day?
+I'll edit together the answers as a list of highly recommended tools in each area.  Please don't start discussing which is the best ;)

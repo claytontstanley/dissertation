@@ -1,0 +1,16 @@
+<p>I am running a Tomcat application, and I need to display some time values.  Unfortunately, the time is coming up an hour off.  I looked into it and discovered that my default TimeZone is being set to:</p>
+
+<pre><code>sun.util.calendar.ZoneInfo[id="GMT-08:00",
+    offset=-28800000,dstSavings=0,useDaylight=false,
+    transitions=0,lastRule=null]
+</code></pre>
+
+<p>Rather than the Pacific time zone.  This is further indicated when I try to print the default time zone's <a href="http://java.sun.com/j2se/1.5.0/docs/api/java/util/TimeZone.html#getDisplayName()" rel="nofollow">display name</a>, and it comes up "GMT-08:00", which seems to indicate to me that it is not correctly set to the US Pacific time zone.  I am running on Ubuntu Hardy Heron, upgraded from Gutsy Gibbon.</p>
+
+<p>Is there a configuration file I can update to tell the JRE to use Pacific with all the associated daylight savings time information?  The time on my machine shows correctly, so it doesn't seem to be an OS-wide misconfiguration.</p>
+
+<hr>
+
+<p>Ok, here's an update. A coworker suggested I update JAVA_OPTS in my /etc/profile to include "-Duser.timezone=US/Pacific", which worked (I also saw CATALINA_OPTS, which I updated as well). Actually, I just exported the change into the variables rather than use the new /etc/profile (a reboot later will pick up the changes and I will be golden).</p>
+
+<p>However, I still think there is a better solution... there should be a configuration for Java somewhere that says what timezone it is using, or how it is grabbing the timezone. If someone knows such a setting, that would be awesome, but for now this is a decent workaround.</p>

@@ -1,0 +1,8 @@
+<p>Currently I know of only two ways to cache data (I use PHP but I assume that the same will apply to most languages).</p>
+
+<ol>
+<li>Save the cache to a file</li>
+<li>Save the cache to a large DB field</li>
+</ol>
+
+<p>Are there any other (perhaps better) ways of caching or is it really just this simple?</p>

@@ -1,0 +1,3 @@
+The .XFDL file extension identifies XFDL Formatted Document files. These belong to the XML-based document and template formatting standard. This format is exactly like the XML file format however, contains a level of encryption for use in secure communications.
+I know how to view XFDL files using a file viewer I found here .  I can also modify and save these files by doing File:Save/Save As.  I'd like, however, to modify these files on the fly.  Any suggestions?  Is this even possible?
+Update #1:  I have now successfully decoded and unziped a .xfdl into an XML file which I can then edit.  Now, I am looking for a way to re-encode the modified XML file back into base64-gzip (using Ruby or the command line)

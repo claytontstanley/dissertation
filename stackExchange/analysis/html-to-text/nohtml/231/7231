@@ -1,0 +1,2 @@
+Can anyone recommend software or a .NET library that will check for bounced emails and the reason for the bounce? I get bounced emails into a pop3 account that I can read then.
+I need it to keep my user database clean from invalid email addresses and want to automate this (mark user as invalid email).

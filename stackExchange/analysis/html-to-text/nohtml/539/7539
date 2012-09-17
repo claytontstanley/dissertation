@@ -1,0 +1,6 @@
+Hi,
+Recently I tried understanding the use of java.math.MathContext but failed to understand properly. Is it used for rounding in java.math.BigDecimal, if yes why does not it round the decimal digits but even mentissa part.
+From API docs, I came to know that it follows the standard specified in ANSI X3.274-1996 and ANSI X3.274-1996/AM 1-2000 specifications but I did not get them to read online.
+Please let me know if you have any idea on this.
+Thanks in advance.
+~Jatan

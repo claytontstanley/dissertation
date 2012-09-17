@@ -1,0 +1,27 @@
+<p>I've had a hard time trying to find good examples of how to manage database schemas and data between development, test, and production servers.</p>
+
+<p>Here's our setup. Each developer has a virtual machine running our app and the MySQL database. It is their personal sandbox to do whatever they want. Currently, developers will make a change to the SQL schema and do a dump of the database to a text file that they commit into SVN.</p>
+
+<p>We're wanting to deploy a continuous integration development server that will always be running the latest committed code. If we do that now, it will reload the database from SVN for each build.</p>
+
+<p>We have a test (virtual) server that runs "release candidates." Deploying to the test server is currently a very manual process, and usually involves me loading the latest SQL from SVN and tweaking it. Also, the data on the test server is inconsistent. You end up with whatever test data the last developer to commit had on his sandbox server.</p>
+
+<p>Where everything breaks down is the deployment to production. Since we can't overwrite the live data with test data, this involves manually re-creating all the schema changes. If there were a large number of schema changes or conversion scripts to manipulate the data, this can get really hairy.</p>
+
+<p>If the problem was just the schema, It'd be an easier problem, but there is "base" data in the database that is updated during development as well, such as meta-data in security and permissions tables.</p>
+
+<p>This is the biggest barrier I see in moving toward continuous integration and one-step-builds. How do <strong><em>you</em></strong> solve it?</p>
+
+<p><hr /></p>
+
+<p>A follow-up question: how do you track database versions so you know which scripts to run to upgrade a given database instance? Is a version table like Lance mentions below the standard procedure?</p>
+
+<p><hr /></p>
+
+<p>Thanks for the reference to Tarantino. I'm not in a .NET environment, but I found their <a href="http://code.google.com/p/tarantino/wiki/DatabaseChangeManagement" rel="nofollow">DataBaseChangeMangement wiki page</a> to be very helpfull. Especially this <a href="http://tarantino.googlecode.com/svn/docs/Database-Change-Management.ppt" rel="nofollow">Powerpoint Presentation (.ppt)</a></p>
+
+<p>I'm going to write a python script that checks the names of *.sql scripts in a given directory against a table in the database and runs the ones that aren't there in order based on a integer that forms the first part of the filename. If it is, as I suspect it will be, a pretty simple solution then I'll post it here.</p>
+
+<p><hr /></p>
+
+<p>I've got a working script for this. It handles initializing the DB if it doesn't exist and running upgrade scripts as necessary. There are also switches for wiping an existing database and importing test data from a file. It's about 200 lines, so I won't post it (though I might put it on pastebin if there's interest.)</p>

@@ -1,0 +1,20 @@
+<p>How are you instrumenting your UI's? In the past I've read that people have instrumented their user interfaces, but what I haven't found is examples or tips on <em>how</em> to instrument a UI.</p>
+
+<p>By instrumenting, I mean collecting data regarding usage and performance of the system. A MSDN article on Instrumentation is <a href="http://msdn.microsoft.com/en-us/library/x5952w0c.aspx" rel="nofollow" title="here">http://msdn.microsoft.com/en-us/library/x5952w0c.aspx</a>. I would like to capture which buttons users click on, what keyboard shortucts they use, what terms they use to search, etc.</p>
+
+<ul>
+<li>How are you instrumenting your UI?</li>
+<li>What format are you storing the instrumentation?</li>
+<li>How are you processing the instrumented data?</li>
+<li>How are you keeping your UI code clean with this instrumentation logic?</li>
+</ul>
+
+<p>Specifically, I am implementing my UI in WPF, so this will provide extra challenges compared to instrumenting a web-based application. (i.e. need to transfer the instrumented data back to a central location, etc). That said, I feel the technology may provide an easier implementation of instrumentation via concepts like attached properties.</p>
+
+<ul>
+<li>Have you instrumented a WPF application? Do you have any tips on how this can be achieved?</li>
+</ul>
+
+<p><hr /></p>
+
+<p>Edit: The following blog post presents an interesting solution: <a href="http://blog.pixelingene.com/?p=257" rel="nofollow">http://blog.pixelingene.com/?p=257</a></p>

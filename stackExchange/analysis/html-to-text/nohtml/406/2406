@@ -1,0 +1,2 @@
+Can you point me to a good real-world WinForms MVC application/framework?
+I understand the Model part - that's your data, and I know the forms are the views, but what's the controller? Especially if I want to use data binding.

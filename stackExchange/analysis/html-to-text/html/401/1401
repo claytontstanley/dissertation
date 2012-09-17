@@ -1,0 +1,13 @@
+<p>I have a custom validation function in JavaScript in a user control on a .Net 2.0 web site which checks to see that the fee paid is not in excess of the fee amount due. </p>
+
+<p>I've placed the validator code in the ascx file, and I have also tried using Page.ClientScript.RegisterClientScriptBlock() and in both cases the validation fires, but cannot find the JavaScript function.</p>
+
+<p>The output in Firefox's error console is "feeAmountCheck is not defined". Here is the function (this was taken directly from firefox-&gt;view source)</p>
+
+<pre><code>&lt;script type="text/javascript"&gt;<br>    function feeAmountCheck(source, arguments)<br>    {<br>        var amountDue = document.getElementById('ctl00_footerContentHolder_Fees1_FeeDue');<br>        var amountPaid = document.getElementById('ctl00_footerContentHolder_Fees1_FeePaid');<br>            if (amountDue.value &gt; 0 &amp;&amp; amountDue &gt;= amountPaid)<br>            {<br>                arguments.IsValid = true;<br>            }<br>            else<br>            {<br>                arguments.IsValid = false;<br>            }<br>          return arguments;<br><br>    }<br></code></pre>
+
+<p></p>
+
+<p>Any ideas as to why the function isn't being found? How can I remedy this without having to add the function to my master page or consuming page?</p>
+
+<p>Thanks in advance.</p>

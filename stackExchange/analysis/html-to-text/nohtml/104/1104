@@ -1,0 +1,2 @@
+Exceptions in C++ don't need to be caught (no compile time errors) by the calling function. So it's up to developer's judgment whether to catch it using try/catch (unlike in Java).
+Is there a way one can ensure that the exceptions thrown are always caught using try/catch by the calling function?

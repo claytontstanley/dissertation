@@ -1,0 +1,13 @@
+My dream IDE does full code hints, explains and completes PHP, Javascript, HTML and CSS. I know it exists!
+so far, Zend studio 6 , under the Eclipse IDE does a great job at hinting PHP, some Javascript and HTML, any way I can expand this?
+edit: a bit more information: right now, using zend-6 under eclipse, i type in
+<?php
+p //(a single letter "p")
+and I get a hint tooltip with all the available php functions that begin with "p" (phpinfo(), parse_ini_file(), parse_str(), etc...), each with its own explanation: phpinfo()->"outputs lots of PHP information", the same applies for regular HTML (no explanations however).
+However, I get nothing when I do:
+<style>
+b /* (a single letter "b") */
+I'd love it if I could get, from that "b" suggestions for "border", "bottom", etc. The same applies for Javascript.
+Any ideas?
+Thx.
+/mp

@@ -1,0 +1,9 @@
+<p>For those of us that like to use the graphical version of Vim or Emacs, instead of the console version, which version do you recommend?</p>
+
+<p>For Vim, there's <a href="http://sourceforge.net/projects/macosxvim/" rel="nofollow">Mac OS X Vim</a>, <a href="http://code.google.com/p/macvim/" rel="nofollow">MacVim</a>, <a href="http://code.google.com/p/vim-cocoa/" rel="nofollow">Vim-Cocoa</a>.</p>
+
+<p>For Emacs, <a href="http://www.apple.com/downloads/macosx/unix_open_source/carbonemacspackage.html" rel="nofollow">CarbonEmacs</a>, <a href="http://www.xemacs.org/" rel="nofollow">XEmacs</a>, and <a href="http://aquamacs.org/" rel="nofollow">Aquamacs</a>.</p>
+
+<p>Are there more? Which of these are ready for prime-time? If it's a tough call, what are the trade-offs? Are all of these still being maintained?</p>
+
+<p>No discussion of Vim vs. Emacs, if you don't mind, or comparisons with other editors.</p>

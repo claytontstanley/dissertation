@@ -1,0 +1,33 @@
+<p>I have a table with a structure like the following:</p>
+
+<pre><code>------------------------------
+LocationID     | AccountNumber
+------------------------------
+long-guid-here | 12345
+long-guid-here | 54321
+</code></pre>
+
+<p>To pass into another stored procedure, I need the XML to look like this:</p>
+
+<pre><code>&lt;root&gt;&lt;clientID&gt;12345&lt;/clientID&gt;&lt;clientID&gt;54321&lt;/clientID&gt;&lt;/root&gt;
+</code></pre>
+
+<p>The best I've been able to do so far was getting it like this:</p>
+
+<pre><code>&lt;root clientID="10705"/&gt;
+</code></pre>
+
+<p>I'm using this SQL statement:</p>
+
+<pre><code>SELECT
+1 as tag,
+null as parent,
+AccountNumber as 'root!1!clientID'
+FROM
+Location.LocationMDAccount
+WHERE
+locationid = 'long-guid-here'
+FOR XML EXPLICIT
+</code></pre>
+
+<p>So far, I've looked at the documentation on <a href="http://msdn.microsoft.com/en-us/library/ms345137.aspx" rel="nofollow">the MSDN page</a>, but I've not come out with the desired results.</p>

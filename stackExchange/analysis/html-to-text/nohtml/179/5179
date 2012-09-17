@@ -1,0 +1,3 @@
+ASP.Net server side controls postback to their own page.  This makes cases where you want to redirect a user to an external page, but need to Post to that page for some reason (for authentication, for instance) a pain.
+An HttpWebRequest works great if you don't want to redirect, and Javascript is fine in some cases, but can get tricky if you really do need the server-side code to get the data together for the post.
+So how do you both post to an external URL and redirect the user to the result from your ASP.Net codebehind code?

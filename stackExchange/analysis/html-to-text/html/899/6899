@@ -1,0 +1,88 @@
+<p>To illustrate, assume that I have two tables as follows:</p>
+
+<pre><code>VehicleID Name
+1         Chuck
+2         Larry
+
+LocationID VehicleID City
+1          1         New York
+2          1         Seattle
+3          1         Vancouver
+4          2         Los Angeles
+5          2         Houston
+</code></pre>
+
+<p>I want to write a query to return the following results:</p>
+
+<pre><code>VehicleID Name    Locations
+1         Chuck   New York, Seattle, Vancouver
+2         Larry   Los Angeles, Houston
+</code></pre>
+
+<p>I know that this can be done using server side cursors, ie:</p>
+
+<pre><code>DECLARE @VehicleID int
+DECLARE @VehicleName varchar(100)
+DECLARE @LocationCity varchar(100)
+DECLARE @Locations varchar(4000)
+DECLARE @Results TABLE
+(
+  VehicleID int
+  Name varchar(100)
+  Locations varchar(4000)
+)
+
+DECLARE VehiclesCursor CURSOR FOR
+SELECT
+  [VehicleID]
+, [Name]
+FROM [Vehicles]
+
+OPEN VehiclesCursor
+
+FETCH NEXT FROM VehiclesCursor INTO
+  @VehicleID
+, @VehicleName
+WHILE @@FETCH_STATUS = 0
+BEGIN
+
+  SET @Locations = ''
+
+  DECLARE LocationsCursor CURSOR FOR
+  SELECT
+    [City]
+  FROM [Locations]
+  WHERE [VehicleID] = @VehicleID
+
+  OPEN LocationsCursor
+
+  FETCH NEXT FROM LocationsCursor INTO
+    @LocationCity
+  WHILE @@FETCH_STATUS = 0
+  BEGIN
+    SET @Locations = @Locations + @LocationCity
+
+    FETCH NEXT FROM LocationsCursor INTO
+      @LocationCity
+  END
+  CLOSE LocationsCursor
+  DEALLOCATE LocationsCursor
+
+  INSERT INTO @Results (VehicleID, Name, Locations) SELECT @VehicleID, @Name, @Locations
+
+END     
+CLOSE VehiclesCursor
+DEALLOCATE VehiclesCursor
+
+SELECT * FROM @Results
+</code></pre>
+
+<p>However, as you can see, this requires a great deal of code.  What I would like is a generic function that would allow me to do something like this:</p>
+
+<pre><code>SELECT VehicleID
+     , Name
+     , JOIN(SELECT City FROM Locations WHERE VehicleID = Vehicles.VehicleID, ', ') AS Locations
+FROM Vehicles
+</code></pre>
+
+<p>Is this possible?  Or something similar?</p>

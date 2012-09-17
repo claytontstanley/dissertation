@@ -1,0 +1,5 @@
+<p>If you've ever used Eclipse, you've probably noticed the great keyboard shortcuts that let you hit a shortcut key combination, then just type the first few characters of a function, class, filename, etc. It's even smart enough to put open files first in the list.</p>
+
+<p><img src="http://archive.eclipse.org/eclipse/downloads/drops/R-3.3-200706251500/whatsnew/images/search-all-type-names.png" alt="alt text" title=""></p>
+
+<p>I'm looking for a similar functionality for Visual Studio 2008. I know there's a findfiles plugin on codeproject, but that one is buggy and a little weird, and doesn't give me access to functions or classes.</p>

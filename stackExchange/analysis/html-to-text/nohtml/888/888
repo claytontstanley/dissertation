@@ -1,0 +1,2 @@
+How do you debug your PHP script?
+I am aware of basic debugging such as using the Error Reporting. The breakpoint debugging in PHPEclipse is also quite useful. Any other good/better techniques out there?

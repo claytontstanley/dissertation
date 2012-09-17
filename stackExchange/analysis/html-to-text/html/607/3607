@@ -1,0 +1,7 @@
+<p>I've got TotroiseSVN installed and have a majority of my repositories checking in and out from C:\subversion\ <em>and a couple checking in and out from a network share (I forgot about this when I originally posted this question)</em>.</p>
+
+<p>This means that I don't have a "subversion" server per-se.</p>
+
+<p>How do I integrate TortoiseSVN and Fogbugz?</p>
+
+<p><em>Edit: inserted italics</em></p>

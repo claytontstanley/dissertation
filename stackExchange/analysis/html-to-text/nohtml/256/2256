@@ -1,0 +1,4 @@
+Is there a way of mapping data collected on a stream or array to a data structure or vice-versa? In C++ this would simply be a matter of casting a pointer to the stream as a data type I want to use (or vice-versa for the reverse) eg: in C++
+Mystruct * pMyStrct = (Mystruct*)&SomeDataStream; pMyStrct->Item1 = 25;  int iReadData = pMyStrct->Item2;
+obviously the C++ way is pretty unsafe unless you are sure of the quality of the stream data when reading incoming data, but for outgoing data is super quick and easy.
+Strange... my previously accepted answer was unaccepted. anyway, while all the given solutions were helpful, the accepted answer is the one I was looking for

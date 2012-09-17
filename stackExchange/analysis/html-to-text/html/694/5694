@@ -1,0 +1,5 @@
+<p>I got this error today when trying to open a Visual Studio 2008 <strong>project</strong> in Visual Studio 2005:</p>
+
+<p>The imported project "C:\Microsoft.CSharp.targets" was not found</p>
+
+<p>So I thought I'd post it here in case anyone else is interested</p>

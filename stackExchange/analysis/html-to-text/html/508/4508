@@ -1,0 +1,11 @@
+<p>Using MAPI functions from within managed code is officially unsupported. Apparently, MAPI uses its own memory management and it crashes and burns within managed code (see <a href="http://blogs.msdn.com/pcreehan/archive/2007/05/04/what-does-unsupported-mean.aspx" rel="nofollow">here</a> and <a href="http://blogs.msdn.com/mstehle/archive/2007/10/03/fyi-why-are-mapi-and-cdo-1-21-not-supported-in-managed-net-code.aspx" rel="nofollow">here</a>)</p>
+
+<p><strong>All I want to do is launch the default e-mail client</strong> with subject, body, <strong>AND one or more attachments</strong>. </p>
+
+<p>So I've been looking into <a href="http://pinvoke.net/default.aspx/mapi32.MAPISendDocuments" rel="nofollow">MAPISendDocuments</a> and it seems to work. But I haven't been able to gather courage to actually use the function in production code.</p>
+
+<p>Has anybody used this function a lot? Do you have any horror stories?</p>
+
+<p><em>PS. No, I won't shellExecute Outlook.exe with command line arguments for attachments.</em></p>
+
+<p><em>PPS. Attachment support is a</em> requirement <em>, so Mailto: solutions do not cut it for me.</em></p>

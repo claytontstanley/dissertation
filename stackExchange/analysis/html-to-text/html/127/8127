@@ -1,0 +1,5 @@
+<p>Hello, I'm currently in the process of setting up a continuous integration environment at work. We are using VisualSVN Server and CrusieControl.NET. Occasionally a build will fail and a symptom is that there are conflicts in the CruiseControl.NET working copy. I believe this is due to the way I've setup the Visual Studio solutions. Hopefully the more projects we run in this environment the better our understanding of how to set them up will be so I'm not questioning why the conflicts happen at this stage. To fix the builds I delete the working copy and force a new build - this works every time (currently). So my questions are: is deleting the working copy a valid part of a continuous integration build process, and how do I go about it?</p>
+
+<p>I've tried solutions including MSTask and calling delete from the command line but I'm not having any luck.</p>
+
+<p>Sorry for being so wordy - good job this is a beta :)</p>

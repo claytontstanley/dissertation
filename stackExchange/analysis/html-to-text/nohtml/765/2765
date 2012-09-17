@@ -1,0 +1,5 @@
+I am trying to learn the keyboard shortcuts in Visual Studio in order to be more productive.  So I downloaded a document showing many of the default keybindings in Visual Basic when using the VS 2008 IDE from Microsoft: http://www.microsoft.com/downloads/details.aspx?familyid=255b8cf1-f6bd-4b55-bb42-dd1a69315833&displaylang=en
+But, when I tried what they say is the keyboard shortcut to view all open documents (CTRL + ALT + DOWN ARROW) I got a completely unexpected result on my XP machine - my entire screen display was flipped upside down!
+Was this a prank by someone at Microsoft?  I can't imagine what practical value this flipping of the screen would have.
+Does anyone know what the correct keyboard shortcut is to view all open documents in VS 2008?
+Oh and if you try the above shortcut and it flips your display the way it did mine, do a CTRL + ALT + UP ARROW to switch it back.

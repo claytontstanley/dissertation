@@ -1,0 +1,3 @@
+<p>I was working with quality yesterday doing some formal testing.  In their procedure they were verifying all files on the test machine were pulled from the release.  The way they were verifying these files were the same was by checking the size and the date/time stamp windows put on them in explorer.  These happened to be off for another reason which I was able to find out why.  </p>
+
+<p>Is this a valid way to verify a file is the same?  I didn't think so and started to argue, but I am younger here so thought I shouldn't push it too far.  I wanted to argue they should do a binary compare on the file to verify its contents are exact.  In my experience time/date stamps and size attributes don't always act as expected.  Any thoughts???</p>

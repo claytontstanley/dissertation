@@ -1,0 +1,2 @@
+I've always found checkin mails to be very useful for keeping track of what work other people are doing in the codebase. How do I set up SVN to email a distribution list on each checkin?
+Edit: I'm running clients on Windows and the server on Linux. The answers below for various platforms will likely be useful to other people though.

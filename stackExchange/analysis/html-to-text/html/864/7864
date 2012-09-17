@@ -1,0 +1,9 @@
+<p>As I learn more and more about OOP, and start to implement various design patterns, I keep coming back to cases where people are hating on <a href="http://en.wikipedia.org/wiki/Active_record_pattern" rel="nofollow">Active Record</a>.</p>
+
+<p>Often, people say that it doesn't scale well (citing Twitter as their prime example) -- but nobody actually explains <strong><em>why</em></strong> it doesn't scale well; and / or how to achieve the pros of AR without the cons (via a similar but different pattern?)</p>
+
+<p>Hopefully this won't turn into a holy war about design patterns -- all I want to know is <strong>**specifically**</strong> what's wrong with Active Record.</p>
+
+<p>If it doesn't scale well, why not?</p>
+
+<p>What other problems does it have?</p>

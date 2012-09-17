@@ -1,0 +1,9 @@
+<p>Is there a trivial, or at least moderately straight-forward way to generate territory maps (e.g. Risk)?</p>
+
+<p>I have looked in the past and the best I could find were vague references to Voronoi diagrams.  An example of a Voronoi diagram is <a href="http://www.dma.fi.upm.es/mabellanas/tfcs/fvd/images/voronoi.gif" rel="nofollow">here</a>.</p>
+
+<p>These hold promise, but I guess i haven't seen any straight-forward ways of rendering these, yet alone holding them in some form of data structure to treat each territory as an object.</p>
+
+<p>Another approach that holds promise is flood fill, but again I'm unsure on the best way to start with this approach.</p>
+
+<p>Any advice would be much appreciated.</p>

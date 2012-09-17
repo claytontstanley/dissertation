@@ -1,0 +1,10 @@
+In a C# (feel free to answer for other languages) loop, what's the difference between break and continue as a means to leave the structure of the loop, and go to the next iteration?
+Example:
+foreach (DataRow row in myTable.Rows)
+{
+if (someConditionEvalsToTrue)
+{
+break; //what's the difference between this and continue ?
+//continue;
+}
+}

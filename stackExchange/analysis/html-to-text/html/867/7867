@@ -1,0 +1,3 @@
+<p>What are people's opinions on the best tool for performance testing ASP.NET applications. Specifically we are looking for a tool that could potentially replay IIS logs to mimic production load. Something that hooks into perf counters would also be useful. </p>
+
+<p>Ideas?</p>

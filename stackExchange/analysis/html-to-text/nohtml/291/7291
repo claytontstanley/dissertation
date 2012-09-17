@@ -1,0 +1,6 @@
+I'm working on an app that converts source code from using one framework to another.
+I really wanted to make the agonizing monotonous job automatic.
+After looking a lot for something that code help me treat source code in an object-oriented way and modify it the closest thing I've found was JaxMeJS and that's short of what I need too.
+I've been working at creating my own parser using antlr , but would love not having to do it by myself.
+Any recommendations? Of course I'd rather a Java solution, but I have an open mind.
+Thanks!

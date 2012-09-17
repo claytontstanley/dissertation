@@ -1,0 +1,15 @@
+<p>So, I need some help. I am working on a project in C++. However, I think I have somehow managed to corrupt my heap. This is based off the fact that I added a <code>std::string</code> to a class and assigning it a value from another <code>std::string</code>:</p>
+
+<pre><code>std::string hello = "Hello, world.\n";
+/* exampleString = "Hello, world.\n" would work fine. */
+exampleString = hello;
+</code></pre>
+
+<p>crashes on my system with a stack dump. So basically I need to <strong>stop</strong> and go through all my code and memory management stuff and find out where I've screwed up. The codebase is still small (about 1000 lines), so this is easily do-able. </p>
+
+<p>Still, I'm over my head with this kind of stuff, so I thought I'd throw it out there. I'm on a Linux system, and have poked around with <code>valgrind</code>, and while not knowing completely what I'm doing, it did report that the <code>std::string</code>'s destructor was an invalid free. I have to admit to getting the term 'Heap Corruption' from a Google search; any general purpose articles on this sort of stuff would be appreciated as well.</p>
+
+<p>(In before <code>rm -rf ProjectDir</code>, do again in C# :D)</p>
+
+<p>EDIT:
+I haven't made it clear, but what I'm asking for are ways an advice of diagnosing these sort of memory problems. I know the std::string stuff is right, so it's something I've done (or a bug, but there's Not A Problem With Select). I'm sure I could chuck the code I've written up and you very smart folks would see the problem in no time, but I want to add this kind of code analysis to my 'toolbox', as it were.</p>

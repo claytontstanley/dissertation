@@ -1,0 +1,6 @@
+<p>I'm tired of opening Dia and creating a database diagram at the beginning of every project. Is there a tool out there that will let me select specific tables and then create a database diagram for me based on a MySQL database? Preferably it would allow me to edit the diagram afterward since none of the foreign keys are set...</p>
+
+<p>Here is what I am picturing diagram-wise (please excuse the horrible data design, I didn't design it. Let's focus on the diagram concept and not on the actual data it represents for this example ;) ):</p>
+
+<p><img src="http://www.chomperstomp.com/img/shippingDBDesign.jpg" alt="diagram" title="">
+<a href="http://www.chomperstomp.com/img/shippingDBDesign.png" rel="nofollow">see full size diagram</a></p>

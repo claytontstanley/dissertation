@@ -1,0 +1,4 @@
+[Assuming you write code on a team]
+Does your team actually agree on a coding style standard? Independent of what language you are using, I'm curious to know A) do you agree and B) are the styles something you created as a group or did you decide to use a "third party's" style guide?
+Our team uses C# primarily, and we've taken to using Microsoft's StyleCop . Not because it's necessarily THE way to do it, but because it's something we [generally] agree with and it's easy to enforce.
+I'm also interested to know of style-compliance tools in other languages.

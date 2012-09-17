@@ -1,0 +1,7 @@
+<p>I have come across a lot of optimization tips which say that you should mark your classes as sealed to get extra performance benefits.</p>
+
+<p>I ran some tests to check the performance differential and found none. Am I doing something wrong? Am I missing the case where sealed classes will give better results?</p>
+
+<p>Has anyone run tests and seen a difference?</p>
+
+<p>Help me learn :) </p>

@@ -1,0 +1,5 @@
+<p>Does anyone know of any good tools (i'm looking for IDEs, primarily) to write assembly on the mac... XCode is a little cumbersome to me.</p>
+
+<p>Also, on the Intel Macs, can I use generic x86 asm?  or is there a modified instruction set?   Any information about post Intel</p>
+
+<p>Also: I know that on windows, asm can run in an emulated environment created by the OS to let the code think it's running on its own dedicated machine... does OSX provide the same thing?</p>

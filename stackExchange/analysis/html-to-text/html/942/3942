@@ -1,0 +1,3 @@
+<p>I inherited a Windows Forms app written in VB.Net.  Certain parts of the app run dreadfully slow.  What's the easiest way to find which parts of the code are holding things up?  I'm looking for a way to quickly find the slowest subroutines and tackle them first in an attempt to speed up the app.</p>
+
+<p>I know that there are several code profiler products available for purchase which will show how long each subroutine takes, but I was hoping to find a <strong>free</strong> solution.</p>

@@ -1,0 +1,2 @@
+I would like to set up VPN access for people in my company to use when they are working from home and on the road. We have a VPN service built into our Watchgard firewall, but it requires a Windows-only custom client and some of our employees have Macs or Linux computers.
+I am not any sort of networking expert so the solution would need to be really easy to set up, maintain, and use. I have a mild prejudice toward Linux solutions but a Windows one would be fine too so long as it supports any kind of client.

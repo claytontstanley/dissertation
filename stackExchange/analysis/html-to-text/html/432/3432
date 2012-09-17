@@ -1,0 +1,10 @@
+<p>I know that you can insert multiple rows at once, is there a way to update multiple rows at once (as in, in one query) in MySQL?</p>
+
+<p>Edit:
+For example I have the following</p>
+
+<pre><code>Name   id  Col1  Col2<br>Row1   1    6     1<br>Row2   2    2     3<br>Row3   3    9     5<br>Row4   4    16    8<br></code></pre>
+
+<p>I want to combine all the following Updates into one query</p>
+
+<pre><code>UPDATE table SET Col1 = 1 WHERE id = 1;<br>UPDATE table SET Col1 = 2 WHERE id = 2;<br>UPDATE table SET Col2 = 3 WHERE id = 3;<br>UPDATE table SET Col1 = 10 WHERE id = 4;<br>UPDATE table SET Col2 = 12 WHERE id = 4;<br></code></pre>

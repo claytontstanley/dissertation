@@ -1,0 +1,7 @@
+<p>I'm trying to do this (which produces an unexpected T_VARIABLE error):</p>
+
+<pre><code>public function createShipment($startZip, $endZip, $weight = $this-&gt;getDefaultWeight()){}<br></code></pre>
+
+<p>I don't want to put a magic number in there for weight, since the object I am using has a "defaultWeight" parameter that all new shipments get if you don't specify a weight. I can't put the defaultWeight in the shipment itself, because it changes from shipment group to shipment group. Is there a better way to do it than the following?</p>
+
+<pre><code>public function createShipment($startZip, $endZip, weight = 0){<br>    if($weight &lt;= 0){<br>        $weight = $this-&gt;getDefaultWeight();<br>    }<br>}<br></code></pre>

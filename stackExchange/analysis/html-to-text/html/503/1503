@@ -1,0 +1,1 @@
+<p>I'm looking into using Visual Studio 2008's built in unit test projects instead of NUnit and I was wondering if anyone has any experience in trying to integrate this type of unit test project with Cruise Control.Net.</p>

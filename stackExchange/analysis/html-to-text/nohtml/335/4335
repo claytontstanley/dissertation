@@ -1,0 +1,3 @@
+Is there anyway to configure a WCF service with a failover endpoint if the primary endpoint dies? Kind of like being able to specify a failover server in a SQL cluster...
+Specifically I am using the TCP/IP binding for speed, but on the rare occurrence that the machine is not available I would like to redirect traffic to the failover server. Not too bothered about losing messages... I'd just prefer not to write the code to handle re-routing!
+Cheers, Stuart

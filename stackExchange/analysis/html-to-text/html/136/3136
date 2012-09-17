@@ -1,0 +1,7 @@
+<p>How can i set up my crontab to execute X script at 11:59PM every day without emailing me or creating any logs?</p>
+
+<p>Right now my crontab looks something like this</p>
+
+<blockquote>
+  <p>@daily /path/to/script.sh</p>
+</blockquote>

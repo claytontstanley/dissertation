@@ -1,0 +1,19 @@
+<p>How would one display any add content from a "dynamic" aspx page? Currently I am working on using the System.Web.HttpResponse "Page.Response" to write a file that is stored on a web server to a web request.</p>
+
+<p>This would allow people to hit a url to the type <a href="http://www.foo.com?Image=test.jpg" rel="nofollow">http://www.foo.com?Image=test.jpg</a> and have the image display in their browser. So as you may know this revolves around the use of Response.ContentType.</p>
+
+<p>By using </p>
+
+<pre><code>Response.ContentType = "application/octet-stream";
+</code></pre>
+
+<p>I am able to display images of type gif/jpeg/png (all i have tested so far), bit trying to display .swf or .ico files gives me a nice little error.</p>
+
+<p>using</p>
+
+<pre><code>Response.ContentType = "application/x-shockwave-flash";
+</code></pre>
+
+<p>I can get flash files to play, but then the images are messed.</p>
+
+<p>So how do i <strong>easily</strong> choose the contenttype?</p>

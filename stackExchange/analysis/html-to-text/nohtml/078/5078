@@ -1,0 +1,3 @@
+I'd like to set up a cheap Linux box as a web server to host a variety of web technologies (PHP & Java EE come to mind, but I'd like to experiment with Ruby or Python in the future as well).
+I'm fairly versed in setting up Tomcat to run on Linux for serving up Java EE applications, but I'd like to be able to open this server up, even just so I can create some tools I can use while I am working in the office. All the experience I've had with configuring Java EE sites has all been for intranet applications where we were told not to focus on securing the pages for external users.
+What is your advice on setting up a personal Linux web server in a secure enough way to open it up for external traffic?

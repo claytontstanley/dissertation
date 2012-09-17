@@ -1,0 +1,4 @@
+<p><strong>I'm not trying to start a "which language is better" argument here, so please don't go there.</strong> <br>
+I typically use PHP for most of my web development (mostly because hosting is cheap), but for various reasons I'm looking to use ASP.NET for a couple new projects.  But one of the major reasons I've stayed away from ASP.NET up until now is the cost.  I've seen some budget hosting options, but they always seem a little sketchy to me.  From what I've generally found, that's just the way the hosting scene looks for ASP.NET unless you want to go dedicated.</p>
+
+<p>Does anyone have any good suggestions for a solid ASP.NET host with a good feature set and reliability for my money?  Also, are there any options out there along the lines of Amazon's Elastic Compute Cloud? And yes, I know... Mono.  I'm talking about <em>Windows</em> based "grid" hosting options?  </p>

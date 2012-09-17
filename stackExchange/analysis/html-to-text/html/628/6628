@@ -1,0 +1,53 @@
+<p>What is the difference, if any, between these methods of indexing into a PHP array:</p>
+
+<pre><code>$array[$index]
+$array["$index"]
+$array["{$index}"]
+</code></pre>
+
+<p>I'm interested in both the performance and functional differences.</p>
+
+<h3>Update:</h3>
+
+<p>(In response to @Jeremy) I'm not sure that's right.  I ran this code:</p>
+
+<pre><code>  $array = array(100, 200, 300);
+  print_r($array);
+  $idx = 0;
+  $array[$idx] = 123;
+  print_r($array);
+  $array["$idx"] = 456;
+  print_r($array);
+  $array["{$idx}"] = 789;
+  print_r($array);
+</code></pre>
+
+<p>And got this output:</p>
+
+<p>Array
+(
+    [0] => 100
+    [1] => 200
+    [2] => 300
+)</p>
+
+<p>Array
+(
+    [0] => 123
+    [1] => 200
+    [2] => 300
+)</p>
+
+<p>Array
+(
+    [0] => 456
+    [1] => 200
+    [2] => 300
+)</p>
+
+<p>Array
+(
+    [0] => 789
+    [1] => 200
+    [2] => 300
+)</p>

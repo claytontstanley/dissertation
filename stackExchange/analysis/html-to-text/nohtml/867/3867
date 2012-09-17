@@ -1,0 +1,3 @@
+I think most people here understand the importance of fully automated builds.
+The problem is one of our project is now using an integrated Visual Studio Setup project (vdproj) and has recently been ported to Visual Studio 2008. Unfortunatly, those won't build in MSBuild and calling devenv.exe /build on 2008 just crashes, apparently it does that on all multi core computer (!!!). So now I have the choice to either rollback to .Net 2.0 and 2005 or simply ditch Visual Studio deployement, but first, I'd like a second opinion.
+Anyone knows of another automated way to build a .vdproj that will not require us to open the IDE and click on stuff?

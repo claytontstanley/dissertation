@@ -1,0 +1,3 @@
+I'm currently tasked with replacing an Apache + Resin Java web server with a Resin-only configuration.
+Currently in our apache setup, we use .htaccess and a small user database to provide passwording at a directory level.
+Does anyone know the equivalent setup when using just Resin as the web server?

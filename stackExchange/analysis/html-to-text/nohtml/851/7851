@@ -1,0 +1,3 @@
+According to the PHP Safe Mode Docs on safe_mode_gid:
+By default, Safe Mode does a UID compare check when opening files. If you want to relax this to a GID compare, then turn on safe_mode_gid. Whether to use UID (FALSE) or GID (TRUE) checking upon file access.
+To a PHP script running on a web server, what is the difference between a UID (User identifier) check and a GID (Group identifier) check?

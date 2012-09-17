@@ -1,0 +1,3 @@
+<p>So I'm using an app that stores images heavily in the DB. What's your outlook on this? I'm more of a type to store the location in the filesystem, than store it directly in the DB.</p>
+
+<p>What do you think are the pros/cons?          </p>

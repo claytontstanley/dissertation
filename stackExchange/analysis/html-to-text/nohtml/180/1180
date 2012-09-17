@@ -1,0 +1,4 @@
+I am looking to allow users to control of subdomain of an app I am toying with, much like Basecamp where it is 'customusername.seework.com'.
+What is required on the DNS end to allow these to be created dynamically and be available instantly.
+And how do you recommend dealing with this in the logic of the site? Htaccess rule to  lookup the subdomain in the DB?
+thanks

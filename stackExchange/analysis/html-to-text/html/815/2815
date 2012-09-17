@@ -1,0 +1,5 @@
+<p>I would like to make a nightly cron job that fetches my stackoverflow page and diffs it from the previous day's page, so I can see a change summary of my questions, answers, ranking, etc.</p>
+
+<p>Unfortunately, I couldn't get the right set of cookies, etc, to make this work.  Any ideas?</p>
+
+<p>Also, when the beta is finished, will my status page be accessible without logging in?</p>

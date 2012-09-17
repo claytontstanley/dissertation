@@ -1,0 +1,52 @@
+I need to do date arithmetic in Unix shell scripts that I use to control the execution of third party programs.
+I'm using a function to increment a day and another to decrement:
+IncrementaDia(){
+echo $1 | awk '
+BEGIN {
+diasDelMes[1] = 31
+diasDelMes[2] = 28
+diasDelMes[3] = 31
+diasDelMes[4] = 30
+diasDelMes[5] = 31
+diasDelMes[6] = 30
+diasDelMes[7] = 31
+diasDelMes[8] = 31
+diasDelMes[9] = 30
+diasDelMes[10] = 31
+diasDelMes[11] = 30
+diasDelMes[12] = 31
+}
+{
+anio=substr($1,1,4)
+mes=substr($1,5,2)
+dia=substr($1,7,2)
+if((anio % 4 == 0 && anio % 100 != 0) || anio % 400 == 0)
+{
+diasDelMes[2] = 29;
+}
+if( dia == diasDelMes[int(mes)] ) {
+if( int(mes) == 12 ) {
+anio = anio + 1
+mes = 1
+dia = 1
+} else {
+mes = mes + 1
+dia = 1
+}
+} else {
+dia = dia + 1
+}
+}
+END {
+printf("%04d%02d%02d", anio, mes, dia)
+}
+'
+}
+if [ $# -eq 1 ]; then
+tomorrow=$1
+else
+today=$(date +"%Y%m%d")
+tomorrow=$(IncrementaDia $hoy)
+fi
+but now I need to do more complex arithmetic.
+What it's the best and more compatible way to do this?

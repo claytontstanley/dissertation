@@ -1,0 +1,2 @@
+How much database performance overhead is involved with using C# and LINQ compared to custom optimized queries loaded with mostly low-level C, both with a SQL Server 2008 backend?
+I'm specifically thinking here of a case where you have a fairly data-intensive program and will be doing a data refresh or update at least once per screen and will have 50-100 simultaneous users.

@@ -1,0 +1,3 @@
+I'm writing an app to help facilitate some research, and part of this involves doing some statistical calculations. Right now, the researchers are using a program called SPSS . Part of the output that they care about looks like this:
+They're really only concerned about the 'F' and 'Sig.' values. My problem is that I have no background in stats, and I can't figure out what the tests are called, or how to calculate them.
+I thought the 'F' value might be the result of the F-test , but after following the steps given on Wikipedia, I got a result that was different from what SPSS gives.

@@ -1,0 +1,14 @@
+<p>Can anyone explain this behavior?
+Running:</p>
+
+<pre><code>#!/bin/sh<br>echo "hello world" | read var1 var2<br>echo $var1<br>echo $var2<br></code></pre>
+
+<p>results in nothing being ouput, while:</p>
+
+<pre><code>#!/bin/sh<br>echo "hello world" &gt; test.file<br>read var1 var2 &lt; test.file<br>echo $var1<br>echo $var2<br></code></pre>
+
+<p>produces the expected output:</p>
+
+<pre><code>hello<br>world<br></code></pre>
+
+<p>Shouldn't the pipe do in one step what the redirection to test.file did in the second example?  I tried the same code with both the dash and bash shells and got the same behavior from both of them.</p>

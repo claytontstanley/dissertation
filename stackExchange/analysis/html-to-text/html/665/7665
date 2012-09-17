@@ -1,0 +1,14 @@
+<p>Given an absolute or relative path (in a Unix-like system), I would like to determine the full path of the target after resolving any intermediate symlinks. Bonus points for also resolving ~username notation at the same time.</p>
+
+<p>If the target is a directory, it might be possible to chdir() into the directory and then call getcwd(), but I really want to do this from a shell script rather than writing a C helper. Unfortunately, shells have a tendency to try to hide the existence of symlinks from the user (this is bash on OS X):</p>
+
+<pre><code>$ ls -ld foo bar
+drwxr-xr-x   2 greg  greg  68 Aug 11 22:36 bar
+lrwxr-xr-x   1 greg  greg   3 Aug 11 22:36 foo -&gt; bar
+$ cd foo
+$ pwd
+/Users/greg/tmp/foo
+$
+</code></pre>
+
+<p>What I want is a function resolve() such that when executed from the tmp directory in the above example, resolve("foo") == "/Users/greg/tmp/bar".</p>

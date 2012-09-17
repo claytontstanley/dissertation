@@ -1,0 +1,15 @@
+<p>What would be the best way to fill a C# struct from a byte[] array where the data was from a C/C++ struct?  The C struct would look something like this (my C is very rusty):</p>
+
+<pre><code>typedef OldStuff {<br>    CHAR Name[8];<br>    UInt32 User;<br>    CHAR Location[8];<br>    UInt32 TimeStamp;<br>    UInt32 Sequence;<br>    CHAR Tracking[16];<br>    CHAR Filler[12];<br>}<br></code></pre>
+
+<p>And would fill something like this:</p>
+
+<pre><code>[StructLayout(LayoutKind.Explicit, Size = 56, Pack = 1)]<br>public struct NewStuff<br>{<br>    [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 8)]<br>    [FieldOffset(0)]<br>    public string Name;<br><br>    [MarshalAs(UnmanagedType.U4)]<br>    [FieldOffset(8)]<br>    public uint User;<br><br>    [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 8)]<br>    [FieldOffset(12)]<br>    public string Location;<br><br>    [MarshalAs(UnmanagedType.U4)]<br>    [FieldOffset(20)]<br>    public uint TimeStamp;<br><br>    [MarshalAs(UnmanagedType.U4)]<br>    [FieldOffset(24)]<br>    public uint Sequence;<br><br>    [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 16)]<br>    [FieldOffset(28)]<br>    public string Tracking;<br>}<br></code></pre>
+
+<p>What is best way to copy OldStuff to NewStuff, if OldStuff was passed as byte[] array?</p>
+
+<p>I'm currently doing something like the following, but it feels kind of clunky.</p>
+
+<pre><code>GCHandle handle;<br>NewStuff MyStuff;<br><br>int BufferSize = Marshal.SizeOf(typeof(NewStuff));<br>byte[] buff = new byte[BufferSize];<br><br>Array.Copy(SomeByteArray, 0, buff, 0, BufferSize);<br><br>handle = GCHandle.Alloc(buff, GCHandleType.Pinned);<br><br>MyStuff = (NewStuff)Marshal.PtrToStructure(handle.AddrOfPinnedObject(),<br>    typeof(NewStuff));<br><br>handle.Free();<br></code></pre>
+
+<p>Is there better way to accomplish this?</p>

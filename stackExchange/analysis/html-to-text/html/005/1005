@@ -1,0 +1,6 @@
+<p>Often while editing config files, I'll open one with vi and then when I go to save it realize that I didn't type</p>
+
+<pre><code>sudo vi filename
+</code></pre>
+
+<p>Is there any way to give vi sudo privileges to save the file? I seem to recall seeing something about this while looking up some stuff about vi a while ago, but now I can't find it.</p>

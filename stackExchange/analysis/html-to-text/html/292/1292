@@ -1,0 +1,1 @@
+<p>I have a Queue&lt;T&gt; object that I have initialised to a capacity of 2, but obviously that is just the capacity and it keeps expanding as I add items.  Is there already an object that automatically dequeues an item when the limit is reached, or is the best solution to create my own inherited class?</p>

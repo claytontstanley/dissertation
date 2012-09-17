@@ -1,0 +1,9 @@
+When you execute a SQL query, you have to clean your 'strings' or users can execute malicious SQL on your website.
+I usually just have a function escape_string(blah), which:
+Replaces escapes () with double escapes (\).
+Replaces single quotes (') with an escaped single quote (\').
+Is this adequate? Is there a hole in my code? Speedy library to reliably do this for me?
+I'd like to see graceful solutions in:
+Perl
+Java
+PHP

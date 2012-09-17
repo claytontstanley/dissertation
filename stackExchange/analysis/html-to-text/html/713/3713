@@ -1,0 +1,3 @@
+<p>I'm writing a web page in ASP.NET. I have some Javascript, and I have a submit button with an onClick event. </p>
+
+<p>Is it possible to call a method I created in ASP with Javascript's onClick event?</p>

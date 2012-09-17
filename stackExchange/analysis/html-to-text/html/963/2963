@@ -1,0 +1,7 @@
+<P>How many folk are doing this and what are your motivations for doing so? I converted because I wanted to run Hyper-V so I could build and test on 64 bit guest OS VM's. In general the experience has been pretty good, I've learned a heap about managing a 2008 environment. I've also been pretty lucky in that all of the drivers for my Dell T5400 just work.</P>
+<P>There's still a couple of niggles though where the UI gets momentarily laggy if there's background network IO e.g. IE or Firefox grabbing images from third party sites, or the RDP client performing the initial handshake to a remote server (even a local running VM).</P>
+<P>Your experiences?</P>
+<P><STRONG>Updated -</STRONG></P>
+<P>@<A href="http://stackoverflow.com/users/638/bestsnowman" rel="nofollow">bestsnowman</A></P>
+<P>I'm working locally. It's the host 2008 OS UI that gets laggy. For example when I log off of an RDP session (to a Hyper-V guest VM or a real machine at a remote location like our DC) the sound distorts (if I'm playing music) and the UI gets sluggish for around 10 seconds. It's annoying but something I've resigned myself to live with. It's certainly not a perf issue with the machine because it's a newish Dell Precision T5400 with 12Gb RAM, a quad core Xeon 3Ghz and a pair of 73Gb 15k RPM SAS disks. The video card is an NVidia GeForce 8800 GTS.</P>
+<P>All the drivers are up to date.</P>

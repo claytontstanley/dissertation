@@ -1,0 +1,9 @@
+I have a table with a structure like the following:
+------------------------------ LocationID     | AccountNumber ------------------------------ long-guid-here | 12345 long-guid-here | 54321
+To pass into another stored procedure, I need the XML to look like this:
+<root><clientID>12345</clientID><clientID>54321</clientID></root>
+The best I've been able to do so far was getting it like this:
+<root clientID="10705"/>
+I'm using this SQL statement:
+SELECT 1 as tag, null as parent, AccountNumber as 'root!1!clientID' FROM Location.LocationMDAccount WHERE locationid = 'long-guid-here' FOR XML EXPLICIT
+So far, I've looked at the documentation on the MSDN page , but I've not come out with the desired results.

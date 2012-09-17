@@ -1,0 +1,5 @@
+Given a string like this:
+a,"string, with",various,"values, and some",quoted
+What is a good algorithm to split this based on commas while ignoring the commas inside the quoted sections?
+The output should be an array:
+[ "a", "string, with", "various", "values, and some", "quoted" ]

@@ -1,0 +1,1 @@
+<p>I encounter an error of the form: "The model item passed into the dictionary is of type FooViewData but this dictionary requires a model item of type bar" even though I am passing in an object of the correct type (bar) for the typed user control.</p>

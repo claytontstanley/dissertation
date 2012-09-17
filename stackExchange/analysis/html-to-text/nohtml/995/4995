@@ -1,0 +1,5 @@
+I'm getting for that error this help in IBM's support site :
+ProblemA JAAS LoginContext could not be created due to the unexpected exception.
+User responseThe problem could be due to a configuration error.
+but I have not any other indication and can't determine the final reason for this error.
+Suggestions?

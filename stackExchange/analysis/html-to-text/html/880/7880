@@ -1,0 +1,1 @@
+<p>I want to open a file for reading, the C++ way. I need to be able to do it for text files, which would involve some sort of read line function, and a way to do it for binary files, which would provide a way to read raw data into a char* buffer.</p>

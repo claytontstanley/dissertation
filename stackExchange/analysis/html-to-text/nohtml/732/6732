@@ -1,0 +1,2 @@
+I've got a website that I've just uploaded onto the interwebs, and when using Firefox 3.0.1 on Ubuntu I don't see the favicon; Firefox 3.0.1 on WinXP shows it.
+Why isn't the favicon displaying under Ubuntu?   It's a favicon.ico file in the root directory, not referenced in the meta tags; would it work better as a GIF?

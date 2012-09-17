@@ -1,0 +1,3 @@
+<!DOCTYPE html>
+It is supposed to be backwards compatible with HTML4 and XHTML. John Resig posted about some of the benefits .
+As long as we don't use any of the new and not supported yet features, would there be any downside to start building sites with this doctype?

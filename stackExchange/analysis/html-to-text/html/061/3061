@@ -1,0 +1,3 @@
+<p>What is the best way to go about calling a function given a string with the function's name in a python program.  For example, let's say that I have a module foo, and I have a string whose contents are "bar".  What is the best way to go about calling foo.bar()?</p>
+
+<p>I need to get the return value of the function, which is why I don't just use eval.  I figured out how to do it by using eval to define a temp function that returns the result of that function call, but I'm hoping that there is a more elegant way to do this.</p>

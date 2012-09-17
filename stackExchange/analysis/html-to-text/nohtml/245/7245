@@ -1,0 +1,9 @@
+What's the most efficient algorithm to find the rectangle with the largest area which will fit in the empty space?
+Let's say the screen looks like this ('#' represents filled area):
+.................... ..............###### ##.................. .................### .................### #####............... #####............... #####...............
+A probable solution is:
+.................... ..............###### ##...++++++++++++... .....++++++++++++### .....++++++++++++### #####++++++++++++... #####++++++++++++... #####++++++++++++...
+Normally I'd enjoy figuring out a solution. Although this time I'd like to avoid wasting time fumbling around on my own since this has a practical use for a project I'm working on. Is there a well-known solution?
+Shog9 wrote:
+Is your input an array (as implied by the other responses), or a list of occlusions in the form of arbitrarily sized, positioned rectangles (as might be the case in a windowing system when dealing with window positions)?
+Yes, I have a structure which keeps track of a set of windows placed on the screen. I also have a grid which keeps track of all the areas between each edge, whether they are empty or filled, and the pixel position of their left or top edge. I think there is some modified form which would take advantage of this property. Do you know of any?

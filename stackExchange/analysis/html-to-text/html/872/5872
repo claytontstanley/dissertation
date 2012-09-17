@@ -1,0 +1,22 @@
+<p>If you are working in PHP (or I guess any programming language...) and using subversion as your source control, is there a way to take your project (for example):</p>
+
+<blockquote>
+  <p>C:\Projects\test\.svn <br>
+  C:\Projects\test\docs\ <br>
+  C:\Projects\test\faq.php <br>
+  C:\Projects\test\guestbook.php <br>
+  C:\Projects\test\index.php <br>
+  C:\Projects\test\test.php</p>
+</blockquote>
+
+<p>and build/copy/whatever it so it weeds out certain files and becomes:</p>
+
+<blockquote>
+  <p>C:\Projects\test\faq.php <br>
+  C:\Projects\test\guestbook.php <br>
+  C:\Projects\test\index.php</p>
+</blockquote>
+
+<p>automagically? I'm getting tired of making a branch, and then going through the branch and deleting all of the ".svn" folders, the docs directory, and my prototyping files. I know I could probably use a .bat file to only copy the specific files I want, but I was hoping there was some way with subversion to sort of pseudo ignore a file, to where it will still version it, but where you could make a snapshot of the project that ignores the files you told it to psuedo ignore.</p>
+
+<p>I know I read online somewhere about some functionality that at least lets you copy without the .svn folders, but I can't find it now...</p>

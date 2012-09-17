@@ -1,0 +1,6 @@
+<p>I have a page that is generated which inserts an HTML comment near the top of the page.  Inside the comment is a *nix-style command.</p>
+
+<pre><code>&lt;!-- command --option value --option2 value2 --option3 --&gt;
+</code></pre>
+
+<p>This comment breaks the page completely.  What is wrong with the comment to cause this to happen, and why is this the case?</p>

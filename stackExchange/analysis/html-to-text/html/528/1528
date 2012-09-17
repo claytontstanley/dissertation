@@ -1,0 +1,8 @@
+<p>I'm looking for some way to effectively hide inherited members.  I have a library of classes which inherit from common base classes.  Some of the more recent descendant classes inherit dependency properties which have become vestigial and can be a little confusing when using intellisense or using the classes in a visual designer.</p>
+
+<p>These classes are all controls that are written to be compiled for either WPF or Silverlight 2.0.  I know about <code>ICustomTypeDescriptor</code> and <code>ICustomPropertyProvider</code>, but I'm pretty certain those can't be used in Silverlight.  </p>
+
+<p>It's not as much a functional issue as a usability issue.  What should I do?</p>
+
+<p><strong>update:</strong>
+Some of the properties that I would really like to hide come from ancestors that are not my own and because of a specific tool I'm designing for, I can't do member hiding with the <code>new</code> operator.  (I know, it's ridiculous)</p>

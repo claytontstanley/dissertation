@@ -1,0 +1,7 @@
+<p>At work we have a 2 X 4 24 inch monitor video wall served by a single Mac Pro with a bunch of video cards. It's an architectural feature of the office and not a particularly good way to use those nice 24 inch dells.</p>
+
+<p>We mostly put a few of our websites on some screens and run <a href="http://www.fudgie.org/" rel="nofollow">gltail</a> on some for watching traffic. Sometimes we <code>tail -f</code> error logs.</p>
+
+<p>My question is this: what other pretty log analyzers except <code>gltail</code> are there? All those bouncing balls in <code>gltail</code> seem to slow down the rendering significantly, and it seems impossible to turn it off. What other things we can stick on there?</p>
+
+<p>You'd be surprised as to how useful this thing is - yesterday we noticed that one of the three virtual servers was a lot slower than usual. It was still up and serving and because of that did not trip our monitoring, but was slow enough to warrant a restart.</p>

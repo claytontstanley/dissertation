@@ -1,0 +1,6 @@
+<p>Why is Array.Length an int, and not an uint. This bothers me (just a bit), because a length value can never by negative. </p>
+
+<p>This also forced me to use an int for a length-property on my own class, because when you 
+specify an int-value, this needs to be cast explicity...</p>
+
+<p>So the ultimate question is: is there any use for an unsigned int (uint)? Even Microsoft seems not to use them.</p>

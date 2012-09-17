@@ -1,0 +1,23 @@
+<p>I saw this in another question in reference to shortcomings of the java spec:</p>
+
+<blockquote>
+  <p>There are more shortcomings and this is a subtle topic. Check <a href="http://kiranthakkar.blogspot.com/2007/05/method-overloading-with-new-features-of.html" rel="nofollow">this</a> out:</p>
+
+<pre><code>public class methodOverloading{<br>     public static void hello(Integer x){<br>     System.out.println("Integer");<br>}<br><br>public static void hello(long x){<br>   System.out.println("long");<br>}<br><br>public static void main(String[] args){<br>  int i = 5;<br>  hello(i);<br>}<br>}<br></code></pre>
+  
+  <p>Here "long" would be printed (haven't checked it myself), because the compiler choses &gt;widening over autoboxing. Be careful when using autoboxing or don't use it at all!</p>
+</blockquote>
+
+<p><em>Are we sure that this is actually an example of widening instead of autoboxing, or is it something else entirely?</em></p>
+
+<p>On my initial scanning, I would agree with the statement that the output would be "long" on the basis of "i" being declared as a primitive and not an object.  However, if you changed </p>
+
+<pre><code>hello(long x)<br></code></pre>
+
+<p>to</p>
+
+<pre><code>hello(Long x)<br></code></pre>
+
+<p>the output would print "Integer"</p>
+
+<p>What's really going on here?  I know nothing about the compilers/bytecode interpreters for java...</p>

@@ -1,0 +1,5 @@
+<p>I've only been using VS 2008 Team Foundation for a few weeks. Over the last few days, I've noticed that sometimes one of my objects/controls on my page just disappears from intellisense. The project builds perfectly and the objects are still in the HTML, but I still can't find the object. </p>
+
+<p>Any one else notice this?</p>
+
+<p>Edit: For what it's worth, I know if I close VS and then open it up again, it comes back.</p>

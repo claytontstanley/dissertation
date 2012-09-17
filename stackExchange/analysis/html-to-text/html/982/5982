@@ -1,0 +1,9 @@
+<p>Does anyone know why when using BindingUtils on the selectedItem property of a ComboBox you get the following warning? Any ideas how to resolve the issue?</p>
+
+<p>The binding still works properly, but it would be nice to get rid of the warning.</p>
+
+<pre><code>warning: multiple describeType entries for 'selectedItem' on type 'mx.controls::ComboBox':<br>&lt;accessor name="selectedItem" access="readwrite" type="Object" declaredBy="mx.controls::ComboBase"&gt;<br>  &lt;metadata name="Bindable"&gt;<br>    &lt;arg key="" value="valueCommit"/&gt;<br>  &lt;/metadata&gt;<br>  ...<br></code></pre>
+
+<p>Thanks,</p>
+
+<p>Matt</p>

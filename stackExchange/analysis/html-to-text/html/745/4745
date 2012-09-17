@@ -1,0 +1,3 @@
+<p>For any of you that have used ASP.NET MVC (especially the Stack Overflow team), do you think it's worth taking the plunge with a technology that's still in "Preview" releases, not even Beta yet?  From what I've seen on the MVC site and various blogs, it seems that a lot is still in flux, making it so that upgrading to the latest MVC version would likely require a lot of code changes.</p>
+
+<p>Compared to WebForms, is it worth getting the MVC model at the expense of likely having to do re-writes later just to comply with the latest version?  I ask this especially in terms of doing something that will be used, not just if I should try it out.</p>

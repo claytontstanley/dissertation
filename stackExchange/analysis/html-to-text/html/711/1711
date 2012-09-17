@@ -1,0 +1,8 @@
+<p>If you could go back in time and tell yourself to read a specific book at the beginning of your career as a developer, which book would it be?</p>
+
+<p>I expect this list to be varied and to cover a wide range of things.</p>
+
+<p><strong>To search:</strong> Use the search box in the upper-right corner. To search the answers of the current question, use <code>inquestion:this</code>.  For example:</p>
+
+<pre><code>inquestion:this "Code Complete"
+</code></pre>

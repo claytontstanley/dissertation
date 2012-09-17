@@ -1,0 +1,15 @@
+<p>I have a very simple problem which requires a very quick and simple solution in SQL Server 2005.</p>
+
+<p>I have a table with x Columns. I want to be able to select one row from the table and then transform the columns into rows.</p>
+
+<pre><code>TableA
+Column1, Column2, Column3
+</code></pre>
+
+<p>SQL Statement to ruturn</p>
+
+<pre><code>ResultA
+Value of Column1
+Value of Column2
+Value of Column3
+</code></pre>

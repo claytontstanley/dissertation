@@ -1,0 +1,6 @@
+I have the Xming X Window Server installed on a laptop running Windows XP to connect to some UNIX development servers.
+It works fine when I connect directly to the company network in the office. However, it does not work when I connect to the network remotely over a VPN.
+When I start Xming when connected remotely none of my terminal windows are displayed.
+I think it may have something to do with the DISPLAY environment variable not being set correctly to the IP address of the laptop when it is connected.
+I've noticed that when I do an ipconfig whilst connected remotely that my laptop has two IP addresses, the one assigned to it from the company network and the local IP address I've set up for it on my "local network" from my modem/router.
+Are there some configuration changes I need to make in Xming to support its use through the VPN ?

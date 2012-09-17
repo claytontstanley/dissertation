@@ -1,0 +1,12 @@
+I'm curious about what types of tools and specific tools people can't live without in their daily work.  Anyone interested, please post up to 10 categories of tools you can't live without, and then with it as many specific implementations of that tool that you use.  The reason for this category/implementation split is to compensate for the disparate backgrounds of all the readers here.  I'll try to collate responses back into this question as responses come in.  Here are mine to get things started:
+Web browser (Firefox)
+Remote machine management (SecureCRT, Remote Desktop, VNC)
+Text editor (vi/vim for *nix, gvim for Windows, BBEdit for Mac OS X)
+IM client (Pidgin, MS OCS)
+Email client (pine, Outlook, Lotus Notes)
+Data visualizer (Perl + MS Excel's graphing functions)
+Network sniffer (tcpdump for linux/Mac OS X, snoop for solaris, Wireshark for Windows and visualizing dumps from other tools)
+VPN client (Cisco VPN client)
+scripting tools (ksh, Perl)
+Looking through this list the big ones I would expect to see from others that I don't use are an IDE (I'm not a professional programmer anymore) and version control (which I ought to rely on but don't at this point).
+EDIT: while I think my question was asked from a different POV, it looks like the answers in the thread Essential Programming Tools would be along the same lines as this one.  Believe it or not I did look before I posted =)

@@ -1,0 +1,26 @@
+Does anyone have, or know of, a binary patch generation algorithm implementation in C#?
+Basically, compare two files (designated old and new), and produce a patch file that can be used to upgrade the old file to have the same contents as the new file.
+The implementation would have to be relatively fast, and work with huge files. It should exhibit O(n) or O(logn) runtimes.
+My own algorithms tend to either be lousy (fast but produce huge patches) or slow (produce small patches but have O(n^2) runtime).
+Any advice, or pointers for implementation would be nice.
+Specifically, the implementation will be used to keep servers in sync for various large datafiles that we have one master server for. When the master server datafiles change, we need to update several off-site servers as well.
+The most naive algorithm I have made, which only works for files that can be kept in memory, is as follows:
+Grab the first four bytes from the old file, call this the key
+Add those bytes to a dictionary, where key -> position, where position is the position where I grabbed those 4 bytes, 0 to begin with
+Skip the first of these four bytes, grab another 4 (3 overlap, 1 one), and add to the dictionary the same way
+Repeat steps 1-3 for all 4-byte blocks in the old file
+From the start of the new file, grab 4 bytes, and attempt to look it up in the dictionary
+If found, find the longest match if there are several, by comparing bytes from the two files
+Encode a reference to that location in the old file, and skip the matched block in the new file
+If not found, encode 1 byte from the new file, and skip it
+Repeat steps 5-8 for the rest of the new file
+This is somewhat like compression, without windowing, so it will use a lot of memory. It is, however, fairly fast, and produces quite small patches, as long as I try to make the codes output minimal.
+A more memory-efficient algorithm uses windowing, but produces much bigger patch files.
+There are more nuances to the above algorithm that I skipped in this post, but I can post more details if necessary. I do, however, feel that I need a different algorithm altogether, so improving on the above algorithm is probably not going to get me far enough.
+Edit #1: Here is a more detailed description of the above algorithm.
+First, combine the two files, so that you have one big file. Remember the cut-point between the two files.
+Secondly, do that grab 4 bytes and add their position to the dictionary step for everything in the whole file.
+Thirdly, from where the new file starts, do the loop with attempting to locate an existing combination of 4 bytes, and find the longest match. Make sure we only consider positions from the old file, or from earlier in the new file than we're currently at. This ensures that we can reuse material in both the old and the new file during patch application.
+Edit #2: Source code to the above algorithm
+You might get a warning about the certificate having some problems. I don't know how to resolve that so for the time being just accept the certificate.
+The source uses lots of other types from the rest of my library so that file isn't all it takes, but that's the algorithm implementation.

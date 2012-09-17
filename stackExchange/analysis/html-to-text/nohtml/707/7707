@@ -1,0 +1,5 @@
+I have an element which may contain very big amounts of data, but I don't want it to ruin the page layout, so I set max-height: 100px and overflow:auto, hoping for scrollbars to appear when the content does not fit. It all works fine in Firefox and IE7, but IE8 behaves as if overflow:hidden was present instead of overflow:auto. I tried overflow:scroll, still does not help, IE8 simply truncates the content without showing scrollbars. Changing max-height declaration to height makes overflow work OK, it's the combination of max-height and overflow:auto that breaks things.
+This is also logged as an official bug in the final, release version of IE8:
+http://connect.microsoft.com/IE/feedback/ViewFeedback.aspx?FeedbackID=408759
+Does anyone know of a workaround? For now I resorted to using height instead of max-height, but it leaves plenty of empty space in case there isn't much data.
+Before you tell me to do that, yes, I've reported the bug to IE developers :)

@@ -1,0 +1,7 @@
+<p>I have a project that I'm currently working on but it currently only supports the .net framework 2.0. I love linq, but because of the framework version I can't use it. What I want isn't so much the ORM side of things, but the "queryability" (is that even a word?) of Linq. </p>
+
+<p>So far the closest is <a href="http://www.llblgen.com/defaultgeneric.aspx" rel="nofollow" title="Jonathan Livingston Seagull">llblgen</a> but if there was something even lighter weight that could just do the querying for me that would be even better.</p>
+
+<p>I've also looked at <a href="http://www.hibernate.org/343.html" rel="nofollow" title="Bootstrap">NHibernate</a> which looks like it could go close to doing what I want, but it has a pretty steep learning curve and the mapping files don't get me overly excited.</p>
+
+<p>If anyone is aware of something that will give me a similar query interface to Linq (or even better, how to get Linq to work on the .net 2.0 framework) I'd really like to hear about it.</p>

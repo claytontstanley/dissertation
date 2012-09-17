@@ -1,0 +1,3 @@
+I'm looking for a .NET regular expression extract all the URLs from a webpage but haven't found one to be comprehensive enough to cover all the different ways you can specify a link.
+And a side question:
+Is there 'one regex to rule them all'? Or am I better off using a series of less complicated regular expressions and just using mutliple passes against the raw HTML? (Speed vs. Maintainability)

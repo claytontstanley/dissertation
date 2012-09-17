@@ -1,0 +1,13 @@
+<p>Hi.  I am a CSS newbie trying to layout a table-like page with two columns.  I want the rightmost column to dock to the right of the page, and this column should have a distinct background color.  The content in the right side is almost always going to be smaller than that on the left.  I would like the div on the right to always be tall enough to reach the separator for the row below it.  How can I make my background color fill that space?</p>
+
+<pre><code>   &lt;html&gt;<br>    &lt;body&gt;<br>    &lt;style type="text/css"&gt;<br>    .rightfloat<br>    {<br>        color: red;<br>        background-color: #BBBBBB;<br>        float: right;<br>        width: 200px;<br>    }<br><br>    .left {<br>        font-size: 20pt;<br>    }<br><br>    .separator {<br>        clear: both;<br>        width: 100%;<br>        border-top: 1px solid black;<br>    }<br>    &lt;/style&gt;<br><br>    &lt;div class="separator"&gt;<br>      &lt;div class="rightfloat"&gt;<br>        Some really short content.<br>      &lt;/div&gt;<br>      &lt;div class="left"&gt; <br>        Some really really really really really really really really really really big content<br>      &lt;/div&gt;<br>    &lt;/div&gt;<br>    &lt;div class="separator"&gt;<br>      &lt;div class="rightfloat"&gt;<br>        Some more short content.<br>      &lt;/div&gt;<br>      &lt;div class="left"&gt; <br>        Some really really really really really really really really really really big content<br>      &lt;/div&gt;<br>    &lt;/div&gt;<br><br>    &lt;/body&gt;<br>    &lt;/html&gt;<br></code></pre>
+
+<hr>
+
+<p>Edit:  I agree that this example is very table-like and an actual table would be a fine choice.  But my "real" page will eventually be less table-like, and I'd just like to first master this task!</p>
+
+<p>Also, for some reason, when I create/edit my posts in IE7, the code shows up correctly in the preview view, but when I actually post the message, the formatting gets removed.  Editing my post in Firefox 2 seems to have worked, FWIW.</p>
+
+<hr>
+
+<p>Another edit: Yeah, I unaccepted GateKiller's answer.  It does indeed work nicely on my simple page, but not in my actual heavier page.  I'll investigate some of the links y'all have pointed me to.  Thanks!</p>

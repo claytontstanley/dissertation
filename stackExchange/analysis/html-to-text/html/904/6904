@@ -1,0 +1,45 @@
+<p>I'm trying to use the CoreCon API in Visual Studio 2008 to programmatically launch device emulators. When I call device.Connect(), I inexplicably get a DirectoryNotFoundException. I get it if I try it in PowerShell or in C# Console Application. Here's the code I'm using:</p>
+
+<pre><code>  static void Main(string[] args)
+  {
+     DatastoreManager dm = new DatastoreManager(1033);
+     Collection&lt;Platform&gt; platforms = dm.GetPlatforms();
+     foreach (var p in platforms)
+     {
+        Console.WriteLine("{0} {1}", p.Name, p.Id);
+     }
+     Platform platform = platforms[3];
+     Console.WriteLine("Selected {0}", platform.Name);
+     Device device = platform.GetDevices()[0];
+     device.Connect();
+     Console.WriteLine("Device Connected");
+     SystemInfo info = device.GetSystemInfo();
+     Console.WriteLine("System OS Version:{0}.{1}.{2}", 
+        info.OSMajor, info.OSMinor, info.OSBuildNo);
+     Console.ReadLine();
+  }
+</code></pre>
+
+<p>My question: Does anyone know why I'm getting this error? I'm running this on WinXP 32-bit, plain jane Visual Studio 2008 Pro. I imagine it's some config issue since I can't do it from a Console app or PowerShell.</p>
+
+<p>Here's the stack trace as requested:</p>
+
+<pre><code>System.IO.DirectoryNotFoundException was unhandled
+
+Message="The system cannot find the path specified.\r\n"
+
+Source="Device Connection Manager"
+
+StackTrace:
+       at Microsoft.VisualStudio.DeviceConnectivity.Interop.ConManServerClass.ConnectDevice()
+       at Microsoft.SmartDevice.Connectivity.Device.Connect()
+       at ConsoleApplication1.Program.Main(String[] args) in C:\Documents and Settings\Thomas\Local Settings\Application Data\Temporary Projects\ConsoleApplication1\Program.cs:line 23
+       at System.AppDomain._nExecuteAssembly(Assembly assembly, String[] args)
+       at System.AppDomain.ExecuteAssembly(String assemblyFile, Evidence assemblySecurity, String[] args)
+       at Microsoft.VisualStudio.HostingProcess.HostProc.RunUsersAssembly()
+       at System.Threading.ThreadHelper.ThreadStart_Context(Object state)
+       at System.Threading.ExecutionContext.Run(ExecutionContext executionContext, ContextCallback callback, Object state)
+       at System.Threading.ThreadHelper.ThreadStart()
+</code></pre>
+
+<p>InnerException: </p>

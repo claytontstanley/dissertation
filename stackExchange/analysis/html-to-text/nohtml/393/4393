@@ -1,0 +1,3 @@
+I'd like a script to drop all tables whose name begins with a given string. I'm sure this can be done with some dynamic sql and the INFORMATION_SCHEMA tables.
+If anyone has a script, or can knock one up quickly, please post it.
+If no-one posts an answer before I figure it out myself, I'll post my solution.

@@ -1,0 +1,7 @@
+Searching for some sample code for converting a point in WGS84 coordinate system to a map position in Google Maps (pixel position), also supporting zoom levels.
+If the codes is well commented, then it can also be in some other language.
+You can also point me to a open source Java project :)
+Some resources found:
+OpenLayer implementation.
+JOSM project
+Excellent Java Map Projection Library from JH LABS. This is a pure java PROJ.4 port. Does projection from WGS84 to meters. From there it's quite straightforward to convert meters to tile pixels.

@@ -1,0 +1,8 @@
+I have a MySQL table with approximately 3000 rows per user. One of the columns is a datetime field, which is mutable, so the rows aren't in chronological order.
+I'd like to visualize the time distribution in a chart, so I need a number of individual datapoints. 20 datapoints would be enough.
+I could do this:
+select timefield from entries where uid = ? order by timefield;
+and look at every 150th row.
+Or I could do 20 separate queries and use limit 1 and offset.
+But there must be a more efficient solution...
+UPDATE: still unanswered

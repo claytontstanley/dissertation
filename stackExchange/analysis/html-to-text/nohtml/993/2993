@@ -1,0 +1,53 @@
+I'm in an environment with a lot of computers that haven't been properly inventoried. Basically, no one knows which IP goes with which mac address and which hostname. So I wrote the following:
+# This script goes down the entire IP range and attempts to
+# retrieve the Hostname and mac address and outputs them
+# into a file. Yay!
+require "socket"
+TwoOctets = "10.26"
+def computer_exists?(computerip)
+system("ping -c 1 -W 1 #{computerip}")
+end
+def append_to_file(line)
+file   = File.open("output.txt", "a")
+file.puts(line)
+file.close
+end
+def getInfo(current_ip)
+begin
+if computer_exists?(current_ip)
+arp_output = `arp -v #{current_ip}`
+mac_addr = arp_output.to_s.match(/..:..:..:..:..:../)
+host_name = Socket.gethostbyname(current_ip)
+append_to_file("#{host_name[0]} - #{current_ip} - #{mac_addr}\n")
+end
+rescue SocketError => mySocketError
+append_to_file("unknown - #{current_ip} - #{mac_addr}")
+end
+end
+(6..8).each do |i|
+case i
+when 6
+for j in (1..190)
+current_ip = "#{TwoOctets}.#{i}.#{j}"
+getInfo(current_ip)
+end
+when 7
+for j in (1..255)
+current_ip = "#{TwoOctets}.#{i}.#{j}"
+getInfo(current_ip)
+end
+when 8
+for j in (1..52)
+current_ip = "#{TwoOctets}.#{i}.#{j}"
+getInfo(current_ip)
+end
+end
+end
+Everything works except it does not find a Reverse DNS.
+Sample output that I'm getting is this:
+10.26.6.12 - 10.26.6.12 - 00:11:11:9B:13:9F
+10.26.6.17 - 10.26.6.17 - 08:00:69:9A:97:C3
+10.26.6.18 - 10.26.6.18 - 08:00:69:93:2C:E2
+If I do nslookup 10.26.6.12 then I get the correct reverse DNS so that shows that my machine is seeing the dns server.
+I have tried Socket.gethostbyname, gethostbyaddr, but it doesn't work : (
+Any guidance will be much appreciated. Thanks!

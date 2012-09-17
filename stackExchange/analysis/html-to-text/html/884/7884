@@ -1,0 +1,16 @@
+<p>I've just come across this in a WHERE clause:</p>
+
+<pre><code>AND NOT (t.id = @id)
+</code></pre>
+
+<p>How does this compare with:</p>
+
+<pre><code>AND t.id != @id
+</code></pre>
+
+<p>Or with:</p>
+
+<pre><code>AND t.id &lt;&gt; @id
+</code></pre>
+
+<p>I'd always write the latter myself, but clearly someone else thinks differently. Is one going to perform any better than the other? I know that using <code>&lt;&gt;</code> or <code>!=</code> is going to bust any hopes for using an index that I might have had, but <em>surely</em> the first approach above will suffer the same problem?</p>

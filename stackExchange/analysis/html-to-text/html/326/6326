@@ -1,0 +1,9 @@
+<p>I have the following html.erb code that I'm looking to move to Haml:</p>
+
+<pre><code>    &lt;span class="&lt;%= item.dashboardstatus.cssclass %&gt;" &gt;&lt;%= item.dashboardstatus.status %&gt;&lt;/span&gt;<br></code></pre>
+
+<p>What it does is associate the CSS class of the currently assigned status to the span.</p>
+
+<p>How is this done in Haml? I'm sure I'm missing something really simple.</p>
+
+<p>Edit: Gah. I can't believe I didn't figure that out on my own. Just goes to show that two sets of eyes are better than one. Thanks!</p>

@@ -1,0 +1,35 @@
+The Setting:
+The program in question tries to post form data via an AJAX call to a target procedure contained in the same package as the caller. This is done for a site that uses a secure connection (https). The technology used here is PLSQL and the DOJO JavaScript library. The development tool is basically a text editor .
+Code Snippet:
+function testPost() {
+dojo.xhrPost( {
+url: ''dr_tm_w_0120.test_post'',
+form: ''orgForm'',
+load: testPostXHRCallback,
+error: testPostXHRError
+});
+}
+function testPostXHRCallback(data,ioArgs) {
+alert(''post callback'');         try{         dojo.byId("messageDiv").innerHTML = data;         }         catch(ex){               if(ex.name == "TypeError")               {                 alert("A type error occurred.");               }         }          return data;      }
+function testPostXHRError(data, ioArgs) {
+alert(data);         alert(''Error when retrieving data from the server!'');         return data;      }
+The Problem:
+When using IE6 (which the entire user-base uses), the response sent back from the server is a 404 error.
+Observations:
+The program works fine in Firefox.
+The calling procedure cannot target any procedures within the same package.
+The calling procedure can target outside sites (both http, https).
+The other AJAX calls in the package that are not posts of form data work fine.
+I've searched the internets and consulted with senior-skilled team members and haven't discovered anything that satisfactorily addresses the issue.
+*Tried Q&A over at Dojo support forums.
+The Questions:
+What troubleshooting techniques do you recommend?
+What troubleshooting tools do you recommend for HTTPS analyzing?
+Any hypotheses on what the issue might be?
+Any ideas for workarounds that aren't total (bad) hacks?
+Ed. The Solution
+lomaxx, thx for the fiddler tip. you have no idea how awesome it was to get that and use it as a debugging tool. after starting it up this is what i found and how i fixed it (at least in the short term):
+ef Fri, 8 Aug 2008 14:01:26 GMT dr_tm_w_0120.test_post: SIGNATURE (parameter names) MISMATCH VARIABLES IN FORM NOT IN PROCEDURE: SO1_DISPLAYED_,PO1_DISPLAYED_,RWA2_DISPLAYED_,DD1_DISPLAYED_ NON-DEFAULT VARIABLES IN PROCEDURE NOT IN FORM: 0
+After seeing that message from the server, I kicked around Fiddler a bit more to see what else I could learn from it. Found that there's a WebForms tab that shows the values in the web form. Wouldn't you know it, the "xxx_DISPLAYED_" fields above were in it.
+I don't really understand yet why these fields exist, because I didn't create them explicitly in the web PLSQL code. But I do understand now that the target procedure has to include them as parameters to work correctly. Again, this is only in the case of IE6 for me, as Firefox worked fine.
+Well, that the short term answer and hack to fix it. Hopefully, a little more work in this area will lead to a better understanding of the fundamentals going on here.

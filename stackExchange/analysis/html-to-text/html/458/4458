@@ -1,0 +1,3 @@
+<p>I was just listening to some older .Net Rocks! episodes, and I <a href="http://www.microsoft.com/downloads/details.aspx?FamilyID=D91887EA-5128-4BB1-B861-1DC1F9564941&amp;displaylang=en" rel="nofollow">found #329 on DSLs</a> to be interesting. My problem is that I can't find any good online resources for people trying to learn this technology. I get the basics of the creating new designers, but the MS docs on the T4 engine used by the DSL tools and then how to integrate the templates with the DSL models are lacking.</p>
+
+<p>Does anyone know of some good introductory resources for the MS DSL tools?</p>

@@ -1,0 +1,5 @@
+<p>Can anyone point me to some decent introductions to WS-Security?</p>
+
+<p>I'm looking for tutorials or something that provide a fairly gentle introduction to the subject, though I don't mind if it assumes basic knowledge of web services and SOAP. Most of the stuff I've seen so far is very technical and you need a lot of complex, detailed background knowledge to understand it properly.</p>
+
+<p>We have to implement a web service in PHP and one or more clients in .NET, so resources covering both would be much appreciated.</p>

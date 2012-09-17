@@ -1,0 +1,7 @@
+Mocking sealed classes can be quite a pain.  I currently favor an Adapter pattern to handle this, but something about just keeps feels weird.
+So, What is the best way you mock sealed classes?
+Java answers are more than welcome.  In fact, I would anticipate that the Java community has been dealing with this longer and has a great deal to offer.
+But here are some of the .NET opinions:
+Why Duck Typing Matters for C# Develoepers
+Creating wrappers for sealed and other types for mocking
+Unit tests for WCF (and Moq)

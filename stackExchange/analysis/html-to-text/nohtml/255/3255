@@ -1,0 +1,3 @@
+Most people with a degree in CS will certainly know what Big O stands for . It helps us to measure how (in)efficient an algorithm really is and if you know in what category the problem you are trying to solve lays in you can figure out if it is still possible to squeeze out that little extra performance.1
+But I'm curious, how do you calculate or approximate the complexity of your algorithms?
+1 but as they say, don't overdo it, premature optimization is the root of all evil , and optimization without a justified cause should deserve that name as well.

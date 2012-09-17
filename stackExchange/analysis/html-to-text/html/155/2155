@@ -1,0 +1,5 @@
+<p>The web applications I develop often require co-dependant configuration settings and there are also settings that have to change as we move between each of our environments.  </p>
+
+<p>All our settings are currently simple key value pairs but it would be useful to create custom config sections so that it is obvious when two values need to change together or when the settings need to change for an environment.</p>
+
+<p>What's the best way to create custom config sections and are there any special considerations to make when retrieving the values?</p>

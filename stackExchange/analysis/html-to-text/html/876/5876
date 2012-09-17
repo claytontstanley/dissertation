@@ -1,0 +1,20 @@
+<p>I use <a href="http://www.thekelleys.org.uk/dnsmasq/doc.html" rel="nofollow">dnsmasq</a> to resolve DNS queries on my home network. Unfortunately, if a domain name is not known, it will append my own domain name to the request which means that I always end up viewing my own site in a browser.</p>
+
+<p>For example, if I enter <a href="http://dlksfhoiahdsfiuhsdf.com" rel="nofollow">http://dlksfhoiahdsfiuhsdf.com</a> in a browser, I end up viewing my own site with that URL. If I try something like:</p>
+
+<pre><code>host dlksfhoiahdsfiuhsdf.com
+</code></pre>
+
+<p>Instead of the expected:</p>
+
+<pre><code>Host dlksfhoiahdsfiuhsdf.com not found: 3(NXDOMAIN)
+</code></pre>
+
+<p>I get this:</p>
+
+<pre><code>dlksfhoiahdsfiuhsdf.com.mydomainname.com has address W.X.Y.Z.
+</code></pre>
+
+<p>Clearly, dnsmasq is appending my domain name to impossible name requests in an effort to resolve them, but I'd rather see the not found error instead.</p>
+
+<p>I've tried playing with the <em>expand-hosts</em> and <em>domain</em> configuration settings, but to no avail. Is there anything else I can try?</p>

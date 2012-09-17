@@ -1,0 +1,3 @@
+<p>I'm trying to get my head around ASP.NET MVC coming from a LAMP development environment. This isn't for anything production or mission-critical, just a guy trying to learn. I've looked at all I can on <a href="http://asp.net/mvc" rel="nofollow">http://asp.net/mvc</a> but a lot of those videos and tutorials seem to assume you know ASP.NET WebForms (which I don't) although I am quite handy with VB.NET.</p>
+
+<p>My question boils down to, does anyone know of a small tutorial or even have one they made themselves whilst exploring ASP.NET MVC, that literally just shows you how to create, read, update and delete records in an MS SQL database?</p>

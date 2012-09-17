@@ -1,0 +1,7 @@
+I have designed database tables (normalised, on an MS SQL server) and created a standalone windows front end for an application that will be used by a handful of users to add and edit information. We will add a web interface to allow searching accross our production area at a later date.
+I am concerned that if two users start editing the same record then the last to commit the update would be the 'winner' and important information may be lost. A number of solutions come to mind but I'm not sure if I am going to create a bigger headache.
+Do nothing and hope that two users are never going to be editing the same record at the same time. - Might never happed but what if it does?
+Editing routine could store a copy of the original data as well as the updates and then compare when the user has finished editing. If they differ show user and comfirm update - Would require two copies of data to be stored.
+Add last updated DATETIME column and check it matches when we update, if not then show differences. - requires new column in each of the relevant tables.
+Create an editing table that registers when users start editing a record that will be checked and prevent other users from editing same record. - would require carful thought of program flow to prevent deadlocks and records becoming locked if a user crashes out of the program.
+Are there any better solutions or should I go for one of these?

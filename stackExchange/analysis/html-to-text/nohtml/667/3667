@@ -1,0 +1,1 @@
+We are currently using a somewhat complicated deployment setup that involves a remote SVN server, 3 SVN branches for DEV, STAGE, and PROD, promoting code between them through patches, etc. I wonder what do you use for deployment in a small dev team situation?

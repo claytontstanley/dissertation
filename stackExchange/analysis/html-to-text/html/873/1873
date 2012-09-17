@@ -1,0 +1,27 @@
+<p>How do I delimit a Javascript databound string parameter in an anchor OnClick event?</p>
+
+<ul>
+<li>I have an anchor tag in an ASP.NET Repeater control.  </li>
+<li>The OnClick event of the anchor contains a call to a Javascript function.  </li>
+<li>The Javascript funciton takes a string for it's input parameter.  </li>
+<li>The string parameter is populated with a databound value from the Repeater.</li>
+</ul>
+
+<p>I need the 'double quotes' for the Container.DataItem. <br>
+I need the 'single quotes' for the OnClick.</p>
+
+<p>And I still need <em>one more delimiter</em> (triple quotes?) for the input string parameter of the Javascript function call.</p>
+
+<p>Since I can't use 'single quotes' again, how do I ensure the Javascript function knows the input parameter is a string and not an integer?</p>
+
+<p>Without the extra quotes around the input string parameter, the Javascript function thinks I'm passing in an integer.</p>
+
+<p>Cheers in advance for any knowledge you can drop.</p>
+
+<p>The anchor:</p>
+
+<pre><code>&lt;a id="aShowHide" onclick='ToggleDisplay(&lt;%# DataBinder.Eval(Container.DataItem, "JobCode") %&gt;);' &gt;Show/Hide&lt;/a&gt;    <br></code></pre>
+
+<p>and here is the Javascript:</p>
+
+<pre><code>&lt;script language="JavaScript" type="text/javascript"&gt;<br>/* Shows/Hides the Jobs Div */<br>  function ToggleDisplay(jobCode)<br>  {<br>  /* Each div has it's ID set dynamically ('d' plus the JobCode) */<br>    var elem = document.getElementById('d' + jobCode);<br>    if (elem) <br>    {<br>      if (elem.style.display != 'block') <br>      {<br>        elem.style.display = 'block';<br>        elem.style.visibility = 'visible';<br>      } <br>      else<br>      {<br>        elem.style.display = 'none';<br>        elem.style.visibility = 'hidden';<br>      }<br>    }<br>  }<br>&lt;/script&gt;<br></code></pre>

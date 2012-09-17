@@ -1,0 +1,26 @@
+I'm thinking of trying Beautiful Soup, a python package for HTML scraping.  Are there any other HTML scraping packages I should be looking at?  Python is not a requirement, I'm actually interested in hearing about other languages as well.
+The story so far:
+Python
+Beautiful Soup
+lxml
+HTQL
+Ruby
+Nokogiri
+Hpricot
+Mechanize
+scrAPI
+scRUBYt!
+.NET
+Html Agility Pack
+WaitiN
+Perl
+WWW::Mechanize
+Web-Scraper
+Java
+Tag Soup
+HtmlUnit
+PHP
+htmlSQL
+Most of them
+Screen-Scraper
+Update: If you want to see a scraper app, check out Grant's SO user page monitor .  Nifty!

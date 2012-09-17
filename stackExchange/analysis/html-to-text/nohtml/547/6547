@@ -1,0 +1,7 @@
+One of those classic programming interview questions...
+You are given two marbles, and told that they will break when dropped from some certain height (and presumably suffer no damage if dropped from below that height). You’re then taken to a 100 story building (presumably higher than the certain height), and asked to find the highest floor your can drop a marble from without breaking it as efficiently as possible.
+Extra info
+You must find the correct floor (not a possible range)
+The marbles are both guaranteed to break at the same floor
+Assume it takes zero time for you to change floors - only the number of marble drops counts
+Assume the correct floor is randomly distributed in the building

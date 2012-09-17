@@ -1,0 +1,2 @@
+How do I rewrite URL's in ASP.NET?
+I would like users to be able to goto http://www.website.com/users/smith instead of http://www.website.com/?user=smith

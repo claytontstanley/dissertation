@@ -1,0 +1,4 @@
+First of all, I know how to build a java application. But I was always puzzled where to put my classes. There are proponents for organizing the packages strictly domain oriented, others separate by tier.
+I for myself have always problems a) with naming, b) with placing
+Where do you put your domain specific constants (and what is the best name for such a class)? Where do you put classes for stuff which is both infrastructural and domain specific (for instance I have a FileStorageStrategy class, which stores the files either in the database, or alternatively in database)? Where to put Exceptions?
+Are there any standards to which I can refer?

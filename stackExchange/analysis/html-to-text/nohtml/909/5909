@@ -1,0 +1,22 @@
+I'm downloading an entire directory from a web server. It works OK, but I can't figure how to get the file size before download to compare if it was updated on the server or not. Can this be done as if I was downloading the file from a FTP server?
+import urllib
+import re
+url = "http://www.someurl.com"
+# Download the page locally
+f = urllib.urlopen(url)
+html = f.read()
+f.close()
+f = open ("temp.htm", "w")
+f.write (html)
+f.close()
+# List only the .TXT / .ZIP files
+fnames = re.findall('^.*<a href="(\w+(?:\.txt|.zip)?)".*$', html, re.MULTILINE)
+for fname in fnames:
+print fname, "..."
+f = urllib.urlopen(url + "/" + fname)
+#### Here I want to check the filesize to download or not ####
+file = f.read()
+f.close()
+f = open (fname, "w")
+f.write (file)
+f.close()

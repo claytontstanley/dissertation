@@ -1,0 +1,1 @@
+What is the best unobtrusive CAPTCHA for web forms? One that does not involve a UI, rather a non-UI Turing test. I have seen a simple example of a non UI CAPTCHA like the Nobot control from Microsoft. I am looking for a CAPTCHA that does not ask the user any question in any form. No riddles, no what's in this image.

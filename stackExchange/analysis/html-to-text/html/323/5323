@@ -1,0 +1,3 @@
+<p>It seems like every time I try to create a pure CSS layout it takes me much longer than if I'd use a table or two. Getting three columns to be of equal lengths with different amount of data in them seems to require particular fancy hacks, especially when dealing with cross-browser issues.</p>
+
+<p>So, my question is this: who are these few tables going to hurt? Tables seem to work particularly good on tabular data - why are they so reviled in this day and age? Google.com has a table its source code, so do many other sites (stackoverflow does not by the way).</p>

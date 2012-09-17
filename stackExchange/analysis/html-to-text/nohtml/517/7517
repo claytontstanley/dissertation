@@ -1,0 +1,1 @@
+Is there a simple way to drop a group of interrelated tables in SQL Server? Ideally I'd like to avoid having to worry about what order they're being dropped in since I know the entire group will be gone by the end of the process.

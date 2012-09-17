@@ -1,0 +1,7 @@
+<p>I have Windows File sharing enabled on an OS X 10.4 computer. It's accessible via \rudy\myshare for all the Windows users on the network, except for one guy running Vista Ultimate 64-bit edition. </p>
+
+<p>All the other users are running Vista or XP, all 32-bit. All the workgroup information is the same, all login with the same username/password.</p>
+
+<p>The Vista 64 guy can see the Mac on the network, but his login is rejected every time.</p>
+
+<p>Now, I imagine that Vista Ultimate is has something configured differently to the Business version and XP but I don't really know where to look. Any ideas?</p>

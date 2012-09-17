@@ -1,0 +1,13 @@
+I am currently working on a project with specific requirements. A brief overview of these are as follows:
+Data is retrieved from external webservices
+Data is stored in SQL 2005
+Data is manipulated via a web GUI
+The windows service that communicates with the web services has no coupling with our internal web UI, except via the database.
+Communication with the web services needs to be both time-based, and triggered via user intervention on the web UI.
+The current (pre-pre-production) model for web service communication triggering is via a database table that stores trigger requests generated from the manual intervention. I do not really want to have multiple trigger mechanisms, but would like to be able to populate the database table with triggers based upon the time of the call. As I see it there are two ways to accomplish this.
+1) Adapt the trigger table to store two extra parameters. One being "Is this time-based or manually added?" and a nullable field to store the timing details (exact format to be determined). If it is a manaully created trigger, mark it as processed when the trigger has been fired, but not if it is a timed trigger.
+or
+2) Create a second windows service that creates the triggers on-the-fly at timed intervals.
+The second option seems like a fudge to me, but the management of option 1 could easily turn into a programming nightmare (how do you know if the last poll of the table returned the event that needs to fire, and how do you then stop it re-triggering on the next poll)
+I'd appreciate it if anyone could spare a few minutes to help me decide which route (one of these two, or possibly a third, unlisted one) to take.
+Thanks in advance

@@ -1,0 +1,6 @@
+<p>I'd like to create a progress bar to indicate the status of an a batch job in Ruby. I've read some <a href="http://tldp.org/HOWTO/NCURSES-Programming-HOWTO/" rel="nofollow" title="NCURSES Programming HOWTO">tutorials</a> / <a href="http://ncurses-ruby.berlios.de/" rel="nofollow" title="ncurses-ruby">libraries</a> on using ncurses, none of which were particularly helpful in explaining how create an "animated" progress bar in the terminal or using curses with Ruby. I'm already aware of using a separate thread to monitor the progress of a given job, I'm just not sure how to proceed with drawing a progress bar. </p>
+
+
+
+<p><strong>Update</strong>
+<a href="http://0xcc.net/ruby-progressbar/" rel="nofollow" title="ruby-progressbar">ProgressBar</a> class was incredibly straight-forward, perfectly solved my problem.</p>

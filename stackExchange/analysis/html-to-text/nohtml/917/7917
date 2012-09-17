@@ -1,0 +1,2 @@
+I'm importing some data from a CSV file, and numbers that are larger 1000 get turned into "1,100" etc. What's a good way to remove both the quotes and the comma from this so I can put it into an int field?
+Edit: The data is actually already in a MySQL table, so I need to be able to this using SQL. Sorry for the mixup.

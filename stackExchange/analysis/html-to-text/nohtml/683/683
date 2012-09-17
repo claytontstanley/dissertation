@@ -1,0 +1,3 @@
+I don't remember whether I was dreaming or not but I seem to recall there being a function which allowed something like,
+foo in iter_attr(array of python objects, attribute name)
+I've looked over the docs but this kind of thing doesn't fall under any obvious listed headers

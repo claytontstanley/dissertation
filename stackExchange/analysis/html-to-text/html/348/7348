@@ -1,0 +1,10 @@
+<p>My requirements:</p>
+
+<ul>
+<li>Support .NET Compact Framework 2.0 and Windows Mobile 6.0 devices.</li>
+<li>Only need to unzip the contents to a directory on a storage card. Creation of zip files is not required.</li>
+<li>Must be able to use in corporate/commercial software.</li>
+<li>Can be open source, but not have GPL or other viral license.</li>
+</ul>
+
+<p>I've seen the <a href="http://xceed.com/Zip_NET_CF_Intro.html" rel="nofollow" title="Reading List: Fog Creek Software Management Training Program">Xceed Zip for CF</a> library. What other options are there?</p>

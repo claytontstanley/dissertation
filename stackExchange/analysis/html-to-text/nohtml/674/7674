@@ -1,0 +1,5 @@
+We have a custom-built Flash-based video player that I maintain, and it needs to support preroll ads and ideally both progressive video playback and streaming depending on a server switch.
+I've been working with the flvPlayback component but am finding myself a little out of my depth. Are there any good tutorials or resources for understanding the difference between netstream and flvPlayback? Or is one part of the other? Have googled without success.
+For the preroll ads we'll probably use DART In-Stream, which is part of the reason I feel I'm losing a grip on the best way to structure this thing.
+Any help with best practices or links most appreciated - ta!
+EDIT - Update: I wrote a player by hand and got it more or less working with everything it needed to do, but we did migrate to JW Player across all the web properties in the end, about six months later. It's very reliable and well-supported, it integrated with the DART system well, and the designers found it easy to skin.

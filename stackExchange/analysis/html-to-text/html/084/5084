@@ -1,0 +1,3 @@
+<p>Just ran into this weird problem with a user using Mac OS X. This user always had a failed upload. The form uses a regular "input type=file". The user could upload using any browser except Firefox 3 on his Mac. Only this particular user was seeing this error.</p>
+
+<p>Obviously, the problem is only with this one particular user.</p>

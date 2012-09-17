@@ -1,0 +1,5 @@
+[I hope this isn't too obscure… I'll ask the newsgroup if nobody knows here]
+I'm using Pylons (a python framework) to serve a simple web application, but it seems to die from time to time, with this in the error log: (2006, 'MySQL server has gone away')
+I did a bit of checking, and saw that this was because the connections to MySQL were not being renewed. This shouldn't be a problem though, because the sqlalchemy.pool_recycle in the config file should automatically keep it alive. The default was 3600, but I dialed it back to 1800 because of this problem. It helped a bit, but 3600 should be fine according to the docs. The errors still happen semi-regularly. I don't want to lower it too much though and DOS my own database :).
+Maybe something in my MySQL config is goofy? Not sure where to look exactly.
+Other relevant details: Python 2.5 Pylons: 0.9.6.2 (w/ sql_alchemy) MySQL: 5.0.51

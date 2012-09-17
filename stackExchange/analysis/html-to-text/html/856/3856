@@ -1,0 +1,1 @@
+<p>I have a component I wrote that display a filename, a thumbnail, and has a button to click on to load/play the file. The component is databound to a repeater. How can I make it so the button event fires to the main application and tells it which file to play?</p>

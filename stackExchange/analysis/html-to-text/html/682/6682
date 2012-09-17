@@ -1,0 +1,9 @@
+<p>I 'm currently investigating the different styles of AOP in Java and I started with AspectJ. I try to get a good view on the different styles:</p>
+
+<ul>
+<li>weaver</li>
+<li>proxy</li>
+<li>any others</li>
+</ul>
+
+<p>Do you know a good tutorial or technology article about the different frameworks and techniques?</p>

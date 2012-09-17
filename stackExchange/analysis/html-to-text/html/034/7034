@@ -1,0 +1,4 @@
+<P>Hi. I have a data structure that represents a directed graph, and I want to render that dynamically on an HTML page. Does anyone know of any javascript code that can do a reasonable job with graph layout? These graphs will usually be just a few nodes, maybe ten at the very upper end, so my guess is that performance isn't going to be a big deal. Ideally, I'd like to be able to hook it in with jQuery so that users can tweak the layout manually by dragging the nodes around.</P>
+<HR>
+
+<P>Edit: Google's Visualization API seems to be more "graphs as charts" oriented than "graphs as nodes" oriented. I didn't see any node-oriented visualizations already built there, anyway. Do you know that one exists?</P>

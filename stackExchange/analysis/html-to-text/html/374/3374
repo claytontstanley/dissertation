@@ -1,0 +1,17 @@
+<p>I am using OpenVPN with an *.opvn config file under Windows XP to connect to a VPN server. Everything works fine, I connect successfully, but after 2 minutes or so of inactivity my connection dies. Does anyone know if this is a:</p>
+
+<ul>
+<li>OpenVPN config problem</li>
+<li>Windows problem</li>
+<li>Client network problem</li>
+<li>Server VPN config problem</li>
+<li>Server network problem</li>
+</ul>
+
+<p>I have included my *.opvn config file below:</p>
+
+<pre><code>#OpenVPN Server conf<br>tls-client<br>client<br>dev tun<br>proto udp<br>tun-mtu 1400<br>remote XXX.XXX.XXX.X XXXX<br>pkcs12 XXXX.p12<br>cipher BF-CBC<br>verb 3<br>ns-cert-type server<br></code></pre>
+
+<p>I have tried the adding following options to my *.ovpn file with no success:</p>
+
+<pre><code>ping 30<br>keepalive 10 60<br></code></pre>

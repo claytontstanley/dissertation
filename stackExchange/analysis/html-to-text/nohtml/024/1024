@@ -1,0 +1,3 @@
+After upgrading a rails 1.2 website to 2.1, the ExceptionNotifier plugin no longer works, complaining about this error:
+ActionView::TemplateFinder::InvalidViewPath:  Unprocessed view path found: "/path/to/appname/vendor/plugins/exception_notification/lib/../views".  Set your view paths with #append_view_path, #prepend_view_path, or #view_paths=.
+What causes it and how do I fix it?

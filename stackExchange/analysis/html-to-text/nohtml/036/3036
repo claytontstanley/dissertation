@@ -1,0 +1,1 @@
+If I want to make something run on startup on Linux, where is the preferred place to put things? I would like a description of each script or file that is executed at boot, and that script or file's purpose as to how you edit it, or what sorts of things are normal to put in it to make run on startup.
