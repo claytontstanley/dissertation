@@ -1,7 +1,7 @@
 ﻿-- NOTE: sotero is replaced by the site name, e.g. 'so' or 'meta'
  
 DROP SCHEMA IF EXISTS sotero ;
-CREATE SCHEMA IF NOT EXISTS sotero DEFAULT CHARACTER SET latin1 ;
+CREATE SCHEMA IF NOT EXISTS sotero DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci ;
 USE sotero;
 
 --  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
@@ -15,7 +15,7 @@ CREATE  TABLE IF NOT EXISTS sotero.`votetypes` (
     ,  PRIMARY KEY (`Id`) 
   )
 ENGINE = MyISAM
-DEFAULT CHARACTER SET = latin1;
+DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
 
 --  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
@@ -29,7 +29,7 @@ CREATE  TABLE IF NOT EXISTS sotero.`posttags` (
     ,  PRIMARY KEY (`PostId`, `Tag`) 
   )
 ENGINE = MyISAM
-DEFAULT CHARACTER SET = latin1;
+DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
 
 --  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
@@ -43,7 +43,7 @@ CREATE  TABLE IF NOT EXISTS sotero.`posttypes` (
     ,  PRIMARY KEY (`Id`) 
   )
 ENGINE = MyISAM
-DEFAULT CHARACTER SET = latin1;
+DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
 
 
@@ -76,7 +76,7 @@ CREATE  TABLE IF NOT EXISTS sotero.`badges` (
     ,  PRIMARY KEY (`Id`) 
   )
 ENGINE = MyISAM
-DEFAULT CHARACTER SET = latin1;
+DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
 --  INDICES CREATE INDEX `IX_Badges_Id_UserId` ON sotero.`badges` (`Id` ASC, `UserId` ASC) ;
 
@@ -96,7 +96,7 @@ CREATE  TABLE IF NOT EXISTS sotero.`comments` (
     ,  PRIMARY KEY (`Id`) 
   )
 ENGINE = MyISAM
-DEFAULT CHARACTER SET = latin1;
+DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
 -- INDICES CREATE INDEX `IX_Comments_Id_PostId` ON sotero.`comments` (`Id` ASC, `PostId` ASC) ;
 -- INDICES CREATE INDEX `IX_Comments_Id_UserId` ON sotero.`comments` (`Id` ASC, `UserId` ASC) ;
@@ -131,7 +131,7 @@ CREATE  TABLE IF NOT EXISTS sotero.`posts` (
     ,  PRIMARY KEY (`Id`) 
   )
 ENGINE = MyISAM
-DEFAULT CHARACTER SET = latin1;
+DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
 -- INDICES CREATE UNIQUE INDEX `IX_Posts_Id_AcceptedAnswerId` ON sotero.`posts` (`Id` ASC, `AcceptedAnswerId` ASC) ;
 -- INDICES CREATE UNIQUE INDEX `IX_Posts_Id_OwnerUserId` ON sotero.`posts` (`Id` ASC, `OwnerUserId` ASC) ;
@@ -162,7 +162,7 @@ CREATE  TABLE IF NOT EXISTS sotero.`users` (
     ,  PRIMARY KEY (`Id`) 
   )
 ENGINE = MyISAM
-DEFAULT CHARACTER SET = latin1;
+DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
 -- INDICES CREATE INDEX `IX_Users_DisplayName` ON sotero.`users` (`DisplayName` ASC) ;
 
@@ -182,7 +182,7 @@ CREATE  TABLE IF NOT EXISTS sotero.`votes` (
     ,  PRIMARY KEY (`Id`) 
   )
 ENGINE = MyISAM
-DEFAULT CHARACTER SET = latin1;
+DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
 -- INDICES CREATE INDEX `IX_Votes_Id_PostId` ON sotero.`votes` (`Id` ASC, `PostId` ASC) ;
 -- INDICES CREATE INDEX `IX_Votes_VoteTypeId` ON sotero.`votes` (`VoteTypeId` ASC) ;
