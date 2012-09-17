@@ -1,0 +1,3 @@
+I often have a Dictionary of keys & values and need to sort it by value. For example, I have a hash of words and their frequencies, and want to order them by frequency.
+There's SortedList which is good for a single value (frequency), but I want to map it back to the word.
+SortedDictionary orders by key, not value. Some resort to a custom class , but what's the cleanest way?

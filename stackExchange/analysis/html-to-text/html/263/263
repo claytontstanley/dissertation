@@ -1,0 +1,9 @@
+<p>I have been trying to implement Win32's MessageBox using GTK. The app using SDL/OpenGL, so this isn't a GTK app. </p>
+
+<p>I handle the initialisation (<strong>gtk_init</strong>) sort of stuff inside the MessageBox function as follows:</p>
+
+<pre><code>int MessageBox(HWND hwnd, const char* text, const char* caption, UINT type)<br>{<br>    GtkWidget *window = NULL;<br>    GtkWidget *dialog = NULL;<br><br>    gtk_init(&amp;gtkArgc, &amp;gtkArgv);<br>    window = gtk_window_new(GTK_WINDOW_TOPLEVEL);<br>    g_signal_connect(G_OBJECT(window), "delete_event", G_CALLBACK(delete_event), NULL);<br>    g_signal_connect(G_OBJECT(window), "destroy", G_CALLBACK(destroy), NULL);<br>    // gcallback calls gtk_main_quit()<br>    gtk_init_add((GtkFunction)gcallback, NULL);<br><br>    if (type &amp; MB_YESNO) {<br>        dialog = gtk_message_dialog_new(GTK_WINDOW(window), GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO, text);<br>    } else {<br>        dialog = gtk_message_dialog_new(GTK_WINDOW(window), GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_INFO, GTK_BUTTONS_OK, text);<br>    }<br><br>    gtk_window_set_title(GTK_WINDOW(dialog), caption);<br>    gint result = gtk_dialog_run(GTK_DIALOG(dialog));<br><br>    gtk_main();<br><br>    gtk_widget_destroy(dialog);<br><br>    if (type &amp; MB_YESNO) {<br>        switch (result) {<br>        default:<br>        case GTK_RESPONSE_DELETE_EVENT:<br>        case GTK_RESPONSE_NO:<br>            return IDNO;<br>            break;<br>        case GTK_RESPONSE_YES:<br>            return IDYES;<br>            break;<br>        }<br>    }<br><br>    return IDOK;<br>} <br></code></pre>
+
+<p>Now, I am by no means an experienced GTK programmer, and I realise that I'm probably doing something(s) horribly wrong.</p>
+
+<p>However, my problem is that the last dialog popped up with this function stays around until the process exits. Any ideas?</p>

@@ -1,0 +1,4 @@
+This is a tricky one - and I've always relied on techniques such as permission-based emails (i.e. only sending to people you have permission to send to) and not using blatantly spamish terminology.
+Of late, some of the emails I send out programmatically have started being shuffled into people's spam folder automatically - and I'm wondering what i can do about it.
+This is despite the fact that these particular emails are not ones that humans would mark as spam (specifically, they are emails that contain license keys that people have paid good money for, so I don't think they're going to consider them spam)
+I figure this is a big topic in which I am essentially an ignorant simpleton.

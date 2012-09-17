@@ -1,11 +1,13 @@
 
+mysql = mysql
+
 load: createTable loadTable
 
 createTable:
-	cat createTable.sql | mysql
+	< createTable.sql ${mysql}
 
 loadTable:
-	cat loadTable.sql | mysql
+	< loadTable.sql ${mysql}
 
 convert:
 	rlwrap ccl -l test.lisp -e '(extract-html)' -e '(quit)'

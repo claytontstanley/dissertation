@@ -1,0 +1,3 @@
+<p>stackoverflow.com has a version number at the bottom: "svn revision: 679"</p>
+
+<p>I want to use such automatic versioning with my .NET web, win forms, wpf projects/solutions.</p>

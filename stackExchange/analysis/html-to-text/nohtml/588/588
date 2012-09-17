@@ -1,0 +1,9 @@
+I'm writing a CMS application in PHP and one of the requirements is that it must be able to interface with the customer's Exchange server.  I've written up this functionality a few times before and have always used WebDAV to do it, but now I'm leaning away from that.
+I will be running the site on IIS OR Apache (no preference) on Windows server 2008.  A few things I would need to do include adding contacts to a given user's address book, sending emails as a given user and running reports on contacts for a user.
+All of this is pretty easy to do with WebDAV, but if there is a better way that doesn't require any functionality that is likely to be deprecated any time soon.
+Any ideas?
+Update:
+Justin, I love the idea of using com objects, I just worry about maintaining a 3rd product to make everything work...
+John, I can write a web service in C# to interface with for these functions and access it with my PHP app, but it's also a little bit out of the way.
+So far, I'm not 100% convinced that either of these is better than WebDAV... Can anyone show me where I'm being silly?
+Thanks, both of you.

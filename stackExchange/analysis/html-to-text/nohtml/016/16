@@ -1,0 +1,4 @@
+How do you expose a LINQ query as an ASMX web service? Usually, from the business tier, I can return a typed DataSet or DataTable which can be serialized for transport over ASMX.
+How can I do the same for a LINQ query? Is there a way to populate a typed DataSet or DataTable via a LINQ query?:
+public static MyDataTable CallMySproc()     {     string conn = ...;  MyDatabaseDataContext db = new MyDatabaseDataContext(conn);     MyDataTable dt = new MyDataTable();  // execute a sproc via LINQ var query = from dr in db.MySproc().AsEnumerable select dr;  // copy LINQ query resultset into a DataTable -this does not work !     dt = query.CopyToDataTable();  return dt; }
+How can I get the resultset of a LINQ query into a DataSet or DataTable? Alternatively, is the LINQ query serializeable so that I can expose it as an ASMX web service?

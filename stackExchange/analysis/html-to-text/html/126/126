@@ -1,0 +1,31 @@
+<p>What is the "purist" or "correct" way to access an object's properties from within an object method that is not a getter/setter method?</p>
+
+<p>I know that from outside of the object you should use a getter/setter, but from within would you just do:</p>
+
+<p>Java:</p>
+
+<pre><code>String property = this.property;
+</code></pre>
+
+<p>PHP:</p>
+
+<pre><code>$property = $this-&gt;property;
+</code></pre>
+
+<p>or would you do:</p>
+
+<p>Java:</p>
+
+<pre><code>String property = this.getProperty();
+</code></pre>
+
+<p>PHP:</p>
+
+<pre><code>$property = $this-&gt;getProperty();
+</code></pre>
+
+<p>Forgive me if my Java is a little off, it's been a year since I programmed in Java...</p>
+
+<p><strong>EDIT:</strong></p>
+
+<p>It seems people are assuming I am talking about private or protected variables/properties only. When I learned OO I was taught to use getters/setters for every single property even if it was public (and actually I was told never to make any variable/property public). So, I may be starting off from a false assumption from the get go. It appears that people answering this question are maybe saying that you should have public properties and that those don't need getters and setters, which goes against what I was taught, and what I was talking about, although maybe that needs to be discussed as well. That's probably a good topic for a different question though...</p>

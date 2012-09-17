@@ -1,0 +1,1 @@
+Is there an existing application or library in Java which will allow me to take CSV data and create an XML file?  The XML tags would be provided through maybe the first row containing column headings.

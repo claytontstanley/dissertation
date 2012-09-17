@@ -1,0 +1,5 @@
+<p>My company makes a monolithic piece of software that our customers use to run their car dealerships. The original app was written in VB6, and it has grown substantially over the last few years. Until now, there hasn't really been a business case for switching to the .net framework. Sure, it's newer, considerably better at certain things, and when used correctly speeds development time, but there's nothing we can't do in VB6 that we need to be able to do. Getting things done is harder in VB6, but almost nothing is impossible. Recently though, Microsoft dropped support for VB6, and it seems obvious to me that switching to a new platform is inevitable.</p>
+
+<p>The way VB .net works and requires you to think is so fundamentally different (heck, even the way you pass variables into subs has changed), and as far as I can tell, switching to .net would require a complete re-design and re-write of the app.</p>
+
+<p>My question(s): Have any of you been in this position? Of the tools available to smooth the transition, which ones work and which should be avoided? And how do I sell our customers and my boss on this? As the suits like to say, where's the ROI?</p>

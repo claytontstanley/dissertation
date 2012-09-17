@@ -1,0 +1,1 @@
+<p>If I have a trigger BEFORE UPDATE on a table. How can I throw an error that prevents the update on that table?</p>

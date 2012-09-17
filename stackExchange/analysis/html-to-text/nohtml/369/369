@@ -1,0 +1,11 @@
+And what is your system of choice?
+Off the top of my head I would say that for a real one step web 'build' the following steps would have take place:
+Take a source snapshot
+Change any config files for release
+Compress CSS and JS
+Run Tests
+Take a database snapshot [without test data]
+Move the source to the server
+Import a clean, current version of the database into the server
+Automatically confirm the 'build' was successful
+Has anyone got a system that does all of these steps?

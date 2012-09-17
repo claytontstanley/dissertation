@@ -1,0 +1,5 @@
+<p>What are the best practices for checking in BIN directories in a collaborative development environment using SVN?  Should project level references be excluded from checkin?  Is it easier to just add all bin directories?</p>
+
+<p>I develop a lot of DotNetNuke sites and it seems that in a multi-developer environment, it's always a huge task to get the environment setup correctly.</p>
+
+<p>The ultimate goal (of course) is to have a new developer checkout the trunk from SVN, restore the DNN database and have it all just 'work'...</p>

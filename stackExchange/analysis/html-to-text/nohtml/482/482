@@ -1,0 +1,7 @@
+Ok, I'm a web developer, but I find myself dabbling in windows forms projects every now and then. One thing that confounds me to this day is the following.
+Assume you are doing something like the following
+List<string> myitems = new List<string> {     "Item 1",     "Item 2",     "Item 3" };  ComboBox box = new ComboBox(); box.DataSource = myitems;  ComboBox box2 = new ComboBox(); box2.DataSource = myitems
+So now we have 2 combo boxes bound to that array, and everything works fine. But when you change the value of one combo box, it changes BOTH combo boxes to the one you just selected.
+Now, I know that Arrays are always passed by reference (learned that when i learned C :D), but why on earth would the combo boxes change together? I don't believe the combo box control is modifying the collection at all.
+As a work around, don't this would achieve the funcionality that is expected / desired
+ComboBox box = new ComboBox(); box.DataSource = myitems.ToArray();

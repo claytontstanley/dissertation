@@ -1,0 +1,1 @@
+I am starting a new web application in PHP and I this time around I want to create something that people can extend by using a plug-in interface.  I am a very confident PHP developer however I have never done this before so I'm not really sure where to start.  How does one go about writing 'hooks' into their code so that plug-ins can attach to specific events?

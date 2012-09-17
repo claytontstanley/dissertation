@@ -1,0 +1,5 @@
+<p>I've been using <a href="http://tortoisesvn.tigris.org/" rel="nofollow">TortoiseSVN </a> in a Windows environment for quite some time.  It seems very feature-complete and nicely integrated into the Windows shell, and more importantly, it's fairly painless to teach to colleagues with little or no experience with source control.  <strong>However</strong>, since we have moved to Windows Vista 64bit, Tortoise has been very buggy and has seemed to cause lots of explorer.exe abnormalities and crashes.  This has happened both with older versions of the software and the latest version (1.5.1 build 13563).</p>
+
+<p>I was curious if anyone has suggestions for other Subversion clients that will run on Windows (specifically Vista 64bit).  Developers here use a variety of text editors so using Visual Studio or Dreamweaver for SVN is not ideal.</p>
+
+<p>I have heard great things about <a href="http://www.zennaware.com/cornerstone/" rel="nofollow">Cornerstone</a>, and would love something similar for Windows if it exists.</p>

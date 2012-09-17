@@ -1,0 +1,5 @@
+I am aware in dot net there are three timer types (see http://msdn.microsoft.com/en-us/magazine/cc164015.aspx ). I have chosen a the threaded timer as the other types can drift if the main thread is busy and I need this to be reliable.
+The way this timer works in the control of the timer is put on another thread so it can always tick along with the work begin completed on the parent thread when it is not busy.
+The issue I have is that with this timer in a console application is that while the timer is ticking along on another thread the main thread is not doing anything so the app closes.
+I tried adding a while true loop but then the main thread is too busy when the timer does go off.
+Any ideas welcome.

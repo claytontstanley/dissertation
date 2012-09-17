@@ -1,0 +1,3 @@
+<p>How would I go about generating a list of all possible permutations of a string between x and y characters in length, containing a variable list of characters.</p>
+
+<p>Any language would work but it should be portable.</p>

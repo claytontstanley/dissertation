@@ -1,0 +1,37 @@
+<h2>Form Based Authentication For Websites</h2>
+
+<p>Please help us create the definitive resource for this topic. We believe that stackoverflow should not just be a resource for very specific technical questions, but also for general guidelines on how to solve variations on common problems. "Form Based Authentication For Websites" should be a fine topic for such an experiment. </p>
+
+<h3>It should include topics such as:</h3>
+
+<ul>
+<li>how to log in</li>
+<li>how to remain logged in</li>
+<li>how to store passwords</li>
+<li>using secret questions</li>
+<li>forgotten password functionality</li>
+<li>OpenID</li>
+<li>"Remember me" checkbox</li>
+<li>Browser autocompletion of usernames and passwords</li>
+<li>secret urls (public urls protected by digest)</li>
+<li>checking password strength</li>
+<li>email validation</li>
+<li>and much more</li>
+</ul>
+
+<h3>It should not include things like:</h3>
+
+<ul>
+<li>roles and authorization</li>
+<li>http basic authentication</li>
+</ul>
+
+<h3>Please help us by</h3>
+
+<ol>
+<li>Suggesting subtopics</li>
+<li>Submitting good articles about this subject</li>
+<li>Editing the official answer (as soon as you have enough karma)</li>
+</ol>
+
+<p>UPDATE: See the terrific 7-part series by Jens Roland below.</p>

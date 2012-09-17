@@ -6,22 +6,6 @@
 (setf cl-csv::*always-quote* t)
 (setf cl-csv::*newline* #?"\n")
 
-(defun csv->lst (csv)
-  (rest 
-    (cl-csv:read-csv csv)))
-
-(defun load-csv (path)
-  (file-string path))
-
-(defun html->text (csv)
-  (with-cwd *_DIR_*
-    (destructuring-bind (posts_id body) csv
-      (let ((tmp-file "/tmp/tmp.txt"))
-        (with-open-file (strm tmp-file :direction :output :if-exists :supersede)
-          (format strm "~a" body))
-        (setf body [python html-to-text.py ?tmp-file ]))
-      (list posts_id body))))
-
 (defun get-dir (posts-id)
   (format nil "~3,'0d" (mod (parse-integer posts-id) 1000)))
 

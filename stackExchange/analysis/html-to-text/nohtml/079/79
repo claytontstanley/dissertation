@@ -1,0 +1,9 @@
+The version of Subclipse (1.2.4) currently available through Aptana's automagic Plugins Manager does not work with the newest version of Subversion.
+I see on the Subclipse website however that they have 1.4.2 out for Eclipse. So I added a new remote update site:
+http://subclipse.tigris.org/update_1.4.x
+to my Update manager. When I tried to install it, it told me I needed Mylyn 3.0.0. So I after much searching I found Mylyn 3.0.0 and added another new remote update site:
+http://download.eclipse.org/tools/mylyn/update/e3.3
+to my update manager. Then when I tried to install that, it told me I needed org.eclipse.ui 3.3.0 or equivalent.
+Looking at the configuration details for Aptana, it looks like it is built against eclipse 3.2.2.
+Does anyone know if there is a way to upgrade the version of Eclipse Aptana is built against to 3.3.0? Or if there is some other way to get Subclipse to work with the very newest version of Subversion?
+I know this isn't necessarily a "programming" question, but I hope it's ok since it's highly relevant to the programming experience...

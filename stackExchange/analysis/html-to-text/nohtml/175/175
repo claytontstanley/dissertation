@@ -1,0 +1,6 @@
+I want to be able to display a normal youtube video with overlaid annotations. This consists of colored rectangles for each frame. The only requirement is that this be done programatically. Youtube has annotations now, but require you use their front end to create them by hand. I want to be able to generate them. What's the best way of doing this?
+Some ideas:
+Build your own flash player (ew?)
+Somehow draw over the youtube flash player. Will this work?
+Reverse engineer & hijack youtube's annotation system. Either messing with the local files or redirecting it's attempt to download the annotations. (using greasemonkey? Firefox plugin?)
+Ideas that don't count: download the video, edit it, re-encode it, and upload it :P

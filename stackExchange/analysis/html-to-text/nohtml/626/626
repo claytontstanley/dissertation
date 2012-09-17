@@ -1,0 +1,7 @@
+In Ruby 1.8, there are subtle differences between proc/lambda on the one hand, and Proc.new on the other.
+What are those differences?
+Can you give guidelines on how to decide which one to choose?
+In Ruby 1.9, proc and lambda are different. What's the deal?
+Edit
+@Mike Stone: there's no difference between 1.8 and 1.9 in this regard.
+@Accordeon Guy: that's the difference I had in mind, but I don't think it's the whole story. What about next/break/return in procs? What about Ruby 1.9? What about scopes, and returning procs from a method?

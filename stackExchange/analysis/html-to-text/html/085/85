@@ -1,0 +1,3 @@
+<p>What are your best practices around creating flat file database structures in PHP?  A lot of the more mature PHP flat file frameworks I see out there attempt to implement SQL-like query syntax, which is over the top for my purposes in most cases (I would just use a database at that point).</p>
+
+<p>Are there any elegant tricks out there to get good performance and features with the small code overhead one would want by taking on this problem in the first place?</p>

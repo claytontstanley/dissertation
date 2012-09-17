@@ -1,0 +1,5 @@
+Part of my everyday work is maintaining and extending legacy VB6 applications. A common engine is written in C/C++ and VB6 uses these functions in order to improve performance.
+When it comes to asynchronous programming, a C interface is not enough and we rely on COM controls to fire events to VB6.
+My problem is that when I register the control in VB6, VB loads this control in memory and does not unload it until I quit the VB6 IDE. As the control is loaded the whole time, I am unable to recompile it in VC6, because the DLL file is locked.
+A solution I found is not to enable the control in VB but use the CreateObject() with the full name of my control. The problem then is that I must declare my control as an Object because VB6 knows nothing of the interface I am using and I do not have access to IntelliSense, which is a pain.
+Any idea how I can tell VB6 to unload controls after quitting the application? Or directly in the IDE?

@@ -1,0 +1,3 @@
+<p>I run into a situation every couple of months where I need to develop a solution that's scheduled to run periodically, but I haven't found a way to handle this in Windows that I'm entirely happy with.  Every time I do it, I end up feeling corralled into using a Windows Service, which seems to be an unacceptable amount of overhead for something I could do with a cron job in Unix.</p>
+
+<p>Am I missing something here?  What have you used to schedule an application in Windows?</p>

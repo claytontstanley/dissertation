@@ -1,0 +1,7 @@
+<p>How do I make it so <code>mailto:</code> links will be registered with my program?</p>
+
+<p>And then how would I handle that event in my program?</p>
+
+<p>Most of the solutions I found from a quick Google search are how to do this manually, but I need to do this automatically for users of my program if they click a button such as "set as default email client".</p>
+
+<p><strong>Edit</strong>: Removed reference to Delphi, because the answer is independent of your language.</p>

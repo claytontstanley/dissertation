@@ -1,0 +1,9 @@
+<p>How can I monitor a MSSQL database for changes to a table without using triggers or modifying the structure of the database in any way?  My preferred programming environment is .Net and C#</p>
+
+<p>(edits)</p>
+
+<p>I'd like to support MS SQL 2000 SP4 or higher</p>
+
+<p>by "changes to a table" I mean changes to table data, not changes to table structure.</p>
+
+<p>Ultimately, I would like the change to trigger an event in my application, instead of having to check for changes at an interval.</p>

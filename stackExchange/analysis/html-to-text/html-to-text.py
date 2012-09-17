@@ -1,5 +1,6 @@
 import sys
 import os, errno
+import codecs
 from boilerpipe.extract import Extractor
 
 def convert(html):
@@ -26,13 +27,13 @@ def convert_all():
 			cnt = cnt + 1
 			print "processing file " + str(cnt) + " with id " + str(post_id)
 			fname = os.path.join(dirname, post_id)
-			with open(fname) as f:
+			with codecs.open(fname, 'r', 'utf-8') as f:
 				html = f.read()
 			txt = convert(html)
 			newdirname = dirname.replace('html','nohtml')
 			mkdir_p('nohtml')
 			mkdir_p(newdirname)	
-			with open(os.path.join(newdirname, post_id), "w") as text_file:
+			with codecs.open(os.path.join(newdirname, post_id), "w", 'utf-8') as text_file:
 				text_file.write(txt)
 
 convert_all()

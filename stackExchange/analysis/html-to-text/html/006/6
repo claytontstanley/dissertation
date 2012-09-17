@@ -1,0 +1,9 @@
+<p>I have an absolutely positioned <code>div</code> containing several children, one of which is a relatively positioned <code>div</code>. When I use a percentage-based width on the child <code>div</code>, it collapses to <code>0</code> width on IE7, but not on Firefox or Safari. </p>
+
+<p>If I use pixel width, it works. If the parent is relatively positioned, the percentage width on the child works. </p>
+
+<p>Is there something I'm missing here? </p>
+
+<p>Is there an easy fix besides the pixel-based width on the child? </p>
+
+<p>Is there an area of the CSS specification that covers this?</p>

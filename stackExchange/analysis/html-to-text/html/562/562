@@ -1,0 +1,5 @@
+<p>Uploading my first decently sized web app to my shared host provided me with a fresh set of challenges, by which I mean, sleepless nights. The issue was that I had most certainly not developed my application for medium trust (or had any clue what that was.) </p>
+
+<p>I mitigated all of the issues, save one. </p>
+
+<p>I had written an installer for the admin to be able to specify their connectionstring and other preferences, but I cannot find a way to write to a web.config in medium trust. Does anyone have a solution, or should I just be putting preferences in another file?</p>

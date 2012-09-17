@@ -1,0 +1,4 @@
+Lets say i have an array like such
+$artist = array("the roots","michael jackson","billy idol","more","and more","and_YET_MORE"); $count = array(5,3,9,1,1,3);
+and i want to generate a tag clound that will have artist with a higher number in count be a H6 tag and the lowest being H1?
+any ideas?

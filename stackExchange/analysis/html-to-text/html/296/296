@@ -1,0 +1,31 @@
+<h2>Original Question: Should I Learn C?</h2>
+
+<p>In the theme of the stackoverflow podcast, here's a fun question: should I learn C?  I expect <a href="http://stackoverflow.com/users/1/jeff-atwood">Jeff</a> &amp; <a href="http://stackoverflow.com/users/4/joel-spolsky">Joel</a> will have something to say on this.</p>
+
+<p>Some info on my background:</p>
+
+<ul>
+<li>Primarily a Java programmer on "enterprisy" systems.</li>
+<li>Favorite languages: python, scheme</li>
+<li>7 years programming experience</li>
+<li>A very small amount of C++ experience, practically no C experience</li>
+<li>No immediate "need" to learn C</li>
+</ul>
+
+<p>So <em>should</em> I learn C?  If so, why?  If not, why?</p>
+
+<hr>
+
+<h2>C or Assembly?</h2>
+
+<p><em>Lots of folks recomending Assembler, so add on question: <strong>Is it better to learn C or Assembler? If Assembler, which one?</em></strong></p>
+
+<p>Recommended assemblers so far:</p>
+
+<ul>
+<li>Motorolla 68000</li>
+<li>Intel Assembler <em>(does he mean x86?)</em></li>
+<li>MASM32</li>
+</ul>
+
+<hr>

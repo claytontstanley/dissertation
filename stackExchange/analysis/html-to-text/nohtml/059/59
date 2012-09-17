@@ -1,0 +1,5 @@
+Lets say I have a DataTable with a Name column. I want to have a collection of the unique names ordered alphabetically. The following query ignores the order by clause.
+var names = (from DataRow dr in dataTable.Rows
+orderby (string)dr["Name"]
+select (string)dr["Name"]).Distinct();
+Why does the orderby not get enforced?

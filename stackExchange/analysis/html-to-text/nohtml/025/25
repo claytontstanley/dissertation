@@ -1,0 +1,1 @@
+I've been having issues getting the C sockets API to work properly in C++. Specifically, although I am including sys/socket.h, I still get compile time errors telling me that AF_INET is not defined. Am I missing something obvious, or could this be related to the fact that I'm doing this coding on z/OS and my problems are much more complicated? ;)

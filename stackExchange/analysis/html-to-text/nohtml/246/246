@@ -1,0 +1,1 @@
+Does anybody know if there is a way to create a SQLite database based on an XSD DataSet? In the past I've just used a basic SQLite manager, but want to fuse things a bit more with my .NET development if possible.

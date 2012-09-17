@@ -1,0 +1,1 @@
+<p>I've been writing a few web services for a .net app and now I'm ready to consume them. I've seen numerous examples where there is homegrown code for consing the service as opposed to using the auto generated methods Visisl Studio creates when adding the web reference. Is there some advantage to this?</p>

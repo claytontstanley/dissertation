@@ -1,0 +1,2 @@
+MySQL has this incredibly useful yet properitary REPLACE INTO SQL Command. I wonder: Can this easily be emulated in SQL Server 2005? Starting a new Transaction, doing a Select() and then either UPDATE or INSERT and Commit is always a little bit a pain in the a.., especially when doing it in the application and therefore always keeping 2 versions of the statement.
+I wonder if there is an easy and universal way to implement such a function into SQL Server 2005?
