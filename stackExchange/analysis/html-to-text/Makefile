@@ -1,30 +1,19 @@
-
 mysql = mysql
 
-load: create-nohtml load-nohtml
+create-chunks create-nohtml: create-%:
+	< create-$*.sql ${mysql}
 
-load-chunks: create-chunks
-	< loadChunks.sql ${mysql}
+load-chunks load-nohtml: load-%: create-%
+	< load-$*.sql ${mysql}
 
-create-chunks:
-	< createChunks.sql ${mysql}
+extract-all:
+	rlwrap ccl -l test.lisp -e '($@)' -e '(quit)'
 
-create-nohtml:
-	< create-nohtml.sql ${mysql}
-
-load-nohtml:
-	< load-nohtml.sql ${mysql}
-
-convert:
-	rlwrap ccl -l test.lisp -e '(extract-all)' -e '(quit)'
-
-html-to-text: convert
+html-to-text: extract-all 
 	python html-to-text.py 
 
 build-all: build-nohtml build-chunks
 
-build-nohtml: html-to-text
-	rlwrap ccl -l test.lisp -e '(build-nohtml)' -e '(quit)'
+build-nohtml build-chunks: html-to-text
+	rlwrap ccl -l test.lisp -e '($@)' -e '(quit)'
 
-build-chunks: html-to-text
-	rlwrap ccl -l test.lisp -e '(build-chunks)' -e '(quit)'
