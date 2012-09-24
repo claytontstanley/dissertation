@@ -22,7 +22,7 @@ def mkdir_p(path):
 
 def convert_all():
 	cnt = 0
-	for dirname, dirnames, filenames in os.walk('body/html'):
+	for dirname, dirnames, filenames in os.walk('body/raw'):
 		for post_id in filenames:
 			cnt = cnt + 1
 			print "processing file " + str(cnt) + " with id " + str(post_id)
@@ -30,7 +30,7 @@ def convert_all():
 			with codecs.open(fname, 'r', 'utf-8') as f:
 				html = f.read()
 			txt = convert(html)
-			newdirname = dirname.replace('html','nohtml')
+			newdirname = dirname.replace('raw','nohtml')
 			mkdir_p('body/nohtml')
 			mkdir_p(newdirname)	
 			with codecs.open(os.path.join(newdirname, post_id), "w", 'utf-8') as text_file:

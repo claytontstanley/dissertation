@@ -22,7 +22,7 @@
                 (format strm "~a" col-val)))))))))
 
 (let ((fun-lst (list 
-                 (write-col 'body "body/html")
+                 (write-col 'body "body/raw")
                  (write-col 'title "title/raw")
                  (write-col 'tags "tags/raw"))))
   (defun write-all-cols (csv)
