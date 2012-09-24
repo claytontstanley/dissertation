@@ -3,6 +3,8 @@ mysql = mysql
 create-chunks create-nohtml: create-%:
 	< create-$*.sql ${mysql}
 
+load-all: load-nohtml load-chunks
+
 load-chunks load-nohtml: load-%: create-%
 	< load-$*.sql ${mysql}
 
