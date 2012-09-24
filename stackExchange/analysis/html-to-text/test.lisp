@@ -37,6 +37,10 @@
   (with-open-file (strm (format nil "~a~a" *_DIR_* *csv-name*) :direction :input)
     (cl-csv:read-csv strm :row-fn #'write-csv)))
 
+(defun build-chunks ()
+  (with-open-file (strm (format nil "~a~a" *_DIR_* *csv-name*) :direction :input)
+    (cl-csv:read-csv strm :row-fn #'write-chunks)))
+
 (defun csv-val (key csv)
   (nth
     (ecase key
@@ -51,6 +55,20 @@
         collect (csv-val key csv)))
 
 (let ((cnt 0))
+  (defun write-chunks (csv)
+    (incf cnt)
+    (format  t "converting line ~a~%" cnt)
+    (let ((out-file "chunks.csv"))
+      (let ((posts-id (csv-val 'posts-id csv)))
+        (with-open-file (strm out-file :direction :output :if-exists (if (= cnt 1) :supersede :append) :if-does-not-exist :create)
+          (when (not (= cnt 1))
+            (dolist (chunk-type (list '|title| '|body| '|tags|))
+              (let ((txt (file-string (format nil "~a/~a/~a/~a" chunk-type "nlp" (get-dir posts-id) posts-id))))
+                (let ((chunks (cl-ppcre:split #?"\n" txt)))
+                  (dolist (chunk chunks)
+                    (cl-csv:write-csv-row (list posts-id chunk chunk-type) :stream strm)))))))))))
+
+(let ((cnt 0))
   (defun write-csv (csv)
     (incf cnt)
     (format  t "converting line ~a~%" cnt)
@@ -60,3 +78,6 @@
           (when (not (= cnt 1))
             (let ((txt (file-string (format nil "~a/~a/~a" "body/nohtml" (get-dir posts-id) posts-id))))
               (cl-csv:write-csv-row (list posts-id txt) :stream strm))))))))
+
+
+

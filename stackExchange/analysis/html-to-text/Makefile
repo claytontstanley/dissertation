@@ -17,3 +17,6 @@ html-to-text: convert
 
 build: html-to-text
 	rlwrap ccl -l test.lisp -e '(build-csv)' -e '(quit)'
+
+build-chunks: html-to-text
+	rlwrap ccl -l test.lisp -e '(build-chunks)' -e '(quit)'

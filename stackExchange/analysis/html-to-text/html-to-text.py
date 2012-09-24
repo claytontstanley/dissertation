@@ -21,6 +21,10 @@ def nlp(txt):
 	words = [w.lower() for w in tokens]
 	return "\n".join(item for item in words)
 
+def nlpTags(txt):
+	words = nltk.regexp_tokenize(txt, pattern=r"(?<=<)[^>]+(?=>)")
+	return "\n".join(item for item in words)
+
 
 def mkdir_p(path):
 	try:
@@ -51,3 +55,4 @@ def convert_all(indir, fun, outdir):
 convert_all('body/raw', convert, 'body/nohtml')
 convert_all('body/nohtml', nlp, 'body/nlp')
 convert_all('title/raw', nlp, 'title/nlp')
+convert_all('tags/raw', nlpTags, 'tags/nlp')
