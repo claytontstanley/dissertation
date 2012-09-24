@@ -1,0 +1,12 @@
+ms-sql
+:
+drop
+all
+table
+whose
+name
+begin
+with
+a
+certain
+string

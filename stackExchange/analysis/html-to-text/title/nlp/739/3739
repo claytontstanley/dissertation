@@ -1,0 +1,11 @@
+sharepoint
+:
+executing
+stsadm
+from
+a
+timer
+job
++
+sharepoint\system
+right
