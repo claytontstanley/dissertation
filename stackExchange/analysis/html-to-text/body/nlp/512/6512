@@ -28,7 +28,8 @@ minor
 problem
 with
 implementing
-continuations.
+continuation
+.
 my
 current
 solution
@@ -47,7 +48,8 @@ copying
 it
 back
 when
-needed.
+needed
+.
 aside
 from
 not
@@ -59,7 +61,8 @@ this
 solution
 is
 hardly
-ideal.
+ideal
+.
 what
 is
 the

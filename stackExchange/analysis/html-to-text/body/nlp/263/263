@@ -8,7 +8,8 @@ win32
 's
 messagebox
 using
-gtk.
+gtk
+.
 the
 app
 using
@@ -20,7 +21,8 @@ is
 n't
 a
 gtk
-app.
+app
+.
 i
 handle
 the
@@ -277,7 +279,8 @@ something
 s
 )
 horribly
-wrong.
+wrong
+.
 however
 ,
 my
@@ -297,7 +300,8 @@ around
 until
 the
 process
-exits.
+exit
+.
 any
 idea
 ?

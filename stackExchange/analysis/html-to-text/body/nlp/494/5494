@@ -9,7 +9,8 @@ server
 for
 a
 sharepoint
-intranet.
+intranet
+.
 external
 incoming
 request
@@ -25,7 +26,8 @@ be
 forced
 to
 use
-ssl.
+ssl
+.
 i
 wa
 wondering
@@ -65,7 +67,8 @@ the
 user
 to
 use
-ssl.
+ssl
+.
 any
 recommendation
 for

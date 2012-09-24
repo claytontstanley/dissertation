@@ -8,7 +8,8 @@ query
 on
 my
 home
-network.
+network
+.
 unfortunately
 ,
 if
@@ -42,7 +43,8 @@ own
 site
 in
 a
-browser.
+browser
+.
 for
 example
 ,
@@ -65,7 +67,8 @@ own
 site
 with
 that
-url.
+url
+.
 if
 i
 try
@@ -95,7 +98,8 @@ this
 dlksfhoiahdsfiuhsdf.com.mydomainname.com
 ha
 address
-w.x.y.z.
+w.x.y.z
+.
 clearly
 ,
 dnsmasq
@@ -124,7 +128,8 @@ the
 not
 found
 error
-instead.
+instead
+.
 i
 've
 tried
@@ -140,7 +145,8 @@ setting
 but
 to
 no
-avail.
+avail
+.
 is
 there
 anything

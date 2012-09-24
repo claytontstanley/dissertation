@@ -41,7 +41,8 @@ interface
 to
 release
 some
-resources.
+resource
+.
 although
 the
 object
@@ -168,7 +169,8 @@ can
 not
 see
 the
-harm.
+harm
+.
 however
 i
 have

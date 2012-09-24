@@ -36,7 +36,8 @@ it
 content
 in
 string
-form.
+form
+.
 the
 xmlelement
 type
@@ -50,7 +51,8 @@ exactly
 what
 i
 'm
-after.
+after
+.
 the
 code
 a
@@ -78,7 +80,8 @@ which
 i
 do
 n't
-want.
+want
+.
 xdocument
 doc
 =

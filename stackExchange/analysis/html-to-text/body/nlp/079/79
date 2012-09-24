@@ -21,7 +21,8 @@ the
 newest
 version
 of
-subversion.
+subversion
+.
 i
 see
 on
@@ -35,7 +36,8 @@ have
 1.4.2
 out
 for
-eclipse.
+eclipse
+.
 so
 i
 added
@@ -51,7 +53,8 @@ http
 to
 my
 update
-manager.
+manager
+.
 when
 i
 tried
@@ -65,7 +68,8 @@ me
 i
 needed
 mylyn
-3.0.0.
+3.0.0
+.
 so
 i
 after
@@ -89,7 +93,8 @@ http
 to
 my
 update
-manager.
+manager
+.
 then
 when
 i
@@ -106,7 +111,8 @@ needed
 org.eclipse.ui
 3.3.0
 or
-equivalent.
+equivalent
+.
 looking
 at
 the
@@ -123,7 +129,8 @@ is
 built
 against
 eclipse
-3.2.2.
+3.2.2
+.
 does
 anyone
 know

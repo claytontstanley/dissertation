@@ -47,7 +47,8 @@ prepend_view_path
 ,
 or
 #
-view_paths=.
+view_paths=
+.
 what
 cause
 it

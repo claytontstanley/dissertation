@@ -8,7 +8,8 @@ a
 c
 #
 web
-service.
+service
+.
 the
 web
 browser
@@ -37,7 +38,8 @@ with
 very
 tight
 security
-constraints.
+constraint
+.
 is
 there
 any
@@ -70,7 +72,8 @@ that
 is
 not
 running
-properly.
+properly
+.
 public
 void
 printthing
@@ -182,7 +185,8 @@ called
 from
 a
 service-type
-thread.
+thread
+.
 changing
 print
 (

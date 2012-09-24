@@ -22,7 +22,8 @@ color.fromargb
 )
 ;
 //light
-urple.
+urple
+.
 when
 this
 is
@@ -37,7 +38,8 @@ color
 the
 color
 will
-blend.
+blend
+.
 so
 blended
 with
@@ -84,7 +86,8 @@ color.fromargb
 )
 ;
 //light
-urple.
+urple
+.
 color
 rgb
 =

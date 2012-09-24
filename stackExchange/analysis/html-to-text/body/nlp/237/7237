@@ -10,7 +10,8 @@ sql
 server
 2000
 and
-2005.
+2005
+.
 to
 simplify
 development
@@ -26,7 +27,8 @@ database
 in
 compatibility
 level
-80.
+80
+.
 however
 ,
 database

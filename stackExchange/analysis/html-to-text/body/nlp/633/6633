@@ -16,7 +16,8 @@ standard
 practice
 to
 use
-register_globals.
+register_globals
+.
 we
 know
 now
@@ -29,7 +30,8 @@ security
 to
 have
 it
-enabled.
+enabled
+.
 the
 problem
 is
@@ -75,7 +77,8 @@ each
 part
 of
 the
-site.
+site
+.
 is
 there
 an

@@ -22,7 +22,8 @@ this
 is
 a
 subtle
-topic.
+topic
+.
 check
 this
 out
@@ -110,7 +111,8 @@ choses
 >
 widening
 over
-autoboxing.
+autoboxing
+.
 be
 careful
 when
@@ -180,7 +182,8 @@ primitive
 and
 not
 an
-object.
+object
+.
 however
 ,
 if

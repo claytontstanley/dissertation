@@ -45,7 +45,8 @@ character
 in
 the
 starting
-string.
+string
+.
 it
 's
 trivial
@@ -79,7 +80,8 @@ i
 have
 enough
 space
-allocated.
+allocated
+.
 if
 i
 try
@@ -267,7 +269,8 @@ longer
 than
 the
 initial
-string.
+string
+.
 (
 it
 still

@@ -18,7 +18,8 @@ having
 unique
 index
 on
-it.
+it
+.
 now
 i
 want
@@ -30,7 +31,8 @@ this
 column
 for
 two
-rows.
+row
+.
 how
 could
 this
@@ -62,7 +64,8 @@ then
 update
 to
 actual
-value.
+value
+.
 but
 i
 do
@@ -84,7 +87,8 @@ appropriate
 solution
 to
 the
-problem.
+problem
+.
 could
 anyone
 help

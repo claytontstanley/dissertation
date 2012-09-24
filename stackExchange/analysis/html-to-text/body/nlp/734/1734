@@ -12,7 +12,8 @@ protocol
 buffer
 data
 interchange
-format.
+format
+.
 has
 anyone
 played
@@ -64,7 +65,8 @@ a
 a
 user-facing
 input
-format.
+format
+.
 the
 speed
 and

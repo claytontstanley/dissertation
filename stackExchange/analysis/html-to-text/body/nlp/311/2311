@@ -10,7 +10,8 @@ webserver
 from
 a
 local
-directory.
+directory
+.
 i
 'm
 migrating
@@ -43,7 +44,8 @@ same
 a
 the
 local
-file.
+file
+.
 once
 i
 download
@@ -61,7 +63,8 @@ difference
 is
 the
 cr/lf
-mark.
+mark
+.
 it
 annoys
 me
@@ -77,7 +80,8 @@ of
 the
 file
 to
-update.
+update
+.
 also
 ,
 it
@@ -86,7 +90,8 @@ perfectly
 in
 php
 vía
-ftp_put.
+ftp_put
+.
 from
 ftplib
 import

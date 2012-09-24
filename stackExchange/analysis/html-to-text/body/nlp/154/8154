@@ -79,7 +79,8 @@ mysql
 were
 not
 being
-renewed.
+renewed
+.
 this
 should
 n't
@@ -99,7 +100,8 @@ should
 automatically
 keep
 it
-alive.
+alive
+.
 the
 default
 wa
@@ -115,7 +117,8 @@ to
 because
 of
 this
-problem.
+problem
+.
 it
 helped
 a
@@ -129,12 +132,14 @@ fine
 according
 to
 the
-docs.
+doc
+.
 the
 error
 still
 happen
-semi-regularly.
+semi-regularly
+.
 i
 do
 n't
@@ -167,7 +172,8 @@ sure
 where
 to
 look
-exactly.
+exactly
+.
 other
 relevant
 detail

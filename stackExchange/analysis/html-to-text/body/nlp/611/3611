@@ -14,7 +14,8 @@ a
 folder
 on
 my
-webserver.
+webserver
+.
 here
 's
 what
@@ -294,13 +295,15 @@ iis
 on
 a
 windows
-box.
+box
+.
 this
 particular
 file/folder
 ha
 777
-permissions.
+permission
+.
 any
 idea
 ?

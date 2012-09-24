@@ -14,7 +14,8 @@ server
 with
 a
 resin-only
-configuration.
+configuration
+.
 currently
 in
 our
@@ -35,7 +36,8 @@ passwording
 at
 a
 directory
-level.
+level
+.
 does
 anyone
 know

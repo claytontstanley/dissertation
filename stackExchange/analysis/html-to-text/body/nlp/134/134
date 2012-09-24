@@ -16,7 +16,8 @@ xsd
 dataset
 and
 tableadapter
-features.
+feature
+.
 my
 contract
 table
@@ -33,7 +34,8 @@ column
 for
 the
 primary
-department.
+department
+.
 this
 column
 is
@@ -55,7 +57,8 @@ name
 ,
 id
 ,
-notes.
+note
+.
 this
 is
 all
@@ -65,7 +68,8 @@ functioning
 in
 my
 sql
-server.
+server
+.
 when
 i
 use
@@ -93,7 +97,8 @@ have
 between
 these
 two
-tables.
+table
+.
 this
 work
 great
@@ -108,7 +113,8 @@ and
 am
 viewing
 contract
-data.
+data
+.
 however
 ,
 when
@@ -122,7 +128,8 @@ to
 modify
 the
 department
-data.
+data
+.
 i
 typically
 do
@@ -182,7 +189,8 @@ have
 the
 contract
 datatable
-filled.
+filled
+.
 has
 anybody
 encountered

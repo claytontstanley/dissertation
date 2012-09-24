@@ -44,7 +44,8 @@ the
 content
 doe
 not
-fit.
+fit
+.
 it
 all
 work
@@ -68,7 +69,8 @@ instead
 of
 overflow
 :
-auto.
+auto
+.
 i
 tried
 overflow
@@ -87,7 +89,8 @@ the
 content
 without
 showing
-scrollbars.
+scrollbars
+.
 changing
 max-height
 declaration
@@ -110,7 +113,8 @@ overflow
 auto
 that
 break
-things.
+thing
+.
 this
 is
 also
@@ -164,7 +168,8 @@ there
 is
 n't
 much
-data.
+data
+.
 before
 you
 tell

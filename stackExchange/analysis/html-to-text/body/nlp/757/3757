@@ -15,7 +15,8 @@ property
 in
 a
 .net
-class.
+class
+.
 in
 winforms
 ,
@@ -33,7 +34,8 @@ lot
 like
 what
 i
-need.
+need
+.
 i
 'm
 just
@@ -63,7 +65,8 @@ a
 dropdownlist
 for
 enum
-properties.
+property
+.
 does
 anything
 like

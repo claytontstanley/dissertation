@@ -8,7 +8,8 @@ to
 effectively
 hide
 inherited
-members.
+member
+.
 i
 have
 a
@@ -20,7 +21,8 @@ inherit
 from
 common
 base
-classes.
+class
+.
 some
 of
 the
@@ -51,7 +53,8 @@ class
 in
 a
 visual
-designer.
+designer
+.
 these
 class
 are
@@ -68,7 +71,8 @@ either
 wpf
 or
 silverlight
-2.0.
+2.0
+.
 i
 know
 about
@@ -87,7 +91,8 @@ n't
 be
 used
 in
-silverlight.
+silverlight
+.
 it
 's
 not
@@ -99,7 +104,8 @@ issue
 a
 a
 usability
-issue.
+issue
+.
 what
 should
 i
@@ -146,7 +152,8 @@ hiding
 with
 the
 new
-operator.
+operator
+.
 (
 i
 know

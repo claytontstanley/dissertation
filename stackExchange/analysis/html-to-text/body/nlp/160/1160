@@ -11,7 +11,8 @@ svn
 a
 my
 source
-control.
+control
+.
 ccnet
 is
 configured
@@ -22,7 +23,8 @@ build
 on
 every
 check
-in.
+in
+.
 ccnet
 us
 msbuild
@@ -30,7 +32,8 @@ to
 build
 the
 source
-code.
+code
+.
 i
 would
 like
@@ -44,7 +47,8 @@ to
 generate
 assemblyinfo.cs
 while
-compiling.
+compiling
+.
 how
 can
 i

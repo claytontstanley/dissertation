@@ -4,6 +4,7 @@ import sys
 import os, errno
 import codecs
 from boilerpipe.extract import Extractor
+import itertools
 
 def convert(html):
 	extractor = Extractor(extractor='KeepEverythingExtractor', html=html)
@@ -13,7 +14,9 @@ def convert(html):
 
 def nlp(txt):
 	wnl = nltk.WordNetLemmatizer()
-	tokens = nltk.word_tokenize(txt)
+	sentences = nltk.sent_tokenize(txt)
+	tokens = [nltk.word_tokenize(sen) for sen in sentences]
+	tokens = list(itertools.chain.from_iterable(tokens))
 	tokens = [wnl.lemmatize(t) for t in tokens]
 	words = [w.lower() for w in tokens]
 	return "\n".join(item for item in words)

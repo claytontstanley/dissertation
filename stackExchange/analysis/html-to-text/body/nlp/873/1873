@@ -22,7 +22,8 @@ in
 an
 asp.net
 repeater
-control.
+control
+.
 the
 onclick
 event
@@ -35,7 +36,8 @@ call
 to
 a
 javascript
-function.
+function
+.
 the
 javascript
 funciton
@@ -46,7 +48,8 @@ for
 it
 's
 input
-parameter.
+parameter
+.
 the
 string
 parameter
@@ -58,7 +61,8 @@ databound
 value
 from
 the
-repeater.
+repeater
+.
 i
 need
 the
@@ -67,7 +71,8 @@ quote
 '
 for
 the
-container.dataitem.
+container.dataitem
+.
 i
 need
 the
@@ -76,7 +81,8 @@ quote
 '
 for
 the
-onclick.
+onclick
+.
 and
 i
 still
@@ -98,7 +104,8 @@ of
 the
 javascript
 function
-call.
+call
+.
 since
 i
 ca
@@ -147,7 +154,8 @@ i
 passing
 in
 an
-integer.
+integer
+.
 cheers
 in
 advance
@@ -156,7 +164,8 @@ any
 knowledge
 you
 can
-drop.
+drop
+.
 the
 anchor
 :

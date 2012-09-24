@@ -11,7 +11,8 @@ instance
 in
 a
 test
-environment.
+environment
+.
 thankfully
 this
 is
@@ -36,7 +37,8 @@ index
 ran
 out
 of
-space.
+space
+.
 following
 this
 ,
@@ -54,7 +56,8 @@ the
 ssp
 were
 not
-accessible.
+accessible
+.
 reclaiming
 the
 disk
@@ -63,7 +66,8 @@ did
 not
 resolve
 the
-issue.
+issue
+.
 so
 rather
 than
@@ -78,7 +82,8 @@ try
 to
 fix
 the
-issue.
+issue
+.
 we
 created
 a
@@ -94,7 +99,8 @@ service
 to
 the
 new
-ssp.
+ssp
+.
 the
 old
 ssp
@@ -104,7 +110,8 @@ it
 database
 were
 then
-deleted.
+deleted
+.
 search
 result
 for
@@ -120,11 +127,13 @@ the
 search
 work
 fine
-otherwise.
+otherwise
+.
 mysites
 also
 work
-ok.
+ok
+.
 following
 the
 implementation
@@ -158,7 +167,8 @@ is
 the
 moss
 farm
-account.
+account
+.
 event
 type
 :
@@ -197,7 +207,9 @@ login
 failed
 for
 user
-'domain\spmosssvc'.
+'domain\spmosssvc
+'
+.
 [
 client
 :
@@ -220,7 +232,8 @@ old
 deleted
 )
 ssp
-database.
+database
+.
 so
 ...
 where

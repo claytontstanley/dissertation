@@ -21,7 +21,8 @@ link
 to
 download
 said
-software.
+software
+.
 unfortunately
 ,
 the
@@ -51,12 +52,14 @@ with
 join
 in
 a
-query.
+query
+.
 the
 common
 item
 is
-sku.
+sku
+.
 i
 'll
 be
@@ -87,7 +90,8 @@ skus
 associated
 with
 that
-download.
+download
+.
 my
 intention
 ,
@@ -105,7 +109,8 @@ datatable
 to
 populate
 a
-gridview.
+gridview
+.
 any
 suggestion
 on
@@ -116,7 +121,8 @@ this
 efficiently
 would
 be
-appreciated.
+appreciated
+.
 if
 it
 help

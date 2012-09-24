@@ -11,7 +11,8 @@ our
 db
 and
 return
-results.
+result
+.
 the
 server
 control
@@ -20,7 +21,8 @@ contains
 an
 asp
 :
-panel.
+panel
+.
 i
 have
 set
@@ -46,7 +48,8 @@ equal
 to
 my
 button
-id.
+id
+.
 on
 the
 panel
@@ -81,7 +84,8 @@ key
 and
 it
 search
-fine.
+fine
+.
 if
 i
 do
@@ -105,7 +109,8 @@ instance
 of
 an
 a
-object.
+object
+.
 anyone
 run
 across

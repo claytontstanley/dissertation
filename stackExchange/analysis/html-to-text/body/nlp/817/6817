@@ -8,7 +8,8 @@ were
 we
 need
 more
-performance.
+performance
+.
 over
 time
 we
@@ -46,7 +47,8 @@ new
 machine
 with
 16
-cores.
+core
+.
 i
 'm
 finding
@@ -69,7 +71,8 @@ in
 a
 shared
 memory
-model.
+model
+.
 for
 example
 the
@@ -79,7 +82,8 @@ allocator
 is
 n't
 good
-enough.
+enough
+.
 what
 resource
 would
@@ -100,7 +104,8 @@ to
 be
 a
 good
-start.
+start
+.
 i
 just
 got

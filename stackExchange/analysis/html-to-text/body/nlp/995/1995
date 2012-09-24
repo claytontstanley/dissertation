@@ -49,7 +49,8 @@ type
 each
 value
 really
-is.
+is
+.
 what
 is
 more
@@ -83,7 +84,8 @@ work
 ,
 the
 return
-true.
+true
+.
 if
 an
 exception
@@ -91,7 +93,8 @@ is
 thrown
 ,
 return
-false.
+false
+.
 regular
 expression
 designed

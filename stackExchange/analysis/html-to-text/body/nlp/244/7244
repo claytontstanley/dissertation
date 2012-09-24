@@ -14,7 +14,8 @@ enums
 with
 combined
 flagged
-values.
+value
+.
 public
 static
 class
@@ -102,7 +103,8 @@ restriction
 only
 class
 and
-struct.
+struct
+.
 c
 #
 doe
@@ -127,7 +129,8 @@ add
 extension
 type
 like
-this.
+this
+.
 anyone
 know
 a

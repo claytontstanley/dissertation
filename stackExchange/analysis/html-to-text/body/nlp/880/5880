@@ -25,7 +25,8 @@ using
 team
 foundation
 from
-dotnetnuke.
+dotnetnuke
+.
 our
 ``
 architect
@@ -36,7 +37,8 @@ we
 use
 one
 class
-project.
+project
+.
 of
 course
 ,

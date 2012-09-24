@@ -16,7 +16,8 @@ make
 it
 accessible
 to
-others.
+others
+.
 my
 plan
 is
@@ -38,7 +39,8 @@ into
 a
 set
 of
-functions.
+function
+.
 then
 ,
 i
@@ -57,7 +59,8 @@ to
 create
 a
 python
-wrapper.
+wrapper
+.
 at
 that
 point
@@ -74,13 +77,15 @@ from
 a
 small
 django
-app.
+app
+.
 at
 least
 ,
 i
 hope
-so.
+so
+.
 do
 i
 have

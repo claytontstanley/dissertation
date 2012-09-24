@@ -19,7 +19,8 @@ fringe
 case
 and
 normal
-values.
+value
+.
 for
 example
 ,
@@ -60,7 +61,8 @@ close-to
 being
 overflowed
 ,
-etcetera.
+etcetera
+.
 then
 generating
 combination
@@ -79,7 +81,8 @@ a
 set
 of
 test
-data.
+data
+.
 (
 inf,0
 ,

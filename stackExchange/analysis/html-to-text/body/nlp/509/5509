@@ -22,7 +22,8 @@ studio
 to
 manage
 memory
-leaks.
+leak
+.
 the
 program
 is
@@ -51,7 +52,8 @@ that
 the
 leak
 occurs
-on.
+on
+.
 unfortunately
 purify
 is
@@ -79,7 +81,8 @@ that
 the
 leak
 occurs
-in.
+in
+.
 unfortunately
 ,
 sometimes
@@ -110,7 +113,8 @@ you
 there
 are
 bear
-there.
+there
+.
 does
 anyone
 with

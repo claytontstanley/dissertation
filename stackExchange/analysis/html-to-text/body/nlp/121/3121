@@ -14,7 +14,8 @@ windows
 xp
 32-bit
 host
-os.
+os
+.
 i
 have
 run
@@ -29,7 +30,8 @@ n't
 done
 any
 other
-tweaking.
+tweaking
+.
 about
 once
 every
@@ -56,7 +58,8 @@ down
 for
 about
 1
-minute.
+minute
+.
 when
 i
 can
@@ -79,7 +82,8 @@ using
 most
 of
 the
-cpu.
+cpu
+.
 occasionally
 taskmgr
 itself
@@ -89,7 +93,8 @@ up
 almost
 all
 of
-it.
+it
+.
 what
 is
 causing
@@ -113,7 +118,8 @@ d
 with
 3
 gig
-ram.
+ram
+.
 the
 vm
 is
@@ -123,7 +129,8 @@ a
 relatively
 fast
 sata
-drive.
+drive
+.
 memory
 usage
 in
@@ -147,7 +154,8 @@ not
 these
 slowdown
 will
-occur.
+occur
+.
 thanks
 !
 chris

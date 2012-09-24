@@ -24,7 +24,8 @@ and
 am
 not
 using
-asp.net.
+asp.net
+.
 this
 web
 site
@@ -84,7 +85,8 @@ digest
 ,
 windows
 ,
-etc.
+etc
+.
 )
 -
 none
@@ -92,7 +94,8 @@ of
 them
 refer
 to
-ssl.
+ssl
+.
 it
 doe
 say
@@ -149,7 +152,8 @@ the
 code
 to
 implement
-ssl.
+ssl
+.
 although
 it
 doe
@@ -201,7 +205,8 @@ ssl
 server
 credential
 private
-key.
+key
+.
 the
 error
 code
@@ -211,7 +216,8 @@ the
 cryptographic
 module
 is
-0x80090016.
+0x80090016
+.
 edit
 :
 steps
@@ -231,7 +237,8 @@ for
 http
 connection
 (
-e.g.
+e.g
+.
 ``
 http
 :
@@ -262,7 +269,8 @@ a
 test
 port
 (
-e.g.
+e.g
+.
 8090
 )
 added
@@ -286,7 +294,8 @@ http
 client
 connection
 ,
-e.g.
+e.g
+.
 (
 http
 :
@@ -306,7 +315,8 @@ https
 client
 connection
 ,
-e.g.
+e.g
+.
 (
 http
 :
@@ -365,7 +375,8 @@ to
 catch
 anything
 else
-earlier.
+earlier
+.
 netstat
 show
 that
@@ -377,7 +388,8 @@ for
 both
 https
 and
-http.
+http
+.
 the
 https
 port
@@ -389,7 +401,8 @@ after
 a
 connection
 is
-attempted.
+attempted
+.
 fiddler
 and
 httpanalyzer

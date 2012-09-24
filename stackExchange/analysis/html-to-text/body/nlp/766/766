@@ -15,7 +15,8 @@ it
 to
 work
 with
-mysql.
+mysql
+.
 the
 main
 problem
@@ -63,7 +64,8 @@ n't
 install
 on
 the
-host.
+host
+.
 i
 found
 bpgsql
@@ -94,7 +96,8 @@ then
 call
 the
 function
-of.
+of
+.
 does
 anybody
 know

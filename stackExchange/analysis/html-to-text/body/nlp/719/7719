@@ -30,7 +30,8 @@ it
 not
 exposed
 in
-textbox.
+textbox
+.
 is
 there
 a
@@ -68,7 +69,8 @@ doe
 n't
 fire
 the
-handler.
+handler
+.
 any
 suggestion
 ?

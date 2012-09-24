@@ -10,7 +10,8 @@ get
 returned
 from
 a
-service.
+service
+.
 the
 value
 is
@@ -27,7 +28,8 @@ should
 be
 an
 array
-reference.
+reference
+.
 however
 ,
 when
@@ -58,7 +60,8 @@ that
 contains
 that
 one
-item.
+item
+.
 i
 want
 to
@@ -69,7 +72,8 @@ loop
 on
 the
 expected
-array.
+array
+.
 without
 checking
 ref
@@ -124,7 +128,8 @@ complain
 for
 the
 simple
-scalar.
+scalar
+.
 edit
 :
 i
@@ -144,7 +149,8 @@ is
 returned
 from
 the
-service.
+service
+.
 the
 problem
 is

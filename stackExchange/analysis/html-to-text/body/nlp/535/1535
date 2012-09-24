@@ -26,7 +26,8 @@ table
 stack
 unwinding
 ,
-etc.
+etc
+.
 )
 ,
 but
@@ -42,7 +43,8 @@ oo
 model
 in
 the
-process.
+process
+.
 anyway
 ,
 here
@@ -66,7 +68,8 @@ file
 io
 operation
 (
-e.g.
+e.g
+.
 reading
 and
 writing
@@ -116,7 +119,8 @@ or
 you
 reach
 a
-timeout.
+timeout
+.
 i
 already
 have
@@ -146,7 +150,8 @@ period
 ha
 elapsed
 ,
-etc.
+etc
+.
 the
 problem
 is
@@ -177,7 +182,8 @@ in
 try-catch
 /
 retry
-logic.
+logic
+.
 here
 's
 an
@@ -288,7 +294,8 @@ delegate
 block
 passed
 to
-it.
+it
+.
 this
 allowed
 me
@@ -326,7 +333,8 @@ a
 lot
 to
 be
-desired.
+desired
+.
 i
 'd
 like

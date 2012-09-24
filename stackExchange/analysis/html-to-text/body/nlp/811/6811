@@ -10,7 +10,8 @@ to
 read
 the
 original
-thread.
+thread
+.
 a
 quick
 simple
@@ -32,7 +33,8 @@ then
 been
 encoded
 in
-base64.
+base64
+.
 i
 wish
 to
@@ -53,7 +55,8 @@ back
 into
 a
 .xfdl
-file.
+file
+.
 xfdl
 >
 xml.gz
@@ -105,7 +108,8 @@ is
 readable
 and
 look
-wonderful.
+wonderful
+.
 without
 modifying
 the
@@ -148,7 +152,8 @@ re-encoded
 file
 should
 be
-equal.
+equal
+.
 if
 i
 put
@@ -165,7 +170,8 @@ they
 do
 not
 match
-up.
+up
+.
 also
 ,
 the
@@ -177,7 +183,8 @@ viewed
 in
 an
 .xfdl
-viewer.
+viewer
+.
 the
 viewer
 say
@@ -186,7 +193,8 @@ the
 re-encoded
 xfdl
 is
-unreadable.
+unreadable
+.
 i
 have
 also
@@ -202,12 +210,14 @@ also
 produce
 the
 same
-results.
+result
+.
 any
 help
 would
 be
-appreciated.
+appreciated
+.
 if
 you
 want

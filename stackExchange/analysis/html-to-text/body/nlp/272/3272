@@ -7,7 +7,8 @@ a
 project
 with
 specific
-requirements.
+requirement
+.
 a
 brief
 overview
@@ -57,7 +58,8 @@ ui
 except
 via
 the
-database.
+database
+.
 communication
 with
 the
@@ -77,7 +79,8 @@ intervention
 on
 the
 web
-ui.
+ui
+.
 the
 current
 (
@@ -102,7 +105,8 @@ generated
 from
 the
 manual
-intervention.
+intervention
+.
 i
 do
 not
@@ -133,7 +137,8 @@ the
 time
 of
 the
-call.
+call
+.
 as
 i
 see
@@ -144,7 +149,8 @@ two
 way
 to
 accomplish
-this.
+this
+.
 1
 )
 adapt
@@ -155,7 +161,8 @@ to
 store
 two
 extra
-parameters.
+parameter
+.
 one
 being
 ``
@@ -166,7 +173,7 @@ or
 manually
 added
 ?
-''
+``
 and
 a
 nullable
@@ -210,7 +217,8 @@ it
 is
 a
 timed
-trigger.
+trigger
+.
 or
 2
 )
@@ -226,7 +234,8 @@ trigger
 on-the-fly
 at
 timed
-intervals.
+interval
+.
 the
 second
 option
@@ -315,7 +324,8 @@ unlisted
 one
 )
 to
-take.
+take
+.
 thanks
 in
 advance

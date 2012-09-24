@@ -11,7 +11,8 @@ and
 document
 from
 a
-server.
+server
+.
 the
 video
 play
@@ -36,7 +37,8 @@ document
 in
 their
 native
-applications.
+application
+.
 i
 am
 looking
@@ -61,7 +63,8 @@ in
 the
 application
 storage
-directory.
+directory
+.
 i
 have
 tried
@@ -81,7 +84,8 @@ it
 need
 a
 remote
-url.
+url
+.
 my
 last
 resort

@@ -32,7 +32,8 @@ to
 manage
 it
 configuration
-settings.
+setting
+.
 i
 'd
 like
@@ -49,7 +50,8 @@ asp.net
 page
 this
 work
-great.
+great
+.
 but
 when
 the
@@ -83,7 +85,8 @@ ha
 no
 knowledge
 of
-web.config.
+web.config
+.
 is
 there
 a
@@ -102,7 +105,8 @@ an
 arbitrary
 path
 (
-e.g.
+e.g
+.
 ``
 ..\web.config
 ''
@@ -139,7 +143,8 @@ null
 for
 my
 custom
-section.
+section
+.
 any
 other
 approach

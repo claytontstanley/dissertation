@@ -175,8 +175,9 @@ echo
 ``
 no
 story
-available.
-''
+available
+.
+``
 ;
 }
 the
@@ -200,7 +201,8 @@ another
 portion
 of
 the
-software.
+software
+.
 if
 i
 comment
@@ -219,7 +221,8 @@ through
 to
 the
 else
-statement.
+statement
+.
 so
 ,
 it
@@ -231,7 +234,8 @@ the
 content
 in
 the
-if.
+if
+.
 i
 have
 been
@@ -266,11 +270,13 @@ a
 doe
 not
 have
-permission.
+permission
+.
 i
 have
 checked
-both.
+both
+.
 i
 can
 still
@@ -293,7 +299,8 @@ account
 ha
 the
 correct
-permissions.
+permission
+.
 i
 think
 i
@@ -314,7 +321,8 @@ block
 of
 code
 all
-day.
+day
+.
 if
 any
 more

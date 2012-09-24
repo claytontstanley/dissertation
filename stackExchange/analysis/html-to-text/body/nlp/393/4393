@@ -13,7 +13,8 @@ begin
 with
 a
 given
-string.
+string
+.
 i
 'm
 sure
@@ -28,7 +29,8 @@ sql
 and
 the
 information_schema
-tables.
+table
+.
 if
 anyone
 ha
@@ -44,7 +46,8 @@ quickly
 ,
 please
 post
-it.
+it
+.
 if
 no-one
 post

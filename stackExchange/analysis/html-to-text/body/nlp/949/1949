@@ -65,7 +65,8 @@ the
 orm
 feature
 of
-linqtosql.
+linqtosql
+.
 my
 question
 is
@@ -91,7 +92,8 @@ some
 way
 through
 foreign
-keys.
+keys
+.
 my
 first
 inclination
@@ -106,7 +108,8 @@ that
 model
 the
 entire
-database.
+database
+.
 that
 way
 i
@@ -151,7 +154,8 @@ insert
 related
 object
 ,
-etc.
+etc
+.
 however
 ,
 after
@@ -189,7 +193,8 @@ interrelated
 section
 within
 my
-database.
+database
+.
 my
 main
 concern
@@ -224,7 +229,8 @@ unnecessary
 imposition
 on
 application
-resources.
+resource
+.
 additionally
 ,
 it
@@ -240,7 +246,8 @@ file
 than
 one
 big
-one.
+one
+.
 the
 thing
 that
@@ -295,7 +302,8 @@ in
 more
 than
 one
-datacontext.
+datacontext
+.
 any
 thought
 or

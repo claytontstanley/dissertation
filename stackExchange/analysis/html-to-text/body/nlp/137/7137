@@ -25,7 +25,8 @@ week
 status
 and
 last
-weeks.
+week
+.
 the
 file
 are
@@ -46,7 +47,8 @@ and
 *_lastweek.jpg
 for
 each
-status.
+status
+.
 each
 week
 i
@@ -61,7 +63,8 @@ the
 old
 *current
 to
-*lastweek.
+*lastweek
+.
 i
 can
 use

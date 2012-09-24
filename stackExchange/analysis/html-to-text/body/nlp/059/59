@@ -7,7 +7,8 @@ datatable
 with
 a
 name
-column.
+column
+.
 i
 want
 to
@@ -19,7 +20,8 @@ the
 unique
 name
 ordered
-alphabetically.
+alphabetically
+.
 the
 following
 query
@@ -27,7 +29,8 @@ ignores
 the
 order
 by
-clause.
+clause
+.
 var
 name
 =

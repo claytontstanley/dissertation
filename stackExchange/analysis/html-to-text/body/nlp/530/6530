@@ -11,7 +11,8 @@ our
 own
 logging
 module
-for.
+for
+.
 my
 question
 is
@@ -28,7 +29,8 @@ log
 file
 to
 ?
-i.e.
+i.e
+.
 the
 website
 will
@@ -40,7 +42,8 @@ anonymous
 user
 identity
 (
-e.g.
+e.g
+.
 iusr
 on
 iis7
@@ -59,5 +62,6 @@ have
 permission
 to
 write
-to.
+to
+.
 cheers,

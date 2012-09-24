@@ -17,7 +17,8 @@ application
 and
 an
 object
-server.
+server
+.
 for
 development
 ,
@@ -36,7 +37,8 @@ on
 my
 local
 development
-machine.
+machine
+.
 when
 i
 'm
@@ -49,7 +51,8 @@ the
 responsiveness
 is
 just
-fine.
+fine
+.
 however
 ,
 when
@@ -61,7 +64,8 @@ the
 speed
 is
 significantly
-slower.
+slower
+.
 if
 i
 disconnect
@@ -99,7 +103,8 @@ speed
 up
 to
 full
-throttle.
+throttle
+.
 my
 assumption
 is
@@ -125,7 +130,8 @@ home
 router
 and/or
 the
-vpn.
+vpn
+.
 does
 anyone
 have

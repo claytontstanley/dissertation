@@ -39,7 +39,9 @@ specify
 the
 assemblyversion
 a
-1.0.*
+1.0
+.
+*
 but
 it
 doe
@@ -49,7 +51,8 @@ me
 exactly
 what
 i
-want.
+want
+.
 i
 'm
 also
@@ -83,7 +86,8 @@ setting
 file
 in
 another
-directory.
+directory
+.
 i
 would
 like
@@ -127,7 +131,8 @@ they
 have
 an
 old
-release.
+release
+.
 a
 short
 explanation
@@ -139,7 +144,8 @@ work
 would
 also
 be
-appreciated.
+appreciated
+.
 when
 doe
 the

@@ -27,7 +27,8 @@ character
 ...
 .
 ''
-error.
+error
+.
 i
 assume
 this
@@ -40,7 +41,8 @@ doe
 not
 accept
 unicode-only
-characters.
+character
+.
 what
 's
 the
@@ -62,7 +64,7 @@ print
 a
 ``
 ?
-''
+``
 instead
 of
 failing

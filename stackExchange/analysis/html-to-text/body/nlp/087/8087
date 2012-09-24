@@ -9,7 +9,8 @@ interact
 with
 the
 db
-layer.
+layer
+.
 in
 java
 ,
@@ -37,7 +38,8 @@ spring
 stored
 procedure
 ,
-etc.
+etc
+.
 in
 your
 language

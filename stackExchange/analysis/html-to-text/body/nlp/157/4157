@@ -38,7 +38,8 @@ choosing
 radio
 button
 ,
-etc.
+etc
+.
 )
 ,
 i
@@ -51,7 +52,8 @@ change
 out
 to
 the
-appsettings.
+appsettings
+.
 at
 the
 same
@@ -78,7 +80,8 @@ will
 be
 constantly
 processing
-data.
+data
+.
 changes
 to
 setting
@@ -104,7 +107,8 @@ be
 accessing
 the
 appsettings
-constantly.
+constantly
+.
 is
 this
 a
@@ -174,7 +178,8 @@ would
 greatly
 appreciate
 the
-input.
+input
+.
 update
 :
 i
@@ -183,7 +188,8 @@ probably
 clarify
 a
 few
-points.
+point
+.
 this
 is
 not
@@ -205,13 +211,15 @@ simply
 for
 storing
 configuration
-settings.
+setting
+.
 this
 is
 a
 windows
 forms
-application.
+application
+.
 according
 to
 the
@@ -233,7 +241,8 @@ but
 user
 setting
 a
-well.
+well
+.
 (
 especially
 important
@@ -249,7 +258,8 @@ installed
 a
 a
 partial-trust
-application.
+application
+.
 )
 update
 2
@@ -298,7 +308,8 @@ the
 caching
 that
 others
-suggested.
+suggested
+.
 this
 mean
 any
@@ -315,7 +326,8 @@ memory
 making
 it
 extremely
-fast.
+fast
+.
 properties
 only
 writes
@@ -328,7 +340,8 @@ you
 explicitly
 tell
 it
-to.
+to
+.
 this
 mean
 i
@@ -356,7 +369,8 @@ disk
 when
 the
 program
-exits.
+exit
+.
 just
 to
 verify
@@ -392,7 +406,8 @@ writes
 per
 second
 using
-properties.
+properties
+.
 that
 is
 so
@@ -420,7 +435,8 @@ using
 properties
 without
 impacting
-performance.
+performance
+.
 thank
 you
 ,

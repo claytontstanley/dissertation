@@ -7,7 +7,8 @@ is
 modelled
 on
 a
-combobox.
+combobox
+.
 i
 want
 to
@@ -26,7 +27,8 @@ of
 a
 standard
 windows
-combobox.
+combobox
+.
 specifically
 ,
 i
@@ -51,7 +53,8 @@ when
 the
 control
 is
-disabled.
+disabled
+.
 just
 to
 be
@@ -65,7 +68,8 @@ system
 with
 visual
 styles
-enabled.
+enabled
+.
 also
 ,
 all
@@ -91,13 +95,15 @@ the
 disabled
 combobox
 border
-colour.
+colour
+.
 i
 am
 using
 the
 visualstylerenderer
-class.
+class
+.
 msdn
 suggests
 using

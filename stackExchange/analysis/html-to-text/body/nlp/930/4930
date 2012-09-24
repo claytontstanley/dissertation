@@ -19,7 +19,8 @@ aspx
 page
 to
 the
-sharepoint.
+sharepoint
+.
 sharepoint
 2007
 run
@@ -43,7 +44,8 @@ behave
 like
 it
 normally
-should.
+should
+.
 the
 problem
 is
@@ -62,7 +64,8 @@ a
 different
 version
 with
-mine.
+mine
+.
 this
 cause
 conflict
@@ -80,7 +83,8 @@ folder
 with
 the
 same
-name.
+name
+.
 from
 what
 i
@@ -94,7 +98,8 @@ to
 handle
 this
 situation
-easily.
+easily
+.
 i
 've
 tried
@@ -117,7 +122,8 @@ dll
 in
 the
 bin
-folder.
+folder
+.
 if
 there
 is
@@ -136,7 +142,8 @@ fail
 to
 load
 the
-assembly.
+assembly
+.
 if
 i
 use

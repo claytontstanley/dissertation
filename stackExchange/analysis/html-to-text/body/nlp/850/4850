@@ -12,7 +12,8 @@ work
 in
 an
 existing
-application.
+application
+.
 i
 have
 a
@@ -33,7 +34,8 @@ to
 position
 using
 arrow
-keys.
+key
+.
 currently
 i
 am
@@ -47,7 +49,8 @@ and
 send
 an
 onkeypress
-event.
+event
+.
 this
 work
 ,
@@ -88,7 +91,8 @@ that
 i
 am
 listening
-to.
+to
+.
 does
 anyone
 have

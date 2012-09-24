@@ -41,7 +41,8 @@ need
 this
 to
 be
-reliable.
+reliable
+.
 the
 way
 this
@@ -77,7 +78,8 @@ when
 it
 is
 not
-busy.
+busy
+.
 the
 issue
 i
@@ -112,7 +114,8 @@ anything
 so
 the
 app
-closes.
+close
+.
 i
 tried
 adding
@@ -133,7 +136,8 @@ the
 timer
 doe
 go
-off.
+off
+.
 any
 idea
 welcome

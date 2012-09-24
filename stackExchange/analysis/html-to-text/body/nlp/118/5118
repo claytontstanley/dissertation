@@ -14,7 +14,8 @@ style
 on
 a
 set
-date.
+date
+.
 the
 site
 's
@@ -34,7 +35,8 @@ require
 a
 css
 reference
-change.
+change
+.
 i
 'm
 working
@@ -81,7 +83,8 @@ progress
 on
 the
 new
-look.
+look
+.
 i
 'm
 planning
@@ -110,13 +113,15 @@ select
 the
 new
 css
-page.
+page
+.
 we
 're
 working
 in
 asp.net
-3.5.
+3.5
+.
 any
 recommendation
 ?
@@ -135,7 +140,8 @@ ie8,7
 ,
 and
 6
-support.
+support
+.
 i
 may
 create

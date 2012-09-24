@@ -14,7 +14,8 @@ to
 programmatically
 launch
 device
-emulators.
+emulator
+.
 when
 i
 call
@@ -26,7 +27,8 @@ i
 inexplicably
 get
 a
-directorynotfoundexception.
+directorynotfoundexception
+.
 i
 get
 it
@@ -41,7 +43,8 @@ in
 c
 #
 console
-application.
+application
+.
 here
 's
 the
@@ -211,7 +214,8 @@ jane
 visual
 studio
 2008
-pro.
+pro
+.
 i
 imagine
 it
@@ -230,7 +234,8 @@ a
 console
 app
 or
-powershell.
+powershell
+.
 here
 's
 the

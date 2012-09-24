@@ -86,13 +86,15 @@ explicit
 50
 ;
 '
-line.
+line
+.
 at
 first
 this
 doe
 n't
-matter.
+matter
+.
 but
 if
 later
@@ -133,7 +135,8 @@ value
 50
 hardcoded
 in
-them.
+them
+.
 and
 the
 whole
@@ -156,7 +159,8 @@ the
 customer
 changing
 his
-mind.
+mind
+.
 obviously
 ,
 if
@@ -183,7 +187,8 @@ attribute
 of
 whatever
 i
-wanted.
+wanted
+.
 but
 here
 i
@@ -198,7 +203,8 @@ of
 property
 in
 the
-base.
+base
+.
 is
 there
 any

@@ -16,7 +16,8 @@ for
 authentication
 on
 my
-site.
+site
+.
 which
 provider
 should
@@ -54,7 +55,8 @@ that
 doe
 attribute
 exchange
-properly.
+properly
+.
 so
 :
 who

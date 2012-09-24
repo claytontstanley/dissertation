@@ -47,7 +47,8 @@ is
 of
 variable
 character
-length.
+length
+.
 as
 an
 example
@@ -86,7 +87,8 @@ comparing
 the
 serialized
 array
-lengths.
+length
+.
 this
 should
 yield
@@ -103,7 +105,8 @@ character
 should
 have
 length
-+1.
++1
+.
 plus
 if
 the
@@ -111,7 +114,8 @@ solution
 is
 elegant
 for
-java.
+java
+.
 i
 ca
 n't
@@ -129,7 +133,8 @@ sequence
 in
 a
 byte
-array.
+array
+.
 (
 could
 be

@@ -3,7 +3,8 @@ so
 i
 need
 some
-help.
+help
+.
 i
 am
 working
@@ -11,7 +12,8 @@ on
 a
 project
 in
-c++.
+c++
+.
 however
 ,
 i
@@ -23,7 +25,8 @@ managed
 to
 corrupt
 my
-heap.
+heap
+.
 this
 is
 based
@@ -72,7 +75,8 @@ world.\n
 ''
 would
 work
-fine.
+fine
+.
 */
 examplestring
 =
@@ -85,7 +89,8 @@ system
 with
 a
 stack
-dump.
+dump
+.
 so
 basically
 i
@@ -109,7 +114,8 @@ where
 i
 've
 screwed
-up.
+up
+.
 the
 codebase
 is
@@ -125,7 +131,8 @@ so
 this
 is
 easily
-do-able.
+do-able
+.
 still
 ,
 i
@@ -147,7 +154,8 @@ i
 throw
 it
 out
-there.
+there
+.
 i
 'm
 on
@@ -185,7 +193,8 @@ destructor
 wa
 an
 invalid
-free.
+free
+.
 i
 have
 to
@@ -215,7 +224,8 @@ would
 be
 appreciated
 a
-well.
+well
+.
 (
 in
 before
@@ -256,7 +266,8 @@ these
 sort
 of
 memory
-problems.
+problem
+.
 i
 know
 the

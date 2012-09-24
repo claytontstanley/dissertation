@@ -11,7 +11,8 @@ an
 enumeration
 between
 two
-applications.
+application
+.
 the
 user
 upload
@@ -24,7 +25,8 @@ that
 is
 on
 the
-web.
+web
+.
 this
 application
 call
@@ -40,7 +42,8 @@ pass
 the
 document
 to
-it.
+it
+.
 the
 back-end
 app
@@ -54,7 +57,8 @@ row
 in
 the
 document
-table.
+table
+.
 the
 document
 type
@@ -67,7 +71,8 @@ type
 invoice
 ,
 contract
-etc.
+etc
+.
 )
 is
 passed
@@ -80,7 +85,8 @@ web
 service
 's
 uploaddocument
-method.
+method
+.
 the
 question
 is
@@ -114,7 +120,8 @@ i
 think
 it
 is
-o.k.
+o.k
+.
 to
 use
 a

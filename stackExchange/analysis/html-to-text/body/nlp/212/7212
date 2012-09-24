@@ -62,7 +62,8 @@ inheritance
 but
 via
 the
-prototype.
+prototype
+.
 the
 class
 is
@@ -93,7 +94,8 @@ it
 will
 be
 overwritten
-anyway.
+anyway
+.
 long
 story
 short
@@ -115,7 +117,8 @@ s
 extension
 methods
 for
-as3.
+as3
+.
 edit
 :
 i
@@ -154,7 +157,8 @@ for
 asking
 the
 wrong
-question.
+question
+.
 :
 )
 also

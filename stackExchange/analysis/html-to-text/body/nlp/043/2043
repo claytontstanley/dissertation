@@ -17,8 +17,10 @@ including
 it
 path
 and
-filename.
-eg.
+filename
+.
+eg
+.
 ``
 c
 :
@@ -37,7 +39,8 @@ a
 dll
 invoked
 via
-loadlibrary.
+loadlibrary
+.
 does
 anyone
 know

@@ -20,7 +20,8 @@ a
 c
 #
 )
-application.
+application
+.
 the
 caveat
 :
@@ -48,7 +49,8 @@ by
 user
 at
 a
-time.
+time
+.
 now
 ,
 my
@@ -73,7 +75,8 @@ not
 run
 off
 a
-network.
+network
+.
 firebird
 seems
 to
@@ -95,7 +98,8 @@ first-class
 and
 is
 largely
-undocumented.
+undocumented
+.
 blackfish
 sql
 look
@@ -109,7 +113,8 @@ trial
 of
 the
 .net
-version.
+version
+.
 pricing
 is
 also

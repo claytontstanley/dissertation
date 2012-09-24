@@ -6,7 +6,8 @@ get
 my
 head
 around
-xaml.
+xaml
+.
 thought
 that
 i
@@ -16,7 +17,8 @@ some
 writing
 xaml
 in
-code.
+code
+.
 trying
 to
 add
@@ -37,7 +39,8 @@ one
 of
 the
 grid
-cells.
+cell
+.
 i
 dont
 seem
@@ -65,7 +68,8 @@ can
 add
 the
 textblock
-too.
+too
+.
 just
 grid.children.add
 (
@@ -74,7 +78,8 @@ object
 .
 no
 cell
-definition.
+definition
+.
 tia
 the
 xaml

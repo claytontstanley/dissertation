@@ -36,7 +36,8 @@ above
 a
 i
 would
-expect.
+expect
+.
 is
 there
 anything
@@ -48,7 +49,8 @@ make
 it
 only
 log
-info.
+info
+.
 <
 logger
 name=

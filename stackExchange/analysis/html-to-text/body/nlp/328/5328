@@ -29,7 +29,8 @@ or
 explicitly
 calling
 another
-constructor.
+constructor
+.
 what
 i
 want
@@ -60,7 +61,8 @@ mock
 class
 for
 a
-test.
+test
+.
 there
 is
 no
@@ -77,7 +79,8 @@ the
 test
 simpler
 to
-read.
+read
+.
 i
 also
 want
@@ -91,7 +94,8 @@ the
 constructor
 into
 a
-runtimeexception.
+runtimeexception
+.
 so
 ,
 what
@@ -150,7 +154,8 @@ is
 n't
 the
 first
-statement.
+statement
+.
 my
 workaround
 :

@@ -11,7 +11,8 @@ libray
 and
 it
 test
-harness.
+harness
+.
 it
 used
 to
@@ -34,7 +35,8 @@ either
 with
 the
 same
-errors.
+error
+.
 i
 've
 tried
@@ -47,7 +49,8 @@ cause
 the
 same
 error
-too.
+too
+.
 nothing
 seems
 out
@@ -64,7 +67,8 @@ work
 in
 the
 main
-app.
+app
+.
 i
 've
 stripped
@@ -84,7 +88,8 @@ minimum
 to
 generate
 the
-error.
+error
+.
 unfortunately
 i
 ca
@@ -98,7 +103,8 @@ is
 used
 in
 production
-code.
+code
+.
 the
 lnk2001
 linker
@@ -119,7 +125,8 @@ to
 implement
 a
 virtual
-function.
+function
+.
 however
 this
 is
@@ -135,7 +142,8 @@ is
 a
 header
 at
-that.
+that
+.
 the
 code
 that
@@ -178,7 +186,8 @@ value
 of
 getlasterror
 or
-wsagetlasterror.
+wsagetlasterror
+.
 the
 function
 mentioned
@@ -204,7 +213,8 @@ override
 it
 if
 need
-be.
+be
+.
 however
 it
 appears
@@ -232,7 +242,8 @@ setting
 that
 would
 control
-that.
+that
+.
 i
 suspect
 that
@@ -261,7 +272,8 @@ way
 of
 knowing
 for
-sure.
+sure
+.
 however
 both
 project
@@ -271,7 +283,8 @@ _mbcs
 in
 the
 compiler
-options.
+option
+.
 --
 --
 --
@@ -388,7 +401,8 @@ unresolved
 external
 error
 executing
-link.exe.
+link.exe
+.
 testcomms.exe
 -
 2
@@ -424,7 +438,8 @@ most
 of
 the
 afternoon
-too.
+too
+.
 thanks
 ,
 g

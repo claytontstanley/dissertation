@@ -34,7 +34,8 @@ msdtc
 )
 ha
 been
-disabled.
+disabled
+.
 please
 enable
 dtc
@@ -70,7 +71,8 @@ it
 support
 for
 remote/network
-transactions.
+transaction
+.
 (
 exception
 from
@@ -123,12 +125,14 @@ which
 the
 app
 is
-installed.
+installed
+.
 but
 the
 error
 still
-occurs.
+occurs
+.
 i
 wa
 wondering

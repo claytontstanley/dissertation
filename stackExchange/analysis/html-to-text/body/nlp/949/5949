@@ -18,7 +18,8 @@ and
 (
 assumed
 )
-speed.
+speed
+.
 but
 when
 using
@@ -67,7 +68,8 @@ of
 2
 ,
 and
-1.
+1
+.
 assuming
 that
 the
@@ -121,7 +123,8 @@ which
 might
 be
 privileged
-information.
+information
+.
 (
 for
 instance
@@ -132,7 +135,8 @@ user
 #
 726
 in
-stackoverflow.
+stackoverflow
+.
 )
 would
 a
@@ -168,7 +172,8 @@ information
 about
 user
 on
-display.
+display
+.
 sure
 ,
 it
@@ -195,7 +200,8 @@ least
 a
 little
 more
-secure.
+secure
+.
 is
 that
 benefit
@@ -230,7 +236,8 @@ just
 to
 speed
 up
-joins.
+join
+.
 there
 's
 also
@@ -240,7 +247,8 @@ of
 in-database
 representation
 of
-uuids.
+uuids
+.
 i
 know
 mysql
@@ -248,7 +256,8 @@ store
 them
 a
 36-character
-strings.
+string
+.
 postgres
 seems
 to
@@ -269,7 +278,8 @@ have
 n't
 tried
 it
-myself.
+myself
+.
 anyone
 have
 any

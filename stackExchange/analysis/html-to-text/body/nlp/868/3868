@@ -32,7 +32,8 @@ then
 run
 xpath
 query
-on.
+on
+.
 how
 do
 i
@@ -64,7 +65,8 @@ of
 the
 string
 into
-that.
+that
+.
 there
 ha
 been
@@ -87,7 +89,8 @@ an
 ns_error_not_implemented
 if
 you
-try.
+try
+.
 is
 there
 any

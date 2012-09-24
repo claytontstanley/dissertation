@@ -22,7 +22,8 @@ single
 character
 to
 the
-screen.
+screen
+.
 the
 problem
 is
@@ -35,7 +36,8 @@ to
 get
 it
 centered
-properly.
+properly
+.
 no
 matter
 what
@@ -70,7 +72,8 @@ the
 greater
 the
 y
-offset.
+offset
+.
 for
 example
 ,
@@ -92,7 +95,8 @@ the
 offset
 is
 about
-10.
+10
+.
 i
 want
 the
@@ -113,12 +117,14 @@ in
 and
 be
 centered
-horizontally.
+horizontally
+.
 here
 's
 my
 basic
-code.
+code
+.
 ``
 this
 ''
@@ -131,7 +137,8 @@ it
 's
 being
 drawn
-in.
+in
+.
 graphics
 g
 =

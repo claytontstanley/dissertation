@@ -8,7 +8,8 @@ approximately
 3000
 row
 per
-user.
+user
+.
 one
 of
 the
@@ -29,7 +30,8 @@ are
 n't
 in
 chronological
-order.
+order
+.
 i
 'd
 like
@@ -49,12 +51,14 @@ a
 number
 of
 individual
-datapoints.
+datapoints
+.
 20
 datapoints
 would
 be
-enough.
+enough
+.
 i
 could
 do
@@ -77,7 +81,8 @@ look
 at
 every
 150th
-row.
+row
+.
 or
 i
 could
@@ -90,7 +95,8 @@ use
 limit
 1
 and
-offset.
+offset
+.
 but
 there
 must

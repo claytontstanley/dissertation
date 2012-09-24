@@ -2,7 +2,8 @@ solutions
 welcome
 in
 any
-language.
+language
+.
 :
 -
 )
@@ -23,7 +24,8 @@ pi
 a
 a
 personal
-challenge.
+challenge
+.
 more
 specifically
 i
@@ -45,7 +47,8 @@ or
 hard-coding
 the
 number
-in.
+in
+.
 the
 program
 below
@@ -55,7 +58,8 @@ various
 way
 i
 know
-of.
+of
+.
 the
 inline
 assembly
@@ -86,7 +90,8 @@ compare
 the
 other
 version
-against.
+against
+.
 in
 my
 test
@@ -118,7 +123,8 @@ atan
 )
 into
 a
-constant.
+constant
+.
 with
 -fno-builtin
 specified
@@ -132,7 +138,8 @@ atan2
 )
 version
 is
-fastest.
+fastest
+.
 here
 's
 the
@@ -284,7 +291,8 @@ double
 diff
 ;
 /*
-warmup.
+warmup
+.
 the
 atan2
 case
@@ -319,7 +327,8 @@ if
 *
 is
 not
-used.
+used
+.
 */
 testwith
 (
@@ -378,7 +387,8 @@ endif
 actual
 test
 start
-here.
+here
+.
 */
 testwith
 (
@@ -601,7 +611,8 @@ order
 of
 the
 test
-around.
+around
+.
 the
 atan2
 (
@@ -617,7 +628,8 @@ top
 every
 time
 ,
-though.
+though
+.
 i
 'm
 keen
@@ -635,7 +647,8 @@ improvement
 to
 the
 testing
-process.
+process
+.
 :
 -
 )

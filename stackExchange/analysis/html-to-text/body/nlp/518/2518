@@ -42,7 +42,8 @@ data
 from
 the
 server
-database.
+database
+.
 for
 example
 ,
@@ -67,7 +68,8 @@ in
 the
 server.db
 trole
-table.
+table
+.
 another
 example
 ,
@@ -91,7 +93,8 @@ in
 the
 server.db
 tfile
-table.
+table
+.
 in
 sql
 server
@@ -106,7 +109,8 @@ the
 name
 of
 the
-database.
+database
+.
 is
 there
 anyway

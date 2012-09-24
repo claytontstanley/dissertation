@@ -20,7 +20,8 @@ particular
 thread
 doing
 intensive
-calculations.
+calculation
+.
 right
 now
 i
@@ -51,7 +52,8 @@ sleep
 )
 with
 hardcoded
-values.
+value
+.
 it
 make
 sure
@@ -72,7 +74,8 @@ for
 a
 certain
 minimal
-time.
+time
+.
 it
 more
 or
@@ -80,7 +83,8 @@ le
 doe
 the
 job
-i.e.
+i.e
+.
 guarantee
 that
 the
@@ -93,7 +97,8 @@ than
 50
 %
 of
-cpu.
+cpu
+.
 however
 behavior
 is

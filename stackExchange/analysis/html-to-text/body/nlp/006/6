@@ -15,7 +15,8 @@ is
 a
 relatively
 positioned
-div.
+div
+.
 when
 i
 use
@@ -40,7 +41,8 @@ not
 on
 firefox
 or
-safari.
+safari
+.
 if
 i
 use
@@ -48,7 +50,8 @@ pixel
 width
 ,
 it
-works.
+work
+.
 if
 the
 parent
@@ -62,7 +65,8 @@ width
 on
 the
 child
-works.
+work
+.
 is
 there
 something

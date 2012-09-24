@@ -25,7 +25,8 @@ to
 near
 the
 original
-value.
+value
+.
 to
 find
 the
@@ -57,7 +58,8 @@ is
 used
 in
 our
-calculations.
+calculation
+.
 this
 work
 well
@@ -93,7 +95,8 @@ higher
 than
 the
 initial
-peak.
+peak
+.
 we
 take
 10
@@ -107,7 +110,8 @@ over
 a
 90
 second
-period.
+period
+.
 my
 initial
 thought
@@ -140,7 +144,8 @@ construct
 an
 array
 of
-peaks.
+peak
+.
 maybe
 we
 should
@@ -166,7 +171,8 @@ for
 noise
 in
 the
-system.
+system
+.
 is
 this
 the

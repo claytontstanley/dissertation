@@ -8,7 +8,8 @@ technique
 called
 discrete
 cosine
-transform.
+transform
+.
 this
 technique
 is
@@ -16,7 +17,8 @@ used
 in
 mpeg
 video
-encoding.
+encoding
+.
 i
 based
 my
@@ -126,7 +128,8 @@ information
 at
 the
 top
-right.
+right
+.
 the
 transformed
 block
@@ -234,7 +237,8 @@ that
 represent
 a
 good
-match.
+match
+.
 also
 ,
 what

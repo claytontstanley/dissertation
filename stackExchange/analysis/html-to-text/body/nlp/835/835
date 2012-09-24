@@ -6,7 +6,8 @@ setup
 cruisecontrol.net
 at
 the
-moment.
+moment
+.
 so
 far
 it
@@ -21,7 +22,8 @@ problem
 with
 the
 msbuild
-task.
+task
+.
 according
 to
 the
@@ -31,7 +33,8 @@ it
 pass
 ccnetartifactdirectory
 to
-msbuild.
+msbuild
+.
 but
 how
 do
@@ -62,7 +65,8 @@ but
 that
 doe
 not
-work.
+work
+.
 in
 fact
 ,

@@ -15,7 +15,8 @@ and
 wrap
 them
 in
-spans.
+span
+.
 i
 am
 using
@@ -26,7 +27,8 @@ it
 's
 not
 outputting
-anything.
+anything
+.
 preg_replace
 (
 ``

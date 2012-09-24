@@ -35,7 +35,8 @@ how
 to
 instrument
 a
-ui.
+ui
+.
 by
 instrumenting
 ,
@@ -49,7 +50,8 @@ and
 performance
 of
 the
-system.
+system
+.
 a
 msdn
 article
@@ -84,7 +86,8 @@ use
 to
 search
 ,
-etc.
+etc
+.
 how
 are
 you
@@ -142,9 +145,11 @@ to
 instrumenting
 a
 web-based
-application.
+application
+.
 (
-i.e.
+i.e
+.
 need
 to
 transfer
@@ -178,7 +183,8 @@ via
 concept
 like
 attached
-properties.
+property
+.
 have
 you
 instrumented

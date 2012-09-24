@@ -35,7 +35,8 @@ to
 add
 and
 edit
-information.
+information
+.
 we
 will
 add
@@ -52,7 +53,8 @@ area
 at
 a
 later
-date.
+date
+.
 i
 am
 concerned
@@ -82,7 +84,8 @@ important
 information
 may
 be
-lost.
+lost
+.
 a
 number
 of
@@ -103,7 +106,8 @@ to
 create
 a
 bigger
-headache.
+headache
+.
 do
 nothing
 and
@@ -123,7 +127,8 @@ record
 at
 the
 same
-time.
+time
+.
 -
 might
 never
@@ -157,7 +162,8 @@ the
 user
 ha
 finished
-editing.
+editing
+.
 if
 they
 differ
@@ -175,7 +181,8 @@ of
 data
 to
 be
-stored.
+stored
+.
 add
 last
 updated
@@ -193,7 +200,8 @@ if
 not
 then
 show
-differences.
+difference
+.
 -
 requires
 new
@@ -203,7 +211,8 @@ each
 of
 the
 relevant
-tables.
+table
+.
 create
 an
 editing
@@ -227,7 +236,8 @@ user
 from
 editing
 same
-record.
+record
+.
 -
 would
 require
@@ -250,7 +260,8 @@ crash
 out
 of
 the
-program.
+program
+.
 are
 there
 any

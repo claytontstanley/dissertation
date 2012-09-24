@@ -22,7 +22,8 @@ advantage
 of
 all
 four
-cores.
+core
+.
 the
 text
 file
@@ -31,7 +32,8 @@ contains
 one
 record
 per
-line.
+line
+.
 multithreading
 is
 n't
@@ -62,7 +64,8 @@ file
 in
 an
 optimal
-manner.
+manner
+.
 my
 first
 thought
@@ -118,7 +121,8 @@ so
 keen
 on
 that
-idea.
+idea
+.
 my
 next
 thought
@@ -171,7 +175,8 @@ can
 read
 and
 assign
-them.
+them
+.
 i
 know
 there

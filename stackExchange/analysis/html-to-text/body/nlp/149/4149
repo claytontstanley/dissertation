@@ -6,7 +6,8 @@ that
 writes
 information
 to
-file.
+file
+.
 this
 information
 is
@@ -17,7 +18,8 @@ determine
 pass/failure/correctness
 of
 the
-application.
+application
+.
 i
 'd
 like
@@ -42,7 +44,8 @@ these
 pass/failure/correctness
 check
 in
-realtime.
+realtime
+.
 i
 assume
 it
@@ -60,7 +63,8 @@ gotchas
 involved
 when
 using
-java.
+java
+.
 if
 the
 reading
@@ -108,7 +112,8 @@ currently
 pushing
 me
 towards
-bufferedstreams.
+bufferedstreams
+.
 is
 this
 the

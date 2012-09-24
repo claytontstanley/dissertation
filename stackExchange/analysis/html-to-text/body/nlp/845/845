@@ -7,7 +7,8 @@ css
 rule
 in
 my
-html.
+html
+.
 body
 {
 font-family
@@ -90,7 +91,8 @@ can
 use
 my
 web
-application.
+application
+.
 currently
 i
 am

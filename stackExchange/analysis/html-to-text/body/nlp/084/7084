@@ -7,7 +7,8 @@ number
 of
 different
 embedded
-systems.
+system
+.
 they
 have
 all
@@ -22,7 +23,8 @@ for
 type
 such
 a
-uint32.
+uint32
+.
 this
 is
 a
@@ -49,7 +51,8 @@ of
 chance
 for
 overflow
-etc.
+etc
+.
 but
 on
 some
@@ -69,7 +72,8 @@ the
 life
 of
 the
-project.
+project
+.
 so
 what
 should
@@ -101,7 +105,8 @@ maybe
 it
 's
 really
-two.
+two
+.
 with
 embedded
 programming
@@ -123,7 +128,8 @@ restricted
 resource
 such
 a
-ram.
+ram
+.
 this
 ca
 n't
@@ -141,7 +147,8 @@ basic
 type
 from
 the
-compiler.
+compiler
+.
 for
 everything
 else
@@ -149,7 +156,8 @@ the
 type
 have
 le
-importance.
+importance
+.
 you
 need
 to
@@ -169,7 +177,8 @@ for
 register
 and
 stack
-usage.
+usage
+.
 which
 may
 lead
@@ -177,7 +186,8 @@ you
 to
 uint16
 ,
-uchar.
+uchar
+.
 using
 type
 such
@@ -188,7 +198,8 @@ add
 compiler
 'fluff
 '
-however.
+however
+.
 because
 register
 are
@@ -206,7 +217,8 @@ the
 result
 into
 the
-type.
+type
+.
 i++
 ;
 can
@@ -219,7 +231,8 @@ reg
 0xff
 which
 is
-unecessary.
+unecessary
+.
 so
 i
 think

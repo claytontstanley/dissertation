@@ -65,7 +65,8 @@ database
 dump
 every
 x
-minutes.
+minute
+.
 i
 've
 read

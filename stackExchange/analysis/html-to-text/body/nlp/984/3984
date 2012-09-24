@@ -13,7 +13,8 @@ marked
 with
 the
 setup
-attribute.
+attribute
+.
 these
 method
 run
@@ -35,7 +36,8 @@ and
 the
 resharper
 mbunit
-plugin.
+plugin
+.
 however
 ,
 when
@@ -53,7 +55,8 @@ the
 setup
 method
 at
-all.
+all
+.
 does
 anyone
 know

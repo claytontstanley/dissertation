@@ -78,7 +78,8 @@ but
 not
 with
 a
-literal.
+literal
+.
 python
 2.5
 and
@@ -91,7 +92,8 @@ way
 to
 express
 binary
-literals.
+literal
+.
 python
 2.6
 beta
@@ -104,7 +106,8 @@ so
 :
 0b1100111
 or
-0b1100111.
+0b1100111
+.
 python
 2.6
 beta
@@ -126,7 +129,8 @@ o
 to
 represent
 an
-octal.
+octal
+.
 python
 3.0
 beta

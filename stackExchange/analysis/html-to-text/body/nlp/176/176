@@ -17,7 +17,8 @@ with
 separate
 logfiles
 and
-everything.
+everything
+.
 the
 only
 thing
@@ -33,7 +34,8 @@ host
 is
 the
 php
-error_log.
+error_log
+.
 overriding
 this
 setting
@@ -50,7 +52,8 @@ not
 seem
 to
 do
-anything.
+anything
+.
 did
 i
 overlook

@@ -26,7 +26,8 @@ after
 resolving
 any
 intermediate
-symlinks.
+symlinks
+.
 bonus
 point
 for
@@ -37,7 +38,8 @@ notation
 at
 the
 same
-time.
+time
+.
 if
 the
 target
@@ -79,7 +81,8 @@ than
 writing
 a
 c
-helper.
+helper
+.
 unfortunately
 ,
 shell

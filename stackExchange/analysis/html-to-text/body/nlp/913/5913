@@ -9,7 +9,8 @@ selected
 in
 my
 dropdown
-menu.
+menu
+.
 document.getelementbyid
 (
 'newskill
@@ -38,7 +39,8 @@ by
 the
 drop
 down
-menu.
+menu
+.
 i
 tried
 ``
@@ -74,7 +76,8 @@ for
 a
 drop
 down
-box.
+box
+.
 <
 select
 name=

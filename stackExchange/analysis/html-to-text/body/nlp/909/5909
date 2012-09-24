@@ -7,7 +7,8 @@ directory
 from
 a
 web
-server.
+server
+.
 it
 work
 ok
@@ -35,7 +36,8 @@ on
 the
 server
 or
-not.
+not
+.
 can
 this
 be
@@ -113,7 +115,9 @@ fnames
 =
 re.findall
 (
-'^.*
+'^
+.
+*
 <
 a
 href=
@@ -128,7 +132,8 @@ href=
 ?
 )
 ''
-.*
+.
+*
 $
 '
 ,

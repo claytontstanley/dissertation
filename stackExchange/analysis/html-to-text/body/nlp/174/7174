@@ -24,7 +24,8 @@ i
 ever
 had
 to
-tackle.
+tackle
+.
 one
 big
 problem
@@ -44,7 +45,8 @@ through
 it
 in
 the
-debugger.
+debugger
+.
 there
 's
 an
@@ -64,7 +66,8 @@ how
 to
 set
 breakpoints
-etc.
+etc
+.
 this
 involves
 copying
@@ -80,7 +83,8 @@ the
 file
 containing
 your
-workflow.
+workflow
+.
 you
 have
 to
@@ -110,7 +114,8 @@ subdirectory
 of
 c
 :
-\windows\assembly.
+\windows\assembly
+.
 however
 ,
 if
@@ -173,7 +178,8 @@ the
 .dll
 file
 is
-locked.
+locked
+.
 i
 've
 found
@@ -226,7 +232,8 @@ process
 ha
 locked
 the
-file.
+file
+.
 when
 i
 do
@@ -243,7 +250,8 @@ hand
 everything
 work
 just
-fine.
+fine
+.
 does
 anyone
 know

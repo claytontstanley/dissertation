@@ -22,7 +22,8 @@ over
 a
 single
 mdb
-file.
+file
+.
 i
 moved
 the
@@ -58,7 +59,8 @@ to
 those
 table
 via
-odbc.
+odbc
+.
 so
 far
 ,
@@ -141,7 +143,8 @@ become
 mysql
 foreign
 key
-constraints.
+constraint
+.
 once
 the
 database

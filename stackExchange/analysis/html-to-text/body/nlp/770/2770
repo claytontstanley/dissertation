@@ -12,7 +12,8 @@ global.asax
 to
 catch
 all
-errors.
+error
+.
 i
 'm
 looking
@@ -36,7 +37,8 @@ being
 a
 hosted
 ie
-control.
+control
+.
 what
 is
 the

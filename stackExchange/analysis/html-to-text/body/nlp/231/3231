@@ -10,7 +10,8 @@ input
 from
 a
 midi
-device.
+device
+.
 the
 midi
 device
@@ -21,7 +22,8 @@ pc
 using
 a
 usb
-connector.
+connector
+.
 i
 'm
 looking
@@ -48,7 +50,8 @@ device
 through
 the
 usb
-port.
+port
+.
 i
 'm
 happy
@@ -74,7 +77,8 @@ the
 code
 for
 it
-capture.
+capture
+.
 i
 'm
 planning

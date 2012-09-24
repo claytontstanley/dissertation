@@ -36,7 +36,8 @@ area
 on
 the
 master
-page.
+page
+.
 i
 would
 like
@@ -59,7 +60,8 @@ listview
 is
 data
 bound
-to.
+to
+.
 the
 listview
 currently
@@ -73,7 +75,8 @@ until
 the
 cache
 is
-reloaded.
+reloaded
+.
 we
 have
 found
@@ -89,7 +92,8 @@ update
 a
 listview
 's
-contents.
+content
+.
 we
 have
 not
@@ -108,7 +112,8 @@ that
 us
 the
 master
-page.
+page
+.
 below
 is
 a

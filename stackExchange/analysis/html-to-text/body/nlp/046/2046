@@ -22,7 +22,8 @@ test
 persistence
 to
 a
-database.
+database
+.
 i
 know
 that
@@ -55,9 +56,11 @@ the
 ff
 :
 testing
-queries.
+query
+.
 testing
-inserts.
+insert
+.
 how
 do
 i

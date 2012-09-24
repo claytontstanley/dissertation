@@ -19,7 +19,8 @@ page
 from
 a
 known
-server.
+server
+.
 i
 would
 like
@@ -57,7 +58,8 @@ trigger
 a
 javascript
 event
-there.
+there
+.
 currently
 ,
 i
@@ -97,7 +99,8 @@ a
 script
 on
 the
-page.
+page
+.
 however
 ,
 i
@@ -116,7 +119,8 @@ specific
 part
 of
 the
-page.
+page
+.
 one
 solution
 ,
@@ -160,7 +164,8 @@ implement
 the
 needed
 drag\drop
-interfaces.
+interface
+.
 would
 that
 work

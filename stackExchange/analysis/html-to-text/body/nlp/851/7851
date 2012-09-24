@@ -20,7 +20,8 @@ compare
 check
 when
 opening
-files.
+file
+.
 if
 you
 want
@@ -35,7 +36,8 @@ compare
 then
 turn
 on
-safe_mode_gid.
+safe_mode_gid
+.
 whether
 to
 use
@@ -51,7 +53,8 @@ true
 checking
 upon
 file
-access.
+access
+.
 to
 a
 php

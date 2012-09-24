@@ -13,7 +13,8 @@ have
 n't
 been
 properly
-inventoried.
+inventoried
+.
 basically
 ,
 no
@@ -28,7 +29,8 @@ mac
 address
 and
 which
-hostname.
+hostname
+.
 so
 i
 wrote
@@ -60,7 +62,8 @@ them
 #
 into
 a
-file.
+file
+.
 yay
 !
 require
@@ -318,7 +321,8 @@ not
 find
 a
 reverse
-dns.
+dns
+.
 sample
 output
 that
@@ -369,7 +373,8 @@ is
 seeing
 the
 dns
-server.
+server
+.
 i
 have
 tried
@@ -389,6 +394,7 @@ guidance
 will
 be
 much
-appreciated.
+appreciated
+.
 thanks
 !

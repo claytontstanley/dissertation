@@ -24,7 +24,8 @@ both
 side
 of
 our
-family.
+family
+.
 does
 anyone
 know
@@ -41,7 +42,8 @@ represent
 this
 type
 of
-information.
+information
+.
 what
 i
 'm
@@ -52,7 +54,8 @@ a
 modified
 org-chart
 type
-chart/tree.
+chart/tree
+.
 the
 modification
 is
@@ -65,7 +68,8 @@ have
 parent
 node
 (
-e.g.
+e.g
+.
 a
 child
 should
@@ -108,7 +112,8 @@ root
 node
 for
 each
-tree.
+tree
+.
 it
 work
 ,
@@ -116,7 +121,8 @@ but
 is
 sort
 of
-clunky.
+clunky
+.
 i
 'm
 working
@@ -134,6 +140,7 @@ or
 source
 code
 is
-preferrable.
+preferrable
+.
 thanks
 .

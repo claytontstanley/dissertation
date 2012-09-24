@@ -25,7 +25,8 @@ same
 package
 a
 the
-caller.
+caller
+.
 this
 is
 done
@@ -51,7 +52,8 @@ and
 the
 dojo
 javascript
-library.
+library
+.
 the
 development
 tool
@@ -141,8 +143,9 @@ alert
 a
 type
 error
-occurred.
-''
+occurred
+.
+``
 )
 ;
 }
@@ -205,7 +208,8 @@ server
 is
 a
 404
-error.
+error
+.
 observations
 :
 the
@@ -213,7 +217,8 @@ program
 work
 fine
 in
-firefox.
+firefox
+.
 the
 calling
 procedure
@@ -225,7 +230,8 @@ procedure
 within
 the
 same
-package.
+package
+.
 the
 calling
 procedure
@@ -255,7 +261,8 @@ of
 form
 data
 work
-fine.
+fine
+.
 i
 've
 searched
@@ -276,7 +283,8 @@ that
 satisfactorily
 address
 the
-issue.
+issue
+.
 *tried
 q
 &
@@ -285,7 +293,8 @@ over
 at
 dojo
 support
-forums.
+forum
+.
 the
 questions
 :
@@ -328,7 +337,8 @@ bad
 )
 hack
 ?
-ed.
+ed
+.
 the
 solution
 lomaxx
@@ -337,7 +347,8 @@ thx
 for
 the
 fiddler
-tip.
+tip
+.
 you
 have
 no
@@ -355,7 +366,8 @@ it
 a
 a
 debugging
-tool.
+tool
+.
 after
 starting
 it
@@ -441,7 +453,8 @@ i
 could
 learn
 from
-it.
+it
+.
 found
 that
 there
@@ -456,7 +469,8 @@ value
 in
 the
 web
-form.
+form
+.
 would
 n't
 you
@@ -471,7 +485,8 @@ field
 above
 were
 in
-it.
+it
+.
 i
 do
 n't
@@ -494,7 +509,8 @@ in
 the
 web
 plsql
-code.
+code
+.
 but
 i
 do
@@ -512,7 +528,8 @@ a
 parameter
 to
 work
-correctly.
+correctly
+.
 again
 ,
 this
@@ -529,7 +546,8 @@ me
 a
 firefox
 worked
-fine.
+fine
+.
 well
 ,
 that
@@ -541,7 +559,8 @@ and
 hack
 to
 fix
-it.
+it
+.
 hopefully
 ,
 a

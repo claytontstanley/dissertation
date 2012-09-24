@@ -5,7 +5,8 @@ msbuild
 to
 build
 my
-stuff.
+stuff
+.
 i
 want
 to
@@ -14,7 +15,8 @@ cruisecontrol.net
 a
 by
 build
-server.
+server
+.
 now
 ,
 ccnet
@@ -43,7 +45,8 @@ the
 project
 configuration
 and
-msbuild.
+msbuild
+.
 also
 ,
 nant
@@ -62,7 +65,8 @@ almost
 a
 year
 old
-now.
+now
+.
 in
 short
 :
@@ -100,7 +104,8 @@ not
 want
 to
 judge
-prematurely.
+prematurely
+.
 what
 would
 be

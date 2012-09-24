@@ -7,13 +7,15 @@ table
 with
 about
 18000
-rows.
+row
+.
 each
 record
 describes
 one
 customer
-location.
+location
+.
 the
 issue
 is
@@ -50,7 +52,8 @@ company
 can
 have
 many
-locations.
+location
+.
 for
 example
 ,
@@ -388,7 +391,8 @@ that
 represents
 the
 multiple
-locations.
+location
+.
 currently
 i
 am
@@ -414,7 +418,8 @@ through
 that
 list
 by
-hand.
+hand
+.
 any
 suggestion
 on
@@ -424,7 +429,8 @@ can
 approach
 this
 is
-appreciated.
+appreciated
+.
 @
 neall
 ,
@@ -451,7 +457,8 @@ location
 name
 ,
 only
-similar.
+similar
+.
 so
 in
 the
@@ -466,7 +473,8 @@ is
 1
 in
 each
-row.
+row
+.
 @
 yukondude
 ,

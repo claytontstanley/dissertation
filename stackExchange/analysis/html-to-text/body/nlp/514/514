@@ -13,7 +13,8 @@ to
 an
 external
 web
-service.
+service
+.
 about
 once
 a
@@ -35,7 +36,8 @@ to
 the
 service
 ha
-failed.
+failed
+.
 if
 i
 then
@@ -51,7 +53,8 @@ moment
 later
 it
 work
-fine.
+fine
+.
 it
 's
 been
@@ -71,7 +74,8 @@ tracking
 down
 what
 cause
-it.
+it
+.
 ruby
 is
 version
@@ -80,7 +84,8 @@ and
 rail
 is
 version
-1.2.6.
+1.2.6
+.
 anyone
 else
 have
@@ -92,7 +97,8 @@ is
 the
 error
 and
-stacktrace.
+stacktrace
+.
 a
 systemexit
 occurred

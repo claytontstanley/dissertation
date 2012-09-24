@@ -18,7 +18,8 @@ from
 one
 vendor
 to
-another.
+another
+.
 we
 (
 brilliantly
@@ -51,7 +52,8 @@ a
 ``
 vendor
 ''
-table.
+table
+.
 so
 ,
 i
@@ -65,7 +67,8 @@ table
 that
 all
 reference
-vendor.no.
+vendor.no
+.
 for
 some
 reason
@@ -79,7 +82,8 @@ all
 three
 a
 foreign
-keys.
+key
+.
 any
 idea
 ?

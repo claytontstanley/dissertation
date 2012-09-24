@@ -24,7 +24,8 @@ debugging
 on
 the
 web
-server.
+server
+.
 the
 web
 server
@@ -34,7 +35,8 @@ respond
 in
 a
 timely
-manner.
+manner
+.
 this
 may
 be
@@ -47,8 +49,9 @@ attached
 to
 the
 web
-server.
-''
+server
+.
+``
 normally
 this
 is
@@ -58,7 +61,8 @@ debug
 the
 application
 once
-already.
+already
+.
 from
 the
 command
@@ -73,7 +77,8 @@ and
 it
 fix
 the
-problem.
+problem
+.
 how
 do
 i

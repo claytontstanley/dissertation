@@ -38,7 +38,8 @@ server
 to
 a
 web
-request.
+request
+.
 this
 would
 allow
@@ -62,7 +63,8 @@ image
 display
 in
 their
-browser.
+browser
+.
 so
 a
 you
@@ -74,7 +76,8 @@ around
 the
 use
 of
-response.contenttype.
+response.contenttype
+.
 by
 using
 response.contenttype
@@ -114,7 +117,8 @@ me
 a
 nice
 little
-error.
+error
+.
 using
 response.contenttype
 =
@@ -135,7 +139,8 @@ then
 the
 image
 are
-messed.
+messed
+.
 so
 how
 do

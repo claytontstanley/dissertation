@@ -7,7 +7,8 @@ base64-encoded
 representation
 of
 the
-viewstate.
+viewstate
+.
 obviously
 this
 would
@@ -91,8 +92,10 @@ rendered
 ,
 not
 on
-postback.
-e.g.
+postback
+.
+e.g
+.
 i
 need
 to

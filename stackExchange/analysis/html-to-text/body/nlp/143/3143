@@ -10,7 +10,8 @@ with
 teamcity
 continuous
 integration
-server.
+server
+.
 i
 have
 been
@@ -43,7 +44,8 @@ report
 like
 a
 nant
-runner.
+runner
+.
 i
 'm
 also
@@ -52,7 +54,8 @@ mbunit
 for
 the
 testing
-framework.
+framework
+.
 how
 can
 i
@@ -112,7 +115,8 @@ teamcity
 's
 feature
 for
-tests.
+test
+.
 mbunittask
 update
 :

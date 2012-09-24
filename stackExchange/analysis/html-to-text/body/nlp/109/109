@@ -13,7 +13,8 @@ asprox
 bot
 sql
 injection
-attack.
+attack
+.
 without
 going
 into
@@ -36,7 +37,8 @@ an
 ascii
 encoded
 binary
-string.
+string
+.
 it
 look
 something
@@ -108,7 +110,8 @@ wa
 happening
 at
 the
-time.
+time
+.
 i
 tried
 to
@@ -129,7 +132,8 @@ without
 even
 touching
 sql
-server.
+server
+.
 the
 main
 part
@@ -221,7 +225,8 @@ encoding
 without
 using
 sql
-server.
+server
+.
 is
 is
 possible

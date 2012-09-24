@@ -21,7 +21,8 @@ for
 view
 or
 function
-resolution.
+resolution
+.
 the
 maximum
 number
@@ -34,7 +35,8 @@ query
 256
 )
 wa
-exceeded.
+exceeded
+.
 --
 sql
 server
@@ -45,12 +47,14 @@ table
 name
 in
 the
-query.
+query
+.
 the
 maximum
 allowable
 is
-256.
+256
+.
 if
 yes
 ,
@@ -101,7 +105,8 @@ in
 the
 answer
 editing
-window.
+window
+.
 even
 if
 i
@@ -136,7 +141,8 @@ the
 code
 will
 be
-meaningless.
+meaningless
+.
 i
 do
 n't
@@ -155,7 +161,8 @@ is
 not
 in
 the
-queries.
+query
+.
 the
 query
 are
@@ -188,7 +195,8 @@ table
 that
 can
 be
-removed.
+removed
+.
 imagine
 a
 report

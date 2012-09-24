@@ -14,7 +14,8 @@ instance
 from
 2000
 to
-2005.
+2005
+.
 i
 installed
 the
@@ -35,7 +36,8 @@ to
 some
 high
 level
-reporting.
+reporting
+.
 one
 of
 the
@@ -45,7 +47,8 @@ missing
 (
 recommended
 )
-indexes.
+index
+.
 i
 think
 it
@@ -61,7 +64,8 @@ maintained
 by
 the
 query
-optimizer.
+optimizer
+.
 my
 question
 is
@@ -77,7 +81,8 @@ to
 take
 an
 index
-recommendation.
+recommendation
+.
 i
 know
 that
@@ -93,7 +98,8 @@ of
 the
 optimizer
 's
-suggestions.
+suggestion
+.
 i
 see
 a
@@ -124,7 +130,8 @@ degrades
 or
 stay
 the
-same.
+same
+.
 i
 wondering
 if

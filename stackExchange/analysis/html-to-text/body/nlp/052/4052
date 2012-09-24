@@ -9,7 +9,8 @@ in
 sql
 server
 2005
-express.
+express
+.
 i
 am
 running
@@ -19,7 +20,8 @@ my
 laptop
 with
 vista
-ultimate.
+ultimate
+.
 i
 understand
 that
@@ -34,7 +36,8 @@ doe
 not
 have
 full-text
-indexing.
+indexing
+.
 i
 have
 already
@@ -115,7 +118,8 @@ database
 properties
 >
 files
-area.
+area
+.
 i
 can
 run
@@ -133,7 +137,8 @@ fulltextserviceproperty
 ''
 and
 return
-1.
+1
+.
 the
 problem
 i
@@ -174,7 +179,8 @@ full-text
 index
 is
 not
-available.
+available
+.
 check
 that
 you
@@ -187,8 +193,9 @@ that
 full-text
 catalog
 are
-defined.
-''
+defined
+.
+``
 any
 idea
 on

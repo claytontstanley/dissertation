@@ -15,7 +15,8 @@ a
 lot
 of
 data
-out.
+out
+.
 i
 've
 been
@@ -37,7 +38,8 @@ this
 into
 a
 mysql
-database.
+database
+.
 my
 first
 call
@@ -109,7 +111,8 @@ anything
 about
 the
 data
-types.
+type
+.
 what
 would
 be
@@ -133,7 +136,8 @@ and
 then
 do
 a
-copy.
+copy
+.
 you
 lose
 view
@@ -143,7 +147,8 @@ procedure
 ,
 trigger
 ,
-etc.
+etc
+.
 but
 it
 is
@@ -200,7 +205,8 @@ float
 ,
 datetime
 and
-string.
+string
+.
 i
 have
 to
@@ -212,7 +218,8 @@ pruning
 ,
 normalising
 ,
-etc.
+etc
+.
 anyway
 so
 i

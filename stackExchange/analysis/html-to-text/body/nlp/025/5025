@@ -10,7 +10,8 @@ point
 in
 my
 web
-app.
+app
+.
 so
 i
 want
@@ -57,7 +58,8 @@ occur
 inside
 of
 a
-transaction.
+transaction
+.
 final
 solution
 :
@@ -86,7 +88,8 @@ a
 transactional
 level
 query
-here.
+here
+.
 this
 wa
 not
@@ -98,7 +101,8 @@ a
 primary
 reason
 to
-switch.
+switch
+.
 i
 had
 been
@@ -124,7 +128,8 @@ running
 on
 the
 same
-database.
+database
+.
 previous
 we
 had
@@ -139,7 +144,8 @@ running
 to
 run
 our
-site.
+site
+.
 the
 port
 wa

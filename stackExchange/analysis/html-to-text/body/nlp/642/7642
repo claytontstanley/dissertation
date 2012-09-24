@@ -28,7 +28,9 @@ call
 the
 private
 field
-'_foo'.
+'_foo
+'
+.
 this
 seems
 to
@@ -48,7 +50,8 @@ a
 prefix
 for
 field
-names.
+name
+.
 for
 example
 ,
@@ -63,8 +66,9 @@ distinguish
 static
 versus
 non-static
-fields.
-''
+field
+.
+``
 in
 c
 #
@@ -94,7 +98,8 @@ a
 '
 in
 the
-constructor.
+constructor
+.
 as
 vb.net
 is

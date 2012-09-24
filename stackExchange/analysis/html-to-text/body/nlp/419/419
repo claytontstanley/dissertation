@@ -9,7 +9,8 @@ and
 extending
 legacy
 vb6
-applications.
+application
+.
 a
 common
 engine
@@ -26,7 +27,8 @@ in
 order
 to
 improve
-performance.
+performance
+.
 when
 it
 come
@@ -50,7 +52,8 @@ to
 fire
 event
 to
-vb6.
+vb6
+.
 my
 problem
 is
@@ -79,7 +82,8 @@ i
 quit
 the
 vb6
-ide.
+ide
+.
 as
 the
 control
@@ -103,7 +107,8 @@ the
 dll
 file
 is
-locked.
+locked
+.
 a
 solution
 i
@@ -128,7 +133,8 @@ full
 name
 of
 my
-control.
+control
+.
 the
 problem
 then
@@ -164,7 +170,8 @@ intellisense
 which
 is
 a
-pain.
+pain
+.
 any
 idea
 how

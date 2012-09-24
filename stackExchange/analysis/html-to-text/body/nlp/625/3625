@@ -10,7 +10,8 @@ express
 version
 of
 the
-linkbutton.
+linkbutton
+.
 (
 the
 windows
@@ -20,7 +21,8 @@ linkbutton
 not
 the
 asp.net
-linkbutton.
+linkbutton
+.
 )
 hyperlinkedit
 doe
@@ -38,7 +40,8 @@ it
 look
 like
 a
-textedit/textbox.
+textedit/textbox
+.
 anyone
 know
 what
@@ -56,6 +59,8 @@ latest
 devx
 control
 :
-8.2.1.
-thanks.
+8.2.1
+.
+thanks
+.
 jk

@@ -48,13 +48,15 @@ is
 what
 i
 have
-currently.
+currently
+.
 select
 replace
 (
 1.23
 ,
-'.
+'
+.
 '
 ,
 ''
@@ -64,7 +66,8 @@ replace
 (
 19.99
 ,
-'.
+'
+.
 '
 ,
 ''
@@ -86,7 +89,8 @@ there
 wa
 a
 better
-way.
+way
+.
 any
 thought
 ?

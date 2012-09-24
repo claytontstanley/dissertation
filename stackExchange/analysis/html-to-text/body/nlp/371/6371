@@ -24,11 +24,13 @@ test
 ,
 and
 production
-servers.
+server
+.
 here
 's
 our
-setup.
+setup
+.
 each
 developer
 ha
@@ -41,7 +43,8 @@ app
 and
 the
 mysql
-database.
+database
+.
 it
 is
 their
@@ -51,7 +54,8 @@ to
 do
 whatever
 they
-want.
+want
+.
 currently
 ,
 developer
@@ -78,7 +82,8 @@ that
 they
 commit
 into
-svn.
+svn
+.
 we
 're
 wanting
@@ -97,7 +102,8 @@ running
 the
 latest
 committed
-code.
+code
+.
 if
 we
 do
@@ -113,7 +119,8 @@ from
 svn
 for
 each
-build.
+build
+.
 we
 have
 a
@@ -126,8 +133,9 @@ that
 run
 ``
 release
-candidates.
-''
+candidate
+.
+``
 deploying
 to
 the
@@ -152,7 +160,8 @@ from
 svn
 and
 tweaking
-it.
+it
+.
 also
 ,
 the
@@ -162,7 +171,8 @@ the
 test
 server
 is
-inconsistent.
+inconsistent
+.
 you
 end
 up
@@ -179,7 +189,8 @@ had
 on
 his
 sandbox
-server.
+server
+.
 where
 everything
 break
@@ -188,7 +199,8 @@ is
 the
 deployment
 to
-production.
+production
+.
 since
 we
 ca
@@ -208,7 +220,8 @@ re-creating
 all
 the
 schema
-changes.
+change
+.
 if
 there
 were
@@ -230,7 +243,8 @@ this
 can
 get
 really
-hairy.
+hairy
+.
 if
 the
 problem
@@ -271,7 +285,8 @@ in
 security
 and
 permission
-tables.
+table
+.
 this
 is
 the
@@ -285,7 +300,8 @@ toward
 continuous
 integration
 and
-one-step-builds.
+one-step-builds
+.
 how
 do
 you
@@ -333,7 +349,8 @@ for
 the
 reference
 to
-tarantino.
+tarantino
+.
 i
 'm
 not
@@ -352,7 +369,8 @@ page
 to
 be
 very
-helpfull.
+helpfull
+.
 especially
 this
 powerpoint
@@ -406,7 +424,8 @@ first
 part
 of
 the
-filename.
+filename
+.
 if
 it
 is
@@ -427,7 +446,8 @@ i
 'll
 post
 it
-here.
+here
+.
 i
 've
 got
@@ -435,7 +455,8 @@ a
 working
 script
 for
-this.
+this
+.
 it
 handle
 initializing
@@ -451,7 +472,8 @@ running
 upgrade
 script
 a
-necessary.
+necessary
+.
 there
 are
 also
@@ -467,7 +489,8 @@ test
 data
 from
 a
-file.
+file
+.
 it
 's
 about

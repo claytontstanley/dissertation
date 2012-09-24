@@ -42,7 +42,8 @@ it
 value
 is
 %
-ul.
+ul
+.
 a
 normal
 number
@@ -77,12 +78,14 @@ and
 it
 value
 is
-285212672l.
+285212672l
+.
 a
 normal
 number
 is
-0.
+0
+.
 i
 assume
 this
@@ -95,7 +98,8 @@ the
 unsigned
 long
 long
-int.
+int
+.
 how
 do
 you

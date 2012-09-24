@@ -143,7 +143,8 @@ an
 error
 on
 the
-server.
+server
+.
 so
 then
 this
@@ -205,7 +206,7 @@ mz
 ?
 )
 ?
-''
+``
 ,
 regexoptions.compiled
 )
@@ -228,7 +229,8 @@ impact
 on
 my
 text
-rendering.
+rendering
+.
 can
 someone
 explain

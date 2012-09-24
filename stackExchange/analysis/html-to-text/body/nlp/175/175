@@ -11,7 +11,8 @@ youtube
 video
 with
 overlaid
-annotations.
+annotation
+.
 this
 consists
 of
@@ -19,7 +20,8 @@ colored
 rectangle
 for
 each
-frame.
+frame
+.
 the
 only
 requirement
@@ -28,7 +30,8 @@ that
 this
 be
 done
-programatically.
+programatically
+.
 youtube
 ha
 annotation
@@ -45,7 +48,8 @@ to
 create
 them
 by
-hand.
+hand
+.
 i
 want
 to
@@ -53,7 +57,8 @@ be
 able
 to
 generate
-them.
+them
+.
 what
 's
 the
@@ -81,7 +86,8 @@ over
 the
 youtube
 flash
-player.
+player
+.
 will
 this
 work
@@ -93,7 +99,8 @@ hijack
 youtube
 's
 annotation
-system.
+system
+.
 either
 messing
 with
@@ -108,7 +115,8 @@ attempt
 to
 download
 the
-annotations.
+annotation
+.
 (
 using
 greasemonkey

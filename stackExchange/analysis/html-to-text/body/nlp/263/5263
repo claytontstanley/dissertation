@@ -38,7 +38,8 @@ save
 value
 to
 this
-table.
+table
+.
 this
 work
 if
@@ -48,7 +49,8 @@ create
 child
 of
 existing
-rows.
+row
+.
 if
 i
 make
@@ -80,7 +82,8 @@ going
 into
 the
 parentid
-column.
+column
+.
 i
 have
 the

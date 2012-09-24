@@ -34,7 +34,8 @@ a
 32
 or
 64bit
-system.
+system
+.
 private
 boolean
 is64bitoperatingsystem
@@ -109,7 +110,8 @@ like
 looking
 through
 the
-registry.
+registry
+.
 is
 this
 a
@@ -135,7 +137,8 @@ lot
 prettier
 in
 the
-preview.
+preview
+.
 i
 'll
 consider

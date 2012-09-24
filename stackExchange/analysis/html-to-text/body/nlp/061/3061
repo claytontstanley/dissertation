@@ -20,7 +20,8 @@ name
 in
 a
 python
-program.
+program
+.
 for
 example
 ,
@@ -78,7 +79,8 @@ do
 n't
 just
 use
-eval.
+eval
+.
 i
 figured
 out

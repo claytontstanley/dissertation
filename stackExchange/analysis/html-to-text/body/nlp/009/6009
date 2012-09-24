@@ -11,7 +11,8 @@ and
 with
 a
 file
-configuration.whatever.
+configuration.whatever
+.
 every
 developer
 working
@@ -36,7 +37,8 @@ dev
 prod
 and
 stage
-versions.
+version
+.
 how
 do
 you

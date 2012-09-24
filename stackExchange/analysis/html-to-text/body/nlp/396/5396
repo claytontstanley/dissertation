@@ -53,7 +53,8 @@ rather
 than
 a
 separate
-entities.
+entity
+.
 while
 initially
 working
@@ -73,7 +74,8 @@ everything
 wa
 fine
 and
-dandy.
+dandy
+.
 issues
 arose
 ,
@@ -94,7 +96,8 @@ sql
 authentication
 on
 the
-database.
+database
+.
 it
 seems
 that
@@ -111,7 +114,8 @@ authentication
 only
 with
 windows
-authentication.
+authentication
+.
 given
 this
 ,

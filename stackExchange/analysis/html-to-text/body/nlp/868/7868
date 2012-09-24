@@ -61,7 +61,8 @@ class
 that
 reads/writes
 to
-database.
+database
+.
 (
 do
 n't
@@ -101,7 +102,8 @@ reference
 to
 form
 and
-databasethingy.
+databasethingy
+.
 but
 when
 creating
@@ -130,7 +132,8 @@ owner
 of
 serverlist
 and
-databasethingy.
+databasethingy
+.
 how
 would
 i

@@ -12,7 +12,8 @@ to
 work
 properly
 in
-c++.
+c++
+.
 specifically
 ,
 although
@@ -33,7 +34,8 @@ that
 af_inet
 is
 not
-defined.
+defined
+.
 am
 i
 missing

@@ -10,7 +10,8 @@ while
 with
 nunit
 and
-nant.
+nant
+.
 for
 a
 recent
@@ -33,7 +34,8 @@ so
 far
 ha
 been
-adequate.
+adequate
+.
 i
 'm
 attempting
@@ -44,7 +46,8 @@ solution
 running
 in
 cruise
-control.
+control
+.
 i
 've
 finally
@@ -83,7 +86,8 @@ designed
 to
 do
 just
-that.
+that
+.
 does
 anyone
 have

@@ -22,7 +22,8 @@ log
 and
 other
 fun
-statistics.
+statistic
+.
 the
 problem
 is
@@ -45,7 +46,8 @@ a
 usb
 to
 serial
-dongle.
+dongle
+.
 it
 show
 up
@@ -106,7 +108,8 @@ tool
 to
 talk
 to
-it.
+it
+.
 if
 i
 run
@@ -124,7 +127,8 @@ tool
 ,
 everthing
 also
-works.
+work
+.
 but
 a
 soon
@@ -136,7 +140,8 @@ tool
 the
 connection
 get
-lost.
+lost
+.
 #
 !
 /usr/bin/python

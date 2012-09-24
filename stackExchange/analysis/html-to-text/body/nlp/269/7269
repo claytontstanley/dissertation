@@ -11,7 +11,8 @@ pretty
 big
 swing
 java
-applet.
+applet
+.
 most
 of
 our
@@ -24,7 +25,8 @@ are
 ton
 of
 singleton
-references.
+reference
+.
 we
 've
 bunched
@@ -38,7 +40,8 @@ single
 application
 context
 ''
-singleton.
+singleton
+.
 what
 we
 now
@@ -102,7 +105,8 @@ the
 id
 to
 all
-locations.
+location
+.
 what
 's
 the

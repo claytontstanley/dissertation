@@ -11,7 +11,8 @@ a
 remember
 me
 ''
-checkbox.
+checkbox
+.
 users
 who
 check
@@ -25,7 +26,8 @@ even
 after
 closing
 their
-browser.
+browser
+.
 i
 'm
 keeping
@@ -44,7 +46,8 @@ in
 the
 user
 's
-session.
+session
+.
 but
 session
 are
@@ -58,7 +61,8 @@ cooky
 which
 are
 not
-persistent.
+persistent
+.
 i
 can
 make
@@ -111,7 +115,8 @@ surprising
 for
 such
 common
-functionality.
+functionality
+.
 is
 there
 a

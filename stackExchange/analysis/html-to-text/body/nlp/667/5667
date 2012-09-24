@@ -73,7 +73,8 @@ library
 into
 the
 informix
-server.
+server
+.
 this
 ha
 to
@@ -84,7 +85,8 @@ can
 do
 purely
 from
-spl.
+spl
+.
 a
 solution
 for
@@ -94,7 +96,8 @@ or
 11
 would
 be
-fine.
+fine
+.
 @
 ret
 -
@@ -116,7 +119,8 @@ know
 about
 the
 system
-command.
+command
+.
 thank
 you
 !

@@ -13,7 +13,8 @@ node
 )
 graph
 in
-python.
+python
+.
 the
 data
 corresponding
@@ -29,7 +30,8 @@ a
 small
 number
 of
-strings.
+string
+.
 what
 is
 the
@@ -70,7 +72,8 @@ of
 list
 to
 be
-faster.
+faster
+.
 the
 list
 option

@@ -8,7 +8,8 @@ wizard
 in
 an
 html
-form.
+form
+.
 one
 button
 go
@@ -16,7 +17,8 @@ back
 and
 one
 go
-forward.
+forward
+.
 since
 the
 ``
@@ -41,7 +43,8 @@ button
 to
 submit
 the
-form.
+form
+.
 ex
 :
 <
@@ -160,7 +163,8 @@ when
 a
 user
 press
-enter.
+enter
+.
 that
 way
 ,
@@ -179,7 +183,8 @@ page
 ,
 not
 the
-previous.
+previous
+.
 do
 you
 have

@@ -15,7 +15,8 @@ to
 perform
 all
 database
-access.
+access
+.
 the
 application
 can
@@ -36,7 +37,8 @@ the
 domain
 server
 is
-not.
+not
+.
 so
 it
 appears
@@ -51,7 +53,8 @@ a
 db
 username
 and
-password.
+password
+.
 the
 dll
 currently
@@ -91,7 +94,8 @@ right
 there
 in
 the
-open.
+open
+.
 one
 of
 the
@@ -121,7 +125,8 @@ to
 our
 internal
 user
-base.
+base
+.
 is
 there
 a
@@ -162,7 +167,8 @@ to
 everyone
 who
 's
-answered.
+answered
+.
 i
 'll
 try
@@ -187,7 +193,8 @@ asp.net
 webforms
 and
 vb.net
-winforms.
+winforms
+.
 i
 understand
 that
@@ -209,7 +216,8 @@ on
 config
 file
 for
-dlls.
+dlls
+.
 unfortunately
 ,
 i
@@ -231,7 +239,8 @@ judge
 if
 that
 will
-work.
+work
+.
 from
 a
 development
@@ -257,7 +266,8 @@ third
 party
 sometime
 next
-year.
+year
+.
 i
 do
 n't
@@ -274,7 +284,8 @@ the
 user
 through
 the
-firewall.
+firewall
+.
 as
 a
 user

@@ -11,7 +11,8 @@ of
 a
 winforms
 picturebox
-control.
+control
+.
 the
 sizemode
 of
@@ -43,7 +44,8 @@ the
 dimension
 of
 the
-picturebox.
+picturebox
+.
 this
 is
 great
@@ -73,7 +75,8 @@ displayed
 using
 it
 best
-fit.
+fit
+.
 unfortunately
 ,
 i
@@ -100,7 +103,8 @@ screen-space
 coordinate
 to
 image-space
-coordinates.
+coordinate
+.
 it
 look
 like
@@ -133,7 +137,8 @@ to
 image
 space
 (
-i.e.
+i.e
+.
 the
 pixel
 coordinate

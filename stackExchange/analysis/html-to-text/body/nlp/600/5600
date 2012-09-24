@@ -13,7 +13,8 @@ uniqueidentifier
 a
 guid
 )
-column.
+column
+.
 because
 guids
 are
@@ -54,7 +55,8 @@ table
 a
 clustered
 primary
-key.
+key
+.
 i
 'm
 wondering
@@ -65,7 +67,8 @@ implication
 are
 for
 this
-approach.
+approach
+.
 i
 've
 seen
@@ -122,7 +125,8 @@ having
 to
 use
 a
-bookmark.
+bookmark
+.
 my
 database
 is
@@ -152,7 +156,8 @@ to
 get
 right
 in
-replication.
+replication
+.
 what
 are
 your

@@ -20,7 +20,8 @@ are
 nested
 within
 other
-controls.
+control
+.
 i
 thought
 i
@@ -144,7 +145,8 @@ ienumerable
 rather
 than
 an
-ienumerator.
+ienumerator
+.
 is
 there
 a

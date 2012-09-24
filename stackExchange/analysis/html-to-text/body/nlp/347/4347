@@ -31,7 +31,8 @@ qt
 ,
 wxwidgets
 ,
-etc.
+etc
+.
 where
 is
 a
