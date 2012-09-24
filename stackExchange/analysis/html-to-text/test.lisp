@@ -81,7 +81,7 @@
   (defun write-csv (csv)
     (incf cnt)
     (format  t "converting line ~a~%" cnt)
-    (let ((out-file "out.csv"))
+    (let ((out-file "nohtml.csv"))
       (let ((posts-id (csv-val 'posts-id csv)))
         (with-open-file (strm out-file :direction :output :if-exists (if (= cnt 1) :supersede :append) :if-does-not-exist :create)
           (when (not (= cnt 1))
