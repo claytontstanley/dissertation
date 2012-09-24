@@ -1,7 +1,7 @@
 
 mysql = mysql
 
-load: createTable loadTable
+load: create-nohtml load-nohtml
 
 load-chunks: create-chunks
 	< loadChunks.sql ${mysql}
@@ -9,11 +9,11 @@ load-chunks: create-chunks
 create-chunks:
 	< createChunks.sql ${mysql}
 
-createTable:
-	< createTable.sql ${mysql}
+create-nohtml:
+	< create-nohtml.sql ${mysql}
 
-loadTable:
-	< loadTable.sql ${mysql}
+load-nohtml:
+	< load-nohtml.sql ${mysql}
 
 convert:
 	rlwrap ccl -l test.lisp -e '(extract-all)' -e '(quit)'
