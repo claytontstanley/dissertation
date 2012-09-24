@@ -3,6 +3,12 @@ mysql = mysql
 
 load: createTable loadTable
 
+load-chunks: create-chunks
+	< loadChunks.sql ${mysql}
+
+create-chunks:
+	< createChunks.sql ${mysql}
+
 createTable:
 	< createTable.sql ${mysql}
 
