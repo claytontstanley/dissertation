@@ -33,7 +33,7 @@
   (with-open-file (strm (format nil "~a~a" *_DIR_* *csv-name*) :direction :input)
     (cl-csv:read-csv strm :row-fn #'write-all-cols)))
 
-(defun build-csv ()
+(defun build-nohtml ()
   (with-open-file (strm (format nil "~a~a" *_DIR_* *csv-name*) :direction :input)
     (cl-csv:read-csv strm :row-fn #'write-csv)))
 
