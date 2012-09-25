@@ -1,10 +1,13 @@
 from __future__ import division
+from __future__ import with_statement
 import nltk, re, pprint
 import sys
 import os, errno
 import codecs
 from boilerpipe.extract import Extractor
 import itertools
+import os.path
+from grizzled.os import working_directory
 
 def convert(html):
 	extractor = Extractor(extractor='KeepEverythingExtractor', html=html)
@@ -34,11 +37,15 @@ def mkdir_p(path):
 			pass
 		else: raise
 
-#f = open(sys.argv[1])
-#html = f.read()
-
 def convert_all(indir, fun, outdir):
+	"""Performs a transformation of calling fun on all text in all files in indir.
+	Stores results as files in outdir.
+	Outdir and indir will have the same directory structure.
+	"""
 	cnt = 0
+	# For a dir structure: a/1/c a/1/c2 a/2/d a/2/c, loop over all of the files (c c2 d c) 
+	# and paths to those files (a/1 a/1 a/2 a/2). If your dir structure is only a flat single
+	# level, the paths to the files (dirname) will remain constant.
 	for dirname, dirnames, filenames in os.walk(indir):
 		for post_id in filenames:
 			cnt = cnt + 1
@@ -46,13 +53,18 @@ def convert_all(indir, fun, outdir):
 			fname = os.path.join(dirname, post_id)
 			with codecs.open(fname, 'r', 'utf-8') as f:
 				html = f.read()
+			# Perform the actual transformation on the text by calling the function
+			# passed into convert_all, and providing it with the raw text.
 			txt = fun(html)
 			newdirname = dirname.replace(indir,outdir)
-			mkdir_p(newdirname)	
+			mkdir_p(newdirname)
 			with codecs.open(os.path.join(newdirname, post_id), "w", 'utf-8') as text_file:
 				text_file.write(txt)
 
-convert_all('body/raw', convert, 'body/nohtml')
-convert_all('body/nohtml', nlp, 'body/nlp')
-convert_all('title/raw', nlp, 'title/nlp')
-convert_all('tags/raw', nlpTags, 'tags/nlp')
+_dir = os.path.dirname(os.path.abspath(__file__))
+
+with working_directory(_dir):
+	convert_all('body/raw', convert, 'body/nohtml')
+	convert_all('body/nohtml', nlp, 'body/nlp')
+	convert_all('title/raw', nlp, 'title/nlp')
+	convert_all('tags/raw', nlpTags, 'tags/nlp')
