@@ -10,13 +10,13 @@ ENGINE = MyISAM
 CHARACTER SET utf8
 COLLATE utf8_general_ci;
 
-DROP VIEW IF EXISTS sotero.posts_html_subset;
+DROP VIEW IF EXISTS sotero.Posts_Text_Subset;
 
 CREATE 
     ALGORITHM = UNDEFINED 
     DEFINER = `root`@`localhost` 
     SQL SECURITY DEFINER
-VIEW `posts_html_subset` AS
+VIEW `Posts_Text_Subset` AS
     select 
         `posts`.`Id` AS `posts_id`,
         `posts`.`Body` AS `Body`,
