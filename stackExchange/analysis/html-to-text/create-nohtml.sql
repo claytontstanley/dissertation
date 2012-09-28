@@ -9,3 +9,20 @@ CREATE  TABLE IF NOT EXISTS sotero.`posts_nohtml` (
 ENGINE = MyISAM
 CHARACTER SET utf8
 COLLATE utf8_general_ci;
+
+DROP VIEW IF EXISTS sotero.posts_html_subset;
+
+CREATE 
+    ALGORITHM = UNDEFINED 
+    DEFINER = `root`@`localhost` 
+    SQL SECURITY DEFINER
+VIEW `posts_html_subset` AS
+    select 
+        `posts`.`Id` AS `posts_id`,
+        `posts`.`Body` AS `Body`,
+        `posts`.`Tags` AS `tags`,
+        `posts`.`Title` AS `title`
+    from
+        `posts`
+    where
+        (`posts`.`PostTypeId` = 1);
