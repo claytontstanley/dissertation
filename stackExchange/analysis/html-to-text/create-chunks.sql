@@ -30,13 +30,13 @@ VIEW `chunkhashes` AS
     group by `chunks`.`Chunk`
     order by `chunks`.`ChunkId`;
 
-DROP VIEW IF EXISTS sotero.chunks_with_hash;
+DROP VIEW IF EXISTS sotero.Chunks_With_Hashes;
 
 CREATE 
     ALGORITHM = UNDEFINED 
     DEFINER = `root`@`localhost` 
     SQL SECURITY DEFINER
-VIEW `chunks_with_hash` AS
+VIEW `Chunks_With_Hashes` AS
     select 
         `t`.`ChunkId` AS `ChunkId`,
         `t`.`Chunk` AS `Chunk`,
@@ -63,9 +63,9 @@ select
 	q.Chunk as RightChunk,
 	q.ChunkHash as RightChunkHash
 from
-	(select * from sotero.chunks_with_hash where chunkType = "Title") as t
+	(select * from sotero.Chunks_With_Hashes where chunkType = "Title") as t
 	join
-	(select * from sotero.chunks_with_hash where chunkType = "Tag") as q
+	(select * from sotero.Chunks_With_Hashes where chunkType = "Tag") as q
 	on
 		t.ID = q.ID
 order by t.ChunkID, q.ChunkID;
