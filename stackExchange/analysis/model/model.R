@@ -18,15 +18,33 @@ hashOf = function(chunk, db) {
 	db[chunk,]$chunkHash
 }
 
-colClasses=c("character", "integer", "character", "integer", "integer")
-testCSV = read.csv(str_c(PATH, "/", "title-chunks.csv"), header=T, sep=",",colClasses=colClasses)
+act = function(context, B, sji) {
+	sji = sji[context,]
+	sji = colSums(sji, sparseResult=T)/ length(context)
+	act = B
+	act = act + sji
+	return(act)
+}
 
+colClasses=c("character", "integer", "character", "integer", "integer")
+testCSV = read.csv(str_c(PATH, "/", "title-chunks.csv"), header=T, sep=",", colClasses=colClasses)
 chunk = with(testCSV, rbind(data.frame(chunk=LeftChunk), data.frame(chunk=RightChunk)))
 chunkHash = with(testCSV, rbind(data.frame(chunkHash=LeftChunkHash), data.frame(chunkHash=RightChunkHash)))
 chunkHashFrame = data.frame(cbind(chunk, chunkHash))
 db = unique(chunkHashFrame)
 
 N = with(testCSV, sparseMatrix(i=LeftChunkHash, j=RightChunkHash, x=ChunkCount))
+
+colClasses=c("character", "integer", "integer")
+priorsFrm = read.csv(str_c(PATH, "/", "tag-priors.csv"), header=T, sep=",", colClasses=colClasses)
+priors = with(priorsFrm, sparseVector(i=ChunkHash, x=ChunkCount, length=dim(N)[2]))
+priorsIndeces = with(priorsFrm, ChunkHash)
+priorsN = sum(priors)
+priorsP = priors/priorsN
+priorsLogs = priorsP
+priorsLogs[priorsIndeces] = priorsP[priorsIndeces] / (1 - priorsP[priorsIndeces])
+B = priorsLogs
+B[priorsIndeces] = log(as.vector(priorsLogs[priorsIndeces]))
 
 NRowSums = rowSums(N, sparseResult=TRUE)
 NColSums = colSums(N, sparseResult=TRUE)
@@ -37,5 +55,8 @@ sji = NSum * sdiv(N, NProdSums)
 
 write.csv(summary(sji), file=str_c(PATH, "/", "sji.csv"))
 write.csv(summary(NProdSums), file=str_c(PATH, "/", "NProdSums.csv"))
+write.csv(data.frame(ChunkHash=priorsIndeces, B=as.vector(B[priorsIndeces])), file=str_c(PATH, "/", "B.csv"))
 
+tmpAct = act(c(1:5), B, sji)
 
+write.csv(data.frame(ChunkHash=priorsIndeces, Activation=as.vector(tmpAct[priorsIndeces])), file=str_c(PATH, "/", "Act.csv"))
