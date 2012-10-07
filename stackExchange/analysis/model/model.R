@@ -18,6 +18,12 @@ hashOf = function(chunk, db) {
 	db[chunk,]$chunkHash
 }
 
+getContext = function(chunks, db) {
+	with(db[chunks,], chunkHash)
+}
+
+
+
 act = function(context, B, sji) {
 	sji = sji[context,]
 	sji = colMeans(sji, sparseResult=T)
@@ -33,6 +39,7 @@ chunk = with(chunkFrm, rbind(data.frame(chunk=LeftChunk), data.frame(chunk=Right
 chunkHash = with(chunkFrm, rbind(data.frame(chunkHash=LeftChunkHash), data.frame(chunkHash=RightChunkHash)))
 chunkHashFrame = data.frame(cbind(chunk, chunkHash))
 db = unique(chunkHashFrame)
+rownames(db) = with(db, chunk)
 
 colClasses=c("character", "integer", "integer")
 priorsFrm = read.csv(str_c(PATH, "/", "tag-priors.csv"), header=T, sep=",", colClasses=colClasses)
@@ -57,3 +64,4 @@ write.csv(data.frame(ChunkHash=priorsIndeces, B=as.vector(B[priorsIndeces])), fi
 
 tmpAct = act(c(1:5), B, sji)
 write.csv(data.frame(ChunkHash=priorsIndeces, Activation=as.vector(tmpAct[priorsIndeces])), file=str_c(PATH, "/", "Act.csv"))
+
