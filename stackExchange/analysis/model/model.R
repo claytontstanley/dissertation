@@ -56,7 +56,8 @@ NRowSums = rowSums(N, sparseResult=TRUE)
 NColSums = colSums(N, sparseResult=TRUE)
 NSum = sum(N)
 NProdSums = with(summary(N), sparseMatrix(i=i, j=j, x=rowSums(N)[i] * colSums(N)[j]))
-sji = NSum * sdiv(N, NProdSums)
+NCellSums = NSum * sdiv(N, NProdSums)
+sji = with(summary(NCellSums), sparseMatrix(i=i, j=j, x=log(x)))
 
 write.csv(summary(sji), file=str_c(PATH, "/", "sji.csv"))
 write.csv(summary(NProdSums), file=str_c(PATH, "/", "NProdSums.csv"))
@@ -64,4 +65,13 @@ write.csv(data.frame(ChunkHash=priorsIndeces, B=as.vector(B[priorsIndeces])), fi
 
 tmpAct = act(c(1:5), B, sji)
 write.csv(data.frame(ChunkHash=priorsIndeces, Activation=as.vector(tmpAct[priorsIndeces])), file=str_c(PATH, "/", "Act.csv"))
+
+hist(as.vector(tmpAct[priorsIndeces]), breaks=50)
+hist(as.vector(B[priorsIndeces]), breaks=50)
+ 
+ 
+ 
+ 
+ 
+ 
 
