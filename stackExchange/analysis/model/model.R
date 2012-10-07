@@ -22,13 +22,34 @@ getContext = function(chunks, db) {
 	with(db[chunks,], chunkHash)
 }
 
-
-
 act = function(context, B, sji) {
 	sji = sji[context,]
 	sji = colMeans(sji, sparseResult=T)
 	act = B + sji
-	return(act)
+	return(list(act=act, sji=sji))
+}
+
+tryAct = function(context, B, sji) {
+	tmp = act(context, B, sji)
+	tmpAct = with(tmp, act)
+	tmpSji = with(tmp, sji)
+	#hist(as.vector(tmpAct[priorsIndeces]), breaks=50)
+	#hist(as.vector(B[priorsIndeces]), breaks=50)
+	hist(as.vector(tmpSji[priorsIndeces]), breaks=50)
+	return(tmpAct)
+}
+
+plotHighest = function(subsetIndeces, vals, db) {
+	vals = as.vector(vals[subsetIndeces])
+	res = sort(vals, decreasing=T, index.return=T)
+	topNum = 10
+	x = subsetIndeces[res$ix[1:topNum]]
+	xnames = db2[as.character(x),]$chunk
+	y = res$x[1:topNum]
+	print(xnames)
+	print(y)
+	plot(1:10, y, xaxt="n")
+	axis(1, at=1:10, labels=xnames)
 }
 
 colClasses=c("character", "integer", "character", "integer", "integer")
@@ -39,7 +60,10 @@ chunk = with(chunkFrm, rbind(data.frame(chunk=LeftChunk), data.frame(chunk=Right
 chunkHash = with(chunkFrm, rbind(data.frame(chunkHash=LeftChunkHash), data.frame(chunkHash=RightChunkHash)))
 chunkHashFrame = data.frame(cbind(chunk, chunkHash))
 db = unique(chunkHashFrame)
+db = subset(db, chunk != "vía")
+db2 = db
 rownames(db) = with(db, chunk)
+rownames(db2) = with(db2, chunkHash)
 
 colClasses=c("character", "integer", "integer")
 priorsFrm = read.csv(str_c(PATH, "/", "tag-priors.csv"), header=T, sep=",", colClasses=colClasses)
@@ -63,11 +87,17 @@ write.csv(summary(sji), file=str_c(PATH, "/", "sji.csv"))
 write.csv(summary(NProdSums), file=str_c(PATH, "/", "NProdSums.csv"))
 write.csv(data.frame(ChunkHash=priorsIndeces, B=as.vector(B[priorsIndeces])), file=str_c(PATH, "/", "B.csv"))
 
-tmpAct = act(c(1:5), B, sji)
+
+tmp = tryAct(getContext(c("lisp", "lisp", "lisp"), db), B, sji)
+plotHighest(priorsIndeces, tmp, db2)
+
+tmpAct = tryAct(c(1:5), B, sji)
 write.csv(data.frame(ChunkHash=priorsIndeces, Activation=as.vector(tmpAct[priorsIndeces])), file=str_c(PATH, "/", "Act.csv"))
 
-hist(as.vector(tmpAct[priorsIndeces]), breaks=50)
-hist(as.vector(B[priorsIndeces]), breaks=50)
+
+
+# Save current objects so that they can be referenced from LaTeX document
+save.image(file = str_c(PATH, "/", ".RData"))
  
  
  
