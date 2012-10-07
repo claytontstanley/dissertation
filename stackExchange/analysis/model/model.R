@@ -27,12 +27,12 @@ act = function(context, B, sji) {
 
 colClasses=c("character", "integer", "character", "integer", "integer")
 chunkFrm = read.csv(str_c(PATH, "/", "title-chunks.csv"), header=T, sep=",", colClasses=colClasses)
+N = with(chunkFrm, sparseMatrix(i=LeftChunkHash, j=RightChunkHash, x=ChunkCount))
+
 chunk = with(chunkFrm, rbind(data.frame(chunk=LeftChunk), data.frame(chunk=RightChunk)))
 chunkHash = with(chunkFrm, rbind(data.frame(chunkHash=LeftChunkHash), data.frame(chunkHash=RightChunkHash)))
 chunkHashFrame = data.frame(cbind(chunk, chunkHash))
 db = unique(chunkHashFrame)
-
-N = with(chunkFrm, sparseMatrix(i=LeftChunkHash, j=RightChunkHash, x=ChunkCount))
 
 colClasses=c("character", "integer", "integer")
 priorsFrm = read.csv(str_c(PATH, "/", "tag-priors.csv"), header=T, sep=",", colClasses=colClasses)
@@ -49,7 +49,6 @@ NRowSums = rowSums(N, sparseResult=TRUE)
 NColSums = colSums(N, sparseResult=TRUE)
 NSum = sum(N)
 NProdSums = with(summary(N), sparseMatrix(i=i, j=j, x=rowSums(N)[i] * colSums(N)[j]))
-
 sji = NSum * sdiv(N, NProdSums)
 
 write.csv(summary(sji), file=str_c(PATH, "/", "sji.csv"))
@@ -57,5 +56,4 @@ write.csv(summary(NProdSums), file=str_c(PATH, "/", "NProdSums.csv"))
 write.csv(data.frame(ChunkHash=priorsIndeces, B=as.vector(B[priorsIndeces])), file=str_c(PATH, "/", "B.csv"))
 
 tmpAct = act(c(1:5), B, sji)
-
 write.csv(data.frame(ChunkHash=priorsIndeces, Activation=as.vector(tmpAct[priorsIndeces])), file=str_c(PATH, "/", "Act.csv"))
