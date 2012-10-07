@@ -20,20 +20,19 @@ hashOf = function(chunk, db) {
 
 act = function(context, B, sji) {
 	sji = sji[context,]
-	sji = colSums(sji, sparseResult=T)/ length(context)
-	act = B
-	act = act + sji
+	sji = colMeans(sji, sparseResult=T)
+	act = B + sji
 	return(act)
 }
 
 colClasses=c("character", "integer", "character", "integer", "integer")
-testCSV = read.csv(str_c(PATH, "/", "title-chunks.csv"), header=T, sep=",", colClasses=colClasses)
-chunk = with(testCSV, rbind(data.frame(chunk=LeftChunk), data.frame(chunk=RightChunk)))
-chunkHash = with(testCSV, rbind(data.frame(chunkHash=LeftChunkHash), data.frame(chunkHash=RightChunkHash)))
+chunkFrm = read.csv(str_c(PATH, "/", "title-chunks.csv"), header=T, sep=",", colClasses=colClasses)
+chunk = with(chunkFrm, rbind(data.frame(chunk=LeftChunk), data.frame(chunk=RightChunk)))
+chunkHash = with(chunkFrm, rbind(data.frame(chunkHash=LeftChunkHash), data.frame(chunkHash=RightChunkHash)))
 chunkHashFrame = data.frame(cbind(chunk, chunkHash))
 db = unique(chunkHashFrame)
 
-N = with(testCSV, sparseMatrix(i=LeftChunkHash, j=RightChunkHash, x=ChunkCount))
+N = with(chunkFrm, sparseMatrix(i=LeftChunkHash, j=RightChunkHash, x=ChunkCount))
 
 colClasses=c("character", "integer", "integer")
 priorsFrm = read.csv(str_c(PATH, "/", "tag-priors.csv"), header=T, sep=",", colClasses=colClasses)
