@@ -48,6 +48,14 @@ VIEW `Chunks_With_Hashes` AS
         join `chunkhashes` `q` ON ((`t`.`Chunk` = `q`.`Chunk`)))
     order by `t`.`ChunkId`;
 
+DROP VIEW IF EXISTS sotero.tag_priors;
+CREATE VIEW `sotero`.`tag_priors` AS
+	select Chunk, ChunkHash, count(ChunkHash) as ChunkCount
+	from sotero.chunks_with_hashes
+	where ChunkType = "Tag"
+	group by ChunkHash
+	order by ChunkCount desc;
+
 DROP PROCEDURE IF EXISTS sotero.title_chunks;
 
 DELIMITER $$
