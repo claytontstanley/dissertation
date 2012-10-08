@@ -19,7 +19,7 @@ hashOf = function(chunk, db) {
 	db[chunk,]$chunkHash
 }
 
-getContext = function(chunks, db) {
+getChunkHashes = function(chunks, db) {
 	return(db[chunks])
 }
 
@@ -92,7 +92,7 @@ write.csv(summary(NProdSums), file=str_c(PATH, "/", "NProdSums.csv"))
 write.csv(data.frame(ChunkHash=priorsIndeces, B=as.vector(B[priorsIndeces])), file=str_c(PATH, "/", "B.csv"))
 
 
-tmp = tryAct(getContext(c("lisp", "lisp", "lisp"), db), B, sji)
+tmp = tryAct(getChunkHashes(c("lisp", "lisp", "lisp"), db), B, sji)
 plotHighest(priorsIndeces, tmp, db)
 
 tmpAct = tryAct(c(1:5), B, sji)
