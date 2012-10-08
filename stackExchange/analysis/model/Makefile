@@ -2,4 +2,4 @@ all: .RData
 
 .RData: driver.R model.R
 	rlwrap R --no-restore -e 'source("$<")'
-	rm Rplots*.pdf
+	mv Rplots*.pdf plots/

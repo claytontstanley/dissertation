@@ -16,7 +16,6 @@ plotHighest = function(subsetIndeces, vals, db) {
 	y = res$x[1:topNum]
 	plot(1:topNum, y, xaxt="n", ann=F)
 	axis(1, at=1:topNum, labels=xnames, las=3)
-	title(ylab="Activation")
 }
 
 source(str_c(PATH, "/model.R"))
@@ -34,7 +33,11 @@ close(con)
 for (run in dataList) {
 	cAct = act(getChunkHashes(run, db), B, sji)
 	plotHighest(priorsIndeces, cAct$act, db)
+	title(paste(run, collapse=" "))
+	title(ylab="Total Activation")
 	plotHighest(priorsIndeces, cAct$sji, db)
+	title(paste(run, collapse=" "))
+	title(ylab="sji activation")
 }
 
 cAct = act(c(1:5), B, sji)
