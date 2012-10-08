@@ -47,10 +47,9 @@ plotHighest = function(subsetIndeces, vals, db) {
 	x = subsetIndeces[res$ix[1:topNum]]
 	xnames = getChunks(x, db)
 	y = res$x[1:topNum]
-	print(xnames)
-	print(y)
-	plot(1:10, y, xaxt="n")
-	axis(1, at=1:10, labels=xnames)
+	plot(1:10, y, xaxt="n", ann=F)
+	axis(1, at=1:10, labels=xnames, las=3)
+	title(ylab="Activation")
 }
 
 colClasses=c("character", "integer", "character", "integer", "integer")
