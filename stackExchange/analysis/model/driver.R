@@ -8,7 +8,7 @@ library(stringr)
 
 source(str_c(PATH, "/model.R"))
 
-cAct = act(getChunkHashes(c("lisp", "git"), db), B, sji)
+cAct = act(getChunkHashes(c("lisp", "a", "the"), db), B, sji)
 plotHighest(priorsIndeces, cAct$act, db)
 plotHighest(priorsIndeces, cAct$sji, db)
 

@@ -1,5 +1,5 @@
 all: .RData
 
-.RData: driver.R
+.RData: driver.R model.R
 	rlwrap R --no-restore -e 'source("$<")'
 	rm Rplots*.pdf
