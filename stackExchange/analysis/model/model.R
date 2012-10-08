@@ -30,25 +30,16 @@ act = function(context, B, sji) {
 	return(list(act=act, sji=sji))
 }
 
-tryAct = function(context, B, sji) {
-	tmp = act(context, B, sji)
-	tmpAct = with(tmp, act)
-	tmpSji = with(tmp, sji)
-	#hist(as.vector(tmpAct[priorsIndeces]), breaks=50)
-	#hist(as.vector(B[priorsIndeces]), breaks=50)
-	#hist(as.vector(tmpSji[priorsIndeces]), breaks=50)
-	return(tmpAct)
-}
-
 plotHighest = function(subsetIndeces, vals, db) {
+	dev.new()
 	vals = as.vector(vals[subsetIndeces])
 	res = sort(vals, decreasing=T, index.return=T)
 	topNum = 10
 	x = subsetIndeces[res$ix[1:topNum]]
 	xnames = getChunks(x, db)
 	y = res$x[1:topNum]
-	plot(1:10, y, xaxt="n", ann=F)
-	axis(1, at=1:10, labels=xnames, las=3)
+	plot(1:topNum, y, xaxt="n", ann=F)
+	axis(1, at=1:topNum, labels=xnames, las=3)
 	title(ylab="Activation")
 }
 
@@ -86,11 +77,12 @@ write.csv(summary(NProdSums), file=str_c(PATH, "/", "NProdSums.csv"))
 write.csv(data.frame(ChunkHash=priorsIndeces, B=as.vector(B[priorsIndeces])), file=str_c(PATH, "/", "B.csv"))
 
 
-tmp = tryAct(getChunkHashes(c("lisp", "lisp", "lisp"), db), B, sji)
-plotHighest(priorsIndeces, tmp, db)
+cAct = act(getChunkHashes(c("lisp", "git"), db), B, sji)
+plotHighest(priorsIndeces, cAct$act, db)
+plotHighest(priorsIndeces, cAct$sji, db)
 
-tmpAct = tryAct(c(1:5), B, sji)
-write.csv(data.frame(ChunkHash=priorsIndeces, Activation=as.vector(tmpAct[priorsIndeces])), file=str_c(PATH, "/", "Act.csv"))
+cAct = act(c(1:5), B, sji)
+write.csv(data.frame(ChunkHash=priorsIndeces, Activation=as.vector(cAct$act[priorsIndeces])), file=str_c(PATH, "/", "Act.csv"))
 
 
 
