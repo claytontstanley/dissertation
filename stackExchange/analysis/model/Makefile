@@ -1,4 +1,4 @@
 all: .RData
 
-.RData: model.R
+.RData: driver.R
 	rlwrap R --no-restore -e 'source("$<")'

@@ -75,21 +75,3 @@ sji = with(summary(NCellSums), sparseMatrix(i=i, j=j, x=log(x)))
 write.csv(summary(sji), file=str_c(PATH, "/", "sji.csv"))
 write.csv(summary(NProdSums), file=str_c(PATH, "/", "NProdSums.csv"))
 write.csv(data.frame(ChunkHash=priorsIndeces, B=as.vector(B[priorsIndeces])), file=str_c(PATH, "/", "B.csv"))
-
-
-cAct = act(getChunkHashes(c("lisp", "git"), db), B, sji)
-plotHighest(priorsIndeces, cAct$act, db)
-plotHighest(priorsIndeces, cAct$sji, db)
-
-cAct = act(c(1:5), B, sji)
-write.csv(data.frame(ChunkHash=priorsIndeces, Activation=as.vector(cAct$act[priorsIndeces])), file=str_c(PATH, "/", "Act.csv"))
-
-# Save current objects so that they can be referenced from LaTeX document
-save.image(file = str_c(PATH, "/", ".RData"))
- 
- 
- 
- 
- 
- 
-
