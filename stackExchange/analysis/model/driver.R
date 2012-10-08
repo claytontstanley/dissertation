@@ -37,7 +37,7 @@ for (run in dataList) {
 	title(ylab="Total Activation")
 	plotHighest(priorsIndeces, cAct$sji, db)
 	title(paste(run, collapse=" "))
-	title(ylab="sji activation")
+	title(ylab="sji Activation")
 }
 
 cAct = act(c(1:5), B, sji)
