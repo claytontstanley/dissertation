@@ -10,7 +10,7 @@ plotHighest = function(subsetIndeces, vals, db) {
 	dev.new()
 	vals = as.vector(vals[subsetIndeces])
 	res = sort(vals, decreasing=T, index.return=T)
-	topNum = 10
+	topNum = 20
 	x = subsetIndeces[res$ix[1:topNum]]
 	xnames = getChunks(x, db)
 	y = res$x[1:topNum]
