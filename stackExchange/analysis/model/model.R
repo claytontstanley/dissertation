@@ -60,8 +60,7 @@ N = with(chunkFrm, sparseMatrix(i=LeftChunkHash, j=RightChunkHash, x=ChunkCount)
 chunk = with(chunkFrm, rbind(data.frame(chunk=LeftChunk), data.frame(chunk=RightChunk)))
 chunkHash = with(chunkFrm, rbind(data.frame(chunkHash=LeftChunkHash), data.frame(chunkHash=RightChunkHash)))
 chunkHashFrame = data.frame(cbind(chunk, chunkHash))
-chunkHashFrame = unique(chunkHashFrame)
-chunkHashFrame = subset(chunkHashFrame, chunk != "vía")
+chunkHashFrame = chunkHashFrame[!duplicated(chunkHashFrame$chunkHash),]
 db = chunkHashFrame$chunkHash
 names(db) = chunkHashFrame$chunk
 
