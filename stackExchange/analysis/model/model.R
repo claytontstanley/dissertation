@@ -6,6 +6,7 @@ PATH = dirname(frameFiles[[length(frameFiles)]])
 
 library(Matrix)
 library(stringr)
+library(fastmatch)
 
 sdiv <- function(X, Y, names=dimnames(X)) {
   sX <- summary(X)
@@ -19,7 +20,11 @@ hashOf = function(chunk, db) {
 }
 
 getContext = function(chunks, db) {
-	with(db[chunks,], chunkHash)
+	return(db[chunks])
+}
+
+getChunks = function(chunkHashes, db) {
+	return(names(db[fmatch(chunkHashes, db)]))
 }
 
 act = function(context, B, sji) {
@@ -35,7 +40,7 @@ tryAct = function(context, B, sji) {
 	tmpSji = with(tmp, sji)
 	#hist(as.vector(tmpAct[priorsIndeces]), breaks=50)
 	#hist(as.vector(B[priorsIndeces]), breaks=50)
-	hist(as.vector(tmpSji[priorsIndeces]), breaks=50)
+	#hist(as.vector(tmpSji[priorsIndeces]), breaks=50)
 	return(tmpAct)
 }
 
@@ -44,7 +49,7 @@ plotHighest = function(subsetIndeces, vals, db) {
 	res = sort(vals, decreasing=T, index.return=T)
 	topNum = 10
 	x = subsetIndeces[res$ix[1:topNum]]
-	xnames = db2[as.character(x),]$chunk
+	xnames = getChunks(x, db)
 	y = res$x[1:topNum]
 	print(xnames)
 	print(y)
@@ -59,11 +64,10 @@ N = with(chunkFrm, sparseMatrix(i=LeftChunkHash, j=RightChunkHash, x=ChunkCount)
 chunk = with(chunkFrm, rbind(data.frame(chunk=LeftChunk), data.frame(chunk=RightChunk)))
 chunkHash = with(chunkFrm, rbind(data.frame(chunkHash=LeftChunkHash), data.frame(chunkHash=RightChunkHash)))
 chunkHashFrame = data.frame(cbind(chunk, chunkHash))
-db = unique(chunkHashFrame)
-db = subset(db, chunk != "vía")
-db2 = db
-rownames(db) = with(db, chunk)
-rownames(db2) = with(db2, chunkHash)
+chunkHashFrame = unique(chunkHashFrame)
+chunkHashFrame = subset(chunkHashFrame, chunk != "vía")
+db = chunkHashFrame$chunkHash
+names(db) = chunkHashFrame$chunk
 
 colClasses=c("character", "integer", "integer")
 priorsFrm = read.csv(str_c(PATH, "/", "tag-priors.csv"), header=T, sep=",", colClasses=colClasses)
@@ -89,7 +93,7 @@ write.csv(data.frame(ChunkHash=priorsIndeces, B=as.vector(B[priorsIndeces])), fi
 
 
 tmp = tryAct(getContext(c("lisp", "lisp", "lisp"), db), B, sji)
-plotHighest(priorsIndeces, tmp, db2)
+plotHighest(priorsIndeces, tmp, db)
 
 tmpAct = tryAct(c(1:5), B, sji)
 write.csv(data.frame(ChunkHash=priorsIndeces, Activation=as.vector(tmpAct[priorsIndeces])), file=str_c(PATH, "/", "Act.csv"))
