@@ -30,19 +30,6 @@ act = function(context, B, sji) {
 	return(list(act=act, sji=sji))
 }
 
-plotHighest = function(subsetIndeces, vals, db) {
-	dev.new()
-	vals = as.vector(vals[subsetIndeces])
-	res = sort(vals, decreasing=T, index.return=T)
-	topNum = 10
-	x = subsetIndeces[res$ix[1:topNum]]
-	xnames = getChunks(x, db)
-	y = res$x[1:topNum]
-	plot(1:topNum, y, xaxt="n", ann=F)
-	axis(1, at=1:topNum, labels=xnames, las=3)
-	title(ylab="Activation")
-}
-
 colClasses=c("character", "integer", "character", "integer", "integer")
 chunkFrm = read.csv(str_c(PATH, "/", "title-chunks.csv"), header=T, sep=",", colClasses=colClasses)
 N = with(chunkFrm, sparseMatrix(i=LeftChunkHash, j=RightChunkHash, x=ChunkCount))
@@ -58,8 +45,7 @@ colClasses=c("character", "integer", "integer")
 priorsFrm = read.csv(str_c(PATH, "/", "tag-priors.csv"), header=T, sep=",", colClasses=colClasses)
 priors = with(priorsFrm, sparseVector(i=ChunkHash, x=ChunkCount, length=dim(N)[2]))
 priorsIndeces = with(priorsFrm, ChunkHash)
-priorsN = sum(priors)
-priorsP = priors/priorsN
+priorsP = priors/sum(priors)
 priorsLogs = priorsP
 priorsLogs[priorsIndeces] = priorsP[priorsIndeces] / (1 - priorsP[priorsIndeces])
 B = priorsLogs

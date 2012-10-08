@@ -6,6 +6,19 @@ PATH = dirname(frameFiles[[length(frameFiles)]])
 
 library(stringr)
 
+plotHighest = function(subsetIndeces, vals, db) {
+	dev.new()
+	vals = as.vector(vals[subsetIndeces])
+	res = sort(vals, decreasing=T, index.return=T)
+	topNum = 10
+	x = subsetIndeces[res$ix[1:topNum]]
+	xnames = getChunks(x, db)
+	y = res$x[1:topNum]
+	plot(1:topNum, y, xaxt="n", ann=F)
+	axis(1, at=1:topNum, labels=xnames, las=3)
+	title(ylab="Activation")
+}
+
 source(str_c(PATH, "/model.R"))
 
 inputFile = str_c(PATH, "/tests.txt")
