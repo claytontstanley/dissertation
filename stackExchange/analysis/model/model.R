@@ -15,10 +15,6 @@ sdiv <- function(X, Y, names=dimnames(X)) {
   sparseMatrix(i=sRes[,1], j=sRes[,2], x=sRes[,3]/sRes[,4],dimnames=names)
 }
 
-hashOf = function(chunk, db) {
-	db[chunk,]$chunkHash
-}
-
 getChunkHashes = function(chunks, db) {
 	return(db[chunks])
 }
