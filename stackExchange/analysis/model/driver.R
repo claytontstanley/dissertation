@@ -39,7 +39,7 @@ for (tagFile in tagFiles) {
 	context = readLines(str_c(PATH, "/../html-to-text/", titleDir, "/", tagFile), warn = F)
 	print(context)
 	
-	#cAct = act(getChunkHashes(context, db), B, sji)
+	cAct = act(getChunkHashes(context, db), B, sji)
 }
 
 
