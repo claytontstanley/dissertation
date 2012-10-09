@@ -8,17 +8,42 @@ library(stringr)
 
 plotHighest = function(subsetIndeces, vals, db) {
 	dev.new()
+	topNum = 20
 	vals = as.vector(vals[subsetIndeces])
 	res = sort(vals, decreasing=T, index.return=T)
-	topNum = 20
-	x = subsetIndeces[res$ix[1:topNum]]
+	sortedChunkHashes = subsetIndeces[res$ix]
+	x = sortedChunkHashes[1:topNum]
 	xnames = getChunks(x, db)
 	y = res$x[1:topNum]
 	plot(1:topNum, y, xaxt="n", ann=F)
 	axis(1, at=1:topNum, labels=xnames, las=3)
 }
 
+rateVals = function(subsetIndeces, vals, db, observed) {
+	vals = as.vector(vals[subsetIndeces])
+	res = sort(vals, decreasing=T, index.return=T)
+	sortedChunkHashes = subsetIndeces[res$ix]
+	matchIndeces = match(observed, sortedChunkHashes)
+	return(data.frame(rank=matchIndeces, tag=getChunks(observed, db), act=res$x[matchIndeces], meanAct=mean(vals)))
+}
+
 source(str_c(PATH, "/model.R"))
+
+tagDir = "tags/nlp"
+titleDir = "title/nlp"
+tagFiles = list.files(path=str_c(PATH, "/../html-to-text/", tagDir), recursive=T)
+
+for (tagFile in tagFiles) {
+	print(str_c("working tag file ", tagFile))
+	tags = readLines(str_c(PATH, "/../html-to-text/", tagDir, "/", tagFile), warn = F)
+	context = readLines(str_c(PATH, "/../html-to-text/", titleDir, "/", tagFile), warn = F)
+	print(context)
+	
+	#cAct = act(getChunkHashes(context, db), B, sji)
+}
+
+
+
 
 inputFile = str_c(PATH, "/tests.txt")
 con = file(inputFile, open = "r")
@@ -30,7 +55,10 @@ while (length(oneLine <- readLines(con, n = 1, warn = FALSE)) > 0) {
 }
 close(con)
 
+res = data.frame()
+
 for (run in dataList) {
+	observed = getChunkHashes(c("php", "lisp", "c#"), db)
 	cAct = act(getChunkHashes(run, db), B, sji)
 	plotHighest(priorsIndeces, cAct$act, db)
 	title(paste(run, collapse=" "))
@@ -38,6 +66,7 @@ for (run in dataList) {
 	plotHighest(priorsIndeces, cAct$sji, db)
 	title(paste(run, collapse=" "))
 	title(ylab="sji Activation")
+	res = rbind(res, rateVals(priorsIndeces, cAct$act, db, observed))
 }
 
 cAct = act(c(1:5), B, sji)
