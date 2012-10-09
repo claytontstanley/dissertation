@@ -59,22 +59,23 @@ CREATE VIEW `sotero`.`tag_priors` AS
 DROP PROCEDURE IF EXISTS sotero.title_chunks;
 
 DELIMITER $$
-CREATE
-	DEFINER=`root`@`localhost`
-PROCEDURE `title_chunks`()
+CREATE DEFINER=`root`@`localhost` PROCEDURE `title_chunks`()
 BEGIN
 select 
-	#t.ChunkID as LeftChunkID,
+	
 	t.Chunk as LeftChunk,
 	t.ChunkHash as LeftChunkHash,
-	#q.ChunkID as RightChunkID,
+
+	
 	q.Chunk as RightChunk,
-	q.ChunkHash as RightChunkHash
+	q.ChunkHash as RightChunkHash,
+	count(t.ChunkHash) as ChunkCount
 from
 	(select * from sotero.Chunks_With_Hashes where chunkType = "Title") as t
 	join
 	(select * from sotero.Chunks_With_Hashes where chunkType = "Tag") as q
 	on
 		t.ID = q.ID
+group by LeftChunkHash, RightChunkHash
 order by t.ChunkID, q.ChunkID;
 END
