@@ -32,17 +32,19 @@ source(str_c(PATH, "/model.R"))
 tagDir = "tags/nlp"
 titleDir = "title/nlp"
 tagFiles = list.files(path=str_c(PATH, "/../html-to-text/", tagDir), recursive=T)
+res = data.frame()
+
 
 for (tagFile in tagFiles) {
 	print(str_c("working tag file ", tagFile))
-	tags = readLines(str_c(PATH, "/../html-to-text/", tagDir, "/", tagFile), warn = F)
+	observed = readLines(str_c(PATH, "/../html-to-text/", tagDir, "/", tagFile), warn = F)
 	context = readLines(str_c(PATH, "/../html-to-text/", titleDir, "/", tagFile), warn = F)
 	print(context)
 	
-	cAct = act(getChunkHashes(context, db), B, sji)
+	#cAct = act(getChunkHashes(context, db), B, sji)
+	#res = rbind(res, rateVals(priorsIndeces, cAct$act, db, getChunkHashes(observed, db)))
+
 }
-
-
 
 
 inputFile = str_c(PATH, "/tests.txt")
