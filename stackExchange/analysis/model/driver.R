@@ -53,8 +53,8 @@ for (tagFile in tagFiles) {
 	context = readLines(str_c(PATH, "/../html-to-text/", titleDir, "/", tagFile), warn = F)
 	print(context)
 	
-	#cAct = act(getChunkHashes(context, db), B, sji)
-	#res = rbind(res, rateVals(priorsIndeces, cAct$act, db, getChunkHashes(observed, db)))
+	cAct = act(getChunkHashes(context, db), B, sji)
+	res = rbind(res, rateVals(priorsIndeces, cAct$act, db, getChunkHashes(observed, db)))
 
 }
 

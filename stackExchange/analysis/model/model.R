@@ -43,7 +43,7 @@ getChunks = function(chunkHashes, db) {
 # Calculate total activation, given base-level activation, sji associations, and context
 act = function(context, B, sji) {
 	sji = sji[context,]
-	sji = colMeans(sji, sparseResult=T)
+	if( length(context) > 1 ) sji = colMeans(sji, sparseResult=T)
 	act = B + sji
 	return(list(act=act, sji=sji))
 }
