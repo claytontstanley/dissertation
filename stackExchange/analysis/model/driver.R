@@ -51,12 +51,13 @@ for (tagFile in tagFiles) {
 	print(str_c("working tag file ", tagFile))
 	observed = readLines(str_c(PATH, "/../html-to-text/", tagDir, "/", tagFile), warn = F)
 	context = readLines(str_c(PATH, "/../html-to-text/", titleDir, "/", tagFile), warn = F)
-	print(context)
 	
 	cAct = act(getChunkHashes(context, db), B, sji)
 	res = rbind(res, rateVals(priorsIndeces, cAct$act, db, getChunkHashes(observed, db)))
 
 }
+
+# Run the model through mockup data, and save results for regression testing
 
 inputFile = str_c(PATH, "/tests.txt")
 con = file(inputFile, open = "r")
@@ -68,8 +69,6 @@ while (length(oneLine <- readLines(con, n = 1, warn = FALSE)) > 0) {
 }
 close(con)
 
-res = data.frame()
-
 for (run in dataList) {
 	observed = getChunkHashes(c("php", "lisp", "c#"), db)
 	cAct = act(getChunkHashes(run, db), B, sji)
@@ -79,7 +78,6 @@ for (run in dataList) {
 	plotHighest(priorsIndeces, cAct$sji, db)
 	title(paste(run, collapse=" "))
 	title(ylab="sji Activation")
-	res = rbind(res, rateVals(priorsIndeces, cAct$act, db, observed))
 }
 
 cAct = act(c(1:5), B, sji)
