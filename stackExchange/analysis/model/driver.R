@@ -15,6 +15,8 @@ PATH = dirname(frameFiles[[length(frameFiles)]])
 # Load up the libraries
 library(stringr)
 
+Rprof()
+
 # A few helper functions
 plotHighest = function(subsetIndeces, vals, db) {
 	dev.new()
@@ -85,3 +87,6 @@ write.csv(data.frame(ChunkHash=priorsIndeces, Activation=as.vector(cAct$act[prio
 
 # Save current objects so that they can be referenced from LaTeX document
 save.image(file = str_c(PATH, "/", ".RData"))
+
+Rprof(NULL) 
+summaryRprof() 
