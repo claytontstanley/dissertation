@@ -1,9 +1,21 @@
+# --------------------------------------------------------------------------------------------------------
+# Driver/analyzer for model
+
+# Takes a tag folder as input
+# Reads in all tags (and title chunks associated with that tag) in that folder
+# Calls the model for each title/tag pair
+# Runs analysis on the results
+# --------------------------------------------------------------------------------------------------------
+
+# Figure out the path to this file
 frameFiles = lapply(sys.frames(), function(x) x$ofile)
 frameFiles = Filter(Negate(is.null), frameFiles)
 PATH = dirname(frameFiles[[length(frameFiles)]])
 
+# Load up the libraries
 library(stringr)
 
+# A few helper functions
 plotHighest = function(subsetIndeces, vals, db) {
 	dev.new()
 	topNum = 20
@@ -25,14 +37,16 @@ rateVals = function(subsetIndeces, vals, db, observed) {
 	return(data.frame(rank=matchIndeces, tag=getChunks(observed, db), act=res$x[matchIndeces], meanAct=mean(vals)))
 }
 
+# Source the model
 source(str_c(PATH, "/model.R"))
 
+# Determine tag files
 tagDir = "tags/nlp"
 titleDir = "title/nlp"
 tagFiles = list.files(path=str_c(PATH, "/../html-to-text/", tagDir), recursive=T)
 res = data.frame()
 
-
+# Run the model for each title/tag pair, and analyse results
 for (tagFile in tagFiles) {
 	print(str_c("working tag file ", tagFile))
 	observed = readLines(str_c(PATH, "/../html-to-text/", tagDir, "/", tagFile), warn = F)
@@ -43,7 +57,6 @@ for (tagFile in tagFiles) {
 	#res = rbind(res, rateVals(priorsIndeces, cAct$act, db, getChunkHashes(observed, db)))
 
 }
-
 
 inputFile = str_c(PATH, "/tests.txt")
 con = file(inputFile, open = "r")
