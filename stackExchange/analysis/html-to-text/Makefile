@@ -18,3 +18,5 @@ build-nohtml build-chunks: process-all
 build-nohtml build-chunks extract-all:
 	rlwrap ccl -l test.lisp -e '($@)' -e '(quit)'
 
+posts-ids.csv: export-posts-ids.sql
+	< $< ${mysql} > $@
