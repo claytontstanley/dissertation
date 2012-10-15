@@ -30,7 +30,7 @@
 (let ((dir-name (if (search "huge" *csv-name*) "raw-huge" "raw")))
   (let ((fun-lst (list 
                    ;(write-col 'body (format nil "body/~a" dir-name))
-                   (write-col 'title (format nil "title/~a" dir-name))
+                   ;(write-col 'title (format nil "title/~a" dir-name))
                    (write-col 'tag (format nil "tag/~a" dir-name)))))
     (defun write-all-cols (csv)
       (loop for fun in fun-lst
@@ -48,11 +48,11 @@
   (with-open-file (strm (format nil "~a~a" *_DIR_* *csv-name*) :direction :input)
     (cl-csv:read-csv strm :row-fn #'write-chunks)))
 
-(defun get-shuffled-posts-ids (start end)
+(defun get-shuffled-post-ids (start end)
   (subseq 
     (mapcar #'parse-integer
             (mapcar #'first-and-only
-                    (with-open-file (strm (format nil "~a~a" *_DIR_* "posts-ids.csv") :direction :input)
+                    (with-open-file (strm (format nil "~a~a" *_DIR_* "post-ids.csv") :direction :input)
                       (cl-csv:read-csv strm :skip-first-p t))))
     start
     end))
@@ -74,7 +74,7 @@
     (create-symlinks 100000 200000 chunk-type 2)))
 
 (defun create-symlinks (start end chunk-type subset-num)
-  (let ((rel-paths (get-rel-paths (get-shuffled-posts-ids start end))))
+  (let ((rel-paths (get-rel-paths (get-shuffled-post-ids start end))))
     (let ((src-paths
             (mapcar (lambda (path)
                       (format nil "~a/~a"
