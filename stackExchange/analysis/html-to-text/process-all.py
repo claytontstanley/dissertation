@@ -67,4 +67,4 @@ with working_directory(_dir):
 	convert_all('body/raw', convert, 'body/nohtml')
 	convert_all('body/nohtml', nlp, 'body/nlp')
 	convert_all('title/raw', nlp, 'title/nlp')
-	convert_all('tags/raw', nlpTags, 'tags/nlp')
+	convert_all('tag/raw', nlpTags, 'tag/nlp')
