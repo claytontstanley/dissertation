@@ -89,31 +89,31 @@
     (string-right-trim (list #\/) dir)))
 
 (defun create-all-post-ids-csv ()
-  (with-cwd *_DIR_*
-    (dolist (chunk-type (list 'tag 'title))
-      (let ((*huge-p* t)) 
-        (dolist (subset (list 1 2 3))
-          (format t "working subset ~a and chunk-type ~a~%" subset chunk-type)
-          (let ((dir
-                  (format nil "~a-subset-~a/~a" (lowercase chunk-type) subset (make-huge-if-huge *processed-dirname*))))
-            (create-post-ids-csv dir))))
-      (let ((*huge-p* nil))
-        (format t "working small set for chunk-type ~a~%" chunk-type)
+  (dolist (chunk-type (list 'tag 'title))
+    (let ((*huge-p* t)) 
+      (dolist (subset (list 1 2 3))
+        (format t "working subset ~a and chunk-type ~a~%" subset chunk-type)
         (let ((dir
-                (format nil "~a/~a" (lowercase chunk-type) (make-huge-if-huge *processed-dirname*))))
-          (create-post-ids-csv dir))))))
+                (format nil "~a-subset-~a/~a" (lowercase chunk-type) subset (make-huge-if-huge *processed-dirname*))))
+          (create-post-ids-csv dir))))
+    (let ((*huge-p* nil))
+      (format t "working small set for chunk-type ~a~%" chunk-type)
+      (let ((dir
+              (format nil "~a/~a" (lowercase chunk-type) (make-huge-if-huge *processed-dirname*))))
+        (create-post-ids-csv dir)))))
 
 (defun create-post-ids-csv (dir)
-  (let ((post-ids
-          (let ((res))
-            (with-cwd *_DIR_*
-              (cl-fad:walk-directory
-                dir
-                (lambda (file)
-                  (push (file-namestring file) res))))
-            (reverse res))))
-    (let ((post-ids-csv (format nil "~a/~a.csv" dir (last-dir dir))))
-      (with-cwd *_DIR_*
+  (let ((post-ids-csv (format nil "~a/~a.csv" dir (last-dir dir))))
+    (with-cwd *_DIR_*
+      (let ((post-ids
+              (let ((res))
+                (when (probe-file post-ids-csv)
+                  (delete-file post-ids-csv))
+                (cl-fad:walk-directory
+                  dir
+                  (lambda (file)
+                    (push (file-namestring file) res)))
+              (reverse res))))
         (with-open-file (strm post-ids-csv :direction :output :if-exists :supersede :if-does-not-exist :create)
           (format strm "~{~a~%~}" post-ids))))))
 
