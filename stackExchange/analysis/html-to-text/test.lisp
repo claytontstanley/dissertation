@@ -1,8 +1,14 @@
-(defparameter *_DIR_* (directory-namestring *load-truename*))
-(defparameter *csv-name* "in-huge.csv")
-(defparameter *processed-dirname* (if (search "huge" *csv-name*) "nlp-huge" "nlp"))
-
 (cl-interpol:enable-interpol-syntax)
+(defparameter *_DIR_* (directory-namestring *load-truename*))
+(defparameter *csv-name* "in.csv")
+
+(defun make-huge-if-huge (str)
+  (if (search "huge" *csv-name*)
+    (let ((split-str (cl-ppcre:split "(\\.)" str :with-registers-p t)))
+      (format nil "~a-huge~{~a~}" (first split-str) (rest split-str)))
+    str))
+
+(defparameter *processed-dirname* (make-huge-if-huge "nlp"))
 
 (setf cl-csv::*always-quote* t)
 (setf cl-csv::*newline* #?"\n")
@@ -27,7 +33,7 @@
               (with-open-file (strm out-file :direction :output :if-exists :supersede :if-does-not-exist :create)
                 (format strm "~a" col-val)))))))))
 
-(let ((dir-name (if (search "huge" *csv-name*) "raw-huge" "raw")))
+(let ((dir-name (make-huge-if-huge "raw")))
   (let ((fun-lst (list 
                    ;(write-col 'body (format nil "body/~a" dir-name))
                    ;(write-col 'title (format nil "title/~a" dir-name))
@@ -126,12 +132,14 @@
 
 (let ((cnt 0))
   (let ((chunk-cnt 0))
-    (defun write-chunks (csv)
-      (incf cnt)
-      (format  t "converting line ~a~%" cnt)
-      (let ((out-file "chunks.csv"))
-        (let ((posts-id (csv-val 'posts-id csv)))
-          (with-open-file (strm out-file :direction :output :if-exists (if (= cnt 1) :supersede :append) :if-does-not-exist :create)
+    (let ((out-file (make-huge-if-huge "chunks.csv")))
+      (let ((strm))
+        (defun write-chunks (csv)
+          (incf cnt)
+          (when (= cnt 1)
+            (setf strm (open out-file :direction :output :if-exists :supersede :if-does-not-exist :create)))
+          (format t "converting line ~a~%" cnt)
+          (let ((posts-id (csv-val 'posts-id csv)))
             (when (not (= cnt 1))
               (dolist (chunk-type (list 'title 'body 'tag))
                 (let ((txt (file-string (format nil "~a/~a/~a/~a" (chunk-type->folder chunk-type) *processed-dirname* (get-dir posts-id) posts-id))))
