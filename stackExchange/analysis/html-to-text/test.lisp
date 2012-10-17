@@ -1,15 +1,17 @@
 (cl-interpol:enable-interpol-syntax)
-(defparameter *_DIR_* (directory-namestring *load-truename*))
-(defparameter *csv-name* "in.csv")
+
+(defparameter *huge-p* nil)
 
 (defun make-huge-if-huge (str)
-  (if (search "huge" *csv-name*)
+  (if *huge-p* 
     (let ((split-str (cl-ppcre:split "(\\.)" str :with-registers-p t)))
       (format nil "~a-huge~{~a~}" (first split-str) (rest split-str)))
     str))
 
-(defparameter *processed-dirname* (make-huge-if-huge "nlp"))
+(defparameter *csv-name* "in.csv")
+(defparameter *processed-dirname* "nlp")
 
+(defparameter *_DIR_* (directory-namestring *load-truename*))
 (setf cl-csv::*always-quote* t)
 (setf cl-csv::*newline* #?"\n")
 
@@ -35,23 +37,23 @@
 
 (let ((dir-name (make-huge-if-huge "raw")))
   (let ((fun-lst (list 
-                   ;(write-col 'body (format nil "body/~a" dir-name))
-                   ;(write-col 'title (format nil "title/~a" dir-name))
+                   (write-col 'body (format nil "body/~a" dir-name))
+                   (write-col 'title (format nil "title/~a" dir-name))
                    (write-col 'tag (format nil "tag/~a" dir-name)))))
     (defun write-all-cols (csv)
       (loop for fun in fun-lst
             do (funcall fun csv)))))
 
 (defun extract-all ()
-  (with-open-file (strm (format nil "~a~a" *_DIR_* *csv-name*) :direction :input)
+  (with-open-file (strm (format nil "~a~a" *_DIR_* (make-huge-if-huge *csv-name*)) :direction :input)
     (cl-csv:read-csv strm :row-fn #'write-all-cols)))
 
 (defun build-nohtml ()
-  (with-open-file (strm (format nil "~a~a" *_DIR_* *csv-name*) :direction :input)
+  (with-open-file (strm (format nil "~a~a" *_DIR_* (make-huge-if-huge *csv-name*)) :direction :input)
     (cl-csv:read-csv strm :row-fn #'write-csv)))
 
 (defun build-chunks ()
-  (with-open-file (strm (format nil "~a~a" *_DIR_* *csv-name*) :direction :input)
+  (with-open-file (strm (format nil "~a~a" *_DIR_* (make-huge-if-huge *csv-name*)) :direction :input)
     (cl-csv:read-csv strm :row-fn #'write-chunks)))
 
 (defun get-shuffled-post-ids (start end)
@@ -69,15 +71,51 @@
           for id in post-ids 
           collect
           (format nil "~a/~a/~a"
-                  *processed-dirname*
+                  (make-huge-if-huge *processed-dirname*)
                   dir
                   id))))
 
 (defun create-all-symlinks ()
-  ; FIXME: Add 'title chunk back in
-  (dolist (chunk-type (list 'tag))
-    (create-symlinks 000000 100000 chunk-type 1)
-    (create-symlinks 100000 200000 chunk-type 2)))
+  (let ((*huge-p* t))
+    (dolist (chunk-type (list 'tag 'title))
+      (create-symlinks 000000 100000 chunk-type 1)
+      (create-symlinks 100000 200000 chunk-type 2)
+      (create-symlinks 200000 201000 chunk-type 3)
+      )))
+
+(defun last-dir (dir)
+  (cl-ppcre:scan-to-strings
+    "((?<=^)|(?<=/))[^/]+$"
+    (string-right-trim (list #\/) dir)))
+
+(defun create-all-post-ids-csv ()
+  (with-cwd *_DIR_*
+    (dolist (chunk-type (list 'tag 'title))
+      (let ((*huge-p* t)) 
+        (dolist (subset (list 1 2 3))
+          (format t "working subset ~a and chunk-type ~a~%" subset chunk-type)
+          (let ((dir
+                  (format nil "~a-subset-~a/~a" (lowercase chunk-type) subset (make-huge-if-huge *processed-dirname*))))
+            (create-post-ids-csv dir))))
+      (let ((*huge-p* nil))
+        (format t "working small set for chunk-type ~a~%" chunk-type)
+        (let ((dir
+                (format nil "~a/~a" (lowercase chunk-type) (make-huge-if-huge *processed-dirname*))))
+          (create-post-ids-csv dir))))))
+
+(defun create-post-ids-csv (dir)
+  (let ((post-ids
+          (let ((res))
+            (with-cwd *_DIR_*
+              (cl-fad:walk-directory
+                dir
+                (lambda (file)
+                  (push (file-namestring file) res))))
+            (reverse res))))
+    (let ((post-ids-csv (format nil "~a/~a.csv" dir (last-dir dir))))
+      (with-cwd *_DIR_*
+        (with-open-file (strm post-ids-csv :direction :output :if-exists :supersede :if-does-not-exist :create)
+          (format strm "~{~a~%~}" post-ids))))))
 
 (defun create-symlinks (start end chunk-type subset-num)
   (let ((rel-paths (get-rel-paths (get-shuffled-post-ids start end))))
@@ -142,7 +180,11 @@
           (let ((posts-id (csv-val 'posts-id csv)))
             (when (not (= cnt 1))
               (dolist (chunk-type (list 'title 'body 'tag))
-                (let ((txt (file-string (format nil "~a/~a/~a/~a" (chunk-type->folder chunk-type) *processed-dirname* (get-dir posts-id) posts-id))))
+                (let ((txt (file-string (format nil "~a/~a/~a/~a"
+                                                (chunk-type->folder chunk-type)
+                                                (make-huge-if-huge *processed-dirname*)
+                                                (get-dir posts-id)
+                                                posts-id))))
                   (let ((chunks (cl-ppcre:split #?"\n" txt)))
                     (dolist (chunk chunks)
                       (cl-csv:write-csv-row (list (incf chunk-cnt) posts-id chunk (lowercase chunk-type)) :stream strm))))))))))))
