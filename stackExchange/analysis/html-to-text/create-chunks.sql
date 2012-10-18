@@ -42,12 +42,16 @@ VIEW `chunkhashes` AS
     order by `chunks`.`ChunkId`;
 
 DELIMITER $$
+
 drop procedure if exists sotero.createChunkSubset;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `createChunkSubset`()
+CREATE DEFINER=`root`@`localhost` PROCEDURE `createChunkSubset`(theSubset varchar(255))
 BEGIN
 drop view if exists sotero.chunkSubset;
 drop view if exists sotero.idSubset;
-create view sotero.idSubset as select id from sotero.subsets where subset = "title";
+
+set @p1 := theSubset;
+
+create view sotero.idSubset as (select id from sotero.subsets where subset = p1());
 create view sotero.chunkSubset as
 	select c.* from sotero.chunks as c 
 	join sotero.idSubset as s 
@@ -55,9 +59,9 @@ create view sotero.chunkSubset as
 END;
 
 DROP PROCEDURE IF EXISTS sotero.title_chunks;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `title_chunks`()
+CREATE DEFINER=`root`@`localhost` PROCEDURE `title_chunks`(theSubset varchar(255))
 BEGIN
-call sotero.createChunkSubset();
+call sotero.createChunkSubset(theSubset);
 select 
 	
 	t.Chunk as LeftChunk,
@@ -85,9 +89,9 @@ drop view sotero.idsubset;
 END;
 
 drop procedure if exists sotero.tag_priors;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `tag_priors`()
+CREATE DEFINER=`root`@`localhost` PROCEDURE `tag_priors`(theSubset varchar(255))
 BEGIN
-call sotero.createChunkSubset();
+call sotero.createChunkSubset(theSubset);
 select 
         `chunks`.`Chunk` AS `Chunk`,
         `chunks`.`ChunkHash` AS `ChunkHash`,
@@ -101,3 +105,9 @@ select
 drop view sotero.chunksubset;
 drop view sotero.idsubset;
 END;
+
+drop function if exists p1;
+CREATE DEFINER=`root`@`localhost` FUNCTION `p1`() RETURNS varchar(255) CHARSET utf8
+    NO SQL
+    DETERMINISTIC
+return @p1;
