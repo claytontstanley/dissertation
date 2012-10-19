@@ -43,20 +43,21 @@ rateVals = function(subsetIndeces, vals, db, observed) {
 source(str_c(PATH, "/model.R"))
 
 # Determine tag files
-tagDir = "tags/nlp"
+tagDir = "tag/nlp"
 titleDir = "title/nlp"
 tagFiles = list.files(path=str_c(PATH, "/../html-to-text/", tagDir), recursive=T)
 res = data.frame()
 
 # Run the model for each title/tag pair, and analyse results
 for (tagFile in tagFiles) {
-	print(str_c("working tag file ", tagFile))
-	observed = readLines(str_c(PATH, "/../html-to-text/", tagDir, "/", tagFile), warn = F)
-	context = readLines(str_c(PATH, "/../html-to-text/", titleDir, "/", tagFile), warn = F)
+	if ( !any(grep("*.csv", tagFile)) ) {
+		print(str_c("working tag file ", tagFile))
+		observed = readLines(str_c(PATH, "/../html-to-text/", tagDir, "/", tagFile), warn = F)
+		context = readLines(str_c(PATH, "/../html-to-text/", titleDir, "/", tagFile), warn = F)
 	
-	cAct = act(getChunkHashes(context, db), B, sji)
-	res = rbind(res, rateVals(priorsIndeces, cAct$act, db, getChunkHashes(observed, db)))
-
+		cAct = act(getChunkHashes(context, db), B, sji)
+		res = rbind(res, rateVals(priorsIndeces, cAct$act, db, getChunkHashes(observed, db)))
+	}
 }
 
 # Run the model through mockup data, and save results for regression testing
