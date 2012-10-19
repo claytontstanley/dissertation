@@ -20,7 +20,8 @@ BEGIN
 drop view if exists sotero.chunkSubset;
 drop view if exists sotero.idSubset;
 set @p1 := theSubset;
-create view sotero.idSubset as (select id from sotero.subsets where subset = p1());
+create view sotero.idSubset as
+	select id from sotero.subsets where subset = p1();
 create view sotero.chunkSubset as
 	select c.* from sotero.chunks as c 
 	join sotero.idSubset as s 
@@ -38,15 +39,13 @@ select
 	q.ChunkHash as RightChunkHash,
 	count(t.ChunkHash) as ChunkCount
 from
-	(select * from 
-		sotero.chunkSubset
-		where chunkType = "Title") as t
+	chunksubset as t
 	join
-	(select * from
-		sotero.chunkSubset
-		where chunkType = "Tag") as q
+	chunksubset as q
 	on
 		t.ID = q.ID
+where t.chunkType = "Title"
+and q.chunkType = "Tag"
 group by LeftChunkHash, RightChunkHash
 order by t.ChunkID, q.ChunkID;
 drop view sotero.chunksubset;
