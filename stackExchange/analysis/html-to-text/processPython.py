@@ -8,6 +8,8 @@ from boilerpipe.extract import Extractor
 import itertools
 import os.path
 from grizzled.os import working_directory
+import MySQLdb
+import string
 
 def convert(html):
 	extractor = Extractor(extractor='KeepEverythingExtractor', html=html)
@@ -62,6 +64,30 @@ def convert_all(indir, fun, outdir):
 				text_file.write(txt)
 
 _dir = os.path.dirname(os.path.abspath(__file__))
+db = MySQLdb.connect(host="127.0.0.1", user="root", passwd="rrb4cith", db="sotero")
+cur = db.cursor()
+
+def loadSubset(file, subset):
+	cmd = "load data infile '${_dir}/${file}' into table subsets fields terminated by ',' enclosed by '\"' escaped by '' (ID) set subset = '${subset}'"
+	cmd = string.Template(cmd).substitute(dict(locals(), **globals()))
+	print cmd
+	cur.execute(cmd)
+
+def loadChunks():
+	cmd = "load data infile '${_dir}/chunks.csv' into table chunks fields terminated by ',' enclosed by '\"' escaped by '' (ChunkId, Id, Chunk, ChunkType) set ChunkHash = 0"
+	cmd = string.Template(cmd).substitute(dict(locals(), **globals()))
+	print cmd
+	cur.execute(cmd)
+	loadSubset("tag/nlp/nlp.csv", "tag")
+	loadSubset("title/nlp/nlp.csv", "title")
+	loadSubset("tag-subset-1/nlp-huge/nlp-huge.csv", "tag-subset-1")
+	loadSubset("title-subset-1/nlp-huge/nlp-huge.csv", "title-subset-1")
+
+def loadNohtml():
+	csvFile = "nohtml.csv"
+	cmd = "load data infile '${_dir}/${csvFile}' into table posts_nohtml fields terminated by ',' enclosed by '\"' escaped by '' (Id, Body)"
+	cmd = string.Template(cmd).substitute(dict(locals(), **globals()))
+	cur.execute(cmd)
 
 def processAll():
 	with working_directory(_dir):

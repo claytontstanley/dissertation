@@ -1,21 +1,20 @@
 mysql = mysql
 
-create-chunks create-nohtml: create-%:
-	< create-$*.sql ${mysql}
+createChunks createNohtml: create%:
+	< create$*.sql ${mysql}
 
-load-chunks load-nohtml: load-%: create-%
-	< load-$*.sql ${mysql}
+loadChunks loadNohtml: load%: create%
 
-update-chunks update-nohtml: update-%: load-%
+updateChunks updateNohtml: update%: load%
 
-update-chunks:
+updateChunks:
 	< $@.sql ${mysql}
 
-update-all: update-nohtml update-chunks
+updateAll: updateNohtml updateChunks
 
 processAll: extract-all 
 
-processAll:
+processAll loadChunks loadNohtml:
 	python -c 'from processPython import *; $@()'
 
 build-all: build-nohtml build-chunks
