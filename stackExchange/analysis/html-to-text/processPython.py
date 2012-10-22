@@ -63,8 +63,9 @@ def convert_all(indir, fun, outdir):
 
 _dir = os.path.dirname(os.path.abspath(__file__))
 
-with working_directory(_dir):
-	convert_all('body/raw', convert, 'body/nohtml')
-	convert_all('body/nohtml', nlp, 'body/nlp')
-	convert_all('title/raw', nlp, 'title/nlp')
-	convert_all('tag/raw', nlpTags, 'tag/nlp')
+def processAll():
+	with working_directory(_dir):
+		convert_all('body/raw', convert, 'body/nohtml')
+		convert_all('body/nohtml', nlp, 'body/nlp')
+		convert_all('title/raw', nlp, 'title/nlp')
+		convert_all('tag/raw', nlpTags, 'tag/nlp')
