@@ -13,8 +13,6 @@ update-chunks:
 
 update-all: update-nohtml update-chunks
 
-load-all: load-nohtml load-chunks
-
 processAll: extract-all 
 
 processAll:
