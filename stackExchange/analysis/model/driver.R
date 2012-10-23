@@ -35,8 +35,14 @@ rateVals = function(subsetIndeces, vals, db, observed) {
 	vals = as.vector(vals[subsetIndeces])
 	res = sort(vals, decreasing=T, index.return=T)
 	sortedChunkHashes = subsetIndeces[res$ix]
-	matchIndeces = match(observed, sortedChunkHashes)
-	return(data.frame(rank=matchIndeces, tag=getChunks(observed, db), act=res$x[matchIndeces], meanAct=mean(vals)))
+	cutoff = 10
+	sortedChunkHashes = sortedChunkHashes[1:cutoff]
+	targetP = rep(0,cutoff)
+	targetP[match(observed, sortedChunkHashes)] = 1
+	sortedChunks = getChunks(sortedChunkHashes, db)
+	#print(sortedChunkHashes)
+	#print(observed)
+	return(data.frame(tag=getChunks(sortedChunkHashes, db), act=res$x[1:cutoff], targetP=targetP))
 }
 
 # Source the model
@@ -59,6 +65,8 @@ for (tagFile in tagFiles) {
 		res = rbind(res, rateVals(priorsIndeces, cAct$act, db, getChunkHashes(observed, db)))
 	}
 }
+
+write.csv(res, file=str_c(PATH, "/LogReg.csv"))
 
 # Run the model through mockup data, and save results for regression testing
 
