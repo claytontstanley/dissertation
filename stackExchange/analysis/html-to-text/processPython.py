@@ -74,21 +74,23 @@ def loadSubset(file, subset):
 	cur.execute(cmd)
 
 def loadChunks():
-	cmd = "load data local infile 'chunks-huge.csv' into table chunks fields terminated by ',' enclosed by '\"' escaped by '' (ChunkId, Id, Chunk, ChunkType) set ChunkHash = 0"
-	cmd = string.Template(cmd).substitute(locals())
-	print cmd
-	cur.execute(cmd)
-	loadSubset("tag/nlp/nlp.csv", "tag")
-	loadSubset("title/nlp/nlp.csv", "title")
-	loadSubset("tag-subset-1/nlp-huge/nlp-huge.csv", "tag-subset-1")
-	loadSubset("title-subset-1/nlp-huge/nlp-huge.csv", "title-subset-1")
+	with working_directory(_dir):
+		cmd = "load data local infile 'chunks-huge.csv' into table chunks fields terminated by ',' enclosed by '\"' escaped by '' (ChunkId, Id, Chunk, ChunkType) set ChunkHash = 0"
+		cmd = string.Template(cmd).substitute(locals())
+		print cmd
+		cur.execute(cmd)
+		loadSubset("tag/nlp/nlp.csv", "tag")
+		loadSubset("title/nlp/nlp.csv", "title")
+		loadSubset("tag-subset-1/nlp-huge/nlp-huge.csv", "tag-subset-1")
+		loadSubset("title-subset-1/nlp-huge/nlp-huge.csv", "title-subset-1")
 
 def loadNohtml():
-	csvFile = "nohtml.csv"
-	cmd = "load data local infile '${csvFile}' into table posts_nohtml fields terminated by ',' enclosed by '\"' escaped by '' (Id, Body)"
-	cmd = string.Template(cmd).substitute(locals())
-	print cmd
-	cur.execute(cmd)
+	with working_directory(_dir):
+		csvFile = "nohtml.csv"
+		cmd = "load data local infile '${csvFile}' into table posts_nohtml fields terminated by ',' enclosed by '\"' escaped by '' (Id, Body)"
+		cmd = string.Template(cmd).substitute(locals())
+		print cmd
+		cur.execute(cmd)
 
 def processAll():
 	with working_directory(_dir):
