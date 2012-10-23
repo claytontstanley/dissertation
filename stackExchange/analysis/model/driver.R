@@ -15,6 +15,7 @@ PATH = dirname(frameFiles[[length(frameFiles)]])
 # Load up the libraries
 library(stringr)
 library(popbio)
+library(multicore)
 
 Rprof()
 
@@ -46,22 +47,8 @@ rateVals = function(subsetIndeces, vals, db, observed) {
 	return(data.frame(tag=getChunks(sortedChunkHashes, db), act=res$x[1:cutoff], targetP=targetP))
 }
 
-# Source the model
-source(str_c(PATH, "/model.R"))
-
-# Determine tag files
-tagDir = "tag-subset-3/nlp-huge"
-titleDir = "title-subset-3/nlp-huge"
-
-tagDir = "tag/nlp"
-titleDir = "title/nlp"
-
-
-tagFiles = list.files(path=str_c(PATH, "/../html-to-text/", tagDir), recursive=T)
-res = data.frame()
-
-# Run the model for each title/tag pair, and analyse results
-for (tagFile in tagFiles) {
+ratePost = function(tagFile) {
+	res = data.frame()
 	if ( !any(grep("*.csv", tagFile)) ) {
 		print(str_c("working tag file ", tagFile))
 		observed = readLines(str_c(PATH, "/../html-to-text/", tagDir, "/", tagFile), warn = F)
@@ -70,7 +57,25 @@ for (tagFile in tagFiles) {
 		cAct = act(getChunkHashes(context, db), B, sji)
 		res = rbind(res, rateVals(priorsIndeces, cAct$act, db, getChunkHashes(observed, db)))
 	}
+	return(res)
 }
+
+# Source the model
+source(str_c(PATH, "/model.R"))
+
+# Determine tag files
+tagDir = "tag-subset-2/nlp-huge"
+titleDir = "title-subset-2/nlp-huge"
+
+tagDir = "tag/nlp"
+titleDir = "title/nlp"
+
+
+tagFiles = list.files(path=str_c(PATH, "/../html-to-text/", tagDir), recursive=T)
+
+# Run the model for each title/tag pair, and analyse results
+res = do.call(rbind, mclapply(tagFiles, ratePost, mc.preschedule=T))
+
 
 write.csv(res, file=str_c(PATH, "/LogReg.csv"))
 dev.new()
