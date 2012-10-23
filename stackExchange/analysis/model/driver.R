@@ -14,6 +14,7 @@ PATH = dirname(frameFiles[[length(frameFiles)]])
 
 # Load up the libraries
 library(stringr)
+library(popbio)
 
 Rprof()
 
@@ -67,6 +68,9 @@ for (tagFile in tagFiles) {
 }
 
 write.csv(res, file=str_c(PATH, "/LogReg.csv"))
+dev.new()
+logi.hist.plot(res$act, res$targetP, boxp=F, type="hist", col="gray")
+
 
 # Run the model through mockup data, and save results for regression testing
 
