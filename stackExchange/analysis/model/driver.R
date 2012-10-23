@@ -50,8 +50,13 @@ rateVals = function(subsetIndeces, vals, db, observed) {
 source(str_c(PATH, "/model.R"))
 
 # Determine tag files
+tagDir = "tag-subset-3/nlp-huge"
+titleDir = "title-subset-3/nlp-huge"
+
 tagDir = "tag/nlp"
 titleDir = "title/nlp"
+
+
 tagFiles = list.files(path=str_c(PATH, "/../html-to-text/", tagDir), recursive=T)
 res = data.frame()
 
@@ -61,7 +66,7 @@ for (tagFile in tagFiles) {
 		print(str_c("working tag file ", tagFile))
 		observed = readLines(str_c(PATH, "/../html-to-text/", tagDir, "/", tagFile), warn = F)
 		context = readLines(str_c(PATH, "/../html-to-text/", titleDir, "/", tagFile), warn = F)
-	
+
 		cAct = act(getChunkHashes(context, db), B, sji)
 		res = rbind(res, rateVals(priorsIndeces, cAct$act, db, getChunkHashes(observed, db)))
 	}

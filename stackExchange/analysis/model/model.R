@@ -32,7 +32,11 @@ sdiv <- function(X, Y, names=dimnames(X)) {
 
 # Interface to retrieve chunkHash for chunk name
 getChunkHashes = function(chunks, db) {
-	return(db[chunks])
+	ret = db[chunks]
+	ret = ret[!is.na(ret)]
+#	stopifnot(length(ret) > 0)
+	print(str_c(length(chunks), "->", length(ret)))
+	return(ret)
 }
 
 # And vice versa
@@ -44,7 +48,8 @@ getChunks = function(chunkHashes, db) {
 act = function(context, B, sji) {
 	sji = sji[context,]
 	if( length(context) > 1 ) sji = colMeans(sji, sparseResult=T)
-	act = B + sji
+	act = B;
+	if( length(context) > 0 ) act = act + sji
 	return(list(act=act, sji=sji))
 }
 
