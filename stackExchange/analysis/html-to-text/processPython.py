@@ -75,7 +75,8 @@ def loadSubset(file, subset):
 
 def loadChunks():
 	with working_directory(_dir):
-		cmd = "load data local infile 'chunks-huge.csv' into table chunks fields terminated by ',' enclosed by '\"' escaped by '' (ChunkId, Id, Chunk, ChunkType) set ChunkHash = 0"
+		csvFile = "chunks-huge.csv"
+		cmd = "load data local infile '${csvFile}' into table chunks fields terminated by ',' enclosed by '\"' escaped by '' (ChunkId, Id, Chunk, ChunkType) set ChunkHash = 0"
 		cmd = string.Template(cmd).substitute(locals())
 		print cmd
 		cur.execute(cmd)
