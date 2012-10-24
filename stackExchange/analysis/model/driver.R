@@ -67,14 +67,14 @@ source(str_c(PATH, "/model.R"))
 tagDir = "tag-subset-2/nlp-huge"
 titleDir = "title-subset-2/nlp-huge"
 
-tagDir = "tag/nlp"
-titleDir = "title/nlp"
+#tagDir = "tag/nlp"
+#titleDir = "title/nlp"
 
 
 tagFiles = list.files(path=str_c(PATH, "/../html-to-text/", tagDir), recursive=T)
 
 # Run the model for each title/tag pair, and analyse results
-res = do.call(rbind, mclapply(tagFiles, ratePost, mc.preschedule=T))
+res = do.call(rbind, multicore::mclapply(tagFiles, ratePost, mc.preschedule=F))
 
 
 write.csv(res, file=str_c(PATH, "/LogReg.csv"))
