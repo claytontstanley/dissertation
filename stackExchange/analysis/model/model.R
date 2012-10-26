@@ -56,6 +56,9 @@ act = function(context, B, sji) {
 priorsCSV = 'tag-priors-subset-1.csv'
 sjiCSV = 'title-chunks-subset-1.csv'
 
+#priorsCSV = 'tag-priors.csv'
+#sjiCSV = 'title-chunks.csv'
+
 logRegResultCSV = "/LogReg-subset-2.csv"
 sjiRankResultCSV = "/sjiRank-subset-2.csv"
 
