@@ -65,7 +65,7 @@ sjiRankResultCSV = "/sjiRank-subset-2.csv"
 colClasses=c("character", "integer", "integer")
 priorsFrm = read.csv(str_c(PATH, "/", priorsCSV), header=T, sep=",", colClasses=colClasses)
 
-logRegRes = read.csv(str_c(PATH, "/" logRegResultCSV))
+logRegRes = read.csv(str_c(PATH, "/", logRegResultCSV))
 observedTags = unique(logRegRes$tag)
 priorsFrm = priorsFrm[priorsFrm$Chunk %in% observedTags,]
 
