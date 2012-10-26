@@ -13,8 +13,6 @@ library(reshape)
 
 res = read.csv(str_c(PATH, "/LogReg-subset-2.csv"))
 
-tmp = read.csv(str_c(PATH, "/tag-priors-subset-1.csv"))
-
 logi.hist.plot(res$act, res$targetP, boxp=F, type="hist", col="gray")
 
 tags = sqldf('select tag, count(tag) as count from res group by tag order by count desc')
@@ -51,21 +49,12 @@ sjiRank = function(row, sji) {
 
 break
 
-lapply(tagSubset$tag, logReg)
+leftChunkHashes=unique(chunkFrm$LeftChunkHash)
+sjiRankRes = do.call(rbind, multicore::mclapply(leftChunkHashes, function(hash) sjiRank(hash, sji)))
 
 lst = as.list(c(1:100))
 lst = lapply(lst, function(row) tags[row,]$tag)
 dFrame = do.call(rbind, multicore::mclapply(lst, logReg))
 
-multicore::mclapply(lst, logReg)
-
-
-tagSubset1 = tags[1:1,]$tag
-tagSubset2 = tags[100:1000,]$tag
-
-resSubset1 = res[res$tag %in% tagSubset1,]
-resSubset2 = res[res$tag %in% tagSubset2,]
-
-lapply(1:5, logReg(tags[1,]$tag))
 
 

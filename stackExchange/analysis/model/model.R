@@ -53,9 +53,36 @@ act = function(context, B, sji) {
 	return(list(act=act, sji=sjiSubset))
 }
 
+priorsCSV = 'tag-priors-subset-1.csv'
+sjiCSV = 'title-chunks-subset-1.csv'
+
+logRegResultCSV = "/LogReg-subset-2.csv"
+sjiRankResultCSV = "/sjiRank-subset-2.csv"
+
+# Read in table of tag occurance counts; use this to build the base-level activation vector
+# Calculates base levels by using the log odds ratio for each tag.
+# Does not take into account the fact that tag likelihoods change over time.
+colClasses=c("character", "integer", "integer")
+priorsFrm = read.csv(str_c(PATH, "/", priorsCSV), header=T, sep=",", colClasses=colClasses)
+
+logRegRes = read.csv(str_c(PATH, "/" logRegResultCSV))
+observedTags = unique(logRegRes$tag)
+priorsFrm = priorsFrm[priorsFrm$Chunk %in% observedTags,]
+
+priors = with(priorsFrm, sparseVector(i=ChunkHash, x=ChunkCount, length=max(ChunkHash)))
+priorsIndeces = with(priorsFrm, ChunkHash)
+priorsP = priors/sum(priors)
+priorsLogs = priorsP
+priorsLogs[priorsIndeces] = priorsP[priorsIndeces] / (1 - priorsP[priorsIndeces])
+B = priorsLogs
+B[priorsIndeces] = log(as.vector(priorsLogs[priorsIndeces]))
+
 # Read in table of context chunk -> tag chunk occurance counts, and place in a sparse matrix
 colClasses=c("character", "integer", "character", "integer", "integer")
-chunkFrm = read.csv(str_c(PATH, "/", "title-chunks-subset-1.csv"), header=T, sep=",", colClasses=colClasses)
+chunkFrm = read.csv(str_c(PATH, "/", sjiCSV), header=T, sep=",", colClasses=colClasses)
+
+chunkFrm = chunkFrm[chunkFrm$RightChunk %in% observedTags,]
+
 N = with(chunkFrm, sparseMatrix(i=LeftChunkHash, j=RightChunkHash, x=ChunkCount))
 
 # Construct the db of chunk (character) <-> chunkHash (integer) associations
@@ -68,18 +95,6 @@ chunkHashFrame = chunkHashFrame[!duplicated(chunkHashFrame$chunkHash),]
 db = chunkHashFrame$chunkHash
 names(db) = chunkHashFrame$chunk
 
-# Read in table of tag occurance counts; use this to build the base-level activation vector
-# Calculates base levels by using the log odds ratio for each tag.
-# Does not take into account the fact that tag likelihoods change over time.
-colClasses=c("character", "integer", "integer")
-priorsFrm = read.csv(str_c(PATH, "/", "tag-priors-subset-1.csv"), header=T, sep=",", colClasses=colClasses)
-priors = with(priorsFrm, sparseVector(i=ChunkHash, x=ChunkCount, length=dim(N)[2]))
-priorsIndeces = with(priorsFrm, ChunkHash)
-priorsP = priors/sum(priors)
-priorsLogs = priorsP
-priorsLogs[priorsIndeces] = priorsP[priorsIndeces] / (1 - priorsP[priorsIndeces])
-B = priorsLogs
-B[priorsIndeces] = log(as.vector(priorsLogs[priorsIndeces]))
 
 # Use occurance counts of context -> tags to build sji strength associations
 NRowSums = rowSums(N, sparseResult=TRUE)
