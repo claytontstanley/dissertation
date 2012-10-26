@@ -11,12 +11,14 @@ library(QuantPsyc)
 library(multicore)
 library(reshape)
 
-res = read.csv(str_c(PATH, "/LogReg-subset-2.csv"))
+#res = read.csv(str_c(PATH, "/LogReg-subset-2.csv"))
+res = read.csv(str_c(PATH, "/LogReg.csv"))
+tags = sqldf('select tag, count(tag) as count from res group by tag order by count desc')
+
 
 logi.hist.plot(res$act, res$targetP, boxp=F, type="hist", col="gray")
+logReg(tags$tag)
 
-tags = sqldf('select tag, count(tag) as count from res group by tag order by count desc')
-tagSubset = tags[100:110,]
 
 logReg = function(tag) {
 	print(str_c("working tag ", tag))
