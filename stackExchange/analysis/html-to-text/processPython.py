@@ -84,6 +84,8 @@ def loadChunks():
 		loadSubset("title/nlp/nlp.csv", "title")
 		loadSubset("tag-subset-1/nlp-huge/nlp-huge.csv", "tag-subset-1")
 		loadSubset("title-subset-1/nlp-huge/nlp-huge.csv", "title-subset-1")
+		loadSubset("tag-subset-4/nlp-huge/nlp-huge.csv", "tag-subset-4")
+		loadSubset("title-subset-4/nlp-huge/nlp-huge.csv", "title-subset-4")
 
 def loadNohtml():
 	with working_directory(_dir):

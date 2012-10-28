@@ -81,6 +81,7 @@
       (create-symlinks 000000 100000 chunk-type 1)
       (create-symlinks 100000 200000 chunk-type 2)
       (create-symlinks 200000 201000 chunk-type 3)
+      (create-symlinks 000000 1000000 chunk-type 4)
       )))
 
 (defun last-dir (dir)
@@ -91,7 +92,7 @@
 (defun create-all-post-ids-csv ()
   (dolist (chunk-type (list 'tag 'title))
     (let ((*huge-p* t)) 
-      (dolist (subset (list 1 2 3))
+      (dolist (subset (list 1 2 3 4))
         (format t "working subset ~a and chunk-type ~a~%" subset chunk-type)
         (let ((dir
                 (format nil "~a-subset-~a/~a" (lowercase chunk-type) subset (make-huge-if-huge *processed-dirname*))))
