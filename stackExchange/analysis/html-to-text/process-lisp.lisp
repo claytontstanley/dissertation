@@ -75,14 +75,33 @@
                   dir
                   id))))
 
+(defclass subset ()
+  ((start-index :reader start-index :initarg :start-index)
+   (end-index :reader end-index :initarg :end-index)
+   (subset-id :reader subset-id :initarg :subset-id)))
+
+(defparameter *subsets*
+  (mapcar
+    (lambda (subset)
+      (destructuring-bind (start-index end-index subset-id) subset
+        (make-instance 'subset
+                       :start-index start-index
+                       :end-index end-index
+                       :subset-id subset-id)))
+    (list
+      ;(list  000000  100000 1)
+      ;(list  100000  200000 2)
+      ;(list  200000  201000 3)
+      ;(list  000000 1000000 4)
+      (list 1000000 1100000 5)
+      )))
+
 (defun create-all-symlinks ()
   (let ((*huge-p* t))
     (dolist (chunk-type (list 'tag 'title))
-      (create-symlinks 000000 100000 chunk-type 1)
-      (create-symlinks 100000 200000 chunk-type 2)
-      (create-symlinks 200000 201000 chunk-type 3)
-      (create-symlinks 000000 1000000 chunk-type 4)
-      )))
+      (dolist (subset *subsets*)
+        (with-slots (start-index end-index subset-id) subset
+          (create-symlinks start-index end-index chunk-type subset-id))))))
 
 (defun last-dir (dir)
   (cl-ppcre:scan-to-strings
@@ -92,7 +111,7 @@
 (defun create-all-post-ids-csv ()
   (dolist (chunk-type (list 'tag 'title))
     (let ((*huge-p* t)) 
-      (dolist (subset (list 1 2 3 4))
+      (dolist (subset (mapcar #'subset-id *subsets*)) 
         (format t "working subset ~a and chunk-type ~a~%" subset chunk-type)
         (let ((dir
                 (format nil "~a-subset-~a/~a" (lowercase chunk-type) subset (make-huge-if-huge *processed-dirname*))))
