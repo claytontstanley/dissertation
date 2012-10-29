@@ -1,3 +1,5 @@
+
+File Summaries:
 LogReg-*-*(-*)?		Testing subset (1st *) on subset (2nd *) training data
 LogReg-2-1-1.csv	Training data is filtered by subset-2
 
