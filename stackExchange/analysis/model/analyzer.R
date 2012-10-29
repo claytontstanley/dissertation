@@ -11,15 +11,6 @@ library(QuantPsyc)
 library(multicore)
 library(reshape)
 
-#res = read.csv(str_c(PATH, "/LogReg-subset-2.csv"))
-res = read.csv(str_c(PATH, "/LogReg.csv"))
-tags = sqldf('select tag, count(tag) as count from res group by tag order by count desc')
-
-
-logi.hist.plot(res$act, res$targetP, boxp=F, type="hist", col="gray")
-logReg(tags$tag)
-
-
 logReg = function(tag) {
 	print(str_c("working tag ", tag))
 	dfSubset = res[res$tag %in% tag,]
@@ -48,6 +39,14 @@ sjiRank = function(row, sji) {
 	temp = temp[temp != 0]
 	return(data.frame(chunkHash=row, chunk=getChunks(row, db), sd=sd(temp), MADZero=mean(abs(temp)), N=length(temp)))
 }
+
+#res = read.csv(str_c(PATH, "/LogReg-subset-2.csv"))
+res = read.csv(str_c(PATH, "/LogReg.csv"))
+tags = sqldf('select tag, count(tag) as count from res group by tag order by count desc')
+
+dev.new()
+logi.hist.plot(res$act, res$targetP, boxp=F, type="hist", col="gray")
+logReg(tags$tag)
 
 break
 
