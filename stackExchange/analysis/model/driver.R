@@ -17,8 +17,6 @@ library(stringr)
 library(popbio)
 library(multicore)
 
-Rprof()
-
 # A few helper functions
 plotHighest = function(subsetIndeces, vals, db) {
 	dev.new()
@@ -67,15 +65,14 @@ source(str_c(PATH, "/model.R"))
 tagDir = "tag-subset-2/nlp-huge"
 titleDir = "title-subset-2/nlp-huge"
 
-#tagDir = "tag/nlp"
-#titleDir = "title/nlp"
+tagDir = "tag/nlp"
+titleDir = "title/nlp"
 
 
 tagFiles = list.files(path=str_c(PATH, "/../html-to-text/", tagDir), recursive=T)
 
 # Run the model for each title/tag pair, and analyse results
 res = do.call(rbind, multicore::mclapply(tagFiles, ratePost, mc.preschedule=F))
-
 
 write.csv(res, file=str_c(PATH, "/LogReg.csv"))
 dev.new()
@@ -110,6 +107,3 @@ write.csv(data.frame(ChunkHash=priorsIndeces, Activation=as.vector(cAct$act[prio
 
 # Save current objects so that they can be referenced from LaTeX document
 save.image(file = str_c(PATH, "/", ".RData"))
-
-Rprof(NULL) 
-summaryRprof() 

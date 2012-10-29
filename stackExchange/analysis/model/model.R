@@ -53,11 +53,11 @@ act = function(context, B, sji) {
 	return(list(act=act, sji=sjiSubset))
 }
 
-priorsCSV = 'tag-priors-subset-1.csv'
-sjiCSV = 'title-chunks-subset-1.csv'
+#priorsCSV = 'tag-priors-subset-4.csv'
+#sjiCSV = 'title-chunks-subset-4.csv'
 
-#priorsCSV = 'tag-priors.csv'
-#sjiCSV = 'title-chunks.csv'
+priorsCSV = 'tag-priors.csv'
+sjiCSV = 'title-chunks.csv'
 
 logRegResultCSV = "/LogReg-subset-2.csv"
 sjiRankResultCSV = "/sjiRank-subset-2.csv"
@@ -68,9 +68,9 @@ sjiRankResultCSV = "/sjiRank-subset-2.csv"
 colClasses=c("character", "integer", "integer")
 priorsFrm = read.csv(str_c(PATH, "/", priorsCSV), header=T, sep=",", colClasses=colClasses)
 
-logRegRes = read.csv(str_c(PATH, "/", logRegResultCSV))
-observedTags = unique(logRegRes$tag)
-priorsFrm = priorsFrm[priorsFrm$Chunk %in% observedTags,]
+#logRegRes = read.csv(str_c(PATH, "/", logRegResultCSV))
+#observedTags = unique(logRegRes$tag)
+#priorsFrm = priorsFrm[priorsFrm$Chunk %in% observedTags,]
 
 priors = with(priorsFrm, sparseVector(i=ChunkHash, x=ChunkCount, length=max(ChunkHash)))
 priorsIndeces = with(priorsFrm, ChunkHash)
@@ -84,7 +84,7 @@ B[priorsIndeces] = log(as.vector(priorsLogs[priorsIndeces]))
 colClasses=c("character", "integer", "character", "integer", "integer")
 chunkFrm = read.csv(str_c(PATH, "/", sjiCSV), header=T, sep=",", colClasses=colClasses)
 
-chunkFrm = chunkFrm[chunkFrm$RightChunk %in% observedTags,]
+#chunkFrm = chunkFrm[chunkFrm$RightChunk %in% observedTags,]
 
 N = with(chunkFrm, sparseMatrix(i=LeftChunkHash, j=RightChunkHash, x=ChunkCount))
 
