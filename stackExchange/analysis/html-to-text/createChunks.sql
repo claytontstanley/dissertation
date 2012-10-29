@@ -19,7 +19,9 @@ drop table if exists sotero.subsets;
 create table if not exists sotero.subsets (
 	Id int(11) not null,
 	Subset varchar(255) binary character set 'utf8' collate utf8_general_ci not null,
-	primary key (Id, Subset)
+	primary key (Id, Subset),
+	INDEX IDIndex (ID ASC),
+	INDEX SubsetIndex (Subset ASC)
  )
 ENGINE = MyISAM
 CHARACTER SET utf8
