@@ -89,11 +89,12 @@
                        :end-index end-index
                        :subset-id subset-id)))
     (list
-      ;(list  000000  100000 1)
-      ;(list  100000  200000 2)
-      ;(list  200000  201000 3)
-      ;(list  000000 1000000 4)
-      (list 1000000 1100000 5)
+      ;(list  000000  100000 1) ; 100k training data
+      ;(list  100000  200000 2) ; 100k test data
+      ;(list  200000  201000 3) ; 1k dataset (not used)
+      ;(list  000000 1000000 4) ; 1M training data
+      ;(list 1000000 1100000 5)  ; 100k test data for 1M training data
+      (list 1000000 1001000 6)  ; 1k test data for 1M training data
       )))
 
 (defun create-all-symlinks ()
@@ -155,11 +156,12 @@
       (let ((cluster-num 1000))
         (loop for src-paths in (group src-paths cluster-num)
               for des-paths in (group des-paths cluster-num)
+              for group = 0 then (1+ group)
               do (let ((src-paths-as-string
                          (format nil "~{~a~^~%~}" src-paths)))
                    (let ((des-paths-as-string
                            (format nil "~{~a~^~%~}" des-paths)))
-                     (format t "sending group of ~a~%" cluster-num)
+                     (format t "sending ~a as group ~a~%" cluster-num group)
                      (with-cwd *_DIR_*
                        (script (format nil "~a '~a' '~a'"
                                        "./create-symlinks.sh"
