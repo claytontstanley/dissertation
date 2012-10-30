@@ -40,13 +40,13 @@ sjiRank = function(row, sji) {
 	return(data.frame(chunkHash=row, chunk=getChunks(row, db), sd=sd(temp), MADZero=mean(abs(temp)), N=length(temp)))
 }
 
-#res = read.csv(str_c(PATH, "/LogReg-subset-2.csv"))
 res = read.csv(str_c(PATH, "/LogReg.csv"))
+#res = read.csv(str_c(PATH, "/LogReg-5-4.csv"))
 tags = sqldf('select tag, count(tag) as count from res group by tag order by count desc')
 
 dev.new()
-logi.hist.plot(res$act, res$targetP, boxp=F, type="hist", col="gray")
-logReg(tags$tag)
+logi.hist.plot(res$rank, res$targetP, boxp=F, type="hist", col="gray")
+#logReg(tags$tag)
 
 break
 

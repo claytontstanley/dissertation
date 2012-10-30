@@ -31,7 +31,7 @@ plotHighest = function(subsetIndeces, vals, db) {
 	axis(1, at=1:topNum, labels=xnames, las=3)
 }
 
-rateVals = function(subsetIndeces, vals, db, observed) {
+rateVals = function(subsetIndeces, vals, observed) {
 	vals = as.vector(vals[subsetIndeces])
 	res = sort(vals, decreasing=T, index.return=T)
 	sortedChunkHashes = subsetIndeces[res$ix]
@@ -42,32 +42,53 @@ rateVals = function(subsetIndeces, vals, db, observed) {
 	sortedChunks = getChunks(sortedChunkHashes, db)
 	#print(sortedChunkHashes)
 	#print(observed)
-	return(data.frame(tag=getChunks(sortedChunkHashes, db), act=res$x[1:cutoff], targetP=targetP))
+	return(data.frame(tag=sortedChunks, act=res$x[1:cutoff], targetP=targetP, rank=1:cutoff))
+}
+
+getObservedContext = function(tagFile) {
+	ret = list()
+	if ( !any(grep("*.csv", tagFile)) ) {
+		observed = readLines(str_c(PATH, "/../html-to-text/", tagDir, "/", tagFile), warn = F)
+		context = readLines(str_c(PATH, "/../html-to-text/", titleDir, "/", tagFile), warn = F)
+		ret = list("observed" = observed, "context" = context)
+	}
+	return(ret)
 }
 
 ratePost = function(tagFile) {
 	res = data.frame()
-	if ( !any(grep("*.csv", tagFile)) ) {
+	if ( length(lst <- getObservedContext(tagFile)) > 0 ) {
 		print(str_c("working tag file ", tagFile))
-		observed = readLines(str_c(PATH, "/../html-to-text/", tagDir, "/", tagFile), warn = F)
-		context = readLines(str_c(PATH, "/../html-to-text/", titleDir, "/", tagFile), warn = F)
-
+		observed = lst$observed
+		context = lst$context
 		cAct = act(getChunkHashes(context, db), B, sji)
-		res = rbind(res, rateVals(priorsIndeces, cAct$act, db, getChunkHashes(observed, db)))
+		res = rbind(res, rateVals(priorsIndeces, cAct$act, getChunkHashes(observed, db)))
 	}
 	return(res)
+}
+
+visPost = function(tagFile) {
+	if ( length(lst <- getObservedContext(tagFile)) > 0 ) {
+		observed = lst$observed
+		context = lst$context
+		cAct = act(getChunkHashes(context, db), B, sji)
+		plotHighest(priorsIndeces, cAct$act, db)
+		title(paste(context, collapse=" "))
+		title(ylab="Total Activation")
+		plotHighest(priorsIndeces, cAct$sji, db)
+		title(str_c(paste(context, collapse=" "), "\n", paste(observed, collapse=" ")))
+		title(ylab="sji Activation")
+	}
 }
 
 # Source the model
 source(str_c(PATH, "/model.R"))
 
 # Determine tag files
-tagDir = "tag-subset-2/nlp-huge"
-titleDir = "title-subset-2/nlp-huge"
-
+#tagDir = "tag-subset-6/nlp-huge"
+#titleDir = "title-subset-6/nlp-huge"
 tagDir = "tag/nlp"
 titleDir = "title/nlp"
-
 
 tagFiles = list.files(path=str_c(PATH, "/../html-to-text/", tagDir), recursive=T)
 
@@ -77,30 +98,6 @@ res = do.call(rbind, multicore::mclapply(tagFiles, ratePost, mc.preschedule=F))
 write.csv(res, file=str_c(PATH, "/LogReg.csv"))
 dev.new()
 logi.hist.plot(res$act, res$targetP, boxp=F, type="hist", col="gray")
-
-
-# Run the model through mockup data, and save results for regression testing
-
-inputFile = str_c(PATH, "/tests.txt")
-con = file(inputFile, open = "r")
-dataList = list()
-while (length(oneLine <- readLines(con, n = 1, warn = FALSE)) > 0) {
-    myVector = (strsplit(oneLine, ","))
-    myVector = myVector[[1]]
-    dataList = c(dataList,list(myVector))
-}
-close(con)
-
-for (run in dataList) {
-	observed = getChunkHashes(c("php", "lisp", "c#"), db)
-	cAct = act(getChunkHashes(run, db), B, sji)
-	plotHighest(priorsIndeces, cAct$act, db)
-	title(paste(run, collapse=" "))
-	title(ylab="Total Activation")
-	plotHighest(priorsIndeces, cAct$sji, db)
-	title(paste(run, collapse=" "))
-	title(ylab="sji Activation")
-}
 
 cAct = act(c(1:5), B, sji)
 write.csv(data.frame(ChunkHash=priorsIndeces, Activation=as.vector(cAct$act[priorsIndeces])), file=str_c(PATH, "/", "Act.csv"))

@@ -59,8 +59,8 @@ act = function(context, B, sji) {
 priorsCSV = 'tag-priors.csv'
 sjiCSV = 'title-chunks.csv'
 
-logRegResultCSV = "/LogReg-subset-2.csv"
-sjiRankResultCSV = "/sjiRank-subset-2.csv"
+#logRegResultCSV = "/LogReg-subset-2.csv"
+#sjiRankResultCSV = "/sjiRank-subset-2.csv"
 
 # Read in table of tag occurance counts; use this to build the base-level activation vector
 # Calculates base levels by using the log odds ratio for each tag.
