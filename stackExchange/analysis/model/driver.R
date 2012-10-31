@@ -47,10 +47,10 @@ rateVals = function(subsetIndeces, act, observed) {
 }
 
 rateVals2 = function(subsetIndeces, act, observed, tagFile) {
-	vals = as.vector(act$sji[subsetIndeces] * 2.24 + B[subsetIndeces])
+	vals = as.vector(act$sji[subsetIndeces] * 2.575 + B[subsetIndeces])
 	res = sort(vals, decreasing=T, index.return=T)
 	sortedChunkHashes = subsetIndeces[res$ix]
-	cutoff = 40
+	cutoff = 400
 	sortedChunkHashes = sortedChunkHashes[1:cutoff]
 	targetP = rep(0, cutoff)
 	targetP[match(observed, sortedChunkHashes)] = 1
@@ -100,10 +100,10 @@ visPost = function(tagFile) {
 source(str_c(PATH, "/model.R"))
 
 # Determine tag files
-#tagDir = "tag-subset-6/nlp-huge"
-#titleDir = "title-subset-6/nlp-huge"
-tagDir = "tag/nlp"
-titleDir = "title/nlp"
+tagDir = "tag-subset-6/nlp-huge"
+titleDir = "title-subset-6/nlp-huge"
+#tagDir = "tag/nlp"
+#titleDir = "title/nlp"
 
 tagFiles = list.files(path=str_c(PATH, "/../html-to-text/", tagDir), recursive=T)
 
