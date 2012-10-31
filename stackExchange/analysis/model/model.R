@@ -48,8 +48,11 @@ getChunks = function(chunkHashes, db) {
 act = function(context, B, sji) {
 	sjiSubset = sji[context,] * W
 	if( length(context) > 1 ) sjiSubset = colMeans(sjiSubset, sparseResult=T)
-	act = B;
-	if( length(context) > 0 ) act = act + sjiSubset
+	if( length(context) == 0) {
+		sjiSubset = B
+		sjiSubset[priorsIndeces] = 0
+	}
+	act = B + sjiSubset
 	return(list(act=act, sji=sjiSubset))
 }
 

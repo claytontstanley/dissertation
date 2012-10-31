@@ -11,13 +11,14 @@ library(QuantPsyc)
 library(multicore)
 library(reshape)
 
-logReg = function(tag) {
-	print(str_c("working tag ", tag))
+logReg = function(tag, res) {
+	print(str_c("working ", length(tag), " tags"))
 	dfSubset = res[res$tag %in% tag,]
 	#dev.new()
 	#logi.hist.plot(dfSubset$act, dfSubset$targetP, boxp=T, type="hist", col="gray")
 	#title(main=tag)
-	mylogit = glm(targetP ~ act, data=dfSubset, family="binomial")
+	mylogit = glm(targetP ~ sji + prior, data=dfSubset, family="binomial")
+	#mylogit = glm(targetP ~ act, data=dfSubset, family="binomial")
 	print(summary(mylogit))
 	tmp = ClassLog(mylogit, dfSubset$targetP)
 	print(tmp) 
@@ -30,8 +31,8 @@ logReg = function(tag) {
 	vals[names(valsSubset)] = valsSubset
 	Ns = c(length(dfSubset[dfSubset$targetP == 1,]$targetP), length(dfSubset[dfSubset$targetP == 0,]$targetP), dim(dfSubset)[1])
 	names(Ns) = c('NTagged', 'NNotTagged', 'N')
-	p = summary(mylogit)$coefficients["act",'Pr(>|z|)']
-	return(with(tmp, data.frame(mcFadden=mcFadden,overall=overall, tag=tag, t(vals), t(Ns), p=p)))
+	#p = summary(mylogit)$coefficients["act",'Pr(>|z|)']
+	#return(with(tmp, data.frame(mcFadden=mcFadden,overall=overall, tag=tag, t(vals), t(Ns), p=p)))
 }
 
 sjiRank = function(row, sji) {
@@ -45,7 +46,7 @@ res = read.csv(str_c(PATH, "/LogReg.csv"))
 tags = sqldf('select tag, count(tag) as count from res group by tag order by count desc')
 
 dev.new()
-logi.hist.plot(res$rank, res$targetP, boxp=F, type="hist", col="gray")
+logi.hist.plot(res$act, res$targetP, boxp=F, type="hist", col="gray")
 #logReg(tags$tag)
 
 break

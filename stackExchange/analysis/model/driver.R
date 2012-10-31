@@ -16,6 +16,7 @@ PATH = dirname(frameFiles[[length(frameFiles)]])
 library(stringr)
 library(popbio)
 library(multicore)
+library(data.table)
 
 # A few helper functions
 plotHighest = function(subsetIndeces, vals, db) {
@@ -31,8 +32,8 @@ plotHighest = function(subsetIndeces, vals, db) {
 	axis(1, at=1:topNum, labels=xnames, las=3)
 }
 
-rateVals = function(subsetIndeces, vals, observed) {
-	vals = as.vector(vals[subsetIndeces])
+rateVals = function(subsetIndeces, act, observed) {
+	vals = as.vector(act$act[subsetIndeces])
 	res = sort(vals, decreasing=T, index.return=T)
 	sortedChunkHashes = subsetIndeces[res$ix]
 	cutoff = 10
@@ -43,6 +44,20 @@ rateVals = function(subsetIndeces, vals, observed) {
 	#print(sortedChunkHashes)
 	#print(observed)
 	return(data.frame(tag=sortedChunks, act=res$x[1:cutoff], targetP=targetP, rank=1:cutoff))
+}
+
+rateVals2 = function(subsetIndeces, act, observed, tagFile) {
+	vals = as.vector(act$sji[subsetIndeces] * 2.24 + B[subsetIndeces])
+	res = sort(vals, decreasing=T, index.return=T)
+	sortedChunkHashes = subsetIndeces[res$ix]
+	cutoff = 40
+	sortedChunkHashes = sortedChunkHashes[1:cutoff]
+	targetP = rep(0, cutoff)
+	targetP[match(observed, sortedChunkHashes)] = 1
+	sortedChunks = getChunks(sortedChunkHashes, db)
+	priors = as.vector(B[sortedChunkHashes])
+	sjis = as.vector(act$sji[sortedChunkHashes])
+	return(data.frame(tag=sortedChunks, sji=sjis, prior=priors, targetP=targetP, act=priors+sjis, tagFile=tagFile))
 }
 
 getObservedContext = function(tagFile) {
@@ -58,11 +73,11 @@ getObservedContext = function(tagFile) {
 ratePost = function(tagFile) {
 	res = data.frame()
 	if ( length(lst <- getObservedContext(tagFile)) > 0 ) {
-		print(str_c("working tag file ", tagFile))
 		observed = lst$observed
 		context = lst$context
+		print(str_c("working tag file ", tagFile))
 		cAct = act(getChunkHashes(context, db), B, sji)
-		res = rbind(res, rateVals(priorsIndeces, cAct$act, getChunkHashes(observed, db)))
+		res = rbind(res, rateVals2(priorsIndeces, cAct, getChunkHashes(observed, db), tagFile))
 	}
 	return(res)
 }
