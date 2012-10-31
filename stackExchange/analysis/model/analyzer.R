@@ -43,7 +43,7 @@ sjiRank = function(row, sji) {
 	return(data.frame(chunkHash=row, chunk=getChunks(row, db), sd=sd(temp), MADZero=mean(abs(temp)), N=length(temp)))
 }
 
-#res = read.csv(str_c(PATH, "/LogReg.csv"))
+res = read.csv(str_c(PATH, "/LogReg.csv"))
 res = read.csv(str_c(PATH, "/LogReg-5-6.csv"))
 #tags = sqldf('select tag, count(tag) as count from res group by tag order by count desc')
 
@@ -51,7 +51,7 @@ res = read.csv(str_c(PATH, "/LogReg-5-6.csv"))
 logRegRes = logReg(res$tag, res)
 res$act = res$sji * logRegRes + res$prior
 dev.new()
-logi.hist.plot(res$act, res$targetP, boxp=F, type="hist", col="gray")
+logi.hist.plot(res$act, res$targetP, boxp=T, type="hist", col="gray")
 
 mylogit2 = glm(targetP ~ act, data=res, family="binomial")
 

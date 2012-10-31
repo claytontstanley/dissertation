@@ -50,7 +50,7 @@ rateVals2 = function(subsetIndeces, act, observed, tagFile) {
 	vals = as.vector(act$sji[subsetIndeces] * 2.575 + B[subsetIndeces])
 	res = sort(vals, decreasing=T, index.return=T)
 	sortedChunkHashes = subsetIndeces[res$ix]
-	cutoff = 400
+	cutoff = min(length(res$ix), 400)
 	sortedChunkHashes = sortedChunkHashes[1:cutoff]
 	targetP = rep(0, cutoff)
 	targetP[match(observed, sortedChunkHashes)] = 1
@@ -108,11 +108,8 @@ titleDir = "title-subset-6/nlp-huge"
 tagFiles = list.files(path=str_c(PATH, "/../html-to-text/", tagDir), recursive=T)
 
 # Run the model for each title/tag pair, and analyse results
-res = do.call(rbind, multicore::mclapply(tagFiles, ratePost, mc.preschedule=F))
-
+res = do.call(rbind, multicore::mclapply(tagFiles, ratePost, mc.preschedule=T))
 write.csv(res, file=str_c(PATH, "/LogReg.csv"))
-dev.new()
-logi.hist.plot(res$act, res$targetP, boxp=F, type="hist", col="gray")
 
 cAct = act(c(1:5), B, sji)
 write.csv(data.frame(ChunkHash=priorsIndeces, Activation=as.vector(cAct$act[priorsIndeces])), file=str_c(PATH, "/", "Act.csv"))
