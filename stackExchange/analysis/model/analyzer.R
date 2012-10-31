@@ -29,10 +29,12 @@ logReg = function(tag, res) {
 	vals = c(rep(0, 4))
 	names(vals) = c("FALSE_0", "TRUE_0", "FALSE_1", "TRUE_1")
 	vals[names(valsSubset)] = valsSubset
+	coeffs = summary(mylogit)$coefficients[,"Estimate"]
 	Ns = c(length(dfSubset[dfSubset$targetP == 1,]$targetP), length(dfSubset[dfSubset$targetP == 0,]$targetP), dim(dfSubset)[1])
 	names(Ns) = c('NTagged', 'NNotTagged', 'N')
 	#p = summary(mylogit)$coefficients["act",'Pr(>|z|)']
 	#return(with(tmp, data.frame(mcFadden=mcFadden,overall=overall, tag=tag, t(vals), t(Ns), p=p)))
+	return(coeffs["sji"]/coeffs["prior"])
 }
 
 sjiRank = function(row, sji) {
@@ -41,13 +43,17 @@ sjiRank = function(row, sji) {
 	return(data.frame(chunkHash=row, chunk=getChunks(row, db), sd=sd(temp), MADZero=mean(abs(temp)), N=length(temp)))
 }
 
-res = read.csv(str_c(PATH, "/LogReg.csv"))
-#res = read.csv(str_c(PATH, "/LogReg-5-4.csv"))
-tags = sqldf('select tag, count(tag) as count from res group by tag order by count desc')
+#res = read.csv(str_c(PATH, "/LogReg.csv"))
+res = read.csv(str_c(PATH, "/LogReg-5-6.csv"))
+#tags = sqldf('select tag, count(tag) as count from res group by tag order by count desc')
 
+
+logRegRes = logReg(res$tag, res)
+res$act = res$sji * logRegRes + res$prior
 dev.new()
 logi.hist.plot(res$act, res$targetP, boxp=F, type="hist", col="gray")
-#logReg(tags$tag)
+
+mylogit2 = glm(targetP ~ act, data=res, family="binomial")
 
 break
 
