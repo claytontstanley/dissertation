@@ -73,7 +73,7 @@ visPost = function(tagFile) {
 		context = lst$context
 		cAct = act(getChunkHashes(context, db), B, sji)
 		plotHighest(priorsIndeces, cAct$act, db)
-		title(paste(context, collapse=" "))
+		title(str_c(paste(context, collapse=" "), "\n", paste(observed, collapse=" ")))
 		title(ylab="Total Activation")
 		plotHighest(priorsIndeces, cAct$sji, db)
 		title(str_c(paste(context, collapse=" "), "\n", paste(observed, collapse=" ")))

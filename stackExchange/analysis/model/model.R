@@ -46,16 +46,16 @@ getChunks = function(chunkHashes, db) {
 
 # Calculate total activation, given base-level activation, sji associations, and context
 act = function(context, B, sji) {
-	sjiSubset = sji[context,]
+	sjiSubset = sji[context,] * W
 	if( length(context) > 1 ) sjiSubset = colMeans(sjiSubset, sparseResult=T)
 	act = B;
 	if( length(context) > 0 ) act = act + sjiSubset
 	return(list(act=act, sji=sjiSubset))
 }
 
+W = 1
 #priorsCSV = 'tag-priors-subset-4.csv'
 #sjiCSV = 'title-chunks-subset-4.csv'
-
 priorsCSV = 'tag-priors.csv'
 sjiCSV = 'title-chunks.csv'
 
@@ -68,10 +68,21 @@ sjiCSV = 'title-chunks.csv'
 colClasses=c("character", "integer", "integer")
 priorsFrm = read.csv(str_c(PATH, "/", priorsCSV), header=T, sep=",", colClasses=colClasses)
 
+# Read in table of context chunk -> tag chunk occurance counts
+colClasses=c("character", "integer", "character", "integer", "integer")
+chunkFrm = read.csv(str_c(PATH, "/", sjiCSV), header=T, sep=",", colClasses=colClasses)
+
+# Perform any filtering on the context and priors frames
+#chunkFrm = chunkFrm[chunkFrm$ChunkCount > 1000,]
+#chunkFrm = chunkFrm[chunkFrm$RightChunk %in% observedTags,]
+#observedTags = unique(chunkFrm$RightChunk)
 #logRegRes = read.csv(str_c(PATH, "/", logRegResultCSV))
 #observedTags = unique(logRegRes$tag)
+#observedTags = priorsFrm$Chunk[1:2000]
+#observedTags = priorsFrm$Chunk
 #priorsFrm = priorsFrm[priorsFrm$Chunk %in% observedTags,]
 
+# Convert tag occurance counts to base level activations, and place in a sparse vector
 priors = with(priorsFrm, sparseVector(i=ChunkHash, x=ChunkCount, length=max(ChunkHash)))
 priorsIndeces = with(priorsFrm, ChunkHash)
 priorsP = priors/sum(priors)
@@ -79,14 +90,6 @@ priorsLogs = priorsP
 priorsLogs[priorsIndeces] = priorsP[priorsIndeces] / (1 - priorsP[priorsIndeces])
 B = priorsLogs
 B[priorsIndeces] = log(as.vector(priorsLogs[priorsIndeces]))
-
-# Read in table of context chunk -> tag chunk occurance counts, and place in a sparse matrix
-colClasses=c("character", "integer", "character", "integer", "integer")
-chunkFrm = read.csv(str_c(PATH, "/", sjiCSV), header=T, sep=",", colClasses=colClasses)
-
-#chunkFrm = chunkFrm[chunkFrm$RightChunk %in% observedTags,]
-
-N = with(chunkFrm, sparseMatrix(i=LeftChunkHash, j=RightChunkHash, x=ChunkCount))
 
 # Construct the db of chunk (character) <-> chunkHash (integer) associations
 # Use a named vector, so that chunk lookups by chunkHash are O(1), and
@@ -98,8 +101,8 @@ chunkHashFrame = chunkHashFrame[!duplicated(chunkHashFrame$chunkHash),]
 db = chunkHashFrame$chunkHash
 names(db) = chunkHashFrame$chunk
 
-
 # Use occurance counts of context -> tags to build sji strength associations
+N = with(chunkFrm, sparseMatrix(i=LeftChunkHash, j=RightChunkHash, x=ChunkCount))
 NRowSums = rowSums(N, sparseResult=TRUE)
 NColSums = colSums(N, sparseResult=TRUE)
 NSum = sum(N)
