@@ -59,13 +59,16 @@ call sotero.createChunkSubset(theSubset);
 select 
         `chunks`.`Chunk` AS `Chunk`,
         `chunks`.`ChunkHash` AS `ChunkHash`,
-        count(`chunks`.`ChunkHash`) AS `ChunkCount`
+        count(`chunks`.`ChunkHash`) AS `ChunkCount`,
+	chunks.chunktype as ChunkType
     from
         `chunksubset` as chunks
     where
-        (`chunks`.`ChunkType` = 'Tag')
-    group by `chunks`.`ChunkHash`
-    order by count(`chunks`.`ChunkHash`) desc , `chunks`.`ChunkHash`;
+        	(`chunks`.`ChunkType` = 'Tag')
+	or
+		chunks.chunktype = 'title'
+	group by chunktype, `chunks`.`ChunkHash`
+	order by count(`chunks`.`ChunkHash`) desc , `chunks`.`ChunkHash`;
 drop view sotero.chunksubset;
 drop view sotero.idsubset;
 END;
