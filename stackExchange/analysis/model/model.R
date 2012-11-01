@@ -21,6 +21,7 @@ PATH = dirname(frameFiles[[length(frameFiles)]])
 library(Matrix)
 library(stringr)
 library(fastmatch)
+library(sqldf)
 
 # And helper functions
 sdiv <- function(X, Y, names=dimnames(X)) {
@@ -57,10 +58,11 @@ act = function(context, B, sji) {
 }
 
 W = 1
-#priorsCSV = 'tag-priors-subset-4.csv'
-#sjiCSV = 'title-chunks-subset-4.csv'
-priorsCSV = 'tag-priors.csv'
-sjiCSV = 'title-chunks.csv'
+contextWeightsCSV = 'contextWeights.csv'
+priorsCSV = 'tag-priors-subset-4.csv'
+sjiCSV = 'title-chunks-subset-4.csv'
+#priorsCSV = 'tag-priors.csv'
+#sjiCSV = 'title-chunks.csv'
 
 #logRegResultCSV = "/LogReg-subset-2.csv"
 #sjiRankResultCSV = "/sjiRank-subset-2.csv"
@@ -76,6 +78,11 @@ contextFrm = occurancesFrm[occurancesFrm$ChunkType == "title",]
 # Read in table of context chunk -> tag chunk occurance counts
 colClasses=c("character", "integer", "character", "integer", "integer")
 chunkFrm = read.csv(str_c(PATH, "/", sjiCSV), header=T, sep=",", colClasses=colClasses)
+
+# Read in table for attentional context weighting
+colClasses=c("character", "character", "numeric", "numeric")
+contextWeightsFrm = read.csv(str_c(PATH, "/", contextWeightsCSV), header=T, sep=",", colClasses=colClasses)
+filteredFrm = sqldf('select * from contextWeightsFrm where N > 30')
 
 # Perform any filtering on the context and priors frames
 #chunkFrm = chunkFrm[chunkFrm$ChunkCount > 1000,]
@@ -116,6 +123,9 @@ NSum = sum(N)
 NProdSums = with(summary(N), sparseMatrix(i=i, j=j, x=rowSums(N)[i] * colSums(N)[j]))
 NCellSums = NSum * sdiv(N, NProdSums)
 sji = with(summary(NCellSums), sparseMatrix(i=i, j=j, x=log(x)))
+
+# Build a sparse vector of context attentional weighting
+contextWeights = with(filteredFrm, sparseVector(i=ChunkHash, x=sdev, length=max(ChunkHash)))
 
 # Write relevant model component values to files, so that changes to the model can be regression tested (using git diff).
 write.csv(summary(sji), file=str_c(PATH, "/", "sji.csv"))

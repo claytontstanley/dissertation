@@ -37,6 +37,18 @@ logReg = function(tag, res) {
 	return(coeffs["sji"]/coeffs["prior"])
 }
 
+contextWeight = function(index) {
+	count = sum(N[index,priorsIndeces])
+	sdev = sd(N[index,priorsIndeces]) / count
+	data.frame(Chunk=getChunks(index, db), ChunkHash=index, sdev=sdev, N=count)
+}
+
+generateContextWeights = function () {
+	filteredIndeces = contextFrm$ChunkHash[contextFrm$ChunkCount > 1]
+	contextWeightsFrm = do.call(rbind, mclapply(filteredIndeces, contextWeight, mc.cores = 4, mc.preschedule=T))
+	write.csv(contextWeightsFrm, file=str_c(PATH, "/", contextWeightsCSV))	
+}
+
 sjiRank = function(row, sji) {
 	temp = as.numeric(sji[row,priorsIndeces])
 	temp = temp[temp != 0]
