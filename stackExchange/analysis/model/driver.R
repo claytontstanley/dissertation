@@ -102,8 +102,8 @@ source(str_c(PATH, "/model.R"))
 # Determine tag files
 tagDir = "tag-subset-6/nlp-huge"
 titleDir = "title-subset-6/nlp-huge"
-#tagDir = "tag/nlp"
-#titleDir = "title/nlp"
+tagDir = "tag/nlp"
+titleDir = "title/nlp"
 
 tagFiles = list.files(path=str_c(PATH, "/../html-to-text/", tagDir), recursive=T)
 

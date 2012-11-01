@@ -57,10 +57,10 @@ act = function(context, B, sji) {
 }
 
 W = 1
-priorsCSV = 'tag-priors-subset-4.csv'
-sjiCSV = 'title-chunks-subset-4.csv'
-#priorsCSV = 'tag-priors.csv'
-#sjiCSV = 'title-chunks.csv'
+#priorsCSV = 'tag-priors-subset-4.csv'
+#sjiCSV = 'title-chunks-subset-4.csv'
+priorsCSV = 'tag-priors.csv'
+sjiCSV = 'title-chunks.csv'
 
 #logRegResultCSV = "/LogReg-subset-2.csv"
 #sjiRankResultCSV = "/sjiRank-subset-2.csv"
@@ -68,8 +68,10 @@ sjiCSV = 'title-chunks-subset-4.csv'
 # Read in table of tag occurance counts; use this to build the base-level activation vector
 # Calculates base levels by using the log odds ratio for each tag.
 # Does not take into account the fact that tag likelihoods change over time.
-colClasses=c("character", "integer", "integer")
-priorsFrm = read.csv(str_c(PATH, "/", priorsCSV), header=T, sep=",", colClasses=colClasses)
+colClasses=c("character", "integer", "integer", "character")
+occurancesFrm = read.csv(str_c(PATH, "/", priorsCSV), header=T, sep=",", colClasses=colClasses)
+priorsFrm = occurancesFrm[occurancesFrm$ChunkType == "tag",]
+contextFrm = occurancesFrm[occurancesFrm$ChunkType == "title",]
 
 # Read in table of context chunk -> tag chunk occurance counts
 colClasses=c("character", "integer", "character", "integer", "integer")
@@ -78,6 +80,8 @@ chunkFrm = read.csv(str_c(PATH, "/", sjiCSV), header=T, sep=",", colClasses=colC
 # Perform any filtering on the context and priors frames
 #chunkFrm = chunkFrm[chunkFrm$ChunkCount > 1000,]
 #chunkFrm = chunkFrm[chunkFrm$RightChunk %in% observedTags,]
+#contetWeightsFiltered = sqldf('select * from contextWeights where N > 30 order by N')
+#chunkFrm = chunkFrm[chunkFrm$LeftChunk %in% contextWeightsFiltered$chunk]
 #observedTags = unique(chunkFrm$RightChunk)
 #logRegRes = read.csv(str_c(PATH, "/", logRegResultCSV))
 #observedTags = unique(logRegRes$tag)
