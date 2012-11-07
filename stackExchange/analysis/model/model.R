@@ -45,24 +45,50 @@ getChunks = function(chunkHashes, db) {
 	return(names(db[fmatch(chunkHashes, db)]))
 }
 
+makeDb = function(frm) {
+	frm = frm[!duplicated(frm$chunkHash),]
+	db = frm$chunkHash
+	names(db) = frm$chunk
+	db
+}
+
+makeSparseTagVector = function(vals) {
+	ret = B
+	ret[priorsIndeces] = vals
+	ret
+}
+
 # Calculate total activation, given base-level activation, sji associations, and context
 act = function(context, B, sji) {
-	sjiSubset = sji[context,] * W
-	if( length(context) > 1 ) sjiSubset = colMeans(sjiSubset, sparseResult=T)
-	if( length(context) == 0) {
-		sjiSubset = B
-		sjiSubset[priorsIndeces] = 0
+	weightsSubset = as.vector(contextWeights[context])
+	if( sum(weightsSubset) > 0) {
+		weightsSubset = weightsSubset / sum(weightsSubset)
 	}
-	act = B + sjiSubset
+	print(weightsSubset)
+	print(context)
+	weightsSubset = rep(1/length(context), length(context))
+	sjiSubset = as.matrix(sji[context,priorsIndeces])
+	if( length(context) > 1 ) {
+		sjiSubset = as.vector(t(sjiSubset) %*% weightsSubset)
+	} 
+	if( length(context) == 1) {
+		sjiSubset = as.vector(sjiSubset * weightsSubset)
+	}
+	if( length(context) == 0) {
+		sjiSubset = rep(0, length(priorsIndeces))
+	}
+	sjiSubset = sjiSubset * W
+	sjiSubset = makeSparseTagVector(sjiSubset)
+	act = makeSparseTagVector(as.vector(B[priorsIndeces]) + as.vector(sjiSubset[priorsIndeces]))
 	return(list(act=act, sji=sjiSubset))
 }
 
 W = 1
 contextWeightsCSV = 'contextWeights.csv'
-priorsCSV = 'tag-priors-subset-4.csv'
-sjiCSV = 'title-chunks-subset-4.csv'
-#priorsCSV = 'tag-priors.csv'
-#sjiCSV = 'title-chunks.csv'
+#priorsCSV = 'tag-priors-subset-4.csv'
+#sjiCSV = 'title-chunks-subset-4.csv'
+priorsCSV = 'tag-priors.csv'
+sjiCSV = 'title-chunks.csv'
 
 #logRegResultCSV = "/LogReg-subset-2.csv"
 #sjiRankResultCSV = "/sjiRank-subset-2.csv"
@@ -80,9 +106,9 @@ colClasses=c("character", "integer", "character", "integer", "integer")
 chunkFrm = read.csv(str_c(PATH, "/", sjiCSV), header=T, sep=",", colClasses=colClasses)
 
 # Read in table for attentional context weighting
-colClasses=c("character", "character", "numeric", "numeric")
+colClasses=c("character", "character", "integer", "numeric", "numeric")
 contextWeightsFrm = read.csv(str_c(PATH, "/", contextWeightsCSV), header=T, sep=",", colClasses=colClasses)
-filteredFrm = sqldf('select * from contextWeightsFrm where N > 30')
+filteredFrm = contextWeightsFrm[contextWeightsFrm$N > 30,]
 
 # Perform any filtering on the context and priors frames
 #chunkFrm = chunkFrm[chunkFrm$ChunkCount > 1000,]
@@ -105,15 +131,15 @@ priorsLogs[priorsIndeces] = priorsP[priorsIndeces] / (1 - priorsP[priorsIndeces]
 B = priorsLogs
 B[priorsIndeces] = log(as.vector(priorsLogs[priorsIndeces]))
 
+
+
 # Construct the db of chunk (character) <-> chunkHash (integer) associations
 # Use a named vector, so that chunk lookups by chunkHash are O(1), and
 # chunkHash lookups by chunk are log(n) (when using the fmatch function)
-chunk = with(chunkFrm, rbind(data.frame(chunk=LeftChunk), data.frame(chunk=RightChunk)))
-chunkHash = with(chunkFrm, rbind(data.frame(chunkHash=LeftChunkHash), data.frame(chunkHash=RightChunkHash)))
-chunkHashFrame = data.frame(cbind(chunk, chunkHash))
-chunkHashFrame = chunkHashFrame[!duplicated(chunkHashFrame$chunkHash),]
-db = chunkHashFrame$chunkHash
-names(db) = chunkHashFrame$chunk
+leftFrm = with(chunkFrm, cbind(data.frame(chunk=LeftChunk), data.frame(chunkHash=LeftChunkHash)))
+rightFrm = with(chunkFrm, cbind(data.frame(chunk=RightChunk), data.frame(chunkHash=RightChunkHash)))
+dbContext = makeDb(leftFrm)
+db = makeDb(rbind(leftFrm, rightFrm))
 
 # Use occurance counts of context -> tags to build sji strength associations
 N = with(chunkFrm, sparseMatrix(i=LeftChunkHash, j=RightChunkHash, x=ChunkCount))

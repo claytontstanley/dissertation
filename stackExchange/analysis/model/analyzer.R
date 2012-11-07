@@ -56,7 +56,7 @@ sjiRank = function(row, sji) {
 }
 
 res = read.csv(str_c(PATH, "/LogReg.csv"))
-res = read.csv(str_c(PATH, "/LogReg-5-6.csv"))
+#res = read.csv(str_c(PATH, "/LogReg-5-6.csv"))
 #tags = sqldf('select tag, count(tag) as count from res group by tag order by count desc')
 
 

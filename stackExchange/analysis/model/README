@@ -3,9 +3,7 @@ File Summaries:
 LogReg-*-*(-*)?		Testing subset (1st *) on subset (2nd *) training data
 LogReg-2-1-1.csv	Training data is filtered by subset-2
 
-LogReg-5-6.csv		unfiltered
-LogReg-5-6-1.csv	filtered on N > 10
-LogReg-5-6-2.csv	filtered on N > 100
-LogReg-5-6-3.csv	filtered on N > 1000
+LogReg-6-4-4.csv	Attentional weighting; not normalized
+LogReg-6-4-5.csv	Attentional weighting; normalized
 
 

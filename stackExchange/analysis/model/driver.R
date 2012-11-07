@@ -76,7 +76,7 @@ ratePost = function(tagFile) {
 		observed = lst$observed
 		context = lst$context
 		print(str_c("working tag file ", tagFile))
-		cAct = act(getChunkHashes(context, db), B, sji)
+		cAct = act(getChunkHashes(context, dbContext), B, sji)
 		res = rbind(res, rateVals2(priorsIndeces, cAct, getChunkHashes(observed, db), tagFile))
 	}
 	return(res)
@@ -86,7 +86,7 @@ visPost = function(tagFile) {
 	if ( length(lst <- getObservedContext(tagFile)) > 0 ) {
 		observed = lst$observed
 		context = lst$context
-		cAct = act(getChunkHashes(context, db), B, sji)
+		cAct = act(getChunkHashes(context, dbContext), B, sji)
 		plotHighest(priorsIndeces, cAct$act, db)
 		title(str_c(paste(context, collapse=" "), "\n", paste(observed, collapse=" ")))
 		title(ylab="Total Activation")
@@ -100,15 +100,17 @@ visPost = function(tagFile) {
 source(str_c(PATH, "/model.R"))
 
 # Determine tag files
-tagDir = "tag-subset-6/nlp-huge"
-titleDir = "title-subset-6/nlp-huge"
+#tagDir = "tag-subset-6/nlp-huge"
+#titleDir = "title-subset-6/nlp-huge"
 tagDir = "tag/nlp"
 titleDir = "title/nlp"
 
 tagFiles = list.files(path=str_c(PATH, "/../html-to-text/", tagDir), recursive=T)
 
 # Run the model for each title/tag pair, and analyse results
-res = do.call(rbind, multicore::mclapply(tagFiles, ratePost, mc.preschedule=T))
+#res = do.call(rbind, parallel::mclapply(tagFiles, ratePost, mc.cores=8, mc.preschedule=T))
+res = do.call(rbind, lapply(tagFiles, ratePost))
+
 write.csv(res, file=str_c(PATH, "/LogReg.csv"))
 
 cAct = act(c(1:5), B, sji)
@@ -116,3 +118,5 @@ write.csv(data.frame(ChunkHash=priorsIndeces, Activation=as.vector(cAct$act[prio
 
 # Save current objects so that they can be referenced from LaTeX document
 save.image(file = str_c(PATH, "/", ".RData"))
+
+print("done")
