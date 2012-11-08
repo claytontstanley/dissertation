@@ -39,6 +39,12 @@ logReg = function(tag, res) {
 
 contextWeight = function(index) {
 	count = sum(N[index,priorsIndeces])
+	print(count)
+	dev.new()
+	hist(as.vector(N[index, priorsIndeces]) / count, xlab="", ylab="", main="", ylim=c(0,50), xlim=c(0,.4))
+	title(xlab="Nji/Nj")
+	title(ylab="Frequency")
+	title(str_c("Entropy distribution for context chunk: ", getChunks(index, db)))
 	sdev = sd(N[index,priorsIndeces]) / count
 	data.frame(Chunk=getChunks(index, db), ChunkHash=index, sdev=sdev, N=count)
 }
@@ -61,20 +67,47 @@ res = read.csv(str_c(PATH, "/LogReg.csv"))
 
 
 logRegRes = logReg(res$tag, res)
+W = logRegRes
 res$act = res$sji * logRegRes + res$prior
+
+#mylogit2 = glm(targetP ~ act, data=res, family="binomial")
+
 dev.new()
 logi.hist.plot(res$act, res$targetP, boxp=T, type="hist", col="gray")
 
-mylogit2 = glm(targetP ~ act, data=res, family="binomial")
+visPost(tagFiles[2])
+visPost(tagFiles[40])
+visPost(tagFiles[120])
 
-break
+descripts = c()
+descripts["sjiCells"] = nnzero(sji)
+descripts["sjiObservations"] = sum(sji)
+descripts["sjiDensity"] = nnzero(sji) / prod(dim(sji))
+descripts["tagCells"] = nnzero(priors)
+descripts["tagObservations"] = sum(priors)
+descripts["tagDensity"] = nnzero(priors) / length(priors)
+descriptsFrm = data.frame(descripts)
 
-leftChunkHashes=unique(chunkFrm$LeftChunkHash)
-sjiRankRes = do.call(rbind, multicore::mclapply(leftChunkHashes, function(hash) sjiRank(hash, sji)))
+dev.new()
+hist(as.vector(B[priorsIndeces]))
 
-lst = as.list(c(1:100))
-lst = lapply(lst, function(row) tags[row,]$tag)
-dFrame = do.call(rbind, multicore::mclapply(lst, logReg))
+dev.new()
+plot(1:length(priorsIndeces), sort(as.vector(B[priorsIndeces]), decreasing=T))
+
+dev.new()
+hist(with(summary(sji), x))
+
+lapply(getChunkHashes(c("php", "the", "?", "lisp"), db), contextWeight)
+
+dev.new()
+hist(as.vector(contextWeights[contextIndeces]))
+
+dev.new()
+plot(log(as.vector(NRowSums[contextIndeces])), contextWeights[contextIndeces])
+
+
+
+
 
 
 

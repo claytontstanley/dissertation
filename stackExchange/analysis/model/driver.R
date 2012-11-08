@@ -29,7 +29,7 @@ plotHighest = function(subsetIndeces, vals, db) {
 	xnames = getChunks(x, db)
 	y = res$x[1:topNum]
 	plot(1:topNum, y, xaxt="n", ann=F)
-	axis(1, at=1:topNum, labels=xnames, las=3)
+	axis(1, at=1:topNum, labels=xnames, las=3, cex.axis=.8)
 }
 
 rateVals = function(subsetIndeces, act, observed) {
@@ -88,22 +88,22 @@ visPost = function(tagFile) {
 		context = lst$context
 		cAct = act(getChunkHashes(context, dbContext), B, sji)
 		plotHighest(priorsIndeces, cAct$act, db)
-		title(str_c(paste(context, collapse=" "), "\n", paste(observed, collapse=" ")))
+		title(str_c(paste(context, collapse=" "), "\n", paste(observed, collapse=" ")), cex.main=.9)
 		title(ylab="Total Activation")
 		plotHighest(priorsIndeces, cAct$sji, db)
-		title(str_c(paste(context, collapse=" "), "\n", paste(observed, collapse=" ")))
+		title(str_c(paste(context, collapse=" "), "\n", paste(observed, collapse=" ")), cex.main=.9)
 		title(ylab="sji Activation")
 	}
 }
 
 # Source the model
-source(str_c(PATH, "/model.R"))
+#source(str_c(PATH, "/model.R"))
 
 # Determine tag files
-#tagDir = "tag-subset-6/nlp-huge"
-#titleDir = "title-subset-6/nlp-huge"
-tagDir = "tag/nlp"
-titleDir = "title/nlp"
+tagDir = "tag-subset-6/nlp-huge"
+titleDir = "title-subset-6/nlp-huge"
+#tagDir = "tag/nlp"
+#titleDir = "title/nlp"
 
 tagFiles = list.files(path=str_c(PATH, "/../html-to-text/", tagDir), recursive=T)
 

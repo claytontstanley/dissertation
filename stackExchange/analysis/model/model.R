@@ -61,12 +61,12 @@ makeSparseTagVector = function(vals) {
 # Calculate total activation, given base-level activation, sji associations, and context
 act = function(context, B, sji) {
 	weightsSubset = as.vector(contextWeights[context])
-	if( sum(weightsSubset) > 0) {
-		weightsSubset = weightsSubset / sum(weightsSubset)
-	}
+	#if( sum(weightsSubset) > 0) {
+	#	weightsSubset = weightsSubset / sum(weightsSubset)
+	#}
 	print(weightsSubset)
 	print(context)
-	weightsSubset = rep(1/length(context), length(context))
+	#weightsSubset = rep(1/length(context), length(context))
 	sjiSubset = as.matrix(sji[context,priorsIndeces])
 	if( length(context) > 1 ) {
 		sjiSubset = as.vector(t(sjiSubset) %*% weightsSubset)
@@ -85,10 +85,10 @@ act = function(context, B, sji) {
 
 W = 1
 contextWeightsCSV = 'contextWeights.csv'
-#priorsCSV = 'tag-priors-subset-4.csv'
-#sjiCSV = 'title-chunks-subset-4.csv'
-priorsCSV = 'tag-priors.csv'
-sjiCSV = 'title-chunks.csv'
+priorsCSV = 'tag-priors-subset-4.csv'
+sjiCSV = 'title-chunks-subset-4.csv'
+#priorsCSV = 'tag-priors.csv'
+#sjiCSV = 'title-chunks.csv'
 
 #logRegResultCSV = "/LogReg-subset-2.csv"
 #sjiRankResultCSV = "/sjiRank-subset-2.csv"
@@ -151,6 +151,7 @@ NCellSums = NSum * sdiv(N, NProdSums)
 sji = with(summary(NCellSums), sparseMatrix(i=i, j=j, x=log(x)))
 
 # Build a sparse vector of context attentional weighting
+contextIndeces = with(filteredFrm, ChunkHash)
 contextWeights = with(filteredFrm, sparseVector(i=ChunkHash, x=sdev, length=max(ChunkHash)))
 
 # Write relevant model component values to files, so that changes to the model can be regression tested (using git diff).
