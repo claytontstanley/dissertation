@@ -47,7 +47,7 @@ rateVals = function(subsetIndeces, act, observed) {
 }
 
 rateVals2 = function(subsetIndeces, act, observed, tagFile) {
-	vals = as.vector(act$sji[subsetIndeces] * 2.575 + B[subsetIndeces])
+	vals = as.vector(act$sji[subsetIndeces] * 320 + B[subsetIndeces])
 	res = sort(vals, decreasing=T, index.return=T)
 	sortedChunkHashes = subsetIndeces[res$ix]
 	cutoff = min(length(res$ix), 400)
@@ -104,6 +104,8 @@ tagDir = "tag-subset-6/nlp-huge"
 titleDir = "title-subset-6/nlp-huge"
 #tagDir = "tag/nlp"
 #titleDir = "title/nlp"
+W = 1
+
 
 tagFiles = list.files(path=str_c(PATH, "/../html-to-text/", tagDir), recursive=T)
 
