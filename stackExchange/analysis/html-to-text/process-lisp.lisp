@@ -93,8 +93,9 @@
       ;(list  100000  200000 2) ; 100k test data
       ;(list  200000  201000 3) ; 1k dataset (not used)
       ;(list  000000 1000000 4) ; 1M training data
-      ;(list 1000000 1100000 5)  ; 100k test data for 1M training data
-      (list 1000000 1001000 6)  ; 1k test data for 1M training data
+      ;(list 1000000 1100000 5) ; 100k test data for 1M training data
+      (list 1000000 1001000 6) ; 1k test data for 1M training data
+      (list 1001000 1002000 7)  ; 2nd 1k test data for 1M training data
       )))
 
 (defun create-all-symlinks ()
