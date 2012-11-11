@@ -47,17 +47,27 @@ rateVals = function(subsetIndeces, act, observed) {
 }
 
 rateVals2 = function(subsetIndeces, act, observed, tagFile) {
-	vals = as.vector(act$sji[subsetIndeces] * 320 + B[subsetIndeces])
+	vals = as.vector(act$sji[subsetIndeces] * 1.3 + B[subsetIndeces])
 	res = sort(vals, decreasing=T, index.return=T)
 	sortedChunkHashes = subsetIndeces[res$ix]
-	cutoff = min(length(res$ix), 400)
+	cutoff = min(length(res$ix), 1000)
+	revCutoff = length(res$ix) - cutoff + 1
+	#sortedChunkHashes = union(sortedChunkHashes[1:cutoff], sortedChunkHashes[revCutoff:length(sortedChunkHashes)])
 	sortedChunkHashes = sortedChunkHashes[1:cutoff]
-	targetP = rep(0, cutoff)
+	sortedChunkHashes = union(sortedChunkHashes, observed)
+	targetP = rep(0, length(sortedChunkHashes))
+	target2P = targetP
+	observedVals = sort(vals[match(observed, subsetIndeces)], decreasing=T, index.return=T)
+	print(observedVals)
+	print(observed)
+	topValHash = observed[observedVals$ix[1]]
+	print(topValHash)
 	targetP[match(observed, sortedChunkHashes)] = 1
+	target2P[match(topValHash, sortedChunkHashes)] = 1
 	sortedChunks = getChunks(sortedChunkHashes, db)
 	priors = as.vector(B[sortedChunkHashes])
 	sjis = as.vector(act$sji[sortedChunkHashes])
-	return(data.frame(tag=sortedChunks, sji=sjis, prior=priors, targetP=targetP, act=priors+sjis, tagFile=tagFile))
+	return(data.frame(tag=sortedChunks, sji=sjis, prior=priors, targetP=targetP, target2P=target2P, act=priors+sjis, tagFile=tagFile))
 }
 
 getObservedContext = function(tagFile) {
@@ -97,13 +107,13 @@ visPost = function(tagFile) {
 }
 
 # Source the model
-#source(str_c(PATH, "/model.R"))
+source(str_c(PATH, "/model.R"))
 
 # Determine tag files
 tagDir = "tag-subset-6/nlp-huge"
 titleDir = "title-subset-6/nlp-huge"
-#tagDir = "tag/nlp"
-#titleDir = "title/nlp"
+tagDir = "tag/nlp"
+titleDir = "title/nlp"
 W = 1
 
 

@@ -64,9 +64,9 @@ act = function(context, B, sji) {
 	#if( sum(weightsSubset) > 0) {
 	#	weightsSubset = weightsSubset / sum(weightsSubset)
 	#}
+	#weightsSubset = rep(1/length(context), length(context))
 	print(weightsSubset)
 	print(context)
-	#weightsSubset = rep(1/length(context), length(context))
 	sjiSubset = as.matrix(sji[context,priorsIndeces])
 	if( length(context) > 1 ) {
 		sjiSubset = as.vector(t(sjiSubset) %*% weightsSubset)
@@ -87,8 +87,8 @@ W = 1
 contextWeightsCSV = 'contextWeights.csv'
 priorsCSV = 'tag-priors-subset-4.csv'
 sjiCSV = 'title-chunks-subset-4.csv'
-#priorsCSV = 'tag-priors.csv'
-#sjiCSV = 'title-chunks.csv'
+priorsCSV = 'tag-priors.csv'
+sjiCSV = 'title-chunks.csv'
 
 #logRegResultCSV = "/LogReg-subset-2.csv"
 #sjiRankResultCSV = "/sjiRank-subset-2.csv"
@@ -100,15 +100,20 @@ colClasses=c("character", "integer", "integer", "character")
 occurancesFrm = read.csv(str_c(PATH, "/", priorsCSV), header=T, sep=",", colClasses=colClasses)
 priorsFrm = occurancesFrm[occurancesFrm$ChunkType == "tag",]
 contextFrm = occurancesFrm[occurancesFrm$ChunkType == "title",]
+contextIndeces = with(contextFrm, ChunkHash)
+priorsIndeces = with(priorsFrm, ChunkHash)
 
 # Read in table of context chunk -> tag chunk occurance counts
 colClasses=c("character", "integer", "character", "integer", "integer")
 chunkFrm = read.csv(str_c(PATH, "/", sjiCSV), header=T, sep=",", colClasses=colClasses)
 
 # Read in table for attentional context weighting
-colClasses=c("character", "character", "integer", "numeric", "numeric")
+colClasses=c("character", "character", "integer", "numeric", "numeric", "numeric")
 contextWeightsFrm = read.csv(str_c(PATH, "/", contextWeightsCSV), header=T, sep=",", colClasses=colClasses)
-filteredFrm = contextWeightsFrm[contextWeightsFrm$N > 30,]
+contextWeightsFrm$logEntropy = 1 - contextWeightsFrm$H / max(contextWeightsFrm$H)
+contextWeightsFrm$entropy = 1 - exp(contextWeightsFrm$H) / exp(max(contextWeightsFrm$H))
+filteredFrm = contextWeightsFrm[contextWeightsFrm$N > 0,]
+#filteredFrm = filteredFrm[filteredFrm$logEntropy > .1,]
 
 # Perform any filtering on the context and priors frames
 #chunkFrm = chunkFrm[chunkFrm$ChunkCount > 1000,]
@@ -124,14 +129,11 @@ filteredFrm = contextWeightsFrm[contextWeightsFrm$N > 30,]
 
 # Convert tag occurance counts to base level activations, and place in a sparse vector
 priors = with(priorsFrm, sparseVector(i=ChunkHash, x=ChunkCount, length=max(ChunkHash)))
-priorsIndeces = with(priorsFrm, ChunkHash)
 priorsP = priors/sum(priors)
 priorsLogs = priorsP
 priorsLogs[priorsIndeces] = priorsP[priorsIndeces] / (1 - priorsP[priorsIndeces])
 B = priorsLogs
 B[priorsIndeces] = log(as.vector(priorsLogs[priorsIndeces]))
-
-
 
 # Construct the db of chunk (character) <-> chunkHash (integer) associations
 # Use a named vector, so that chunk lookups by chunkHash are O(1), and
@@ -151,8 +153,8 @@ NCellSums = NSum * sdiv(N, NProdSums)
 sji = with(summary(NCellSums), sparseMatrix(i=i, j=j, x=log(x)))
 
 # Build a sparse vector of context attentional weighting
-contextIndeces = with(filteredFrm, ChunkHash)
-contextWeights = with(filteredFrm, sparseVector(i=ChunkHash, x=sdev, length=max(ChunkHash)))
+contextWeightsIndeces = with(filteredFrm, ChunkHash)
+contextWeights = with(filteredFrm, sparseVector(i=ChunkHash, x=logEntropy, length=max(ChunkHash)))
 
 # Write relevant model component values to files, so that changes to the model can be regression tested (using git diff).
 write.csv(summary(sji), file=str_c(PATH, "/", "sji.csv"))

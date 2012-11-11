@@ -39,14 +39,20 @@ logReg = function(tag, res) {
 
 contextWeight = function(index) {
 	count = sum(N[index,priorsIndeces])
-	print(count)
-	dev.new()
-	hist(as.vector(N[index, priorsIndeces]) / count, xlab="", ylab="", main="", ylim=c(0,50), xlim=c(0,.4))
-	title(xlab="Nji/Nj")
-	title(ylab="Frequency")
-	title(str_c("Entropy distribution for context chunk: ", getChunks(index, db)))
-	sdev = sd(N[index,priorsIndeces]) / count
-	data.frame(Chunk=getChunks(index, db), ChunkHash=index, sdev=sdev, N=count)
+	ps = N[index, priorsIndeces] / count
+	ps = ps[ps != 0]
+	sdev = sd(ps)
+	Hs = ps * log(ps)
+	H = -sum(Hs)
+	#dev.new()
+	#hist(ps, xlab="", ylab="", main="", ylim=c(0,50), xlim=c(0,.4))
+	#title(xlab="Nji/Nj")
+	#title(ylab="Frequency")
+	#title(str_c("Entropy distribution for context chunk: ", getChunks(index, db)))
+	#dev.new()
+	#hist(Hs)
+	#print(str_c(count, "->", getChunks(index, db), "->", H))
+	data.frame(Chunk=getChunks(index, db), ChunkHash=index, sdev=sdev, H=H, N=count)
 }
 
 generateContextWeights = function () {
@@ -62,7 +68,7 @@ sjiRank = function(row, sji) {
 }
 
 res = read.csv(str_c(PATH, "/LogReg.csv"))
-#res = read.csv(str_c(PATH, "/LogReg-5-6.csv"))
+res = read.csv(str_c(PATH, "/LogReg-6-4-2.csv"))
 #tags = sqldf('select tag, count(tag) as count from res group by tag order by count desc')
 
 
@@ -70,7 +76,7 @@ logRegRes = logReg(res$tag, res)
 W = logRegRes
 res$act = res$sji * logRegRes + res$prior
 
-#mylogit2 = glm(targetP ~ act, data=res, family="binomial")
+mylogit2 = glm(targetP ~ act, data=res, family="binomial")
 
 dev.new()
 logi.hist.plot(res$act, res$targetP, boxp=T, type="hist", col="gray")
@@ -100,10 +106,10 @@ hist(with(summary(sji), x))
 lapply(getChunkHashes(c("php", "the", "?", "lisp"), db), contextWeight)
 
 dev.new()
-hist(as.vector(contextWeights[contextIndeces]))
+hist(as.vector(contextWeights[contextWeightsIndeces]))
 
 dev.new()
-plot(log(as.vector(NRowSums[contextIndeces])), contextWeights[contextIndeces])
+plot(log(as.vector(NRowSums[contextWeightsIndeces])), contextWeights[contextWeightsIndeces])
 
 
 
