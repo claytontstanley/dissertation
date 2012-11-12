@@ -68,22 +68,18 @@ sjiRank = function(row, sji) {
 }
 
 res = read.csv(str_c(PATH, "/LogReg.csv"))
-res = read.csv(str_c(PATH, "/LogReg-6-4-2.csv"))
+#res = read.csv(str_c(PATH, "/LogReg-6-4-2.csv"))
 #tags = sqldf('select tag, count(tag) as count from res group by tag order by count desc')
 
 
 logRegRes = logReg(res$tag, res)
+
 W = logRegRes
 res$act = res$sji * logRegRes + res$prior
 
 mylogit2 = glm(targetP ~ act, data=res, family="binomial")
 
-dev.new()
-logi.hist.plot(res$act, res$targetP, boxp=T, type="hist", col="gray")
 
-visPost(tagFiles[2])
-visPost(tagFiles[40])
-visPost(tagFiles[120])
 
 descripts = c()
 descripts["sjiCells"] = nnzero(sji)
@@ -95,23 +91,43 @@ descripts["tagDensity"] = nnzero(priors) / length(priors)
 descriptsFrm = data.frame(descripts)
 
 dev.new()
-hist(as.vector(B[priorsIndeces]))
+hist(as.vector(B[priorsIndeces]), main="Distribution of tag activations", xlab="Activation")
 
 dev.new()
-plot(1:length(priorsIndeces), sort(as.vector(B[priorsIndeces]), decreasing=T))
+main="Activations of individual tags when sorted by activation"
+xlab="Sorted tag ID"
+ylab="Activation"
+plot(1:length(priorsIndeces), sort(as.vector(B[priorsIndeces]), decreasing=T), main=main, xlab=xlab, ylab=ylab)
 
 dev.new()
-hist(with(summary(sji), x))
+hist(with(summary(sji), x), main="Distribution of sji associations", xlab="Activation")
+
+dev.new()
+with(summary(sji), plot(i,j, main="Scatter of sji sparse matrix", xlab="i index", ylab="j index", cex=.2))
 
 lapply(getChunkHashes(c("php", "the", "?", "lisp"), db), contextWeight)
 
 dev.new()
-hist(as.vector(contextWeights[contextWeightsIndeces]))
+hist(as.vector(contextWeights[contextWeightsIndeces]), main="Distribution of attentional weights", xlab="Weight")
 
 dev.new()
-plot(log(as.vector(NRowSums[contextWeightsIndeces])), contextWeights[contextWeightsIndeces])
+main="Attentional weights as a function of #observations for each cue"
+xlab="log #observations for cue"
+ylab="Attentional weight"
+plot(log(as.vector(NRowSums[contextWeightsIndeces])), contextWeights[contextWeightsIndeces], main=main, xlab=xlab, ylab=ylab)
+
+visPost(tagFiles[2])
+visPost(tagFiles[40])
+visPost(tagFiles[120])
+
+dev.new()
+logi.hist.plot(res$act, res$targetP, boxp=T, type="hist", col="gray")
 
 
+
+
+# Save current objects so that they can be referenced from LaTeX document
+save.image(file = str_c(PATH, "/", ".RData"))
 
 
 

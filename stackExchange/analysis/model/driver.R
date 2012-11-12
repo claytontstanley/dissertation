@@ -98,22 +98,23 @@ visPost = function(tagFile) {
 		context = lst$context
 		cAct = act(getChunkHashes(context, dbContext), B, sji)
 		plotHighest(priorsIndeces, cAct$act, db)
-		title(str_c(paste(context, collapse=" "), "\n", paste(observed, collapse=" ")), cex.main=.9)
+		weights = round(as.vector(contextWeights[getChunkHashes(context, db)]), 2)
+		title(str_c(paste(context, collapse=" "), "\n", paste(weights, collapse=" "), "\n", paste(observed, collapse=" ")), cex.main=.9)
 		title(ylab="Total Activation")
 		plotHighest(priorsIndeces, cAct$sji, db)
-		title(str_c(paste(context, collapse=" "), "\n", paste(observed, collapse=" ")), cex.main=.9)
+		title(str_c(paste(context, collapse=" "), "\n", paste(weights, collapse=" "), "\n", paste(observed, collapse=" ")), cex.main=.9)
 		title(ylab="sji Activation")
 	}
 }
 
 # Source the model
-source(str_c(PATH, "/model.R"))
+#source(str_c(PATH, "/model.R"))
 
 # Determine tag files
 tagDir = "tag-subset-6/nlp-huge"
 titleDir = "title-subset-6/nlp-huge"
-tagDir = "tag/nlp"
-titleDir = "title/nlp"
+#tagDir = "tag/nlp"
+#titleDir = "title/nlp"
 W = 1
 
 
