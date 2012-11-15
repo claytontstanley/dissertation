@@ -75,17 +75,17 @@ def loadSubset(file, subset):
 
 def loadChunks():
 	with working_directory(_dir):
-		csvFile = "chunks-huge.csv"
+		csvFile = "chunks.csv"
 		cmd = "load data local infile '${csvFile}' into table chunks fields terminated by ',' enclosed by '\"' escaped by '' (ChunkId, Id, Chunk, ChunkType) set ChunkHash = 0"
 		cmd = string.Template(cmd).substitute(locals())
 		print cmd
 		cur.execute(cmd)
 		loadSubset("tag/nlp/nlp.csv", "tag")
 		loadSubset("title/nlp/nlp.csv", "title")
-		loadSubset("tag-subset-1/nlp-huge/nlp-huge.csv", "tag-subset-1")
-		loadSubset("title-subset-1/nlp-huge/nlp-huge.csv", "title-subset-1")
-		loadSubset("tag-subset-4/nlp-huge/nlp-huge.csv", "tag-subset-4")
-		loadSubset("title-subset-4/nlp-huge/nlp-huge.csv", "title-subset-4")
+		#loadSubset("tag-subset-1/nlp-huge/nlp-huge.csv", "tag-subset-1")
+		#loadSubset("title-subset-1/nlp-huge/nlp-huge.csv", "title-subset-1")
+		#loadSubset("tag-subset-4/nlp-huge/nlp-huge.csv", "tag-subset-4")
+		#loadSubset("title-subset-4/nlp-huge/nlp-huge.csv", "title-subset-4")
 
 def loadNohtml():
 	with working_directory(_dir):

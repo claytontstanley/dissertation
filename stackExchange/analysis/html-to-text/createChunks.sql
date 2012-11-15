@@ -11,7 +11,8 @@ CREATE TABLE IF NOT EXISTS sotero.`chunks` (
    INDEX `ChunkTypeIndex` (`ChunkType` ASC),
    PRIMARY KEY (`ChunkId`)
   )
-ENGINE = MyISAM
+ENGINE = InnoDB
+Row_format = Dynamic
 CHARACTER SET utf8
 COLLATE utf8_general_ci;
 
@@ -23,7 +24,7 @@ create table if not exists sotero.subsets (
 	INDEX IDIndex (ID ASC),
 	INDEX SubsetIndex (Subset ASC)
  )
-ENGINE = MyISAM
+ENGINE = InnoDB
 CHARACTER SET utf8
 COLLATE utf8_general_ci;
 

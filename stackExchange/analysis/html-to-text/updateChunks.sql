@@ -44,8 +44,9 @@ from
 	chunksubset as q
 	on
 		t.ID = q.ID
-where t.chunkType = "Title"
-and q.chunkType = "Tag"
+#where t.chunkType = "Title"
+#and q.chunkType = "Tag"
+where t.chunk != q.chunk
 group by LeftChunkHash, RightChunkHash
 order by t.ChunkID, q.ChunkID;
 drop view sotero.chunksubset;

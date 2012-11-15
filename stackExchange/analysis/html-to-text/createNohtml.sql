@@ -6,7 +6,7 @@ CREATE  TABLE IF NOT EXISTS sotero.`posts_nohtml` (
   `Body` LONGTEXT CHARACTER SET 'utf8' COLLATE utf8_general_ci NOT NULL
     ,  PRIMARY KEY (`Id`) 
   )
-ENGINE = MyISAM
+ENGINE = InnoDB
 CHARACTER SET utf8
 COLLATE utf8_general_ci;
 
