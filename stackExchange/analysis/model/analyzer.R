@@ -11,6 +11,10 @@ library(QuantPsyc)
 library(multicore)
 library(reshape)
 
+asFig = function(figName) {
+	pdf(str_c(PATH, "/Pictures/", figName, ".pdf"))
+}
+
 logReg = function(tag, res) {
 	print(str_c("working ", length(tag), " tags"))
 	dfSubset = res[res$tag %in% tag,]
@@ -34,7 +38,38 @@ logReg = function(tag, res) {
 	names(Ns) = c('NTagged', 'NNotTagged', 'N')
 	#p = summary(mylogit)$coefficients["act",'Pr(>|z|)']
 	#return(with(tmp, data.frame(mcFadden=mcFadden,overall=overall, tag=tag, t(vals), t(Ns), p=p)))
-	return(coeffs["sji"]/coeffs["prior"])
+	return(list("W"=coeffs["sji"]/coeffs["prior"], "logit"=mylogit, "classLog"=tmp))
+}
+
+plotHighest = function(subsetIndeces, vals, db) {
+	topNum = 20
+	vals = as.vector(vals[subsetIndeces])
+	res = sort(vals, decreasing=T, index.return=T)
+	sortedChunkHashes = subsetIndeces[res$ix]
+	x = sortedChunkHashes[1:topNum]
+	xnames = getChunks(x, db)
+	y = res$x[1:topNum]
+	plot(1:topNum, y, xaxt="n", ann=F)
+	axis(1, at=1:topNum, labels=xnames, las=3, cex.axis=.8)
+}
+
+visPost = function(tagFile) {
+	if ( length(lst <- getObservedContext(tagFile)) > 0 ) {
+		observed = lst$observed
+		context = lst$context
+		cAct = act(getChunkHashes(context, dbContext), B, sji)
+		asFig(str_c("visPost-", sub("^.*/", "", tagFile), "-act"))
+		plotHighest(priorsIndeces, cAct$act, db)
+		weights = round(as.vector(contextWeights[getChunkHashes(context, db)]), 2)
+		title(str_c(paste(context, collapse=" "), "\n", paste(weights, collapse=" "), "\n", paste(observed, collapse=" ")), cex.main=.9)
+		title(ylab="Total Activation")
+		dev.off()
+		asFig(str_c("visPost-", sub("^.*/", "", tagFile), "-sji"))
+		plotHighest(priorsIndeces, cAct$sji, db)
+		title(str_c(paste(context, collapse=" "), "\n", paste(weights, collapse=" "), "\n", paste(observed, collapse=" ")), cex.main=.9)
+		title(ylab="sji Activation")
+		dev.off()
+	}
 }
 
 contextWeight = function(index) {
@@ -67,20 +102,6 @@ sjiRank = function(row, sji) {
 	return(data.frame(chunkHash=row, chunk=getChunks(row, db), sd=sd(temp), MADZero=mean(abs(temp)), N=length(temp)))
 }
 
-res = read.csv(str_c(PATH, "/LogReg.csv"))
-#res = read.csv(str_c(PATH, "/LogReg-6-4-2.csv"))
-#tags = sqldf('select tag, count(tag) as count from res group by tag order by count desc')
-
-
-logRegRes = logReg(res$tag, res)
-
-W = logRegRes
-res$act = res$sji * logRegRes + res$prior
-
-mylogit2 = glm(targetP ~ act, data=res, family="binomial")
-
-
-
 descripts = c()
 descripts["sjiCells"] = nnzero(sji)
 descripts["sjiObservations"] = sum(sji)
@@ -90,45 +111,87 @@ descripts["tagObservations"] = sum(priors)
 descripts["tagDensity"] = nnzero(priors) / length(priors)
 descriptsFrm = data.frame(descripts)
 
-dev.new()
+asFig("tagActDis")
 hist(as.vector(B[priorsIndeces]), main="Distribution of tag activations", xlab="Activation")
+dev.off()
 
-dev.new()
+asFig("tagActSorted")
 main="Activations of individual tags when sorted by activation"
 xlab="Sorted tag ID"
 ylab="Activation"
 plot(1:length(priorsIndeces), sort(as.vector(B[priorsIndeces]), decreasing=T), main=main, xlab=xlab, ylab=ylab)
+dev.off()
 
-dev.new()
+asFig("sjiActDis")
 hist(with(summary(sji), x), main="Distribution of sji associations", xlab="Activation")
+dev.off()
 
-dev.new()
+figName = "sjiActScatter"
+png(str_c(PATH, "/Pictures/", figName, ".png"), width=480*10, height=480*10, res=72*10)
 with(summary(sji), plot(i,j, main="Scatter of sji sparse matrix", xlab="i index", ylab="j index", cex=.2))
+dev.off()
 
-lapply(getChunkHashes(c("php", "the", "?", "lisp"), db), contextWeight)
+figName = "sjiActScatterLowRes"
+png(str_c(PATH, "/Pictures/", figName, ".png"))
+with(summary(sji), plot(i,j, main="Scatter of sji sparse matrix", xlab="i index", ylab="j index", cex=.2))
+dev.off()
 
-dev.new()
+#lapply(getChunkHashes(c("php", "the", "?", "lisp"), db), contextWeight)
+
+asFig("attentionalDis")
 hist(as.vector(contextWeights[contextWeightsIndeces]), main="Distribution of attentional weights", xlab="Weight")
+dev.off()
 
-dev.new()
+asFig("attentionalN")
 main="Attentional weights as a function of #observations for each cue"
 xlab="log #observations for cue"
 ylab="Attentional weight"
 plot(log(as.vector(NRowSums[contextWeightsIndeces])), contextWeights[contextWeightsIndeces], main=main, xlab=xlab, ylab=ylab)
+dev.off()
 
+runLogReg = function(logRegFile, figName) {
+	res = read.csv(str_c(PATH, "/", logRegFile))
+	logRegRes = logReg(res$tag, res)
+	res$act = res$sji * logRegRes$W + res$prior
+	asFig(figName)
+	logi.hist.plot(res$act, res$targetP, boxp=T, type="hist", col="gray")
+	dev.off()
+	return(append(logRegRes, list("res"=res)))
+}
+
+run1 = runLogReg("LogReg-6-4-2.csv", "run1LogReg")
+
+tagDir = "tag-subset-6/nlp-huge"
+titleDir = "title-subset-6/nlp-huge"
+tagFiles = getTagFiles(tagDir)
+W=run1$W
 visPost(tagFiles[2])
 visPost(tagFiles[40])
 visPost(tagFiles[120])
 
-dev.new()
-logi.hist.plot(res$act, res$targetP, boxp=T, type="hist", col="gray")
+run2 = runLogReg("LogReg-7-4.csv", "run2LogReg")
 
+coeffsFrm = rbind(data.frame(summary(run2$logit)$coefficients, row.names=NULL), data.frame(summary(run1$logit)$coefficients, row.names=NULL))
+coeffsFrm$parameter = rep(rownames(summary(run2$logit)$coefficients), 2)
+coeffsFrm$run = c("1", "", "", "2", "", "")
+coeffsFrm = coeffsFrm[,c(6,5,1:4)]
 
+genFitFrm = function(run2) {
+	mcFadden = run2$classLog$mcFadden
+	overall = run2$classLog$overall
+	classtab = as.vector(run2$classLog$classtab)
+	rawtab = as.vector(run2$classLog$rawtab)
+	result = as.matrix(c(mcFadden, overall, classtab, rawtab))
+	rownames(result) = c("mcFadden", "overall", "CRs", "FAs", "Misses", "Hits", "numCRs", "numFAs", "numMisses", "numHits")
+	data.frame(result)
+}
 
+fitFrm = cbind(genFitFrm(run1), genFitFrm(run2))
+colnames(fitFrm) = c("run1", "run2")
 
 # Save current objects so that they can be referenced from LaTeX document
-save.image(file = str_c(PATH, "/", ".RData"))
-
+savedVars=c("descriptsFrm", "coeffsFrm", "fitFrm")
+save(list=savedVars, file = str_c(PATH, "/", ".RData"))
 
 
 
