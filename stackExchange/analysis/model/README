@@ -5,4 +5,4 @@ LogReg-2-1-1.csv	Training data is filtered by subset-2
 
 LogReg-6-4-1.csv	sd attentional weighting; not normalized
 LogReg-6-4-2.csv	log entropy; not normalized
-
+LogReg-7-4.csv		log entropy; not normalized
