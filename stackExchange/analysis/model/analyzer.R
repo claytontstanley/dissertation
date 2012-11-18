@@ -15,6 +15,10 @@ asFig = function(figName) {
 	pdf(str_c(PATH, "/Pictures/", figName, ".pdf"))
 }
 
+devOff = function() {
+	dev.off()
+}
+
 logReg = function(tag, res) {
 	print(str_c("working ", length(tag), " tags"))
 	dfSubset = res[res$tag %in% tag,]
@@ -63,12 +67,12 @@ visPost = function(tagFile) {
 		weights = round(as.vector(contextWeights[getChunkHashes(context, db)]), 2)
 		title(str_c(paste(context, collapse=" "), "\n", paste(weights, collapse=" "), "\n", paste(observed, collapse=" ")), cex.main=.9)
 		title(ylab="Total Activation")
-		dev.off()
+		devOff()
 		asFig(str_c("visPost-", sub("^.*/", "", tagFile), "-sji"))
 		plotHighest(priorsIndeces, cAct$sji, db)
 		title(str_c(paste(context, collapse=" "), "\n", paste(weights, collapse=" "), "\n", paste(observed, collapse=" ")), cex.main=.9)
 		title(ylab="sji Activation")
-		dev.off()
+		devOff()
 	}
 }
 
@@ -113,41 +117,41 @@ descriptsFrm = data.frame(descripts)
 
 asFig("tagActDis")
 hist(as.vector(B[priorsIndeces]), main="Distribution of tag activations", xlab="Activation")
-dev.off()
+devOff()
 
 asFig("tagActSorted")
 main="Activations of individual tags when sorted by activation"
 xlab="Sorted tag ID"
 ylab="Activation"
 plot(1:length(priorsIndeces), sort(as.vector(B[priorsIndeces]), decreasing=T), main=main, xlab=xlab, ylab=ylab)
-dev.off()
+devOff()
 
 asFig("sjiActDis")
 hist(with(summary(sji), x), main="Distribution of sji associations", xlab="Activation")
-dev.off()
+devOff()
 
 figName = "sjiActScatter"
 png(str_c(PATH, "/Pictures/", figName, ".png"), width=480*10, height=480*10, res=72*10)
 with(summary(sji), plot(i,j, main="Scatter of sji sparse matrix", xlab="i index", ylab="j index", cex=.2))
-dev.off()
+devOff()
 
 figName = "sjiActScatterLowRes"
 png(str_c(PATH, "/Pictures/", figName, ".png"))
 with(summary(sji), plot(i,j, main="Scatter of sji sparse matrix", xlab="i index", ylab="j index", cex=.2))
-dev.off()
+devOff()
 
 #lapply(getChunkHashes(c("php", "the", "?", "lisp"), db), contextWeight)
 
 asFig("attentionalDis")
 hist(as.vector(contextWeights[contextWeightsIndeces]), main="Distribution of attentional weights", xlab="Weight")
-dev.off()
+devOff()
 
 asFig("attentionalN")
 main="Attentional weights as a function of #observations for each cue"
 xlab="log #observations for cue"
 ylab="Attentional weight"
 plot(log(as.vector(NRowSums[contextWeightsIndeces])), contextWeights[contextWeightsIndeces], main=main, xlab=xlab, ylab=ylab)
-dev.off()
+devOff()
 
 runLogReg = function(logRegFile, figName) {
 	res = read.csv(str_c(PATH, "/", logRegFile))
@@ -155,7 +159,7 @@ runLogReg = function(logRegFile, figName) {
 	res$act = res$sji * logRegRes$W + res$prior
 	asFig(figName)
 	logi.hist.plot(res$act, res$targetP, boxp=T, type="hist", col="gray")
-	dev.off()
+	devOff()
 	return(append(logRegRes, list("res"=res)))
 }
 
