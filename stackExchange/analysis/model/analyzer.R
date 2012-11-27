@@ -10,6 +10,10 @@ library(sqldf)
 library(QuantPsyc)
 library(multicore)
 library(reshape)
+library(calibrate)
+library(RMySQL)
+library(multicore)
+
 
 asFig = function(figName) {
 	pdf(str_c(PATH, "/Pictures/", figName, ".pdf"))
@@ -95,7 +99,8 @@ contextWeight = function(index) {
 }
 
 generateContextWeights = function () {
-	filteredIndeces = contextFrm$ChunkHash[contextFrm$ChunkCount > 1]
+	#filteredIndeces = contextFrm$ChunkHash[contextFrm$ChunkCount > 1]
+	filteredIndeces  = contextFrm$ChunkHash
 	contextWeightsFrm = do.call(rbind, mclapply(filteredIndeces, contextWeight, mc.cores = 4, mc.preschedule=T))
 	write.csv(contextWeightsFrm, file=str_c(PATH, "/", contextWeightsCSV))	
 }
@@ -106,13 +111,25 @@ sjiRank = function(row, sji) {
 	return(data.frame(chunkHash=row, chunk=getChunks(row, db), sd=sd(temp), MADZero=mean(abs(temp)), N=length(temp)))
 }
 
+con = dbConnect(MySQL())
+
+fullDataset = list()
+fullDataset$postCount = dbGetQuery(con,'select count(*) from sotero.posts where posttypeid = 1')
+fullDataset$userCount = dbGetQuery(con, 'select count(*) from users')
+fullDataset$cSharpCount = priorsFrm$ChunkCount[match("c#", priorsFrm$Chunk)]
+fullDataset$numItemsRemoved = dim(contextWeightsFrm)[1] - dim(filteredFrm)[1]
+fullDataset$fractionRemoved = 1 - dim(filteredFrm)[1] / dim(contextWeightsFrm)[1]
+
 descripts = c()
-descripts["sjiCells"] = nnzero(sji)
-descripts["sjiObservations"] = sum(sji)
-descripts["sjiDensity"] = nnzero(sji) / prod(dim(sji))
+descripts["sjiCells"] = nnzero(N)
+descripts["sjiObservations"] = sum(N)
+descripts["sjiDensity"] = nnzero(N) / prod(dim(N))
 descripts["tagCells"] = nnzero(priors)
 descripts["tagObservations"] = sum(priors)
 descripts["tagDensity"] = nnzero(priors) / length(priors)
+descripts["contextCells"] = nnzero(context)
+descripts["contextObservations"] = sum(context)
+descripts["contextDensity"] = nnzero(context) / length(context)
 descriptsFrm = data.frame(descripts)
 
 asFig("tagActDis")
@@ -143,7 +160,7 @@ devOff()
 #lapply(getChunkHashes(c("php", "the", "?", "lisp"), db), contextWeight)
 
 asFig("attentionalDis")
-hist(as.vector(contextWeights[contextWeightsIndeces]), main="Distribution of attentional weights", xlab="Weight")
+hist(rep(as.vector(contextWeights[contextWeightsIndeces]), as.vector(NRowSums[contextWeightsIndeces])), main="Distribution of attentional weights", xlab="Weight")
 devOff()
 
 asFig("attentionalN")
@@ -151,6 +168,9 @@ main="Attentional weights as a function of #observations for each cue"
 xlab="log #observations for cue"
 ylab="Attentional weight"
 plot(log(as.vector(NRowSums[contextWeightsIndeces])), contextWeights[contextWeightsIndeces], main=main, xlab=xlab, ylab=ylab)
+textVect = c("php", "lisp", "the", "?", "xml", "foo", "very", "much", "well", "binding", "network", "a", "baz")
+textHash = getChunkHashes(textVect, db)
+textxy(log(as.vector(NRowSums[textHash])), contextWeights[textHash], textVect, cx=1, dcol = "orange")
 devOff()
 
 runLogReg = function(logRegFile, figName) {
@@ -175,10 +195,17 @@ visPost(tagFiles[120])
 
 run2 = runLogReg("LogReg-7-4.csv", "run2LogReg")
 
-coeffsFrm = rbind(data.frame(summary(run2$logit)$coefficients, row.names=NULL), data.frame(summary(run1$logit)$coefficients, row.names=NULL))
-coeffsFrm$parameter = rep(rownames(summary(run2$logit)$coefficients), 2)
-coeffsFrm$run = c("1", "", "", "2", "", "")
-coeffsFrm = coeffsFrm[,c(6,5,1:4)]
+run1Compressed = runLogReg("LogReg-6-4-3.csv", "run1CompressedLogReg")
+run2Compressed = runLogReg("LogReg-7-4-1.csv", "run2CompressedLogReg")
+
+run1HighEntropy = runLogReg("LogReg-6-4-5.csv", "run1BadContextLogReg")
+
+coeffsFrm = do.call(rbind, lapply(list(run1, run2, run1Compressed, run2Compressed, run1HighEntropy), function(run) data.frame(summary(run$logit)$coefficients, row.names=NULL)))
+
+coeffsFrm$parameter = rep(rownames(summary(run2$logit)$coefficients), 5)
+coeffsFrm$run = c("1", "", "", "2", "", "", "1", "", "", "2", "", "", "1", "", "")
+coeffsFrm$runName = c("uncompressed", rep(c(""), 5), "compressed", rep(c(""), 5), "highEntropy", "", "")
+coeffsFrm = coeffsFrm[,c(7,6,5,1:4)]
 
 genFitFrm = function(run2) {
 	mcFadden = run2$classLog$mcFadden
@@ -190,11 +217,11 @@ genFitFrm = function(run2) {
 	data.frame(result)
 }
 
-fitFrm = cbind(genFitFrm(run1), genFitFrm(run2))
-colnames(fitFrm) = c("run1", "run2")
+fitFrm = do.call(cbind, lapply(list(run1, run2, run1Compressed, run2Compressed, run1HighEntropy), genFitFrm))
+colnames(fitFrm) = c("run1", "run2", "run1Compressed", "run2Compressed", "run1HighEntropy")
 
 # Save current objects so that they can be referenced from LaTeX document
-savedVars=c("descriptsFrm", "coeffsFrm", "fitFrm")
+savedVars=c("descriptsFrm", "coeffsFrm", "fitFrm", "fullDataset")
 save(list=savedVars, file = str_c(PATH, "/", ".RData"))
 
 
