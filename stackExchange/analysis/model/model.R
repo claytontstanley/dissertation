@@ -127,10 +127,10 @@ chunkFrm = chunkFrm[chunkFrm$LeftChunkHash %in% contextWeightsIndeces,]
 
 # Convert tag occurance counts to base level activations, and place in a sparse vector
 priorsP = priors/sum(priors)
-priorsLogs = priorsP
-priorsLogs[priorsIndeces] = priorsP[priorsIndeces] / (1 - priorsP[priorsIndeces])
-B = priorsLogs
-B[priorsIndeces] = log(as.vector(priorsLogs[priorsIndeces]))
+priorsOdds = priorsP
+priorsOdds[priorsIndeces] = priorsP[priorsIndeces] / (1 - priorsP[priorsIndeces])
+B = priorsOdds
+B[priorsIndeces] = log(as.vector(priorsOdds[priorsIndeces]))
 
 # Construct the db of chunk (character) <-> chunkHash (integer) associations
 # Use a named vector, so that chunk lookups by chunkHash are O(1), and
