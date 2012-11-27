@@ -115,6 +115,7 @@ filteredFrm = filteredFrm[filteredFrm$logEntropy > .2,]
 chunkFrm = chunkFrm[chunkFrm$LeftChunkHash %in% contextWeightsFrm$ChunkHash,]
 contextFrm = contextFrm[contextFrm$ChunkHash %in% contextWeightsFrm$ChunkHash,]
 
+# Generate context and prior indeces and counts
 contextIndeces = with(contextFrm, ChunkHash)
 priorsIndeces = with(priorsFrm, ChunkHash)
 priors = with(priorsFrm, sparseVector(i=ChunkHash, x=ChunkCount, length=max(ChunkHash)))
@@ -147,7 +148,6 @@ NSum = sum(N)
 NProdSums = with(summary(N), sparseMatrix(i=i, j=j, x=rowSums(N)[i] * colSums(N)[j]))
 NCellSums = NSum * sdiv(N, NProdSums)
 sji = with(summary(NCellSums), sparseMatrix(i=i, j=j, x=log(x)))
-
 
 # Write relevant model component values to files, so that changes to the model can be regression tested (using git diff).
 write.csv(summary(sji), file=str_c(PATH, "/", "sji.csv"))
