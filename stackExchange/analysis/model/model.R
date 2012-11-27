@@ -46,9 +46,9 @@ getChunks = function(chunkHashes, db) {
 }
 
 makeDb = function(frm) {
-	frm = frm[!duplicated(frm$chunkHash),]
-	db = frm$chunkHash
-	names(db) = frm$chunk
+	frm = frm[!duplicated(frm$ChunkHash),]
+	db = frm$ChunkHash
+	names(db) = frm$Chunk
 	db
 }
 
@@ -95,8 +95,6 @@ sjiCSV = 'title-chunks.csv'
 # Does not take into account the fact that tag likelihoods change over time.
 colClasses=c("character", "integer", "integer", "character")
 occurancesFrm = read.csv(str_c(PATH, "/", priorsCSV), header=T, sep=",", colClasses=colClasses)
-priorsFrm = occurancesFrm[occurancesFrm$ChunkType == "tag",]
-contextFrm = occurancesFrm[occurancesFrm$ChunkType == "title",]
 
 # Read in table of context chunk -> tag chunk occurance counts
 colClasses=c("character", "integer", "character", "integer", "integer")
@@ -110,10 +108,12 @@ filteredFrm = contextWeightsFrm
 filteredFrm = filteredFrm[filteredFrm$logEntropy > .2,]
 
 # Perform any filtering on the context and priors frames
-#observedTags = priorsFrm$Chunk
-#priorsFrm = priorsFrm[priorsFrm$Chunk %in% observedTags,]
 chunkFrm = chunkFrm[chunkFrm$LeftChunkHash %in% contextWeightsFrm$ChunkHash,]
-contextFrm = contextFrm[contextFrm$ChunkHash %in% contextWeightsFrm$ChunkHash,]
+occurancesFrm = occurancesFrm[with(occurancesFrm, ChunkType == "tag" | ChunkHash %in% contextWeightsFrm$ChunkHash),]
+
+
+priorsFrm = occurancesFrm[occurancesFrm$ChunkType == "tag",]
+contextFrm = occurancesFrm[occurancesFrm$ChunkType == "title",]
 
 # Generate context and prior indeces and counts
 contextIndeces = with(contextFrm, ChunkHash)
@@ -135,10 +135,8 @@ B[priorsIndeces] = log(as.vector(priorsOdds[priorsIndeces]))
 # Construct the db of chunk (character) <-> chunkHash (integer) associations
 # Use a named vector, so that chunk lookups by chunkHash are O(1), and
 # chunkHash lookups by chunk are log(n) (when using the fmatch function)
-leftFrm = with(chunkFrm, cbind(data.frame(chunk=LeftChunk), data.frame(chunkHash=LeftChunkHash)))
-rightFrm = with(chunkFrm, cbind(data.frame(chunk=RightChunk), data.frame(chunkHash=RightChunkHash)))
-dbContext = makeDb(leftFrm)
-db = makeDb(rbind(leftFrm, rightFrm))
+dbContext = makeDb(contextFrm)
+db = makeDb(occurancesFrm)
 
 # Use occurance counts of context -> tags to build sji strength associations
 N = with(chunkFrm, sparseMatrix(i=LeftChunkHash, j=RightChunkHash, x=ChunkCount))
@@ -155,3 +153,5 @@ write.csv(summary(NProdSums), file=str_c(PATH, "/", "NProdSums.csv"))
 write.csv(data.frame(ChunkHash=priorsIndeces, B=as.vector(B[priorsIndeces])), file=str_c(PATH, "/", "B.csv"))
 cAct = act(c(1:5), B, sji)
 write.csv(data.frame(ChunkHash=priorsIndeces, Activation=as.vector(cAct$act[priorsIndeces])), file=str_c(PATH, "/", "Act.csv"))
+write.csv(data.frame(sort(db)), file=str_c(PATH, "/", "db.csv"))
+write.csv(data.frame(sort(dbContext)), file=str_c(PATH, "/", "dbContext.csv"))
