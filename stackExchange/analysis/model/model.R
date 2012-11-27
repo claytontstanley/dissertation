@@ -108,9 +108,8 @@ filteredFrm = contextWeightsFrm
 filteredFrm = filteredFrm[filteredFrm$logEntropy > .2,]
 
 # Perform any filtering on the context and priors frames
-chunkFrm = chunkFrm[chunkFrm$LeftChunkHash %in% contextWeightsFrm$ChunkHash,]
-occurancesFrm = occurancesFrm[with(occurancesFrm, ChunkType == "tag" | ChunkHash %in% contextWeightsFrm$ChunkHash),]
-
+chunkFrm = subset(chunkFrm, LeftChunkHash %in% contextWeightsFrm$ChunkHash)
+occurancesFrm = subset(occurancesFrm, ChunkType == "tag" | ChunkHash %in% contextWeightsFrm$ChunkHash)
 
 priorsFrm = occurancesFrm[occurancesFrm$ChunkType == "tag",]
 contextFrm = occurancesFrm[occurancesFrm$ChunkType == "title",]
