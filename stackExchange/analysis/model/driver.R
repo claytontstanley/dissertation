@@ -101,8 +101,6 @@ res = do.call(rbind, lapply(tagFiles, ratePost))
 
 write.csv(res, file=str_c(PATH, "/LogReg.csv"))
 
-cAct = act(c(1:5), B, sji)
-write.csv(data.frame(ChunkHash=priorsIndeces, Activation=as.vector(cAct$act[priorsIndeces])), file=str_c(PATH, "/", "Act.csv"))
 
 # Save current objects so that they can be referenced from LaTeX document
 #save.image(file = str_c(PATH, "/", ".RData"))
