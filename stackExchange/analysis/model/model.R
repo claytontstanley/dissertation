@@ -90,9 +90,6 @@ contextWeightsCSV = 'contextWeights.csv'
 priorsCSV = 'tag-priors.csv'
 sjiCSV = 'title-chunks.csv'
 
-#logRegResultCSV = "/LogReg-subset-2.csv"
-#sjiRankResultCSV = "/sjiRank-subset-2.csv"
-
 # Read in table of tag occurance counts; use this to build the base-level activation vector
 # Calculates base levels by using the log odds ratio for each tag.
 # Does not take into account the fact that tag likelihoods change over time.
@@ -100,10 +97,6 @@ colClasses=c("character", "integer", "integer", "character")
 occurancesFrm = read.csv(str_c(PATH, "/", priorsCSV), header=T, sep=",", colClasses=colClasses)
 priorsFrm = occurancesFrm[occurancesFrm$ChunkType == "tag",]
 contextFrm = occurancesFrm[occurancesFrm$ChunkType == "title",]
-contextIndeces = with(contextFrm, ChunkHash)
-priorsIndeces = with(priorsFrm, ChunkHash)
-priors = with(priorsFrm, sparseVector(i=ChunkHash, x=ChunkCount, length=max(ChunkHash)))
-context = with(contextFrm, sparseVector(i=ChunkHash, x=ChunkCount, length=max(ChunkHash)))
 
 # Read in table of context chunk -> tag chunk occurance counts
 colClasses=c("character", "integer", "character", "integer", "integer")
@@ -116,14 +109,20 @@ contextWeightsFrm$logEntropy = 1 - contextWeightsFrm$H / max(contextWeightsFrm$H
 filteredFrm = contextWeightsFrm
 filteredFrm = filteredFrm[filteredFrm$logEntropy > .2,]
 
-# Build a sparse vector of context attentional weighting
-contextWeightsIndeces = with(contextWeightsFrm, ChunkHash)
-contextWeights = with(contextWeightsFrm, sparseVector(i=ChunkHash, x=logEntropy, length=max(ChunkHash)))
-
 # Perform any filtering on the context and priors frames
 #observedTags = priorsFrm$Chunk
 #priorsFrm = priorsFrm[priorsFrm$Chunk %in% observedTags,]
-chunkFrm = chunkFrm[chunkFrm$LeftChunkHash %in% contextWeightsIndeces,]
+chunkFrm = chunkFrm[chunkFrm$LeftChunkHash %in% contextWeightsFrm$ChunkHash,]
+contextFrm = contextFrm[contextFrm$ChunkHash %in% contextWeightsFrm$ChunkHash,]
+
+contextIndeces = with(contextFrm, ChunkHash)
+priorsIndeces = with(priorsFrm, ChunkHash)
+priors = with(priorsFrm, sparseVector(i=ChunkHash, x=ChunkCount, length=max(ChunkHash)))
+context = with(contextFrm, sparseVector(i=ChunkHash, x=ChunkCount, length=max(ChunkHash)))
+
+# Build a sparse vector of context attentional weighting
+contextWeightsIndeces = with(contextWeightsFrm, ChunkHash)
+contextWeights = with(contextWeightsFrm, sparseVector(i=ChunkHash, x=logEntropy, length=max(ChunkHash)))
 
 # Convert tag occurance counts to base level activations, and place in a sparse vector
 priorsP = priors/sum(priors)
