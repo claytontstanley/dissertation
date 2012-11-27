@@ -87,8 +87,8 @@ W = 1
 contextWeightsCSV = 'contextWeights.csv'
 #priorsCSV = 'tag-priors-subset-4.csv'
 #sjiCSV = 'title-chunks-subset-4.csv'
-#priorsCSV = 'tag-priors.csv'
-#sjiCSV = 'title-chunks.csv'
+priorsCSV = 'tag-priors.csv'
+sjiCSV = 'title-chunks.csv'
 
 #logRegResultCSV = "/LogReg-subset-2.csv"
 #sjiRankResultCSV = "/sjiRank-subset-2.csv"
