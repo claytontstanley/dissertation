@@ -1,34 +1,25 @@
-DROP TABLE IF EXISTS sotero.`chunks`;
-CREATE TABLE IF NOT EXISTS sotero.`chunks` (
-  `ChunkId` INT(11) NOT NULL ,
-  `ChunkHash` INT(11) NOT NULL ,
-  `Id` INT(11) NOT NULL ,
-  `Chunk` VARCHAR(255) BINARY CHARACTER SET 'utf8' COLLATE utf8_general_ci NOT NULL ,
-  `ChunkType` VARCHAR(255) CHARACTER SET 'utf8' COLLATE utf8_general_ci NOT NULL ,
-   INDEX `ChunkHashIndex` (`ChunkHash` ASC),
-   INDEX `IDIndex` (`ID` ASC),
-   INDEX `ChunkIndex` (`Chunk` ASC),
-   INDEX `ChunkTypeIndex` (`ChunkType` ASC),
-   PRIMARY KEY (`ChunkId`)
-  )
-ENGINE = MyISAM
-CHARACTER SET utf8
-COLLATE utf8_general_ci;
+DROP TABLE IF EXISTS chunks cascade;
+CREATE TABLE IF NOT EXISTS chunks (
+  ChunkId integer NOT NULL ,
+  ChunkHash integer,
+  Id integer NOT NULL ,
+  Chunk VARCHAR(255) NOT NULL ,
+  ChunkType VARCHAR(255) NOT NULL ,
+  PRIMARY KEY (ChunkId)
+  );
 
-drop table if exists sotero.subsets;
-create table if not exists sotero.subsets (
-	Id int(11) not null,
-	Subset varchar(255) binary character set 'utf8' collate utf8_general_ci not null,
-	primary key (Id, Subset),
-	INDEX IDIndex (ID ASC),
-	INDEX SubsetIndex (Subset ASC)
- )
-ENGINE = MyISAM
-CHARACTER SET utf8
-COLLATE utf8_general_ci;
+create index chunkHashIndex on chunks (chunkhash);
+create index idIndexChunks on chunks (id);
+create index chunkIndex on chunks (chunk);
+create index chunkTypeIndex on chunks (chunkType);
 
+drop table if exists subsets cascade;
+create table if not exists subsets (
+	Id integer not null,
+	Subset varchar(255),
+	primary key (Id, Subset)
+ );
 
-
-
-
+create index idIndexSubsets on subsets (id);
+create index subsetIndex on subsets (subset);
 

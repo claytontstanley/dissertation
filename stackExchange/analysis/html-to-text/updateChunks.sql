@@ -1,37 +1,17 @@
-DROP VIEW IF EXISTS sotero.chunkhashes;
+DROP VIEW IF EXISTS chunkhashes;
 CREATE 
-    ALGORITHM = UNDEFINED 
-    DEFINER = `root`@`localhost` 
-    SQL SECURITY DEFINER
-VIEW `chunkhashes` AS
-    select 
-        `chunks`.`Chunk` AS `Chunk`,
-        min(`chunks`.`ChunkId`) AS `ChunkHash`
-    from
-        `chunks`
-    group by `chunks`.`Chunk`
-    order by `chunks`.`ChunkId`;
+VIEW chunkhashes AS
+select 
+	chunks.Chunk AS Chunk,
+        min(ChunkId) AS ChunkHash
+from
+	chunks
+group by Chunk
+order by ChunkHash;
 
-DELIMITER $$
-
-drop procedure if exists sotero.createChunkSubset;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `createChunkSubset`(theSubset varchar(255))
-BEGIN
-drop view if exists sotero.chunkSubset;
-drop view if exists sotero.idSubset;
-set @p1 := theSubset;
-create view sotero.idSubset as
-	select id from sotero.subsets where subset = p1();
-create view sotero.chunkSubset as
-	select c.* from sotero.chunks as c 
-	join sotero.idSubset as s 
-	on s.id = c.id;
-END;
-
-DROP PROCEDURE IF EXISTS sotero.title_chunks;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `title_chunks`(theSubset varchar(255))
-BEGIN
-call sotero.createChunkSubset(theSubset);
+create or replace function title_chunks(varchar(255))
+returns setof record as
+$$
 select 
 	t.Chunk as LeftChunk,
 	t.ChunkHash as LeftChunkHash,
@@ -39,47 +19,44 @@ select
 	q.ChunkHash as RightChunkHash,
 	count(t.ChunkHash) as ChunkCount
 from
-	chunksubset as t
+	(select c1.* from chunks as c1
+		join (select id from subsets where subset = $1) as s1
+		on s1.id = c1.id) as t
 	join
-	chunksubset as q
+	(select c2.* from chunks as c2
+		join (select id from subsets where subset = $1) as s2
+		on s2.id = c2.id) as q
 	on
 		t.ID = q.ID
-where t.chunkType = "Title"
-and q.chunkType = "Tag"
-group by LeftChunkHash, RightChunkHash
-order by t.ChunkID, q.ChunkID;
-drop view sotero.chunksubset;
-drop view sotero.idsubset;
-END;
+where t.chunkType = 'title'
+and q.chunkType = 'tag'
+group by LeftChunkHash, LeftChunk, RightChunkHash, RightChunk
+order by LeftChunkHash, RightChunkHash;
+$$
+language sql;
 
-drop procedure if exists sotero.tag_priors;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `tag_priors`(theSubset varchar(255))
-BEGIN
-call sotero.createChunkSubset(theSubset);
+create or replace function tag_priors(varchar(255))
+returns setof record as
+$$
 select 
-        `chunks`.`Chunk` AS `Chunk`,
-        `chunks`.`ChunkHash` AS `ChunkHash`,
-        count(`chunks`.`ChunkHash`) AS `ChunkCount`,
+        chunks.Chunk AS Chunk,
+        chunks.ChunkHash AS ChunkHash,
+        count(chunks.ChunkHash) AS ChunkCount,
 	chunks.chunktype as ChunkType
-    from
-        `chunksubset` as chunks
-    where
-        	(`chunks`.`ChunkType` = 'Tag')
-	or
+from
+	(select c.* from chunks as c
+		join (select id from subsets where subset = $1) as s
+		on s.id = c.id) as chunks
+where
+        	chunks.ChunkType = 'tag'
+		or
 		chunks.chunktype = 'title'
-	group by chunktype, `chunks`.`ChunkHash`
-	order by count(`chunks`.`ChunkHash`) desc , `chunks`.`ChunkHash`;
-drop view sotero.chunksubset;
-drop view sotero.idsubset;
-END;
+group by chunktype, chunks.ChunkHash, chunk
+order by count(chunks.ChunkHash) desc , chunks.ChunkHash;
+$$
+language sql;
 
-drop function if exists p1;
-CREATE DEFINER=`root`@`localhost` FUNCTION `p1`() RETURNS varchar(255) CHARSET utf8
-    NO SQL
-    DETERMINISTIC
-return @p1;
+update chunks set chunkhash = t.chunkhash
+from chunkhashes as t where t.chunk = chunks.chunk;
 
-update sotero.chunks as t
-	join sotero.chunkhashes as s 
-	on s.chunk = t.chunk
-	set t.ChunkHash = s.ChunkHash
+cluster chunks using chunks_pkey;
