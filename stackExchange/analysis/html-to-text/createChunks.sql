@@ -1,14 +1,19 @@
 DROP TABLE IF EXISTS chunks cascade;
 CREATE TABLE IF NOT EXISTS chunks (
   ChunkId integer NOT NULL ,
-  ChunkHash integer,
   Id integer NOT NULL ,
   Chunk VARCHAR(255) NOT NULL ,
   ChunkType VARCHAR(255) NOT NULL ,
   PRIMARY KEY (ChunkId)
   );
 
-create index chunkHashIndex on chunks (chunkhash);
+drop table if exists chunkhashes cascade;
+create table chunkHashes (
+	ChunkHash integer,
+	Chunk varchar(255) unique,
+	primary key (ChunkHash)
+);
+
 create index idIndexChunks on chunks (id);
 create index chunkIndex on chunks (chunk);
 create index chunkTypeIndex on chunks (chunkType);

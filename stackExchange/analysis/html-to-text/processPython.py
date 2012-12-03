@@ -10,6 +10,7 @@ import os.path
 from grizzled.os import working_directory
 import MySQLdb
 import string
+import pg
 
 def convert(html):
 	extractor = Extractor(extractor='KeepEverythingExtractor', html=html)
@@ -64,22 +65,31 @@ def convert_all(indir, fun, outdir):
 				text_file.write(txt)
 
 _dir = os.path.dirname(os.path.abspath(__file__))
-db = MySQLdb.connect(host="127.0.0.1", read_default_file="~/.my.cnf")
-cur = db.cursor()
+#db = MySQLdb.connect(host="127.0.0.1", read_default_file="~/.my.cnf")
+cur = pg.connect(host="127.0.0.1")
+#cur = db.cursor()
 
 def loadSubset(file, subset):
-	cmd = "load data local infile '${file}' into table subsets fields terminated by ',' enclosed by '\"' escaped by '' (ID) set subset = '${subset}'"
+	ldir = _dir
+	cur.query('create temporary table foo (id integer, subset varchar(255))')
+	cmd = "copy foo (id) from '${ldir}/${file}' delimiters ',' csv"
 	cmd = string.Template(cmd).substitute(locals())
 	print cmd
-	cur.execute(cmd)
+	cur.query(cmd)
+	cmd = "update foo set subset = '${subset}'" 
+	cmd = string.Template(cmd).substitute(locals())
+	cur.query(cmd)
+	cur.query('insert into subsets(id, subset) select * from foo')
+	cur.query('drop table foo')
 
 def loadChunks():
-	with working_directory(_dir):
+	ldir = _dir
+	with working_directory(ldir):
 		csvFile = "chunks-huge.csv"
-		cmd = "load data local infile '${csvFile}' into table chunks fields terminated by ',' enclosed by '\"' escaped by '' (ChunkId, Id, Chunk, ChunkType) set ChunkHash = 0"
+		cmd = "copy chunks (chunkId, Id, chunk, chunkType) from '${ldir}/${csvFile}' delimiters ',' csv"
 		cmd = string.Template(cmd).substitute(locals())
 		print cmd
-		cur.execute(cmd)
+		cur.query(cmd)
 		loadSubset("tag/nlp/nlp.csv", "tag")
 		loadSubset("title/nlp/nlp.csv", "title")
 		loadSubset("tag-subset-1/nlp-huge/nlp-huge.csv", "tag-subset-1")

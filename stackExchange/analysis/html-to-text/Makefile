@@ -1,14 +1,15 @@
 mysql = mysql
+psql = psql
 
 createChunks createNohtml: create%:
-	< create$*.sql ${mysql}
+	< create$*.sql ${psql}
 
 loadChunks loadNohtml: load%: create%
 
 updateChunks updateNohtml: update%: load%
 
 updateChunks:
-	< $@.sql ${mysql}
+	< $@.sql ${psql}
 
 updateAll: updateNohtml updateChunks
 
