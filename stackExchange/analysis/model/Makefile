@@ -16,7 +16,8 @@ run-command-% : url = $*.local
 %-4.csv : subset = tag-subset-4
 
 ${csvs}: %.csv: alwaysRemake
-	 psql -c "copy (select * from $(subst -,_,$*)('${subset}')) to stdout with csv header" > $@
+	funName=$$(echo "$*" | egrep -o '^[a-z]+-[a-z]+' | sed 's/-/_/'); \
+	psql -c "copy (select * from $$funName('${subset}')) to stdout with csv header" > $@
 
 alwaysRemake:
 	@ exit 0
