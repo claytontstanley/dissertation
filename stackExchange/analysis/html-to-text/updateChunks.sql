@@ -14,6 +14,14 @@ from chunkhashes as t where t.chunk = chunks.chunk;
 
 cluster chunks using chunks_pkey;
 
+drop function if exists chunksFromSubset(varchar(255));
+create function chunksFromSubset(varchar(255))
+returns setof chunks as
+$$
+select c.* from chunks as c join subsets as s on s.id = c.id where s.subset = $1;
+$$
+language sql;
+
 drop type if exists title_chunksType cascade;
 create type title_chunksType as ("LeftChunk" varchar(255), "LeftChunkHash" int, "RightChunk" varchar(255), "RightChunkHash" int, "ChunkCount" bigint);
 drop function if exists title_chunks(varchar(255));
@@ -27,20 +35,18 @@ select
 	q.ChunkHash as RightChunkHash,
 	count(t.ChunkHash) as ChunkCount
 from
-	(select c1.* from chunks as c1
-		join (select id from subsets where subset = $1) as s1
-		on s1.id = c1.id) as t
+	chunksFromSubset($1) as t
 	join
-	(select c2.* from chunks as c2
-		join (select id from subsets where subset = $1) as s2
-		on s2.id = c2.id) as q
+		chunksFromSubset($1) as q
 	on
 		t.ID = q.ID
 where
 	t.chunkType = 'title'
 	and q.chunkType = 'tag'
-group by LeftChunkHash, LeftChunk, RightChunkHash, RightChunk
-order by LeftChunkHash, RightChunkHash;
+group by
+	LeftChunkHash, LeftChunk, RightChunkHash, RightChunk
+order by
+	LeftChunkHash, RightChunkHash;
 $$
 language sql;
 
@@ -56,14 +62,14 @@ select
         count(chunks.ChunkHash) AS ChunkCount,
         chunks.chunktype as ChunkType
 from
-        (select c.* from chunks as c
-                join (select id from subsets where subset = $1) as s
-                on s.id = c.id) as chunks
+	chunksFromSubset($1) as chunks
 where
         chunks.ChunkType = 'tag'
         or
         chunks.chunktype = 'title'
-group by chunktype, chunks.ChunkHash, chunk
-order by count(chunks.ChunkHash) desc , chunks.ChunkHash, chunktype;
+group by
+	chunktype, chunks.ChunkHash, chunk
+order by
+	count(chunks.ChunkHash) desc , chunks.ChunkHash, chunktype;
 $$
 language sql;
