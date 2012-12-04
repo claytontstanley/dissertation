@@ -12,6 +12,8 @@ alter table chunks add column chunkhash integer references chunkhashes (chunkhas
 update chunks set chunkhash = t.chunkhash
 from chunkhashes as t where t.chunk = chunks.chunk;
 
+
+create index chunkhashIndex on chunks (chunkHash);
 cluster chunks using chunks_pkey;
 
 drop function if exists chunksFromSubset(varchar(255));
