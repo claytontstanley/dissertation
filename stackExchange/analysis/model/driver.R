@@ -89,15 +89,15 @@ getTagFiles = function(tagDir) {
 # Determine tag files
 tagDir = "tag-subset-7/nlp-huge"
 titleDir = "title-subset-7/nlp-huge"
-#tagDir = "tag/nlp"
-#titleDir = "title/nlp"
+tagDir = "tag/nlp"
+titleDir = "title/nlp"
 W = 1
 
 tagFiles = getTagFiles(tagDir)
 
 # Run the model for each title/tag pair, and analyse results
-#res = do.call(rbind, parallel::mclapply(tagFiles, ratePost, mc.cores=8, mc.preschedule=T))
-res = do.call(rbind, lapply(tagFiles, ratePost))
+res = do.call(rbind, parallel::mclapply(tagFiles, ratePost, mc.cores=2, mc.preschedule=T))
+#res = do.call(rbind, lapply(tagFiles, ratePost))
 
 write.csv(res, file=str_c(PATH, "/LogReg.csv"))
 
