@@ -17,6 +17,7 @@ library(stringr)
 library(popbio)
 library(multicore)
 library(data.table)
+library(plyr)
 
 # A few helper functions
 rateVals = function(subsetIndeces, act, observed) {
@@ -28,8 +29,8 @@ rateVals = function(subsetIndeces, act, observed) {
 	targetP = rep(0,cutoff)
 	targetP[match(observed, sortedChunkHashes)] = 1
 	sortedChunks = getChunks(sortedChunkHashes, db)
-	#print(sortedChunkHashes)
-	#print(observed)
+	#myPrint(sortedChunkHashes)
+	#myPrint(observed)
 	return(data.frame(tag=sortedChunks, act=res$x[1:cutoff], targetP=targetP, rank=1:cutoff))
 }
 
@@ -45,10 +46,10 @@ rateVals2 = function(subsetIndeces, act, observed, tagFile) {
 	targetP = rep(0, length(sortedChunkHashes))
 	target2P = targetP
 	observedVals = sort(vals[match(observed, subsetIndeces)], decreasing=T, index.return=T)
-	print(observedVals)
-	print(observed)
+	myPrint(observedVals)
+	myPrint(observed)
 	topValHash = observed[observedVals$ix[1]]
-	print(topValHash)
+	myPrint(topValHash)
 	targetP[match(observed, sortedChunkHashes)] = 1
 	target2P[match(topValHash, sortedChunkHashes)] = 1
 	sortedChunks = getChunks(sortedChunkHashes, db)
@@ -72,7 +73,7 @@ ratePost = function(tagFile) {
 	if ( length(lst <- getObservedContext(tagFile)) > 0 ) {
 		observed = lst$observed
 		context = lst$context
-		print(str_c("working tag file ", tagFile))
+		myPrint(str_c("working tag file ", tagFile))
 		cAct = act(getChunkHashes(context, dbContext), B, sji)
 		res = rbind(res, rateVals2(priorsIndeces, cAct, getChunkHashes(observed, db), tagFile))
 	}
@@ -87,17 +88,18 @@ getTagFiles = function(tagDir) {
 #source(str_c(PATH, "/model.R"))
 
 # Determine tag files
-tagDir = "tag-subset-7/nlp-huge"
-titleDir = "title-subset-7/nlp-huge"
-tagDir = "tag/nlp"
-titleDir = "title/nlp"
+tagDir = "tag-subset-6/nlp-huge"
+titleDir = "title-subset-6/nlp-huge"
+#tagDir = "tag/nlp"
+#titleDir = "title/nlp"
 W = 1
 
 tagFiles = getTagFiles(tagDir)
 
 # Run the model for each title/tag pair, and analyse results
-res = do.call(rbind, parallel::mclapply(tagFiles, ratePost, mc.cores=2, mc.preschedule=T))
-#res = do.call(rbind, lapply(tagFiles, ratePost))
+printP = 1
+#res = do.call(rbind, parallel::mclapply(tagFiles, ratePost, mc.cores=2, mc.preschedule=T))
+res = rbind.fill(lapply(tagFiles, ratePost))
 
 write.csv(res, file=str_c(PATH, "/LogReg.csv"))
 
@@ -105,4 +107,4 @@ write.csv(res, file=str_c(PATH, "/LogReg.csv"))
 # Save current objects so that they can be referenced from LaTeX document
 #save.image(file = str_c(PATH, "/", ".RData"))
 
-print("done")
+myPrint("done")

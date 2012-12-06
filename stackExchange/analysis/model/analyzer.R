@@ -24,18 +24,18 @@ devOff = function() {
 }
 
 logReg = function(tag, res) {
-	print(str_c("working ", length(tag), " tags"))
+	myPrint(str_c("working ", length(tag), " tags"))
 	dfSubset = res[res$tag %in% tag,]
 	#dev.new()
 	#logi.hist.plot(dfSubset$act, dfSubset$targetP, boxp=T, type="hist", col="gray")
 	#title(main=tag)
 	mylogit = glm(targetP ~ sji + prior, data=dfSubset, family="binomial")
 	#mylogit = glm(targetP ~ act, data=dfSubset, family="binomial")
-	print(summary(mylogit))
+	myPrint(summary(mylogit))
 	tmp = ClassLog(mylogit, dfSubset$targetP)
-	print(tmp) 
+	myPrint(tmp) 
 	tmp2 = melt(tmp$classtab)
-	print(tmp2)
+	myPrint(tmp2)
 	valsSubset = tmp2$value
 	names(valsSubset) = paste(tmp2$Var.1, tmp2$resp, sep="_")
 	vals = c(rep(0, 4))
@@ -94,7 +94,7 @@ contextWeight = function(index) {
 	#title(str_c("Entropy distribution for context chunk: ", getChunks(index, db)))
 	#dev.new()
 	#hist(Hs)
-	#print(str_c(count, "->", getChunks(index, db), "->", H))
+	#myPrint(str_c(count, "->", getChunks(index, db), "->", H))
 	data.frame(Chunk=getChunks(index, db), ChunkHash=index, sdev=sdev, H=H, N=count)
 }
 

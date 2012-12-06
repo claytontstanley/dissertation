@@ -31,12 +31,19 @@ sdiv <- function(X, Y, names=dimnames(X)) {
   sparseMatrix(i=sRes[,1], j=sRes[,2], x=sRes[,3]/sRes[,4],dimnames=names)
 }
 
+printP = 0
+myPrint = function(str) {
+	if( printP == 1) {
+		print(str)
+	}
+}
+
 # Interface to retrieve chunkHash for chunk name
 getChunkHashes = function(chunks, db) {
 	ret = db[chunks]
 	ret = ret[!is.na(ret)]
 #	stopifnot(length(ret) > 0)
-	print(str_c(length(chunks), "->", length(ret)))
+	myPrint(str_c(length(chunks), "->", length(ret)))
 	return(ret)
 }
 
@@ -65,8 +72,8 @@ act = function(context, B, sji) {
 	#	weightsSubset = weightsSubset / sum(weightsSubset)
 	#}
 	#weightsSubset = rep(1/length(context), length(context))
-	print(weightsSubset)
-	print(context)
+	myPrint(weightsSubset)
+	myPrint(context)
 	sjiSubset = as.matrix(sji[context,priorsIndeces])
 	if( length(context) > 1 ) {
 		sjiSubset = as.vector(t(sjiSubset) %*% weightsSubset)
@@ -85,10 +92,10 @@ act = function(context, B, sji) {
 
 W = 1
 contextWeightsCSV = 'contextWeights.csv'
-#priorsCSV = 'tag-priors-subset-4.csv'
-#sjiCSV = 'title-chunks-subset-4.csv'
-priorsCSV = 'tag-priors.csv'
-sjiCSV = 'title-chunks.csv'
+priorsCSV = 'tag-priors-subset-4.csv'
+sjiCSV = 'title-chunks-subset-4.csv'
+#priorsCSV = 'tag-priors.csv'
+#sjiCSV = 'title-chunks.csv'
 
 # Read in table of tag occurance counts; use this to build the base-level activation vector
 # Calculates base levels by using the log odds ratio for each tag.
@@ -105,7 +112,7 @@ colClasses=c("character", "character", "integer", "numeric", "numeric", "numeric
 contextWeightsFrm = read.csv(str_c(PATH, "/", contextWeightsCSV), header=T, sep=",", colClasses=colClasses)
 contextWeightsFrm$logEntropy = 1 - contextWeightsFrm$H / max(contextWeightsFrm$H)
 filteredFrm = contextWeightsFrm
-filteredFrm = filteredFrm[filteredFrm$logEntropy > .2,]
+#filteredFrm = filteredFrm[filteredFrm$logEntropy > .2,]
 
 # Perform any filtering on the context and priors frames
 chunkFrm = subset(chunkFrm, LeftChunkHash %in% contextWeightsFrm$ChunkHash)
