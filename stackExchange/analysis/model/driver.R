@@ -58,6 +58,24 @@ rateVals2 = function(subsetIndeces, act, observed, tagFile) {
 	return(data.frame(tag=sortedChunks, sji=sjis, prior=priors, targetP=targetP, target2P=target2P, act=priors+sjis, tagFile=tagFile))
 }
 
+rateVals3 = function(subsetIndeces, act, observed, tagFile) {
+	cutoff = 100
+	vals = as.vector(act$sji[subsetIndeces] * 1.3 + B[subsetIndeces])
+	res = sort(vals, decreasing=T, index.return=T)
+	sortedChunkHashes = subsetIndeces[res$ix]
+	#sortedChunkHashes = sortedChunkHashes[1:cutoff]
+	#sampleIndeces = union(union(observed, sortedChunkHashes), sample(subsetIndeces, 100, replace=F))
+	#sampleIndeces = union(sortedChunkHashes[1:cutoff], union(observed, sample(subsetIndeces, 500, replace=F, prob=vals)))
+	probs = 1/(1+exp(-vals/.5))
+	sampleIndeces = union(sortedChunkHashes[1:cutoff], union(observed, sample(subsetIndeces, 1000, replace=F, prob=probs)))
+	targetP = rep(0, length(sampleIndeces))
+	targetP[match(observed, sampleIndeces)] = 1
+	tags = getChunks(sampleIndeces, db)
+	priors = as.vector(B[sampleIndeces])
+	sjis = as.vector(act$sji[sampleIndeces])
+	return(data.frame(tag=tags, sji=sjis, prior=priors, targetP=targetP, act=priors+sjis, tagFile=tagFile))
+}
+
 getObservedContext = function(tagFile) {
 	ret = list()
 	if ( !any(grep("*.csv", tagFile)) ) {
@@ -75,7 +93,7 @@ ratePost = function(tagFile) {
 		context = lst$context
 		myPrint(str_c("working tag file ", tagFile))
 		cAct = act(getChunkHashes(context, dbContext), B, sji)
-		res = rbind(res, rateVals2(priorsIndeces, cAct, getChunkHashes(observed, db), tagFile))
+		res = rbind(res, rateVals3(priorsIndeces, cAct, getChunkHashes(observed, db), tagFile))
 	}
 	return(res)
 }
@@ -98,7 +116,7 @@ tagFiles = getTagFiles(tagDir)
 
 # Run the model for each title/tag pair, and analyse results
 printP = 1
-#res = do.call(rbind, parallel::mclapply(tagFiles, ratePost, mc.cores=2, mc.preschedule=T))
+#res = rbind.fill(parallel::mclapply(tagFiles, ratePost, mc.cores=2, mc.preschedule=T))
 res = rbind.fill(lapply(tagFiles, ratePost))
 
 write.csv(res, file=str_c(PATH, "/LogReg.csv"))
