@@ -1,9 +1,10 @@
 csvs = $(shell find . -maxdepth 1 -name 'title-chunks*.csv' -o -name 'tag-priors*.csv' | tr '\n' ' ')
 
-all: .RData
+all: model.R
 
-.RData: driver.R model.R
-	rlwrap R --no-restore -e 'source("$<")'
+driver.R model.R: alwaysRemake
+	rlwrap R --no-restore -e 'source("$@")'
+
 
 allCsvs: ${csvs}
 

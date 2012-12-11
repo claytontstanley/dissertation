@@ -10,3 +10,4 @@ LogReg-6-4-3.csv	compressed; log entropy; not normalized
 LogReg-7-4-1.csv	compressed; log entropy; not normalized
 LogREg-6-4-4.csv	no context
 LogREg-6-4-5.csv	bad context (anti-compressed context)
+LogReg-6-4-6.csv	after using sampling for distribution	

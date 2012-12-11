@@ -59,7 +59,7 @@ rateVals2 = function(subsetIndeces, act, observed, tagFile) {
 }
 
 rateVals3 = function(subsetIndeces, act, observed, tagFile) {
-	cutoff = 100
+	cutoff = 200
 	vals = as.vector(act$sji[subsetIndeces] * 1.3 + B[subsetIndeces])
 	res = sort(vals, decreasing=T, index.return=T)
 	sortedChunkHashes = subsetIndeces[res$ix]
@@ -67,7 +67,7 @@ rateVals3 = function(subsetIndeces, act, observed, tagFile) {
 	#sampleIndeces = union(union(observed, sortedChunkHashes), sample(subsetIndeces, 100, replace=F))
 	#sampleIndeces = union(sortedChunkHashes[1:cutoff], union(observed, sample(subsetIndeces, 500, replace=F, prob=vals)))
 	probs = 1/(1+exp(-vals/.5))
-	sampleIndeces = union(sortedChunkHashes[1:cutoff], union(observed, sample(subsetIndeces, 1000, replace=F, prob=probs)))
+	sampleIndeces = union(sortedChunkHashes[1:cutoff], union(observed, sample(subsetIndeces, 800, replace=F, prob=probs)))
 	targetP = rep(0, length(sampleIndeces))
 	targetP[match(observed, sampleIndeces)] = 1
 	tags = getChunks(sampleIndeces, db)
