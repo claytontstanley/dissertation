@@ -82,9 +82,16 @@ def loadSubset(file, subset):
 	cur.query('insert into subsets(id, subset) select * from foo')
 	cur.query('drop table foo')
 
+def loadSynonyms(file):
+	ldir = _dir
+	cmd = "copy tagsynonyms from '${ldir}/${file}' delimiter ',' csv header"
+	cmd = string.Template(cmd).substitute(locals())
+	cur.query(cmd)
+
 def loadChunks():
 	ldir = _dir
 	with working_directory(ldir):
+		loadSynonyms("synonyms/synonyms.csv")
 		csvFile = "chunks-huge.csv"
 		cmd = "copy chunks (chunkId, Id, chunk, chunkType) from '${ldir}/${csvFile}' delimiters ',' csv"
 		cmd = string.Template(cmd).substitute(locals())
@@ -111,3 +118,4 @@ def processAll():
 		convert_all('body/nohtml', nlp, 'body/nlp')
 		convert_all('title/raw', nlp, 'title/nlp')
 		convert_all('tag/raw', nlpTags, 'tag/nlp')
+		#e.g., convert_all('body/nohtml-huge', nlp, 'body/nlp-huge')

@@ -1,3 +1,8 @@
+*table(chunkId, chunk, chunkRoot)
+
+convert chunks in title and body (and tags?) to tag synonyms
+intercept in logistic model
+
 Look only at the most recent tags
 Windows 8 file tagging
 Twitter sarcastic tagging
@@ -14,5 +19,4 @@ what happens when context has never been seen for a chunk?
 
 utf8 general vs unicode
 sequel pro os x gui
-
 

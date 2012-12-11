@@ -1,3 +1,19 @@
+insert into synonyms (chunkId, chunk, chunkType, chunkRoot)
+select
+	chunkId,
+	chunk,
+	chunkType,
+	targettagname as chunkRoot
+from
+	chunks as p
+	join
+	tagsynonyms as q
+	on p.chunk = q.sourcetagname;
+
+
+update chunks set chunk = t.chunkRoot
+from synonyms as t where t.chunkId = chunks.chunkId and t.chunkType = 'tag';
+
 insert into chunkHashes (chunkHash, Chunk)
 select
 	min(ChunkId) AS ChunkHash,
@@ -11,7 +27,6 @@ alter table chunks add column chunkhash integer references chunkhashes (chunkhas
 
 update chunks set chunkhash = t.chunkhash
 from chunkhashes as t where t.chunk = chunks.chunk;
-
 
 create index chunkhashIndex on chunks (chunkHash);
 cluster chunks using chunks_pkey;

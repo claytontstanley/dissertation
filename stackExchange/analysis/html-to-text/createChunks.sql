@@ -7,6 +7,34 @@ CREATE TABLE IF NOT EXISTS chunks (
   PRIMARY KEY (ChunkId)
   );
 
+drop table if exists tagsynonyms cascade;
+create table if not exists tagsynonyms (
+	Id integer not null,
+	SourceTagName varchar(255) unique not null,
+	TargetTagName varchar(255) not null,
+	CreationDate varchar(255) not null,
+	OwnerUserId integer not null,
+	AutoRenameCount integer not null,
+	LastAutoRename varchar(255) not null,
+	Score integer not null,
+	ApprovedByUserId varchar(255) not null,
+	ApprovalDate varchar(255) not null,
+	primary key (Id)
+);
+
+create index targetTagNameIndex on tagsynonyms (targetTagName);
+
+drop table if exists synonyms cascade;
+create table if not exists synonyms (
+	chunkId integer not null references chunks (chunkId),
+	chunk varchar(255) not null references tagsynonyms (SourceTagName),
+	chunkType varchar(255) not null,
+	chunkRoot varchar(255) not null,
+	primary key (chunkId)
+);
+
+create index chunkTypeIndexSynonyms on synonyms (chunkType);
+
 drop table if exists chunkhashes cascade;
 create table chunkHashes (
 	ChunkHash integer,
