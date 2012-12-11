@@ -52,10 +52,10 @@ getChunks = function(chunkHashes, db) {
 	return(names(db[fmatch(chunkHashes, db)]))
 }
 
-makeDb = function(frm) {
-	frm = frm[!duplicated(frm$ChunkHash),]
-	db = frm$ChunkHash
-	names(db) = frm$Chunk
+makeDb = function(frm, valsAcc = "ChunkHash", namesAcc = "Chunk") {
+	frm = frm[!duplicated(frm[[namesAcc]]),]
+	db = frm[[valsAcc]]
+	names(db) = frm[[namesAcc]]
 	db
 }
 

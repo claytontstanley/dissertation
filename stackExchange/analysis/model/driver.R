@@ -80,6 +80,7 @@ getObservedContext = function(tagFile) {
 	ret = list()
 	if ( !any(grep("*.csv", tagFile)) ) {
 		observed = readLines(str_c(PATH, "/../html-to-text/", tagDir, "/", tagFile), warn = F)
+		observed = replaceSynonyms(observed, dbSynonyms)
 		context = readLines(str_c(PATH, "/../html-to-text/", titleDir, "/", tagFile), warn = F)
 		ret = list("observed" = observed, "context" = context)
 	}
@@ -101,6 +102,17 @@ ratePost = function(tagFile) {
 getTagFiles = function(tagDir) {
 	list.files(path=str_c(PATH, "/../html-to-text/", tagDir), recursive=T)
 }
+
+replaceSynonyms = function(chunks, dbSynonyms) {
+	ret = dbSynonyms[chunks]
+	ret[is.na(ret)] = chunks[is.na(ret)]
+	return(as.vector(ret))
+}
+
+# Load up the synonyms
+colClasses=c("character", "character", "character", "character", "character", "character", "character", "character", "character", "character")
+synonymsFrm = read.csv(str_c(PATH, "/../html-to-text/synonyms/synonyms.csv"), header=T, sep=",", colClasses=colClasses)
+dbSynonyms = makeDb(synonymsFrm, namesAcc="SourceTagName", valsAcc="TargetTagName")
 
 # Source the model
 #source(str_c(PATH, "/model.R"))
