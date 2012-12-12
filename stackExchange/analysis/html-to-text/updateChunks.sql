@@ -1,3 +1,12 @@
+create index idIndexSubsets on subsets (id);
+create index subsetIndex on subsets (subset);
+
+create index idIndexChunksBase on chunksBase (id);
+create index chunkIndexBase on chunksBase (chunk);
+create index chunkTypeIndexBase on chunksBase (chunkType);
+
+create index targetTagNameIndex on tagsynonyms (targetTagName);
+
 insert into synonyms (chunkId, chunk, chunkType, chunkRoot)
 select
 	chunkId,
@@ -5,31 +14,55 @@ select
 	chunkType,
 	targettagname as chunkRoot
 from
-	chunks as p
+	chunksBase as p
 	join
 	tagsynonyms as q
 	on p.chunk = q.sourcetagname;
 
+create index chunkTypeIndexSynonyms on synonyms (chunkType);
 
-update chunks set chunk = t.chunkRoot
-from synonyms as t where t.chunkId = chunks.chunkId and t.chunkType = 'tag';
+
+drop function if exists modChunksBase();
+create function modChunksBase()
+returns setof chunksBase as
+$$
+select 
+	p.chunkid as chunkid,
+	p.Id as id,
+	case when q.chunkroot is null then p.chunk else q.chunkroot end as chunk,
+	p.chunkType as chunkType
+from
+	chunksBase as p
+	left outer join
+	synonyms as q
+	on p.chunkId = q.chunkid and q.chunktype = 'tag'
+order by p.chunkid;
+$$
+language sql;
 
 insert into chunkHashes (chunkHash, Chunk)
 select
 	min(ChunkId) AS ChunkHash,
 	chunks.Chunk AS Chunk
 from
-	chunks
+	modChunksBase() as chunks
 group by
 	Chunk;
 
-alter table chunks add column chunkhash integer references chunkhashes (chunkhash);
+insert into chunks (chunkId, Id, chunk, chunktype, chunkHash)
+select p.*, q.chunkhash as chunkHash
+from
+	modChunksBase() as p
+join
+	chunkhashes as q
+	on p.chunk = q.chunk
+order by
+	p.chunkId;
 
-update chunks set chunkhash = t.chunkhash
-from chunkhashes as t where t.chunk = chunks.chunk;
-
+create index idIndexChunks on chunks (id);
+create index chunkIndex on chunks (chunk);
+create index chunkTypeIndex on chunks (chunkType);
 create index chunkhashIndex on chunks (chunkHash);
-cluster chunks using chunks_pkey;
 
 drop function if exists chunksFromSubset(varchar(255));
 create function chunksFromSubset(varchar(255))

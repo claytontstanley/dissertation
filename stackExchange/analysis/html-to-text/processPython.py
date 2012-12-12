@@ -92,8 +92,8 @@ def loadChunks():
 	ldir = _dir
 	with working_directory(ldir):
 		loadSynonyms("synonyms/synonyms.csv")
-		csvFile = "chunks-huge.csv"
-		cmd = "copy chunks (chunkId, Id, chunk, chunkType) from '${ldir}/${csvFile}' delimiters ',' csv"
+		csvFile = "chunks-huge-nobody.csv"
+		cmd = "copy chunksBase (chunkId, Id, chunk, chunkType) from '${ldir}/${csvFile}' delimiters ',' csv"
 		cmd = string.Template(cmd).substitute(locals())
 		print cmd
 		cur.query(cmd)

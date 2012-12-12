@@ -1,5 +1,15 @@
 DROP TABLE IF EXISTS chunks cascade;
 CREATE TABLE IF NOT EXISTS chunks (
+  ChunkId integer NOT NULL references chunksBase (chunkId),
+  Id integer NOT NULL ,
+  Chunk VARCHAR(255) NOT NULL ,
+  ChunkType VARCHAR(255) NOT NULL ,
+  ChunkHash integer not null references chunkHashes (chunkHash),
+  PRIMARY KEY (ChunkId)
+  );
+
+DROP TABLE IF EXISTS chunksBase cascade;
+CREATE TABLE IF NOT EXISTS chunksBase (
   ChunkId integer NOT NULL ,
   Id integer NOT NULL ,
   Chunk VARCHAR(255) NOT NULL ,
@@ -22,18 +32,14 @@ create table if not exists tagsynonyms (
 	primary key (Id)
 );
 
-create index targetTagNameIndex on tagsynonyms (targetTagName);
-
 drop table if exists synonyms cascade;
 create table if not exists synonyms (
-	chunkId integer not null references chunks (chunkId),
+	chunkId integer not null references chunksBase (chunkId),
 	chunk varchar(255) not null references tagsynonyms (SourceTagName),
 	chunkType varchar(255) not null,
 	chunkRoot varchar(255) not null,
 	primary key (chunkId)
 );
-
-create index chunkTypeIndexSynonyms on synonyms (chunkType);
 
 drop table if exists chunkhashes cascade;
 create table chunkHashes (
@@ -42,10 +48,6 @@ create table chunkHashes (
 	primary key (ChunkHash)
 );
 
-create index idIndexChunks on chunks (id);
-create index chunkIndex on chunks (chunk);
-create index chunkTypeIndex on chunks (chunkType);
-
 drop table if exists subsets cascade;
 create table if not exists subsets (
 	Id integer not null,
@@ -53,6 +55,4 @@ create table if not exists subsets (
 	primary key (Id, Subset)
  );
 
-create index idIndexSubsets on subsets (id);
-create index subsetIndex on subsets (subset);
 
