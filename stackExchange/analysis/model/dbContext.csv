@@ -381,7 +381,6 @@
 "combobox",974
 "binding",976
 "gotcha",977
-"databinding",980
 "test",985
 "layout",986
 "design",987
@@ -504,7 +503,6 @@
 "solving",1414
 "linear",1416
 "equation",1417
-"systems",1420
 "itertools.groupby",1428
 "oriented",1435
 "v",1436
@@ -547,7 +545,6 @@
 "debugging",1572
 "unicode",1578
 "os",1587
-"osx",1589
 "word-break",1595
 "dash",1598
 "text",1603
@@ -964,7 +961,6 @@
 "node",3699
 "some",3704
 "threaded",3709
-"casting",3715
 "newtype",3718
 "progressive",3729
 "enhancement",3730
