@@ -212,6 +212,25 @@
                     (dolist (chunk chunks)
                       (cl-csv:write-csv-row (list (incf chunk-cnt) posts-id chunk (lowercase chunk-type)) :stream strm))))))))))))
 
+(defun process-long-lines ()
+  (with-open-file (strm (format nil "~a~a" *_DIR_* (make-huge-if-huge "chunks.csv")) :direction :input)
+    (cl-csv:read-csv strm :row-fn #'remove-long-lines)))
+
+(defun truncate-string (str)
+  (let ((max-length 255))
+    (subseq str 0 (min max-length (length str)))))
+
+(let ((cnt 0))
+  (let ((out-file (make-huge-if-huge "chunks-processed.csv")))
+    (let ((strm))
+      (defun remove-long-lines (csv)
+        (incf cnt)
+        (when (= (mod cnt 10000) 0)
+          (format  t "converting line ~a~%" cnt))
+        (when (= cnt 1)
+          (setf strm (open out-file :direction :output :if-exists :supersede :if-does-not-exist :create)))
+        (cl-csv:write-csv-row (mapcar #'truncate-string csv) :stream strm)))))
+
 (let ((cnt 0))
   (defun write-csv (csv)
     (incf cnt)
