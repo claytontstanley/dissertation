@@ -88,15 +88,25 @@ def loadSynonyms(file):
 	cmd = string.Template(cmd).substitute(locals())
 	cur.query(cmd)
 
+def loadChunksFromFile(csvFile):
+	ldir = _dir
+	cmd = "copy chunksBase (chunkId, Id, chunk, chunkType) from '${ldir}/${csvFile}' delimiters ',' csv"
+	cmd = string.Template(cmd).substitute(locals())
+	print cmd
+	cur.query(cmd)
+
+def loadChunksFromDir(thisDir):
+	for dirname, dirnames, filenames in os.walk(thisDir):
+		for csvFile in filenames:
+			relPathToFile = "${thisDir}/$csvFile"
+			relPathToFile = string.Template(relPathToFile).substitute(locals())
+			loadChunksFromFile(relPathToFile)
+
 def loadChunks():
 	ldir = _dir
 	with working_directory(ldir):
 		loadSynonyms("synonyms/synonyms.csv")
-		csvFile = "chunks-huge-nobody.csv"
-		cmd = "copy chunksBase (chunkId, Id, chunk, chunkType) from '${ldir}/${csvFile}' delimiters ',' csv"
-		cmd = string.Template(cmd).substitute(locals())
-		print cmd
-		cur.query(cmd)
+		loadChunksFromFile('chunks-huge-processed.csv')
 		loadSubset("tag/nlp/nlp.csv", "tag")
 		loadSubset("title/nlp/nlp.csv", "title")
 		loadSubset("tag-subset-1/nlp-huge/nlp-huge.csv", "tag-subset-1")

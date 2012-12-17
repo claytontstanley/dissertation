@@ -212,24 +212,26 @@
                     (dolist (chunk chunks)
                       (cl-csv:write-csv-row (list (incf chunk-cnt) posts-id chunk (lowercase chunk-type)) :stream strm))))))))))))
 
-(defun process-long-lines ()
-  (with-open-file (strm (format nil "~a~a" *_DIR_* (make-huge-if-huge "chunks.csv")) :direction :input)
-    (cl-csv:read-csv strm :row-fn #'remove-long-lines)))
+(defun remove-long-lines (input-csv)
+  (with-open-file (strm (format nil "~a~a" *_DIR_* input-csv) :direction :input)
+    (cl-csv:read-csv strm :row-fn #'maybe-remove-long-line)))
 
-(defun truncate-string (str)
+(defun trim-chunks ()
+  (remove-long-lines "chunks.csv"))
+
+(defun trim-chunks-huge ()
+  (remove-long-lines "chunks-huge.csv"))
+
+(defun valid-string-p (csv)
   (let ((max-length 255))
-    (subseq str 0 (min max-length (length str)))))
+    (every
+      (lambda (str)
+        (<= (length str) max-length))
+      csv)))
 
-(let ((cnt 0))
-  (let ((out-file (make-huge-if-huge "chunks-processed.csv")))
-    (let ((strm))
-      (defun remove-long-lines (csv)
-        (incf cnt)
-        (when (= (mod cnt 10000) 0)
-          (format  t "converting line ~a~%" cnt))
-        (when (= cnt 1)
-          (setf strm (open out-file :direction :output :if-exists :supersede :if-does-not-exist :create)))
-        (cl-csv:write-csv-row (mapcar #'truncate-string csv) :stream strm)))))
+(defun maybe-remove-long-line (csv)
+  (when (valid-string-p csv)
+    (cl-csv:write-csv-row csv :stream *standard-output*)))
 
 (let ((cnt 0))
   (defun write-csv (csv)
