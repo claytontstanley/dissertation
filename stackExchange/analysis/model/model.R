@@ -22,6 +22,7 @@ library(Matrix)
 library(stringr)
 library(fastmatch)
 library(sqldf)
+library(plyr)
 
 # And helper functions
 sdiv <- function(X, Y, names=dimnames(X)) {
@@ -94,8 +95,8 @@ W = 1
 contextWeightsCSV = 'contextWeights.csv'
 priorsCSV = 'tag-priors-subset-4.csv'
 sjiCSV = 'title-chunks-subset-4.csv'
-#priorsCSV = 'tag-priors.csv'
-#sjiCSV = 'title-chunks.csv'
+priorsCSV = 'tag-priors.csv'
+sjiCSV = 'title-chunks.csv'
 
 # Read in table of tag occurance counts; use this to build the base-level activation vector
 # Calculates base levels by using the log odds ratio for each tag.
@@ -115,11 +116,16 @@ filteredFrm = contextWeightsFrm
 #filteredFrm = filteredFrm[filteredFrm$logEntropy > .2,]
 
 # Perform any filtering on the context and priors frames
-chunkFrm = subset(chunkFrm, LeftChunkHash %in% contextWeightsFrm$ChunkHash)
-occurancesFrm = subset(occurancesFrm, ChunkType == "tag" | ChunkHash %in% contextWeightsFrm$ChunkHash)
+chunkFrm = subset(chunkFrm, LeftChunk %in% contextWeightsFrm$Chunk)
+occurancesFrm = subset(occurancesFrm, ChunkType == "tag" | Chunk %in% contextWeightsFrm$Chunk)
+
+# Collapse all context chunktypes on occurancesFrm
+occurancesFrm = occurancesFrm[occurancesFrm$ChunkType != 'body',]
+occurancesFrm$ChunkType[occurancesFrm$ChunkType != 'tag'] = 'context'
+occurancesFrm = ddply(occurancesFrm, .(Chunk,ChunkHash,ChunkType), summarize, ChunkCount = sum(ChunkCount))
 
 priorsFrm = occurancesFrm[occurancesFrm$ChunkType == "tag",]
-contextFrm = occurancesFrm[occurancesFrm$ChunkType == "title",]
+contextFrm = occurancesFrm[occurancesFrm$ChunkType == "context",]
 
 # Generate context and prior indeces and counts
 contextIndeces = with(contextFrm, ChunkHash)
