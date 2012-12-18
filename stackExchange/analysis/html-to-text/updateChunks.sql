@@ -101,7 +101,7 @@ select
         count(chunks.ChunkHash) AS ChunkCount,
         chunks.chunktype as ChunkType
 from
-	(select c.* from chunks as c join subsets as s on s.id = c.id where s.subset = $1 and (c.chunkType = 'title' or c.chunkType = 'tag')) as chunks
+	(select c.* from chunks as c join subsets as s on s.id = c.id where s.subset = $1) as chunks
 group by
 	chunktype, chunks.ChunkHash, chunk
 order by
