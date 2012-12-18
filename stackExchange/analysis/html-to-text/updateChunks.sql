@@ -64,14 +64,6 @@ create index chunkIndex on chunks (chunk);
 create index chunkTypeIndex on chunks (chunkType);
 create index chunkhashIndex on chunks (chunkHash);
 
-drop function if exists chunksFromSubset(varchar(255));
-create function chunksFromSubset(varchar(255))
-returns setof chunks as
-$$
-select c.* from chunks as c join subsets as s on s.id = c.id where s.subset = $1;
-$$
-language sql;
-
 drop type if exists title_chunksType cascade;
 create type title_chunksType as ("LeftChunk" varchar(255), "LeftChunkHash" int, "RightChunk" varchar(255), "RightChunkHash" int, "ChunkCount" bigint);
 drop function if exists title_chunks(varchar(255));
@@ -85,20 +77,17 @@ select
 	q.ChunkHash as RightChunkHash,
 	count(t.ChunkHash) as ChunkCount
 from
-	chunksFromSubset($1) as t
+	(select c.* from chunks as c join subsets as s on s.id = c.id where s.subset = $1 and c.chunkType = 'title') as t
 	join
-		chunksFromSubset($1) as q
+		(select c.* from chunks as c join subsets as s on s.id = c.id where s.subset = $1 and c.chunkType = 'tag') as q
 	on
 		t.ID = q.ID
-where
-	t.chunkType = 'title'
-	and q.chunkType = 'tag'
 group by
 	LeftChunkHash, LeftChunk, RightChunkHash, RightChunk
 order by
 	LeftChunkHash, RightChunkHash;
 $$
-language sql;
+language sql immutable;
 
 drop type if exists tag_priorsType cascade;
 create type tag_priorsType as ("Chunk" varchar(255), "ChunkHash" int, "ChunkCount" bigint, "ChunkType" varchar(255));
@@ -112,14 +101,10 @@ select
         count(chunks.ChunkHash) AS ChunkCount,
         chunks.chunktype as ChunkType
 from
-	chunksFromSubset($1) as chunks
-where
-        chunks.ChunkType = 'tag'
-        or
-        chunks.chunktype = 'title'
+	(select c.* from chunks as c join subsets as s on s.id = c.id where s.subset = $1 and (c.chunkType = 'title' or c.chunkType = 'tag')) as chunks
 group by
 	chunktype, chunks.ChunkHash, chunk
 order by
 	count(chunks.ChunkHash) desc , chunks.ChunkHash, chunktype;
 $$
-language sql;
+language sql immutable;
