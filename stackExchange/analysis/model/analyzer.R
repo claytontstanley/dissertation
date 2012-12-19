@@ -90,8 +90,9 @@ visPost = function(tagFile) {
 }
 
 contextWeight = function(index) {
-	count = sum(N[index,priorsIndeces])
-	ps = N[index, priorsIndeces] / count
+	vect = as.vector(N[index, priorsIndeces])
+	count = sum(vect)
+	ps = vect / count
 	ps = ps[ps != 0]
 	sdev = sd(ps)
 	Hs = ps * log(ps)
@@ -107,10 +108,17 @@ contextWeight = function(index) {
 	data.frame(Chunk=getChunks(index, db), ChunkHash=index, sdev=sdev, H=H, N=count)
 }
 
+contextWeight2 = function(indeces) {
+	arr = N[indeces,priorsIndeces]
+	arrSums = rowSums(arr)
+	ps = with(summary(arr), sparseMatrix(i=i, j=j, x=x/arrSums[i]))
+	Hs = with(summary(ps), sparseMatrix(i=i, j=j, x=x*log(x)))
+	H = -rowSums(Hs)
+	data.frame(Chunk=getChunks(indeces, db), ChunkHash=indeces, H=H, N=arrSums)
+}
+
 generateContextWeights = function () {
-	#filteredIndeces = contextFrm$ChunkHash[contextFrm$ChunkCount > 1]
-	filteredIndeces  = contextFrm$ChunkHash
-	contextWeightsFrm = do.call(rbind, mclapply(filteredIndeces, contextWeight, mc.cores = 4, mc.preschedule=T))
+	contextWeightsFrm = contextWeight2(contextFrm$ChunkHash)
 	write.csv(contextWeightsFrm, file=str_c(PATH, "/", contextWeightsCSV))	
 }
 
