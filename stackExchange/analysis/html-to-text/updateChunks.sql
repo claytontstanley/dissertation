@@ -77,7 +77,7 @@ select
 	q.ChunkHash as RightChunkHash,
 	count(t.ChunkHash) as ChunkCount
 from
-	(select c.* from chunks as c join subsets as s on s.id = c.id where s.subset = $1 and c.chunkType = 'title') as t
+	(select c.* from chunks as c join subsets as s on s.id = c.id where s.subset = $1 and (c.chunkType = 'title' or c.chunkType = 'body')) as t
 	join
 		(select c.* from chunks as c join subsets as s on s.id = c.id where s.subset = $1 and c.chunkType = 'tag') as q
 	on
