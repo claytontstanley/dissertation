@@ -82,6 +82,7 @@ getObservedContext = function(tagFile) {
 		observed = readLines(str_c(PATH, "/../html-to-text/", tagDir, "/", tagFile), warn = F)
 		observed = replaceSynonyms(observed, dbSynonyms)
 		context = readLines(str_c(PATH, "/../html-to-text/", titleDir, "/", tagFile), warn = F)
+		#context = c(context, readLines(str_c(PATH, "/../html-to-text/", bodyDir, "/", tagFile), warn = F))
 		ret = list("observed" = observed, "context" = context)
 	}
 	return(ret)
@@ -120,6 +121,7 @@ dbSynonyms = makeDb(synonymsFrm, namesAcc="SourceTagName", valsAcc="TargetTagNam
 # Determine tag files
 tagDir = "tag-subset-6/nlp-huge"
 titleDir = "title-subset-6/nlp-huge"
+bodyDir = "body-subset-6/nlp-huge"
 #tagDir = "tag/nlp"
 #titleDir = "title/nlp"
 W = 1
