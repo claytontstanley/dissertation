@@ -121,7 +121,7 @@ filteredFrm = contextWeightsFrm
 #filteredFrm = filteredFrm[filteredFrm$logEntropy > .2,]
 
 myPrint('# Perform any filtering on the context and priors frames')
-chunkFrm = subset(chunkFrm, LeftChunkHash %in% contextWeightsFrm$ChunkHash)
+chunkFrm = subset(chunkFrm, RightChunkHash %in% contextWeightsFrm$ChunkHash)
 occurancesFrm = subset(occurancesFrm, ChunkType == "tag" | ChunkHash %in% contextWeightsFrm$ChunkHash)
 
 myPrint('# Collapse all context chunktypes on occurancesFrm')
