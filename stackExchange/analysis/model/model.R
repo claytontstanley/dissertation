@@ -23,6 +23,7 @@ library(stringr)
 library(fastmatch)
 library(sqldf)
 library(plyr)
+library(data.table)
 
 # And helper functions
 sdiv <- function(X, Y, names=dimnames(X)) {
@@ -108,54 +109,42 @@ myPrint('
 colClasses=c("character", "integer", "integer", "character")
 occurancesFrm = read.csv(str_c(PATH, "/", priorsCSV), header=T, sep=",", colClasses=colClasses)
 
-myPrint('
-# Read in table of context chunk -> tag chunk occurance counts
-')
+myPrint('# Read in table of context chunk -> tag chunk occurance counts')
 colClasses=c("character", "integer", "character", "integer", "integer")
 chunkFrm = read.csv(str_c(PATH, "/", sjiCSV), header=T, sep=",", colClasses=colClasses)
 
-myPrint('
-# Read in table for attentional context weighting
-')
+myPrint('# Read in table for attentional context weighting')
 colClasses=c("character", "character", "integer", "numeric", "numeric")
 contextWeightsFrm = read.csv(str_c(PATH, "/", contextWeightsCSV), header=T, sep=",", colClasses=colClasses)
 contextWeightsFrm$logEntropy = 1 - contextWeightsFrm$H / max(contextWeightsFrm$H)
 filteredFrm = contextWeightsFrm
 #filteredFrm = filteredFrm[filteredFrm$logEntropy > .2,]
 
-myPrint('
-# Perform any filtering on the context and priors frames
-')
+myPrint('# Perform any filtering on the context and priors frames')
 chunkFrm = subset(chunkFrm, LeftChunk %in% contextWeightsFrm$Chunk)
 occurancesFrm = subset(occurancesFrm, ChunkType == "tag" | Chunk %in% contextWeightsFrm$Chunk)
 
-myPrint('
-# Collapse all context chunktypes on occurancesFrm
-')
+myPrint('# Collapse all context chunktypes on occurancesFrm')
 #occurancesFrm = occurancesFrm[occurancesFrm$ChunkType != 'body',]
 occurancesFrm$ChunkType[occurancesFrm$ChunkType != 'tag'] = 'context'
-occurancesFrm = ddply(occurancesFrm, .(Chunk,ChunkHash,ChunkType), summarize, ChunkCount = sum(ChunkCount))
+occurancesTbl = data.table(occurancesFrm, key=c("Chunk", "ChunkHash", "ChunkType"))
+occurancesTbl = occurancesTbl[, list(ChunkCount=sum(ChunkCount)), by=c("Chunk", "ChunkHash", "ChunkType")]
+occurancesFrm = data.frame(occurancesTbl)
 
 priorsFrm = occurancesFrm[occurancesFrm$ChunkType == "tag",]
 contextFrm = occurancesFrm[occurancesFrm$ChunkType == "context",]
 
-myPrint('
-# Generate context and prior indeces and counts
-')
+myPrint('# Generate context and prior indeces and counts')
 contextIndeces = with(contextFrm, ChunkHash)
 priorsIndeces = with(priorsFrm, ChunkHash)
 priors = with(priorsFrm, sparseVector(i=ChunkHash, x=ChunkCount, length=max(ChunkHash)))
 context = with(contextFrm, sparseVector(i=ChunkHash, x=ChunkCount, length=max(ChunkHash)))
 
-myPrint('
-# Build a sparse vector of context attentional weighting
-')
+myPrint('# Build a sparse vector of context attentional weighting')
 contextWeightsIndeces = with(contextWeightsFrm, ChunkHash)
 contextWeights = with(contextWeightsFrm, sparseVector(i=ChunkHash, x=logEntropy, length=max(ChunkHash)))
 
-myPrint('
-# Convert tag occurance counts to base level activations, and place in a sparse vector
-')
+myPrint('# Convert tag occurance counts to base level activations, and place in a sparse vector')
 priorsP = priors/sum(priors)
 priorsOdds = priorsP
 priorsOdds[priorsIndeces] = priorsP[priorsIndeces] / (1 - priorsP[priorsIndeces])
@@ -170,9 +159,7 @@ myPrint('
 dbContext = makeDb(contextFrm)
 db = makeDb(occurancesFrm)
 
-myPrint('
-# Use occurance counts of context -> tags to build sji strength associations
-')
+myPrint('# Use occurance counts of context -> tags to build sji strength associations')
 N = with(chunkFrm, sparseMatrix(i=LeftChunkHash, j=RightChunkHash, x=ChunkCount))
 NRowSums = rowSums(N, sparseResult=TRUE)
 NColSums = colSums(N, sparseResult=TRUE)
@@ -181,9 +168,7 @@ NProdSums = with(summary(N), sparseMatrix(i=i, j=j, x=rowSums(N)[i] * colSums(N)
 NCellSums = NSum * sdiv(N, NProdSums)
 sji = with(summary(NCellSums), sparseMatrix(i=i, j=j, x=log(x)))
 
-myPrint('
-# Write relevant model component values to files, so that changes to the model can be regression tested (using git diff).
-')
+myPrint('# Write relevant model component values to files, so that changes to the model can be regression tested (using git diff).')
 write.csv(summary(sji), file=str_c(PATH, "/", "sji.csv"))
 write.csv(summary(NProdSums), file=str_c(PATH, "/", "NProdSums.csv"))
 write.csv(data.frame(ChunkHash=priorsIndeces, B=as.vector(B[priorsIndeces])), file=str_c(PATH, "/", "B.csv"))
