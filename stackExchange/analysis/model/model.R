@@ -132,7 +132,7 @@ occurancesFrm = subset(occurancesFrm, ChunkType == "tag" | Chunk %in% contextWei
 myPrint('
 # Collapse all context chunktypes on occurancesFrm
 ')
-occurancesFrm = occurancesFrm[occurancesFrm$ChunkType != 'body',]
+#occurancesFrm = occurancesFrm[occurancesFrm$ChunkType != 'body',]
 occurancesFrm$ChunkType[occurancesFrm$ChunkType != 'tag'] = 'context'
 occurancesFrm = ddply(occurancesFrm, .(Chunk,ChunkHash,ChunkType), summarize, ChunkCount = sum(ChunkCount))
 
