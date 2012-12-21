@@ -25,14 +25,6 @@ library(sqldf)
 library(plyr)
 library(data.table)
 
-# And helper functions
-sdiv <- function(X, Y, names=dimnames(X)) {
-  sX <- summary(X)
-  sY <- summary(Y)
-  sRes <- merge(sX, sY, by=c("i", "j"))
-  sparseMatrix(i=sRes[,1], j=sRes[,2], x=sRes[,3]/sRes[,4],dimnames=names)
-}
-
 printP = 1
 myPrint = function(str) {
 	if( printP == 1) {
@@ -173,13 +165,10 @@ rm(chunkFrm)
 NRowSums = rowSums(N, sparseResult=TRUE)
 NColSums = colSums(N, sparseResult=TRUE)
 NSum = sum(N)
-NProdSums = with(summary(N), sparseMatrix(i=i, j=j, x=rowSums(N)[i] * colSums(N)[j]))
-NCellSums = NSum * sdiv(N, NProdSums)
-sji = with(summary(NCellSums), sparseMatrix(i=i, j=j, x=log(x)))
+sji = with(summary(N), sparseMatrix(i=i, j=j, x=log( (NSum * x) / (rowSums(N)[i] * colSums(N)[j]))))
 
 myPrint('# Write relevant model component values to files, so that changes to the model can be regression tested (using git diff).')
 write.csv(summary(sji), file=str_c(PATH, "/", "sji.csv"))
-write.csv(summary(NProdSums), file=str_c(PATH, "/", "NProdSums.csv"))
 write.csv(data.frame(ChunkHash=priorsIndeces, B=as.vector(B[priorsIndeces])), file=str_c(PATH, "/", "B.csv"))
 write.csv(data.frame(Chunk=getChunks(priorsIndeces, db), ChunkHash=priorsIndeces, B=as.vector(B[priorsIndeces])), file=str_c(PATH, "/", "B.csv"))
 write.csv(data.frame(sort(db)), file=str_c(PATH, "/", "db.csv"))
