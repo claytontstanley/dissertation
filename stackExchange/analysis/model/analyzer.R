@@ -118,7 +118,7 @@ contextWeight2 = function(indeces) {
 }
 
 generateContextWeights = function () {
-	contextWeightsFrm = contextWeight2(contextFrm$ChunkHash)
+	contextWeightsFrm = contextWeight2(contextIndeces)
 	write.csv(contextWeightsFrm, file=str_c(PATH, "/", contextWeightsCSV))	
 }
 

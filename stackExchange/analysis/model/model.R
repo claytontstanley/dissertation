@@ -67,6 +67,15 @@ makeSparseTagVector = function(vals) {
 	ret
 }
 
+getLogOdds = function(priors) {
+	priorsP = priors/sum(priors)
+	priorsOdds = priorsP
+	priorsOdds[priorsIndeces] = priorsP[priorsIndeces] / (1 - priorsP[priorsIndeces])
+	B = priorsOdds
+	B[priorsIndeces] = log(as.vector(priorsOdds[priorsIndeces]))
+	B
+}
+
 # Calculate total activation, given base-level activation, sji associations, and context
 act = function(context, B, sji) {
 	weightsSubset = as.vector(contextWeights[context])
@@ -117,8 +126,6 @@ myPrint('# Read in table for attentional context weighting')
 colClasses=c("character", "character", "integer", "numeric", "numeric")
 contextWeightsFrm = read.csv(str_c(PATH, "/", contextWeightsCSV), header=T, sep=",", colClasses=colClasses)
 contextWeightsFrm$logEntropy = 1 - contextWeightsFrm$H / max(contextWeightsFrm$H)
-filteredFrm = contextWeightsFrm
-#filteredFrm = filteredFrm[filteredFrm$logEntropy > .2,]
 
 myPrint('# Perform any filtering on the context and priors frames')
 chunkFrm = subset(chunkFrm, LeftChunkHash %in% contextWeightsFrm$ChunkHash)
@@ -130,6 +137,7 @@ occurancesFrm$ChunkType[occurancesFrm$ChunkType != 'tag'] = 'context'
 occurancesTbl = data.table(occurancesFrm, key=c("Chunk", "ChunkHash", "ChunkType"))
 occurancesTbl = occurancesTbl[, list(ChunkCount=sum(ChunkCount)), by=c("Chunk", "ChunkHash", "ChunkType")]
 occurancesFrm = data.frame(occurancesTbl)
+rm(occurancesTbl)
 
 priorsFrm = occurancesFrm[occurancesFrm$ChunkType == "tag",]
 contextFrm = occurancesFrm[occurancesFrm$ChunkType == "context",]
@@ -139,17 +147,15 @@ contextIndeces = with(contextFrm, ChunkHash)
 priorsIndeces = with(priorsFrm, ChunkHash)
 priors = with(priorsFrm, sparseVector(i=ChunkHash, x=ChunkCount, length=max(ChunkHash)))
 context = with(contextFrm, sparseVector(i=ChunkHash, x=ChunkCount, length=max(ChunkHash)))
+rm(priorsFrm)
 
 myPrint('# Build a sparse vector of context attentional weighting')
 contextWeightsIndeces = with(contextWeightsFrm, ChunkHash)
 contextWeights = with(contextWeightsFrm, sparseVector(i=ChunkHash, x=logEntropy, length=max(ChunkHash)))
+rm(contextWeightsFrm)
 
 myPrint('# Convert tag occurance counts to base level activations, and place in a sparse vector')
-priorsP = priors/sum(priors)
-priorsOdds = priorsP
-priorsOdds[priorsIndeces] = priorsP[priorsIndeces] / (1 - priorsP[priorsIndeces])
-B = priorsOdds
-B[priorsIndeces] = log(as.vector(priorsOdds[priorsIndeces]))
+B = getLogOdds(priors)
 
 myPrint('
 # Construct the db of chunk (character) <-> chunkHash (integer) associations
@@ -158,9 +164,12 @@ myPrint('
 ')
 dbContext = makeDb(contextFrm)
 db = makeDb(occurancesFrm)
+rm(contextFrm)
+rm(occurancesFrm)
 
 myPrint('# Use occurance counts of context -> tags to build sji strength associations')
 N = with(chunkFrm, sparseMatrix(i=LeftChunkHash, j=RightChunkHash, x=ChunkCount))
+rm(chunkFrm)
 NRowSums = rowSums(N, sparseResult=TRUE)
 NColSums = colSums(N, sparseResult=TRUE)
 NSum = sum(N)
@@ -172,7 +181,6 @@ myPrint('# Write relevant model component values to files, so that changes to th
 write.csv(summary(sji), file=str_c(PATH, "/", "sji.csv"))
 write.csv(summary(NProdSums), file=str_c(PATH, "/", "NProdSums.csv"))
 write.csv(data.frame(ChunkHash=priorsIndeces, B=as.vector(B[priorsIndeces])), file=str_c(PATH, "/", "B.csv"))
-cAct = act(c(1:5), B, sji)
 write.csv(data.frame(Chunk=getChunks(priorsIndeces, db), ChunkHash=priorsIndeces, B=as.vector(B[priorsIndeces])), file=str_c(PATH, "/", "B.csv"))
 write.csv(data.frame(sort(db)), file=str_c(PATH, "/", "db.csv"))
 write.csv(data.frame(sort(dbContext)), file=str_c(PATH, "/", "dbContext.csv"))
