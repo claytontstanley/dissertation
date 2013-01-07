@@ -73,7 +73,7 @@ rateVals3 = function(subsetIndeces, act, observed, tagFile) {
 	tags = getChunks(sampleIndeces, db)
 	priors = as.vector(B[sampleIndeces])
 	sjis = as.vector(act$sji[sampleIndeces])
-	return(data.frame(tag=tags, sji=sjis, prior=priors, targetP=targetP, act=priors+sjis, tagFile=tagFile))
+	return(data.frame(tag=tags, sji=sjis, prior=priors, targetP=targetP, act=priors+sjis))
 }
 
 getObservedContext = function(tagFile) {
@@ -81,8 +81,9 @@ getObservedContext = function(tagFile) {
 	if ( !any(grep("*.csv", tagFile)) ) {
 		observed = readLines(str_c(PATH, "/../html-to-text/", tagDir, "/", tagFile), warn = F)
 		observed = replaceSynonyms(observed, dbSynonyms)
-		context = readLines(str_c(PATH, "/../html-to-text/", titleDir, "/", tagFile), warn = F)
-		#context = c(context, readLines(str_c(PATH, "/../html-to-text/", bodyDir, "/", tagFile), warn = F))
+		context = c()
+		#context = readLines(str_c(PATH, "/../html-to-text/", titleDir, "/", tagFile), warn = F)
+		context = c(context, readLines(str_c(PATH, "/../html-to-text/", bodyDir, "/", tagFile), warn = F))
 		ret = list("observed" = observed, "context" = context)
 	}
 	return(ret)
@@ -95,7 +96,11 @@ ratePost = function(tagFile) {
 		context = lst$context
 		myPrint(str_c("working tag file ", tagFile))
 		cAct = act(getChunkHashes(context, dbContext), B, sji)
-		res = rbind(res, rateVals3(priorsIndeces, cAct, getChunkHashes(observed, db), tagFile))
+		ret = rateVals3(priorsIndeces, cAct, getChunkHashes(observed, db), tagFile)
+		ret$tagFile=tagFile
+		ret$WContext=sum(as.vector(contextWeights[getChunkHashes(context, db)]))
+		ret$NContext=length(context)
+		res = rbind(res, ret)
 	}
 	return(res)
 }

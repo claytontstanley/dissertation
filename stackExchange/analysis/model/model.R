@@ -71,12 +71,11 @@ getLogOdds = function(priors) {
 # Calculate total activation, given base-level activation, sji associations, and context
 act = function(context, B, sji) {
 	weightsSubset = as.vector(contextWeights[context])
-	#if( sum(weightsSubset) > 0) {
-	#	weightsSubset = weightsSubset / sum(weightsSubset)
-	#}
+	if( sum(weightsSubset) > 0) {
+		weightsSubset = weightsSubset / sum(weightsSubset)
+	}
 	#weightsSubset = rep(1/length(context), length(context))
-	myPrint(weightsSubset)
-	myPrint(context)
+	myPrint(paste(getChunks(context, db), weightsSubset))
 	sjiSubset = as.matrix(sji[context,priorsIndeces])
 	if( length(context) > 1 ) {
 		sjiSubset = as.vector(t(sjiSubset) %*% weightsSubset)
