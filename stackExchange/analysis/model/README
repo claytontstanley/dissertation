@@ -12,3 +12,5 @@ LogREg-6-4-4.csv	no context
 LogREg-6-4-5.csv	bad context (anti-compressed context)
 LogReg-6-4-6.csv	after using sampling for distribution	
 LogReg-6-4-7.csv	after using updated tag synonyms	
+LogReg-6-4-8.csv	after using body keywords for just building sji
+			(not in test dataset for context)
