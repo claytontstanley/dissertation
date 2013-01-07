@@ -6,7 +6,7 @@
 # Bi is a sparse row vector
 
 # Chunknames are hashed to a unique integer value for each chunk
-# Hashing procedure is done outside of R (in MySQL)
+# Hashing procedure is done outside of R (in PostgreSQL)
 # Chunks are are already hashed when read in
 # This allows the sji and Bi structures to be indexed by integer hash (O(1) lookup times as a consequence)
 # ChunkHash <-> Chunk mappings are maintained in the db hash table
