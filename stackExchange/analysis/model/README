@@ -14,6 +14,7 @@ LogReg-6-4-6.csv	after using sampling for distribution
 LogReg-6-4-7.csv	after using updated tag synonyms	
 LogReg-6-4-8.csv	after using body keywords for just building sji
 			(not in test dataset for context)
-LogReg-6-4-9.csv	after using body keywords for sji and test dataset context
-LogReg-6-4-10.csv	same as above except normalized context by sum of weights	
-LogReg-6-4-11.csv	same as above except normalized context by length of weights	
+LogReg-6-4-9.csv	after using body keywords for sji and test dataset context (only body in context?)
+LogReg-6-4-10.csv	only body for context; normalized context by sum of weights		7% CA
+LogReg-6-4-11.csv	only body for context; normalized context by length of weights		4% CA	
+LogReg-6-4-12.csv	only title for context; normalized context by sum of weights		9% CA
