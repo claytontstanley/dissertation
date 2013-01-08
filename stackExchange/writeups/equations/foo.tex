@@ -1,0 +1,31 @@
+\documentclass[man]{apa6}
+
+\usepackage[american]{babel}
+\usepackage[utf8]{inputenc}
+
+\usepackage{graphicx}
+\usepackage[group-separator={,}]{siunitx}
+
+
+\title{Psyc 602 Psychometrics Project}
+\shorttitle{Psyc 602 Project}
+
+\begin{document}
+
+$A_{i} = B_{i} + \sum_{j\in title}^{ } W_{j} S_{ji} + \sum_{j\in body}^{ } W_{j} S_{ji}$
+
+$B_{i} = log \frac{p_{i}}{1-p_{i}}$
+
+$S_{ji} = log \frac{p(i|j)}{p(i))} = log \frac{p(j,i)}{p(j)p(i)} = log \frac{NN(j,i)}{N_{Row}(j)N_{Col}(i)}$
+
+$W_{j} = WE_{j}$
+
+$W = \frac{1}{\sum_{}^{} W_{j}}$
+
+$E_{j} = 1-\frac{H_{j}}{H_{max}}$
+
+$H_{j} = -\sum_{i=1}^{N}p(i|j)log\left (  p(i|j) \right )$
+
+$H_{max} = maxH$
+
+\end{document}
