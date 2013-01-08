@@ -28,8 +28,7 @@ logReg = function(tag, res) {
 	#dev.new()
 	#logi.hist.plot(dfSubset$act, dfSubset$targetP, boxp=T, type="hist", col="gray")
 	#title(main=tag)
-	mylogit = glm(targetP ~ sji + prior, data=dfSubset, family="binomial")
-	#mylogit = glm(targetP ~ act, data=dfSubset, family="binomial")
+	mylogit = glm(targetP ~ sjiBody + sjiTitle + prior, data=dfSubset, family="binomial")
 	myPrint(summary(mylogit))
 	tmp = ClassLog(mylogit, dfSubset$targetP)
 	myPrint(tmp) 
@@ -45,18 +44,20 @@ logReg = function(tag, res) {
 	names(Ns) = c('NTagged', 'NNotTagged', 'N')
 	#p = summary(mylogit)$coefficients["act",'Pr(>|z|)']
 	#return(with(tmp, data.frame(mcFadden=mcFadden,overall=overall, tag=tag, t(vals), t(Ns), p=p)))
-	return(list("W"=coeffs["sji"]/coeffs["prior"], "logit"=mylogit, "classLog"=tmp))
+	return(list("logit"=mylogit, "classLog"=tmp))
 }
 
 runLogReg = function(logRegFile, figName) {
 	res = read.csv(str_c(PATH, "/", logRegFile))
 	logRegRes = logReg(res$tag, res)
-	res$act = res$sji * logRegRes$W + res$prior
+	coeffs = summary(logRegRes$logit)$coefficients[,"Estimate"]
+	res$act = res$sjiTitle * coeffs["sjiTitle"] + res$sjiBody * coeffs["sjiBody"] + res$prior
 	asFig(figName)
 	logi.hist.plot(res$act, res$targetP, boxp=T, type="hist", col="gray")
 	devOff()
-	return(append(logRegRes, list("res"=res)))
+	return(append(logRegRes, list("res"=res, coeffs=as.list(coeffs))))
 }
+
 
 plotHighest = function(subsetIndeces, vals, db) {
 	topNum = 20
@@ -70,21 +71,30 @@ plotHighest = function(subsetIndeces, vals, db) {
 	axis(1, at=1:topNum, labels=xnames, las=3, cex.axis=.8)
 }
 
-visPost = function(tagFile) {
+addLabels = function(observed, titleContext, ylab) {
+		weights = round(as.vector(contextWeights[getChunkHashes(titleContext, db)]), 2)
+		title(str_c(paste(titleContext, collapse=" "), "\n", paste(weights, collapse=" "), "\n", paste(observed, collapse=" ")), cex.main=.9)
+		title(ylab=ylab)
+}
+
+visPost = function(tagFile, coeffs=list(sjiTitle=1, sjiBody=1)) {
 	if ( length(lst <- getObservedContext(tagFile)) > 0 ) {
 		observed = lst$observed
-		context = lst$context
-		cAct = act(getChunkHashes(context, dbContext), B, sji)
+		titleContext = lst$titleContext
+		bodyContext = lst$bodyContext
+		tAct = act(getChunkHashes(titleContext, dbContext), B, sji)
+		bAct = act(getChunkHashes(bodyContext, dbContext), B, sji)
 		asFig(str_c("visPost-", sub("^.*/", "", tagFile), "-act"))
-		plotHighest(priorsIndeces, cAct$act, db)
-		weights = round(as.vector(contextWeights[getChunkHashes(context, db)]), 2)
-		title(str_c(paste(context, collapse=" "), "\n", paste(weights, collapse=" "), "\n", paste(observed, collapse=" ")), cex.main=.9)
-		title(ylab="Total Activation")
+		plotHighest(priorsIndeces, B+tAct$sji*coeffs$sjiTitle+bAct$sji*coeffs$sjiBody, db)
+		addLabels(observed, titleContext, "Total Activation")
 		devOff()
-		asFig(str_c("visPost-", sub("^.*/", "", tagFile), "-sji"))
-		plotHighest(priorsIndeces, cAct$sji, db)
-		title(str_c(paste(context, collapse=" "), "\n", paste(weights, collapse=" "), "\n", paste(observed, collapse=" ")), cex.main=.9)
-		title(ylab="sji Activation")
+		asFig(str_c("visPost-", sub("^.*/", "", tagFile), "-sjiTitle"))
+		plotHighest(priorsIndeces, tAct$sji*coeffs$sjiTitle, db)
+		addLabels(observed, titleContext, "sji Title")
+		devOff()
+		asFig(str_c("visPost-", sub("^.*/", "", tagFile), "-sjiBody"))
+		plotHighest(priorsIndeces, bAct$sji*coeffs$sjiBody, db)
+		addLabels(observed, titleContext, "sjiBody")
 		devOff()
 	}
 }

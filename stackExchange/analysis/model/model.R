@@ -74,6 +74,9 @@ act = function(context, B, sji) {
 	if( sum(weightsSubset) > 0) {
 		weightsSubset = weightsSubset / sum(weightsSubset)
 	}
+	#if( length(weightsSubset) > 0) {
+	#	weightsSubset = weightsSubset / length(weightsSubset)
+	#}
 	#weightsSubset = rep(1/length(context), length(context))
 	myPrint(paste(getChunks(context, db), weightsSubset))
 	sjiSubset = as.matrix(sji[context,priorsIndeces])

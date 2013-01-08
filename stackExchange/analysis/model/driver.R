@@ -60,7 +60,7 @@ rateVals2 = function(subsetIndeces, act, observed, tagFile) {
 
 rateVals3 = function(subsetIndeces, act, observed, tagFile) {
 	cutoff = 200
-	vals = as.vector(act$sji[subsetIndeces] * 1.3 + B[subsetIndeces])
+	vals = as.vector(B[subsetIndeces] + act$sjiTitle[subsetIndeces] + act$sjiBody[subsetIndeces])
 	res = sort(vals, decreasing=T, index.return=T)
 	sortedChunkHashes = subsetIndeces[res$ix]
 	#sortedChunkHashes = sortedChunkHashes[1:cutoff]
@@ -72,8 +72,9 @@ rateVals3 = function(subsetIndeces, act, observed, tagFile) {
 	targetP[match(observed, sampleIndeces)] = 1
 	tags = getChunks(sampleIndeces, db)
 	priors = as.vector(B[sampleIndeces])
-	sjis = as.vector(act$sji[sampleIndeces])
-	return(data.frame(tag=tags, sji=sjis, prior=priors, targetP=targetP, act=priors+sjis))
+	sjiTitle = as.vector(act$sjiTitle[sampleIndeces])
+	sjiBody = as.vector(act$sjiBody[sampleIndeces])
+	return(data.frame(tag=tags, sjiTitle=sjiTitle, sjiBody=sjiBody, prior=priors, targetP=targetP, act=priors + sjiTitle + sjiBody))
 }
 
 getObservedContext = function(tagFile) {
@@ -81,10 +82,9 @@ getObservedContext = function(tagFile) {
 	if ( !any(grep("*.csv", tagFile)) ) {
 		observed = readLines(str_c(PATH, "/../html-to-text/", tagDir, "/", tagFile), warn = F)
 		observed = replaceSynonyms(observed, dbSynonyms)
-		context = c()
-		#context = readLines(str_c(PATH, "/../html-to-text/", titleDir, "/", tagFile), warn = F)
-		context = c(context, readLines(str_c(PATH, "/../html-to-text/", bodyDir, "/", tagFile), warn = F))
-		ret = list("observed" = observed, "context" = context)
+		titleContext = readLines(str_c(PATH, "/../html-to-text/", titleDir, "/", tagFile), warn = F)
+		bodyContext = readLines(str_c(PATH, "/../html-to-text/", bodyDir, "/", tagFile), warn = F)
+		ret = list(observed=observed, titleContext=titleContext, bodyContext=bodyContext)
 	}
 	return(ret)
 }
@@ -93,13 +93,16 @@ ratePost = function(tagFile) {
 	res = data.frame()
 	if ( length(lst <- getObservedContext(tagFile)) > 0 ) {
 		observed = lst$observed
-		context = lst$context
+		titleContext = lst$titleContext
+		bodyContext = lst$bodyContext
 		myPrint(str_c("working tag file ", tagFile))
-		cAct = act(getChunkHashes(context, dbContext), B, sji)
+		tAct = act(getChunkHashes(titleContext, dbContext), B, sji)
+		bAct = act(getChunkHashes(bodyContext, dbContext), B, sji)
+		cAct = list()
+		cAct$sjiTitle = tAct$sji
+		cAct$sjiBody = bAct$sji
 		ret = rateVals3(priorsIndeces, cAct, getChunkHashes(observed, db), tagFile)
 		ret$tagFile=tagFile
-		ret$WContext=sum(as.vector(contextWeights[getChunkHashes(context, db)]))
-		ret$NContext=length(context)
 		res = rbind(res, ret)
 	}
 	return(res)
