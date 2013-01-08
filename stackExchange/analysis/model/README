@@ -15,3 +15,4 @@ LogReg-6-4-7.csv	after using updated tag synonyms
 LogReg-6-4-8.csv	after using body keywords for just building sji
 			(not in test dataset for context)
 LogReg-6-4-9.csv	after using body keywords for sji and test dataset context
+LogReg-6-4-10.csv	same as above except normalized context by sum of weights	
