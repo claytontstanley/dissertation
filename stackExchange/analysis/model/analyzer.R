@@ -11,7 +11,6 @@ library(QuantPsyc)
 library(multicore)
 library(reshape)
 library(calibrate)
-library(RMySQL)
 library(multicore)
 
 asFig = function(figName) {

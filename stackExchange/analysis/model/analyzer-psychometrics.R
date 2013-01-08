@@ -6,6 +6,7 @@ PATH = dirname(frameFiles[[length(frameFiles)]])
 # Source the analyzer utility functions
 source(str_c(PATH, "/analyzer.R"))
 
+library(RMySQL)
 con = dbConnect(MySQL())
 
 fullDataset = list()
