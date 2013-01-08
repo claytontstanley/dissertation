@@ -18,3 +18,4 @@ LogReg-6-4-9.csv	after using body keywords for sji and test dataset context (onl
 LogReg-6-4-10.csv	only body for context; normalized context by sum of weights		7% CA
 LogReg-6-4-11.csv	only body for context; normalized context by length of weights		4% CA	
 LogReg-6-4-12.csv	only title for context; normalized context by sum of weights		9% CA
+LogReg-6-4-13.csv	both title and bodyfor context; normalized context by sum of weights	14% CA
