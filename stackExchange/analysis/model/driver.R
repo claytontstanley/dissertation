@@ -60,7 +60,7 @@ rateVals2 = function(subsetIndeces, act, observed, tagFile) {
 
 rateVals3 = function(subsetIndeces, act, observed, tagFile) {
 	cutoff = 200
-	vals = as.vector(B[subsetIndeces] + act$sjiTitle[subsetIndeces] + act$sjiBody[subsetIndeces])
+	vals = as.vector(B[subsetIndeces] + act$sjiTitle[subsetIndeces]*1.02 + act$sjiBody[subsetIndeces])*1.88
 	res = sort(vals, decreasing=T, index.return=T)
 	sortedChunkHashes = subsetIndeces[res$ix]
 	#sortedChunkHashes = sortedChunkHashes[1:cutoff]
