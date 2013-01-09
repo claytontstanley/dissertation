@@ -18,5 +18,6 @@ writeStruct = function(struct, name=as.character(substitute(struct))) {
 res = list()
 res$standard = act(getChunkHashes(c("i", "want", "to", "learn", "php", "codez"), db), B, sji)
 res$noContext = act(getChunkHashes(c(), db), B, sji)
+res$oneContext = act(getChunkHashes(c("the"), db), B, sji)
 
 writeStruct(res)
