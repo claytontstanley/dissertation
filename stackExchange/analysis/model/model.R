@@ -1,9 +1,9 @@
 # --------------------------------------------------------------------------------------------------------
 # ACT-R DM activation equations implemented in R
 
-# sji is implemented as a sparse array
+# sji is implemented as a sparse matrix 
 # Context and possible retrieval chunks are on vertical and horizontal axes respectively
-# Bi is a sparse row vector
+# Bi is a row vector
 
 # Chunknames are hashed to a unique integer value for each chunk
 # Hashing procedure is done outside of R (in PostgreSQL)
@@ -53,12 +53,6 @@ makeDb = function(frm, valsAcc = "ChunkHash", namesAcc = "Chunk") {
 	db
 }
 
-makeSparseTagVector = function(vals) {
-	ret = B
-	ret[priorsIndeces] = vals
-	ret
-}
-
 getLogOdds = function(priors) {
 	priorsP = priors/sum(priors)
 	priorsOdds = priorsP
@@ -74,8 +68,9 @@ act = function(context, B, sji) {
 	if( sum(weights) > 0) {
 		weights = weights / sum(weights)
 	}
-	weightsSubset = sparseVector(i=context, x=weights, length=dim(sji)[1])
-	myPrint(paste(getChunks(context, db), weights))
+	weightsSubset = rep(0, dim(sji)[1])
+	weightsSubset[context] = weights
+	myPrint(paste(getChunks(context, dbContext), weights))
 	sjiSubset = weightsSubset %*% sji
 	return(list(sji=sjiSubset))
 }
@@ -84,8 +79,8 @@ W = 1
 contextWeightsCSV = 'contextWeights.csv'
 priorsCSV = 'tag-priors-subset-4.csv'
 sjiCSV = 'title-chunks-subset-4.csv'
-priorsCSV = 'tag-priors.csv'
-sjiCSV = 'title-chunks.csv'
+#priorsCSV = 'tag-priors.csv'
+#sjiCSV = 'title-chunks.csv'
 
 Rprof()
 
@@ -137,16 +132,15 @@ contextFrm = occurancesFrm[occurancesFrm$ChunkType == "context",]
 myPrint('# Generate context and prior indeces and counts')
 contextIndeces = with(contextFrm, ChunkHash)
 priorsIndeces = with(priorsFrm, ChunkHash)
-priors = with(priorsFrm, sparseVector(i=ChunkHash, x=ChunkCount, length=max(ChunkHash)))
-context = with(contextFrm, sparseVector(i=ChunkHash, x=ChunkCount, length=max(ChunkHash)))
+priors = with(priorsFrm, as.vector(sparseVector(i=ChunkHash, x=ChunkCount, length=max(ChunkHash))))
+context = with(contextFrm, as.vector(sparseVector(i=ChunkHash, x=ChunkCount, length=max(ChunkHash))))
 
-myPrint('# Build a sparse vector of context attentional weighting')
+myPrint('# Build a vector of context attentional weighting')
 contextWeightsIndeces = with(contextWeightsFrm, ChunkHash)
-contextWeights = with(contextWeightsFrm, sparseVector(i=ChunkHash, x=logEntropy, length=max(ChunkHash)))
-contextWeights = as.vector(contextWeights)
+contextWeights = with(contextWeightsFrm, as.vector(sparseVector(i=ChunkHash, x=logEntropy, length=max(ChunkHash))))
 rm(contextWeightsFrm)
 
-myPrint('# Convert tag occurance counts to base level activations, and place in a sparse vector')
+myPrint('# Convert tag occurance counts to base level activations, and place in a row vector')
 B = getLogOdds(priors)
 
 myPrint('
@@ -163,8 +157,6 @@ rm(occurancesFrm)
 myPrint('# Use occurance counts of context -> tags to build sji strength associations')
 N = with(chunkFrm, sparseMatrix(i=LeftChunkHash, j=RightChunkHash, x=ChunkCount))
 rm(chunkFrm)
-NRowSums = rowSums(N, sparseResult=TRUE)
-NColSums = colSums(N, sparseResult=TRUE)
 NSum = sum(N)
 sji = with(summary(N), sparseMatrix(i=i, j=j, x=log( (NSum * x) / (rowSums(N)[i] * colSums(N)[j]))))
 
@@ -173,3 +165,6 @@ write.csv(summary(sji), file=str_c(PATH, "/", "sji.csv"))
 write.csv(data.frame(Chunk=getChunks(priorsIndeces, dbPriors), ChunkHash=priorsIndeces, B=as.vector(B[priorsIndeces])), file=str_c(PATH, "/", "B.csv"))
 write.csv(data.frame(sort(dbPriors)), file=str_c(PATH, "/", "dbPriors.csv"))
 write.csv(data.frame(sort(dbContext)), file=str_c(PATH, "/", "dbContext.csv"))
+
+Rprof(NULL)
+print(summaryRprof())
