@@ -70,7 +70,7 @@ act = function(context, B, sji) {
 		weights = weights / sum(weights)
 	}
 	weightsSubset = rep(0, dim(sji)[1])
-	weightsSubset[context] = weights
+	weightsSubset[context] = weights * table(context)[as.character(context)]
 	myPrint(paste(getChunks(context, dbContext), weights))
 	sjiSubset = weightsSubset %*% sji
 	return(list(sji=sjiSubset))
