@@ -34,7 +34,7 @@ myPrint = function(str) {
 
 # Interface to retrieve chunkHash for chunk name
 getChunkHashes = function(chunks, db) {
-	ret = db[chunks]
+	ret = db[fmatch(chunks, names(db))]
 	ret = ret[!is.na(ret)]
 #	stopifnot(length(ret) > 0)
 	myPrint(str_c(length(chunks), "->", length(ret)))
@@ -70,29 +70,14 @@ getLogOdds = function(priors) {
 
 # Calculate total activation, given base-level activation, sji associations, and context
 act = function(context, B, sji) {
-	weightsSubset = as.vector(contextWeights[context])
-	if( sum(weightsSubset) > 0) {
-		weightsSubset = weightsSubset / sum(weightsSubset)
+	weights = contextWeights[context]
+	if( sum(weights) > 0) {
+		weights = weights / sum(weights)
 	}
-	#if( length(weightsSubset) > 0) {
-	#	weightsSubset = weightsSubset / length(weightsSubset)
-	#}
-	#weightsSubset = rep(1/length(context), length(context))
-	myPrint(paste(getChunks(context, db), weightsSubset))
-	sjiSubset = as.matrix(sji[context,priorsIndeces])
-	if( length(context) > 1 ) {
-		sjiSubset = as.vector(t(sjiSubset) %*% weightsSubset)
-	} 
-	if( length(context) == 1) {
-		sjiSubset = as.vector(sjiSubset * weightsSubset)
-	}
-	if( length(context) == 0) {
-		sjiSubset = rep(0, length(priorsIndeces))
-	}
-	sjiSubset = sjiSubset * W
-	sjiSubset = makeSparseTagVector(sjiSubset)
-	act = makeSparseTagVector(as.vector(B[priorsIndeces]) + as.vector(sjiSubset[priorsIndeces]))
-	return(list(act=act, sji=sjiSubset))
+	weightsSubset = sparseVector(i=context, x=weights, length=dim(sji)[1])
+	myPrint(paste(getChunks(context, db), weights))
+	sjiSubset = weightsSubset %*% sji
+	return(list(sji=sjiSubset))
 }
 
 W = 1
@@ -121,17 +106,30 @@ colClasses=c("character", "character", "integer", "numeric", "numeric")
 contextWeightsFrm = read.csv(str_c(PATH, "/", contextWeightsCSV), header=T, sep=",", colClasses=colClasses)
 contextWeightsFrm$logEntropy = 1 - contextWeightsFrm$H / max(contextWeightsFrm$H)
 
-myPrint('# Perform any filtering on the context and priors frames')
-chunkFrm = subset(chunkFrm, LeftChunkHash %in% contextWeightsFrm$ChunkHash)
-occurancesFrm = subset(occurancesFrm, ChunkType == "tag" | ChunkHash %in% contextWeightsFrm$ChunkHash)
-
 myPrint('# Collapse all context chunktypes on occurancesFrm')
-#occurancesFrm = occurancesFrm[occurancesFrm$ChunkType != 'body',]
 occurancesFrm$ChunkType[occurancesFrm$ChunkType != 'tag'] = 'context'
 occurancesTbl = data.table(occurancesFrm, key=c("Chunk", "ChunkHash", "ChunkType"))
 occurancesTbl = occurancesTbl[, list(ChunkCount=sum(ChunkCount)), by=c("Chunk", "ChunkHash", "ChunkType")]
 occurancesFrm = data.frame(occurancesTbl)
 rm(occurancesTbl)
+
+myPrint('# Perform any filtering on the context and priors frames')
+chunkFrm = subset(chunkFrm, LeftChunkHash %in% contextWeightsFrm$ChunkHash)
+occurancesFrm = subset(occurancesFrm, ChunkType == "tag" | ChunkHash %in% contextWeightsFrm$ChunkHash)
+contextWeightsFrm = subset(contextWeightsFrm, ChunkHash %in% with(occurancesFrm, ChunkHash[ChunkType == "context"]))
+
+myPrint('# Compress ChunkHash indeces in data frames')
+tagSubsetIndeces = which(occurancesFrm$ChunkType == "tag")
+contextSubsetIndeces = which(occurancesFrm$ChunkType == "context")
+tagHashIndeces = occurancesFrm$ChunkHash[tagSubsetIndeces]
+contextHashIndeces = occurancesFrm$ChunkHash[contextSubsetIndeces]
+occurancesFrm$ChunkHash[tagSubsetIndeces] = fmatch(occurancesFrm$ChunkHash[tagSubsetIndeces], tagHashIndeces)
+occurancesFrm$ChunkHash[contextSubsetIndeces] = fmatch(occurancesFrm$ChunkHash[contextSubsetIndeces], contextHashIndeces)
+chunkFrm$LeftChunkHash = fmatch(chunkFrm$LeftChunkHash, contextHashIndeces)
+chunkFrm$RightChunkHash = fmatch(chunkFrm$RightChunkHash, tagHashIndeces)
+contextWeightsFrm$ChunkHash = fmatch(contextWeightsFrm$ChunkHash, contextHashIndeces)
+rm(tagSubsetIndeces)
+rm(contextSubsetIndeces)
 
 priorsFrm = occurancesFrm[occurancesFrm$ChunkType == "tag",]
 contextFrm = occurancesFrm[occurancesFrm$ChunkType == "context",]
@@ -141,11 +139,11 @@ contextIndeces = with(contextFrm, ChunkHash)
 priorsIndeces = with(priorsFrm, ChunkHash)
 priors = with(priorsFrm, sparseVector(i=ChunkHash, x=ChunkCount, length=max(ChunkHash)))
 context = with(contextFrm, sparseVector(i=ChunkHash, x=ChunkCount, length=max(ChunkHash)))
-rm(priorsFrm)
 
 myPrint('# Build a sparse vector of context attentional weighting')
 contextWeightsIndeces = with(contextWeightsFrm, ChunkHash)
 contextWeights = with(contextWeightsFrm, sparseVector(i=ChunkHash, x=logEntropy, length=max(ChunkHash)))
+contextWeights = as.vector(contextWeights)
 rm(contextWeightsFrm)
 
 myPrint('# Convert tag occurance counts to base level activations, and place in a sparse vector')
@@ -153,12 +151,13 @@ B = getLogOdds(priors)
 
 myPrint('
 # Construct the db of chunk (character) <-> chunkHash (integer) associations
-# Use a named vector, so that chunk lookups by chunkHash are O(1), and
-# chunkHash lookups by chunk are log(n) (when using the fmatch function)
+# Use a named vector, so that chunk lookups by chunkHash are O(log(n)), and
+# chunkHash lookups by chunk are O(log(n)) (when using the fmatch function)
 ')
 dbContext = makeDb(contextFrm)
-db = makeDb(occurancesFrm)
+dbPriors = makeDb(priorsFrm)
 rm(contextFrm)
+rm(priorsFrm)
 rm(occurancesFrm)
 
 myPrint('# Use occurance counts of context -> tags to build sji strength associations')
@@ -171,7 +170,6 @@ sji = with(summary(N), sparseMatrix(i=i, j=j, x=log( (NSum * x) / (rowSums(N)[i]
 
 myPrint('# Write relevant model component values to files, so that changes to the model can be regression tested (using git diff).')
 write.csv(summary(sji), file=str_c(PATH, "/", "sji.csv"))
-write.csv(data.frame(ChunkHash=priorsIndeces, B=as.vector(B[priorsIndeces])), file=str_c(PATH, "/", "B.csv"))
-write.csv(data.frame(Chunk=getChunks(priorsIndeces, db), ChunkHash=priorsIndeces, B=as.vector(B[priorsIndeces])), file=str_c(PATH, "/", "B.csv"))
-write.csv(data.frame(sort(db)), file=str_c(PATH, "/", "db.csv"))
+write.csv(data.frame(Chunk=getChunks(priorsIndeces, dbPriors), ChunkHash=priorsIndeces, B=as.vector(B[priorsIndeces])), file=str_c(PATH, "/", "B.csv"))
+write.csv(data.frame(sort(dbPriors)), file=str_c(PATH, "/", "dbPriors.csv"))
 write.csv(data.frame(sort(dbContext)), file=str_c(PATH, "/", "dbContext.csv"))
