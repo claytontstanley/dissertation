@@ -22,6 +22,7 @@ Rprof()
 res$standard = act(getChunkHashes(c("i", "want", "to", "learn", "php", "codez"), dbContext), B, sji)
 res$noContext = act(getChunkHashes(c(), dbContext), B, sji)
 res$oneContext = act(getChunkHashes(c("the"), dbContext), B, sji)
+res$duplicates = act(getChunkHashes(c("i", "i", "i", "php", "i"), dbContext), B, sji)
 
 Rprof(NULL)
 print(summaryRprof())
