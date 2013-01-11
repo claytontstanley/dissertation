@@ -65,6 +65,7 @@ getLogOdds = function(priors) {
 # Calculate total activation, given base-level activation, sji associations, and context
 act = function(context, B, sji) {
 	weights = contextWeights[context]
+	print(sum(weights))
 	if( sum(weights) > 0) {
 		weights = weights / sum(weights)
 	}
@@ -79,8 +80,8 @@ W = 1
 contextWeightsCSV = 'contextWeights.csv'
 priorsCSV = 'tag-priors-subset-4.csv'
 sjiCSV = 'title-chunks-subset-4.csv'
-priorsCSV = 'tag-priors.csv'
-sjiCSV = 'title-chunks.csv'
+#priorsCSV = 'tag-priors.csv'
+#sjiCSV = 'title-chunks.csv'
 
 Rprof()
 
@@ -156,6 +157,8 @@ rm(occurancesFrm)
 
 myPrint('# Use occurance counts of context -> tags to build sji strength associations')
 N = with(chunkFrm, sparseMatrix(i=LeftChunkHash, j=RightChunkHash, x=ChunkCount))
+NRowSums = rowSums(N)
+NColSums = colSums(N)
 rm(chunkFrm)
 NSum = sum(N)
 sji = with(summary(N), sparseMatrix(i=i, j=j, x=log( (NSum * x) / (rowSums(N)[i] * colSums(N)[j]))))
