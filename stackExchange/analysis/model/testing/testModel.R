@@ -3,8 +3,6 @@ frameFiles = lapply(sys.frames(), function(x) x$ofile)
 frameFiles = Filter(Negate(is.null), frameFiles)
 PATH = dirname(frameFiles[[length(frameFiles)]])
 
-Rprof(NULL)
-
 writeStruct = function(struct, name=as.character(substitute(struct))) {
 	if( mode(struct) == "list") {
 		for( element in names(struct)) {
@@ -18,10 +16,14 @@ writeStruct = function(struct, name=as.character(substitute(struct))) {
 }
 
 res = list()
+
+Rprof()
+
 res$standard = act(getChunkHashes(c("i", "want", "to", "learn", "php", "codez"), dbContext), B, sji)
 res$noContext = act(getChunkHashes(c(), dbContext), B, sji)
 res$oneContext = act(getChunkHashes(c("the"), dbContext), B, sji)
 
+Rprof(NULL)
 print(summaryRprof())
 
 writeStruct(res)
