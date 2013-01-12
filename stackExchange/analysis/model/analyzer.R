@@ -57,21 +57,20 @@ runLogReg = function(logRegFile, figName) {
 	return(append(logRegRes, list("res"=res, coeffs=as.list(coeffs))))
 }
 
-
-plotHighest = function(subsetIndeces, vals, db) {
+plotHighest = function(contextIndeces, vals) {
 	topNum = 20
-	vals = as.vector(vals[subsetIndeces])
+	vals = as.vector(vals[contextIndeces])
 	res = sort(vals, decreasing=T, index.return=T)
-	sortedChunkHashes = subsetIndeces[res$ix]
+	sortedChunkHashes = contextIndeces[res$ix]
 	x = sortedChunkHashes[1:topNum]
-	xnames = getChunks(x, db)
+	xnames = getChunks(x, dbPriors)
 	y = res$x[1:topNum]
 	plot(1:topNum, y, xaxt="n", ann=F)
 	axis(1, at=1:topNum, labels=xnames, las=3, cex.axis=.8)
 }
 
 addLabels = function(observed, titleContext, ylab) {
-		weights = round(as.vector(contextWeights[getChunkHashes(titleContext, db)]), 2)
+		weights = round(as.vector(contextWeights[getChunkHashes(titleContext, dbContext)]), 2)
 		title(str_c(paste(titleContext, collapse=" "), "\n", paste(weights, collapse=" "), "\n", paste(observed, collapse=" ")), cex.main=.9)
 		title(ylab=ylab)
 }
@@ -84,56 +83,30 @@ visPost = function(tagFile, coeffs=list(sjiTitle=1, sjiBody=1)) {
 		tAct = act(getChunkHashes(titleContext, dbContext), B, sji)
 		bAct = act(getChunkHashes(bodyContext, dbContext), B, sji)
 		asFig(str_c("visPost-", sub("^.*/", "", tagFile), "-act"))
-		plotHighest(priorsIndeces, B+tAct$sji*coeffs$sjiTitle+bAct$sji*coeffs$sjiBody, db)
+		plotHighest(priorsIndeces, B+tAct$sji*coeffs$sjiTitle+bAct$sji*coeffs$sjiBody)
 		addLabels(observed, titleContext, "Total Activation")
 		devOff()
 		asFig(str_c("visPost-", sub("^.*/", "", tagFile), "-sjiTitle"))
-		plotHighest(priorsIndeces, tAct$sji*coeffs$sjiTitle, db)
+		plotHighest(priorsIndeces, tAct$sji*coeffs$sjiTitle)
 		addLabels(observed, titleContext, "sji Title")
 		devOff()
 		asFig(str_c("visPost-", sub("^.*/", "", tagFile), "-sjiBody"))
-		plotHighest(priorsIndeces, bAct$sji*coeffs$sjiBody, db)
+		plotHighest(priorsIndeces, bAct$sji*coeffs$sjiBody)
 		addLabels(observed, titleContext, "sjiBody")
 		devOff()
 	}
 }
 
-contextWeight = function(index) {
-	vect = as.vector(N[index, priorsIndeces])
-	count = sum(vect)
-	ps = vect / count
-	ps = ps[ps != 0]
-	sdev = sd(ps)
-	Hs = ps * log(ps)
-	H = -sum(Hs)
-	#dev.new()
-	#hist(ps, xlab="", ylab="", main="", ylim=c(0,50), xlim=c(0,.4))
-	#title(xlab="Nji/Nj")
-	#title(ylab="Frequency")
-	#title(str_c("Entropy distribution for context chunk: ", getChunks(index, db)))
-	#dev.new()
-	#hist(Hs)
-	#myPrint(str_c(count, "->", getChunks(index, db), "->", H))
-	data.frame(Chunk=getChunks(index, db), ChunkHash=index, sdev=sdev, H=H, N=count)
-}
-
 contextWeight2 = function(indeces) {
-	arr = N[indeces,priorsIndeces]
+	arr = N
 	arrSums = rowSums(arr)
 	ps = with(summary(arr), sparseMatrix(i=i, j=j, x=x/arrSums[i]))
 	Hs = with(summary(ps), sparseMatrix(i=i, j=j, x=x*log(x)))
 	H = -rowSums(Hs)
-	data.frame(Chunk=getChunks(indeces, db), ChunkHash=indeces, H=H, N=arrSums)
+	data.frame(Chunk=getChunks(indeces, dbContext), ChunkHash=contextHashIndeces[indeces], H=H, N=arrSums)
 }
 
 generateContextWeights = function () {
 	contextWeightsFrm = contextWeight2(contextIndeces)
 	write.csv(contextWeightsFrm, file=str_c(PATH, "/", contextWeightsCSV))	
 }
-
-sjiRank = function(row, sji) {
-	temp = as.numeric(sji[row,priorsIndeces])
-	temp = temp[temp != 0]
-	return(data.frame(chunkHash=row, chunk=getChunks(row, db), sd=sd(temp), MADZero=mean(abs(temp)), N=length(temp)))
-}
-

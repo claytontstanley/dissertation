@@ -39,7 +39,7 @@ xlab="log #observations for cue"
 ylab="Attentional weight"
 plot(log(as.vector(NRowSums[contextWeightsIndeces])), contextWeights[contextWeightsIndeces], main=main, xlab=xlab, ylab=ylab)
 textVect = c("php", "lisp", "the", "?", "xml", "foo", "very", "much", "well", "binding", "network", "a", "baz")
-textHash = getChunkHashes(textVect, db)
+textHash = getChunkHashes(textVect, dbContext)
 textxy(log(as.vector(NRowSums[textHash])), contextWeights[textHash], textVect, cx=1, dcol = "orange")
 devOff()
 
