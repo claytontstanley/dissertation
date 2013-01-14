@@ -94,7 +94,6 @@ titleDir = "title-subset-6/nlp-huge"
 bodyDir = "body-subset-6/nlp-huge"
 #tagDir = "tag/nlp"
 #titleDir = "title/nlp"
-W = 1
 
 tagFiles = getTagFiles(tagDir)
 

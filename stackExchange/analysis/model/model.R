@@ -76,7 +76,6 @@ act = function(context, B, sji) {
 	return(list(sji=sjiSubset))
 }
 
-W = 1
 contextWeightsCSV = 'contextWeights.csv'
 priorsCSV = 'tag-priors-subset-4.csv'
 sjiCSV = 'title-chunks-subset-4.csv'

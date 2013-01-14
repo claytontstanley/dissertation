@@ -74,7 +74,6 @@ run1 = runLogReg("LogReg-6-4-2.csv", "run1LogReg")
 tagDir = "tag-subset-6/nlp-huge"
 titleDir = "title-subset-6/nlp-huge"
 tagFiles = getTagFiles(tagDir)
-W=run1$W
 visPost(tagFiles[2])
 visPost(tagFiles[40])
 visPost(tagFiles[120])
