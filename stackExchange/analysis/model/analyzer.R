@@ -27,7 +27,7 @@ logReg = function(tag, res) {
 	#dev.new()
 	#logi.hist.plot(dfSubset$act, dfSubset$targetP, boxp=T, type="hist", col="gray")
 	#title(main=tag)
-	mylogit = glm(targetP ~ sjiBody + sjiTitle + prior, data=dfSubset, family="binomial")
+	mylogit = glm(targetP ~ sjiBody + sjiTitle + prior + max, data=dfSubset, family="binomial")
 	myPrint(summary(mylogit))
 	tmp = ClassLog(mylogit, dfSubset$targetP)
 	myPrint(tmp) 
@@ -46,15 +46,58 @@ logReg = function(tag, res) {
 	return(list("logit"=mylogit, "classLog"=tmp))
 }
 
+addColumns = function(res) {
+	res$act=res$sjiTitle * 1.26 + res$sjiBody * 2.3 + res$prior * 1.07
+	#res$act=res$sjiTitle * 1.06 + res$sjiBody * 1.82 + res$prior * 1.03
+	maxAct=sqldf('select tagFile, max(act) as max from res group by tagFile')
+	return(sqldf('select * from res join maxAct on maxAct.tagFile = res.tagFile'))
+}
+
+addColumnsPost = function(res){
+	res$shuffledAct = with(res, sample(act, length(act)))
+	res$cSharp = with(res, as.numeric(tag=="c#")+rnorm(length(tag), mean=0, sd=.0001))
+	return(res)
+}
+
 runLogReg = function(logRegFile, figName) {
 	res = read.csv(str_c(PATH, "/", logRegFile))
+	res = addColumns(res)
 	logRegRes = logReg(res$tag, res)
 	coeffs = summary(logRegRes$logit)$coefficients[,"Estimate"]
-	res$act = res$sjiTitle * coeffs["sjiTitle"] + res$sjiBody * coeffs["sjiBody"] + res$prior
+	res$act = res$sjiTitle * coeffs["sjiTitle"] + res$sjiBody * coeffs["sjiBody"] + res$prior * coeffs["prior"] + res$max * coeffs["max"]
+	res = addColumnsPost(res)
 	asFig(figName)
 	logi.hist.plot(res$act, res$targetP, boxp=T, type="hist", col="gray")
 	devOff()
 	return(append(logRegRes, list("res"=res, coeffs=as.list(coeffs))))
+}
+
+plotROCColumn = function(dFrame, column, cnt, col) {
+	pred = prediction(dFrame[[column]], dFrame$targetP)
+	perf = performance(pred, "tpr", "fpr")
+	nSamples = length(unlist(perf@x.values))
+	indeces = sort(sample(nSamples, 2000, prob=1/(1+1000*unlist(perf@x.values))))
+	fp = unlist(perf@x.values)*sum(!dFrame$targetP)
+	tp = unlist(perf@y.values)*sum(dFrame$targetP)
+	x = tp[indeces]+fp[indeces]
+	x = x/length(unique(dFrame$tagFile))
+	y = tp[indeces]/(tp[indeces]+fp[indeces])
+	xlim = c(0, sum(dFrame$targetP)/length(unique(dFrame$tagFile)))
+	if(cnt != 1) {
+		lines(x, y, col=col, typ="p", pch=cnt)
+	} else {
+		plot(x, y, xlim=xlim, col=col, pch=cnt, xlab="average number of tags per post", ylab="model tag proportion correct")
+	}		
+}
+
+plotROC = function(dFrame, columns) {
+	dev.new()
+	colors = c("red", "green", "blue")
+	for(column in columns){
+		ind = match(column, columns)
+		plotROCColumn(dFrame, column, ind, colors[ind]) 
+	}
+	legend("topright", legend=columns, col=colors, pch=1:length(columns))
 }
 
 plotHighest = function(contextIndeces, vals) {
