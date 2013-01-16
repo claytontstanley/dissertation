@@ -27,7 +27,7 @@ logReg = function(tag, res) {
 	#dev.new()
 	#logi.hist.plot(dfSubset$act, dfSubset$targetP, boxp=T, type="hist", col="gray")
 	#title(main=tag)
-	mylogit = glm(targetP ~ sjiBody + sjiTitle + prior + max, data=dfSubset, family="binomial")
+	mylogit = glm(targetP ~ sjiBody + sjiTitle + prior + offset, data=dfSubset, family="binomial")
 	myPrint(summary(mylogit))
 	tmp = ClassLog(mylogit, dfSubset$targetP)
 	myPrint(tmp) 
@@ -49,8 +49,10 @@ logReg = function(tag, res) {
 addColumns = function(res) {
 	res$act=res$sjiTitle * 1.26 + res$sjiBody * 2.3 + res$prior * 1.07
 	#res$act=res$sjiTitle * 1.06 + res$sjiBody * 1.82 + res$prior * 1.03
-	maxAct=sqldf('select tagFile, max(act) as max from res group by tagFile')
-	return(sqldf('select * from res join maxAct on maxAct.tagFile = res.tagFile'))
+	offsetFrm=sqldf('select tagFile, max(act) as max, avg(act) as avg from res group by tagFile')
+	res = sqldf('select * from res join offsetFrm on offsetFrm.tagFile = res.tagFile')
+	res$offset = res$max
+	return(res)
 }
 
 addColumnsPost = function(res){
@@ -64,7 +66,7 @@ runLogReg = function(logRegFile, figName) {
 	res = addColumns(res)
 	logRegRes = logReg(res$tag, res)
 	coeffs = summary(logRegRes$logit)$coefficients[,"Estimate"]
-	res$act = res$sjiTitle * coeffs["sjiTitle"] + res$sjiBody * coeffs["sjiBody"] + res$prior * coeffs["prior"] + res$max * coeffs["max"]
+	res$act = res$sjiTitle * coeffs["sjiTitle"] + res$sjiBody * coeffs["sjiBody"] + res$prior * coeffs["prior"] + res$offset * coeffs["offset"]
 	res = addColumnsPost(res)
 	asFig(figName)
 	logi.hist.plot(res$act, res$targetP, boxp=T, type="hist", col="gray")
@@ -86,7 +88,7 @@ plotROCColumn = function(dFrame, column, cnt, col) {
 	if(cnt != 1) {
 		lines(x, y, col=col, typ="p", pch=cnt)
 	} else {
-		plot(x, y, xlim=xlim, col=col, pch=cnt, xlab="average number of tags per post", ylab="model tag proportion correct")
+		plot(x, y, xlim=xlim, ylim=c(0, 1), col=col, pch=cnt, xlab="average number of tags per post", ylab="model tag proportion correct")
 	}		
 }
 
