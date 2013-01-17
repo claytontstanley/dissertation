@@ -47,11 +47,19 @@ logReg = function(tag, res) {
 }
 
 addColumns = function(res) {
-	res$act=res$sjiTitle * 1.26 + res$sjiBody * 2.3 + res$prior * 1.07
+	res$act=res$sjiTitle * 1.34 + res$sjiBody * 2.48 + res$prior * 1.09
 	#res$act=res$sjiTitle * 1.06 + res$sjiBody * 1.82 + res$prior * 1.03
-	offsetFrm=sqldf('select tagFile, max(act) as max, avg(act) as avg from res group by tagFile')
-	res = sqldf('select * from res join offsetFrm on offsetFrm.tagFile = res.tagFile')
-	res$offset = res$max
+	resTbl = data.table(res, key=c("tagFile"))
+	resTbl = resTbl[, mean := mean(act), by=c("tagFile")]
+	resTbl = resTbl[, median := median(act), by=c("tagFile")]
+	resTbl = resTbl[, max := max(act), by=c("tagFile")]
+	resTbl = resTbl[, sd := sd(act), by=c("tagFile")]
+	resTbl = resTbl[, z := scale(act), by=c("tagFile")]
+	resTbl = resTbl[, sum := sum(act), by=c("tagFile")]
+	resTbl = resTbl[, meanN := mean(sort(act, decreasing=T)[1:5]), by=c("tagFile")]
+	resTbl = resTbl[, rank := sort(act, decreasing=F, index.return=T)$ix, by=c("tagFile")]
+	res = data.frame(resTbl)
+	res$offset = res$meanN
 	return(res)
 }
 
