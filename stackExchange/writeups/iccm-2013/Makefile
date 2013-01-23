@@ -1,5 +1,6 @@
 
-cogsci_template.pdf: cogsci_template.tex alwaysRemake
+
+writeup.pdf: writeup.tex alwaysRemake
 	latexmk -pdf $<
 
 alwaysRemake:
