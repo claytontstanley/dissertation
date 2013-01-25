@@ -12,6 +12,7 @@ library(multicore)
 library(reshape)
 library(calibrate)
 library(multicore)
+library(ROCR)
 
 asFig = function(figName) {
 	pdf(str_c(PATH, "/Pictures/", figName, ".pdf"))
@@ -47,8 +48,7 @@ logReg = function(tag, res) {
 }
 
 addColumns = function(res) {
-	res$act=res$sjiTitle * 1.34 + res$sjiBody * 2.48 + res$prior * 1.09
-	#res$act=res$sjiTitle * 1.06 + res$sjiBody * 1.82 + res$prior * 1.03
+	res$act=res$sjiTitle * coeffs$sjiTitle + res$sjiBody * coeffs$sjiBody + res$prior * coeffs$prior
 	resTbl = data.table(res, key=c("tagFile"))
 	resTbl = resTbl[, mean := mean(act), by=c("tagFile")]
 	resTbl = resTbl[, median := median(act), by=c("tagFile")]

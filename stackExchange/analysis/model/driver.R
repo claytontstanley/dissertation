@@ -22,7 +22,7 @@ library(plyr)
 # A few helper functions
 rateVals3 = function(priorsIndeces, act, observed, tagFile) {
 	cutoff = 200
-	vals = as.vector(B[priorsIndeces] + act$sjiTitle[priorsIndeces]*1.02 + act$sjiBody[priorsIndeces])*1.88
+	vals = as.vector(B[priorsIndeces]*coeffs$prior + act$sjiTitle[priorsIndeces]*coeffs$sjiTitle + act$sjiBody[priorsIndeces])*coeffs$sjiBody
 	res = sort(vals, decreasing=T, index.return=T)
 	sortedChunkHashes = priorsIndeces[res$ix]
 	#sortedChunkHashes = sortedChunkHashes[1:cutoff]
@@ -39,7 +39,9 @@ rateVals3 = function(priorsIndeces, act, observed, tagFile) {
 	return(data.frame(tag=tags, sjiTitle=sjiTitle, sjiBody=sjiBody, prior=priors, targetP=targetP, act=priors + sjiTitle + sjiBody))
 }
 
-getObservedContext = function(tagFile) {
+getObservedContext = function(tagFile, tagDir) {
+	bodyDir = makeBodyDir(getSubsetId(tagDir))
+	titleDir = makeTitleDir(getSubsetId(tagDir))
 	ret = list()
 	if ( !any(grep("*.csv", tagFile)) ) {
 		observed = readLines(str_c(PATH, "/../html-to-text/", tagDir, "/", tagFile), warn = F)
@@ -51,9 +53,9 @@ getObservedContext = function(tagFile) {
 	return(ret)
 }
 
-ratePost = function(tagFile) {
+ratePost = function(tagFile, tagDir) {
 	res = data.frame()
-	if ( length(lst <- getObservedContext(tagFile)) > 0 ) {
+	if ( length(lst <- getObservedContext(tagFile, tagDir)) > 0 ) {
 		observed = lst$observed
 		titleContext = lst$titleContext
 		bodyContext = lst$bodyContext
@@ -80,32 +82,46 @@ replaceSynonyms = function(chunks, dbSynonyms) {
 	return(as.vector(ret))
 }
 
+makeTagDir = function(subsetId) {
+	str_c("tag-subset-", subsetId, "/nlp-huge")
+}
+
+makeTitleDir = function(subsetId) {
+	str_c("title-subset-", subsetId, "/nlp-huge")
+}
+
+makeBodyDir = function(subsetId) {
+	str_c("body-subset-", subsetId, "/nlp-huge")
+}
+
+getSubsetId = function(str) {
+	str_extract(str_extract(str, "subset-[0-9]+"), "[0-9]+$")
+}
+
+ratePosts = function(subsetId) {
+	tagDir = makeTagDir(subsetId)
+	tagFiles = getTagFiles(tagDir)
+	#res = rbind.fill(parallel::mclapply(tagFiles, ratePost, mc.cores=3, mc.preschedule=T))
+	res = rbind.fill(lapply(tagFiles, function(tagFile) {ratePost(tagFile, tagDir)}))
+	return(res)
+}
+
+writePosts = function(res, testSubset, modelSubset, id) {
+	write.csv(res, file=str_c(PATH, "/LogReg-", testSubset, "-", modelSubset, "-", id, ".csv"))
+}
+
+runSet = function() {
+	sets = c(8:17)
+	lapply(sets, function(set) {writePosts(ratePosts(set), set, getSubsetId(sjiCSV), 1)})
+}
+
+coeffs = list(sjiTitle=1.34, sjiBody=2.48, prior=1.09)
+
 # Load up the synonyms
 colClasses=c("character", "character", "character", "character", "character", "character", "character", "character", "character", "character")
 synonymsFrm = read.csv(str_c(PATH, "/../html-to-text/synonyms/synonyms.csv"), header=T, sep=",", colClasses=colClasses)
 dbSynonyms = makeDb(synonymsFrm, namesAcc="SourceTagName", valsAcc="TargetTagName")
 
-# Source the model
-#source(str_c(PATH, "/model.R"))
-
-# Determine tag files
-tagDir = "tag-subset-6/nlp-huge"
-titleDir = "title-subset-6/nlp-huge"
-bodyDir = "body-subset-6/nlp-huge"
-#tagDir = "tag/nlp"
-#titleDir = "title/nlp"
-
-tagFiles = getTagFiles(tagDir)
-
-# Run the model for each title/tag pair, and analyse results
 printP = 0
-#res = rbind.fill(parallel::mclapply(tagFiles, ratePost, mc.cores=3, mc.preschedule=T))
-res = rbind.fill(lapply(tagFiles, ratePost))
+writePosts(ratePosts(6), 6, getSubsetId(sjiCSV), 15)
 
-write.csv(res, file=str_c(PATH, "/LogReg.csv"))
-
-
-# Save current objects so that they can be referenced from LaTeX document
-#save.image(file = str_c(PATH, "/", ".RData"))
-
-print("done")
