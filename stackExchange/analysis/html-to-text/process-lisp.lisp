@@ -94,13 +94,23 @@
       ;(list  200000  201000 3) ; 1k dataset (not used)
       ;(list  000000 1000000 4) ; 1M training data
       ;(list 1000000 1100000 5) ; 100k test data for 1M training data
-      (list 1000000 1001000 6) ; 1k test data for 1M training data
-      (list 1001000 1002000 7)  ; 2nd 1k test data for 1M training data
+      ;(list 1000000 1001000 6) ; 1k test data for 1M training data
+      ;(list 1001000 1002000 7)  ; 2nd 1k test data for 1M training data
+      (list 1002000 1003000 8)  ; 1st 1k test data for 1M training data for pub
+      (list 1003000 1004000 9)  ; 1st 1k test data for 1M training data for pub
+      (list 1004000 1005000 10)  ; 1st 1k test data for 1M training data for pub
+      (list 1005000 1006000 11)  ; 2nd 1k test data for 1M training data for pub
+      (list 1006000 1007000 12)  ; 3rd 1k test data for 1M training data for pub
+      (list 1007000 1008000 13)  ; 4th 1k test data for 1M training data for pub
+      (list 1008000 1009000 14)  ; 5th 1k test data for 1M training data for pub
+      (list 1009000 1010000 15)  ; 6th 1k test data for 1M training data for pub
+      (list 1010000 1011000 16)  ; 7th 1k test data for 1M training data for pub
+      (list 1011000 1012000 17)  ; 8th 1k test data for 1M training data for pub
       )))
 
 (defun create-all-symlinks ()
   (let ((*huge-p* t))
-    (dolist (chunk-type (list 'tag 'title))
+    (dolist (chunk-type (list 'tag 'title 'body))
       (dolist (subset *subsets*)
         (with-slots (start-index end-index subset-id) subset
           (create-symlinks start-index end-index chunk-type subset-id))))))
@@ -111,7 +121,7 @@
     (string-right-trim (list #\/) dir)))
 
 (defun create-all-post-ids-csv ()
-  (dolist (chunk-type (list 'tag 'title))
+  (dolist (chunk-type (list 'tag 'title 'body))
     (let ((*huge-p* t)) 
       (dolist (subset (mapcar #'subset-id *subsets*)) 
         (format t "working subset ~a and chunk-type ~a~%" subset chunk-type)
