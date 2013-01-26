@@ -110,9 +110,8 @@ writePosts = function(res, testSubset, modelSubset, id) {
 	write.csv(res, file=str_c(PATH, "/LogReg-", testSubset, "-", modelSubset, "-", id, ".csv"))
 }
 
-runSet = function() {
-	sets = c(8:17)
-	lapply(sets, function(set) {writePosts(ratePosts(set), set, getSubsetId(sjiCSV), 1)})
+runSet = function(sets=c(8:17), id=1) {
+	lapply(sets, function(set) {writePosts(ratePosts(set), set, getSubsetId(sjiCSV), id)})
 }
 
 coeffs = list(sjiTitle=1.34, sjiBody=2.48, prior=1.09)
@@ -123,5 +122,5 @@ synonymsFrm = read.csv(str_c(PATH, "/../html-to-text/synonyms/synonyms.csv"), he
 dbSynonyms = makeDb(synonymsFrm, namesAcc="SourceTagName", valsAcc="TargetTagName")
 
 printP = 0
-writePosts(ratePosts(6), 6, getSubsetId(sjiCSV), 15)
+#writePosts(ratePosts(6), 6, getSubsetId(sjiCSV), 15)
 
