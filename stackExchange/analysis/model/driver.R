@@ -114,7 +114,7 @@ runSet = function(sets=c(8:17), id=1) {
 	lapply(sets, function(set) {writePosts(ratePosts(set), set, getSubsetId(sjiCSV), id)})
 }
 
-coeffs = list(sjiTitle=1.34, sjiBody=2.48, prior=1.09)
+coeffsGlobal = list(sjiTitle=1.34, sjiBody=2.48, prior=1.09)
 
 # Load up the synonyms
 colClasses=c("character", "character", "character", "character", "character", "character", "character", "character", "character", "character")

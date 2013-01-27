@@ -43,8 +43,7 @@ logReg = function(tag, res, model) {
 	return(list("logit"=mylogit, "classLog"=tmp))
 }
 
-addColumns = function(res) {
-	coeffs = coeffs
+addColumns = function(res, coeffs) {
 	coeffs[["offset"]] = NULL
 	res$act=computeAct(res, coeffs)
 	resTbl = data.table(res, key=c("tagFile"))
@@ -80,8 +79,8 @@ computeAct = function(res, coeffs) {
 	act
 }
 
-runLogRegFrm = function(res, model=formula(targetP ~ sjiBody + sjiTitle + prior + offset)) {
-	res = addColumns(res)
+runLogRegFrm = function(res, coeffs=coeffsGlobal, model=formula(targetP ~ sjiBody + sjiTitle + prior + offset)) {
+	res = addColumns(res, coeffs)
 	logRegRes = logReg(res$tag, res, model)
 	coeffs = as.list(summary(logRegRes$logit)$coefficients[,"Estimate"])
 	res$act = computeAct(res, coeffs)
@@ -97,34 +96,63 @@ runLogReg = function(logRegFile, figName) {
 	return(res)
 }
 
-getFrms = function(frms=c(8:17)) {
-	lapply(frms, function(id) {read.csv(str_c(PATH, "/", "LogReg-", id, "-4-1.csv"))})
+getFrms = function(testDatasets, runId) {
+	lapply(testDatasets, function(id) {read.csv(str_c(PATH, "/", "LogReg-", id, "-4-", runId, ".csv"))})
 }
 
-generateItems = function(model) {
-	frms = getFrms(c(8:9))
-	for(i in c(1:4)) {
-		res = runLogRegFrm(frms[[1]], model)
-		coeffs <<- res$coeffs
+getAllFrmsForModel = function(model, coeffs=coeffsGlobal, frms=c(8:17), runId=1) {
+	frms = getFrms(frms, runId)
+	for(i in c(1:3)) {
+		res = runLogRegFrm(frms[[1]], coeffs, model)
+		coeffs = res$coeffs
 	}
-	frms = adjustFrms(frms)
-	items = makeItems(frms)
+	frms = adjustFrms(frms, coeffs)
 }
 
-adjustFrms = function(frms) {
+adjustFrms = function(frms, coeffs) {
 	foo = function(frm) {
-		frm = addColumns(frm)
+		frm = addColumns(frm, coeffs)
 		frm$act = computeAct(frm, coeffs)
-		return(frm)		
+		return(frm)
 	}
 	lapply(frms, foo)
 }
 
-makeItems = function(frms) {
+getAllFrms = function() {
+	models=list(
+		formula(targetP ~ prior + sjiTitle + sjiBody + offset),
+		formula(targetP ~ prior + sjiTitle + offset),
+		formula(targetP ~ prior + sjiBody + offset), 
+		formula(targetP ~ prior + sjiTitle + sjiBody)
+		)
+	frms = list()
+	for(model in models) {
+		frms = append(frms, getAllFrmsForModel(frms=c(8:9), runId=1, model=model))
+	}
+	models=list(
+		models[[1]],
+		formula(targetP ~ prior + sjiTitle + sjiBody),
+		formula(targetP ~ prior + sjiTitle)
+		)
+	for(model in models) {
+		frms = append(frms, getAllFrmsForModel(frms=8, runId=2, model=model))
+	}
+	frms
+}
+
+plotAllFrms = function() {
+	#frms = getAllFrms()
+	legendText = c("Full Model, Calibration", "Full Model, Test", "Without Body Words", "Without Title Words", 
+		"Without Offset", "Without Entropy Weighting", "Without Offset & Entropy", "Withought Offset, Entropy, & Body")
+	items = makeItems(frms[c(1,2,3,5,7,9,10,11)], legendText)
+	plotROC2(items)
+}
+
+makeItems = function(frms, legendText=as.character(c(1:length(frms)))) {
 	cnt = 0
 	foo = function(frm) {
 		cnt <<- cnt+1
-		list(act=frm$act, targetP=frm$targetP, tagFile=frm$tagFile, col=colors[cnt])
+		list(act=frm$act, targetP=frm$targetP, tagFile=frm$tagFile, col=colors[cnt], legendText=legendText[cnt])
 	}
 	lapply(frms, foo)
 }
@@ -137,18 +165,13 @@ plotROCColumn = function(dFrame, column) {
 	fp = unlist(perf@x.values)*sum(!dFrame$targetP)
 	tp = unlist(perf@y.values)*sum(dFrame$targetP)
 	x = tp[indeces]+fp[indeces]
-	x = x/length(unique(dFrame$tagFile))
+	x = x/sum(dFrame$targetP)
 	y = tp[indeces]/(tp[indeces]+fp[indeces])
-	return(list(x=x, y=y))
-	xlim = c(0, sum(dFrame$targetP)/length(unique(dFrame$tagFile)))
-	if(cnt != 1) {
-		lines(x, y, col=col, typ="p", pch=cnt)
-	} else {
-		plot(x, y, xlim=xlim, ylim=c(0, 1), col=col, pch=cnt, xlab="average number of tags per post", ylab="model tag proportion correct")
-	}		
+	return(list(x=x, y=y))	
 }
 
 colors = c("red", "green", "blue", "orange", "yellow", "black", "grey", "purple", "magenta", "cyan", "pink")
+colors = rep("black", 10)
 
 plotROC2 = function(items) {
 	dev.new()
@@ -158,18 +181,20 @@ plotROC2 = function(items) {
 	}
 	ROCs = lapply(items, function(item) {plotROCColumn(foo(item), "act")})
 	cnt = 0
-	columns=as.character(c(1:length(items)))
-	xlim = c(0, sum(items[[1]]$targetP)/length(unique(items[[1]]$tagFile)))
+	columns=unlist(lapply(items, function(item) item$legendText))
+	xlim = c(0, 1.3)
 	for(ROC in ROCs) {
 		cnt = cnt + 1
 		col = colors[cnt]
 		if(cnt != 1) {
 			lines(ROC$x, ROC$y, col=col, typ="p", pch=c(cnt, rep(NA, 9)))
 		} else {
-			plot(ROC$x, ROC$y, xlim=xlim, ylim=c(.3, 1), col=col, pch=c(cnt, rep(NA, 9)), xlab="average number of tags per post", ylab="model tag proportion correct")
+			plot(ROC$x, ROC$y, xlim=xlim, ylim=c(.2, .9), col=col, pch=c(cnt, rep(NA, 9)),
+				xlab="proportion of model tags compared to observed tag count", ylab="model tag proportion correct")
 		}
 	}	
 	legend("topright", legend=columns, col=colors, pch=1:length(columns))
+	with(items[[1]], abline(v=length(unique(tagFile))/sum(targetP), lty=3))
 }
 
 plotHighest = function(contextIndeces, vals) {
