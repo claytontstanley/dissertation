@@ -143,7 +143,7 @@ getAllFrms = function() {
 plotAllFrms = function() {
 	#frms = getAllFrms()
 	legendText = c("Full Model, Calibration", "Full Model, Test", "Without Body Words", "Without Title Words", 
-		"Without Offset", "Without Entropy Weighting", "Without Offset & Entropy", "Withought Offset, Entropy, & Body")
+		"Without Offset", "Without Entropy Weighting", "Without Offset & Entropy", "Without Offset, Entropy, & Body")
 	items = makeItems(frms[c(1,2,3,5,7,9,10,11)], legendText)
 	plotROC2(items)
 }
@@ -160,10 +160,10 @@ makeItems = function(frms, legendText=as.character(c(1:length(frms)))) {
 plotROCColumn = function(dFrame, column) {
 	pred = prediction(dFrame[[column]], dFrame$targetP)
 	perf = performance(pred, "tpr", "fpr")
-	nSamples = length(unlist(perf@x.values))
-	indeces = sort(sample(nSamples, 2000, prob=1/(1+1000*unlist(perf@x.values))))
 	fp = unlist(perf@x.values)*sum(!dFrame$targetP)
 	tp = unlist(perf@y.values)*sum(dFrame$targetP)
+	cutoff = min(which((tp+fp) > (sum(dFrame$targetP) * 2)))
+	indeces = sort(sample(cutoff, 2000, prob=1/(1+1:cutoff)))
 	x = tp[indeces]+fp[indeces]
 	x = x/sum(dFrame$targetP)
 	y = tp[indeces]/(tp[indeces]+fp[indeces])
@@ -174,7 +174,7 @@ colors = c("red", "green", "blue", "orange", "yellow", "black", "grey", "purple"
 colors = rep("black", 10)
 
 plotROC2 = function(items) {
-	dev.new()
+	asFig("ROC")
 	colors = unlist(lapply(items, function(item) {item$col}))
 	foo = function(item) {
 		data.frame(act=item$act, targetP=item$targetP, tagFile=item$tagFile)
@@ -187,51 +187,60 @@ plotROC2 = function(items) {
 		cnt = cnt + 1
 		col = colors[cnt]
 		if(cnt != 1) {
-			lines(ROC$x, ROC$y, col=col, typ="p", pch=c(cnt, rep(NA, 9)))
+			lines(ROC$x, ROC$y, col=col, typ="p", pch=c(cnt, rep(NA, 32)))
 		} else {
-			plot(ROC$x, ROC$y, xlim=xlim, ylim=c(.2, .9), col=col, pch=c(cnt, rep(NA, 9)),
-				xlab="proportion of model tags compared to observed tag count", ylab="model tag proportion correct")
+			plot(ROC$x, ROC$y, xlim=xlim, ylim=c(.2, .9), col=col, pch=c(cnt, rep(NA, 32)),
+				xlab="proportion of model tag count to observed tag count", ylab="model tag proportion correct")
 		}
 	}	
 	legend("topright", legend=columns, col=colors, pch=1:length(columns))
 	with(items[[1]], abline(v=length(unique(tagFile))/sum(targetP), lty=3))
+	dev.off()
 }
 
 plotHighest = function(contextIndeces, vals) {
-	topNum = 20
-	vals = as.vector(vals[contextIndeces])
+	vals = lapply(vals, function(val) {val[contextIndeces]})
+	frm = data.frame(vals)
+	topNum = 10
+	vals = rowSums(frm)
 	res = sort(vals, decreasing=T, index.return=T)
 	sortedChunkHashes = contextIndeces[res$ix]
 	x = sortedChunkHashes[1:topNum]
 	xnames = getChunks(x, dbPriors)
-	y = res$x[1:topNum]
-	plot(1:topNum, y, xaxt="n", ann=F)
-	axis(1, at=1:topNum, labels=xnames, las=3, cex.axis=.8)
+	if(sum(colnames(frm) == "prior") > 0) {
+		priorOffset = min(frm$prior[x])
+		frm$prior = frm$prior - priorOffset	
+	}
+	par(mar=c(10,4.1,4.1,2.1))
+	barplot(t(frm[x,]), legend=colnames(frm), names.arg=xnames, las=3)
 }
 
 addLabels = function(observed, titleContext, ylab) {
 		weights = round(as.vector(contextWeights[getChunkHashes(titleContext, dbContext)]), 2)
-		title(str_c(paste(titleContext, collapse=" "), "\n", paste(weights, collapse=" "), "\n", paste(observed, collapse=" ")), cex.main=.9)
+		titleText = paste(titleContext, collapse=" ")
+		padding = floor( 1.8 * (nchar(titleText) - sum(nchar(weights)))/(length(titleContext)-1) )
+		titleWeights = paste(weights, collapse=paste(rep(" ", padding), collapse=""))
+		title(str_c(titleText, "\n", titleWeights, "\n", paste(observed, collapse=" ")), cex.main=.9)
 		title(ylab=ylab)
 }
 
-visPost = function(tagFile, coeffs=list(sjiTitle=1, sjiBody=1)) {
-	if ( length(lst <- getObservedContext(tagFile)) > 0 ) {
+visPost = function(tagFile, tagDir, coeffs=coeffsGlobal) {
+	if ( length(lst <- getObservedContext(tagFile, tagDir)) > 0 ) {
 		observed = lst$observed
 		titleContext = lst$titleContext
 		bodyContext = lst$bodyContext
 		tAct = act(getChunkHashes(titleContext, dbContext), B, sji)
 		bAct = act(getChunkHashes(bodyContext, dbContext), B, sji)
 		asFig(str_c("visPost-", sub("^.*/", "", tagFile), "-act"))
-		plotHighest(priorsIndeces, B+tAct$sji*coeffs$sjiTitle+bAct$sji*coeffs$sjiBody)
+		plotHighest(priorsIndeces, list(prior=B, sjiTitle=tAct$sji*coeffs$sjiTitle, sjiBody=bAct$sji*coeffs$sjiBody))
 		addLabels(observed, titleContext, "Total Activation")
 		devOff()
 		asFig(str_c("visPost-", sub("^.*/", "", tagFile), "-sjiTitle"))
-		plotHighest(priorsIndeces, tAct$sji*coeffs$sjiTitle)
+		plotHighest(priorsIndeces, list(sjiTitle=tAct$sji*coeffs$sjiTitle))
 		addLabels(observed, titleContext, "sji Title")
 		devOff()
 		asFig(str_c("visPost-", sub("^.*/", "", tagFile), "-sjiBody"))
-		plotHighest(priorsIndeces, bAct$sji*coeffs$sjiBody)
+		plotHighest(priorsIndeces, list(sjiBody=bAct$sji*coeffs$sjiBody))
 		addLabels(observed, titleContext, "sjiBody")
 		devOff()
 	}
