@@ -1,4 +1,4 @@
-csvs = $(shell find . -maxdepth 1 -name 'title-chunks*.csv' -o -name 'tag-priors*.csv' | tr '\n' ' ')
+csvs = $(shell find . -maxdepth 1 -name 'title-chunks*.csv' -o -name 'tag-priors*.csv' -o -name 'tagPriors*.csv' | tr '\n' ' ')
 
 all: model.R
 
@@ -17,7 +17,7 @@ run-command-% : url = $*.local
 %-4.csv : subset = tag-subset-4
 
 ${csvs}: %.csv: alwaysRemake
-	funName=$$(echo "$*" | egrep -o '^[a-z]+-[a-z]+' | sed 's/-/_/'); \
+	funName=$$(echo "$*" | egrep -o '^[a-z]+-?[A-Za-z]+' | sed 's/-/_/'); \
 	psql -c "copy (select * from $$funName('${subset}')) to stdout with csv header" > $@
 
 alwaysRemake:

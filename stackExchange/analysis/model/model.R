@@ -79,8 +79,10 @@ act = function(context, B, sji) {
 contextWeightsCSV = 'contextWeights.csv'
 priorsCSV = 'tag-priors-subset-4.csv'
 sjiCSV = 'title-chunks-subset-4.csv'
-#priorsCSV = 'tag-priors.csv'
-#sjiCSV = 'title-chunks.csv'
+priorsByUserIdCSV = 'tagPriorsByUser-subset-4.csv'
+priorsCSV = 'tag-priors.csv'
+sjiCSV = 'title-chunks.csv'
+priorsByUserIdCSV = 'tagPriorsByUser.csv'
 
 Rprof()
 
@@ -100,6 +102,10 @@ myPrint('# Read in table for attentional context weighting')
 colClasses=c("character", "character", "integer", "numeric", "numeric")
 contextWeightsFrm = read.csv(str_c(PATH, "/", contextWeightsCSV), header=T, sep=",", colClasses=colClasses)
 contextWeightsFrm$logEntropy = 1 - contextWeightsFrm$H / max(contextWeightsFrm$H)
+
+myPrint('# Read in table for tag counts by userId')
+colClasses=c("integer", "character", "integer", "integer", "character")
+occurancesByUserIdFrm = read.csv(str_c(PATH, "/", priorsByUserIdCSV), header=T, sep=",", colClasses=colClasses)
 
 myPrint('# Collapse all context chunktypes on occurancesFrm')
 occurancesFrm$ChunkType[occurancesFrm$ChunkType != 'tag'] = 'context'
@@ -123,6 +129,7 @@ occurancesFrm$ChunkHash[contextSubsetIndeces] = fmatch(occurancesFrm$ChunkHash[c
 chunkFrm$LeftChunkHash = fmatch(chunkFrm$LeftChunkHash, contextHashIndeces)
 chunkFrm$RightChunkHash = fmatch(chunkFrm$RightChunkHash, tagHashIndeces)
 contextWeightsFrm$ChunkHash = fmatch(contextWeightsFrm$ChunkHash, contextHashIndeces)
+occurancesByUserIdFrm$ChunkHash = fmatch(occurancesByUserIdFrm$ChunkHash, tagHashIndeces)
 rm(tagSubsetIndeces)
 rm(contextSubsetIndeces)
 
