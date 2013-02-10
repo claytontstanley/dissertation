@@ -94,7 +94,7 @@ Note that the author tagged this post with java, twitter, twitter4j, and twitter
 
 \begin{figure}[ht]
   \centering
-  \resizebox{\linewidth}{!}{\includegraphics{visPost-4148010-act.pdf}}
+  \resizebox{\linewidth}{!}{\includegraphics{visPost-4148010-act-cropped.pdf}}
   \caption{Example Post}
   \label{fig:examplePost}
 \end{figure}
@@ -116,13 +116,13 @@ A query was then used to build the post word, tag word co-occurrence matrix.
 For a given word found in the body or title of a post, the query counts the number of times that that word appears with each tag.
 Each of those counts is recorded as the word co-occurrence for that word and each associated tag.
 This process is done across all words found in any post.
-The result is a comma-separated value (csv) file of context word, tag, count for each combination.
+The result is a comma-separated value (csv) file of context word, tag, count for each of the \num{39223968} unique context word, tag combinations.
 
 \subsection{Measuring Tag Occurrences}
 
 Model tag predictions are also based on the frequency that each tag has been used.
 More often used tags more likely to have higher activation.
-A SQL query was used to build a similar csv for tag occurrences.
+A SQL query was used to build a similar csv of tag use counts for the \num{26176} unique tags.
 This csv for example would show that C\# is the most often used tag, where about 11\% of posts were tagged with C\#.
 
 \subsection{Generating Model Predictions}
@@ -203,15 +203,15 @@ A formal description of the model's equations are included below:
       \hline
       Common Name &  Equation \\
       \hline
-      Activation & 		$A_{i} = B_{i} + \sum_{j\in T}^{ } W_{j} S_{ji} + \sum_{j\in B}^{ } W_{j} S_{ji} + O$ \\
+      Activation & 		$A_{i} = B_{i} + \sum_{j\in T}^{ } W_{j} S_{ji} + \sum_{j\in B}^{ } W_{j} S_{ji} - O$ \\
       Base Level & 		$B_{i} = log \frac{p_{i}}{1-p_{i}}$ \\
-      Offset & 			$O = \frac{1}{5}\sum_{i\in top 5}^{ } A_{i}$ \\
       Strength Assoc. &		$S_{ji} = log \frac{p(i|j)}{p(i))} = log \frac{p(j,i)}{p(j)p(i)}$ \\
       & 			$= log \frac{NN(j,i)}{N_{Row}(j)N_{Col}(i)}$ \\
       Attentional Weight	& $W_{j} = WE_{j}$ \\
       Scaled Entropy & 		$E_{j} = 1-\frac{H_{j}}{H_{max}}$ \\
       Entropy & 		$H_{j} = -\sum_{i=1}^{N}p(i|j)log\left (  p(i|j) \right )$ \\
       Max Entropy & 		$H_{max} = maxH$ \\
+      Offset & 			$O = \frac{1}{5}\sum_{i\in top 5}^{ } A_{i}$ \\
       \hline
     \end{tabular} 
   \end{center} 
@@ -234,15 +234,13 @@ However, the ACT-R theory asserts that pure context is often not enough to overc
 
 \subsubsection{Contextual Activation}
 
-Contextual activation ($S_{ji}$) can be thought of as the amount of odds adjustment to base levels, given the current context $_{j}$.
-For example, if the words in the title contained only 'PHP', 'PHP5', and 'PHPUnit', then the number of $_{j}$'s is three.
-And for the 'PHP' tag, those three words are often in the title of PHP-tagged posts.
-So the sum of the three $S_{ji}$'s for the tag PHP will be high, meaning that the odds adjustment for PHP given the current context will be high.
-Since PHP already has a high base-level activation (frequently used tag), the model should produce a high total activation for the tag PHP, given the context.
+Contextual activation can be thought of as the amount of odds adjustment to base levels, given the current context $_{j}$.
+Contextual activation has two components: strength of association ($s_{sji}$) and attentional weight ($w_{j}$).
+Strength of association measures the relatedness of a contextual element $_{i}$ (e.g., the word PHP in the title of a post) with a tag $_{j}$ (e.g., the tag PHP5).
 
 \subsubsection{Attentional Weighting}
 
-Attentional weighting ($W_{j}$) can be thought of as the amount of attentional resources that are dedicated to contextual element $_{j}$.
+The second component of contextual activation, attentional weighting ($W_{j}$), can be thought of as the amount of attentional resources that are dedicated to contextual element $_{j}$.
 Total attentional weighting ($W$) is bound, most often set to 1, and reflects the fact that our attentional resources are limited.
 For the StackOverflow model, the attentional weighting was left unbound, and allowed to be calibrated by the logistic regression model.
 This was done for two main reasons.
@@ -283,11 +281,16 @@ The scaled entropy measure $E_{j}$ transforms the entropy measure to a scale tha
 This means that a stop word like 'the' will have a scaled entropy measure close to 0, while a highly-predictive word like 'Macro' will have a scaled entropy measure close to 1.
 Going back to ACT-R's attentional weighting $W_{j}$, if $E_{j}$ is low then $W_{j}$ is low, meaning that the scaled entropy measure helps allocate the limited attentional resources to predictive contextual elements.
 
+\subsubsection{Offset}
 
-R was chosen as the implementation language for two main reasons.
-First, it has sparse matrix support and vectorization routines, so that the model could scale to millions of $S_{jis}$'s.
-Second, it has excellent data visualization and analysis capabilities. 
-This way statistical data analysis and visualization could be done within the same R process that was running the model. 
+An offset measurement (mean of the top five tags for the post) was used to equalize the top activated tags for each post.
+This was done primarily to improve model fit.
+To see why this is the case, suppose the following scenario:
+The offset measurement is not used, and the model is asked to provide 10 tags across 10 posts.
+The top ten tags for one of these posts have activations that are higher than activations for all other tags in the other nine posts.
+The model would then select the ten tags from the single post as the most likely tags.
+But this doesn't make intuitive sense, because there is a limit to the number of tags that people tend to use for each post (average number of tags per post is ~ 3).
+So the offset measure aims to place all of these 10 posts on the same level, so that asking the model to choose 10 tags from 10 posts will select roughly a single tag from each post.
 
 \section{Results}
 
@@ -310,7 +313,7 @@ If further improvements to the model were found, these would increase the separa
 
 \begin{figure}[ht]
   \centering
-  \resizebox{\linewidth}{!}{\includegraphics{foo.pdf}}
+  \resizebox{\linewidth}{!}{\includegraphics{foo-cropped.pdf}}
   \caption{
     Logistic regression of tag used on post (binary) regressed on four components of model tag activation.
   }
@@ -323,7 +326,7 @@ A visualization of the model's tag activation for the example post in Figure \re
 
 \begin{figure}[ht]
   \centering
-  \resizebox{\linewidth}{!}{\includegraphics{visPost-4148010-act.pdf}}
+  \resizebox{\linewidth}{!}{\includegraphics{visPost-4148010-act-cropped.pdf}}
   \caption{
     Model's prediction of top-ten tags for post in Figure \ref{fig:examplePost}.
     The title is the title text of the post.
@@ -354,7 +357,7 @@ A plot of model performance for both the calibration and test dataset is include
 
 \begin{figure}[ht]
   \centering
-  \resizebox{\linewidth}{!}{\includegraphics{ROC.pdf}}
+  \resizebox{\linewidth}{!}{\includegraphics{ROC-cropped.pdf}}
   \caption{
     Model performance across the calibration and test dataset, as well as when specific model components are removed.
     The vertical dotted line represents the point where the model is asked to tag on average one tag per post.
