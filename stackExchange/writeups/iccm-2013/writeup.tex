@@ -266,7 +266,6 @@ and many of those theories use a combination of weighting schemes for contextual
 For example, \citeA{Dumais1991} shows that a measure of how likely term ${_j}$ is in document ${_i}$ is often the product of a local weighting $L_{ji}$ and global weighting $G_{j}$ measure.
 This idea maps rather nicely to ACT-R's contextual weighting.
 That is, terms are context words ${_j}$, documents are tags ${_i}$, local weighting is strength of association $S_{ji}$, and global weighting is attentional weighting $W_{j}$.
-
 \citeA{Dumais1991} states that predictions tend to improve when a global weighting scheme is used, so that words that occur frequently or with many documents (tags) are not weighted as high.
 He reviews four different commonly-used weighting schemes; one of which is a scaled entropy measure.
 
@@ -283,14 +282,6 @@ This makes intuitive sense because if all marginal probabilities are equal, ther
 The scaled entropy measure $E_{j}$ transforms the entropy measure to a scale that ranges from 0, 1, where maximum entropy means lowest scaled entropy.
 This means that a stop word like 'the' will have a scaled entropy measure close to 0, while a highly-predictive word like 'Macro' will have a scaled entropy measure close to 1.
 Going back to ACT-R's attentional weighting $W_{j}$, if $E_{j}$ is low then $W_{j}$ is low, meaning that the scaled entropy measure helps allocate the limited attentional resources to predictive contextual elements.
-
-\subsection{PMI}
-
-ACT-R's declarative memory retrieval equations appear in other information retrieval literature that use word co-occurrence counts, although it's usually called the Pointwise Mutual Information Index.
-For example, \citeA{Fu2007} and \citeA{Farahat2004} have shown that ACT-R's retrieval equations are mathematically equivalent to the Pointwise Mutual Information (PMI) index when the sample size of the corpus is large.
-\citeA{Budiu2007} and \citeA{Farahat2004} have shown that the PMI index for word co-occurrences is a strong predictor of word similarity and information scent.
-And on large corpora \citeA{Budiu2007} has shown that PMI is the best predictor of word pair similarity (compared to LSA and generalized LSA).
-It is interesting to note that ACT-R's declarative memory retrieval theory not only fits human performance data well, but is also a useful and competitive best predictor of word pair similarity in the general information retrieval literature that is less bounded by cognitive constraints.
 
 
 R was chosen as the implementation language for two main reasons.
@@ -420,6 +411,15 @@ However it seemed somewhat arbitrary to explicitly list out a few stop words and
 Looking at the scaled entropy measure, it seems quite plausible that this measure of word predictiveness can also be used to identify stop words.
 That is, words with scaled entropy close to zero are the stop words.
 Looking at the lowest ten scaled-entropy words for this dataset, (does, anyone, 've, found, are, seems, has, been, for, support), using scaled entropy to determine stop words seems to work fairly well.
+
+\subsection{Entropy and ACT-R's Attentional Weighting}
+
+Model performance improved by using a scaled entropy measure to weight the importance of each contextual element in the body and title of a post.
+However, it's uncommon for an ACT-R model that uses the declarative memory retrieval mechanisms to use anything other than equal attentional weighting for each chunk in context.
+But it is much more common outside of the ACT-R modeling community to use both a local (strength of association) and global (attentional weight) term to predict document retrieval \citeA{Dumais1991}.
+In fact, it's been shown that the Pointwise Mutual Information Index (PMI) (a commonly-used measure to predict document retrieval) is mathematically equivalent to ACT-R's retrieval equations when the sample size of the corpus is large (\citeNP{Budiu2007}, \citeNP{Farahat2004}).
+Both global and local weightings are commonly used when the PMI measurement is used.
+This suggests that using a global weighting term for chunks in context (e.g., the scaled entropy measure used ehre) alongside the more commonly-used local weighting (spreading activation) might be useful for other ACT-R models that are taking advantage of large stores of declarative memory datesets to build up the model's base knowledge.
 
 \subsection{Future Work}
 
