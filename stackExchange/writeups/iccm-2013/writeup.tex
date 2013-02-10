@@ -90,11 +90,11 @@ The questions are all programming related and can be posted by anyone with an ac
 Each question is tagged by the author with (presumably) the tags that are most representative of the post.
 Example tags are programming languages (PHP, Common-Lisp, MySQL, C\#) and also general topics (databases, optimization, arrays).
 An Example question from the stackoverflow.com site is included in Figure \ref{fig:examplePost}.
-Note that the author tagged this post with java, twitter, twitter4j, and twitter−oauth.
+Note that the author tagged this post with javascript, firefox, dom, and svg.
 
 \begin{figure}[ht]
   \centering
-  \resizebox{\linewidth}{!}{\includegraphics{visPost-4148010-act-cropped.pdf}}
+  \resizebox{\linewidth}{!}{\includegraphics{visPost-2977094-screen-cropped.pdf}}
   \caption{Example Post}
   \label{fig:examplePost}
 \end{figure}
@@ -192,8 +192,10 @@ So ACT-R's prior odds component of the declarative memory retrieval equations wa
 
 \subsection{Equations}
 
-A formal description of the model's equations are included below:
+A formal description of the model's equations are included in Table \ref{sample-table}. 
 
+\renewcommand{\arraystretch}{1.5}% Wider
+\renewcommand{\tabcolsep}{.5mm}
 \begin{table}[!ht]
   \begin{center} 
     \caption{Sample table title.} 
@@ -205,9 +207,8 @@ A formal description of the model's equations are included below:
       \hline
       Activation & 		$A_{i} = B_{i} + \sum_{j\in T}^{ } W_{j} S_{ji} + \sum_{j\in B}^{ } W_{j} S_{ji} - O$ \\
       Base Level & 		$B_{i} = log \frac{p_{i}}{1-p_{i}}$ \\
-      Strength Assoc. &		$S_{ji} = log \frac{p(i|j)}{p(i))} = log \frac{p(j,i)}{p(j)p(i)}$ \\
-      & 			$= log \frac{NN(j,i)}{N_{Row}(j)N_{Col}(i)}$ \\
-      Attentional Weight	& $W_{j} = WE_{j}$ \\
+      Strength Assoc. &		$S_{ji} = log \frac{p(i|j)}{p(i))} = log \frac{NN(j,i)}{N_{Row}(j)N_{Col}(i)}$ \\
+      Attention Weight	& 	$W_{j} = WE_{j}$ \\
       Scaled Entropy & 		$E_{j} = 1-\frac{H_{j}}{H_{max}}$ \\
       Entropy & 		$H_{j} = -\sum_{i=1}^{N}p(i|j)log\left (  p(i|j) \right )$ \\
       Max Entropy & 		$H_{max} = maxH$ \\
@@ -326,7 +327,7 @@ A visualization of the model's tag activation for the example post in Figure \re
 
 \begin{figure}[ht]
   \centering
-  \resizebox{\linewidth}{!}{\includegraphics{visPost-4148010-act-cropped.pdf}}
+  \resizebox{\linewidth}{!}{\includegraphics{visPost-2977094-act-cropped.pdf}}
   \caption{
     Model's prediction of top-ten tags for post in Figure \ref{fig:examplePost}.
     The title is the title text of the post.
@@ -339,10 +340,11 @@ A visualization of the model's tag activation for the example post in Figure \re
 \end{figure}
 
 Note how the base level activation and contextual activation combine to predict tags that are both frequently used and contextually relevant.
-For example, note that the 'twitter' tag leverages a combination of contextual activation and prior activation to achieve a high total activation.
-Alternatively, the 'twitter-4j' tag relies almost entirely on context to achieve high activation.
+For example, note that the 'javascript' tag leverages a combination of contextual activation and prior activation to achieve a high total activation.
+Alternatively, the 'svg' tag relies almost entirely on context to achieve high activation.
 And note that the model is by no means perfect.
-For example, the 'java' tag was used by the post author, and it does have a high prior activation, but context in this particular post was not associated too highly with java, so the model rank of java suffered.
+For example, note that 'html' is not tagged by the author, but the model ranks it as the second highest tag.
+And note that author's tag 'firefox' is only ranked 8th by the model.
 
 \subsection{Generalizeability}
 
