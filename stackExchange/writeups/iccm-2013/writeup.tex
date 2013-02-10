@@ -170,7 +170,7 @@ So a form of cross validation was used to measure model fit, although the more r
 
 The base R glm function (with 'binomial' argument) was used to perform the logistic regression.
 The parameters were optimized to best predict categorization (chosen tag, not chosen tag) from the four predictor variables:
-prior tag occurrence, word co-occurrence activation for title and body words, and activation offset for the post.
+The tag's prior occurrence frequency, word co-occurrence activation for title and body words, and activation offset for the post.
 Further discussion and operationalization of the predictor variables is included in the Model section.
 
 \section{Model}
@@ -218,13 +218,13 @@ A formal description of the model's equations are included in Table \ref{sample-
   \end{center} 
 \end{table}
 
-Here, the $_{i}$ subscript denotes activation for a particular tag i, and the $_{j}$ subscript is for context.
-$A_{i}$ is total activation for tag i.
+Here, the $i$ subscript denotes activation for a particular tag $i$, and the $j$ subscript is for context.
+$A_{i}$ is total activation for tag $i$.
 Note the similarities between the StackOverflow model and ACT-R's retrieval equations (base level and contextual component, log odds of prior being adjusted by association strength with context).
 
 \subsubsection{Base-Level Activation}
 
-Base-level activation ($B_{i}$) is the log prior odds of observing tag i in the world.
+Base-level activation ($B_{i}$) is the log prior odds of observing tag $i$ in the world.
 So the tag with the highest frequency (C\#) would have the highest base-level activation.
 Tag frequency drops off sharply for this dataset.
 The top 1\% of tags based on frequency of use account for approximately 60\% of total tag instances.
@@ -235,13 +235,13 @@ However, the ACT-R theory asserts that pure context is often not enough to overc
 
 \subsubsection{Contextual Activation}
 
-Contextual activation can be thought of as the amount of odds adjustment to base levels, given the current context $_{j}$.
+Contextual activation can be thought of as the amount of odds adjustment to base levels, given the current context $j$.
 Contextual activation has two components: strength of association ($S_{ji}$) and attentional weight ($W_{j}$).
-Strength of association measures the relatedness of a contextual element $_{i}$ (e.g., the word PHP in the title of a post) with a tag $_{j}$ (e.g., the tag PHP5).
+Strength of association measures the relatedness of a contextual element $i$ (e.g., the word PHP in the title of a post) with a tag $j$ (e.g., the tag PHP5).
 
 \subsubsection{Attentional Weighting}
 
-The second component of contextual activation, attentional weighting ($W_{j}$), can be thought of as the amount of attentional resources that are dedicated to contextual element $_{j}$.
+The second component of contextual activation, attentional weighting ($W_{j}$), can be thought of as the amount of attentional resources that are dedicated to contextual element $j$.
 Total attentional weighting ($W$) is bound, most often set to 1, and reflects the fact that our attentional resources are limited.
 For the StackOverflow model, the attentional weighting was left unbound, and allowed to be calibrated by the logistic regression model.
 This was done for two main reasons.
