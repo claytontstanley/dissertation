@@ -198,6 +198,12 @@ plotROC2 = function(items) {
 	dev.off()
 }
 
+getAccuracyAtNAverageTags = function(frm, N=1) {
+	propTagged = with(frm, length(unique(tagFile))/sum(targetP) * N)
+	res = plotROCColumn(frm, "act")
+	res$y[max(which(res$x<propTagged))]
+}
+
 plotHighest = function(contextIndeces, vals) {
 	vals = lapply(vals, function(val) {val[contextIndeces]})
 	frm = data.frame(vals)
