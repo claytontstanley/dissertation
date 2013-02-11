@@ -182,12 +182,7 @@ This model is also similar in design to the approach used by SNIF-ACT (\citeNP{F
 SNIF-ACT can predict link traversal for search queries.
 That is, given a search query (goal state), fetched results, and words included in those fetched results, the model predicts the most likely link that a person will click on.
 This StackOverflow model is similar because it leverages ACT-R's declarative memory retrieval mechanisms to generate predictions (tag activations instead of link activations).
-However, it is slightly different because it takes into account prior odds of tag activations (set to zero in SNIF-ACT).
-This was set to zero in SNIF-ACT because each link has multiple words, so looking at word co-occurrences between the search query and link words produces a stable predictor.
-It's also the case that search engines already rank order search results.
-So even if prior odds for link activations were used in the SNIF-ACT model, the prior odds for the top few links would be virtually identical, so model predictions would not change much.
-For the StackOverflow dataset, each tag is a single word, and those tags are not already rank ordered.
-So ACT-R's prior odds component of the declarative memory retrieval equations was included for the StackOverflow model.
+However, it is slightly different because it takes into account prior odds of tag activations which wasn't necessary in SNIF-ACT.
 
 \subsection{Equations}
 
@@ -242,28 +237,28 @@ Strength of association measures the relatedness of a contextual element $i$ (e.
 
 The second component of contextual activation, attentional weighting ($W_{j}$), can be thought of as the amount of attentional resources that are dedicated to contextual element $j$.
 Total attentional weighting ($W$) is bound, most often set to 1, and reflects the fact that our attentional resources are limited.
-For the StackOverflow model, the attentional weighting was left unbound, and allowed to be calibrated by the logistic regression model.
-This was done for two main reasons.
+For the StackOverflow model, the attentional weighting was left unbound and allowed to be calibrated by the logistic regression model.
+This was done for two main reasons:
 First, the researcher was curious to see what value the logistic regression model would give for $W$.
 Second, a non-ACT-R standard measure of attentional weighting was used ($E_{j}$), so it seemed appropriate to allow $W$ to vary alongside exploring this new weighting measure. 
 
 \subsubsection{Entropy}
 
 During initial model testing, the attentional weighting for all words was equal.
-That is initially, for a given post with $n$ title words, the attentional weighting $W_{j\in C}$ for all of those words was $W/n$, where the logistic regression model fit $W$ to range between 1-3.
-The problem with this approach was that familiar stop words like 'the' and '?', that were observed so often and for all tags, had the same attentional weighting as highly predictive words like 'PHP'.
+That is initially, for a given post with $n$ title words, the attentional weighting $W_{j\in C}$ for all of those words was $W/n$.
+The problem with this approach was that familiar stop words like 'the' and '?', that were often observed across all tags had the same attentional weighting as highly predictive words like 'PHP'.
 Granted the $S_{ji}$'s across all tags for context words like 'the' are much lower (and more evenly distributed) than the few $S_{ji}$'s that spike for 'PHP' (e.g., the tag PHP).
-So the amount of adjusted log odds from stop words was low, even with equal attentional weighting (since their $S_{ji}$'s were low).
-However, it still seemed problematic for two reasons.
+So the amount of adjusted log odds from stop words was low even with equal attentional weighting (since their $S_{ji}$'s were low).
+However, it still seemed problematic for two reasons:
 First, intuitively it seemed that regardless of word co-occurrence association strengths, because stop words like 'the' are observed with all tags, they are not highly predictive of any tag.
 So one could argue that their presence is simply adding error in the model's tag activation calculation.
 Second, because $W$ is held constant across posts, any attentional resources that are allocated to stop words like 'the' and '?' are taken away from being used for highly predictive words like 'PHP'.
 
-It's the case that there are many connections and commonalities between ACT-R's declarative memory retrieval equations and other non-ACT-R information retrieval theories,
+It's also the case that there are many connections and commonalities between ACT-R's declarative memory retrieval equations and other non-ACT-R information retrieval theories,
 and many of those theories use a combination of weighting schemes for contextual relevance and global importance of a particular chunk in context.
-For example, \citeA{Dumais1991} shows that a measure of how likely term ${_j}$ is in document ${_i}$ is often the product of a local weighting $L_{ji}$ and global weighting $G_{j}$ measure.
+For example, \citeA{Dumais1991} shows that a measure of how likely term $j$ is in document $i$ is often the product of a local weighting $L_{ji}$ and global weighting $G_{j}$ measure.
 This idea maps rather nicely to ACT-R's contextual weighting.
-That is, terms are context words ${_j}$, documents are tags ${_i}$, local weighting is strength of association $S_{ji}$, and global weighting is attentional weighting $W_{j}$.
+That is, terms are context words $j$, documents are tags $i$, local weighting is strength of association $S_{ji}$, and global weighting is attentional weighting $W_{j}$.
 \citeA{Dumais1991} states that predictions tend to improve when a global weighting scheme is used, so that words that occur frequently or with many documents (tags) are not weighted as high.
 He reviews four different commonly-used weighting schemes; one of which is a scaled entropy measure.
 
@@ -454,7 +449,7 @@ This is much like how \citeA{Douglass2010} implemented the equations in Erlang w
 However, it is increasingly likely that there is no fundamental reason why vanilla ACT-R (Common Lisp version) cannot be optimized to handle spreading activation calculations with datasets this large.
 All that is really needed is a more appropriate data structure to handle the large scale.
 This can be seen by comparing the implementation of spreading activation here to the implementation in \citeA{Douglass2010}.
-Both implementations handle sji counts greater than \num{1000000}, with declarative memory retrieval times (time to calculate $A_i$'s) around one second at this scale.
+Both implementations handle sji counts greater than \num{1000000}, with declarative memory retrieval times (time to calculate $A_{i}$'s) around one second at this scale.
 However, the implementations could not be more different.
 The Erlang implementation leverages a semantic network of millions of isolated process chunks and massive concurrency to achieve the scale.
 The R implementation here is single threaded and requires only a sparse matrix implementation to achieve the scale.
