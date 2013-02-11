@@ -297,8 +297,9 @@ In order to formally test model performance and to calibrate model parameters, a
 For the calibration run, the category prediction (chosen or not chosen tag for a post) was regressed on base-level activation, spreading activation for title and body, and post offset.
 However using a single run of the \num{1000} posts was insufficient because there are two model components that require prior estimates of coefficients:
 The offset measure to determine the top-five tags and associated activation and the sampling technique used to pick a representative set of tags for each post.
-So model calibration was performed four times, where the coefficients from the previous run were used as estimates of coefficients for the next run.
-The coefficients converged on best-fit values quickly (running just two times would have sufficed), and did not show any sign of instability with the iterative technique.
+So model calibration was iteratively bootstrapped, where the coefficients from the previous run were used as estimates of coefficients for the next run.
+The coefficients converged on best-fit values quickly (only required two sets of four iterations), and did not show any signs of instability.
+
 The final best-fit coefficients for each model component and formal statistical measurements are included in Tables \ref{tab:coeffs} and \ref{tab:fits} respectively.
 
 \renewcommand{\arraystretch}{1}% Wider
