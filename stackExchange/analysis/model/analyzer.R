@@ -140,8 +140,7 @@ getAllFrms = function() {
 	frms
 }
 
-plotAllFrms = function() {
-	#frms = getAllFrms()
+plotAllFrms = function(frms=getAllFrms()) {
 	legendText = c("Full Model, Calibration", "Full Model, Test", "Without Body Words", "Without Title Words", 
 		"Without Offset", "Without Entropy Weighting", "Without Offset & Entropy", "Without Offset, Entropy, & Body")
 	items = makeItems(frms[c(1,2,3,5,7,9,10,11)], legendText)
@@ -190,7 +189,7 @@ plotROC2 = function(items) {
 			lines(ROC$x, ROC$y, col=col, typ="p", pch=c(cnt, rep(NA, 32)))
 		} else {
 			plot(ROC$x, ROC$y, xlim=xlim, ylim=c(.2, .9), col=col, pch=c(cnt, rep(NA, 32)),
-				xlab="proportion of model tag count to observed tag count", ylab="model tag proportion correct")
+				xlab="Proportion of model tag count to observed tag count", ylab="Model tag proportion correct")
 		}
 	}	
 	legend("topright", legend=columns, col=colors, pch=1:length(columns))
