@@ -151,7 +151,7 @@ makeItems = function(frms, legendText=as.character(c(1:length(frms)))) {
 	cnt = 0
 	foo = function(frm) {
 		cnt <<- cnt+1
-		list(act=frm$act, targetP=frm$targetP, tagFile=frm$tagFile, col=colors[cnt], legendText=legendText[cnt])
+		list(act=frm$act, targetP=frm$targetP, tagFile=frm$tagFile, col=colors[cnt], legendText=legendText[cnt], shapes=shapes[cnt])
 	}
 	lapply(frms, foo)
 }
@@ -170,11 +170,13 @@ plotROCColumn = function(dFrame, column) {
 }
 
 colors = c("red", "green", "blue", "orange", "yellow", "black", "grey", "purple", "magenta", "cyan", "pink")
+shapes = c(1, 2, 3, 4, 5, 20, 7, 8, 9, 10, 11)
 colors = rep("black", 10)
 
 plotROC2 = function(items) {
 	asFig("ROC")
 	colors = unlist(lapply(items, function(item) {item$col}))
+	shapes = unlist(lapply(items, function(item) {item$shape}))
 	foo = function(item) {
 		data.frame(act=item$act, targetP=item$targetP, tagFile=item$tagFile)
 	}
@@ -186,13 +188,13 @@ plotROC2 = function(items) {
 		cnt = cnt + 1
 		col = colors[cnt]
 		if(cnt != 1) {
-			lines(ROC$x, ROC$y, col=col, typ="p", pch=c(cnt, rep(NA, 32)))
+			lines(ROC$x, ROC$y, col=col, typ="p", pch=c(shapes[cnt], rep(NA, 32)))
 		} else {
-			plot(ROC$x, ROC$y, xlim=xlim, ylim=c(.2, .9), col=col, pch=c(cnt, rep(NA, 32)),
+			plot(ROC$x, ROC$y, xlim=xlim, ylim=c(.2, .9), col=col, pch=c(shapes[cnt], rep(NA, 32)),
 				xlab="Proportion of model tag count to observed tag count", ylab="Model tag proportion correct")
 		}
 	}	
-	legend("topright", legend=columns, col=colors, pch=1:length(columns))
+	legend("topright", legend=columns, col=colors, pch=shapes[1:length(columns)])
 	with(items[[1]], abline(v=length(unique(tagFile))/sum(targetP), lty=3))
 	dev.off()
 }
