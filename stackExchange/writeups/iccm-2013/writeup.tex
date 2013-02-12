@@ -71,7 +71,7 @@ Also tag cleanup systems could be implemented where mistags are identified and c
 A tag-prediction system was built here for the StackOverflow dataset that can solve precisely these sorts of problems.
 The StackOverflow dataset was chosen because it is relatively constrained, contains a large number of posts and associated tags, and the data are easy to obtain.
 It is constrained because there is a fully enumerated and limited set of tags that an author can use, as opposed to a less-constrained domain such as Twitter.
-The site also makes public all posting data on a quarterly basis, which can be downloaded and loaded into a local relational database for further analysis.
+The site also makes public all post data on a quarterly basis, which can be downloaded and loaded into a relational database for further analysis.
 
 \subsection{Stack Overflow Dataset}
 
@@ -85,7 +85,7 @@ Note that the author tagged this post with javascript, firefox, dom, and svg.
 \begin{figure}[ht]
   \centering
   \resizebox{\linewidth}{!}{\includegraphics{visPost-2977094-screen-cropped.pdf}}
-  \caption{Example Post}
+  \caption{Example post on stackoverflow.com}
   \label{fig:examplePost}
 \end{figure}
 
@@ -110,7 +110,7 @@ Model tag predictions are based on the amount of word co-occurrences between wor
 To build the co-occurrence matrix between post words and tags, all title and body text and associated tags were extracted from the relational database.
 The Python Natural Language Processing Toolkit \cite{Bird2009} was used to chunk (i.e., tokenize and lemmatize) the text in the post.
 The tags were already chunked, but tag synonyms were converted to their root tag using the community-maintained StackOverflow tag synonym database.
-Afterwords the processed word chunks and root tags were fed back in to the database.
+Afterwords the processed word chunks and root tags were imported into a PostgreSQL database table.
 
 A query was then used to build the post word, tag word co-occurrence matrix.
 The result is a set of context word, tag, count for each of the \num{39223968} unique context word, tag combinations.
@@ -134,11 +134,11 @@ and an offset to equalize activation values for tags across all posts.
 The equations that operationalize this process will be included in the Model section.
 
 The R statistical programming environment was used to build the model and generate model predictions.
-One million posts (approximately 2/3 of all posts) were fed into R to build the co-occurrences and tag occurrences.
+One million posts (approximately 2/3 of all posts) were loaded into R to build the co-occurrences and tag occurrences.
 These were represented as a sparse matrix of co-occurrences and a sparse vector of tag occurrences.
 In order to generate a model prediction, tag activations for title and body context were computed separately, and then added to each tag's prior base-level activation.
 An offset constant (equal to the average activation of the top 5 model-predicted tags for the post) was then subtracted from the prior value.
-The resulting tags were rank sorted, and the one with the highest activation would then be the model's prediction of the most likely tag associated with that post.
+The resulting tags were rank sorted, and the one with the highest activation is the model's prediction of the most likely tag associated with that post.
 
 \subsection{Measuring Model Fit}
 
@@ -153,8 +153,7 @@ The model's tag activations for the highest 200 tags, a weighted sample of 800 t
 Each of these observations was assigned a category of 0 or 1 depending on if the tag was a chosen tag or not for that post (0 is not chosen).
 Conceptually, if the model has good categorization power, the observations assigned 1 should have higher tag activations than the observations assigned 0.
 
-These vectors of tag activation, categorization were collected across a set of \num{1000} posts.
-The set of posts did not include any posts that were used to train the model on word association strength.
+These vectors of tag activation, categorization were collected across a set of \num{1000} fresh posts that were not used to train the model on word association strength.
 So a form of cross validation was used to measure model fit, although the more robust full k-fold cross validation technique was not used (due mostly to resource and time limitations).
 
 The base R glm function (with 'binomial' argument) was used to perform the logistic regression.
@@ -164,7 +163,7 @@ Further discussion and operationalization of the predictor variables is included
 
 \section{Model}
 
-The tag-prediction model is a cognitively-inspired Bayesian probabilistic model, based on ACT-R's declarative memory retrieval mechanisms \cite{Anderson2004}.
+The tag-prediction model is a cognitively-inspired Bayesian probabilistic model based on ACT-R's declarative memory retrieval mechanisms \cite{Anderson2004}.
 These equations describe the likelihood that a chunk from memory will be retrieved, given the prior odds of retrieving the chunk and the current context.
 In this way the task of retrieving the tag with the highest activation from the words in the post is similar to performing a declarative memory retrieval request for a tag, given the context of title and body words.
 
@@ -221,7 +220,7 @@ However, the ACT-R theory asserts that pure context is often not enough to overc
 
 Contextual activation can be thought of as the amount of odds adjustment to base levels, given the current context $j$.
 Contextual activation has two components: strength of association ($S_{ji}$) and attentional weight ($W_{j}$).
-Strength of association measures the relatedness of a contextual element $i$ (e.g., the word PHP in the title of a post) with a tag $j$ (e.g., the tag PHP5).
+Strength of association measures the relatedness of a contextual element $j$ (e.g., the word PHP in the title of a post) with a tag $i$ (e.g., the tag PHP5).
 
 \subsubsection{Attentional Weighting}
 
@@ -236,11 +235,11 @@ Second, a non-ACT-R standard measure of attentional weighting was used ($E_{j}$)
 
 During initial model testing, the attentional weighting for all words was equal.
 That is initially, for a given post with $n$ title words, the attentional weighting $W_{j\in C}$ for all of those words was $W/n$.
-The problem with this approach was that familiar stop words like 'the' and '?', that were often observed across all tags had the same attentional weighting as highly predictive words like 'PHP'.
+The problem with this approach is that familiar stop words like 'the' and '?', that are often observed across all tags have the same attentional weighting as highly predictive words like 'PHP'.
 Granted the $S_{ji}$'s across all tags for context words like 'the' are much lower (and more evenly distributed) than the few $S_{ji}$'s that spike for 'PHP' (e.g., the tag PHP).
-So the amount of adjusted log odds from stop words was low even with equal attentional weighting (since their $S_{ji}$'s were low).
-However, it still seemed problematic for two reasons:
-First, intuitively it seemed that regardless of word co-occurrence association strengths, because stop words like 'the' are observed with all tags, they are not highly predictive of any tag.
+So the amount of adjusted log odds from stop words is low even with equal attentional weighting (since their $S_{ji}$'s are low).
+However, this still seemed problematic for two reasons:
+First, because stop words like 'the' are observed with all tags, they are not highly predictive of any tag.
 So one could argue that their presence is simply adding error in the model's tag activation calculation.
 Second, because $W$ is held constant across posts, any attentional resources that are allocated to stop words like 'the' and '?' are taken away from being used for highly predictive words like 'PHP'.
 
@@ -250,7 +249,7 @@ For example, \citeA{Dumais1991} shows that a measure of how likely term $j$ is i
 This idea maps rather nicely to ACT-R's contextual weighting.
 That is, terms are context words $j$, documents are tags $i$, local weighting is strength of association $S_{ji}$, and global weighting is attentional weighting $W_{j}$.
 
-The scaled entropy measure $E_{j}$ was chosen as a global weighting measure for this dataset because it has a strong theoretical foundation and it predicts well (\citeNP{Dumais1991}).
+So the scaled entropy measure $E_{j}$ was chosen as a global weighting measure for this dataset because it has a strong theoretical foundation and it predicts well (\citeNP{Dumais1991}).
 It is based on Shannon's Information Theory, which measures the amount of information content (predictiveness) of a word.
 The scaled entropy ($E_{j}$) of a context word can be thought of as the amount of predictiveness that that word has to any tag.
 
@@ -350,10 +349,10 @@ A visualization of the model's tag activation for the example post in Figure \re
   \caption{
     Model's prediction of top-ten tags for post in Figure \ref{fig:examplePost}.
     The title is the title text of the post.
-    The attentional weight (entropy) for each word in the title is included below each word.
+    The attentional weight (scaled entropy) for each word in the title is included below each word.
     The user-chosen tags are included below the attentional weights.
     The stacked bar graphs are the total activation for the top-ten predicted model tags for the post.
-    Each bar graph is partitioned into the 3 model components that vary between tags within a post (not the post offset).
+    Each bar graph is partitioned into the three model components that vary across the tags in a single post (not the offset).
 }
   \label{fig:modelPost}
 \end{figure}
@@ -393,7 +392,7 @@ It also provides evidence that \num{1000} posts is an adequate number to estimat
 \subsection{Necessity Analysis}
 
 Figure \ref{fig:ROC} also shows model performance after specific model components are removed.
-Model parameters were recalibrated for each model, except for the full model test dataset which used the parameters from the calibration dataset.
+Model parameters were recalibrated for each model, except for the full model test dataset that used the parameters from the calibration dataset.
 These plots provide useful information regarding the relative necessity of each component in the full model.
 That is, which model components contribute most strongly to increased performance, and which model components might be redundant (not necessary).
 Note that it is certainly the case that each model component contributes positive and unique variance to model performance.
@@ -408,7 +407,7 @@ Predicting tags for the StackOverflow dataset has been worked on by at least one
 However he does mention that the co-occurrence model he used has about a 47\% classification accuracy for predicting StackOverflow tags when required to predict one tag per post.
 The full model used here achieves 67\% classification accuracy when predicting one tag per post on average
 (height of full model at vertical dotted line in Figure \ref{fig:ROC}).
-The increase in model performance is most likely due to the fact that \citeA{Kuo2011} only used \num{10000} posts to generate the co-occurrence matrix ($S_{ji}$).
+The increase in model performance here is most likely due to the fact that \citeA{Kuo2011} only used \num{10000} posts to generate the co-occurrence matrix ($S_{ji}$).
 One million posts (two orders of magnitude higher) were used here.
 Also the model here has some additional components: The offset in particular and possibly the body term as well,
 as it was unclear from \citeA{Kuo2011} if the author used context from both the body and title of a post or just the title. 
@@ -447,9 +446,9 @@ Looking at the lowest ten scaled-entropy words for this dataset, (does, anyone, 
 Model performance improved by using a scaled entropy measure to weight the importance of each contextual element in the body and title of a post.
 However, it's uncommon for an ACT-R model that uses the declarative memory retrieval mechanisms to use anything other than equal attentional weighting for each chunk in context.
 But it is much more common outside of the ACT-R modeling community to use both a local (strength of association) and global (attentional weight) term to predict document retrieval \citeA{Dumais1991}.
-In fact, it's been shown that the Pointwise Mutual Information Index (PMI) (a commonly-used measure to predict document retrieval) is mathematically equivalent to ACT-R's retrieval equations when the sample size of the corpus is large (\citeNP{Budiu2007}, \citeNP{Farahat2004}).
-Both global and local weightings are commonly used when the PMI measurement is used.
-This suggests that using a global weighting term for chunks in context (e.g., the scaled entropy measure used here) alongside the more commonly-used local weighting (spreading activation) might be useful for other ACT-R models that are taking advantage of large stores of declarative memory datasets to build up the model's base knowledge.
+In fact, it's been shown that the Pointwise Mutual Information Index (PMI) (a commonly-used measure to predict document retrieval) is mathematically equivalent to ACT-R's retrieval equations when the sample size of the corpus is large (\citeNP{Budiu2007}, \citeNP{Farahat2004}),
+and both global and local weightings are commonly used when the PMI measurement is used.
+This suggests that using a global weighting term for chunks in context (e.g., the scaled entropy measure used here) alongside the more commonly-used local weighting (spreading activation) might be useful for other ACT-R models that are taking advantage of large declarative memory datasets to build up the model's base knowledge.
 
 \section{Acknowledgments}
 
