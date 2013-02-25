@@ -52,7 +52,7 @@
   A logistic regression technique was used to calibrate model parameters and measure performance.
   Model fit is satisfactory (McFadden's pseudo $R_{}^{2}=.46$, npv = .997, ppv = .70) and model performance on the test dataset is fairly strong (67\% accuracy when asked to tag one tag per post on average).
 
-  \textbf{Keywords:} 
+  \textbf{Keywords:}
   Machine Learning; ACT-R; Large-Scale Declarative Memory
 \end{abstract}
 
@@ -65,7 +65,7 @@ Additionally, an increasing number of individuals are using tags as a form of qu
 (e.g., \citeNP{Diakopoulos2010}).
 
 There is a growing body of research that aims to characterize the lifetime and growth characteristics of hashtags for real-time social networking sites such as Twitter
-(e.g., \citeNP{Bauer2012, Tsur2012, Chang2010}).
+(e.g., \citeNP{Tsur2012, Chang2010}).
 However, less is known about the underlying process when choosing particular tags during the creation of the tweet or post.
 Modeling tag creation accurately (as opposed to modeling tag growth and behavior after creation) could allow a system to predict the hashtag that a user should use, given the contextual clues available.
 There are numerous benefits to this type of tag prediction.
@@ -96,29 +96,23 @@ Note that the author tagged this post with \emph{javascript}, \emph{firefox}, \e
 The Apr' 11 StackOverflow dataset \cite{DataDump2011} was used for this analysis.
 The dataset contains \num{4945168} posts from \num{559803} unique users and \num{26176} unique tags.
 The dataset is the entire collection of posts dated between Jul' 2008 (StackOverflow's creation) and Apr' 11.
-Post authors used approximately 3 tags on average per post. 
+Post authors used approximately 3 tags on average per post.
 
 \subsection{Related Work}
-Predicting tags for the StackOverflow dataset has been worked on by at least one prior researcher \cite{Kuo2011}.
-\citeA{Kuo2011} only looks at the Stack Overflow dataset briefly at the end of the technical report.
-However he does mention that the co-occurrence model he used has about a 47\% classification accuracy for predicting StackOverflow tags when required to predict one tag per post.
-The full model used here achieves 67\% classification accuracy when predicting one tag per post on average
-(height of full model at vertical dotted line in Figure \ref{fig:ROC}).
-The increase in model performance here is most likely due to the fact that \citeA{Kuo2011} only used \num{10000} posts to generate the co-occurrence matrix ($S_{ji}$).
-One million posts (two orders of magnitude higher) were used here.
-Also the model here has some additional components: The offset in particular and possibly the body term as well,
-as it was unclear from \citeA{Kuo2011} if the author used context from both the body and title of a post or just the title. 
-Nonetheless, there are certainly similarities in the approach:
-Co-occurrence count was used as the core measure of similarity, and both local (strength of association) and global (idf or entropy) measures were used to compute tag likelihood, given context.
 
+Predicting tags for the StackOverflow dataset has been worked on by at least one prior researcher \cite{Kuo2011}.
+\citeauthor{Kuo2011} only looks at the Stack Overflow dataset briefly at the end of the technical report.
+However he does mention that his co-occurrence model has a 47\% classification accuracy for predicting StackOverflow tags when required to predict one tag per post.
+Our model achieves 67\% classification accuracy when predicting one tag per post on average.
 
 \section{Model}
 
 The tag prediction model is a cognitively-inspired Bayesian probabilistic model based on ACT-R's declarative memory retrieval mechanisms \cite{Anderson2004}.
 These equations describe the likelihood that a chunk from memory will be retrieved, given the prior odds of retrieving the chunk and the current context.
 In this way the task of retrieving the tag with the highest activation from the words in the post is similar to performing a declarative memory retrieval request for a tag, given the context of title and body words.
+The hypothesis is that the tags used for posts are based on a tag's history of prior use and the strength of association between the tag and the content of words in the title and body of the post.
 
-This model is also similar in design to the approach used by SNIF-ACT \cite{Fu2007, Pirolli2003}. 
+This model is also similar in design to the approach used by SNIF-ACT \cite{Fu2007}.
 SNIF-ACT can predict link traversal for search queries.
 That is, given a search query (goal state), fetched results, and words included in those fetched results, the model predicts the most likely link that a person will click on.
 This StackOverflow model is similar because it leverages ACT-R's declarative memory retrieval mechanisms to generate predictions (tag activations instead of link activations).
@@ -126,29 +120,31 @@ However, it is slightly different because it takes into account prior odds of ta
 
 \subsection{Equations}
 
-A formal description of the model's equations are included in Table \ref{sample-table}. 
+Table \ref{sample-table} includes a description of the model's equations.
 
-\renewcommand{\arraystretch}{1.5}% Wider
+\renewcommand{\arraystretch}{1.5}
 \renewcommand{\tabcolsep}{.5mm}
 \begin{table}[!ht]
-  \begin{center} 
-    \caption{The StackOverflow tag prediction model} 
-    \label{sample-table} 
+  \begin{center}
+    \caption{The StackOverflow tag prediction model}
+    \label{sample-table}
     \vskip 0.12in
-    \begin{tabular}{ll} 
+    \begin{tabular}{ll}
       \hline
       Common Name &  Equation \\
       \hline
       Activation & 		$A_{i} = B_{i} + \sum_{j\in T}^{ } W_{j} S_{ji} + \sum_{j\in B}^{ } W_{j} S_{ji} - O$ \\
       Base Level & 		$B_{i} = log \frac{p_{i}}{1-p_{i}}$ \\
-      Strength Assoc. &		$S_{ji} = log \frac{p(i|j)}{p(i))} = log \frac{NN(j,i)}{N_{Row}(j)N_{Col}(i)}$ \\
-      Attention Weight	& 	$W_{j} = WE_{j}$ \\
+      Strength Assoc. &		$S_{ji} = log \frac{p(i|j)}{p(i))} = log \frac{NN_{ji}}{N_{Row}(j)N_{Col}(i)}$ \\
+      Co-occurrence &		$N_{ji} = \sum_{}^{}{observed_{ji}}$ \\
+      Observations &		$N = \sum_{}^{}{\sum_{}^{}{N_{ji}}}$ \\
+      Attention Weight	& 	$W_{j} = W \frac{E_{j}} {\sum_{}^{} {E_{j}}} $ \\
       Scaled Entropy & 		$E_{j} = 1-\frac{H_{j}}{H_{max}}$ \\
       Entropy & 		$H_{j} = -\sum_{i=1}^{N}p(i|j)log\left (  p(i|j) \right )$ \\
       Offset & 			$O = \frac{1}{5}\sum_{i\in top 5}^{ } A_{i}$ \\
       \hline
-    \end{tabular} 
-  \end{center} 
+    \end{tabular}
+  \end{center}
 \end{table}
 
 Here, the $i$ subscript denotes activation for a particular tag $i$, and the $j$ subscript is for context.
@@ -165,9 +161,6 @@ So the tag with the highest frequency (\emph{C\#}) would have the highest base-l
 Tag frequency drops off sharply for this dataset.
 The top 1\% of tags based on frequency of use account for approximately 60\% of total tag instances.
 This is why accounting for tag frequency (by including ACT-R's base-level activation component) is so important for the StackOverflow dataset.
-Otherwise without context, the likelihood of choosing \emph{C\#} as a tag would be the same as choosing \emph{ora-00997} (one of the many tags with only a single occurrence of use).
-One might argue that with context, it's unlikely that the words associated with \emph{ora-00997} will occur again, so pure context would be able to still often predict \emph{C\#}.
-However, the ACT-R theory asserts that pure context is often not enough to overcome high base-level activations (e.g., it can be difficult to break a bad habit).
 
 \subsubsection{Contextual Activation}
 
@@ -182,18 +175,15 @@ Total attentional weighting ($W$) is bound, most often set to 1, and reflects th
 For the StackOverflow model, the attentional weighting was left unbound and allowed to be calibrated by the logistic regression model.
 This was done for two reasons:
 First, the we were curious to see what value the logistic regression model would give for $W$.
-Second, a non-ACT-R standard measure of attentional weighting was used ($E_{j}$), so it seemed appropriate to allow $W$ to vary alongside exploring this new weighting measure. 
+Second, a non-ACT-R standard measure of attentional weighting was used ($E_{j}$), so it seemed appropriate to allow $W$ to vary alongside exploring this new weighting measure.
 
 \subsubsection{Entropy}
 
-During initial model testing, the attentional weighting for all words was equal.
-That is initially, for a given post with $n$ title words, the attentional weighting $W_{j\in C}$ for all of those words was $W/n$.
+During initial model testing, the attentional weighting for all words was equal, and set to $W/n$ for $n$ title words (and set similarly for body words).
 The problem with this approach is that familiar stop words like ``the'' and ``?'', that are often observed across all tags have the same attentional weighting as highly predictive words like ``PHP''.
 Granted the $S_{ji}$'s across all tags for context words like ``the'' are much lower (and more evenly distributed) than the few $S_{ji}$'s that spike for ``PHP'' (e.g., the tag \emph{PHP}).
-So the amount of adjusted log odds from stop words is low even with equal attentional weighting (since their $S_{ji}$'s are low).
 However, this still seemed problematic for two reasons:
-First, because stop words like ``the'' are observed with all tags, they are not highly predictive of any tag.
-So one could argue that their presence is simply adding error in the model's tag activation calculation.
+First, because stop words like ``the'' are observed with all tags, and not highly predictive of any tag, one could argue that their presence is simply adding error in the model's tag activation calculation.
 Second, because $W$ is held constant across posts, any attentional resources that are allocated to stop words like ``the'' and ``?'' are taken away from being used for highly predictive words like ``PHP''.
 
 It's also the case that there are many commonalities between ACT-R's declarative memory retrieval equations and other non-ACT-R information retrieval theories,
@@ -205,14 +195,19 @@ That is, terms are context words $j$, documents are tags $i$, local weighting is
 So the scaled entropy measure $E_{j}$ was chosen as a global weighting measure for this dataset because it has a strong theoretical foundation and it predicts well \cite{Dumais1991}.
 It is based on Shannon's Information Theory, which measures the amount of information content (predictiveness) of a word.
 The scaled entropy ($E_{j}$) of a context word can be thought of as the amount of predictiveness that that word has to any tag.
-
-For example, a stop word like ``the'' will have an even distribution of co-occurrences across all tags.
-This means that the marginal probabilities of ``the'' with all tags will be roughly equal.
-It can be shown that maximum entropy $H_{j}$ is reached when all marginal probabilities are equal.
-This makes intuitive sense because if all marginal probabilities are equal, there is no information gained in observing the context word.
-The scaled entropy measure $E_{j}$ transforms the entropy measure to a scale that ranges from 0 to 1, where maximum entropy means lowest scaled entropy.
 This means that a stop word like ``the'' will have a scaled entropy measure close to 0, while a highly-predictive word like \emph{macro} will have a scaled entropy measure close to 1.
 Going back to ACT-R's attentional weighting $W_{j}$, if $E_{j}$ is low then $W_{j}$ is low, meaning that the scaled entropy measure helps allocate the limited attentional resources to predictive contextual elements.
+
+\subsubsection{Entropy and Stop Words}
+
+It was recommended to remove stop words from the analysis \cite{Bird2009}.
+Stop words are low-predictor words, and \citeauthor listed a short list that were commonly removed (e.g., ``the'', ``and'', ``or'').
+However it seemed somewhat arbitrary to explicitly list out a few stop words and then simply choose those as the words to remove.
+Looking at the scaled entropy measure, it seems quite plausible that this measure of word predictiveness can also be used to identify stop words.
+That is, words with scaled entropy close to zero are the stop words.
+Looking at the lowest ten scaled-entropy words for this dataset, (``does'', ``anyone'', ``'ve'', ``found'', ``are'', ``seems'', ``has'', ``been'', ``for'', ``support''),
+using scaled entropy to determine stop words seems to work fairly well.
+So instead of explicitly removing an enumerated list of stop words, we used a data-driven approach and let the scaled entropy measure attentuate the words that were not predictive of any tag.
 
 \subsubsection{Offset}
 
@@ -230,33 +225,24 @@ So the offset measure aims to place all of these ten posts on the same level, so
 \subsubsection{Summary}
 
 A variation of ACT-R's declarative memory retrieval theory \cite{Anderson2004} was used to model tag retrievals for StackOverflow posts.
-The hypothesis is that the tags used for posts are based on a tag's history of prior use and the strength of association between the tag and the content of words in the title and body of the post.
 The strength of association between post words and tags was calculated using 2/3 of the dataset (one million posts).
 A logistic regression statistical technique was used to calibrate model parameters and optimize performance.
 The weights for each model component were calibrated using a sample of \num{1000} posts not contained within the strength of association dataset.
 The calibrated model was then tested on a new sample of \num{1000} posts not contained within either previous training dataset.
 Classification accuracy was used as a metric of model performance (i.e., how many of the model's predicted tags are correct).
 
-FIXME. The Apr' 11 StackOverflow dataset \cite{DataDump2011} was downloaded and imported into the MySQL relational database system.
-
 \subsection{Generating Model Predictions}
 
 For a given title and body of a post, the model returns the activations for each possible tag.
 The tag with the highest activation is the most likely tag to be associated with that post.
-Tag activation is a function of four components:
-The tag's base level activation (prior odds of being used),
-contextual activation for words in the title (word co-occurrence weighting),
-contextual activation for words in the body,
-and an offset to equalize activation values for tags across all posts.
 
 The R statistical programming environment was used to build the model and generate model predictions.
 One million posts (approximately 2/3 of all posts) were loaded into R to build the co-occurrences and tag occurrences.
-These were represented as a sparse matrix of co-occurrences and a sparse vector of tag occurrences.
 In order to generate a model prediction, tag activations for title and body context were computed separately, and then added to each tag's prior base-level activation.
 An offset constant (equal to the average activation of the top 5 model-predicted tags for the post) was then subtracted from the prior value.
 The resulting tags were rank sorted, and the one with the highest activation is the model's prediction of the most likely tag associated with that post.
 
-\subsection{Measuring Co-occurrences}
+\subsubsection{Measuring Co-occurrences}
 
 Model tag predictions are based on the amount of word co-occurrences between words in the title and body of the post and tags used for that post.
 To build the co-occurrence matrix between post words and tags, all title and body text and associated tags were extracted from the relational database.
@@ -266,13 +252,13 @@ Afterwords the processed word chunks and root tags were imported into a PostgreS
 
 A query was then used to build the post word, tag word co-occurrence matrix.
 There are \num{39223968} unique post word, tag word combinations.
-The result is a table of co-occurence counts for each of the combinations.
+The result is a table of co-occurence counts for each of the combinations, which was loaded into R.
 
-\subsection{Measuring Tag Occurrences}
+\subsubsection{Measuring Tag Occurrences}
 
 Model tag predictions are also based on the frequency that each tag has been used.
 More often used tags more likely to have higher activation.
-A SQL query was used to build a similar set of tag use counts for the \num{26176} unique tags.
+A SQL query was used to build a similar table of tag use counts for the \num{26176} unique tags, which was loaded into R.
 This set for example would show that \emph{C\#} is the most often used tag, where about 11\% of posts were tagged with \emph{C\#}.
 
 \subsection{Measuring Model Fit}
@@ -291,10 +277,8 @@ Conceptually, if the model has good categorization power, the observations assig
 These vectors of tag activation, categorization were collected across a set of \num{1000} fresh posts that were not used to train the model on word association strength.
 So a form of cross validation was used to measure model fit, although the more robust full k-fold cross validation technique was not used (due mostly to resource and time limitations).
 
-The base R glm function (with ``binomial'' argument) was used to perform the logistic regression.
 The parameters were optimized to best predict categorization (chosen tag, not chosen tag) from the four predictor variables:
 The tag's prior occurrence frequency, word co-occurrence activation for title and body words, and activation offset for the post.
-Further discussion and operationalization of the predictor variables is included in the Model section.
 
 \section{Results}
 
@@ -309,14 +293,14 @@ The coefficients converged on best-fit values quickly (only required two sets of
 
 The final best-fit coefficients for each model component and formal statistical measurements are included in Tables \ref{tab:coeffs} and \ref{tab:fits} respectively.
 
-\renewcommand{\arraystretch}{1}% Wider
+\renewcommand{\arraystretch}{1}
 \renewcommand{\tabcolsep}{1mm}
 \begin{table}[!ht]
-  \begin{center} 
-    \caption{Best-fit coefficient estimates from logistic regression} 
-    \label{tab:coeffs} 
+  \begin{center}
+    \caption{Best-fit coefficient estimates from logistic regression}
+    \label{tab:coeffs}
     \vskip 0.12in
-    \begin{tabular}{lllll} 
+    \begin{tabular}{lllll}
       \hline
       Coefficient & 	Estimate &	Std. Err. &	z value &	$Pr(>|z|)$  \\
       \hline
@@ -326,20 +310,20 @@ The final best-fit coefficients for each model component and formal statistical 
       sjiBody &		2.36 &		0.04 &		58.48 &		\textless2e-16 *** \\
       offset &		-0.71 &		0.02 &		-39.05 &	\textless2e-16 *** \\
       \hline
-    \end{tabular} 
-  \end{center} 
+    \end{tabular}
+  \end{center}
 \end{table}
 
 \vspace{-2em}
 
-\renewcommand{\arraystretch}{1}% Wider
+\renewcommand{\arraystretch}{1}
 \renewcommand{\tabcolsep}{3mm}
 \begin{table}[!ht]
-  \begin{center} 
-    \caption{Model fit metrics} 
-    \label{tab:fits} 
+  \begin{center}
+    \caption{Model fit metrics}
+    \label{tab:fits}
     \vskip 0.12in
-    \begin{tabular}{ll} 
+    \begin{tabular}{ll}
       \hline
       Common Name &  Value	\\
       \hline
@@ -351,8 +335,8 @@ The final best-fit coefficients for each model component and formal statistical 
       Positive Predictive Value &	0.70 \\
       Negative Predictive Value &	0.997 \\
       \hline
-    \end{tabular} 
-  \end{center} 
+    \end{tabular}
+  \end{center}
 \end{table}
 
 Note that all four coefficients for the run are strong predictors of tag use ($p<.01$), and model fit is satisfactory (McFadden's pseudo $R_{}^{2}=.46$, npv = .997, ppv = .70).
@@ -422,47 +406,53 @@ It's only when groups of components are removed that model performance starts to
 
 \section{Discussion}
 
-\subsection{ACT-R and Scale}
-\num{39223968} unique context word, tag combinations were contained within the one million posts that were used to build the strength of association matrix.
-Since the model is based on ACT-R's declarative memory retrieval equations, it could have been implemented in Common Lisp (programming language for ACT-R's implementation).
-However, it is known that the current implementation of spreading activation (required for $S_{ji}$) in ACT-R does not scale to an $S_{ji}$ corpus over 100,000 \cite{Douglass2010, Douglass2009}.
-So it was decided to use a one-off R implementation of ACT-R's retrieval equations for this analysis.
-This is much like how \citeA{Douglass2010} implemented the equations in Erlang when using the theory to test the fan effect on large-scale declarative memory datasets.
+Our StackOverflow model is a successful case showing that ACT-Rs declarative memory retrieval mechanisms can be scaled up and applied to retrieval requests occuring across large-scale declarative memory datasets. 
+The model can successfully tag 67/100 posts correctly, when tasked to predict one tag per post on average.
+The model is also computationall space efficient:
+Large-scale relational database techniques and efficient sparse matrix data structures were used for implementation,
+so that the data structures require only 3GB of memory and retrieval requests with a DM dataset of \num{556677795} chunks occur in less than one second on a single processor.
+Although certainly not perfect, model accuracy is significant and retrieval times are fast, so we are considering potential applications of the model in real-world settings.
 
-However, it is increasingly likely that there is no fundamental reason why vanilla ACT-R (Common Lisp version) cannot be optimized to handle spreading activation calculations with datasets this large.
-All that is really needed is a more appropriate data structure to handle the large scale.
-This can be seen by comparing the implementation of spreading activation here to the implementation in \citeA{Douglass2010}.
-Both implementations handle sji counts greater than one million, with declarative memory retrieval times (time to calculate $A_{i}$'s) around one second at this scale.
-However, the implementations could not be more different.
-The Erlang implementation leverages a semantic network of millions of isolated process chunks and massive concurrency to achieve the scale.
-The R implementation here is single threaded and requires only a sparse matrix implementation to achieve the scale.
-Since the programming languages are different, it's not likely the case that only a specific programming language can achieve the scale.
-And since the parallelism is different (single threaded vs multi threaded), it's not likely the case that achieving the scale can only be done with massively concurrent implementations.
-So, it's most likely the case that using an appropriate data structure is all that is needed for ACT-R Common Lisp to handle sji counts in the millions and above.
+\subsection{Potential Applications}
 
-\subsection{Entropy and Stop Words}
+The model could be deployed as a tag recommender system for stackoverflow.com. 
+If a post author does not include the model's predicted best tag for the post, then the model could suggest the tag to the author.
+This could potentially introduce authors to tags that are contextually relevant to their interests that they may not have known about.
+This could also improve the answers received for the post, since other expert programmers may have only been monitoring the model's predicted best tag for the post.
 
-The Python NLTK documentation \cite{Bird2009} recommended to remove stop words from the analysis.
-Stop words are low-predictor words, and the documentation listed out a short list that were commonly removed (e.g., ``the'', ``and'', ``or'')
-However it seemed somewhat arbitrary to explicitly list out a few stop words and then simply choose those as the words to remove.
-Looking at the scaled entropy measure, it seems quite plausible that this measure of word predictiveness can also be used to identify stop words.
-That is, words with scaled entropy close to zero are the stop words.
-Looking at the lowest ten scaled-entropy words for this dataset, (``does'', ``anyone'', ``'ve'', ``found'', ``are'', ``seems'', ``has'', ``been'', ``for'', ``support''),
-using scaled entropy to determine stop words seems to work fairly well.
+The model could also be used as a tag cleanup system for stackoverflow.com.
+In this scenario the tags for a previously submitted post would be compared againt model predictions.
+If the model's predicted tag activation for a used tag is substantially low, then that tag could either be removed from the post, or the post could be flagged for further analysis by an operator.
+
+\subsection{Comparison to \citeA{Kuo2011}}
+
+Our model achieves 67\% classification accuracy when predicting one tag per post on average
+(height of full model at vertical dotted line in Figure \ref{fig:ROC})
+compared to 47\% accuracy for the co-occurence model presented in \citeA{Kuo2011}.
+Most likely we achieved the increase in model performance by adding some additional model components:
+The offset and possibly the body term as well,
+as it was unclear if \citeauthor{Kuo2011} used context from both the body and title of a post or just the title.
+Also we used two orders of magnitude more posts to train the model co-occurrence matrix ($S_{ji}$).
+Nonetheless, there are certainly model similarities:
+Co-occurrence count was used as the core measure of similarity, and both local (strength of association) and global (entropy or idf) weighting measures were used to compute tag likelihood, given context.
 
 \subsection{Entropy and ACT-R's Attentional Weighting}
 
 Model performance improved by using a scaled entropy measure to weight the importance of each contextual element in the body and title of a post.
 However, it's uncommon for an ACT-R model that uses the declarative memory retrieval mechanisms to use anything other than equal attentional weighting for each chunk in context.
-But it is much more common outside of the ACT-R modeling community to use both a local (strength of association) and global (attentional weight) term to predict document retrieval \citeA{Dumais1991}.
+But it is much more common outside of the ACT-R modeling community to use both a local (strength of association) and global (attentional weight) term to predict document retrieval \cite{Dumais1991}.
 In fact, it's been shown that the Pointwise Mutual Information Index (PMI) (a commonly-used measure to predict document retrieval)
 is mathematically equivalent to ACT-R's retrieval equations when the sample size of the corpus is large \cite{Budiu2007, Farahat2004},
 and both global and local weightings are commonly used when the PMI measurement is used.
 This suggests that using a global weighting term for chunks in context (e.g., the scaled entropy measure used here) alongside the more commonly-used local weighting (spreading activation) might be useful for other ACT-R models that are taking advantage of large declarative memory datasets to build up the model's base knowledge.
 
+\subsection{Future Planned Research}
+
+
+
 \section{Acknowledgments}
 
-I would like to thank Dr. Mike Byrne and Dr. Fred Oswald for their excellent guidance and recommendations throughout the model development and data analysis process.
+We would like to thank Fred Oswald for his excellent guidance and recommendations throughout the model development and data analysis process.
 
 \bibliographystyle{apacite}
 \setlength{\bibleftmargin}{.125in}
