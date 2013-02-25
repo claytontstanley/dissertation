@@ -207,7 +207,7 @@ Looking at the scaled entropy measure, it seems quite plausible that this measur
 That is, words with scaled entropy close to zero are the stop words.
 Looking at the lowest ten scaled-entropy words for this dataset, (``does'', ``anyone'', ``'ve'', ``found'', ``are'', ``seems'', ``has'', ``been'', ``for'', ``support''),
 using scaled entropy to determine stop words seems to work fairly well.
-So instead of explicitly removing an enumerated list of stop words, we used a data-driven approach and let the scaled entropy measure attentuate the words that were not predictive of any tag.
+So instead of explicitly removing an enumerated list of stop words, we used a data-driven approach and let the scaled entropy measure attenuate the words that were not predictive of any tag.
 
 \subsubsection{Offset}
 
@@ -252,7 +252,7 @@ Afterwords the processed word chunks and root tags were imported into a PostgreS
 
 A query was then used to build the post word, tag word co-occurrence matrix.
 There are \num{39223968} unique post word, tag word combinations.
-The result is a table of co-occurence counts for each of the combinations, which was loaded into R.
+The result is a table of co-occurrence counts for each of the combinations, which was loaded into R.
 
 \subsubsection{Measuring Tag Occurrences}
 
@@ -406,9 +406,9 @@ It's only when groups of components are removed that model performance starts to
 
 \section{Discussion}
 
-Our StackOverflow model is a successful case showing that ACT-Rs declarative memory retrieval mechanisms can be scaled up and applied to retrieval requests occuring across large-scale declarative memory datasets. 
+Our StackOverflow model is a successful case showing that ACT-Rs declarative memory retrieval mechanisms can be scaled up and applied to retrieval requests occurring across large-scale declarative memory datasets. 
 The model can successfully tag 67/100 posts correctly, when tasked to predict one tag per post on average.
-The model is also computationall space efficient:
+The model is also computationally space efficient:
 Large-scale relational database techniques and efficient sparse matrix data structures were used for implementation,
 so that the data structures require only 3GB of memory and retrieval requests with a DM dataset of \num{556677795} chunks occur in less than one second on a single processor.
 Although certainly not perfect, model accuracy is significant and retrieval times are fast, so we are considering potential applications of the model in real-world settings.
@@ -421,14 +421,14 @@ This could potentially introduce authors to tags that are contextually relevant 
 This could also improve the answers received for the post, since other expert programmers may have only been monitoring the model's predicted best tag for the post.
 
 The model could also be used as a tag cleanup system for stackoverflow.com.
-In this scenario the tags for a previously submitted post would be compared againt model predictions.
+In this scenario the tags for a previously submitted post would be compared against model predictions.
 If the model's predicted tag activation for a used tag is substantially low, then that tag could either be removed from the post, or the post could be flagged for further analysis by an operator.
 
 \subsection{Comparison to \citeA{Kuo2011}}
 
 Our model achieves 67\% classification accuracy when predicting one tag per post on average
 (height of full model at vertical dotted line in Figure \ref{fig:ROC})
-compared to 47\% accuracy for the co-occurence model presented in \citeA{Kuo2011}.
+compared to 47\% accuracy for the co-occurrence model presented in \citeA{Kuo2011}.
 Most likely we achieved the increase in model performance by adding some additional model components:
 The offset and possibly the body term as well,
 as it was unclear if \citeauthor{Kuo2011} used context from both the body and title of a post or just the title.
