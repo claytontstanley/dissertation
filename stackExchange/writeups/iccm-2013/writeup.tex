@@ -98,6 +98,20 @@ The dataset contains \num{4945168} posts from \num{559803} unique users and \num
 The dataset is the entire collection of posts dated between Jul' 2008 (StackOverflow's creation) and Apr' 11.
 Post authors used approximately 3 tags on average per post. 
 
+\subsection{Related Work}
+Predicting tags for the StackOverflow dataset has been worked on by at least one prior researcher \cite{Kuo2011}.
+\citeA{Kuo2011} only looks at the Stack Overflow dataset briefly at the end of the technical report.
+However he does mention that the co-occurrence model he used has about a 47\% classification accuracy for predicting StackOverflow tags when required to predict one tag per post.
+The full model used here achieves 67\% classification accuracy when predicting one tag per post on average
+(height of full model at vertical dotted line in Figure \ref{fig:ROC}).
+The increase in model performance here is most likely due to the fact that \citeA{Kuo2011} only used \num{10000} posts to generate the co-occurrence matrix ($S_{ji}$).
+One million posts (two orders of magnitude higher) were used here.
+Also the model here has some additional components: The offset in particular and possibly the body term as well,
+as it was unclear from \citeA{Kuo2011} if the author used context from both the body and title of a post or just the title. 
+Nonetheless, there are certainly similarities in the approach:
+Co-occurrence count was used as the core measure of similarity, and both local (strength of association) and global (idf or entropy) measures were used to compute tag likelihood, given context.
+
+
 \section{Model}
 
 The tag prediction model is a cognitively-inspired Bayesian probabilistic model based on ACT-R's declarative memory retrieval mechanisms \cite{Anderson2004}.
@@ -407,19 +421,6 @@ However, removing only one component (particularly the words in the body of the 
 It's only when groups of components are removed that model performance starts to drastically suffer.
 
 \section{Discussion}
-
-\subsection{Related Work}
-Predicting tags for the StackOverflow dataset has been worked on by at least one prior researcher \cite{Kuo2011}.
-\citeA{Kuo2011} only looks at the Stack Overflow dataset briefly at the end of the technical report.
-However he does mention that the co-occurrence model he used has about a 47\% classification accuracy for predicting StackOverflow tags when required to predict one tag per post.
-The full model used here achieves 67\% classification accuracy when predicting one tag per post on average
-(height of full model at vertical dotted line in Figure \ref{fig:ROC}).
-The increase in model performance here is most likely due to the fact that \citeA{Kuo2011} only used \num{10000} posts to generate the co-occurrence matrix ($S_{ji}$).
-One million posts (two orders of magnitude higher) were used here.
-Also the model here has some additional components: The offset in particular and possibly the body term as well,
-as it was unclear from \citeA{Kuo2011} if the author used context from both the body and title of a post or just the title. 
-Nonetheless, there are certainly similarities in the approach:
-Co-occurrence count was used as the core measure of similarity, and both local (strength of association) and global (idf or entropy) measures were used to compute tag likelihood, given context.
 
 \subsection{ACT-R and Scale}
 \num{39223968} unique context word, tag combinations were contained within the one million posts that were used to build the strength of association matrix.
