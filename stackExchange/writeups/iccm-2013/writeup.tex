@@ -24,6 +24,7 @@
 \usepackage{pslatex}
 \usepackage{apacite}
 \usepackage[none]{hyphenat}
+\usepackage[compact]{titlesec}
 
 \usepackage[group-separator={,}]{siunitx}
 
@@ -59,12 +60,12 @@
 \section{Introduction}
 
 Human-based tagging of online content has increased in recent years.
-A few examples of human-based tagging of information are hashtags for Twitter tweets and Facebook posts, as well as keywords for research papers.
+A few examples are authors creating hashtags for Twitter tweets and Facebook posts, as well as keywords for research papers.
 A large portion of the growing number of social media sites support some sort of human-directed tagging of posts.
 Additionally, an increasing number of individuals are using tags as a form of query-based search to find information
 (e.g., \citeNP{Diakopoulos2010}).
 
-There is a growing body of research that aims to characterize the lifetime and growth characteristics of hashtags for real-time social networking sites such as Twitter
+A growing body of research is focusing on the lifetime and growth characteristics of hashtags for real-time social networking sites such as Twitter
 (e.g., \citeNP{Tsur2012, Chang2010}).
 However, less is known about the underlying process when choosing particular tags during the creation of the tweet or post.
 Modeling tag creation accurately (as opposed to modeling tag growth and behavior after creation) could allow a system to predict the hashtag that a user should use, given the contextual clues available.
@@ -93,11 +94,6 @@ Note that the author tagged this post with \emph{javascript}, \emph{firefox}, \e
   \label{fig:examplePost}
 \end{figure}
 
-The Apr' 11 StackOverflow dataset \cite{DataDump2011} was used for this analysis.
-The dataset contains \num{4945168} posts from \num{559803} unique users and \num{26176} unique tags.
-The dataset is the entire collection of posts dated between Jul' 2008 (StackOverflow's creation) and Apr' 11.
-Post authors used approximately 3 tags on average per post.
-
 \subsection{Related Work}
 
 Predicting tags for the StackOverflow dataset has been worked on by at least one prior researcher \cite{Kuo2011}.
@@ -121,6 +117,8 @@ However, it is slightly different because it takes into account prior odds of ta
 \subsection{Equations}
 
 Table \ref{sample-table} includes a formal description of the model.
+
+\vspace{-1em}
 
 \renewcommand{\arraystretch}{1.5}
 \renewcommand{\tabcolsep}{.5mm}
@@ -159,13 +157,6 @@ However we are are assuming that frequency of tag use does not change greatly be
 This allows us to compute log odds based on frequency only, as is indicated in Table \ref{sample-table}.
 So the tag with the highest frequency (\emph{C\#}) would have the highest base-level activation.
 
-\subsubsection{Distribution of Tag Frequency}
-
-\emph{C\#} is the most often used tag, where about 11\% of posts were tagged with \emph{C\#}.
-Tag frequency then drops off sharply.
-The top 1\% of tags based on frequency of use account for approximately 60\% of total tag instances.
-This is why accounting for tag frequency (by including ACT-R's base-level activation component) is so important for the StackOverflow dataset.
-
 \subsubsection{Contextual Activation}
 
 Contextual activation can be thought of as the amount of odds adjustment to base levels, given the current context $j$.
@@ -188,7 +179,7 @@ The problem with this approach is that familiar stop words like ``the'' and ``?'
 Granted the $S_{ji}$'s across all tags for context words like ``the'' are much lower (and more evenly distributed) than the few $S_{ji}$'s that spike for ``PHP'' (e.g., the tag \emph{PHP}).
 However, this still seemed problematic for two reasons:
 First, because stop words like ``the'' are observed with all tags and not highly predictive of any tag, one could argue that their presence is simply adding error in the model's tag activation calculation.
-Second, because $W$ is held constant across posts, any attentional resources that are allocated to stop words like ``the'' and ``?'' are taken away from being used for highly predictive words like ``PHP''.
+Second, because $W$ is held constant across posts, any attentional resources that are allocated to stop words are taken away from being used for highly predictive words.
 
 It's also the case that there are many commonalities between ACT-R's declarative memory retrieval equations and other non-ACT-R information retrieval theories,
 and many of those theories use a combination of weighting schemes for contextual relevance and global importance of a particular chunk in context.
@@ -201,17 +192,6 @@ It is based on Shannon's Information Theory, which measures the amount of inform
 The scaled entropy ($E_{j}$) of a context word can be thought of as the amount of predictiveness that that word has to any tag.
 This means that a stop word like ``the'' will have a scaled entropy measure close to 0, while a highly-predictive word like \emph{macro} will have a scaled entropy measure close to 1.
 Going back to ACT-R's attentional weighting $W_{j}$, if $E_{j}$ is low then $W_{j}$ is low, meaning that the scaled entropy measure helps allocate limited attentional resources to predictive contextual elements.
-
-\subsubsection{Entropy and Stop Words}
-
-It was recommended to remove stop words from the analysis \cite{Bird2009}.
-Stop words are low-predictor words, and \citeauthor{Bird2009} listed a short list that were commonly removed (e.g., ``the'', ``and'', ``or'').
-However it seemed somewhat arbitrary to explicitly list out a few stop words and then simply choose those as the words to remove.
-Looking at the scaled entropy measure, it seems quite plausible that this measure of word predictiveness can also be used to identify stop words.
-That is, words with scaled entropy close to zero are the stop words.
-Looking at the lowest ten scaled-entropy words for this dataset, (``does'', ``anyone'', ``'ve'', ``found'', ``are'', ``seems'', ``has'', ``been'', ``for'', ``support''),
-using scaled entropy to determine stop words seems to work fairly well.
-So instead of explicitly removing an enumerated list of stop words, we used a data-driven approach and let the scaled entropy measure attenuate the words that were not predictive of any tag to near-zero levels.
 
 \subsubsection{Offset}
 
@@ -235,6 +215,19 @@ The weights for each model component were calibrated using a sample of \num{1000
 The calibrated model was then tested on a new sample of \num{1000} posts not contained within either previous training dataset.
 Classification accuracy was used as a metric of model performance (i.e., how many of the model's predicted tags are correct).
 
+\subsubsection{Dataset}
+
+The Apr' 11 StackOverflow dataset \cite{DataDump2011} was used for this analysis.
+The dataset contains \num{4945168} posts from \num{559803} unique users and \num{26176} unique tags.
+The dataset is the entire collection of posts dated between Jul' 2008 (StackOverflow's creation) and Apr' 11.
+Post authors used approximately 3 tags on average per post.
+
+\subsubsection{Distribution of Tag Frequency}
+\emph{C\#} is the most often used tag, where about 11\% of posts were tagged with \emph{C\#}.
+Tag frequency then drops off sharply.
+The top 1\% of tags based on frequency of use account for approximately 60\% of total tag instances.
+This is why accounting for tag frequency (by including ACT-R's base-level activation component) is so important for the StackOverflow dataset.
+
 \subsection{Generating Model Predictions}
 
 For a given title and body of a post, the model returns the activations for each possible tag.
@@ -252,7 +245,7 @@ Model tag predictions are based on the amount of word co-occurrences between wor
 To build the co-occurrence matrix between post words and tags, all title and body text and associated tags were extracted from the relational database.
 The Python Natural Language Processing Toolkit \cite{Bird2009} was used to chunk (i.e., tokenize and lemmatize) the text in the post.
 The tags were already chunked, but tag synonyms were converted to their root tag using the community-maintained StackOverflow tag synonym database.
-Afterwords the processed word chunks and root tags were imported into a PostgreSQL database table.
+Afterwords the processed word chunks and root tags were imported into a PostgreSQL table.
 
 A query was then used to build the post word, tag word co-occurrence matrix.
 There are \num{39223968} unique post word, tag word combinations.
@@ -263,6 +256,17 @@ The result was a table of co-occurrence counts for each of the combinations, whi
 Model tag predictions are also based on the frequency that each tag has been used.
 More often used tags have a higher base-level activation.
 A SQL query was used to build a similar table of tag use counts for the \num{26176} unique tags, which was loaded into R.
+
+\subsubsection{Entropy and Stop Words}
+
+It was recommended to remove stop words from the analysis \cite{Bird2009}.
+Stop words are low-predictor words, and \citeauthor{Bird2009} listed a short list that were commonly removed (e.g., ``the'', ``and'', ``or'').
+However it seemed somewhat arbitrary to explicitly list out a few stop words and then simply choose those as the words to remove.
+Looking at the scaled entropy measure, it seems quite plausible that this measure of word predictiveness can also be used to identify stop words.
+That is, words with scaled entropy close to zero are the stop words.
+Looking at the lowest ten scaled-entropy words for this dataset, (``does'', ``anyone'', ``'ve'', ``found'', ``are'', ``seems'', ``has'', ``been'', ``for'', ``support''),
+using scaled entropy to determine stop words seems to work fairly well.
+So instead of explicitly removing an enumerated list of stop words, we used a data-driven approach and let the scaled entropy measure attenuate the words that were not predictive of any tag to near-zero levels.
 
 \subsection{Measuring Model Fit}
 
@@ -449,9 +453,21 @@ and both global and local weightings are commonly used when the PMI measurement 
 This suggests that using a global weighting term for chunks in context (e.g., the scaled entropy measure used here)
 alongside the more commonly-used local weighting (spreading activation) might be useful for other ACT-R models that are taking advantage of large declarative memory datasets to build up the model's base knowledge.
 
+\subsection{Current Model Issues}
+
+Including the offset term in the model improved performance (see Figure \ref{fig:ROC}).
+However by normalizing the top activations for all posts, the model cannot differentiate between a post where the top predicted tag is certain, and a post where the top-predicted tag is questionable.
+One could argue that normalizing top activations for all posts should cause model performance to decrease, and the opposite was actually observed.
+One hypothesis is that this normalization is required because the retrieval threshold of a tag is adjusted for each post, and changed so that only a small set of tags are retrieved for all posts.
+Further research will explore this and other theories for the behavior of the offset component in the model.
+
 \subsection{Future Planned Research}
 
-
+Alongside exploring the offset component of the model, our main planned research is to include the post author's past tagging behavior as an additional model predictor.
+We are exploring a Bayesian updating technique that would adjust prior tag activations from global priors to user's priors as more tagging information about the user is collected.
+For the StackOverflow dataset, adding user's tagging history to the model should drastically improve predictive power for veteran users,
+since tags are tied to programming languages and specific technologies, and programmers tend to specialize on a few set of tags that are of interest to them.
+This technique could also be deployed, since a post author must be signed into StackOverflow before creating a new post.
 
 \section{Acknowledgments}
 
