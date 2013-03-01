@@ -107,6 +107,7 @@ getAllFrmsForModel = function(model, coeffs=coeffsGlobal, frms=c(8:17), runId=1)
 		coeffs = res$coeffs
 	}
 	frms = adjustFrms(frms, coeffs)
+	return(lapply(frms, function(frm) list(frm=frm, coeffs=coeffs)))
 }
 
 adjustFrms = function(frms, coeffs) {
@@ -150,6 +151,7 @@ plotAllFrms = function(frms=getAllFrms()) {
 makeItems = function(frms, legendText=as.character(c(1:length(frms)))) {
 	cnt = 0
 	foo = function(frm) {
+		frm = frm$frm
 		cnt <<- cnt+1
 		list(act=frm$act, targetP=frm$targetP, tagFile=frm$tagFile, col=colors[cnt], legendText=legendText[cnt], shapes=shapes[cnt])
 	}
