@@ -22,7 +22,9 @@ library(plyr)
 # A few helper functions
 rateVals3 = function(priorsIndeces, act, observed, tagFile) {
 	cutoff = 200
-	vals = as.vector(B[priorsIndeces]*coeffs$prior + act$sjiTitle[priorsIndeces]*coeffs$sjiTitle + act$sjiBody[priorsIndeces])*coeffs$sjiBody
+	vals = as.vector(B[priorsIndeces]*coeffsGlobal$prior 
+		+ act$sjiTitle[priorsIndeces]*coeffsGlobal$sjiTitle 
+		+ act$sjiBody[priorsIndeces])*coeffsGlobal$sjiBody
 	res = sort(vals, decreasing=T, index.return=T)
 	sortedChunkHashes = priorsIndeces[res$ix]
 	#sortedChunkHashes = sortedChunkHashes[1:cutoff]
@@ -36,7 +38,9 @@ rateVals3 = function(priorsIndeces, act, observed, tagFile) {
 	priors = as.vector(B[sampleIndeces])
 	sjiTitle = as.vector(act$sjiTitle[sampleIndeces])
 	sjiBody = as.vector(act$sjiBody[sampleIndeces])
-	return(data.frame(tag=tags, sjiTitle=sjiTitle, sjiBody=sjiBody, prior=priors, targetP=targetP, act=priors + sjiTitle + sjiBody))
+	userIdPriors = as.vector(getPriorsForPost(getPostIdForTagFile(tagFile)))[sampleIndeces]
+	return(data.frame(tag=tags, sjiTitle=sjiTitle, sjiBody=sjiBody, prior=priors, targetP=targetP, act=priors + sjiTitle + sjiBody,
+		userIdPriors=userIdPriors))
 }
 
 getObservedContext = function(tagFile, tagDir) {
@@ -96,6 +100,10 @@ makeBodyDir = function(subsetId) {
 
 getSubsetId = function(str) {
 	str_extract(str_extract(str, "subset-[0-9]+"), "[0-9]+$")
+}
+
+getPostIdForTagFile = function(tagFile) {
+	as.integer(str_extract(tagFile, "[^/][0-9]+$"))
 }
 
 ratePosts = function(subsetId) {

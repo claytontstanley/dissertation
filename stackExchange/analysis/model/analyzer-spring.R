@@ -58,7 +58,7 @@ analyzeForICCM = function(frms=getAllFrms()) {
 }
 
 analyzeForMultivariate = function() {
-	
+	runSet(sets=8, id=3)
 }
 
 
