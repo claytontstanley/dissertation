@@ -62,6 +62,11 @@ getLogOdds = function(priors) {
 	B
 }
 
+getPriorsForPost = function(PostId) {
+	userId = as.numeric(userIdForPostId[PostId])
+	as.vector(priorsByUserId[userId,])
+}
+
 # Calculate total activation, given base-level activation, sji associations, and context
 act = function(context, B, sji) {
 	weights = contextWeights[context]
@@ -106,6 +111,10 @@ contextWeightsFrm$logEntropy = 1 - contextWeightsFrm$H / max(contextWeightsFrm$H
 myPrint('# Read in table for tag counts by userId')
 colClasses=c("integer", "character", "integer", "integer", "character")
 occurancesByUserIdFrm = read.csv(str_c(PATH, "/", priorsByUserIdCSV), header=T, sep=",", colClasses=colClasses)
+
+myPrint('# Read in table for post id user id mapping')
+colClasses=c("integer", "integer")
+userIdForPostIdFrm = read.csv(str_c(PATH, "/../html-to-text/idUserId/idUserId.csv"), header=T, sep=",", colClasses=colClasses)
 
 myPrint('# Collapse all context chunktypes on occurancesFrm')
 occurancesFrm$ChunkType[occurancesFrm$ChunkType != 'tag'] = 'context'
@@ -169,11 +178,18 @@ rm(chunkFrm)
 NSum = sum(N)
 sji = with(summary(N), sparseMatrix(i=i, j=j, x=log( (NSum * x) / (rowSums(N)[i] * colSums(N)[j]))))
 
+myPrint('# build priorsByUserId and userIdForPostId')
+priorsByUserId = with(occurancesByUserIdFrm, sparseMatrix(i=UserId, j=ChunkHash, x=ChunkCount))
+userIdForPostId = with(userIdForPostIdFrm, sparseVector(i=id, x=userId, length=max(id)))
+rm(userIdForPostIdFrm)
+rm(occurancesByUserIdFrm)
+
 myPrint('# Write relevant model component values to files, so that changes to the model can be regression tested (using git diff).')
 write.csv(summary(sji), file=str_c(PATH, "/", "sji.csv"))
 write.csv(data.frame(Chunk=getChunks(priorsIndeces, dbPriors), ChunkHash=priorsIndeces, B=as.vector(B[priorsIndeces])), file=str_c(PATH, "/", "B.csv"))
 write.csv(data.frame(sort(dbPriors)), file=str_c(PATH, "/", "dbPriors.csv"))
 write.csv(data.frame(sort(dbContext)), file=str_c(PATH, "/", "dbContext.csv"))
+write.csv(data.frame(as.vector(userIdForPostId)), file=str_c(PATH, "/", "userIdForPostId.csv"))
 
 Rprof(NULL)
 print(summaryRprof())

@@ -57,6 +57,9 @@ analyzeForICCM = function(frms=getAllFrms()) {
 	visPost(tagFiles[105], makeTagDir(8), coeffs=frms[[1]]$coeffs)
 }
 
+analyzeForMultivariate = function() {
+	
+}
 
 
 
