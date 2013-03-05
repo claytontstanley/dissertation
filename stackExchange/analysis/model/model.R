@@ -64,6 +64,9 @@ getLogOdds = function(priors) {
 
 getPriorsForPost = function(PostId) {
 	userId = as.numeric(userIdForPostId[PostId])
+	if( userId == 0) {
+		return(rep(0, dim(priorsByUserId)[2]))
+	}
 	as.vector(priorsByUserId[userId,])
 }
 
@@ -181,6 +184,7 @@ sji = with(summary(N), sparseMatrix(i=i, j=j, x=log( (NSum * x) / (rowSums(N)[i]
 myPrint('# build priorsByUserId and userIdForPostId')
 priorsByUserId = with(occurancesByUserIdFrm, sparseMatrix(i=UserId, j=ChunkHash, x=ChunkCount))
 userIdForPostId = with(userIdForPostIdFrm, sparseVector(i=id, x=userId, length=max(id)))
+userIdIndeces = unique(occurancesByUserIdFrm$UserId)
 rm(userIdForPostIdFrm)
 rm(occurancesByUserIdFrm)
 

@@ -51,6 +51,12 @@ analyzeForPresentation = function() {
 
 }
 
+maxCount = 50
+combinePs = function(psGlobal, psLocal, count) {
+	count = pmin(count, maxCount)
+	(psGlobal*(maxCount-count+1) + psLocal*count) / (maxCount + 1)
+}
+
 analyzeForICCM = function(frms=getAllFrms()) {
 	plotAllFrms(frms=frms)
 	tagFiles=getTagFiles(makeTagDir(8))
@@ -59,6 +65,21 @@ analyzeForICCM = function(frms=getAllFrms()) {
 
 analyzeForMultivariate = function() {
 	runSet(sets=8, id=3)
+	baseFrm = getFrms(8, 3)[[1]]
+	baseFrm = modifyBaseFrm(baseFrm)
+	res = runLogRegFrm(baseFrm, coeffs = coeffsGlobal, model=formula(targetP ~ prior + userIdLogPriors + sjiTitle + sjiBody + offset))
+	#frms = getAllFrmsForModel(model=formula(targetP ~ prior + sjiTitle + sjiBody + offset + userTaggedP), frms=8, runId=3)
+}
+
+modifyBaseFrm = function(baseFrm) {
+	baseFrm$userIdPriorsP = as.numeric(baseFrm$userIdPriors != 0)
+	baseFrm$userIdLogPriors = with(baseFrm, log(userIdPriors + 1))
+	baseFrm$globalPriorProb = with(baseFrm, exp(prior)/( exp(prior) + 1))
+	baseFrm$userPriorProb = with(baseFrm, userIdPriors/userIdTagCount)
+	baseFrm$userPriorProb[is.nan(baseFrm$userPriorProb)] = 0
+	baseFrm$combinedPriorProb = with(baseFrm, combinePs(globalPriorProb, userPriorProb, userIdTagCount))
+	baseFrm$combinedPrior = with(baseFrm, log(combinedPriorProb/(1-combinedPriorProb)))
+	baseFrm
 }
 
 

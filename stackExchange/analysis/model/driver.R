@@ -38,9 +38,11 @@ rateVals3 = function(priorsIndeces, act, observed, tagFile) {
 	priors = as.vector(B[sampleIndeces])
 	sjiTitle = as.vector(act$sjiTitle[sampleIndeces])
 	sjiBody = as.vector(act$sjiBody[sampleIndeces])
-	userIdPriors = as.vector(getPriorsForPost(getPostIdForTagFile(tagFile)))[sampleIndeces]
+	userIdPriors = as.vector(getPriorsForPost(getPostIdForTagFile(tagFile)))
+	userIdTagCount = rep(sum(userIdPriors), length(sampleIndeces))
+	userIdPriors = userIdPriors[sampleIndeces]
 	return(data.frame(tag=tags, sjiTitle=sjiTitle, sjiBody=sjiBody, prior=priors, targetP=targetP, act=priors + sjiTitle + sjiBody,
-		userIdPriors=userIdPriors))
+		userIdPriors=userIdPriors, userIdTagCount = userIdTagCount))
 }
 
 getObservedContext = function(tagFile, tagDir) {
