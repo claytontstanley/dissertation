@@ -24,3 +24,5 @@ LogReg-6-4-14.csv	identical to 13; after packing the sparse array and optimizing
 LogReg-8-4-1.csv	ICCM: Training dataset
 LogReg-8-4-2.csv	ICCM: Training dataset for model w/o entropy
 LogReg-9-4-1.csv	ICCM: Test dataset
+
+LogReg-8-4-3.csv	Multi: Initial training dataset 
