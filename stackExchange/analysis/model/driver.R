@@ -21,7 +21,7 @@ library(plyr)
 
 # A few helper functions
 rateVals3 = function(priorsIndeces, act, observed, tagFile) {
-	cutoff = 200
+	cutoff = 20
 	vals = as.vector(B[priorsIndeces]*coeffsGlobal$prior 
 		+ act$sjiTitle[priorsIndeces]*coeffsGlobal$sjiTitle 
 		+ act$sjiBody[priorsIndeces])*coeffsGlobal$sjiBody
@@ -31,7 +31,7 @@ rateVals3 = function(priorsIndeces, act, observed, tagFile) {
 	#sampleIndeces = union(union(observed, sortedChunkHashes), sample(priorsIndeces, 100, replace=F))
 	#sampleIndeces = union(sortedChunkHashes[1:cutoff], union(observed, sample(priorsIndeces, 500, replace=F, prob=vals)))
 	probs = 1/(1+exp(-vals/.5))
-	sampleIndeces = union(sortedChunkHashes[1:cutoff], union(observed, sample(priorsIndeces, 800, replace=F, prob=probs)))
+	sampleIndeces = union(sortedChunkHashes[1:cutoff], union(observed, sample(priorsIndeces, 40, replace=F, prob=probs)))
 	targetP = rep(0, length(sampleIndeces))
 	targetP[match(observed, sampleIndeces)] = 1
 	tags = getChunks(sampleIndeces, dbPriors)

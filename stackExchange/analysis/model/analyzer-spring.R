@@ -77,7 +77,7 @@ makeMultivariateROC = function(baseFrm, figName) {
 }
 
 analyzeForMultivariate = function() {
-	runSet(sets=8, id=3)
+	runSet(sets=18, id=1)
 	baseFrm = getFrms(8, 3)[[1]]
 	baseFrm = modifyBaseFrm(baseFrm)
 	makeMultivariateROC(baseFrm, "usersROC")
