@@ -96,16 +96,17 @@
       ;(list 1000000 1100000 5) ; 100k test data for 1M training data
       ;(list 1000000 1001000 6) ; 1k test data for 1M training data
       ;(list 1001000 1002000 7)  ; 2nd 1k test data for 1M training data
-      (list 1002000 1003000 8)  ; 1st 1k test data for 1M training data for pub
-      (list 1003000 1004000 9)  ; 1st 1k test data for 1M training data for pub
-      (list 1004000 1005000 10)  ; 1st 1k test data for 1M training data for pub
-      (list 1005000 1006000 11)  ; 2nd 1k test data for 1M training data for pub
-      (list 1006000 1007000 12)  ; 3rd 1k test data for 1M training data for pub
-      (list 1007000 1008000 13)  ; 4th 1k test data for 1M training data for pub
-      (list 1008000 1009000 14)  ; 5th 1k test data for 1M training data for pub
-      (list 1009000 1010000 15)  ; 6th 1k test data for 1M training data for pub
-      (list 1010000 1011000 16)  ; 7th 1k test data for 1M training data for pub
-      (list 1011000 1012000 17)  ; 8th 1k test data for 1M training data for pub
+      ;(list 1002000 1003000 8)  ; 1st 1k test data for 1M training data for pub
+      ;(list 1003000 1004000 9)  ; 1st 1k test data for 1M training data for pub
+      ;(list 1004000 1005000 10)  ; 1st 1k test data for 1M training data for pub
+      ;(list 1005000 1006000 11)  ; 2nd 1k test data for 1M training data for pub
+      ;(list 1006000 1007000 12)  ; 3rd 1k test data for 1M training data for pub
+      ;(list 1007000 1008000 13)  ; 4th 1k test data for 1M training data for pub
+      ;(list 1008000 1009000 14)  ; 5th 1k test data for 1M training data for pub
+      ;(list 1009000 1010000 15)  ; 6th 1k test data for 1M training data for pub
+      ;(list 1010000 1011000 16)  ; 7th 1k test data for 1M training data for pub
+      ;(list 1011000 1012000 17)  ; 8th 1k test data for 1M training data for pub
+      (list 1000000 1010000 18) ; 10k test data for 1M training data
       )))
 
 (defun create-all-symlinks ()
