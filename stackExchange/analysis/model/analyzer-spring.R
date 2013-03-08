@@ -63,12 +63,25 @@ analyzeForICCM = function(frms=getAllFrms()) {
 	visPost(tagFiles[105], makeTagDir(8), coeffs=frms[[1]]$coeffs)
 }
 
+makeMultivariateROC = function(baseFrm, figName) {
+	baseFrms = adjustFrms(list(baseFrm), coeffsGlobal, model=formula(targetP ~ prior + userIdLogPriors + sjiTitle + sjiBody + offset))
+	baseFrms[2] = getAllFrmsForModel(model=formula(targetP ~ prior + sjiTitle + sjiBody + offset), frms=8, runId=1)
+	baseFrms[3] = adjustFrms(list(baseFrms[[1]]$frm), coeffsGlobal, model=formula(targetP ~ combinedPrior + sjiTitle + sjiBody + offset))
+	#tempFrm = baseFrms[[1]]$frm
+	#tempFrm = subset(tempFrm, userIdTagCount > 500)
+	#tempFrm$userPrior[is.infinite(tempFrm$userPrior)] = -10000
+	#baseFrms[4] = adjustFrms(list(tempFrm), coeffsGlobal, model=formula(targetP ~ prior + sjiTitle + sjiBody + offset))
+	legendText = c("With user log priors added", "With global prior", "With combined prior", "With only user prior")
+	items = makeItems(baseFrms, legendText)
+	plotROC2(items, figName)
+}
+
 analyzeForMultivariate = function() {
 	runSet(sets=8, id=3)
 	baseFrm = getFrms(8, 3)[[1]]
 	baseFrm = modifyBaseFrm(baseFrm)
-	res = runLogRegFrm(baseFrm, coeffs = coeffsGlobal, model=formula(targetP ~ prior + userIdLogPriors + sjiTitle + sjiBody + offset))
-	#frms = getAllFrmsForModel(model=formula(targetP ~ prior + sjiTitle + sjiBody + offset + userTaggedP), frms=8, runId=3)
+	makeMultivariateROC(baseFrm, "usersROC")
+	makeMultivariateROC(subset(baseFrm, userIdTagCount > 100), "usersROC gt 100")
 }
 
 modifyBaseFrm = function(baseFrm) {
@@ -77,6 +90,7 @@ modifyBaseFrm = function(baseFrm) {
 	baseFrm$globalPriorProb = with(baseFrm, exp(prior)/( exp(prior) + 1))
 	baseFrm$userPriorProb = with(baseFrm, userIdPriors/userIdTagCount)
 	baseFrm$userPriorProb[is.nan(baseFrm$userPriorProb)] = 0
+	baseFrm$userPrior = with(baseFrm, log(userPriorProb/(1-userPriorProb)))
 	baseFrm$combinedPriorProb = with(baseFrm, combinePs(globalPriorProb, userPriorProb, userIdTagCount))
 	baseFrm$combinedPrior = with(baseFrm, log(combinedPriorProb/(1-combinedPriorProb)))
 	baseFrm

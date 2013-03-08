@@ -25,7 +25,7 @@ devOff = function() {
 logReg = function(tag, res, model) {
 	myPrint(str_c("working ", length(tag), " tags"))
 	dfSubset = res[res$tag %in% tag,]
-	mylogit = glm(model, data=dfSubset, family="binomial")
+	mylogit = glm(model, data=dfSubset, family=binomial(link="logit"))
 	myPrint(summary(mylogit))
 	tmp = ClassLog(mylogit, dfSubset$targetP)
 	myPrint(tmp) 
@@ -102,21 +102,21 @@ getFrms = function(testDatasets, runId) {
 
 getAllFrmsForModel = function(model, coeffs=coeffsGlobal, frms=c(8:17), runId=1) {
 	frms = getFrms(frms, runId)
-	for(i in c(1:3)) {
+	frms = adjustFrms(frms, coeffs, model)
+}
+
+adjustFrms = function(frms, coeffs, model) {
+	for(i in c(1:1)) {
 		res = runLogRegFrm(frms[[1]], coeffs, model)
 		coeffs = res$coeffs
 	}
-	frms = adjustFrms(frms, coeffs)
-	return(lapply(frms, function(frm) list(frm=frm, coeffs=coeffs)))
-}
-
-adjustFrms = function(frms, coeffs) {
 	foo = function(frm) {
 		frm = addColumns(frm, coeffs)
 		frm$act = computeAct(frm, coeffs)
 		return(frm)
 	}
-	lapply(frms, foo)
+	frms = lapply(frms, foo)
+	return(lapply(frms, function(frm) list(frm=frm, coeffs=coeffs)))
 }
 
 getAllFrms = function() {
@@ -164,7 +164,7 @@ plotROCColumn = function(dFrame, column) {
 	fp = unlist(perf@x.values)*sum(!dFrame$targetP)
 	tp = unlist(perf@y.values)*sum(dFrame$targetP)
 	cutoff = min(which((tp+fp) > (sum(dFrame$targetP) * 2)))
-	indeces = sort(sample(cutoff, 2000, prob=1/(1+1:cutoff)))
+	indeces = sort(sample(cutoff, min(cutoff, 2000), prob=1/(1+1:cutoff)))
 	x = tp[indeces]+fp[indeces]
 	x = x/sum(dFrame$targetP)
 	y = tp[indeces]/(tp[indeces]+fp[indeces])
@@ -175,8 +175,8 @@ colors = c("red", "green", "blue", "orange", "yellow", "black", "grey", "purple"
 shapes = c(1, 2, 3, 4, 5, 20, 7, 8, 9, 10, 11)
 colors = rep("black", 10)
 
-plotROC2 = function(items) {
-	asFig("ROC")
+plotROC2 = function(items, figName="ROC") {
+	asFig(figName)
 	colors = unlist(lapply(items, function(item) {item$col}))
 	shapes = unlist(lapply(items, function(item) {item$shape}))
 	foo = function(item) {
