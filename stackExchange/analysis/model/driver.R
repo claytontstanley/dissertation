@@ -31,7 +31,7 @@ rateVals3 = function(priorsIndeces, act, observed, tagFile) {
 	#sampleIndeces = union(union(observed, sortedChunkHashes), sample(priorsIndeces, 100, replace=F))
 	#sampleIndeces = union(sortedChunkHashes[1:cutoff], union(observed, sample(priorsIndeces, 500, replace=F, prob=vals)))
 	probs = 1/(1+exp(-vals/.5))
-	sampleIndeces = union(sortedChunkHashes[1:cutoff], union(observed, sample(priorsIndeces, 40, replace=F, prob=probs)))
+	sampleIndeces = union(sortedChunkHashes[1:cutoff], union(observed, sample(priorsIndeces, 400, replace=F)))
 	targetP = rep(0, length(sampleIndeces))
 	targetP[match(observed, sampleIndeces)] = 1
 	tags = getChunks(sampleIndeces, dbPriors)
@@ -124,7 +124,8 @@ runSet = function(sets=c(8:17), id=1) {
 	lapply(sets, function(set) {writePosts(ratePosts(set), set, getSubsetId(sjiCSV), id)})
 }
 
-coeffsGlobal=list(sjiTitle=1.40, sjiBody=2.36, prior=1.08)
+#coeffsGlobal=list(sjiTitle=1.40, sjiBody=2.36, prior=1.08)
+coeffsGlobal=list(sjiTitle=.875, sjiBody=1.67, prior=.830)
 
 # Load up the synonyms
 colClasses=c("character", "character", "character", "character", "character", "character", "character", "character", "character", "character")

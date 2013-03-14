@@ -26,5 +26,9 @@ LogReg-8-4-2.csv	ICCM: Training dataset for model w/o entropy
 LogReg-9-4-1.csv	ICCM: Test dataset
 
 LogReg-8-4-3.csv	Multi: Initial training dataset 
+LogReg-8-4-4.csv	Multi: Testing sampling; 20/40
+LogReg-8-4-5.csv	Multi: Testing sampling; 20/40 no prob weight on 40
+LogReg-8-4-6.csv	Multi: Testing sampling; 20/800 no prob weight on 800
+LogReg-8-4-7.csv	Multi: Testing sampling; 20/400 no weight, new global coeffs
 
 LogReg-18-4-1.csv	Multi: 10k training dataset

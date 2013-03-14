@@ -87,13 +87,10 @@ runLogRegFrm = function(res, coeffs=coeffsGlobal, model=formula(targetP ~ sjiBod
 	return(append(logRegRes, list("res"=res, coeffs=coeffs)))	
 }
 
-runLogReg = function(logRegFile, figName) {
-	frm = read.csv(str_c(PATH, "/", logRegFile))
-	res = runLogRegFrm(frm)
+plotFrm = function(res, figName) {
 	asFig(figName)
 	logi.hist.plot(res$act, res$targetP, boxp=T, type="hist", col="gray")
 	devOff()
-	return(res)
 }
 
 getFrms = function(testDatasets, runId) {
@@ -105,17 +102,18 @@ getAllFrmsForModel = function(model, coeffs=coeffsGlobal, frms=c(8:17), runId=1)
 	frms = adjustFrms(frms, coeffs, model)
 }
 
+recomputeActivation = function(frm, coeffs) {
+	frm = addColumns(frm, coeffs)
+	frm$act = computeAct(frm, coeffs)
+	frm
+}
+
 adjustFrms = function(frms, coeffs, model) {
-	for(i in c(1:1)) {
+	for(i in c(1:4)) {
 		res = runLogRegFrm(frms[[1]], coeffs, model)
 		coeffs = res$coeffs
 	}
-	foo = function(frm) {
-		frm = addColumns(frm, coeffs)
-		frm$act = computeAct(frm, coeffs)
-		return(frm)
-	}
-	frms = lapply(frms, foo)
+	frms = lapply(frms, function(frm) recomputeActivation(frm, coeffs))
 	return(lapply(frms, function(frm) list(frm=frm, coeffs=coeffs)))
 }
 
