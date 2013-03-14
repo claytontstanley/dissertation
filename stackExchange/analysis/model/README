@@ -31,4 +31,4 @@ LogReg-8-4-5.csv	Multi: Testing sampling; 20/40 no prob weight on 40
 LogReg-8-4-6.csv	Multi: Testing sampling; 20/800 no prob weight on 800
 LogReg-8-4-7.csv	Multi: Testing sampling; 20/400 no weight, new global coeffs
 
-LogReg-18-4-1.csv	Multi: 10k training dataset
+LogReg-18-4-1.csv	Multi: 10k training dataset; 2/40 no weight; not new global coeffs
