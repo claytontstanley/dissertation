@@ -20,18 +20,8 @@ library(data.table)
 library(plyr)
 
 # A few helper functions
-rateVals3 = function(priorsIndeces, act, observed, tagFile) {
-	cutoff = 20
-	vals = as.vector(B[priorsIndeces]*coeffsGlobal$prior 
-		+ act$sjiTitle[priorsIndeces]*coeffsGlobal$sjiTitle 
-		+ act$sjiBody[priorsIndeces])*coeffsGlobal$sjiBody
-	res = sort(vals, decreasing=T, index.return=T)
-	sortedChunkHashes = priorsIndeces[res$ix]
-	#sortedChunkHashes = sortedChunkHashes[1:cutoff]
-	#sampleIndeces = union(union(observed, sortedChunkHashes), sample(priorsIndeces, 100, replace=F))
-	#sampleIndeces = union(sortedChunkHashes[1:cutoff], union(observed, sample(priorsIndeces, 500, replace=F, prob=vals)))
-	probs = 1/(1+exp(-vals/.5))
-	sampleIndeces = union(sortedChunkHashes[1:cutoff], union(observed, sample(priorsIndeces, 400, replace=F)))
+
+rateValsInner = function(sampleIndeces, act, observed, tagFile) {
 	targetP = rep(0, length(sampleIndeces))
 	targetP[match(observed, sampleIndeces)] = 1
 	tags = getChunks(sampleIndeces, dbPriors)
@@ -43,6 +33,21 @@ rateVals3 = function(priorsIndeces, act, observed, tagFile) {
 	userIdPriors = userIdPriors[sampleIndeces]
 	return(data.frame(tag=tags, sjiTitle=sjiTitle, sjiBody=sjiBody, prior=priors, targetP=targetP, act=priors + sjiTitle + sjiBody,
 		userIdPriors=userIdPriors, userIdTagCount = userIdTagCount))
+}
+
+rateVals3 = function(priorsIndeces, act, observed, tagFile) {
+	cutoff = 20
+	vals = as.vector(B[priorsIndeces]*coeffsGlobal$prior 
+		+ act$sjiTitle[priorsIndeces]*coeffsGlobal$sjiTitle 
+		+ act$sjiBody[priorsIndeces])*coeffsGlobal$sjiBody
+	res = sort(vals, decreasing=T, index.return=T)
+	sortedChunkHashes = priorsIndeces[res$ix]
+	sampleIndeces = union(sortedChunkHashes[1:cutoff], union(observed, sample(priorsIndeces, 400, replace=F)))
+	rateValsInner(sampleIndeces, act, observed, tagFile)
+}
+
+rateVals4 = function(priorsIndeces, act, observed, tagFile) {
+	rateValsInner(priorsIndeces, act, observed, tagFile)
 }
 
 getObservedContext = function(tagFile, tagDir) {
@@ -59,7 +64,7 @@ getObservedContext = function(tagFile, tagDir) {
 	return(ret)
 }
 
-ratePost = function(tagFile, tagDir) {
+ratePostInner = function(tagFile, tagDir, indeces, rateValsFun=rateVals3) {
 	res = data.frame()
 	if ( length(lst <- getObservedContext(tagFile, tagDir)) > 0 ) {
 		observed = lst$observed
@@ -71,11 +76,20 @@ ratePost = function(tagFile, tagDir) {
 		cAct = list()
 		cAct$sjiTitle = tAct$sji
 		cAct$sjiBody = bAct$sji
-		ret = rateVals3(priorsIndeces, cAct, getChunkHashes(observed, dbPriors), tagFile)
+		ret = do.call(rateValsFun, list(indeces, cAct, getChunkHashes(observed, dbPriors), tagFile))
 		ret$tagFile=tagFile
 		res = rbind(res, ret)
 	}
 	return(res)
+}
+
+ratePost = function(tagFile, tagDir) {
+	ratePostInner(tagFile, tagDir, priorsIndeces)
+}
+
+ratePost2 = function(tagFile, tagDir) {
+	subsetIndeces = getChunkHashes(dFrameGlobal[dFrameGlobal$tagFile == tagFile,]$tag, dbPriors)
+	ratePostInner(tagFile, tagDir, subsetIndeces, rateValsFun=rateVals4)
 }
 
 getTagFiles = function(tagDir) {
@@ -108,11 +122,11 @@ getPostIdForTagFile = function(tagFile) {
 	as.integer(str_extract(tagFile, "[^/][0-9]+$"))
 }
 
-ratePosts = function(subsetId) {
+ratePosts = function(subsetId, ratePostFun=ratePost) {
 	tagDir = makeTagDir(subsetId)
 	tagFiles = getTagFiles(tagDir)
 	#res = rbind.fill(parallel::mclapply(tagFiles, ratePost, mc.cores=3, mc.preschedule=T))
-	res = rbind.fill(lapply(tagFiles, function(tagFile) {ratePost(tagFile, tagDir)}))
+	res = rbind.fill(lapply(tagFiles, function(tagFile) do.call(ratePostFun, list(tagFile, tagDir))))
 	return(res)
 }
 
@@ -122,6 +136,11 @@ writePosts = function(res, testSubset, modelSubset, id) {
 
 runSet = function(sets=c(8:17), id=1) {
 	lapply(sets, function(set) {writePosts(ratePosts(set), set, getSubsetId(sjiCSV), id)})
+}
+
+runFromPrevious = function(previousDFrame, set, id) {
+	dFrameGlobal <<- previousDFrame
+	writePosts(ratePosts(set, ratePostFun=ratePost2), set, getSubsetId(sjiCSV), id)
 }
 
 #coeffsGlobal=list(sjiTitle=1.40, sjiBody=2.36, prior=1.08)

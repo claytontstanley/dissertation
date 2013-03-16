@@ -73,6 +73,7 @@ getPriorsForPost = function(PostId) {
 # Calculate total activation, given base-level activation, sji associations, and context
 act = function(context, B, sji) {
 	weights = contextWeights[context]
+	#weights = rep(1, length(weights))
 	print(sum(weights))
 	if( sum(weights) > 0) {
 		weights = weights / sum(weights)

@@ -112,9 +112,11 @@ adjustFrms = function(frms, coeffs, model) {
 	for(i in c(1:4)) {
 		res = runLogRegFrm(frms[[1]], coeffs, model)
 		coeffs = res$coeffs
+		classLog = res$classLog
+		logit = summary(res$logit)
 	}
 	frms = lapply(frms, function(frm) recomputeActivation(frm, coeffs))
-	return(lapply(frms, function(frm) list(frm=frm, coeffs=coeffs)))
+	return(lapply(frms, function(frm) list(frm=frm, coeffs=coeffs, classLog=classLog, logit=logit)))
 }
 
 getAllFrms = function() {
@@ -208,15 +210,17 @@ getAccuracyAtNAverageTags = function(frm, N=1) {
 plotHighest = function(contextIndeces, vals) {
 	vals = lapply(vals, function(val) {val[contextIndeces]})
 	frm = data.frame(vals)
-	topNum = 10
+	topNum = 12
 	vals = rowSums(frm)
 	res = sort(vals, decreasing=T, index.return=T)
 	sortedChunkHashes = contextIndeces[res$ix]
 	x = sortedChunkHashes[1:topNum]
 	xnames = getChunks(x, dbPriors)
-	if(sum(colnames(frm) == "prior") > 0) {
-		priorOffset = min(frm$prior[x])
-		frm$prior = frm$prior - priorOffset	
+	for (name in colnames(frm)) {
+		offset = min(frm[[name]][x])
+		if (offset < 0) {
+			frm[[name]] = frm[[name]] - offset
+		}
 	}
 	par(mar=c(10,4.1,4.1,2.1))
 	barplot(t(frm[x,]), legend=colnames(frm), names.arg=xnames, las=3)

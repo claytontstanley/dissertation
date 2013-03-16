@@ -61,7 +61,12 @@ combinePs = function(psGlobal, psLocal, count) {
 	(psGlobal*(maxCount-count+1) + psLocal*count) / (maxCount + 1)
 }
 
-analyzeForICCM = function(frms=getAllFrms()) {
+analyzeForICCM = function() {
+	runSet(sets=8, id=1)
+	runSet(sets=9, id=1)
+	prevFrm = getFrms(8,1)[[1]]
+	runFromPrevious(prevFrm, 8, 2)
+	frms = getAllFrms()
 	plotAllFrms(frms=frms)
 	tagFiles=getTagFiles(makeTagDir(8))
 	visPost(tagFiles[105], makeTagDir(8), coeffs=frms[[1]]$coeffs)
@@ -74,9 +79,9 @@ makeMultivariateROC = function(baseFrms, figName, legendText) {
 }
 
 analyzeBaseFrmForMultivariate = function(baseFrm) {
-	baseFrms = adjustFrms(list(baseFrm), coeffsGlobal, model=formula(targetP ~ prior + userIdLogPriors + sjiTitle + sjiBody + offset + 0))
-	baseFrms[2] = adjustFrms(list(baseFrms[[1]]$frm), coeffsGlobal, model=formula(targetP ~ prior + sjiTitle + sjiBody + offset + 0))
-	baseFrms[3] = adjustFrms(list(baseFrms[[1]]$frm), coeffsGlobal, model=formula(targetP ~ combinedPrior + sjiTitle + sjiBody + offset + 0))
+	baseFrms = adjustFrms(list(baseFrm), coeffsGlobal, model=formula(targetP ~ prior + userIdLogPriors + sjiTitle + sjiBody + offset))
+	baseFrms[2] = adjustFrms(list(baseFrms[[1]]$frm), coeffsGlobal, model=formula(targetP ~ prior + sjiTitle + sjiBody + offset))
+	baseFrms[3] = adjustFrms(list(baseFrms[[1]]$frm), coeffsGlobal, model=formula(targetP ~ combinedPrior + sjiTitle + sjiBody + offset))
 	#tempFrm = baseFrms[[1]]$frm
 	#tempFrm = subset(tempFrm, userIdTagCount > 500)
 	#tempFrm$userPrior[is.infinite(tempFrm$userPrior)] = -10000
@@ -92,10 +97,31 @@ getCoeffs = function(baseFrms) {
 	lapply(baseFrms, function(baseFrm) baseFrm$coeffs)
 }
 
+getClassLog = function(baseFrms) {
+	lapply(baseFrms, function(baseFrm) baseFrm$classLog)
+}
+
+getLogitSummary = function(baseFrms) {
+	lapply(baseFrms, function(baseFrm) baseFrm$logit)
+}
+
+getBaseFrmsDescriptives = function(baseFrms) {
+	lapply(baseFrms, function(baseFrm) {
+		by(baseFrm$frm$act, baseFrm$frm$targetP, summary)
+	})
+}
+
 assignCoeffs = function(baseFrms, coeffs) {
 	lapply(1:length(baseFrms), function(i) {
 		baseFrm = baseFrms[[i]]
 		baseFrm$coeffs = coeffs[[i]]
+		baseFrm
+	})
+}
+
+convertToSummary = function(baseFrms) {
+	lapply(baseFrms, function(baseFrm) {
+		baseFrm$logit = summary(baseFrm$logit)
 		baseFrm
 	})
 }
@@ -120,8 +146,8 @@ recomputeActivations = function(baseFrms) {
 }
 
 fooFun = function() {
-	baseFrms = baseFrmsNoWeighting3
-	baseFrms=assignCoeffs(baseFrmsNoWeighting, getCoeffs(baseFrmsNoWeighting))
+	baseFrms = baseFrmsNoWeighting4
+	baseFrms=assignCoeffs(baseFrms, getCoeffs(baseFrmsNoWeighting2.2))
 	baseFrms=assignCoeffs(baseFrmsNoWeighting, coeffsGlobal)
 	baseFrms=recomputeActivations(baseFrms)
 	baseFrms = sortBaseFrms(baseFrms)
@@ -133,15 +159,15 @@ fooFun = function() {
 }
 
 analyzeForMultivariate = function() {
-	runSet(sets=18, id=1)
+	runSet(sets=18, id=2)
 	runSet(sets=8, id=4)
 	runSet(sets=8, id=7)
 	originalBaseFrm = getFrms(8,3)[[1]]
 	originalBaseFrm = modifyBaseFrm(originalBaseFrm)
-	baseFrm = getFrms(18, 1)[[1]]
+	baseFrm = getFrms(18, 2)[[1]]
 	baseFrm = modifyBaseFrm(baseFrm)
 	baseFrmSubset = subsetBaseFrmNewRepd(baseFrm)
-	baseFrmSubset = baseFrmNoWeighting3
+	baseFrmSubset = baseFrm
 	baseFrms = analyzeBaseFrmForMultivariate(baseFrmSubset)
   	legendText = c("With user log priors added", "With global prior", "With combined prior") #, "With only user prior")
 	makeMultivariateROC(baseFrms, "usersROC", legendText)
@@ -180,10 +206,10 @@ modifyBaseFrm = function(baseFrm) {
 	baseFrm$userPrior = with(baseFrm, log(userPriorProb/(1-userPriorProb)))
 	baseFrm$combinedPriorProb = with(baseFrm, combinePs(globalPriorProb, userPriorProb, userIdTagCount))
 	baseFrm$combinedPrior = with(baseFrm, log(combinedPriorProb/(1-combinedPriorProb)))
-	baseFrm$weights = baseFrm$targetP
+	baseFrm$weights = rep(1, length(baseFrm$targetP))
 	popTotal = length(priorsIndeces) * length(unique(baseFrm$tagFile))
-	baseFrm$weights[baseFrm$targetP==0] = as.integer(ceiling(popTotal / sum(baseFrm$targetP==0)))
-	baseFrm$weights[baseFrm$targetP==0] = 20
+	#baseFrm$weights[baseFrm$targetP==0] = as.integer(ceiling(popTotal / sum(baseFrm$targetP==0)))
+	baseFrm$weights[baseFrm$targetP==1] = .071
 	baseFrm
 }
 
