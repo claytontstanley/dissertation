@@ -88,7 +88,7 @@ ratePost = function(tagFile, tagDir) {
 }
 
 ratePost2 = function(tagFile, tagDir) {
-	subsetIndeces = getChunkHashes(dFrameGlobal[dFrameGlobal$tagFile == tagFile,]$tag, dbPriors)
+	subsetIndeces = getChunkHashes(frmGlobal[frmGlobal$tagFile == tagFile,]$tag, dbPriors)
 	ratePostInner(tagFile, tagDir, subsetIndeces, rateValsFun=rateVals4)
 }
 
@@ -138,8 +138,8 @@ runSet = function(sets=c(8:17), id=1) {
 	lapply(sets, function(set) {writePosts(ratePosts(set), set, getSubsetId(sjiCSV), id)})
 }
 
-runFromPrevious = function(previousDFrame, set, id) {
-	dFrameGlobal <<- previousDFrame
+runFromPrevious = function(prevFrm, set, id) {
+	frmGlobal <<- prevFrm
 	writePosts(ratePosts(set, ratePostFun=ratePost2), set, getSubsetId(sjiCSV), id)
 }
 
