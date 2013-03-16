@@ -35,7 +35,7 @@ rateValsInner = function(sampleIndeces, act, observed, tagFile) {
 		userIdPriors=userIdPriors, userIdTagCount = userIdTagCount))
 }
 
-rateVals3 = function(priorsIndeces, act, observed, tagFile) {
+rateValsSample = function(priorsIndeces, act, observed, tagFile) {
 	cutoff = 20
 	vals = as.vector(B[priorsIndeces]*coeffsGlobal$prior 
 		+ act$sjiTitle[priorsIndeces]*coeffsGlobal$sjiTitle 
@@ -46,7 +46,7 @@ rateVals3 = function(priorsIndeces, act, observed, tagFile) {
 	rateValsInner(sampleIndeces, act, observed, tagFile)
 }
 
-rateVals4 = function(priorsIndeces, act, observed, tagFile) {
+rateValsNoSample = function(priorsIndeces, act, observed, tagFile) {
 	rateValsInner(priorsIndeces, act, observed, tagFile)
 }
 
@@ -64,7 +64,7 @@ getObservedContext = function(tagFile, tagDir) {
 	return(ret)
 }
 
-ratePostInner = function(tagFile, tagDir, indeces, rateValsFun=rateVals3) {
+ratePostInner = function(tagFile, tagDir, indeces, rateValsFun=rateValsSample) {
 	res = data.frame()
 	if ( length(lst <- getObservedContext(tagFile, tagDir)) > 0 ) {
 		observed = lst$observed
@@ -89,7 +89,7 @@ ratePost = function(tagFile, tagDir) {
 
 ratePost2 = function(tagFile, tagDir) {
 	subsetIndeces = getChunkHashes(frmGlobal[frmGlobal$tagFile == tagFile,]$tag, dbPriors)
-	ratePostInner(tagFile, tagDir, subsetIndeces, rateValsFun=rateVals4)
+	ratePostInner(tagFile, tagDir, subsetIndeces, rateValsFun=rateValsNoSample)
 }
 
 getTagFiles = function(tagDir) {
