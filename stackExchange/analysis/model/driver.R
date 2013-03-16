@@ -83,11 +83,11 @@ ratePostInner = function(tagFile, tagDir, indeces, rateValsFun=rateValsSample) {
 	return(res)
 }
 
-ratePost = function(tagFile, tagDir) {
+ratePostSample = function(tagFile, tagDir) {
 	ratePostInner(tagFile, tagDir, priorsIndeces)
 }
 
-ratePost2 = function(tagFile, tagDir) {
+ratePostNoSample = function(tagFile, tagDir) {
 	subsetIndeces = getChunkHashes(frmGlobal[frmGlobal$tagFile == tagFile,]$tag, dbPriors)
 	ratePostInner(tagFile, tagDir, subsetIndeces, rateValsFun=rateValsNoSample)
 }
@@ -122,7 +122,7 @@ getPostIdForTagFile = function(tagFile) {
 	as.integer(str_extract(tagFile, "[^/][0-9]+$"))
 }
 
-ratePosts = function(subsetId, ratePostFun=ratePost) {
+ratePosts = function(subsetId, ratePostFun=ratePostSample) {
 	tagDir = makeTagDir(subsetId)
 	tagFiles = getTagFiles(tagDir)
 	#res = rbind.fill(parallel::mclapply(tagFiles, ratePost, mc.cores=3, mc.preschedule=T))
@@ -140,7 +140,7 @@ runSet = function(sets=c(8:17), id=1) {
 
 runFromPrevious = function(prevFrm, set, id) {
 	frmGlobal <<- prevFrm
-	writePosts(ratePosts(set, ratePostFun=ratePost2), set, getSubsetId(sjiCSV), id)
+	writePosts(ratePosts(set, ratePostFun=ratePostNoSample), set, getSubsetId(sjiCSV), id)
 }
 
 #coeffsGlobal=list(sjiTitle=1.40, sjiBody=2.36, prior=1.08)
