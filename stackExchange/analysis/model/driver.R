@@ -135,7 +135,7 @@ writePosts = function(res, testSubset, modelSubset, id) {
 }
 
 runSet = function(sets=c(8:17), id=1) {
-	lapply(sets, function(set) {writePosts(ratePosts(set), set, getSubsetId(sjiCSV), id)})
+	lapply(sets, function(set) writePosts(ratePosts(set), set, getSubsetId(sjiCSV), id))
 }
 
 runFromPrevious = function(prevFrm, set, id) {
