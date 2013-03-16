@@ -271,9 +271,9 @@ For a given post, the model produces a vector of tag activations.
 For that post, the author's chosen tags are known (see Figure \ref{fig:examplePost}).
 So model performance can be measured by comparing the model's tag activations with chosen tags for a post, and then aggregated across posts to get an overall average performance.
 
-A logistic regression technique was used in order to operationalize this fit measure.
+A logistic regression technique was used to operationalize this fit measure.
 For each post, three sets of tag groups were combined to most accurately sample tag activations while managing computer resource constraints:
-The model's tag activations for the highest 200 tags, a weighted sample of 800 tags (weighted towards higher activation), and the tag activations for all tags that were chosen by the author of the post.
+The top 20 tags having the highest model activation, a random sample of 400 tags, and the tags that were chosen by the author of the post.
 Each of these observations was assigned a category of 0 or 1 depending on if the tag was a chosen tag or not for that post (0 is not chosen).
 Conceptually, if the model has good categorization power, the observations assigned 1 should have higher tag activations than the observations assigned 0.
 
@@ -282,7 +282,7 @@ The parameters were optimized to best predict categorization (chosen tag, not ch
 The tag's prior occurrence frequency, word co-occurrence activation for title and body words, and activation offset for the post.
 
 However using a single run of the \num{1000} posts was insufficient because there are two model components that require prior estimates of coefficients:
-The offset measure to determine the top-five tags and associated activation and the sampling technique used to pick a representative set of tags for each post.
+The offset measure to determine the top-five tags and associated activation and the sampling technique used to pick the top 20 model-predicted tags for each post.
 So model calibration was bootstrapped, where the coefficients from the previous run were used as estimates of coefficients for the next run.
 The coefficients converged on best-fit values quickly (only required two sets of four iterations), and did not show any signs of instability.
 
@@ -290,7 +290,8 @@ The coefficients converged on best-fit values quickly (only required two sets of
 
 \subsection{Logistic Regression}
 
-The final best-fit coefficients for each model component and formal statistical measurements are included in Tables \ref{tab:coeffs} and \ref{tab:fits} respectively.
+\vspace{-1em}
+
 
 \renewcommand{\arraystretch}{1}
 \renewcommand{\tabcolsep}{1mm}
@@ -336,6 +337,7 @@ The final best-fit coefficients for each model component and formal statistical 
   \end{center}
 \end{table}
 
+The final best-fit coefficients for each model component and formal statistical measurements are included in Tables \ref{tab:coeffs} and \ref{tab:fits} respectively.
 Note that all four coefficients for the run are strong predictors of tag use ($p<.01$), and model fit is satisfactory (McFadden's pseudo $R_{}^{2}=.46$, npv = .997, ppv = .70).
 It is also interesting that although the attentional weighting ($W$) terms for the title and body were calibrated by the regression, they did not stray far from cognitively-plausible defaults
 (see coefficients for title and body in Table \ref{tab:coeffs}).
@@ -362,8 +364,8 @@ Note how the base level activation and contextual activation combine to predict 
 For example, note that the \emph{javascript} tag leverages a combination of contextual activation and prior activation to achieve a high total activation.
 Alternatively, the \emph{svg} tag relies almost entirely on context to achieve high activation.
 And note that the model is by no means perfect.
-For example, \emph{html} is not tagged by the author, but the model ranks it as the second highest tag.
-And the author's tag \emph{firefox} is only ranked 8th by the model.
+For example, \emph{html} and \emph{jquery} are not tagged by the author, but the model ranks them as the second and third highest tag.
+And the author's tag \emph{firefox} is only ranked 12th by the model.
 
 \subsection{Generalizability}
 
@@ -371,7 +373,7 @@ In order to test how well the model (and calibrated parameters) generalize to th
 model parameters were held constant and the model was tested on a fresh set of \num{1000} posts.
 Model classification accuracy as a function of number of tags predicted by the model was used as the metric to test if the model generalized.
 
-\subsection{Classification Accuracy}
+\subsubsection{Classification Accuracy}
 
 A plot of model performance for both the calibration and test runs is included in Figure \ref{fig:ROC}.
 
@@ -409,7 +411,7 @@ Large-scale relational database techniques and efficient sparse matrix data stru
 so that the data structures require only 3GB of memory and retrieval requests with a DM dataset of \num{556677795} chunks occur in less than one second on a single processor.
 Although certainly not perfect, model accuracy is significant and retrieval times are fast, so we are considering potential applications of the model in real-world settings.
 
-\subsection{Potential Applications}
+\subsubsection{Potential Applications}
 
 The model could be deployed as a tag recommender system for stackoverflow.com. 
 If a post author does not include the model's predicted best tag for the post, then the model could suggest the tag to the author.
@@ -420,7 +422,7 @@ The model could also be used as a tag cleanup system for stackoverflow.com.
 In this scenario the tags for a previously submitted post would be compared against model predictions.
 If the model's predicted tag activation for a used tag is substantially low, then that tag could either be removed from the post, or the post could be flagged for further analysis.
 
-\subsection{Comparison to \citeA{Kuo2011}}
+\subsubsection{Comparison to \citeA{Kuo2011}}
 
 Our model achieves 67\% classification accuracy when predicting one tag per post on average
 (height of full model at vertical dotted line in Figure \ref{fig:ROC})
@@ -432,7 +434,7 @@ Also we used two orders of magnitude more posts to train the model co-occurrence
 Nonetheless, there are certainly model similarities:
 Co-occurrence count was used as the core measure of similarity, and both local (strength of association) and global (entropy or idf) weighting measures were used to compute tag likelihood, given context.
 
-\subsection{Entropy and ACT-R's Attentional Weighting}
+\subsubsection{Entropy and ACT-R's Attentional Weighting}
 
 Model performance improved by using a scaled entropy measure to weight the importance of each contextual element in the body and title of a post.
 However, it is uncommon for an ACT-R model that uses the declarative memory retrieval mechanisms to use anything other than equal attentional weighting for each chunk in context.
@@ -443,21 +445,21 @@ and both global and local weightings are commonly used when the PMI measurement 
 This suggests that using a global weighting term for chunks in context (e.g., the scaled entropy measure used here)
 alongside the more commonly-used local weighting (spreading activation) might be useful for other ACT-R models that are taking advantage of large declarative memory datasets to build up the model's base knowledge.
 
-\subsection{Current Model Issues}
+\subsubsection{Current Model Issues}
 
 Including the offset term in the model improved performance (see Figure \ref{fig:ROC}).
 However by normalizing the top activations for all posts, the model cannot differentiate between a post where the top predicted tag is certain, and a post where the top-predicted tag is questionable.
 One could argue that normalizing top activations for all posts should cause model performance to decrease, and the opposite was actually observed.
 One hypothesis is that this normalization is required because the retrieval threshold of a tag is adjusted for each post, and changed so that only a small set of tags are retrieved for all posts.
-Further research will explore this and other theories for the behavior of the offset component in the model.
+Further research will explore this and other theories for the behavior of the offset component.
 
-\subsection{Future Planned Research}
+\subsubsection{Future Planned Research}
 
 Alongside exploring the offset component of the model, our main planned research is to include the post author's past tagging behavior as an additional model predictor.
 We are exploring a Bayesian updating technique that would adjust prior tag activations from global priors to user's priors as more tagging information about the user is collected.
-For the StackOverflow dataset, adding user's tagging history to the model should drastically improve predictive power for veteran users,
-since tags are tied to programming languages and specific technologies, and programmers tend to specialize on a few set of tags that are of interest to them.
-This technique could also be deployed, since a post author must be signed into StackOverflow before creating a new post.
+For the StackOverflow dataset, adding user's tagging history to the model should improve predictive power for veteran users,
+since programmers tend to specialize on a few set of tags that are of interest to them.
+This technique could also be deployed, since a post author must be signed in before creating a post.
 
 \section{Acknowledgments}
 
