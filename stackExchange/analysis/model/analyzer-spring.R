@@ -25,6 +25,11 @@ analyzeForPresentation = function() {
 	ylab="Activation"
 	plot(1:length(priorsIndeces), sort(as.vector(B[priorsIndeces]), decreasing=T), main=main, xlab=xlab, ylab=ylab)
 	devOff()
+	
+	asFig("TagActZipf")
+	main="Log-log plot of tag freqency vs tag rank"
+	plot(log(1:length(priors)), log(sort(priors, decreasing=T)), main=main, xlab="Log tag rank", ylab="Log tag frequency")
+	devOff()
 
 	asFig("sjiActDis")
 	hist(with(summary(sji), x), main="Distribution of sji associations", xlab="Activation")
@@ -67,6 +72,7 @@ analyzeForICCM = function() {
 	prevFrm = getFrms(8,1)[[1]]
 	runFromPrevious(prevFrm, 8, 2)
 	frms = getAllFrms()
+	frms = sortBaseFrms(frms)
 	plotAllFrms(frms=frms)
 	tagFiles=getTagFiles(makeTagDir(8))
 	visPost(tagFiles[105], makeTagDir(8), coeffs=frms[[1]]$coeffs)
