@@ -388,9 +388,10 @@ A plot of model performance for both the calibration and test runs is included i
   \label{fig:ROC}
 \end{figure}
 
-Note how model performance is almost identical for the calibration and test dataset (compare full model calibration to full model test).
-This indicates that the model parameters were not overfit, and generalize well to the rest of the dataset.
-It also provides evidence that \num{1000} posts is an adequate number to estimate model parameters accurately.
+Note how model performance is almost identical for the calibration and test dataset (compare full model calibration to full model test), which indicates that model parameters generalize well.
+There is a small decrease in performance for test compared to calibration to the left of the vertical dotted line, and model performance at the dotted line is slightly lower (65\% compared to 67\%).
+Model performance for the test dataset (cross-validated performance) is the most accurate measurement of real-world performance,
+and model accuracy is 65\% for this dataset when tasked to predict one tag per post on average.
 
 \subsection{Necessity Analysis}
 
