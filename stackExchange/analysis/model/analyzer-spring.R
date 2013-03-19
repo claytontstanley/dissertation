@@ -6,6 +6,53 @@ PATH = dirname(frameFiles[[length(frameFiles)]])
 # Source the analyzer utility functions
 source(str_c(PATH, "/analyzer.R"))
 
+library(Hmisc)
+
+getCoeffs = function(baseFrms) {
+	lapply(baseFrms, function(baseFrm) baseFrm$coeffs)
+}
+
+getClassLog = function(baseFrms) {
+	lapply(baseFrms, function(baseFrm) baseFrm$classLog)
+}
+
+getLogitSummary = function(baseFrms) {
+	lapply(baseFrms, function(baseFrm) baseFrm$logit)
+}
+
+getBaseFrmsDescriptives = function(baseFrms) {
+	lapply(baseFrms, function(baseFrm) {
+		by(baseFrm$frm$act, baseFrm$frm$targetP, summary)
+	})
+}
+
+assignCoeffs = function(baseFrms, coeffs) {
+	lapply(1:length(baseFrms), function(i) {
+		baseFrm = baseFrms[[i]]
+		baseFrm$coeffs = coeffs[[i]]
+		baseFrm
+	})
+}
+
+sortBaseFrm = function(baseFrm) {
+	baseFrm[with(baseFrm, order(-act)),]
+}
+
+sortBaseFrms = function(baseFrms) {
+	lapply(1:length(baseFrms), function(i) {
+		baseFrm = baseFrms[[i]]
+		baseFrm$frm = sortBaseFrm(baseFrm$frm)
+		baseFrm
+	})
+}
+
+recomputeActivations = function(baseFrms) {
+	lapply(baseFrms, function(baseFrm) {
+		baseFrm$frm = recomputeActivation(baseFrm$frm, baseFrm$coeffs)
+		baseFrm
+	})
+}
+
 analyzeForPresentation = function() {
 	frms = getAllFrmsForModel(model=formula(targetP ~ prior + sjiTitle + sjiBody + offset), frms=8, runId=1)
 	tagFiles = getTagFiles(makeTagDir(6))
@@ -60,10 +107,15 @@ analyzeForPresentation = function() {
 
 }
 
-maxCount = 50
-combinePs = function(psGlobal, psLocal, count) {
+combinePs = function(psGlobal, psLocal, count, maxCount) {
 	count = pmin(count, maxCount)
 	(psGlobal*(maxCount-count+1) + psLocal*count) / (maxCount + 1)
+}
+
+computeCombinedPrior = function(baseFrm, maxCount) {
+	baseFrm$combinedPriorProb = with(baseFrm, combinePs(globalPriorProb, userPriorProb, userIdTagCount, maxCount))
+	baseFrm$combinedPrior = with(baseFrm, log(combinedPriorProb/(1-combinedPriorProb)))
+	baseFrm
 }
 
 analyzeForICCM = function() {
@@ -84,71 +136,41 @@ makeMultivariateROC = function(baseFrms, figName, legendText) {
 	plotFrm(baseFrms[[1]]$frm, "LogReg-with-user-log-priors-added")
 }
 
+analyzeBaseFrmPrior = function(baseFrm) {
+	adjustFrms(list(baseFrm), coeffsGlobal, model=formula(targetP ~ prior + sjiTitle + sjiBody + offset))
+}
+
+analyzeBaseFrmUserPrior = function(baseFrm) {
+	baseFrm$userPrior[is.infinite(baseFrm$userPrior)] = with(baseFrm, min(userPrior[!is.infinite(userPrior)]))
+	adjustFrms(list(baseFrm), coeffsGlobal, model=formula(targetP ~ userPrior + sjiTitle + sjiBody + offset))
+}
+
+analyzeBaseFrmCombinedPrior = function(baseFrm, maxCount=5) {
+	baseFrm = computeCombinedPrior(baseFrm, maxCount=maxCount)
+	adjustFrms(list(baseFrm), coeffsGlobal, model=formula(targetP ~ combinedPrior + sjiTitle + sjiBody + offset))
+}
+
+analyzeBaseFrmFull = function(baseFrm) {
+	baseFrm$userPrior[is.infinite(baseFrm$userPrior)] = with(baseFrm, min(userPrior[!is.infinite(userPrior)]))
+	adjustFrms(list(baseFrm), coeffsGlobal, model=formula(targetP ~ userPrior + userIdLogPriors + sjiTitle + sjiBody + offset))
+}
+
+analyzeBaseFrmNoPriorUserLogPriors = function(baseFrm) {
+	adjustFrms(list(baseFrm), coeffsGlobal, model=formula(targetP ~ userIdLogPriors + sjiTitle + sjiBody + offset))
+}
+
 analyzeBaseFrmForMultivariate = function(baseFrm) {
-	baseFrms = adjustFrms(list(baseFrm), coeffsGlobal, model=formula(targetP ~ prior + userIdLogPriors + sjiTitle + sjiBody + offset))
-	baseFrms[2] = adjustFrms(list(baseFrms[[1]]$frm), coeffsGlobal, model=formula(targetP ~ prior + sjiTitle + sjiBody + offset))
-	baseFrms[3] = adjustFrms(list(baseFrms[[1]]$frm), coeffsGlobal, model=formula(targetP ~ combinedPrior + sjiTitle + sjiBody + offset))
+	#baseFrms = adjustFrms(list(baseFrm), coeffsGlobal, model=formula(targetP ~ prior + userIdLogPriors + sjiTitle + sjiBody + offset))
+	baseFrms = analyzeBaseFrmPrior(baseFrm)
+	baseFrms[2] = analyzeBaseFrmCombinedPrior(baseFrm)
+	baseFrms[3] = analyzeBaseFrmUserPrior(baseFrm)
+	#baseFrms[5] = analyzeBaseFrmFull(baseFrm)
+	#baseFrms[6] = analyzeBaseFrmNoPriorUserLogPriors(baseFrm)
 	#tempFrm = baseFrms[[1]]$frm
 	#tempFrm = subset(tempFrm, userIdTagCount > 500)
 	#tempFrm$userPrior[is.infinite(tempFrm$userPrior)] = -10000
 	#baseFrms[4] = adjustFrms(list(tempFrm), coeffsGlobal, model=formula(targetP ~ prior + sjiTitle + sjiBody + offset))
 	baseFrms
-}
-
-#dev.new()
-#hist(subset(baseFrm, targetP==1)$act)
-#?hist
-
-getCoeffs = function(baseFrms) {
-	lapply(baseFrms, function(baseFrm) baseFrm$coeffs)
-}
-
-getClassLog = function(baseFrms) {
-	lapply(baseFrms, function(baseFrm) baseFrm$classLog)
-}
-
-getLogitSummary = function(baseFrms) {
-	lapply(baseFrms, function(baseFrm) baseFrm$logit)
-}
-
-getBaseFrmsDescriptives = function(baseFrms) {
-	lapply(baseFrms, function(baseFrm) {
-		by(baseFrm$frm$act, baseFrm$frm$targetP, summary)
-	})
-}
-
-assignCoeffs = function(baseFrms, coeffs) {
-	lapply(1:length(baseFrms), function(i) {
-		baseFrm = baseFrms[[i]]
-		baseFrm$coeffs = coeffs[[i]]
-		baseFrm
-	})
-}
-
-convertToSummary = function(baseFrms) {
-	lapply(baseFrms, function(baseFrm) {
-		baseFrm$logit = summary(baseFrm$logit)
-		baseFrm
-	})
-}
-
-sortBaseFrm = function(baseFrm) {
-	baseFrm[with(baseFrm, order(-act)),]
-}
-
-sortBaseFrms = function(baseFrms) {
-	lapply(1:length(baseFrms), function(i) {
-		baseFrm = baseFrms[[i]]
-		baseFrm$frm = sortBaseFrm(baseFrm$frm)
-		baseFrm
-	})
-}
-
-recomputeActivations = function(baseFrms) {
-	lapply(baseFrms, function(baseFrm) {
-		baseFrm$frm = recomputeActivation(baseFrm$frm, baseFrm$coeffs)
-		baseFrm
-	})
 }
 
 fooFun = function() {
@@ -164,18 +186,55 @@ fooFun = function() {
 	cumsum(head(baseFrmsWeighting[[2]]$frm, n=1000)$targetP)
 }
 
+getPriorsPerformance = function(baseFrm) {
+	baseFrms = analyzeBaseFrmPrior(baseFrm)
+	baseFrms[2] = analyzeBaseFrmUserPrior(baseFrm)
+	priorAt3 = getAccuracyAtNAverageTags(baseFrms[[1]]$frm, N=3)
+	userPriorAt3 = getAccuracyAtNAverageTags(baseFrms[[2]]$frm, N=3)
+	list(priorAt3=priorAt3, userPriorAt3=userPriorAt3)
+}
+
+extractPerformance = function(priorsPerfs) {
+	list(
+		priorsAt3=lapply(priorsPerfs, function(x) x$priorAt3),
+		userPriorsAt3=lapply(priorsPerfs, function(x) x$userPriorAt3))
+}
+
+getBaseFrmSubset = function(baseFrm, gt, lt) {
+	subset(baseFrm, userIdTagCount > gt & userIdTagCount < lt)
+}
+
+plotPriorsPerformance = function() {
+	points = list(c(0, 5), c(.5, 5.5), c(1, 6), c(1.5, 6.5), c(2, 7), c(2.5, 7.5), c(3, 8), c(3.5, 8.5), c(4, 9), c(4.5, 9.5), c(5, 10), c(5, 25), c(10, 30), c(15, 35), c(20, 40))
+	perfs = lapply(points, function(pt) getPriorsPerformance(getBaseFrmSubset(baseFrm, pt[1], pt[2])))
+	perfs = perfs2
+	ys = extractPerformance(perfs)
+	xs = lapply(points, mean)
+	plot(xs, as.numeric(ys$priorsAt3) - as.numeric(ys$userPriorsAt3))
+}
+
 analyzeForMultivariate = function() {
 	runSet(sets=18, id=2)
-	runSet(sets=8, id=4)
 	runSet(sets=8, id=7)
-	originalBaseFrm = getFrms(8,3)[[1]]
-	originalBaseFrm = modifyBaseFrm(originalBaseFrm)
 	baseFrm = getFrms(18, 2)[[1]]
+	baseFrm = getFrms(8, 1)[[1]]
 	baseFrm = modifyBaseFrm(baseFrm)
+	baseFrms = analyzeBaseFrmForMultivariate(baseFrm)
+	baseFrms[4] = analyzeBaseFrmUserPrior(baseFrm)
+	baseFrms[3] = analyzeBaseFrmCombinedPrior(baseFrm, maxCount=5)
+	baseFrms[2] = analyzeBaseFrmPrior(subset(baseFrm, userIdTagCount > 7.5 & userIdTagCount < 15))
+	baseFrms[2] = analyzeBaseFrmPrior(baseFrm)
+	baseFrms[5] = analyzeBaseFrmFull(baseFrm)
+	baseFrms[6] = analyzeBaseFrmNoPriorUserLogPriors(baseFrm)
+	Ecdf(baseFrm$userIdTagCount, what='1-F')
+	baseFrms = baseFrms[c(1, 2, 3)]
+	legendText = c("With global prior", "With combined prior", "With user prior")
+
 	baseFrmSubset = subsetBaseFrmNewRepd(baseFrm)
 	baseFrmSubset = baseFrm
 	baseFrms = analyzeBaseFrmForMultivariate(baseFrmSubset)
-  	legendText = c("With user log priors added", "With global prior", "With combined prior") #, "With only user prior")
+  	legendText = c("With global prior", "With combined prior", "With user prior", "With user prior and user log priors added",
+  		"With no prior and user log priors added")
 	makeMultivariateROC(baseFrms, "usersROC", legendText)
 	makeMultivariateROC(subset(baseFrm, userIdTagCount > 100), "usersROC gt 100")
 }
@@ -187,7 +246,6 @@ subsetBaseFrm = function(baseFrm) {
 	baseFrmPresent = subset(baseFrm, targetP==1)
 	subsetPresent = baseFrmPresent[sample(dim(baseFrmPresent)[1], 1000),]
 	baseFrmAbsent = subset(baseFrm, targetP==0)
-	baseFrmAbsent = subset(originalBaseFrm, targetP==0)
 	baseFrmAbsent = baseFrmAbsent[sample(dim(baseFrmAbsent)[1], 40000),]
 	subsetAbsent = baseFrmAbsent[sample(dim(baseFrmAbsent)[1], 800000, replace=T),]
 #	return(rbind(subsetPresent, subsetAbsent))
@@ -210,9 +268,8 @@ modifyBaseFrm = function(baseFrm) {
 	baseFrm$userPriorProb = with(baseFrm, userIdPriors/userIdTagCount)
 	baseFrm$userPriorProb[is.nan(baseFrm$userPriorProb)] = 0
 	baseFrm$userPrior = with(baseFrm, log(userPriorProb/(1-userPriorProb)))
-	baseFrm$combinedPriorProb = with(baseFrm, combinePs(globalPriorProb, userPriorProb, userIdTagCount))
-	baseFrm$combinedPrior = with(baseFrm, log(combinedPriorProb/(1-combinedPriorProb)))
 	baseFrm$weights = rep(1, length(baseFrm$targetP))
+	baseFrm = computeCombinedPrior(baseFrm, 10)
 	popTotal = length(priorsIndeces) * length(unique(baseFrm$tagFile))
 	#baseFrm$weights[baseFrm$targetP==0] = as.integer(ceiling(popTotal / sum(baseFrm$targetP==0)))
 	baseFrm$weights[baseFrm$targetP==1] = .071
