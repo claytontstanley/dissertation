@@ -125,6 +125,7 @@ occurancesFrm$ChunkType[occurancesFrm$ChunkType != 'tag'] = 'context'
 occurancesTbl = data.table(occurancesFrm, key=c("Chunk", "ChunkHash", "ChunkType"))
 occurancesTbl = occurancesTbl[, list(ChunkCount=sum(ChunkCount)), by=c("Chunk", "ChunkHash", "ChunkType")]
 occurancesFrm = data.frame(occurancesTbl)
+occurancesFrm = arrange(occurancesFrm, Chunk)
 rm(occurancesTbl)
 
 myPrint('# Perform any filtering on the context and priors frames')
