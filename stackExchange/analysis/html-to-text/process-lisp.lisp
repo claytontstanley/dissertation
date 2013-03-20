@@ -106,7 +106,8 @@
       ;(list 1009000 1010000 15)  ; 6th 1k test data for 1M training data for pub
       ;(list 1010000 1011000 16)  ; 7th 1k test data for 1M training data for pub
       ;(list 1011000 1012000 17)  ; 8th 1k test data for 1M training data for pub
-      (list 1000000 1010000 18) ; 10k test data for 1M training data
+      ;(list 1000000 1010000 18) ; 10k test data for 1M training data
+      (list 1010000 1011000 19) ; 1k test data for 1M training data
       )))
 
 (defun create-all-symlinks ()

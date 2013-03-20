@@ -145,31 +145,15 @@ analyzeBaseFrmUserPrior = function(baseFrm) {
 	adjustFrms(list(baseFrm), coeffsGlobal, model=formula(targetP ~ userPrior + sjiTitle + sjiBody + offset))
 }
 
-analyzeBaseFrmCombinedPrior = function(baseFrm, maxCount=5) {
+analyzeBaseFrmCombinedPrior = function(baseFrm, maxCount) {
 	baseFrm = computeCombinedPrior(baseFrm, maxCount=maxCount)
 	adjustFrms(list(baseFrm), coeffsGlobal, model=formula(targetP ~ combinedPrior + sjiTitle + sjiBody + offset))
 }
 
-analyzeBaseFrmFull = function(baseFrm) {
-	baseFrm$userPrior[is.infinite(baseFrm$userPrior)] = with(baseFrm, min(userPrior[!is.infinite(userPrior)]))
-	adjustFrms(list(baseFrm), coeffsGlobal, model=formula(targetP ~ userPrior + userIdLogPriors + sjiTitle + sjiBody + offset))
-}
-
-analyzeBaseFrmNoPriorUserLogPriors = function(baseFrm) {
-	adjustFrms(list(baseFrm), coeffsGlobal, model=formula(targetP ~ userIdLogPriors + sjiTitle + sjiBody + offset))
-}
-
-analyzeBaseFrmForMultivariate = function(baseFrm) {
-	#baseFrms = adjustFrms(list(baseFrm), coeffsGlobal, model=formula(targetP ~ prior + userIdLogPriors + sjiTitle + sjiBody + offset))
+analyzeBaseFrmForMultivariate = function(baseFrm, maxCount) {
 	baseFrms = analyzeBaseFrmPrior(baseFrm)
-	baseFrms[2] = analyzeBaseFrmCombinedPrior(baseFrm)
+	baseFrms[2] = analyzeBaseFrmCombinedPrior(baseFrm, maxCount)
 	baseFrms[3] = analyzeBaseFrmUserPrior(baseFrm)
-	#baseFrms[5] = analyzeBaseFrmFull(baseFrm)
-	#baseFrms[6] = analyzeBaseFrmNoPriorUserLogPriors(baseFrm)
-	#tempFrm = baseFrms[[1]]$frm
-	#tempFrm = subset(tempFrm, userIdTagCount > 500)
-	#tempFrm$userPrior[is.infinite(tempFrm$userPrior)] = -10000
-	#baseFrms[4] = adjustFrms(list(tempFrm), coeffsGlobal, model=formula(targetP ~ prior + sjiTitle + sjiBody + offset))
 	baseFrms
 }
 
@@ -204,39 +188,42 @@ getBaseFrmSubset = function(baseFrm, gt, lt) {
 	subset(baseFrm, userIdTagCount > gt & userIdTagCount < lt)
 }
 
-plotPriorsPerformance = function() {
+plotPriorsPerformance = function(baseFrm) {
 	points = list(c(0, 5), c(.5, 5.5), c(1, 6), c(1.5, 6.5), c(2, 7), c(2.5, 7.5), c(3, 8), c(3.5, 8.5), c(4, 9), c(4.5, 9.5), c(5, 10), c(5, 25), c(10, 30), c(15, 35), c(20, 40))
 	perfs = lapply(points, function(pt) getPriorsPerformance(getBaseFrmSubset(baseFrm, pt[1], pt[2])))
-	perfs = perfs2
 	ys = extractPerformance(perfs)
-	xs = lapply(points, mean)
-	plot(xs, as.numeric(ys$priorsAt3) - as.numeric(ys$userPriorsAt3))
+	xs = as.numeric(lapply(points, function(point) point[1] + (point[2] - point[1]) / 2))
+	errs = as.numeric(lapply(points, function(point) (point[2] - point[1]) / 2))
+	delta = as.numeric(ys$priorsAt3) - as.numeric(ys$userPriorsAt3)
+	main = "Performance delta between global and user prior vs user tag count"
+	plotCI(xs, delta, errs, err="x", main=main, xlab="user tag count", ylab="performance difference when producing 3 tags per post")
+	abline(h=0, lty=3)
 }
 
 analyzeForMultivariate = function() {
 	runSet(sets=18, id=2)
 	runSet(sets=8, id=7)
 	baseFrm = getFrms(18, 2)[[1]]
-	baseFrm = getFrms(8, 1)[[1]]
 	baseFrm = modifyBaseFrm(baseFrm)
-	baseFrms = analyzeBaseFrmForMultivariate(baseFrm)
-	baseFrms[4] = analyzeBaseFrmUserPrior(baseFrm)
-	baseFrms[3] = analyzeBaseFrmCombinedPrior(baseFrm, maxCount=5)
-	baseFrms[2] = analyzeBaseFrmPrior(subset(baseFrm, userIdTagCount > 7.5 & userIdTagCount < 15))
-	baseFrms[2] = analyzeBaseFrmPrior(baseFrm)
-	baseFrms[5] = analyzeBaseFrmFull(baseFrm)
-	baseFrms[6] = analyzeBaseFrmNoPriorUserLogPriors(baseFrm)
-	Ecdf(baseFrm$userIdTagCount, what='1-F')
-	baseFrms = baseFrms[c(1, 2, 3)]
+	plotPriorsPerformance(baseFrm)
+	baseFrms = analyzeBaseFrmForMultivariate(baseFrm, maxCount=5)
+	baseFrms10000 = baseFrms
 	legendText = c("With global prior", "With combined prior", "With user prior")
-
-	baseFrmSubset = subsetBaseFrmNewRepd(baseFrm)
-	baseFrmSubset = baseFrm
-	baseFrms = analyzeBaseFrmForMultivariate(baseFrmSubset)
-  	legendText = c("With global prior", "With combined prior", "With user prior", "With user prior and user log priors added",
-  		"With no prior and user log priors added")
-	makeMultivariateROC(baseFrms, "usersROC", legendText)
-	makeMultivariateROC(subset(baseFrm, userIdTagCount > 100), "usersROC gt 100")
+ 	makeMultivariateROC(baseFrms, "usersROC", legendText)
+ 	
+ 	tagFiles = getTagFiles(makeTagDir(19))
+	visPost(tagFiles[3], makeTagDir(19), baseFrms[[2]]$coeffs)
+	visPost(tagFiles[121], makeTagDir(19), baseFrms[[2]]$coeffs)
+	visPost(tagFiles[105], makeTagDir(19), baseFrms[[2]]$coeffs)	
+	
+	#Ecdf(baseFrm$userIdTagCount, what='1-F')	
+	baseFrm = getFrms(8, 1)[[1]]
+	baseFrms = analyzeBaseFrmForMultivariate(baseFrm, maxCount=5)
+	baseFrms1000 = baseFrms
+	
+	#baseFrms = baseFrms10000
+	#baseFrms = assignCoeffs(baseFrms, getCoeffs(baseFrms1000))
+	#baseFrms = recomputeActivations(baseFrms)
 }
 
 subsetBaseFrm = function(baseFrm) {
