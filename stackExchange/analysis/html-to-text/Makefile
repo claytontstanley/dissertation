@@ -1,5 +1,6 @@
 mysql = mysql
 psql = psql
+ccl = ~/bin/ccl-mod
 
 createChunks createNohtml: create%:
 	< create$*.sql ${psql}
@@ -23,7 +24,7 @@ build-all: build-nohtml build-chunks
 build-nohtml build-chunks: processAll
 
 trim-chunks trim-chunks-huge build-nohtml build-chunks extract-all create-all-symlinks create-all-post-ids-csv:
-	rlwrap ccl -l process-lisp.lisp -e '($@)' -e '(quit)'
+	rlwrap ${ccl} -l process-lisp.lisp -e '($@)' -e '(quit)'
 
 post-ids.csv: export-post-ids.sql
 	< $< ${mysql} > $@
