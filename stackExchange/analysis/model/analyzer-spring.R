@@ -151,9 +151,10 @@ analyzeBaseFrmCombinedPrior = function(baseFrm, maxCount) {
 }
 
 analyzeBaseFrmForMultivariate = function(baseFrm, maxCount) {
-	baseFrms = analyzeBaseFrmPrior(baseFrm)
-	baseFrms[2] = analyzeBaseFrmCombinedPrior(baseFrm, maxCount)
-	baseFrms[3] = analyzeBaseFrmUserPrior(baseFrm)
+	baseFrms = adjustFrms(list(baseFrm), coeffsGlobal, model=formula(targetP ~ prior + sjiTitle + offset))
+	baseFrms[2] = analyzeBaseFrmPrior(baseFrm)
+	baseFrms[3] = analyzeBaseFrmCombinedPrior(baseFrm, maxCount)
+	baseFrms[4] = analyzeBaseFrmUserPrior(baseFrm)
 	baseFrms
 }
 
@@ -189,6 +190,7 @@ getBaseFrmSubset = function(baseFrm, gt, lt) {
 }
 
 plotPriorsPerformance = function(baseFrm) {
+	asFig("transPoint")
 	points = list(c(0, 5), c(.5, 5.5), c(1, 6), c(1.5, 6.5), c(2, 7), c(2.5, 7.5), c(3, 8), c(3.5, 8.5), c(4, 9), c(4.5, 9.5), c(5, 10), c(5, 25), c(10, 30), c(15, 35), c(20, 40))
 	perfs = lapply(points, function(pt) getPriorsPerformance(getBaseFrmSubset(baseFrm, pt[1], pt[2])))
 	ys = extractPerformance(perfs)
@@ -198,6 +200,7 @@ plotPriorsPerformance = function(baseFrm) {
 	main = "Performance delta between global and user prior vs user tag count"
 	plotCI(xs, delta, errs, err="x", main=main, xlab="user tag count", ylab="performance difference when producing 3 tags per post")
 	abline(h=0, lty=3)
+	dev.off()
 }
 
 analyzeForMultivariate = function() {
@@ -208,7 +211,7 @@ analyzeForMultivariate = function() {
 	plotPriorsPerformance(baseFrm)
 	baseFrms = analyzeBaseFrmForMultivariate(baseFrm, maxCount=5)
 	baseFrms10000 = baseFrms
-	legendText = c("With global prior", "With combined prior", "With user prior")
+	legendText = c("Without body words", "With global prior", "With combined prior", "With user prior")
  	makeMultivariateROC(baseFrms, "usersROC", legendText)
  	
  	tagFiles = getTagFiles(makeTagDir(19))
