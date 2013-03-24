@@ -207,10 +207,9 @@ getAccuracyAtNAverageTags = function(frm, N=1) {
 	res$y[max(which(res$x<propTagged))]
 }
 
-plotHighest = function(contextIndeces, vals) {
+plotHighest = function(contextIndeces, vals, topNum) {
 	vals = lapply(vals, function(val) {val[contextIndeces]})
 	frm = data.frame(vals)
-	topNum = 12
 	vals = rowSums(frm)
 	res = sort(vals, decreasing=T, index.return=T)
 	sortedChunkHashes = contextIndeces[res$ix]
@@ -235,7 +234,7 @@ addLabels = function(observed, titleContext, ylab) {
 		title(ylab=ylab)
 }
 
-visPost = function(tagFile, tagDir, coeffs=coeffsGlobal) {
+visPost = function(tagFile, tagDir, coeffs=coeffsGlobal, topNum=12) {
 	if ( length(lst <- getObservedContext(tagFile, tagDir)) > 0 ) {
 		observed = lst$observed
 		titleContext = lst$titleContext
@@ -243,15 +242,15 @@ visPost = function(tagFile, tagDir, coeffs=coeffsGlobal) {
 		tAct = act(getChunkHashes(titleContext, dbContext), B, sji)
 		bAct = act(getChunkHashes(bodyContext, dbContext), B, sji)
 		asFig(str_c("visPost-", sub("^.*/", "", tagFile), "-act"))
-		plotHighest(priorsIndeces, list(prior=B, sjiTitle=tAct$sji*coeffs$sjiTitle, sjiBody=bAct$sji*coeffs$sjiBody))
+		plotHighest(priorsIndeces, list(prior=B, sjiTitle=tAct$sji*coeffs$sjiTitle, sjiBody=bAct$sji*coeffs$sjiBody), topNum=topNum)
 		addLabels(observed, titleContext, "Total Activation")
 		devOff()
 		asFig(str_c("visPost-", sub("^.*/", "", tagFile), "-sjiTitle"))
-		plotHighest(priorsIndeces, list(sjiTitle=tAct$sji*coeffs$sjiTitle))
+		plotHighest(priorsIndeces, list(sjiTitle=tAct$sji*coeffs$sjiTitle), topNum=topNum)
 		addLabels(observed, titleContext, "sji Title")
 		devOff()
 		asFig(str_c("visPost-", sub("^.*/", "", tagFile), "-sjiBody"))
-		plotHighest(priorsIndeces, list(sjiBody=bAct$sji*coeffs$sjiBody))
+		plotHighest(priorsIndeces, list(sjiBody=bAct$sji*coeffs$sjiBody), topNum=topNum)
 		addLabels(observed, titleContext, "sjiBody")
 		devOff()
 	}

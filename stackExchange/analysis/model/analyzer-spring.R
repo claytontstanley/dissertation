@@ -153,8 +153,8 @@ analyzeBaseFrmCombinedPrior = function(baseFrm, maxCount) {
 analyzeBaseFrmForMultivariate = function(baseFrm, maxCount) {
 	baseFrms = adjustFrms(list(baseFrm), coeffsGlobal, model=formula(targetP ~ prior + sjiTitle + offset))
 	baseFrms[2] = analyzeBaseFrmPrior(baseFrm)
-	baseFrms[3] = analyzeBaseFrmCombinedPrior(baseFrm, maxCount)
-	baseFrms[4] = analyzeBaseFrmUserPrior(baseFrm)
+	baseFrms[3] = analyzeBaseFrmUserPrior(baseFrm)
+	baseFrms[4] = analyzeBaseFrmCombinedPrior(baseFrm, maxCount)
 	baseFrms
 }
 
@@ -211,19 +211,18 @@ analyzeForMultivariate = function() {
 	plotPriorsPerformance(baseFrm)
 	baseFrms = analyzeBaseFrmForMultivariate(baseFrm, maxCount=5)
 	baseFrms10000 = baseFrms
-	legendText = c("Without body words", "With global prior", "With combined prior", "With user prior")
+	legendText = c("Without body words", "With global prior", "With user prior", "With combined prior")
  	makeMultivariateROC(baseFrms, "usersROC", legendText)
  	
- 	tagFiles = getTagFiles(makeTagDir(19))
-	visPost(tagFiles[3], makeTagDir(19), baseFrms[[2]]$coeffs)
-	visPost(tagFiles[121], makeTagDir(19), baseFrms[[2]]$coeffs)
-	visPost(tagFiles[105], makeTagDir(19), baseFrms[[2]]$coeffs)	
+ 	tagFiles=getTagFiles(makeTagDir(8))
+	visPost(tagFiles[105], makeTagDir(8), coeffs=baseFrms10000[[4]]$coeffs, topNum=20)
+	
+	plotAllFrms()
 	
 	#Ecdf(baseFrm$userIdTagCount, what='1-F')	
-	baseFrm = getFrms(8, 1)[[1]]
-	baseFrms = analyzeBaseFrmForMultivariate(baseFrm, maxCount=5)
-	baseFrms1000 = baseFrms
-	
+	#baseFrm = getFrms(8, 1)[[1]]
+	#baseFrms = analyzeBaseFrmForMultivariate(baseFrm, maxCount=5)
+	#baseFrms1000 = baseFrms
 	#baseFrms = baseFrms10000
 	#baseFrms = assignCoeffs(baseFrms, getCoeffs(baseFrms1000))
 	#baseFrms = recomputeActivations(baseFrms)
