@@ -36,7 +36,7 @@
   Department of Psychology, 6100 Main Street \\
   Houston, TX 77005 USA 
   \AND {\large \bf Michael D. Byrne (byrne@rice.edu)} \\
-  Department of Psychology and Computer Science, 6100 Main Street \\
+  Departments of Psychology and Computer Science, 6100 Main Street \\
   Houston, TX 77005 USA }
 
 \begin{document}
@@ -46,9 +46,10 @@
 \frenchspacing
 
 \begin{abstract}
-  Large-scale behavioral datasets such as Twitter, Facebook, LinkedIn, StackOverflow, and Yelp can be mined and explored to study human behavior and human computer interaction.
-  We focused on hashtag creation as a specific human behavior, since understanding and modeling hashtag creation can lead to improved human-computer systems that can better identify users' goals and interests.
-  We explored the StackOverflow dataset, and developed an ACT-R inspired Bayesian probabilistic model that can predict the hashtags used by the author of the post---predicting the users' programming interests.
+  Hashtags created by authors of online content provide a view of a user's goals and interests.
+  Predicting users' interests can lead to improved, more user-centered human-computer systems.
+  Large-scale behavioral datasets such as Twitter, Facebook, LinkedIn, StackOverflow, and Yelp can be mined and explored to study these hashtags and how they relate to users' interests.
+  We explored the StackOverflow dataset, and developed an ACT-R inspired Bayesian probabilistic model that can predict the hashtags used by the author of the post.
   The model is 65\% accurate when tasked to predict one tag per post on average.
   This is achieved by choosing the tag that has the highest log odds of being correct,
   given the tag's prior log odds of occurrence and adjusting for the log likelihood ratio of the words in the post being associated with the tag.
@@ -74,10 +75,10 @@ There are numerous benefits to this type of tag prediction.
 For example, users could be introduced to tags (and potentially communities surrounding those tags) that are of interest to them.
 Also tag cleanup systems could be implemented where mistags are identified and corrected.
 
-We built a tag prediction system for the StackOverflow dataset that can solve precisely these sorts of problems.
+We built a tag prediction system for the StackOverflow dataset that is intended to solve precisely these sorts of problems.
 The StackOverflow dataset was chosen because it is relatively constrained, contains a large number of posts and associated tags, and the data are easy to obtain.
 It is constrained because there is a fully enumerated and limited set of tags that an author can use, as opposed to a less-constrained domain such as Twitter.
-The site also makes public all post data on a quarterly basis, which can be downloaded and loaded into a relational database for further analysis.
+The site also makes public all post data on a quarterly basis, which can be downloaded and loaded into a database for further analysis.
 
 \subsection{Stack Overflow Dataset}
 
@@ -98,10 +99,10 @@ Note that the author tagged this post with \emph{javascript}, \emph{firefox}, \e
 The Apr' 11 dataset \cite{DataDump2011} was used for the analysis.
 It contains all posts dated between Jul' 08 (site creation) and Apr' 11.
 There are \num{1468485} posts from \num{559803} unique users and \num{26176} unique tags.
-Post authors used approximately 3 tags per post.
+Post authors used an average of 2.9 tags per post.
 
 \emph{C\#} is the most often used tag, where about 11\% of posts were tagged with \emph{C\#}.
-Tag frequency drops off sharply and follows Zipf's law.
+Tag frequency drops off sharply and approximately follows Zipf's law.
 The top 1\% of tags ranked by frequency of use account for approximately 60\% of total tag instances.
 
 \subsection{Related Work}
@@ -305,8 +306,8 @@ The coefficients converged on best-fit values quickly (only required two sets of
       \hline
       (Intercept) &	-3.00 &		0.12 &		-25.97 &	\textless2e-16 *** \\
       prior &		0.62 & 		0.01 &		66.94 & 	\textless2e-16 *** \\
-      sjiTitle &	0.92 &		0.02 &		39.90 &		\textless2e-16 *** \\
-      sjiBody &		1.76 &		0.04 &		43.21 &		\textless2e-16 *** \\
+      Wtitle &		0.92 &		0.02 &		39.90 &		\textless2e-16 *** \\
+      Wbody &		1.76 &		0.04 &		43.21 &		\textless2e-16 *** \\
       offset &		0.78 &		0.02 &		33.25 &		\textless2e-16 *** \\
       \hline
     \end{tabular}
@@ -459,7 +460,7 @@ Alongside exploring the offset component of the model, our main planned research
 We are exploring a Bayesian updating technique that would adjust prior tag activations from global priors to user's priors as more tagging information about the user is collected.
 For the StackOverflow dataset, adding user's tagging history to the model should improve predictive power for veteran users,
 since programmers tend to specialize on a few set of tags that are of interest to them.
-This technique could also be deployed, since a post author must be signed in before creating a post.
+This technique is possible, since a post author must be signed in before creating a post.
 
 \section{Acknowledgments}
 
