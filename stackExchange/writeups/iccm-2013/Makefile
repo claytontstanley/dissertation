@@ -21,3 +21,6 @@ deploy:
 	rsync -avzLe ssh ./ ${sshCmd}:${depPath}
 	ssh ${sshCmd} 'cd ${depPath}; make clean; make'
 
+cropped-pdfs:
+	cat ${outFile}.tex | grep '\.pdf' | perl -pe 's/^.*{(.*)-crop(.*)}}/$$1$$2/' | sed 's/^/pictures\//' | xargs -n 1 pdfcrop
+
