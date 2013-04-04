@@ -121,8 +121,8 @@ computeCombinedPrior = function(baseFrm, maxCount) {
 analyzeForICCM = function() {
 #	runSet(sets=8, id=1)
 #	runSet(sets=9, id=1)
-	prevFrm = getFrms(8,1)[[1]]
-	runFromPrevious(prevFrm, 8, 2)
+#	prevFrm = getFrms(8,1)[[1]]
+#	runFromPrevious(prevFrm, 8, 2)
 	frms = getAllFrms()
 	frms = sortBaseFrms(frms)
 	plotAllFrms(frms=frms)
