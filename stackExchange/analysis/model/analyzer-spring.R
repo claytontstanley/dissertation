@@ -204,18 +204,17 @@ plotPriorsPerformance = function(baseFrm) {
 }
 
 analyzeForMultivariate = function() {
-	runSet(sets=18, id=2)
-	runSet(sets=8, id=7)
+	#runSet(sets=18, id=2)
+	#runSet(sets=8, id=7)
 	baseFrm = getFrms(18, 2)[[1]]
 	baseFrm = modifyBaseFrm(baseFrm)
 	plotPriorsPerformance(baseFrm)
 	baseFrms = analyzeBaseFrmForMultivariate(baseFrm, maxCount=5)
-	baseFrms10000 = baseFrms
 	legendText = c("Without body words", "With global prior", "With user prior", "With combined prior")
  	makeMultivariateROC(baseFrms, "usersROC", legendText)
  	
  	tagFiles=getTagFiles(makeTagDir(8))
-	visPost(tagFiles[105], makeTagDir(8), coeffs=baseFrms10000[[4]]$coeffs, topNum=20)
+	visPost(tagFiles[105], makeTagDir(8), coeffs=baseFrms[[4]]$coeffs, topNum=20)
 	
 	plotAllFrms()
 	
