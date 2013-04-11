@@ -233,6 +233,7 @@ plotPairsCombined = function(baseFrm) {
 	size = 10000
 	figName="pairsCombined"
 	png(str_c(PATH, "/Pictures/", figName, ".png"), width=480*10, height=480*10, res=72*10)
+	#asFig(figName)
 	pairs(targetP ~ combinedPrior + sjiTitle + sjiBody + offset, baseFrm[sample(nrow(baseFrm), size),], cex=.5)
 	dev.off()	
 }
