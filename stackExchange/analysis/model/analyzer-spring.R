@@ -217,6 +217,8 @@ analyzeForMultivariate = function() {
 	visPost(tagFiles[105], makeTagDir(8), coeffs=baseFrms[[4]]$coeffs, topNum=20)
 	
 	plotAllFrms()
+	plotPairsCombined(baseFrms[[1]]$frm)
+
 	
 	#Ecdf(baseFrm$userIdTagCount, what='1-F')	
 	#baseFrm = getFrms(8, 1)[[1]]
@@ -225,6 +227,14 @@ analyzeForMultivariate = function() {
 	#baseFrms = baseFrms10000
 	#baseFrms = assignCoeffs(baseFrms, getCoeffs(baseFrms1000))
 	#baseFrms = recomputeActivations(baseFrms)
+}
+
+plotPairsCombined = function(baseFrm) {
+	size = 10000
+	figName="pairsCombined"
+	png(str_c(PATH, "/Pictures/", figName, ".png"), width=480*10, height=480*10, res=72*10)
+	pairs(targetP ~ combinedPrior + sjiTitle + sjiBody + offset, baseFrm[sample(nrow(baseFrm), size),], cex=.5)
+	dev.off()	
 }
 
 subsetBaseFrm = function(baseFrm) {
