@@ -14,6 +14,9 @@ library(calibrate)
 library(multicore)
 library(ROCR)
 
+# Source the driver functions
+source(str_c(PATH, "/driver.R"))
+
 asFig = function(figName) {
 	pdf(str_c(PATH, "/Pictures/", figName, ".pdf"))
 }

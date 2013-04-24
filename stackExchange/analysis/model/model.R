@@ -24,6 +24,7 @@ library(fastmatch)
 library(sqldf)
 library(plyr)
 library(data.table)
+library(codetools)
 
 printP = 1
 myPrint = function(str) {
