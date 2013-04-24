@@ -21,7 +21,8 @@ library(plyr)
 
 # A few helper functions
 
-rateValsInner = function(sampleIndeces, act, observed, tagFile) {
+rateValsInner = function(sampleFrm, act, observed, tagFile) {
+	sampleIndeces = sampleFrm$index
 	targetP = rep(0, length(sampleIndeces))
 	targetP[match(observed, sampleIndeces)] = 1
 	tags = getChunks(sampleIndeces, dbPriors)
@@ -32,7 +33,7 @@ rateValsInner = function(sampleIndeces, act, observed, tagFile) {
 	userIdTagCount = rep(sum(userIdPriors), length(sampleIndeces))
 	userIdPriors = userIdPriors[sampleIndeces]
 	return(data.frame(tag=tags, sjiTitle=sjiTitle, sjiBody=sjiBody, prior=priors, targetP=targetP, act=priors + sjiTitle + sjiBody,
-		userIdPriors=userIdPriors, userIdTagCount = userIdTagCount))
+		userIdPriors=userIdPriors, userIdTagCount = userIdTagCount, type=sampleFrm$type, types=sampleFrm$types))
 }
 
 rateValsSample = function(priorsIndeces, act, observed, tagFile) {
@@ -42,8 +43,14 @@ rateValsSample = function(priorsIndeces, act, observed, tagFile) {
 		+ act$sjiBody[priorsIndeces])*coeffsGlobal$sjiBody
 	res = sort(vals, decreasing=T, index.return=T)
 	sortedChunkHashes = priorsIndeces[res$ix]
-	sampleIndeces = union(sortedChunkHashes[1:cutoff], union(observed, sample(priorsIndeces, 400, replace=F)))
-	rateValsInner(sampleIndeces, act, observed, tagFile)
+	sortedIndeces = sortedChunkHashes[1:cutoff]
+	taggedIndeces = observed
+	sampledIndeces = sample(priorsIndeces, 400, replace=F)
+	precedenceOrder=c("tagged", "sorted", "sampled")
+	dFrm = rbind(data.frame(index=taggedIndeces, type='tagged'), data.frame(index=sortedIndeces, type='sorted'), data.frame(index=sampledIndeces, type='sampled'))
+	dFrmAgg = ddply(dFrm, .(index), transform, types=paste(type, collapse=","), type=precedenceOrder[precedenceOrder %in% type][1])
+	dFrmAgg = dFrmAgg[!duplicated(dFrmAgg),]
+	rateValsInner(dFrmAgg, act, observed, tagFile)
 }
 
 rateValsNoSample = function(priorsIndeces, act, observed, tagFile) {

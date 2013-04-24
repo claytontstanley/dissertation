@@ -34,3 +34,4 @@ LogReg-8-4-7.csv	Multi: Testing sampling; 20/400 no weight, new global coeffs
 LogReg-18-4-1.csv	Multi: 10k training dataset; 20/40 weight; not new global coeffs
 LogReg-18-4-2.csv	Multi: 10k training dataset; 20/40 no weight; new global coeffs
 
+LogReg-8-4-8.csv	Summer: 20/400 no weight, new globals, added index type
