@@ -336,12 +336,10 @@ analyzeBaseFrmPrior = function(baseFrm) {
 }
 
 analyzeBaseFrmUserPrior = function(baseFrm) {
-	baseFrm$userPrior[is.infinite(baseFrm$userPrior)] = with(baseFrm, min(userPrior[!is.infinite(userPrior)]))
 	adjustFrms(list(baseFrm), coeffsGlobal, model=formula(targetP ~ userPrior + sjiTitle + sjiBody + offset))
 }
 
-analyzeBaseFrmCombinedPrior = function(baseFrm, maxCount) {
-	baseFrm = computeCombinedPrior(baseFrm, maxCount=maxCount)
+analyzeBaseFrmCombinedPrior = function(baseFrm) {
 	adjustFrms(list(baseFrm), coeffsGlobal, model=formula(targetP ~ combinedPrior + sjiTitle + sjiBody + offset))
 }
 
@@ -409,14 +407,15 @@ subsetBaseFrmNewRepd = function(baseFrm) {
 	return(rbind(baseFrmPresent, baseFrmAbsent))
 }
 
-modifyBaseFrm = function(baseFrm) {
+modifyBaseFrm = function(baseFrm, maxCount) {
 	baseFrm$userIdPriorsP = as.numeric(baseFrm$userIdPriors != 0)
 	baseFrm$userIdLogPriors = with(baseFrm, log(userIdPriors + 1))
 	baseFrm$globalPriorProb = with(baseFrm, exp(prior)/( exp(prior) + 1))
 	baseFrm$userPriorProb = with(baseFrm, userIdPriors/userIdTagCount)
 	baseFrm$userPriorProb[is.nan(baseFrm$userPriorProb)] = 0
 	baseFrm$userPrior = with(baseFrm, log(userPriorProb/(1-userPriorProb)))
-	baseFrm = computeCombinedPrior(baseFrm, 10)
+	baseFrm = computeCombinedPrior(baseFrm, maxCount=maxCount)
+	baseFrm$userPrior[is.infinite(baseFrm$userPrior)] = with(baseFrm, min(userPrior[!is.infinite(userPrior)]))
 	baseFrm
 }
 

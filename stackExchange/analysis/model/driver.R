@@ -151,7 +151,8 @@ runFromPrevious = function(prevFrm, set, id) {
 }
 
 #coeffsGlobal=list(sjiTitle=1.40, sjiBody=2.36, prior=1.08)
-coeffsGlobal=list(sjiTitle=.875, sjiBody=1.67, prior=.830)
+#coeffsGlobal=list(sjiTitle=.875, sjiBody=1.67, prior=.830)
+coeffsGlobal=list(sjiTitle=.94, sjiBody=1.76, prior=.62)
 
 # Load up the synonyms
 colClasses=c("character", "character", "character", "character", "character", "character", "character", "character", "character", "character")
