@@ -35,3 +35,4 @@ LogReg-18-4-1.csv	Multi: 10k training dataset; 20/40 weight; not new global coef
 LogReg-18-4-2.csv	Multi: 10k training dataset; 20/40 no weight; new global coeffs
 
 LogReg-8-4-8.csv	Summer: 20/400 no weight, new globals, added index type
+LogReg-18-4-3.csv	Summer: 10k 20/40 no weight, new globals, added index type

@@ -28,7 +28,8 @@ devOff = function() {
 logReg = function(tag, res, model) {
 	myPrint(str_c("working ", length(tag), " tags"))
 	dfSubset = res[res$tag %in% tag,]
-	mylogit = glm(model, data=dfSubset, family=binomial(link="logit"))
+	weights = dfSubset$weights
+	mylogit = glm(model, data=dfSubset, family=binomial(link="logit"), weights=weights)
 	myPrint(summary(mylogit))
 	tmp = ClassLog(mylogit, dfSubset$targetP)
 	myPrint(tmp) 
@@ -175,8 +176,8 @@ plotROCColumn = function(dFrame, column) {
 }
 
 colors = c("red", "green", "blue", "orange", "yellow", "black", "grey", "purple", "magenta", "cyan", "pink")
-shapes = c(1, 2, 3, 4, 5, 20, 7, 8, 9, 10, 11)
-colors = rep("black", 10)
+shapes = c(1, 2, 3, 4, 5, 20, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20)
+colors = rep("black", 20)
 
 plotROC2 = function(items, figName="ROC") {
 	asFig(figName)
@@ -415,11 +416,7 @@ modifyBaseFrm = function(baseFrm) {
 	baseFrm$userPriorProb = with(baseFrm, userIdPriors/userIdTagCount)
 	baseFrm$userPriorProb[is.nan(baseFrm$userPriorProb)] = 0
 	baseFrm$userPrior = with(baseFrm, log(userPriorProb/(1-userPriorProb)))
-	baseFrm$weights = rep(1, length(baseFrm$targetP))
 	baseFrm = computeCombinedPrior(baseFrm, 10)
-	popTotal = length(priorsIndeces) * length(unique(baseFrm$tagFile))
-	#baseFrm$weights[baseFrm$targetP==0] = as.integer(ceiling(popTotal / sum(baseFrm$targetP==0)))
-	baseFrm$weights[baseFrm$targetP==1] = .071
 	baseFrm
 }
 
