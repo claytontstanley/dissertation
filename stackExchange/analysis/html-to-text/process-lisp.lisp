@@ -148,7 +148,7 @@
                   dir
                   (lambda (file)
                     (push (file-namestring file) res)))
-              (reverse res))))
+                (reverse res))))
         (with-open-file (strm post-ids-csv :direction :output :if-exists :supersede :if-does-not-exist :create)
           (format strm "~{~a~%~}" post-ids))))))
 
@@ -177,10 +177,11 @@
                            (format nil "~{~a~^~%~}" des-paths)))
                      (format t "sending ~a as group ~a~%" cluster-num group)
                      (with-cwd *_DIR_*
-                       (script (format nil "~a '~a' '~a'"
-                                       "./create-symlinks.sh"
-                                       src-paths-as-string
-                                       des-paths-as-string))))))))))
+                       (trivial-shell:shell-command
+                         (format nil "~a '~a' '~a'"
+                                 "./create-symlinks.sh"
+                                 src-paths-as-string
+                                 des-paths-as-string))))))))))
 
 (defun csv-val (key csv)
   (nth
