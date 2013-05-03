@@ -326,15 +326,15 @@ combinePs = function(psGlobal, psLocal, count, maxCount) {
 	ret
 }
 
+combinePsByExp = function(psGlobal, psLocal, count, b) {
+	propGlobal = exp(-b * count)
+	psGlobal * propGlobal + psLocal * (1 - propGlobal)
+}
+
 computeCombinedPrior = function(baseFrm, combinePsFun) {
 	baseFrm$combinedPriorProb = with(baseFrm, combinePsFun(globalPriorProb, userPriorProb, userIdTagCount))
 	baseFrm$combinedPrior = with(baseFrm, log(combinedPriorProb/(1-combinedPriorProb)))
 	baseFrm
-}
-
-combinePsByExp = function(psGlobal, psLocal, count, b) {
-	propGlobal = exp(-b * count)
-	psGlobal * propGlobal + psLocal * (1 - propGlobal)
 }
 
 analyzeBaseFrmPrior = function(baseFrm) {
@@ -348,7 +348,6 @@ analyzeBaseFrmUserPrior = function(baseFrm) {
 analyzeBaseFrmCombinedPrior = function(baseFrm) {
 	adjustFrms(list(baseFrm), coeffsGlobal, model=formula(targetP ~ combinedPrior + sjiTitle + sjiBody + offset))
 }
-
 
 getPriorsPerformance = function(baseFrm) {
 	baseFrms = analyzeBaseFrmPrior(baseFrm)
@@ -424,4 +423,3 @@ modifyBaseFrm = function(baseFrm, combinePsFun) {
 	baseFrm$userPrior[is.infinite(baseFrm$userPrior)] = with(baseFrm, min(userPrior[!is.infinite(userPrior)]))
 	baseFrm
 }
-
