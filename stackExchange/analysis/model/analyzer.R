@@ -326,8 +326,8 @@ combinePs = function(psGlobal, psLocal, count, maxCount) {
 	ret
 }
 
-computeCombinedPrior = function(baseFrm, maxCount) {
-	baseFrm$combinedPriorProb = with(baseFrm, combinePs(globalPriorProb, userPriorProb, userIdTagCount, maxCount))
+computeCombinedPrior = function(baseFrm, combinePsFun) {
+	baseFrm$combinedPriorProb = with(baseFrm, combinePsFun(globalPriorProb, userPriorProb, userIdTagCount))
 	baseFrm$combinedPrior = with(baseFrm, log(combinedPriorProb/(1-combinedPriorProb)))
 	baseFrm
 }
@@ -335,12 +335,6 @@ computeCombinedPrior = function(baseFrm, maxCount) {
 combinePsByExp = function(psGlobal, psLocal, count, b) {
 	propGlobal = exp(-b * count)
 	psGlobal * propGlobal + psLocal * (1 - propGlobal)
-}
-
-computeCombinedPriorByExp = function(baseFrm, b) {
-	baseFrm$combinedPriorProb = with(baseFrm, combinePsByExp(globalPriorProb, userPriorProb, userIdTagCount, b))
-	baseFrm$combinedPrior = with(baseFrm, log(combinedPriorProb/(1-combinedPriorProb)))
-	baseFrm	
 }
 
 analyzeBaseFrmPrior = function(baseFrm) {
@@ -419,14 +413,14 @@ subsetBaseFrmNewRepd = function(baseFrm) {
 	return(rbind(baseFrmPresent, baseFrmAbsent))
 }
 
-modifyBaseFrm = function(baseFrm, computeCombinedFun) {
+modifyBaseFrm = function(baseFrm, combinePsFun) {
 	baseFrm$userIdPriorsP = as.numeric(baseFrm$userIdPriors != 0)
 	baseFrm$userIdLogPriors = with(baseFrm, log(userIdPriors + 1))
 	baseFrm$globalPriorProb = with(baseFrm, exp(prior)/( exp(prior) + 1))
 	baseFrm$userPriorProb = with(baseFrm, userIdPriors/userIdTagCount)
 	baseFrm$userPriorProb[is.nan(baseFrm$userPriorProb)] = 0
 	baseFrm$userPrior = with(baseFrm, log(userPriorProb/(1-userPriorProb)))
-	baseFrm = computeCombinedFun(baseFrm)
+	baseFrm = computeCombinedPrior(baseFrm, combinePsFun)
 	baseFrm$userPrior[is.infinite(baseFrm$userPrior)] = with(baseFrm, min(userPrior[!is.infinite(userPrior)]))
 	baseFrm
 }

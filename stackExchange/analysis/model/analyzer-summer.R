@@ -25,11 +25,12 @@ analyzeForSummer = function() {
 	baseFrms[3] = analyzeBaseFrmPrior(updateAllBaseFrm(baseFrm10k, sampledWeight=baseFrm10kWeight * 10))
 	baseFrms[4] = analyzeBaseFrmCombinedPrior(updateAllBaseFrm(baseFrm10k, sampledWeight=baseFrm10kWeight * 10))
 	baseFrms[5] = analyzeBaseFrmCombinedPrior(updateAllBaseFrm(baseFrm10k, sampledWeight=baseFrm10kWeight))
-	baseFrms[6] = analyzeBaseFrmCombinedPrior(updateAllBaseFrm(baseFrm, sampledWeight=baseFrmWeight))	
+	baseFrms[6] = analyzeBaseFrmCombinedPrior(updateAllBaseFrm(baseFrm, sampledWeight=baseFrmWeight))
 	baseFrms[7] = analyzeBaseFrmUserPrior(updateAllBaseFrm(baseFrm, sampledWeight=baseFrmWeight))
 	baseFrms[8] = analyzeBaseFrmUserPrior(updateAllBaseFrm(baseFrm10k, sampledWeight=baseFrm10kWeight * 10))
 	
-	baseFrms[9] = analyzeBaseFrmCombinedPrior(updateAllBaseFrm(baseFrm, sampledWeight=baseFrmWeight, computeCombinedFun = function(frm) computeCombinedPriorByExp(frm, b=0.002626)))
+	lambdaFun = function(psGlobal, psLocal, count) combinePsByExp(psGlobal, psLocal, count, 0.002626)
+	baseFrms[9] = analyzeBaseFrmCombinedPrior(updateAllBaseFrm(baseFrm, sampledWeight=baseFrmWeight, combinePsFun=lambdaFun))
 		
 	legendText = c("1k posts 400 sampled per post", "10k/40", "10k/400 weights", "10k/400 weights combined", "10k/40 combined", "1k/400 combined", "1k/400 user", "10k/400 user weights", "1k/400 combined exp")
 	lambdaFun = function(lst) lapply(lst, function(baseFrm) list(frm=baseFrm))
@@ -52,19 +53,15 @@ analyzeForSummer = function() {
 }
 
 computeAt = function(prob) {
-	function (baseFrm) {
-		baseFrm$combinedPriorProb = with(baseFrm, globalPriorProb*prob + (1-prob)* userPriorProb)
-		baseFrm$combinedPrior = with(baseFrm, log(combinedPriorProb/(1-combinedPriorProb)))
-		baseFrm
+	function (psGlobal, psLocal, count) {
+		psGlobal*prob + (1-prob)*psLocal
 	}
 }
-
-#foo = updateAllBaseFrm(baseFrmSubset, sampledWeight=baseFrm10kWeight * 10, computeCombinedFun=computeAt(.0001))
 
 getProbForRange = function(baseFrm10k, minCount, maxCount) {
 	baseFrmSubset = subsetByTagCount(baseFrm10k, minCount, maxCount)
 	dim(baseFrmSubset)
-	lambdaFun = function(prob) analyzeBaseFrmCombinedPrior(updateAllBaseFrm(baseFrmSubset, sampledWeight=baseFrm10kWeight * 10, computeCombinedFun=computeAt(prob)))[[1]]
+	lambdaFun = function(prob) analyzeBaseFrmCombinedPrior(updateAllBaseFrm(baseFrmSubset, sampledWeight=baseFrm10kWeight * 10, combinePsFun=computeAt(prob)))
 	baseFrmsSubset = lapply(list(.001, .01, .1, .3, .5, .7, .9, .99, .999), lambdaFun)
 	accuracyFun = function(baseFrmSubset) getAccuracyAtNAverageTags(baseFrmSubset$frm, N=3)
 	lapply(baseFrmsSubset, accuracyFun)
@@ -133,10 +130,10 @@ sampleBaseFrm = function(baseFrm, samplesPerPost, replace=F) {
 }
 
 updateAllBaseFrm = function(baseFrm, samplesPerPost=F, replace=F, taggedWeight=1, sampledWeight=1, 
-							sortedWeight=1, computeCombinedFun=function(baseFrm) computeCombinedPrior(baseFrm, 5)) {
+							sortedWeight=1, combinePsFun=function(psGlobal, psLocal, count) combinePs(psGlobal, psLocal, count, 5)) {
 	if (samplesPerPost != F) {
 		baseFrm = sampleBaseFrm(baseFrm, samplesPerPost, replace=replace)
 	}
 	baseFrm = addWeightsBaseFrm(baseFrm, taggedWeight=taggedWeight, sampledWeight=sampledWeight, sortedWeight=sortedWeight)
-	baseFrm = modifyBaseFrm(baseFrm, computeCombinedFun=computeCombinedFun)
+	baseFrm = modifyBaseFrm(baseFrm, combinePsFun=combinePsFun)
 }
