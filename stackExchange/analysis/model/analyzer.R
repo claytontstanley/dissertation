@@ -64,12 +64,6 @@ addColumns = function(res, coeffs) {
 	return(res)
 }
 
-addColumnsPost = function(res){
-	res$shuffledAct = with(res, sample(act, length(act)))
-	res$cSharp = with(res, as.numeric(tag=="c#")+rnorm(length(tag), mean=0, sd=.0001))
-	return(res)
-}
-
 computeAct = function(res, coeffs) {
 	print(coeffs)
 	act = 0
@@ -347,38 +341,6 @@ analyzeBaseFrmUserPrior = function(baseFrm) {
 
 analyzeBaseFrmCombinedPrior = function(baseFrm) {
 	adjustFrms(list(baseFrm), coeffsGlobal, model=formula(targetP ~ combinedPrior + sjiTitle + sjiBody + offset))
-}
-
-getPriorsPerformance = function(baseFrm) {
-	baseFrms = analyzeBaseFrmPrior(baseFrm)
-	baseFrms[2] = analyzeBaseFrmUserPrior(baseFrm)
-	priorAt3 = getAccuracyAtNAverageTags(baseFrms[[1]]$frm, N=3)
-	userPriorAt3 = getAccuracyAtNAverageTags(baseFrms[[2]]$frm, N=3)
-	list(priorAt3=priorAt3, userPriorAt3=userPriorAt3)
-}
-
-extractPerformance = function(priorsPerfs) {
-	list(
-		priorsAt3=lapply(priorsPerfs, function(x) x$priorAt3),
-		userPriorsAt3=lapply(priorsPerfs, function(x) x$userPriorAt3))
-}
-
-getBaseFrmSubset = function(baseFrm, gt, lt) {
-	subset(baseFrm, userIdTagCount > gt & userIdTagCount < lt)
-}
-
-plotPriorsPerformance = function(baseFrm) {
-	asFig("transPoint")
-	points = list(c(0, 5), c(.5, 5.5), c(1, 6), c(1.5, 6.5), c(2, 7), c(2.5, 7.5), c(3, 8), c(3.5, 8.5), c(4, 9), c(4.5, 9.5), c(5, 10), c(5, 25), c(10, 30), c(15, 35), c(20, 40))
-	perfs = lapply(points, function(pt) getPriorsPerformance(getBaseFrmSubset(baseFrm, pt[1], pt[2])))
-	ys = extractPerformance(perfs)
-	xs = as.numeric(lapply(points, function(point) point[1] + (point[2] - point[1]) / 2))
-	errs = as.numeric(lapply(points, function(point) (point[2] - point[1]) / 2))
-	delta = as.numeric(ys$priorsAt3) - as.numeric(ys$userPriorsAt3)
-	main = "Performance delta between global and user prior vs user tag count"
-	plotCI(xs, delta, errs, err="x", main=main, xlab="user tag count", ylab="performance difference when producing 3 tags per post")
-	abline(h=0, lty=3)
-	dev.off()
 }
 
 plotPairsCombined = function(baseFrm) {
