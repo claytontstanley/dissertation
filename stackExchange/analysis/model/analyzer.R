@@ -319,16 +319,28 @@ recomputeActivations = function(baseFrms) {
 	})
 }
 
-
 combinePs = function(psGlobal, psLocal, count, maxCount) {
-	count = pmin(count, maxCount)
-	(psGlobal*(maxCount-count+1) + psLocal*count) / (maxCount + 1)
+	globalCount = maxCount - pmin(count, maxCount)
+	localCount = pmin(count, maxCount)
+	ret = (psGlobal*(globalCount+1) + psLocal*localCount) / (globalCount + localCount + 1)
+	ret
 }
 
 computeCombinedPrior = function(baseFrm, maxCount) {
 	baseFrm$combinedPriorProb = with(baseFrm, combinePs(globalPriorProb, userPriorProb, userIdTagCount, maxCount))
 	baseFrm$combinedPrior = with(baseFrm, log(combinedPriorProb/(1-combinedPriorProb)))
 	baseFrm
+}
+
+combinePsByExp = function(psGlobal, psLocal, count, b) {
+	propGlobal = exp(-b * count)
+	psGlobal * propGlobal + psLocal * (1 - propGlobal)
+}
+
+computeCombinedPriorByExp = function(baseFrm, b) {
+	baseFrm$combinedPriorProb = with(baseFrm, combinePsByExp(globalPriorProb, userPriorProb, userIdTagCount, b))
+	baseFrm$combinedPrior = with(baseFrm, log(combinedPriorProb/(1-combinedPriorProb)))
+	baseFrm	
 }
 
 analyzeBaseFrmPrior = function(baseFrm) {
@@ -407,14 +419,14 @@ subsetBaseFrmNewRepd = function(baseFrm) {
 	return(rbind(baseFrmPresent, baseFrmAbsent))
 }
 
-modifyBaseFrm = function(baseFrm, maxCount) {
+modifyBaseFrm = function(baseFrm, computeCombinedFun) {
 	baseFrm$userIdPriorsP = as.numeric(baseFrm$userIdPriors != 0)
 	baseFrm$userIdLogPriors = with(baseFrm, log(userIdPriors + 1))
 	baseFrm$globalPriorProb = with(baseFrm, exp(prior)/( exp(prior) + 1))
 	baseFrm$userPriorProb = with(baseFrm, userIdPriors/userIdTagCount)
 	baseFrm$userPriorProb[is.nan(baseFrm$userPriorProb)] = 0
 	baseFrm$userPrior = with(baseFrm, log(userPriorProb/(1-userPriorProb)))
-	baseFrm = computeCombinedPrior(baseFrm, maxCount=maxCount)
+	baseFrm = computeCombinedFun(baseFrm)
 	baseFrm$userPrior[is.infinite(baseFrm$userPrior)] = with(baseFrm, min(userPrior[!is.infinite(userPrior)]))
 	baseFrm
 }
