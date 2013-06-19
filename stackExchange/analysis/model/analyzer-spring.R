@@ -6,8 +6,7 @@ PATH = dirname(frameFiles[[length(frameFiles)]])
 # Source the analyzer utility functions
 source(str_c(PATH, "/analyzer.R"))
 
-#FIXME: This library is probably needed, but won't currently load on R 3.0
-#library(Hmisc)
+library(Hmisc)
 
 analyzeForPresentation = function() {
 	frms = getAllFrmsForModel(model=formula(targetP ~ prior + sjiTitle + sjiBody + offset), frms=8, runId=1)
