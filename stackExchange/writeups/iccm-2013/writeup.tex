@@ -445,7 +445,7 @@ alongside the more commonly-used local weighting (spreading activation) might be
 \subsubsection{Model Plausibility}
 
 ACT-R's declarative memory retrieval process makes up the core of the StackOverflow model.
-This is a more constrained and cognitively-plausible model than the set of machine learning techniques used by \citeA{Kuo2011} for the same task. 
+This is a more constrained and cognitively-plausible model than the set of general machine learning techniques used by \citeA{Kuo2011} for the same task. 
 Interestingly, when using ACT-R's retrieval mechanism, the model performs significantly better than the less constrained models in \citeA{Kuo2011}.
 So there is no reason to think that people do not engage in a process much like this to select tags.
 However, more research is necessary before making the strong claim that the StackOverflow model \emph{is} the process people go through when selecting tags on the site, or tags in general.
@@ -462,7 +462,7 @@ Further research will explore this and other theories for the behavior of the of
 
 \subsubsection{Future Planned Research}
 
-Alongside exploring the offset component and testing cognitive plausibility, our main planned research is to include the post author's past tagging behavior as an additional model predictor.
+Alongside exploring the offset component and cognitive plausibility, our main planned research is to include the post author's past tagging behavior as an additional model predictor.
 We are exploring a Bayesian updating technique that would adjust prior tag activations from global priors to user's priors as more tagging information about the user is collected.
 For the StackOverflow dataset, adding user's tagging history to the model should improve predictive power for veteran users,
 since programmers tend to specialize on a few set of tags that are of interest to them.
