@@ -28,7 +28,10 @@ devOff = function() {
 logReg = function(tag, res, model) {
 	myPrint(str_c("working ", length(tag), " tags"))
 	dfSubset = res[res$tag %in% tag,]
-	weights = dfSubset$weights
+	if( ! "weights" %in% colnames(dfSubset)) {
+		myPrint("Did not find weights column in dataframe; running model w/o weights")
+		dfSubset$weights = 1
+	}
 	mylogit = glm(model, data=dfSubset, family=binomial(link="logit"), weights=weights)
 	myPrint(summary(mylogit))
 	tmp = ClassLog(mylogit, dfSubset$targetP)

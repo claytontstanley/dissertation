@@ -72,6 +72,8 @@ analyzeForICCM = function() {
 	plotAllFrms(frms=frms)
 	tagFiles=getTagFiles(makeTagDir(8))
 	visPost(tagFiles[105], makeTagDir(8), coeffs=frms[[1]]$coeffs, topNum=12)
+	getLogitSummary(frms[1])
+	getClassLog(frms[1])
 }
 
 analyzeBaseFrmForMultivariate = function(baseFrm, maxCount) {
