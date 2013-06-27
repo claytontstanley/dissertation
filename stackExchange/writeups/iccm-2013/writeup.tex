@@ -161,8 +161,8 @@ The main difference is that an offset term ($O$) was included for the StackOverf
 
 \subsubsection{Base-Level Activation}
 
-Base-level activation ($B_{i}$) is the log prior odds of observing tag $i$ in the world.
-The log prior odds are based on both frequency and recency of use.
+Base-level activation ($B_{i}$) is the prior log odds of an author using tag $i$.
+The prior log odds are based on both frequency and recency of use.
 However, we are assuming that frequency of tag use does not change greatly between Jul' 08 and Apr' 11 (time period of dataset).
 This is a reasonable assumption for the StackOverflow dataset, since tags relate to programming languages, and the rank of programming-language popularity has not changed drastically within the past few years.
 This also makes calculating the priors computationally tractable for this large-scale dataset, because the prior log odds can be computed based on frequency only, as is indicated in Table \ref{sample-table}.
