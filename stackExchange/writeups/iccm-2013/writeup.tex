@@ -351,7 +351,7 @@ A visualization of the model's tag activation for the post in Figure \ref{fig:ex
   \resizebox{\linewidth}{!}{\includegraphics{visPost-2977094-act-crop.pdf}}
   \caption{
     Model's prediction of the top tags for post in Figure \ref{fig:examplePost}.
-    At the top is the title text of the post, then the attentional weight (scaled entropy) for each word in the title, then the user-chosen tags.
+    At the top is the title text of the post, then the attentional weight (scaled entropy) for each word in the title, then the author-chosen tags.
     The bar graphs are the total activation for the top predicted model tags for the post.
     Each bar graph is partitioned into the three model components that vary across the tags in a single post.
 }
@@ -404,7 +404,7 @@ It is only when groups of components are removed that model performance starts t
 \section{Discussion}
 
 Our StackOverflow model is a successful case showing that ACT-R's declarative memory retrieval mechanisms scale, and can be applied to retrieval requests occurring across large-scale declarative memory datasets. 
-The model can successfully tag 65\% of posts correctly, when tasked to predict one tag per post on average.
+The model can successfully tag 65\% of StackOverflow posts correctly, when tasked to predict one tag per post on average.
 The model is also computationally space efficient:
 Large-scale relational database techniques and efficient sparse matrix data structures were used for implementation,
 so that the data structures require only 3GB of memory and retrieval requests with a DM dataset of \num{556677795} chunks occur in less than one second on a single processor.
@@ -462,7 +462,7 @@ Further research will explore this and other theories for the behavior of the of
 
 \subsubsection{Future Planned Research}
 
-Alongside exploring the offset component and cognitive plausibility, our main planned research is to include the post author's past tagging behavior as an additional model predictor.
+Alongside exploring the offset component and cognitive plausibility of the model, our main planned research is to include the post author's past tagging behavior as an additional model predictor.
 We are exploring a Bayesian updating technique that would adjust prior tag activations from global priors to user's priors as more tagging information about the user is collected.
 For the StackOverflow dataset, adding user's tagging history to the model should improve predictive power for veteran users,
 since programmers tend to specialize on a few set of tags that are of interest to them.

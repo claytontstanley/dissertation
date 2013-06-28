@@ -74,6 +74,8 @@ analyzeForICCM = function() {
 	visPost(tagFiles[105], makeTagDir(8), coeffs=frms[[1]]$coeffs, topNum=12)
 	getLogitSummary(frms[1])
 	getClassLog(frms[1])
+	getAccuracyAtNAverageTags(frms[[1]]$frm, N=1)
+	getAccuracyAtNAverageTags(frms[[2]]$frm, N=1)
 }
 
 analyzeBaseFrmForMultivariate = function(baseFrm, maxCount) {
