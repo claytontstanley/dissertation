@@ -7,10 +7,12 @@ depBasePath = /Users/Shared
 depDir = stackOverflowICCM
 depPath = ${depBasePath}/${depDir}
 
-${outFile}.pdf: ${outFile}.tex alwaysRemake
+figPdfs = $(shell cat ${outFile}.tex | grep '\.pdf' | perl -pe 's/^.*{(.*)-crop(.*)}}/$$1$$2/' | sed 's/^/pictures\//')
+
+${outFile}.pdf: ${outFile}.tex always-remake
 	latexmk -pdf $<
 
-alwaysRemake:
+always-remake:
 	@exit 0
 
 clean:
@@ -21,6 +23,9 @@ deploy:
 	rsync -avzLe ssh ./ ${sshCmd}:${depPath}
 	ssh ${sshCmd} 'cd ${depPath}; make clean; make'
 
-cropped-pdfs:
-	cat ${outFile}.tex | grep '\.pdf' | perl -pe 's/^.*{(.*)-crop(.*)}}/$$1$$2/' | sed 's/^/pictures\//' | xargs -n 1 pdfcrop
+pdfs: ${figPdfs}
+
+${figPdfs}: %.pdf: always-remake
+	pdfcrop $@
+	R -q -e 'embedFonts("$*-crop.pdf", format="pdfwrite", options="-dSubsetFonts=true -dEmbedAllFonts=true -dPDFSETTINGS=/printer")'
 
