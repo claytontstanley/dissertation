@@ -76,6 +76,24 @@ analyzeForICCM = function() {
 	getClassLog(frms[1])
 	getAccuracyAtNAverageTags(frms[[1]]$frm, N=1)
 	getAccuracyAtNAverageTags(frms[[2]]$frm, N=1)
+	plotFrm(frms[[1]]$frm, "LogReg-ICCM")
+	plotSjiMatrix()
+	dev.new()
+}
+
+plotSjiMatrix = function() {
+#	asFig("sjiActScatter")
+	sjiSum = summary(sji)
+	sjiSample = sample(length(sjiSum$i), 100000)
+	maxGreen = max(sjiSum$x[sjiSample])
+	maxRed = abs(min(sjiSum$x[sjiSample]))
+	zGreen = ifelse(sjiSum$x[sjiSample] > 0, sjiSum$x[sjiSample], 0)
+	zRed = ifelse(sjiSum$x[sjiSample] < 0, abs(sjiSum$x[sjiSample]), 0)
+	z = rgb(zRed/maxRed, 0, zGreen/maxGreen)
+	xlab="Tag Index"
+	ylab="Context Word Index"
+	plot(sjiSum$j[sjiSample], sjiSum$i[sjiSample], main="Scatter of sji sparse matrix", xlab=xlab, ylab=ylab, col=z, cex=.05)
+#	dev.off()
 }
 
 analyzeBaseFrmForMultivariate = function(baseFrm, maxCount) {

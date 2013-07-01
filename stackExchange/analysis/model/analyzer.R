@@ -90,7 +90,7 @@ runLogRegFrm = function(res, coeffs=coeffsGlobal, model=formula(targetP ~ sjiBod
 
 plotFrm = function(res, figName) {
 	asFig(figName)
-	logi.hist.plot(res$act, res$targetP, boxp=T, type="hist", col="gray")
+	logi.hist.plot(res$act, res$targetP, boxp=T, type="hist", col="gray", las.h=0, xlabel='Activation')
 	devOff()
 }
 
