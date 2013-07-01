@@ -76,6 +76,7 @@ analyzeForICCM = function() {
 	getClassLog(frms[1])
 	getAccuracyAtNAverageTags(frms[[1]]$frm, N=1)
 	getAccuracyAtNAverageTags(frms[[2]]$frm, N=1)
+	# And the extra plots for the poster
 	plotFrm(frms[[1]]$frm, "LogReg-ICCM")
 	plotSjiMatrix()
 	dev.new()
