@@ -27,19 +27,19 @@ tweepy.models.Status.parse = parse
 _dir = os.path.dirname(os.path.abspath(__file__))
 
 class CustomStreamListener(tweepy.StreamListener):
-    def on_status(self, status):
-        print status.user.screen_name
-	with codecs.open(os.path.join(_dir, 'tweets.json'), "a", 'utf-8') as textFile:
-		textFile.write(status.json)
-		textFile.write('\n')
+	def on_status(self, status):
+		print status.user.screen_name
+		with codecs.open(os.path.join(_dir, 'tweets.json'), "a", 'utf-8') as textFile:
+			textFile.write(status.json)
+			textFile.write('\n')
 
-    def on_error(self, status_code):
-        print >> sys.stderr, 'Encountered error with status code:', status_code
-        return True # Don't kill the stream
+	def on_error(self, status_code):
+		print >> sys.stderr, 'Encountered error with status code:', status_code
+		return True # Don't kill the stream
 
-    def on_timeout(self):
-        print >> sys.stderr, 'Timeout...'
-        return True # Don't kill the stream
+	def on_timeout(self):
+		print >> sys.stderr, 'Timeout...'
+		return True # Don't kill the stream
 
 class TweetEncoder(json.JSONEncoder):
 	def default(self, obj):
