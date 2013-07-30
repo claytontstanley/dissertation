@@ -41,20 +41,6 @@ class CustomStreamListener(tweepy.StreamListener):
 		print >> sys.stderr, 'Timeout...'
 		return True # Don't kill the stream
 
-class TweetEncoder(json.JSONEncoder):
-	def default(self, obj):
-		if isinstance(obj, tweepy.models.User):
-			return obj.__getstate__() 
-		elif isinstance(obj, datetime.datetime):
-			return str(obj)
-		elif isinstance(obj, tweepy.models.Status):
-			return obj.__getstate__() 
-		if isinstance(obj, tweepy.models.Place):
-			return obj.__getstate__() 
-		if isinstance(obj, tweepy.models.BoundingBox):
-			return obj.__getstate__() 
-		return json.JSONEncoder.default(self, obj)
-
 sapi = tweepy.streaming.Stream(auth, CustomStreamListener())
 # sapi.filter(track=['curiosity'])
 # sapi.filter(track=['believetour'])
