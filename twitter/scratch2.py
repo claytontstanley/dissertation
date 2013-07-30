@@ -29,9 +29,8 @@ _dir = os.path.dirname(os.path.abspath(__file__))
 class CustomStreamListener(tweepy.StreamListener):
 	def on_status(self, status):
 		print status.user.screen_name
-		with codecs.open(os.path.join(_dir, 'tweets.json'), "a", 'utf-8') as textFile:
-			textFile.write(status.json)
-			textFile.write('\n')
+		with codecs.open(os.path.join(_dir, 'data/tweets.json'), "a", 'utf-8') as textFile:
+			textFile.write(status.json + '\n')
 
 	def on_error(self, status_code):
 		print >> sys.stderr, 'Encountered error with status code:', status_code
