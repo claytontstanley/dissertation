@@ -1,0 +1,15 @@
+.DS_Store
+*.aux
+*.log
+*.pdf
+*.ttt
+*.fff
+*.blg
+*.fls
+*.toc
+*.bbl
+*.bcf
+*.xml
+*.fdb_latexmk
+*(Autosaved).R
+*.RData

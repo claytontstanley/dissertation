@@ -1,0 +1,111 @@
+\documentclass[man]{apa6}
+
+
+\usepackage[american]{babel}
+\usepackage[utf8]{inputenc}
+%\usepackage[compact]{titlesec}
+
+\usepackage{amssymb,amsmath}
+
+\usepackage{graphicx}
+\usepackage[group-separator={,}]{siunitx}
+\RequirePackage[l2tabu, orthodox]{nag}
+\graphicspath{{./figures/}} % Specifies the directory where pictures are stored
+
+\usepackage{csquotes}
+\usepackage[style=apa,sortcites=true,sorting=nyt,backend=biber]{biblatex}
+\DeclareLanguageMapping{american}{american-apa}
+\addbibresource{bibliography.bib}
+
+\title{Psyc 601 Multivariate Statistics Project}
+\shorttitle{Psyc 601 Project}
+
+\author{Clayton Stanley}
+\affiliation{Rice University}
+
+\leftheader{Beitzel}
+
+\abstract{
+  The base StackOverflow tag-prediction model from the Fall '12 Psychometrics course was improved by incorporating the words in the body of the post and the post author's specific tagging history.
+  We focused on hashtag creation as a specific human behavior, since understanding and modeling hashtag creation can lead to improved human-computer systems that can better identify users' goals and interests.
+  We used multivariate logistic regression statistical techniques to guide the model building process, and found that adding the two model terms improved model accuracy from 56\% to 69\%.
+  The model is a successful case showing that ACT-R's declarative memory retrieval equations scale, and are relevant to task domains that require large-scale knowledge stores.
+}
+
+
+\keywords{StackOverflow, Machine Learning, ACT-R, Tagging, Large-Scale Semantic Memory}
+
+\begin{document}
+\maketitle
+
+\tableofcontents
+\newpage
+
+\section{Motivation}
+
+TODO: Motivation
+
+\subsection{Research Questions}
+
+\subsubsection{Comparison Between ACT-R and Vector-based Memory Systems}
+
+\subsubsection{Modeling Lifetime of a User's Hashtag}
+
+\subsubsection{Single-user-focused Hashtag Modeling}
+
+\section{Hashtag Prediction}
+
+\subsection{Recommendation Systems}
+
+\subsubsection{Netflix}
+
+\subsubsection{Facebook}
+
+\subsubsection{Twitter}
+
+\section{ACT-R Declarative Memory Theory}
+
+\subsection{ACT-R DM Model}
+
+\subsection{Pointwise Mutual Information}
+
+\section{Matrix-based Models of Semantics}
+
+\subsection{Latent Semantic Analysis}
+
+\subsubsection{Word Order}
+
+\subsubsection{Comparison to PMI}
+
+TODO: Issue of scale.
+
+\section{Vector-based Models of Semantics}
+
+\subsection{Addressing Word Order}
+
+\subsection{Addressing Scalability}
+
+\subsection{BEAGLE}
+
+\subsection{Random Permutations}
+
+\subsubsection{Connection to LSA}
+
+\section{Methods}
+
+\subsection{StackOverflow Dataset}
+
+\subsection{Twitter Dataset}
+
+\subsection{Analyses}
+
+\subsubsection{Top Hashtag Prediction}
+
+\subsubsection{Lifetime of a User's Hashtag}
+
+\subsubsection{User-customized Hashtag Prediction}
+
+\printbibliography
+
+\end{document}
+
