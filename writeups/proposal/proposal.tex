@@ -17,6 +17,9 @@
 \DeclareLanguageMapping{american}{american-apa}
 \addbibresource{bibliography.bib}
 
+% If the toc is too detailed, try limiting the depth of printed sections in the TOC:
+% \setcounter{tocdepth}{2}
+
 \title{Psyc 601 Multivariate Statistics Project}
 \shorttitle{Psyc 601 Project}
 
@@ -63,7 +66,7 @@ TODO: Useful problem since real-time search on social media sites is growing \ci
 
 \subsection{Research Questions}
 
-\subsubsection{Comparison Between ACT-R and Vector-based Memory Systems}
+\subsubsection{Comparison Between ACT-R and Vector-Based Memory Systems}
 
 TODO: Extending work from \cite{Rutledge2008}
 
@@ -71,11 +74,11 @@ TODO: Can user prior be represented in vector-based memory systems?
 
 TODO: Can word order be represented in ACT-R?
 
-\subsubsection{Modeling Lifetime of a User's Hashtag}
+\subsubsection{Single-User-Focused Hashtag Modeling}
 
 TODO: Comparison to global lifetime of a hashtag \cite{Tsur2012}
 
-\subsubsection{Single-user-focused Hashtag Modeling}
+TODO: How is recency information about the hashtag included in the model?
 
 \subsubsection{Task Domain}
 
@@ -89,13 +92,16 @@ TODO: StackOverflow and Twitter; large scale, hashtag prediction, etc.
 
 TODO: \cite{Kuo2011}
 
-\subsubsection{Twitter}
-
-FIXME: Find cite for twitter hashtag prediction
-
 \subsubsection{Google+}
 
 TODO: Summarize Google+ hashtag prediction \cite{GoogleKeynote2013}
+
+\subsubsection{Twitter}
+
+\cite{Efron2010} Generated related hashtags from 'query'.
+Showed that users found those hashtags useful for the query.
+Not using the model to predict hashtags from tweets, but a model like this could be used for that purpose.
+They were focused more on making the case that hashtags provide useful information that can be used on sites like Twitter as part of a general recommendation system.
 
 \subsection{Recommendation Systems}
 
@@ -163,7 +169,6 @@ TODO: Summarize \cite{Recchia2010}
 
 TODO: Summarize \cite{Kanerva2000}
 
-
 \section{Comparison of Vector-based Models and ACT-R}
 
 TODO: Summarize \cite{Rutledge2007}
@@ -175,6 +180,17 @@ TODO: Can user prior be represented in vector-based memory systems?
 TODO: Can word order be represented in ACT-R?
 TODO: Do they both scale?
 
+\section{Incorporating Hashtag Recency}
+
+\subsection{ACT-R}
+
+TODO: ACT-R has a strong theory here.
+TODO: IR literature for Twitter domain uses a model similar to ACT-R \cite{Efron2011}
+
+\subsection{Vector-based Models}
+
+TODO: Unclear how recency will fit in with random permutation vector-based model.
+
 \section{Methods}
 
 \subsection{StackOverflow Dataset}
@@ -182,6 +198,9 @@ TODO: Do they both scale?
 \cite{DataDump2013}
 
 \subsection{Twitter Dataset}
+
+TODO: common-hashtags dataset
+TODO: popular-users dataset
 
 \subsection{Tokenizing and Lemmetizing Text}
 
@@ -193,9 +212,27 @@ TODO: Explore entropy weighting instead of stop word removal \cite{Dumais1991}
 
 \subsection{Analyses}
 
+\subsubsection{StackOverflow Dataset Modifications}
+
+TODO: Use newest dataset
+TODO: Chunk tags
+
+\subsubsection{Analyze Recency for User-Generated Hashtags}
+
+TODO: Use stackoverflow and twitter dataset
+
+\subsubsection{Incorporating Recency Into Random Permutations}
+
+TODO: Use stackoverflow dataset only for random permutations
+
+\subsubsection{Incorporating Word Order Into ACT-R}
+
+TODO: Use twitter dataset only for ACT-R
+
 \subsubsection{Top Hashtag Prediction}
 
-\subsubsection{Lifetime of a User's Hashtag}
+TODO: vector-based and act-r head to head on twitter
+TODO: head to head on stackoverflow
 
 \subsubsection{User-customized Hashtag Prediction}
 
