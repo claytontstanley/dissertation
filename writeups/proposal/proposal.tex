@@ -18,7 +18,7 @@
 \addbibresource{bibliography.bib}
 
 % If the toc is too detailed, try limiting the depth of printed sections in the TOC:
-% \setcounter{tocdepth}{2}
+\setcounter{tocdepth}{2}
 
 \title{Psyc 601 Multivariate Statistics Project}
 \shorttitle{Psyc 601 Project}
@@ -34,7 +34,6 @@
   We used multivariate logistic regression statistical techniques to guide the model building process, and found that adding the two model terms improved model accuracy from 56\% to 69\%.
   The model is a successful case showing that ACT-R's declarative memory retrieval equations scale, and are relevant to task domains that require large-scale knowledge stores.
 }
-
 
 \keywords{StackOverflow, Machine Learning, ACT-R, Tagging, Large-Scale Semantic Memory}
 
@@ -74,13 +73,17 @@ TODO: Can user prior be represented in vector-based memory systems?
 
 TODO: Can word order be represented in ACT-R?
 
-\subsubsection{Single-User-Focused Hashtag Modeling}
+\subsubsection{Modeling Hashtag Creation for a Single User}
 
 TODO: Comparison to global lifetime of a hashtag \cite{Tsur2012}
 
 TODO: How is recency information about the hashtag included in the model?
 
-\subsubsection{Task Domain}
+\subsubsection{Adding Word-Order Information When Predicting Hashtags}
+
+TODO: speak generally about how word order might be useful for hashtags
+
+\subsubsection{StackOverflow and Twitter Task Domains}
 
 TODO: StackOverflow and Twitter; large scale, hashtag prediction, etc. 
 
@@ -109,67 +112,67 @@ They were focused more on making the case that hashtags provide useful informati
 
 TODO: Summarize and \cite{Bennett2007}
 
-\subsubsection{Recommending Twitter Users to Follow}
+\subsubsection{Recommending Followers on Twitter}
 
 TODO: Summarize and \cite{Hannon2010}
 
 FIXME: Find cites for recommendation systems.
 
-\section{ACT-R Declarative Memory Theory}
+\subsection{ACT-R Declarative Memory Theory}
 
 \cite{Anderson2004}
 
-\subsection{ACT-R DM Model}
+\subsubsection{ACT-R DM Model}
 
-\subsection{Connection to Pointwise Mutual Information}
+\subsubsection{Connection to Pointwise Mutual Information}
 
 TODO: Introduce PMI \cite{Farahat2004}
 
 TODO: Comparison to ACT-R: Virtually equivalent for large corpora \cite{Farahat2004}
 
-\subsection{Scaling the Equations}
+\subsubsection{Scaling the Equations}
 
 \cite{Douglass2010}
 
 TODO: SNIF-ACT \cite{Fu2007} \cite{Pirolli2003}
 
-\section{Latent Semantic Analysis Memory Theory}
+\subsection{Latent Semantic Analysis Memory Theory}
 
 TODO: Summarize \cite{Landauer1997}
 
-\subsection{Singular Value Decomposition}
+\subsubsection{Singular Value Decomposition}
 
-\subsection{Word Order}
+\subsubsection{Word Order}
 
-\subsection{Scaling Issues}
+\subsubsection{Scaling Issues}
 
 TODO: Compare with PMI, performance and issue of scale. \cite{Budiu2007}
 
-\section{Vector-Based Memory Systems}
+\subsection{Vector-Based Memory Systems}
 
 TODO: Summarize \cite{Plate1995}
 
-\subsection{Addressing Word Order}
+\subsubsection{Addressing Word Order}
 
-\subsection{Addressing Scalability}
+\subsubsection{Addressing Scalability}
 
-\subsection{BEAGLE}
+\subsubsection{BEAGLE}
 
 TODO: Sumarize Jones' model \cite{Jones2007}
 
-\subsection{Random Permutations}
+\subsubsection{Random Permutations}
 
 TODO: Summarize \cite{Sahlgren2008}
 
-\subsection{Comparison between BEAGLE and Random Permutations}
+\subsubsection{Comparison between BEAGLE and Random Permutations}
 
 TODO: Summarize \cite{Recchia2010}
 
-\subsection{Connection to LSA}
+\subsubsection{Connection to LSA}
 
 TODO: Summarize \cite{Kanerva2000}
 
-\section{Comparison of Vector-based Models and ACT-R}
+\subsection{Comparison of Vector-Based Models and ACT-R}
 
 TODO: Summarize \cite{Rutledge2007}
 
@@ -180,14 +183,14 @@ TODO: Can user prior be represented in vector-based memory systems?
 TODO: Can word order be represented in ACT-R?
 TODO: Do they both scale?
 
-\section{Incorporating Hashtag Recency}
+\subsection{Incorporating Hashtag Recency}
 
-\subsection{ACT-R}
+\subsubsection{ACT-R}
 
 TODO: ACT-R has a strong theory here.
 TODO: IR literature for Twitter domain uses a model similar to ACT-R \cite{Efron2011}
 
-\subsection{Vector-based Models}
+\subsubsection{Vector-Based Models}
 
 TODO: Unclear how recency will fit in with random permutation vector-based model.
 
@@ -210,7 +213,7 @@ TODO: Python NLP toolkit \cite{Bird2009}
 
 TODO: Explore entropy weighting instead of stop word removal \cite{Dumais1991}
 
-\subsection{Analyses}
+\subsection{Experiments}
 
 \subsubsection{StackOverflow Dataset Modifications}
 
@@ -219,7 +222,7 @@ TODO: Chunk tags
 
 \subsubsection{Analyze Recency for User-Generated Hashtags}
 
-TODO: Use stackoverflow and twitter dataset
+TODO: Use stackoverflow and twitter popular-users dataset
 
 \subsubsection{Incorporating Recency Into Random Permutations}
 
@@ -227,14 +230,19 @@ TODO: Use stackoverflow dataset only for random permutations
 
 \subsubsection{Incorporating Word Order Into ACT-R}
 
-TODO: Use twitter dataset only for ACT-R
+TODO: Use twitter common-hashtags dataset only for ACT-R
 
 \subsubsection{Top Hashtag Prediction}
 
-TODO: vector-based and act-r head to head on twitter
+TODO: vector-based and act-r head to head on twitter common-hashtags
+TODO: head to head without word order on twitter common-hashtags
 TODO: head to head on stackoverflow
 
-\subsubsection{User-customized Hashtag Prediction}
+\subsubsection{User-Customized Hashtag Prediction}
+
+TODO: head to head on twitter popular-users dataset
+TODO: head to head on stackoverflow
+
 
 \printbibliography
 
