@@ -1,11 +1,12 @@
 \documentclass[man]{apa6}
 
-
+\usepackage{textcomp}
 \usepackage[american]{babel}
 \usepackage[utf8]{inputenc}
 %\usepackage[compact]{titlesec}
 
 \usepackage{amssymb,amsmath}
+\usepackage{setspace}
 
 \usepackage[hyphens]{url}
 %\usepackage{hyperref}
@@ -17,12 +18,12 @@
 \graphicspath{{./figures/}} % Specifies the directory where pictures are stored
 
 \usepackage{csquotes}
-\usepackage[style=apa,sortcites=true,sorting=nyt,backend=biber]{biblatex}
+\usepackage[style=apa,sortcites=true,sorting=nyt,backend=biber,doi=false,uniquename=false]{biblatex}
 \DeclareLanguageMapping{american}{american-apa}
 \addbibresource{bibliography.bib}
 
 % If the toc is too detailed, try limiting the depth of printed sections in the TOC:
-\setcounter{tocdepth}{2}
+%\setcounter{tocdepth}{2}
 
 \title{Psyc 601 Multivariate Statistics Project}
 \shorttitle{Psyc 601 Project}
@@ -52,12 +53,11 @@
 TODO: Motivation
 
 TODO: Useful problem since real-time search on social media sites is growing \cite{Jansen2011}
+TODO: Social media sites are composed almost entirely of human-generated content.
+Users are searching through this content.
 TODO: Users want to be quickly connected to the content that they care about, with minimal amount of searching necessary, since the amount of generated content on these sites is so vast.
 
 TODO: Challenging domain due to time constraints on information. \cite{Bauer2012}
-
-TODO: Social media sites are composed almost entirely of human-generated content.
-Users are searching through this content.
 
 TODO: Identifying user's goals when searching social media sites is an open research problem \cite{Rose2004}
 
@@ -82,7 +82,7 @@ TODO: Can user prior be represented in vector-based memory systems?
 
 TODO: Can word order be represented in ACT-R?
 
-\subsubsection{Modeling Hashtag Creation for a Single User}
+\subsubsection{Modeling Hashtag Use for a Single User}
 
 TODO: Comparison to global lifetime of a hashtag \cite{Tsur2012}
 
@@ -98,7 +98,32 @@ TODO: StackOverflow and Twitter; large scale, hashtag prediction, etc.
 
 \section{Prior Research}
 
+\subsection{Recommendation Systems}
+
+Grown in need with the growth of the web.
+Users on a site need access to specific pieces of information, and the site contains much more information than they can process / care about.
+Recommendation systems are used to tailor the presented information to what is relevant to the user.
+\cite{Pazzani2007}
+
+\subsubsection{The Netflix Prize}
+
+TODO: Summarize and \cite{Bennett2007}
+
+\subsubsection{Recommending Followers on Twitter}
+
+TODO: Summarize and \cite{Hannon2010}
+
+\subsubsection{Hashtags for Recommendation Systems}
+
+\cite{Efron2010} Generated related hashtags from 'query'.
+Showed that users found those hashtags useful for the query.
+Not using the model to predict hashtags from tweets, but a model like this could be used for that purpose.
+They were focused more on making the case that hashtags provide useful information that can be used on sites like Twitter as part of a general recommendation system.
+
 \subsection{Hashtag Prediction}
+
+Previous research focused on StackOverflow, Google+, and Twitter.
+Google+ has deployed automatic tagging of posts.
 
 \subsubsection{StackOverflow}
 
@@ -110,22 +135,7 @@ TODO: Summarize Google+ hashtag prediction \cite{GoogleKeynote2013}
 
 \subsubsection{Twitter}
 
-\cite{Efron2010} Generated related hashtags from 'query'.
-Showed that users found those hashtags useful for the query.
-Not using the model to predict hashtags from tweets, but a model like this could be used for that purpose.
-They were focused more on making the case that hashtags provide useful information that can be used on sites like Twitter as part of a general recommendation system.
-
-\subsection{Recommendation Systems}
-
-\subsubsection{The Netflix Prize}
-
-TODO: Summarize and \cite{Bennett2007}
-
-\subsubsection{Recommending Followers on Twitter}
-
-TODO: Summarize and \cite{Hannon2010}
-
-FIXME: Find cites for recommendation systems.
+TODO: None that we are aware of.
 
 \subsection{ACT-R Declarative Memory Theory}
 
@@ -252,8 +262,11 @@ TODO: head to head on stackoverflow
 TODO: head to head on twitter popular-users dataset
 TODO: head to head on stackoverflow
 
-
+\begingroup
+\setstretch{1}
+\setlength\bibitemsep{12pt}
 \printbibliography
+\endgroup
 
 \end{document}
 
