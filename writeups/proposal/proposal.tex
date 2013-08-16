@@ -22,6 +22,17 @@
 \DeclareLanguageMapping{american}{american-apa}
 \addbibresource{bibliography.bib}
 
+\AtEveryBibitem{\clearfield{doi}}
+
+\AtEveryBibitem{
+  \ifentrytype{misc}{}{
+    \clearfield{url}
+  }
+}
+
+
+
+
 % If the toc is too detailed, try limiting the depth of printed sections in the TOC:
 %\setcounter{tocdepth}{2}
 
@@ -57,6 +68,7 @@ TODO: Social media sites are composed almost entirely of human-generated content
 Users are searching through this content.
 TODO: Users want to be quickly connected to the content that they care about, with minimal amount of searching necessary, since the amount of generated content on these sites is so vast.
 
+FIXME: Fix cite for Bauer2012
 TODO: Challenging domain due to time constraints on information. \cite{Bauer2012}
 
 TODO: Identifying user's goals when searching social media sites is an open research problem \cite{Rose2004}
@@ -107,6 +119,7 @@ Recommendation systems are used to tailor the presented information to what is r
 
 \subsubsection{The Netflix Prize}
 
+FIXME: Fix cite for Bennett2007
 TODO: Summarize and \cite{Bennett2007}
 
 \subsubsection{Recommending Followers on Twitter}
