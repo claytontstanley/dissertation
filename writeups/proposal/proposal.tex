@@ -22,15 +22,26 @@
 \DeclareLanguageMapping{american}{american-apa}
 \addbibresource{bibliography.bib}
 
+% Needed to ensure periods are placed at the end of every bibliography entry in the references section
 \AtEveryBibitem{\clearfield{doi}}
 
+% Make sure only urls that are printed in references section are for webpages
 \AtEveryBibitem{
   \ifentrytype{misc}{}{
     \clearfield{url}
   }
 }
 
-
+% ref: http://tex.stackexchange.com/questions/128592/remove-backslashes-from-url-fields-in-bib-entry
+\DeclareSourcemap{
+  \maps[datatype=bibtex]{
+    \map{
+      \step[fieldsource=url,
+	match=\regexp{\\},
+      replace=\regexp{}]
+    }
+  }
+}
 
 
 % If the toc is too detailed, try limiting the depth of printed sections in the TOC:
