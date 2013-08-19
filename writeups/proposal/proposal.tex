@@ -3,6 +3,7 @@
 \usepackage{textcomp}
 \usepackage[american]{babel}
 \usepackage[utf8]{inputenc}
+
 %\usepackage[compact]{titlesec}
 
 \usepackage{amssymb,amsmath}
@@ -74,46 +75,93 @@
 
 TODO: Motivation
 
-TODO: Useful problem since real-time search on social media sites is growing \cite{Jansen2011}
-TODO: Social media sites are composed almost entirely of human-generated content.
-Users are searching through this content.
-TODO: Users want to be quickly connected to the content that they care about, with minimal amount of searching necessary, since the amount of generated content on these sites is so vast.
+Social media sites such as Twitter, Facebook, StackOverflow, Google+, and Yelp, are composed almost entirely of human-generated content.
+The amount of human-generated content on these sites is staggering, and continues to grow.
+Users of Twitter's microblogging service, for example, generate half a billion tweets per day \parencite{TwitterReport2012}.
+However, a single user of a social media site is most likely interested in only a small fragment of this large amount of information.
+One general question to support the the user in this domain is:
+How can we quickly and effectively connect users to the content that they care about?
 
-FIXME: Fix cite for Bauer2012
-TODO: Challenging domain due to time constraints on information. \cite{Bauer2012}
+% FIXME: Fix cite for Bauer2012
+One traditional technique is to provide the user with a powerful search engine so that they can actively look for content that interests them.
+However, users are not forming the same search queries that work so effectively on search engines like Google.
+Users of social media sites are searching for information that is happening now, in real time \cite{Bauer2012}.
+In other words, users on social-media sites want the fresh \emph{stream} of information about a particular topic.
+This can certainly be seen in the main user-interface views that these social media site provide:
+Twitter's homepage showing your followers' tweets, Facebook's homepage showing your friends' posts, StackOverflow's daily digest of posts for particular tags, etc.
 
-TODO: Identifying user's goals when searching social media sites is an open research problem \cite{Rose2004}
+So how can we ensure that users are connected to the information streams that they care most about?
+One promising approach is to model and predict the user's goals when using and searching these social media sites \parencite{Rose2004}.
+If we have a better understanding of a user's goals, then we can tailor the information streams provided to the ones that are most inline with these goals.
+For example, Twitter might suggest other users and hashtags for the user to follow, Facebook could suggest pages to like, Yelp could recommend businesses to check out, etc.
+Researchers are currently looking for ways to automate the goal-identification task for more general search queries like those generated for Google \parencites{Jansen2008}{Lee2005}.
 
-TODO: Researchers are currently looking for ways to automate the task \cite{Lee2005}, \cite{Jansen2008}
+However, social media sites have an advantage for identifying user goals over traditional search engines:
+Human-generated content.
+Twitter does not have only the tweet that a user is currently composing to try and identify that user's goals.
+Rather, the site has all of the user's previously-generated content, and can use that information to provide a much better prediction of a user's goals.
+Further, sites like Twitter, StackOverflow, Google+, and Facebook support ways for the user to explicitly identify their precise goals when creating content: Hashtags.
+These user-created hashtags are a key indicator to a user's goals on a social media site. 
 
-TODO: Hashtags are an additional view of a user's goals when generating content on a site, and can help in this automation.
-TODO: These hashtags relate to user's goals and interests because they are human-generated content; a form of human-based document tagging \cite{Chang2010}
-TODO: People are also using hashtags as an information source on social media cites \cite{Diakopoulos2010} \cite{Kwak2010}
+These hashtags relate to a user's goals and interests because they are human-generated content, and a form of human-based document tagging \cite{Chang2010}.
+Further, people are using hashtags as a way to create information streams on social media sites \parencite{Kwak2010}.
+Twitter users, for example, commonly create hashtags for upcoming political events, such as debates and races \cite{Diakopoulos2010}.
+So if we can predict what hashtags a user is interested in, we have a better understanding of the information streams that they care about.
+With that understanding, we can tailor the system to suggest hashtags that they may not yet know about but are of likely interest to them.
+We can help aid in their discovery of fresh and relevant information that match their goals on the site.
 
-TODO: Natural question to ask is if we can predict a users' interested hashtags, we have a better understanding of that user's goals on the site.
-And with that understanding, we can improve their interaction with the site by tailoring the system to give them content that they care most about.
-
-TODO: Co-occurence-based modeling is a potentially useful approach. \cite{Efron2010}
+FIXME: It is certainly the case that real-time search on these social media sites is growing \parencite{Jansen2011}.
 
 \subsection{Research Questions}
 
+The core research question we are interested in is:
+What kinds of cognitively-plausible models can best predict the human-generated tags that a user on a social media site is interested in?
+This question can be tested by generating a prediction for the most likely used hashtag whenever a user is about to generate a hashtag, and then comparing the user's chosen hashtag to the model's prediction.
+This process can be framed as a memory retrieval problem.
+That is, each user on a social media site has created content that contain a set of human-generated tags within the context of each post.
+The process of suggesting a relevant hashtag to a user can be thought of as a memory retrieval request for a hashtag, given prior hashtag use and current context.
+
+Co-occurrence-based modeling has been shown as a potentially useful approach when predicting Twitter hashtag use \parencite{Efron2010}.
+Several memory retrieval models are based on this broad methodology, where a count is maintained of the times each contextual element (such as a word in a post) co-occur with a tag.
+Two of the current state-of-the-art memory models are based on a co-occurrence methodology, and we'll be comparing these two models for hashtag prediction:
+ACT-R's declarative memory retrieval theory and random permutation vector-based memory systems.
+
 \subsubsection{Comparison Between ACT-R and Vector-Based Memory Systems}
 
-TODO: Extending work from \cite{Rutledge2008}
+ACT-R's declarative memory and vector-based memory systems are substantially different in their implementation.
+Nonetheless, both can successfully model the classic fan effect phenomena found in word pairing experiments \parencite{Rutledge2008}.
+We will extend the work done by \textcite{Rutledge2008} by formally comparing the models on large-scale hashtag prediction tasks.
+We'll also replace the vector-based model used by \textcite{Rutledge2008} with an improved and simplified random-permutation model \parencite{Sahlgren2008}.
+The primary objective is to compare the random-permutation vector-based model to ACT-R's declarative memory theory.
 
-TODO: Can user prior be represented in vector-based memory systems?
+An advantage of vector-based models is that word order can be easily incorporated into the single co-occurrence representation \parencite{Jones2007}.
+Word-order information on sites like Twitter may contain highly-predictive pieces of information, as it is likely that specific words immediately precede specific hashtags.
+However, it is unclear and unexplored how word order can be represented in the ACT-R declarative memory theory.
+We will explore how the word-order strength of vector-based models can be incorporated into the ACT-R theory when testing the models on hashtag prediction tasks.
 
-TODO: Can word order be represented in ACT-R?
+ACT-R's declarative memory system has a strong theory on how a user's prior knowledge and experience influences the likelihood that a particular memory item is retrieved \parencite{Anderson2004}.
+However, it is unexplored how a user's prior knowledge should influence retrieval for vector-based models.
+We will explore how a user's prior knowledge influences the likelihood that a particular hashtag is generated for both ACT-R's memory theory and vector-based models.
 
-\subsubsection{Modeling Hashtag Use for a Single User}
+\subsubsection{Lifetime of a Hashtag for a Specific User}
 
-TODO: Comparison to global lifetime of a hashtag \cite{Tsur2012}
+Prior research has examined the growth and decay cycle of hashtag use across users \parencite{Tsur2012}.
+However, much less is known about hashtag lifetime within a single user.
+It may not be the case that a hashtag's lifecycle for a single user matches the lifecycle across users.
+Further, modeling a hashtag's life within users is much more applicable to hashtag prediction, since that model can be directly incorporated into the a specific user's prior likelihood of hashtag use.
+So we will characterize the hashtag growth and decay cycle within users.
+The expectation is that this cycle will match ACT-R's decay rate used in the declarative memory system to compute a particular memory item's prior.
+
+\subsubsection{User-Customized Hashtag Prediction}
+
+The end goal of this work is to identify a memory retrieval model that can suggest relevant hashtags to users when they wish to retrieve one.
+These hashtags should be customized to their specific interests and relevant to the content of the post that they are currently creating.
+This will undoubtably require a combination of two primary model components:
+[1] A user's prior likelihood of choosing a particular hashtag, given their prievously-generated content, [2] the likelihood that a particular hashtag is related to the context of the post being generated. 
+
+***
 
 TODO: How is recency information about the hashtag included in the model?
-
-\subsubsection{Adding Word-Order Information When Predicting Hashtags}
-
-TODO: speak generally about how word order might be useful for hashtags
 
 \subsubsection{StackOverflow and Twitter Task Domains}
 
