@@ -126,6 +126,24 @@ Several memory retrieval models are based on this broad methodology, where a cou
 Two of the current state-of-the-art memory models are based on a co-occurrence methodology, and we'll be comparing these two models for hashtag prediction:
 ACT-R's declarative memory retrieval theory and random permutation vector-based memory systems.
 
+\subsubsection{StackOverflow and Twitter Task Domains}
+
+We will compare these two memory systems across two domains where users generate tags for posts: Twitter and StackOverflow.
+Twitter is a micro-blogging service where users create 140 character tweets and broadcast those messages out to the users who follow their posts.
+StackOverflow is a question and answer site for computer programming where users ask programming-related questions and fellow members of the community provide answers.
+
+These two datasets were chosen because the content of the human-generated content is quite different between them, and we are interested in retrieval models that generalize across different task domains.
+However, they are also quite similar on several accounts:
+both domains have emassed large amounts of user-generated content, users generate tags for posts when creating content on the site, and the user data from the datasets are publicly available for analysis.
+
+Also, studying user-based tag generation on these sites is a relevant task domain.
+Models that can accuratly predict the tags that users will generate on Twitter and StackOverflow can be used as the foundation for recommendations systems on these very popular sites.
+These systems can help newer users by recommending proper tags for their newest content.
+On the StackOverflow site for example, experts often subscribe to specific hashtags that interest them, and receive a daily digest of posts that are tagged with those hashtags.
+Helping the user properly tag posts on StackOverflow ensures that right community sees the post, which greatly increases the chance that the question on the post will be answered quickly and correctly.
+For Twitter, hashtags represent streams of information that are possibly interesting to the user.
+Having a recommendation system that can suggest relevant hashtags to the user provides a way for the user to connect to and discover new information streams.
+
 \subsubsection{Comparison Between ACT-R and Vector-Based Memory Systems}
 
 ACT-R's declarative memory and vector-based memory systems are substantially different in their implementation.
@@ -151,46 +169,64 @@ It may not be the case that a hashtag's lifecycle for a single user matches the 
 Further, modeling a hashtag's life within users is much more applicable to hashtag prediction, since that model can be directly incorporated into the a specific user's prior likelihood of hashtag use.
 So we will characterize the hashtag growth and decay cycle within users.
 The expectation is that this cycle will match ACT-R's decay rate used in the declarative memory system to compute a particular memory item's prior.
+This decay rate equation formalizes how recency and frequency of hashtag use relate to the prior probability that a hashtag will be retrieved.
 
 \subsubsection{User-Customized Hashtag Prediction}
 
 The end goal of this work is to identify a memory retrieval model that can suggest relevant hashtags to users when they wish to retrieve one.
 These hashtags should be customized to their specific interests and relevant to the content of the post that they are currently creating.
 This will undoubtably require a combination of two primary model components:
-[1] A user's prior likelihood of choosing a particular hashtag, given their prievously-generated content, [2] the likelihood that a particular hashtag is related to the context of the post being generated. 
+[1] A user's prior likelihood of choosing a particular hashtag, given their prievously-generated content, and [2] the likelihood that a particular hashtag is related to the context of the post being generated. 
 
-***
-
-TODO: How is recency information about the hashtag included in the model?
-
-\subsubsection{StackOverflow and Twitter Task Domains}
-
-TODO: StackOverflow and Twitter; large scale, hashtag prediction, etc. 
+A user's prior hashtag use will be an essential model component for domains such as Twitter, where the number of possible hashtags is practically infinite.
+In these domains, the model can utilize a user's prior hashtag use as a way to prune the infinite space of possible hashtags, and generate a much smaller and more manageable set for prediction.
+However, not only should the model properly take into account a user's prior hashtag use, but it should also generate new hashtag predictions when a user is most likely choosing a hashtag they have never used before.
+Calibrating the models to properly balance this exploitation of prior hashtag use vs. exploration of new hashtags will be a primary resaerch focus.
+The end goal is to have a model that can properly balance the user's prior tag with the contextual cues in the post in order to generate an accurate prediciton.
 
 \section{Prior Research}
 
 \subsection{Recommendation Systems}
 
-Grown in need with the growth of the web.
-Users on a site need access to specific pieces of information, and the site contains much more information than they can process / care about.
-Recommendation systems are used to tailor the presented information to what is relevant to the user.
-\cite{Pazzani2007}
+A model that predicts a user-chosen hashtag is a specific type of the more general recommendatino systems.
+These systems have grown in need with the growth of the web.
+Users on a site need quick access to specific pieces of information, and the site contains much more information than they can process or care about.
+Recommendation systems are used to tailor the information presented to what is most relevant to the user \cite{Pazzani2007}.
 
 \subsubsection{The Netflix Prize}
 
-FIXME: Fix cite for Bennett2007
-TODO: Summarize and \cite{Bennett2007}
+% FIXME: Fix cite for Bennett2007
+The Netflix Prize \parencite{Bennett2007} is an example of a recommendation system where prior user behavior and current context was used to present the most relevant information to the user.
+Netflix is an online-subscription service where users can stream their favorite television episodes and movies.
+Each user of the site is only interested in a small portion of the entire library of content that Netflix provides.
+In order to provide a high-quality user experience on the site, Netflix created a content-recommendation service.
+This tool recommends to the user movies and television episodes that most likely match their specific interests.
+Netflix wanted to improve the accuracy of their recommendation system, so they held a competition where teams could try to improve on the accuracy of the service.
+
+The winning team utilized a singular value decomposition (SVD) method to identify particular dimensions of the entire content library (e.g., genre, time period, previously watched) that best predicted user preferences.
+This is a dimensionality-reducing technique that aims to filter out noise by forcing the data to be represented from a smaller number of dimensions than were originally present.
+This method used prior user behavior to classify a user along the dimensions of the reduced space, and current user behavior (e.g., just watched) to understand what they were interested in watching at that moment.
+By using an SVD technique and combining these indicators, the model improved on Netflix's original recommendation system by 10\%.
 
 \subsubsection{Recommending Followers on Twitter}
 
-TODO: Summarize and \cite{Hannon2010}
+Recommendation systems based on the content of user-generated posts have been successfull in recommending people on Twitter for a user to follow.
+\parencite{Hannon2010} built a Twitter follower recommendation system by creating a profile of each user based on the words they used in previous posts.
+The recommendation system would then suggest other Twitter users to follow that had similar profiles to a particular user.
+The profiles were created by generating a word frequency matrix of words x (user + followers + followees), and then providing that matrix as input into the Lucine text search engine framework.
+When the system needed to recommend a set of individuals for a user to follow, it would take all of the words used in posts from that user to construct a search query to be provided to Lucine.
+That search query would return the most likely users that share similar words in posts within their twitter network with the words provided in the query.
+Using this simple technique based on a standard text search engine allowed the recommendation system to accurately predict the people that a particular user will follow at 25\% accuracy.
 
 \subsubsection{Hashtags for Recommendation Systems}
 
-\cite{Efron2010} Generated related hashtags from 'query'.
-Showed that users found those hashtags useful for the query.
-Not using the model to predict hashtags from tweets, but a model like this could be used for that purpose.
-They were focused more on making the case that hashtags provide useful information that can be used on sites like Twitter as part of a general recommendation system.
+\cite{Efron2010} showed how hashtags might be used as a type of recommendation system for Twitter.
+Users constructed a query of text that represented a search for a topic that they were interested in.
+The system then retrieved the most likely hashtags that were associated with that search query.
+The model is based on building a word co-occurance matrix of words x hashtags, and then uses that matrix to assign a similarity score for each hashtag when provided with a search query.
+Participants graded how relevant the hashtags returned were to each search query.
+The results suggest that hashtags contain useful information that help classify the gist of a post. 
+Although this model does not predict hashtags directly when composing a tweet, a model like this could certainly be tailored for that purpose.
 
 \subsection{Hashtag Prediction}
 
@@ -286,6 +322,10 @@ TODO: IR literature for Twitter domain uses a model similar to ACT-R \cite{Efron
 \subsubsection{Vector-Based Models}
 
 TODO: Unclear how recency will fit in with random permutation vector-based model.
+
+\section{Models}
+
+TODO: Formal description of each model.
 
 \section{Methods}
 
