@@ -85,7 +85,7 @@ How can we quickly and effectively connect users to the content that they care a
 % FIXME: Fix cite for Bauer2012
 One traditional technique is to provide the user with a powerful search engine so that they can actively look for content that interests them.
 However, users are not forming the same search queries that work so effectively on search engines like Google.
-Users of social media sites are searching for information that is happening now, in real time \cite{Bauer2012}.
+Users of social media sites are searching for information that is happening now, in real time \parencite{Bauer2012}.
 In other words, users on social-media sites want the fresh \emph{stream} of information about a particular topic.
 This can certainly be seen in the main user-interface views that these social media site provide:
 Twitter's homepage showing your followers' tweets, Facebook's homepage showing your friends' posts, StackOverflow's daily digest of posts for particular tags, etc.
@@ -97,15 +97,15 @@ For example, Twitter might suggest other users and hashtags for the user to foll
 Researchers are currently looking for ways to automate the goal-identification task for more general search queries like those generated for Google \parencites{Jansen2008}{Lee2005}.
 
 However, social media sites have an advantage for identifying user goals over traditional search engines:
-Human-generated content.
+human-generated content.
 Twitter does not have only the tweet that a user is currently composing to try and identify that user's goals.
 Rather, the site has all of the user's previously-generated content, and can use that information to provide a much better prediction of a user's goals.
 Further, sites like Twitter, StackOverflow, Google+, and Facebook support ways for the user to explicitly identify their precise goals when creating content: Hashtags.
 These user-created hashtags are a key indicator to a user's goals on a social media site. 
 
-These hashtags relate to a user's goals and interests because they are human-generated content, and a form of human-based document tagging \cite{Chang2010}.
+These hashtags relate to a user's goals and interests because they are human-generated content, and a form of human-based document tagging \parencite{Chang2010}.
 Further, people are using hashtags as a way to create information streams on social media sites \parencite{Kwak2010}.
-Twitter users, for example, commonly create hashtags for upcoming political events, such as debates and races \cite{Diakopoulos2010}.
+Twitter users, for example, commonly create hashtags for upcoming political events, such as debates and races \parencite{Diakopoulos2010}.
 So if we can predict what hashtags a user is interested in, we have a better understanding of the information streams that they care about.
 With that understanding, we can tailor the system to suggest hashtags that they may not yet know about but are of likely interest to them.
 We can help aid in their discovery of fresh and relevant information that match their goals on the site.
@@ -130,11 +130,15 @@ ACT-R's declarative memory retrieval theory and random permutation vector-based 
 
 We will compare these two memory systems across two domains where users generate tags for posts: Twitter and StackOverflow.
 Twitter is a micro-blogging service where users create 140 character tweets and broadcast those messages out to the users who follow their posts.
+User-created hashtags on Twitter are embedded into the tweet, and can be used to connect the tweet to other tweets about the same topic through common hashtag use.
+Some recent and often-used hashtags for Twitter are \emph{\#photography}, \emph{\#startup}, \emph{\#4change}, \emph{\#android}, and \emph{\#solar}.
 StackOverflow is a question and answer site for computer programming where users ask programming-related questions and fellow members of the community provide answers.
+User-chosen tags on the StackOverflow site represent the primary topic of the question, such as a specific programming language, tool, software package, or framework.
+Some example tags for StackOverflow are \emph{PHP}, \emph{Arrays}, \emph{MVC}, \emph{C\#}, or \emph{Common Lisp}.
 
 These two datasets were chosen because the content of the human-generated content is quite different between them, and we are interested in retrieval models that generalize across different task domains.
 However, they are also quite similar on several accounts:
-both domains have emassed large amounts of user-generated content, users generate tags for posts when creating content on the site, and the user data from the datasets are publicly available for analysis.
+Both domains have emassed large amounts of user-generated content, users generate tags for posts when creating content on the site, and the user data from the datasets are publicly available for analysis.
 
 Also, studying user-based tag generation on these sites is a relevant task domain.
 Models that can accuratly predict the tags that users will generate on Twitter and StackOverflow can be used as the foundation for recommendations systems on these very popular sites.
@@ -191,7 +195,7 @@ The end goal is to have a model that can properly balance the user's prior tag w
 A model that predicts a user-chosen hashtag is a specific type of the more general recommendatino systems.
 These systems have grown in need with the growth of the web.
 Users on a site need quick access to specific pieces of information, and the site contains much more information than they can process or care about.
-Recommendation systems are used to tailor the information presented to what is most relevant to the user \cite{Pazzani2007}.
+Recommendation systems are used to tailor the information presented to what is most relevant to the user \parencite{Pazzani2007}.
 
 \subsubsection{The Netflix Prize}
 
@@ -211,7 +215,7 @@ By using an SVD technique and combining these indicators, the model improved on 
 \subsubsection{Recommending Followers on Twitter}
 
 Recommendation systems based on the content of user-generated posts have been successfull in recommending people on Twitter for a user to follow.
-\parencite{Hannon2010} built a Twitter follower recommendation system by creating a profile of each user based on the words they used in previous posts.
+\textcite{Hannon2010} built a Twitter follower recommendation system by creating a profile of each user based on the words they used in previous posts.
 The recommendation system would then suggest other Twitter users to follow that had similar profiles to a particular user.
 The profiles were created by generating a word frequency matrix of words x (user + followers + followees), and then providing that matrix as input into the Lucine text search engine framework.
 When the system needed to recommend a set of individuals for a user to follow, it would take all of the words used in posts from that user to construct a search query to be provided to Lucine.
@@ -220,7 +224,7 @@ Using this simple technique based on a standard text search engine allowed the r
 
 \subsubsection{Hashtags for Recommendation Systems}
 
-\cite{Efron2010} showed how hashtags might be used as a type of recommendation system for Twitter.
+\textcite{Efron2010} showed how hashtags might be used as a type of recommendation system for Twitter.
 Users constructed a query of text that represented a search for a topic that they were interested in.
 The system then retrieved the most likely hashtags that were associated with that search query.
 The model is based on building a word co-occurance matrix of words x hashtags, and then uses that matrix to assign a similarity score for each hashtag when provided with a search query.
@@ -230,22 +234,68 @@ Although this model does not predict hashtags directly when composing a tweet, a
 
 \subsection{Hashtag Prediction}
 
-Previous research focused on StackOverflow, Google+, and Twitter.
-Google+ has deployed automatic tagging of posts.
+More specific hashtag-recommendation models that attempt to predict a user's chosen hashtag have also been created and tested for a few social media sites.
+Google has even deployed a hashtag-recommendation model to help users properly tag posts for their Google+ social media site \parencite{GoogleKeynote2013}.
+However, to our knowledge a hashtag-recommendation model for Twitter tweets has not yet been attempted.
 
 \subsubsection{StackOverflow}
 
-TODO: \cite{Kuo2011}
-FIXME: cite recent paper
-FIXME: cite tex.stackexchange.org as a hashtag suggestion tool
+\textcite{Kuo2011} was the first to model tag use for StackOverflow posts.
+His set of models were originally designed for next-word prediction for large text document collections.
+In order to structure the models to work for StackOverflow tag prediction, the models would request the most-likely next word after a user generated a post, and restrict the space of possible words to only tags.
+He tested the set of next-word predictino models to generate predictions for the most likely tags that a user would choose when asking a question on the site.
+Interestingly, the Bayesian co-occurrance model outperformed the more complicated and computatinoally expensive Singular Value Decomposition and K-nearest-neighbors models.
+This model can accurately predict a user-chosen tag at 47\% accuracy.
+
+\textcite{Stanley2013} also modeled a user's chosen tags for a post on the StackOverflow site.
+The model was based on ACT-R's declarative memory retrieval theory, which at the core is also a Bayesian co-occurrance model.
+However, this model scaled much better than the co-occurrance model presented in \textcite{Kuo2011}.
+Because of this, 100 times more posts were used to build the co-occurrance matrix (\num{1000000} versus \num{10000}), which significantly increased the model's performance.
+After scaling up the model, this model can successfully predict a user's tag for a post at 65\% accuracy.
+It is interesting that in both research papers the best performing model was based on a Bayesian co-occurrance framework, since that is precisely the framework from which ACT-R's declarative memory system is built.
+This suggests that more cognitively-plausible memory retrieval models may outperform more general machine-learning approaches in this particular task domain:
+predictng the user-chosen tags for human-generated content on social media sites.
+
+Although recent work has been done to model human tagging on the StackOverflow site, to our knowledge no vector-based holographic memory model has been tested or used.
+We are curious to see the prediction difference between a vector-based models and current co-occurrance models on the StackOverflow dataset.
+Both types of models are neurologically plausible, and both have been successfully incorporated as the declarative memory component of the ACT-R cognitive architecture \parencite{Rutledge2007}. 
+Given that the Bayesian cognitively-plausible models have done so well to predict tag use on StackOverflow, we are curious to see how a cognitively-plausible vector-based model performs at the task.
+
+A tag suggestion tool has also been deployed for the tex.stackexchange.org site. \parencite{LatexTags2013}
+Both the \LaTeX site and StackOverflow are part of the broader StackExchange network of question and answer sites, and they provide the same user interface and workflow when asking questions.
+Once a user has created a question on the Latex site, the site provides subdued text of suggested tags in the text field where the user fills in the tags to associate with the question.
+The post author is not forced to use the suggested tags, and is free to choose tags from them or tags not represented in the suggested set.
+
+The Latex site is not nearly as popular as StackOverflow currently.
+The site has roughly \num{50000} questions compared to \num{5000000} questions on StackOverflow.
+It may be the case that the StackExchange company decided to try out a tag recommendation system on one of their smaller sites first, before deploying this type of system on their most popular StackOverflow site.
+Or it is possible that their current tag recommendation system is not efficient enough to work with the demand of the StackOverflow site.
+Nonetheless, it is encouraging that StackExchange finds tag recommendation models beneficial enough to the user to start adding them to their question and answer sites. 
 
 \subsubsection{Google+}
 
-TODO: Summarize Google+ hashtag prediction \cite{GoogleKeynote2013}
+The hashtag recommendation system deployed for the Google+ micro-blogging service is probably the most ambitious model of user-created hashtags to date \parencite{GoogleKeynote2013}.
+The workflow and user interface provided for recommending hashtags for Google+ is similar to how a hashtag recommendation system for Twitter might look.
+When generating content on Google+, the system automatically associates the most likely relevant hashtags with that post.
+The user is free to remove any or all of the tags that the system has associated with the post, and can also use tags that were not included in the recommended set.
+
+Google is apparently highly confident in the accuracy of their system.
+On the Latex site, the User Interface provides subdued suggestions to the user, but requires the user to explicitly choose each tag he/she wants to associated with the post.
+For Google+, the User Interface automatically provides tags for a user's post, and then requires the user to explicitly change those tags if he/she wants to use a different set.
+If tag accuracy is high enough, the Google+ technique is certainly favorable, since the user does not have to spend time figuring out which tags best represent this post.
+However, if the model makes even just a few errors, users may become annoyed and frustrated with the recommendation system, since they will have to explicitly correct it every time they generate a post.
 
 \subsubsection{Twitter}
 
-TODO: None that we are aware of.
+To our knowledge, no model of user-created hashtags when composing tweets on Twitter has yet been built.
+There are two likely reasons for this:
+[1] Modeling user-chosen hashtags and building hashtag-recommendation systems has only explored over the past few years, and
+[2] Twitter is a large database of human-generated content, spanning a wide range of topics, containing a sizeable set of user-generated hashtags, so hashtag prediction for Twitter is a relatively hard problem.
+We are nonetheless curious if declarative memory retrieval models can be applied to this domain to generate useful hashtag predictions.
+The domain shares many similarities with environments where hashtag-recommendation systems have already been deployed:
+Google+'s microblogging service is essentially Twitter, but focused on a specific subset of users and topics.
+The StackExchange sites are also built from a large database of human generated content, where users have chosen specific tags to associate with posts.
+So we will evaluate how well an ACT-R-inspired Bayesian declarative memory model and a new vector-based model predict a user's chosen hashtag when composing a tweet on Twitter.
 
 \subsection{ACT-R Declarative Memory Theory}
 
