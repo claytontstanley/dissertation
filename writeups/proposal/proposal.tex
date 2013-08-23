@@ -362,6 +362,7 @@ Association strenght between a chunk in memory and a single contextual element c
 The likelihood a chunk occurred with the current context ($p(i|j)$) over the likeihood that the chunk occured in any of the other contexts ($p(i|\overline{j})$).
 For large datasets, the likelihood that a chunk occurs in any particular context reaches near-zero values ($p(j) \Rightarrow 0$).
 So it can be assumed that the likelihood that a chunk occurs in any context but one ($p(i|\overline{j})$) is equivalent to the likelihood that a chunk occurs in any context ($p(i)$).
+This assumption has been both mentioned and used when deriving the $S_{ji}$ equation \parencite{Anderson1989}, as well as in recent research working with large-scale datasets \parencite{Stanley2013}.
 
 Using this assumption for large datasets, the interpretation of the context-adusted odds ratio becomes much simpler.
 If this ratio for a particular tag and context chunk is greater than one, then the log is positive, which means that this context has been observed more often with this tag than in general.
