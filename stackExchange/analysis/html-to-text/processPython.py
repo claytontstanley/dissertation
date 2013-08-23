@@ -46,7 +46,7 @@ def convert_all(indir, fun, outdir):
 	Outdir and indir will have the same directory structure.
 	"""
 	cnt = 0
-	# For a dir structure: a/1/c a/1/c2 a/2/d a/2/c, loop over all of the files (c c2 d c) 
+	# For a dir structure: a/1/c a/1/c2 a/2/d a/2/c, loop over all of the files (c c2 d c)
 	# and paths to those files (a/1 a/1 a/2 a/2). If your dir structure is only a flat single
 	# level, the paths to the files (dirname) will remain constant.
 	for dirname, dirnames, filenames in os.walk(indir):
@@ -76,7 +76,7 @@ def loadSubset(file, subset):
 	cmd = string.Template(cmd).substitute(locals())
 	print cmd
 	cur.query(cmd)
-	cmd = "update foo set subset = '${subset}'" 
+	cmd = "update foo set subset = '${subset}'"
 	cmd = string.Template(cmd).substitute(locals())
 	cur.query(cmd)
 	cur.query('insert into subsets(id, subset) select * from foo')
