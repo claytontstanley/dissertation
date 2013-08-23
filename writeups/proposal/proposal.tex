@@ -1,11 +1,13 @@
 \documentclass[man]{apa6}
 
+\usepackage{xfrac}
 \usepackage{textcomp}
 \usepackage[american]{babel}
 \usepackage[utf8]{inputenc}
 
 %\usepackage[compact]{titlesec}
 
+\usepackage{tabu}
 \usepackage{amssymb,amsmath}
 \usepackage{setspace}
 
@@ -299,9 +301,71 @@ So we will evaluate how well an ACT-R-inspired Bayesian declarative memory model
 
 \subsection{ACT-R Declarative Memory Theory}
 
-\cite{Anderson2004}
+ACT-R \cite{Anderson2004} is a cognitive architecture that formalizes how each cognitive process of the brain (e.g., memory, learning, visual and motor) interacts to produce behavior.
+The declarative memory system is a component of that architecture that models the timing, learning, and forgetting processes that make up long-term declarative memory retrieval.
+The equations that make up this system can be described through a rational analysis of long-term memory retrieval.
+That is, given the task of retrieving a chunk of information from long-term declarative memory,
+the current context (i.e., external and internal environment state), and past experience (i.e., prior memories and exposure), 
+what is the optimal behavior (i.e., the optimal chunk to retrieve from memory)?
+Using Bayesian reasoning, each chunk of information in declarative memory can be assigned a prior likilihood of being retrieved again, given the prior number of times it has been needed.
+Those prior probabilities for each chunk are then adjusted for the current context, so that the posterior probabilities represent the likilihood that a chunk is needed, given prior odds and current environment state.
 
 \subsubsection{ACT-R DM Model}
+
+\begin{table}[!ht]
+  \caption{ACT-R Declarative Memory Model}
+  \label{tabACT-RModel}
+  {\tabulinesep=1.2mm
+    \begin{tabu}{ll}
+      \hline
+      Common Name &  Equation \\
+      \hline
+      Activation &	 	$A_{i} = B_{i} + \sum_{j \in c}^{} W_{j} S_{ji}$ \\
+      Attentional Weight &	$W_{j} = \frac{W}{n}$ \\
+      Base Level & 		$B_{i} = log \sum_{j=1}^{n} {t_{j}}^{-d}$ \\
+      Constant Base Level &	$B_{i} = log \frac{p(i)}{p(\overline{i})}$ \\
+      Strength of Association &	$S_{ji} = log \frac{p(i|j)}{p(i|\overline{j})} \approx log \frac{p(i|j)}{p(i)}$ \\
+      Recall Probability &	$P_{i} = \left( 1 + e^{\frac{\tau - A_{i}}{s}} \right )^{-1}$ \\
+      \hline
+    \end{tabu}
+  }
+\end{table}
+
+A formal description of the ACT-R Declarative Memory model is included in Table \ref{tabACT-RModel}.
+The total activation ($A_{i}$) for a chunk in declarative memory is a function of two components: base level activation ($B_{i}$) and strength of association ($S_{ji}$).
+The recall probability that a chunk will be retrieved from memory increases with total activation ($A_{i}$).
+
+\subsubsection{Base-Level Activation}
+
+Base-level activation reflects the log prior odds of needing an observed chunk again.
+The primary way to calculate these log prior odds is to use the standard base level equation in Table \ref{tabACT-RModel}.
+This equation formalizes how log prior odds are a function of both frequency and recency of prior exposure to a particular chunk.
+Chunks used more frequently (either through exposure or from a retrieval) are more likely to be needed for retrieval again.
+However, as time progresses and a particular chunk is no longer used, the activation for that chunk decays.
+In this way the standard base level equation formalizes the time dynamics of the retrieval system, where a chunk's base-level activation evolves over time, depending on its current frequency and recency of use.
+
+For some domains, it is reasonable to assume that the base-level activations of each chunk within a particualar window of interest are stable, and do not change within that window.
+Programming-language popularity over the past few years is a reasonable example of this.
+Although the popularity of various programming languages has certainly changed slightly over the past few years (.e.g, \emph{closure}'s growth), it is not the case that the changes have been drastic.
+\emph{C\#}, \emph{Python}, and \emph{Java} are still a few of the most popular languages, \emph{Common Lisp} has not gained or lost much ground in popularity over the past few years, etc.
+
+Further, if this is a reasonable assumption to make, it greatly simplifies the computation of the base-level activation for chunks, and can turn the computation into a tractable problem for large datasets.
+In these time-constant domains, one can compute the log prior odds of needing each chunk directly as the log odds ratio of being exposed to a chunk.
+For example, if the StackOverflow tag \emph{PHP} has been used four times as often as the tag \emph{Common Lisp}, then the prior odds of needing \emph{PHP} again is $\frac{.8}{.2}=4$ times that of \emph{Common Lisp}.
+
+\subsubsection{Strength of Association}
+
+Strength of association ($S_{ji}$) reflects the amount of log odds adjustment to the activation of a chunk, given the current context (i.e., external environment and internal state).
+Context for the StackOverflow domain for example, can be represented as each word in the title and body of a post.
+Context for the Twitter domain would be the words in a Tweet.
+Association strenght between a chunk in memory and a single contextual element can be computed directly by calculating its context-adjusted odds ratio:
+The likelihood a chunk occurred with the current context ($p(i|j)$) over the likeihood that the chunk occured in any of the other contexts ($p(i|\overline{j})$).
+For large datasets, the likelihood that a chunk occurs in any particular context reaches near-zero values ($p(j) \Rightarrow 0$).
+So it can be assumed that the likelihood that a chunk occurs in any context but one ($p(i|\overline{j})$) is equivalent to the likelihood that a chunk occurs in any context ($p(i)$).
+
+Using this assumption for large datasets, the interpretation of the context-adusted odds ratio becomes much simpler.
+If this ratio for a particular tag and context chunk is greater than one, then the log is positive, which means that this context has been observed more often with this tag than in general.
+If this ratio is less than one, then the log is negative, which provides a negative adjustment of total activation since this context has been observed more often in general than with this particular tag.
 
 \subsubsection{Connection to Pointwise Mutual Information}
 
