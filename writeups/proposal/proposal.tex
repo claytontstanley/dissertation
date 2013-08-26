@@ -303,7 +303,7 @@ Regardless of the method to compute the similarity between tweets, each method c
 This tweet-centered approach is quite different than the hashtag-centered approach presented in \textcite{Mazzia2009}.
 With a hashtag-centered approach, a direct association is built between the words in a tweet and hashtags that occur in tweets.
 With a tweet-centered approach, that association between words and hashtags is indirect:
-The relationship is built between words in a tweet and a user, and then similar users are assumed to use similar hashtags.
+The relationship is built between a tweet and its content, and then similar tweets are assumed to use similar hashtags.
 One problem with the tweet-centered approach is that the storage size grows with the number of tweets, as a vector representatino of the content in each tweet has to be maintained to later compute tweet similarity.
 The storage size for a hashtag-centered approach grows with the number of hashtags, but it seems reasonable that this will grow slower than the number of tweets and asymptote after collecting a large sample of tweets.
 So from the perspective of efficient information storage and retrieval, it seems more likely that the hashtag-centered approach used in \textcite{Mazzia2009} will scale as Twitter grows in size and use.
