@@ -312,7 +312,7 @@ So from the perspective of efficient information storage and retrieval, it seems
 The set of recommended hashtags was the union of hashtags used in similar tweets and hashtags used by similar users.
 This was done by storing a content vector of hshtag use for each user (user-centered approach) alongside the content vectors of hashtag use for each tweet (tweet-centered approach).
 To generate recommended hashtags, the model would return the top-ranked hashtags from the hashtags used in 0-50 similar tweets and 0-4 similar users.
-Prediction accuracy improved when the model generated recommendations based on hashtags in both similar tweets and the top few similar users compared to basing recommendations on similar tweets alone. 
+Prediction accuracy improved when the model combined recommendations based on hashtags in both similar tweets and the top few similar users compared to basing recommendations on similar tweets alone. 
 
 FIXME: \cite{Godin2013}
 This paragraph will discuss the topics-based approach.
