@@ -414,15 +414,33 @@ If this ratio is less than one, then the log is negative, which provides a negat
 
 \subsubsection{Connection to Pointwise Mutual Information}
 
-TODO: Introduce PMI \cite{Farahat2004}
+\textcite{Farahat2004} introduced the Pointwise Mutual Information (PMI) index that also measures strength of association between two terms.
+It is based on the co-occurrence count between pair-wise observations of terms, similar to ACT-R's strength of association.
+The PMI index is included in Equation \eqref{eqPMI}.
 
-TODO: Comparison to ACT-R: Virtually equivalent for large corpora \cite{Farahat2004}
+\begin{equation}
+  \label{eqPMI}
+  PMI(y,x) = log \frac{p(y|x)}{p(y)}
+\end{equation}
+
+This PMI equation is identical to ACT-R's strength of association ($S_{ji}$) equation for large datasets.
+Once the number of occurrences is large enough such that the probability of observing any particular contextual element ($p(x)$) is near zero, then ACT-R's strength of association index simplifies to the PMI equation.
 
 \subsubsection{Scaling the Equations}
 
-\cite{Douglass2010}
+ACT-R's strength of association ($S_{ji}$) and the equivalent pointwise mutual information index ($PMI_{ji}$) have been shown to scale well for large corpora.
+\textcite{Douglass2010} implemented the large-scale version of $S_{ji}$ in Erlang.
+The wall-clock time required for a declarative memory retrieval request scaled linearly with the size of declarative memory with this implementation.
+Retrieval times were around one second with the largest declarative memory that contained over one million associations (co-occurrence pairs).
 
-TODO: SNIF-ACT \cite{Fu2007} \cite{Pirolli2003}
+The SNIF-ACT framework is also based on the large-scale version of $S_{ji}$, and scales well when working with a large-scale search query database for internet search \parencites{Fu2007,Pirolli2003}.
+The $S_{ji}$ values were based on a 118GB local database of 10 million pages of the Stanford Webbase Project.
+So this implementation did not fit into RAM, but a spinning-disk database implementation still scaled well enough for reasonably fast retrieval times for $S_{ji}$ values.
+
+The SNIF-ACT model uses the strength of association to measure the relationship between the words in a search query and the words contained in each query result.
+A higher $S_{ji}$ between a query and a result means that the result is a better fit for the query, and that the user is more likely to click on that link.
+The links that user chose in experimental testing were largely predictive of the strength of association measure.
+The predictive power of the SNIF-ACT model went above and beyond what would be predicted by simply assuming that the user always clicks on the first link in the search results page.
 
 \subsection{Latent Semantic Analysis Memory Theory}
 
