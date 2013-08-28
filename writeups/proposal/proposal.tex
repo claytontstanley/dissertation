@@ -332,19 +332,19 @@ We are curious to see the prediction difference between a vector-based models an
 Both types of models are neurologically plausible, and both have been successfully incorporated as the declarative memory component of the ACT-R cognitive architecture \parencite{Rutledge2007}. 
 Given that the Bayesian cognitively-plausible models have done so well to predict tag use on StackOverflow, we are curious to see how a cognitively-plausible vector-based model performs at the task.
 
-The current state of research on Twitter hashtag prediction is that a mix of co-occurrence and latent-based models have been used to predict hashtags, and the results are encouraging.
-However, there has been very little research on how a specific user's past hashtag use should influence the model's prediction when that user is composing a tweet.
-\textcite{Kywe2012} did take a user-centered view with their model, but the hashtags predicted by the user and content were analyzed separately and then the top from each group were combined for prediction.
-The ACT-R declarative memory retrieval model takes a combined approach, and shows how past user behavior and current context combine to produce the most likely retrieval.
-Each component is summed together to generate a total activation, and then the likelihodd of chunks are ranked by that summed activation.
-This technique allows for a more natural combination of the two components, where weights can be assigned to each component depending on how strongly each term predicts performance.
-This type of weighted additive model that combines past user behavior and current tweet context to predict the most likely hashtags has not yet been explored for Twitter.
-
 Also, a vector-based retrieval model has not yet been tested on Twitter.
 One of the advantages of vector-based models is that word order can be easily incorporated into the single co-occurrence representation \parencite{Jones2007}.
 It seems quite likely that the few words used just before a hashtag embedded in a tweet will be highly predictive of the hashtag chosen.
 To our knowledge, only bag-of-words models have been tested on Twitter to predict hashtags, where co-occurrance between words and hashtags are computed independently from where the word is located in the tweet.
 It will be interesting to see how much (if at all) accuracy improves when incorporating word-order information into the model.
+
+There has been a mix of co-occurrence and latent-based models created to predict hashtags use on Twitter, and the results are encouraging.
+However, there has been very little research on how a specific user's past hashtag use should influence the model's prediction when that user is composing a tweet.
+\textcite{Kywe2012} did take a user-centered view with their model, but the hashtags predicted by the user and content were analyzed separately and then the top from each group were combined for prediction.
+The ACT-R declarative memory retrieval theory shows how past user behavior and current context combine to produce the most likely retrieval.
+Each component is summed together to generate a total activation, and then the likelihodd of chunks are ranked by that summed activation.
+This technique allows for a more natural combination of the two components, where weights can be assigned to each component depending on how strongly each term predicts performance.
+This type of weighted additive model that combines past user behavior and current tweet context to predict the most likely hashtags has not yet been explored for Twitter.
 
 \subsection{ACT-R Declarative Memory Theory}
 
