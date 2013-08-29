@@ -486,14 +486,14 @@ Another issue with LSA is the SVD matrix decomposition technique is computationa
 As the size of the original word x document matrix increases, the SVD computation becomes more and more time consuming.
 If the domains where LSA is being applied contained small enough datasets where SVD computation could be computed in a reasonable amount of time, then this would not be much of a concern.
 However, with large-scale human-generated dataesets such as Twitter, Stackoverflow, and Wikipedia, the total size of the dataset far exceeds the maximum size that can even be computed by an LSA approach.
-\textcite{Budui2007} used the first six million pages of the Stanford WebBase corpus to compare performance between LSA and PMI on the TOEFL, and the LSA model could not be implemented with this size dataset.
+\textcite{Budiu2007} used the first six million pages of the Stanford WebBase corpus to compare performance between LSA and PMI on the TOEFL, and the LSA model could not be implemented with this size dataset.
 Instead, they compared the measures on the smaller TASA corpus created from \num{60527} samples of text from high school to early college textbooks.
-This is one of the available corpuses on the LSA website and is aimed to summarize the general reading up to the 1st year of college \parencite{Budui2007}.
+This is one of the available corpuses on the LSA website and is aimed to summarize the general reading up to the 1st year of college \parencite{Budiu2007}.
 
-When \textcite{Budui2007} compared the simpler PMI (i.e., $S_{ji}$) measure to LSA on smaller TASA-corpus-size datasets, LSA performed much better (23\% vs. 60\%).
+When \textcite{Budiu2007} compared the simpler PMI (i.e., $S_{ji}$) measure to LSA on smaller TASA-corpus-size datasets, LSA performed much better (23\% vs. 60\%).
 However, once the dataset surpasses in size what is computationally feasable with LSA, the much simpler PMI measure can still be computed, and the performance for PMI becomes on par and even surpasses that of LSA.
 This was one of the primary motivating reasons that LSA was developed in the first place, since reduced dimensionality model out-performed the full dimensionality model on TASA-sized datasets.
-\textcite{Budui2007} also trained the PMI measure on the much larger Stanford WebBase corpus and tested the measure on the TOEFL.
+\textcite{Budiu2007} also trained the PMI measure on the much larger Stanford WebBase corpus and tested the measure on the TOEFL.
 This PMI model increased accuracy from 23\% to 51\% when training the dataset on the smaller TASA compared to the larger Stanford dataset.
 Further, when \textcite{Turney2001} trained the PMI measure on the even larger AltaVista index of 350 million webpages, the accuracy on the TOEFL increased to 73.75\%, which is 10\% higher than the TASA-trained LSA.
 This suggests that simpler models may be preferred to more complex (yet more accurate) models in large-scale domains, since the simpler models scale and can utilize all available informaiton to generate predictions.
