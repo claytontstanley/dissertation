@@ -420,7 +420,7 @@ The PMI index is included in Equation \eqref{eqPMI}.
 
 \begin{equation}
   \label{eqPMI}
-  PMI(y,x) = log \frac{p(y|x)}{p(y)}
+  \mathit{PMI}(y,x) = log \frac{p(y|x)}{p(y)}
 \end{equation}
 
 This PMI equation is identical to ACT-R's strength of association ($S_{ji}$) equation for large datasets.
@@ -428,7 +428,12 @@ Once the number of occurrences is large enough such that the probability of obse
 
 \subsubsection{Scaling the Equations}
 
-ACT-R's strength of association ($S_{ji}$) and the equivalent pointwise mutual information index ($PMI_{ji}$) have been shown to scale well for large corpora.
+The majority of tag-recommendation systems use some measure of word pair associations to compute the likelihood of a tag, given current context.
+It is important that this measure scales well enough to handle the sheer volume of information present in online social media datasets.
+Large-scale social media datasets such as StackOverflow and Twitter contain on the order of millions to hundreds of millions of unique word pair associations between terms and tags.
+If one wants to capitilize on all of the information present in the database to build the most accurate measure of relatedness between words and tags, then the association measure used must scale to this large size.
+
+ACT-R's strength of association ($S_{ji}$) and the equivalent pointwise mutual information index ($\mathit{PMI}_{ji}$) have been shown to scale well for large corpora.
 \textcite{Douglass2010} implemented the large-scale version of $S_{ji}$ in Erlang.
 The wall-clock time required for a declarative memory retrieval request scaled linearly with the size of declarative memory with this implementation.
 Retrieval times were around one second with the largest declarative memory that contained over one million associations (co-occurrence pairs).
