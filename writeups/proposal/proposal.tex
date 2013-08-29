@@ -449,15 +449,60 @@ The predictive power of the SNIF-ACT model went above and beyond what would be p
 
 \subsection{Latent Semantic Analysis Memory Theory}
 
-TODO: Summarize \cite{Landauer1997}
+Latent Semantic Analysis \parencite{Landauer1997} is a technique that has mathematical roots in factor analysis and also measures strength of association between two terms.
+The process starts with a set of N documents.
+A word x document co-occurrence matrix is built by counting the number of times each word appears in each document.
+The dimensionality of the full word frequency co-occurrence matrix is then reduced and forced to be represented on a smaller set of dimensions.
+This process is similar to how factor analysis takes a data table and finds the most efficient way to represent that data with as few dimensions as possible.
+The strength of association between two words is measured by the cosine of the two word vectors across the reduced dimension space, which would be similar to computing the cosine of two correlated eigenvectors.
+
+Usually information is lost when the data are restructered into a smaller set of latent dimensions.
+However it was shown that this process actually improves predictiveness and reduces noise by allowing the frequency count of highly similar concepts (words) to be pooled together and represented by a single dimension.
+They tested the LSA model on the Test of English as a Foreign Language (TOEFL) task of choosing the best of four possible synonyms to a target word.
+Model results were on par with a large sample of applicants to american universities from non-english speaking countries (64.4\% compared to 64.5\%).
+Model performance also improved when the original dimensionality of the data was reduced.
 
 \subsubsection{Singular Value Decomposition}
 
+LSA uses the Singular Value Decomposition process to reduce the dimensionality of the word x document co-occurrence matrix.
+The technique attempts to maximize the amount of variability in the data left after forcing the original dimensionality of the data to be reduced.
+The best way to remove a dimension while maintianing all variability is to look for words with highly-similar co-occurrence patterns and deduce that these words represent the same concept.
+For example, synonyms such as \emph{\#photograph} and \emph{\#photo} would appear interchangably accross documents, so these terms would be collapsed to a single dimension and frequncy counts would be pooled.
+By pooling co-occurrence counts the model is able to generate better predictions with less data.
+
 \subsubsection{Word Order}
+
+Although the LSA model has been shown to perform well as a way to measure similarity between two terms, one of the main criticisms is that it is a ``bag of words'' model.
+This means that the model does not account for or pay attention to word order when building the base word x document matrix or consequently, when performing the SVD dimension reduction.
+Other models that can account for word order have been shown to perform better than ``bag of words'' models on tasks that do not even appear to require grammatical structure such as word order to do well.
+For example, \textcite{Jones2007} compared a vector-based model called BEAGLE directly to LSA, training and testing both models on the same corpus used in \textcite{Landauer1997}.
+The context-only BEAGLE model (no word order) performed slightly better than the LSA model at the task (55.6\% vs. 55.3\%).
+However, even in a multiple-choice domain where the task is to identify synonyms (very little grammatical structure in the task), adding word order when training the model improved task performance to 57.5\%.
+It seems reasonable to expect that task performance will improve much more on tasks where word order is used (e.g., generating a Twitter hashtag in the middle of a sentence).
 
 \subsubsection{Scaling Issues}
 
-TODO: Compare with PMI, performance and issue of scale. \cite{Budiu2007}
+Another issue with LSA is the SVD matrix decomposition technique is computationally very expensive.
+As the size of the original word x document matrix increases, the SVD computation becomes more and more time consuming.
+If the domains where LSA is being applied contained small enough datasets where SVD computation could be computed in a reasonable amount of time, then this would not be much of a concern.
+However, with large-scale human-generated dataesets such as Twitter, Stackoverflow, and Wikipedia, the total size of the dataset far exceeds the maximum size that can even be computed by an LSA approach.
+\textcite{Budui2007} used the first six million pages of the Stanford WebBase corpus to compare performance between LSA and PMI on the TOEFL, and the LSA model could not be implemented with this size dataset.
+Instead, they compared the measures on the smaller TASA corpus created from \num{60527} samples of text from high school to early college textbooks.
+This is one of the available corpuses on the LSA website and is aimed to summarize the general reading up to the 1st year of college \parencite{Budui2007}.
+
+When \textcite{Budui2007} compared the simpler PMI (i.e., $S_{ji}$) measure to LSA on smaller TASA-corpus-size datasets, LSA performed much better (23\% vs. 60\%).
+However, once the dataset surpasses in size what is computationally feasable with LSA, the much simpler PMI measure can still be computed, and the performance for PMI becomes on par and even surpasses that of LSA.
+This was one of the primary motivating reasons that LSA was developed in the first place, since reduced dimensionality model out-performed the full dimensionality model on TASA-sized datasets.
+\textcite{Budui2007} also trained the PMI measure on the much larger Stanford WebBase corpus and tested the measure on the TOEFL.
+This PMI model increased accuracy from 23\% to 51\% when training the dataset on the smaller TASA compared to the larger Stanford dataset.
+Further, when \textcite{Turney2001} trained the PMI measure on the even larger AltaVista index of 350 million webpages, the accuracy on the TOEFL increased to 73.75\%, which is 10\% higher than the TASA-trained LSA.
+This suggests that simpler models may be preferred to more complex (yet more accurate) models in large-scale domains, since the simpler models scale and can utilize all available informaiton to generate predictions.
+
+\subsubsection{Cost of Incremental Updating}
+
+Another issue with LSA is that adding additional observations to an already-computed reduced representation requires rerunning the SVD \textcite{Farahat2004}.
+Since computing the SVD is the most computationally-expensive operation with LSA, it is difficult to see how LSA could be implemented in incremental domains where information is periodically being added.
+For Twitter and StackOverflow, it might certainly be useful to update the strength of association representation when new information arrives, especially for Twitter, where hashtag use and news content change rapidly.
 
 \subsection{Vector-Based Memory Systems}
 
