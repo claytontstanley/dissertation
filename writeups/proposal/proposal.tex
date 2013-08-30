@@ -506,9 +506,62 @@ For Twitter and StackOverflow, it might certainly be useful to update the streng
 
 \subsection{Vector-Based Memory Systems}
 
-TODO: Summarize \cite{Plate1995}
+``holographic'' memory systems \parencite{Plate1995} or vector-based memory systems represent a concept (i.e., chunk) as a vector.
+The representation of the concept is distributed across all elements of the vector.
+This is somewhat similar to taking a column (i.e., a tag) on a word co-occurrence matrix and saying that the distribution of co-occurrence counts across the rows in the column is the representation of that concept.
+However, vector-based memory systems represent information in a much more compact way than a full word co-occurrence matrix.
+
+For vector-based systems, each word is represented by an environment vector $e_{j}$ that is nearly orthogonal to all other words' environment vectors.
+The number of dimensions for these vectors is much less than the number of rows in a full word co-occurrence matrix, which is how vector-based systems represent information in a much more compact space.
+Paired with each environment vector ($e_{i}$) is a memory vector ($m_{i}$) that contains the summed representation of all other environment vectors that have co-occured with that $e_{i}$ environment vector.
+These memory vectors can contain environment vectors from bag-of-words co-occurrence information ($c_{i}$) and word order information ($o_{i}$), which can be combined into a single representation ($m_{i}$).
+Over time, memory vectors accumulate a distributed representation of the most common environment vectors that co-occurred with them.
+
+\subsubsection{Retrieval Process}
+
+Retrieving the most likely chunk given context can be done in two ways: decoding and resonance \parencite{Jones2007}.
+Decoding takes the memory vector for context and decodes it back into an environment vector.
+The cosine between that decoded environment vector and all other environment vectors is computed and ranked, and the chunk with the environment vector with the highest cosine is retrieved.
+For example, assume that a user has written the word ``zend'' in a post.
+``zend'' has co-occurred with \emph{PHP}, so the unordered memory vector for ``zend'' ($c_{zend}$) contains the unordered environment vector for \emph{PHP}.
+Since the environment vector for \emph{PHP} was added to the memory vector for ``zend'' without any encoding, no decoding is necessary.
+So the cosine between the environment vector \emph{PHP} and decoded memory vector for ``zend'' ($c_{zend}$) will be high, and most likely \emph{PHP} will be retrieved through decoding.
+
+Resonance is the opposite retrieval process, where a memory vector is created from the context, and then that context memory vector is compared to all memory vectors.
+Fo the \emph{PHP} and ``zend'' example, the context memory vector would consist of the unordered environment vector for ``zend''.
+Since the memory vector for \emph{PHP} contains the ``zend'' environment vector, it is likely that the correlation between these two memory vectors will be high.
+
+Usually both resonance and decoding will return very similar rank orderings of most likely chunks given context.
+\textcite{Jones2007} recommends averaging the cosine values returned from each process for each chunk, and then rank ordering those averages to determine the chunk to retrieve.
+However, decoding does require an additional decoding step that resonance does not require, and depending on the decoding operation, this step may be computatinoally expensive.
 
 \subsubsection{Addressing Word Order}
+
+One of the strengths of vector-based systems is that word order can naturally be represented alongside word co-occurrence in these distributed representations.
+Representing word order is an example where the endoding and decoding operations are applied.
+As a motivating example, say that one wants to encode the first and second words immediately preceding a hashtag in a tweet.
+Simply counting co-occurrences of the two immediately-preceding words to hashtags does not include the order information of the words in the representation.
+With this representation, it would be impossible to tell the difference between 1-back words that immediately preceded the hashtag, and 2-back words that occured just prior to these 1-back words.
+Order information is lost if a simply co-occurrence counting technique is used.
+
+With vector-based systems, order informatino is included by creating an environment vector ($e_{bind(i,\Phi)}$) that is a function of environment vectors for both the word ($e_{i}$) and location ($\Phi$).
+This function has the useful property that the resulting environment vector and the location vector can be inverted to return the original word's environment vector.
+Convolution and inverse convolution (i.e,. circular correlation) are used by \textcite{Plate1995} and \textcite{Jones2007} to implement these operations.
+This allows for retrieval requests such as ``playing \#$\Phi$'', ``just read \#$\Phi$'', and ``vector-based $\Phi$ systems''.
+
+For example, suppose that a retrieval request is made for ``martin $\Phi$'' given that the model was trained on the TASA corpus.
+Within this corpus, the phrase ``martin luther'' often occured.
+When this occurs, the word-order memory vector for martin ($o_{martin}$) will be updated with the convolving luther and a 1-back location vector ($o_{martin} = o_{martin'} + \Phi * e_{luther}$).
+Also, the word-order memory vector for luther ($o_{luther}$) will be updated by convolving martin and a 1-forward location vector ($o_{luther} = o_{luther'} + e_{martin} * \Phi$).
+The retrieval request for ``martin $\Phi$'' can be done in two ways: through decoding or resonance.
+
+Using decoding, the word-order memory vector for martin is deconvolved to the right ($o_{martin} \circledast \Phi$) which returns the environment vector for luther ($e_{luther}$).
+Using resonance, a memory vector for ``martin $\Phi$'' is constructed ($e_{martin} * \Phi$), which returns the word-order memory vector for luther ($o_{luther}$).
+Either way, luther is returned as the most likely term to match the phrase ``martin $\Phi$''.
+
+New vectors generated by circular convolution are uncorrelated with all other environment vectors and have the same length.
+This allows the word order information and unordered context information for a chunk to be aggregated and represented in the same memory vector.
+Quite simply, the different types of memory vectors can be summed to create a single memory vector representation for each chunk (i.e., $m_{j} = c_{j} + o_{j}$).
 
 \subsubsection{Addressing Scalability}
 
