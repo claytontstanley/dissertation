@@ -565,16 +565,44 @@ Quite simply, the different types of memory vectors can be summed to create a si
 
 \subsubsection{Addressing Scalability}
 
+Vector-based represnetations compute chunk likelihoods by performing a correlation operation directly on the memory vectors.
+Each memory vector can be thought of as a column on a context word x tag word co-occurrence matrix used for a Bayesian representation.
+Further, the number of rows for a vector-based representation are fixed and set much smaller than the number of rows in the full word x tag co-occurrence matrix.
+Since Bayesian representations have been shown to scale to over hundreds of millions of word x tag co-occurrences \parencite{Stanley2013}, the compressed vector-based representations should scale as well or better.
+
 \subsubsection{BEAGLE}
 
-TODO: Sumarize Jones' model \cite{Jones2007}
+\textcite{Jones2007} created the BEAGLE vector-based memory representation.
+Each memory vector ($m_{j}$) is a summed representation of unordered and ordered word co-occurrences ($c_{j} + o_{j}$).
+This model uses circular convoluation and inverse correlation as a way to encode and decode word order.
+BEAGLE performed similar to LSA when trained on the TASA and tested on the TOEFL (55.6\% compared to 55.3\%).
+BEAGLE with unordered context and word order was also more correllated to the WordNet synonym database than LSA (-.311 compared to -.165).
+Further, it was shown that incorporating word-order information into the same representation resulted in minimal data loss (less than 1 percent of total predictive variance).
+This model provided an efficient algorithm for using a single representation for unordered and ordered informaiton that showed performance similar to if not better than LSA.
 
 \subsubsection{Random Permutations}
 
-TODO: Summarize \cite{Sahlgren2008}
+In order to represent word order information, a funciton must be used that converts the memory vectors for a set of words (``stack $\Phi$'') into a new uncorrelated environment vector.
+The BEAGLE model uses circular convolution and inverse correlation as the encoding and decoding operations.
+Howerver, that is certainly not the only operation that can generate new uncorrelated vectors from a set of memory vectors.
+\textcite{Sahlgren2008} used a much simpler random permutation method for this operation.
+
+Random permutatinos use a large sparse vector of zeros with a few ones in random locations as an environment vector for each of the words.
+In order to create a new vector for a particular word that occurs one back ($\mathit{stack}^{-1}$), that word's environment vector ($e_{stack}$) is bit shifted to the left one position.
+This produces a new environment vector for the combination of ``stack'' and the one back position that is uncorrelated with the original ``stack'' environment vector and all other environment vectors.
+So if ``stack overflow'' occurred in a sentence, the one-back environment vector for ``stack'' would be added to the memory vector for ``overflow'' ($m_{overflow} = m_{overflow'} + e_{stack^{-1}}$).
+
+A retrieval for a word following ``stack'' (``stack $\Phi$'') is done by creating a memory vector out of all information in context.
+In this case, assume only a single piece of order information is available, that ``stack'' precedes the word to retrieve.
+So the memory vector for context is the environment vector for one-back ``stack'' ($m_{context} = e_{stack^{-1}}$).
+The memory vector for ``overflow'' will be correlated the highest with this context vector since it contains this vector.
 
 \subsubsection{Comparison between BEAGLE and Random Permutations}
 
+RP used the simplest permutation possible to create a new environment vector.
+Performance is actually better than BEAGLE.
+Computational efficiency is better as well.
+Strong case for using RP over circular convulation for decoding / encoding.
 TODO: Summarize \cite{Recchia2010}
 
 \subsubsection{Connection to LSA}
