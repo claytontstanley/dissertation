@@ -582,20 +582,23 @@ This model provided an efficient algorithm for using a single representation for
 
 \subsubsection{Random Permutations}
 
-In order to represent word order information, a funciton must be used that converts the memory vectors for a set of words (``stack $\Phi$'') into a new uncorrelated environment vector.
+In order to represent word order information, a funciton must be used that converts an environment vector for a set of words and positions (e.g., ``stack $\Phi$'') into a new uncorrelated environment vector.
 The BEAGLE model uses circular convolution and inverse correlation as the encoding and decoding operations.
-Howerver, that is certainly not the only operation that can generate new uncorrelated vectors from a set of memory vectors.
+Howerver, that is certainly not the only operation that can generate new uncorrelated vectors from a set of memory vectors and positions.
 \textcite{Sahlgren2008} used a much simpler random permutation method for this operation.
 
-Random permutatinos use a large sparse vector of zeros with a few ones in random locations as an environment vector for each of the words.
-In order to create a new vector for a particular word that occurs one back ($\mathit{stack}^{-1}$), that word's environment vector ($e_{stack}$) is bit shifted to the left one position.
-This produces a new environment vector for the combination of ``stack'' and the one back position that is uncorrelated with the original ``stack'' environment vector and all other environment vectors.
-So if ``stack overflow'' occurred in a sentence, the one-back environment vector for ``stack'' would be added to the memory vector for ``overflow'' ($m_{overflow} = m_{overflow'} + e_{stack^{-1}}$).
+With random permutations, each word environment vector is a large sparse vector of zeros with a few $[1,-1]$s in random locations. 
+In order to create a new environment vector for a word that preceded another word in a sentence, that word's environment vector is bit shifted to the left one position.
+This produces a new environment vector for the combination of the word and the position that is uncorrelated with the original word's environment vector and all other environment vectors.
+
+For example, suppose that the words ``stack overflow'' appear in a sentence, and we want to represent that ``stack'' preceded the word ``overflow''.
+The ``stack'' environment vector ($e_{stack}$) is bit shifted one to the left, producing an environment vector for ``stack'' preceding a word ($e_{stack^{-1}}$).
+That environment vector is then added to the memory vector for ``overflow'' ($m_{overflow} = m_{overflow'} + e_{stack^{-1}}$), so that ``overflow'' remembers that ``stack'' has preceded it in a sentence.
 
 A retrieval for a word following ``stack'' (``stack $\Phi$'') is done by creating a memory vector out of all information in context.
 In this case, assume only a single piece of order information is available, that ``stack'' precedes the word to retrieve.
 So the memory vector for context is the environment vector for one-back ``stack'' ($m_{context} = e_{stack^{-1}}$).
-The memory vector for ``overflow'' will be correlated the highest with this context vector since it contains this vector.
+The memory vector for ``overflow'' will be correlated the highest with this context vector since ``overflow'' contains this vector.
 
 \subsubsection{Comparison between BEAGLE and Random Permutations}
 
