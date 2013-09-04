@@ -602,11 +602,21 @@ The memory vector for ``overflow'' will be correlated the highest with this cont
 
 \subsubsection{Comparison between BEAGLE and Random Permutations}
 
-RP used the simplest permutation possible to create a new environment vector.
-Performance is actually better than BEAGLE.
-Computational efficiency is better as well.
-Strong case for using RP over circular convulation for decoding / encoding.
-TODO: Summarize \cite{Recchia2010}
+Random permutations use one of simplest permutations possible to create a new environment vector.
+This operation is much less costly than circular convoluation used by the BEAGLE model, which allows random permutations to scale better and handle larger datasets.
+However, even though random permutations is a simpler representation than BEAGLE, it also performs better when trained on the same sized corpus. 
+
+\textcite{Recchia2010} found that random permutations could use smaller vectors to produce equivalent performance (better compression), and scale to larger datasets (better computational efficiency).
+The vector x performance tradeoff was tested on a simple paired associative retrieval task. 
+Retrieval accuracy for the vector-based models remained high even after reducing each environment vector's length from \num{2048} to \num{1024}.
+This indicates that vector-based representations using random permutations compress better than those using circular convolution.
+
+To test computational efficiency, each model was trained on a subset of the Wikipedia corpus, and tested on the TOEFFL (among other tasks).
+The random-permutatino model was trained on \num{2.33} GB corpus.
+The BEAGLE model was unable to train on a corpus this large, so both models were also trained on an additional \num{35} MB subset of the Wikipedia corpus.
+The random permutatino model performed as well or slightly better than teh BEAGLE model when trained on the smaller corpus.
+The model's performance also significantly improved when trained on the much larger corpus that was computationally intractable for the BEAGLE model.
+These results make a strong case to favor random-permutations over circular convoluation when implementing vector-based memory representations.
 
 \subsubsection{Connection to LSA}
 
