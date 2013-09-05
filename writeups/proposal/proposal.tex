@@ -620,7 +620,26 @@ These results make a strong case to favor random-permutations over circular conv
 
 \subsubsection{Connection to LSA}
 
-TODO: Summarize \cite{Kanerva2000}
+Both random permutations and LSA calculate word similarity on a reduced matrix.
+For LSA, the original word x document matrix is compressed to a factor x document matrix and the number of factors are much less than the number of words.
+For the StackOverflow and Twitter datasets, the number of documents are the number of different tags.
+
+For random permutations, each tag is represented by a compressed vector with a length much less than the number of words.
+Note that if teh length of a word's environment vector was the number of unique words, then each word could be represented by associating it with a particular column in the vector.
+If done in this way, building a matrix of all words' environment vectors x tags would recover the original word x document matrix \parencite{Kanerva2000}.
+However, each word's environment vector is compressed by using a length much less than the number of unique words and using a combination of a few [1,-1]s to represent the word.
+
+Information is lost with this compression in both cases: by starting with a compressed representation with random permutaitons or by reducing to a compressed representation with LSA.
+However, the way that the compression works in these two cases is not the same.
+LSA uses SVD to find words that have highly correlated tag occurance distributions (i.e., latent concepts), and then pools those co-occurrence counts into a single dimension.
+A vector-based approach like BEAGLE or random permutations essentially randomizes the mapping of the words on the reduced set of dimensions, and does not take into account word similarity when generating the mapping.
+Nonetheless, random permutations have been shown to perform similarl to if not better than LSA when trained on the TASA and tested on the TOEFFL \parencites{Sahlgren2008,Jones2007}.
+
+This is a conterintuitive result.
+It seems plausible that an SVD technique that takes into account word similarity when reducing teh matrix should generate a reduced matrix that has more information than a randomly-compressed matrix.
+This does not seem to be the case in testing however, as vector-based approaches like BEAGLE and random permutations perform just as well as the LSA when trained and tested on similar datasets.
+Nonetheless, it has been suggested to perform an SVD reduction technique on a compressed random-permutation vector \parencite{Kanerva2000}.
+This approach might be worth investigating, as it would reduce computational requirements even further, and possibly improve performance by pooling co-occurrance counts from latent topics together.
 
 \subsection{Comparison of Vector-Based Models and ACT-R}
 
