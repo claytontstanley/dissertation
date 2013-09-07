@@ -345,7 +345,7 @@ This type of weighted additive model that combines past user behavior and curren
 
 \subsection{ACT-R Declarative Memory Theory}
 
-ACT-R \cite{Anderson2004} is a cognitive architecture that formalizes how each cognitive process of the brain (e.g., memory, learning, visual and motor) interacts to produce behavior.
+ACT-R \parencite{Anderson2004} is a cognitive architecture that formalizes how each cognitive process of the brain (e.g., memory, learning, visual and motor) interacts to produce behavior.
 The declarative memory system is a component of that architecture that models the timing, learning, and forgetting processes that make up long-term declarative memory retrieval.
 The equations that make up this system can be described through a rational analysis of long-term memory retrieval.
 That is, given the task of retrieving a chunk of information from long-term declarative memory,
@@ -643,25 +643,36 @@ This approach might be worth investigating, as it would reduce computational req
 
 \subsection{Comparison of Vector-Based Models and ACT-R}
 
-TODO: Summarize MALTA \cite{Rutledge2007}
+Vector-based models can be thought of as a compressed representation of the full co-occurrence matrix used for the ACT-R declarative memory system.
+Each model computes an activation for each word to retrieve, given prior knowledge and context.
+Since both models produce activations for each chunk, one can be swapped out for another and used as the declarative memory component of the ACT-R infrastructure.
+For example, \textcite{Rutledge2007} used a variant of the BEAGLE vector-based model as the DM component of ACT-R.
+\textcite{Rutledge2008} showed that an ACT-R theory with a vector-based memory system can successfully model the fan effect, which is a psychological phenomina that ACT-R's current Bayesian DM system can model as well.
 
-TODO: This approach can be used to model the fan effect \cite{Rutledge2008} 
+\subsubsection{Base-Level Activation}
 
-TODO: However, there are open issues that need to be addressed:
-TODO: Can user prior be represented in vector-based memory systems?
-TODO: Can word order be represented in ACT-R?
-TODO: Do they both scale?
+However, vector-based models and ACT-R's current Bayesian DM model are not identical, and there are open issues with both models that need to be addressed before further evaluating the benefits of one over the other.
+For example, the frequency and recency of retrievals for each chunk are not currently used for vector-based models when calculating activation.
+More recent tweets on a news site like Twitter should be more relevant, for example.
+\textcite{Efron2011} tested this claim by evaluating a set of query likeihood models on returning relevant Twitter tweets from search queries.
+They showed that a model incorporating recency information of the tweet produced more relevant results than models that did not pay attention to this information.
 
-\subsection{Incorporating Hashtag Recency}
+ACT-R's Bayesian model has a strong theory with respect to recency and frequency information.
+It uses this information to calculate a chunk's prior activation (i.e., prior likelihood of being needed again, independent of current context).
+Vector-based models compute activation based entirely on context, so chunks that resonate with context will be retrieved, irrespective to the frequency and recency of use of that chunk.
+ACT-R's prior activation can also be computed for each user, so that hashtags that have been used frequently and recently for a particular user are rated with higher activation.
+This type of information on a user's prior behavior is not being utilized with vector-based models currently.
+It may certainly be the case that vector-based models can be modified to incorporate base-level activation, and this idea will be pursued with this research.
 
-\subsubsection{ACT-R}
+\subsubsection{Word Order}
 
-TODO: ACT-R has a strong theory here.
-TODO: IR literature for Twitter domain uses a model similar to ACT-R \cite{Efron2011}
+One strength of a vector-based model over ACT-R's Bayesian DM model is that word order can be naturally represented alongside unordered co-occerrence information.
+With the ACT-R model for example, it is unclear how to represent that a particular word appeared just before a hashtag. 
+It may be that multiple co-occurrence matrices must be used to represent word-order co-occurrences and unordered co-occurrences separately.
+However, it would be more parsimonious if these matrices could be combined into a single matrix representation, much like how this informatino is combined for vector-based models.
 
-\subsubsection{Vector-Based Models}
+\subsubsection{Activation Calculation}
 
-TODO: Unclear how recency will fit in with random permutation vector-based model.
 
 \section{Models}
 
