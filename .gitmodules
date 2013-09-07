@@ -1,6 +1,6 @@
 [submodule "submodules/python-boilerpipe"]
 	path = submodules/python-boilerpipe
-	url = https://github.com/misja/python-boilerpipe.git
+	url = ssh://chil/srv/git/python-boilerpipe 
 [submodule "submodules/lisp-dev"]
 	path = submodules/lisp-dev
 	url = ssh://chil/srv/git/lisp-dev
