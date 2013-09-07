@@ -673,8 +673,82 @@ However, it would be more parsimonious if these matrices could be combined into 
 
 \subsubsection{Activation Calculation}
 
+Vector-based and LSA retrieval models calculate chunk activation by correlating a representation of the current context with each memory item.
+Bayesian retrieval models like ACT-R calculate activation by computing each chunk's posterior odd adjustment likelihood, given the context.
+These two computations are certainly not equivalent, even though they are most likely highly correlated with one another.
+It may be interesting to explore how model performance changes when one calculation is swapped out for another.
+For example, a vector-based model could be used to generate a compress (reduced dimension) co-occurrence matrix, and then Bayesian calculations could be performed on that matrix to compute adjusted odd likelihoods.
+Alternatively, a vector representation of the current context could be correlated with each column in a full co-occurrence matrix.
+It's unlikely that the latter technique will improve performance, as \textcite{Landauer1997} has shown that performing correlations on uncompressed co-occurrence matrices does not perform well.
+But it may be the case that using Bayesian computation on a compressed vector-based model improves performance.
 
 \section{Models}
+
+Two models will be evaluated for hashtag prediction on both the Twitter and StackOverflow datasets:
+A vector-based model and Bayesian retrieval model.
+The random permutation model described in \textcite{Sahlgren2008} will be used for the vector-based model, since it has shown to perform better than the BEAGLE model \parencite{Recchia2010}.
+The modified ACT-R Bayesian model described in \textcite{Stanley2013} will be used for the Bayesian model, since it has already been applied to tag use on StackOverflow posts.
+
+\subsubsection{ACT-R Bayesian Model}
+
+\begin{table}[!ht]
+  \caption{The StackOverflow tag prediction model}
+  \label{tabModACTRModel}
+  {\tabulinesep=1.2mm
+    \begin{tabu}{ll}
+      \hline
+      Common Name &  Equation \\
+      \hline
+      Activation & 		$A_{i} = B_{i} + \sum_{j\in T}^{ } W_{j} S_{ji} + \sum_{j\in B}^{ } W_{j} S_{ji} - O$ \\
+      Base Level & 		$B_{i} = log \frac{p_{i}}{1-p_{i}}$ \\
+      Strength Assoc. &		$S_{ji} = log \frac{p(i|j)}{p(i))} = log \frac{NN_{ji}}{N_{Row}(j)N_{Col}(i)}$ \\
+      Co-occurrence &		$N_{ji} = \sum_{}^{}{observed_{ji}}$ \\
+      Observations &		$N = \sum_{}^{}{\sum_{}^{}{N_{ji}}}$ \\
+      Attentional Weight& 	$W_{j} = W \frac{E_{j}} {\sum_{}^{} {E_{j}}} $ \\
+      Scaled Entropy & 		$E_{j} = 1-\frac{H_{j}}{H_{max}}$ \\
+      Entropy & 		$H_{j} = -\sum_{i=1}^{N}p(i|j)log\left (  p(i|j) \right )$ \\
+      Offset & 			$O = \frac{1}{5}\sum_{i\in top 5}^{ } A_{i}$ \\
+      \hline
+    \end{tabu}
+  }
+\end{table}
+
+A formal description of the modified ACT-R Bayesian model from \textcite{Stanley2013} is included in Table \ref{tabModACTRModel}.
+The activation of each tag ($A_{i}$) is a function of four components:
+That tag's base level activation ($B_{i}$), contextual activation for the words in the title, activation for words in the body, and an offset term ($O$).
+This model has been modified from the standard ACT-R model (Table \ref{tabACT-RModel}) in three ways:
+Two separate contextual compoennts were used (words in title and body of post), an offset term was added, and an entropy metric was used to compute the attential weight ($W_{j}$).
+
+The offset term was added to normalize the mean activation across retrievals.
+This allowed the use of a logistical reggresion statistical technique to calibrate the weights for each of the terms.
+The title and body contextual components were separated since it seemed plausible that the words in the title would be better predictors of the tag used than the words in the body.
+It actually turned out that the words in the body were a better predictor of tag use \parencite{Stanley2013}, most likely because there are many more words in the body than the title of the post.
+The entropy metric was used to compute the attentional weight for two reasons:
+Stop words could be included in the analysis, and more predictive words of some tag (e.g., the word ``PHP'' in a post) were given higher weight.
+Using an entropy metric (as opposed to weighting each word equally in the post) allows the model to allocate limited attentional resources ($W$) to important contextual elements.
+
+\subsubsection{Random Permutation Model}
+
+\begin{table}[!ht]
+  \caption{Random Permutation Model}
+  \label{tabRandPermModel}
+  {\tabulinesep=1.2mm
+    \begin{tabu}{ll}
+      \hline
+      Common Name &  Equation \\
+      \hline
+      Activation &		$A_{i} = r(m_{C},m_{i})$ \\
+      Memory Vector &		$m_{i} = e_{i} + \sum_{j \in all past} c_{j} + \sum_{j \in all past} \sum_{k \in locations} o_{j,k}$ \\
+      Unordered Context &	$c_{i} = e_{i}$ \\
+      Ordered Context &		$o_{i,k} = e_{i^{-k}}$ \\
+      Context Memory Vector &	$m_{C} = \sum_{j \in C} c_{j} + \sum_{j \in C} \sum_{j \in locations} o_{j,k}$ \\
+      Environment Vector & 	$e_{i} = rand$ \\
+      \hline
+    \end{tabu}
+  }
+\end{table}
+
+A formal description of the random permutation model in \textcite{Sahlgren2008} is included in Table \ref{tabRandPermModel}.
 
 TODO: Formal description of each model.
 
