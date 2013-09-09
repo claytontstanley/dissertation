@@ -84,7 +84,7 @@ How can we quickly and effectively connect users to the content that they care a
 % FIXME: Fix cite for Bauer2012
 One traditional technique is to provide the user with a powerful search engine so that they can actively look for content that interests them.
 However, users are not forming the same search queries that work so effectively on search engines like Google.
-Users of social media sites are searching for information that is happening now, in real time \parencite{Bauer2012}.
+A growing number of users on social media sites are searching for information that is happening now, in real time \parencites{Bauer2012,Jansen2011}.
 In other words, users on social-media sites want the fresh \emph{stream} of information about a particular topic.
 This can certainly be seen in the main user-interface views that these social media site provide:
 Twitter's homepage showing your followers' tweets, Facebook's homepage showing your friends' posts, StackOverflow's daily digest of posts for particular tags, etc.
@@ -108,8 +108,6 @@ Twitter users, for example, commonly create hashtags for upcoming political even
 So if we can predict what hashtags a user is interested in, we have a better understanding of the information streams that they care about.
 With that understanding, we can tailor the system to suggest hashtags that they may not yet know about but are of likely interest to them.
 We can help aid in their discovery of fresh and relevant information that match their goals on the site.
-
-FIXME: It is certainly the case that real-time search on these social media sites is growing \parencite{Jansen2011}.
 
 \subsection{Research Questions}
 
@@ -447,6 +445,44 @@ A higher $S_{ji}$ between a query and a result means that the result is a better
 The links that user chose in experimental testing were largely predictive of the strength of association measure.
 The predictive power of the SNIF-ACT model went above and beyond what would be predicted by simply assuming that the user always clicks on the first link in the search results page.
 
+\subsubsection{\textcite{Stanley2013}'s ACT-R DM Model for StackOverflow}
+
+\begin{table}[!ht]
+  \caption{The StackOverflow tag prediction model}
+  \label{tabModACTRModel}
+  {\tabulinesep=1.2mm
+    \begin{tabu}{ll}
+      \hline
+      Common Name &  Equation \\
+      \hline
+      Activation & 		$A_{i} = B_{i} + \sum_{j\in T}^{ } W_{j} S_{ji} + \sum_{j\in B}^{ } W_{j} S_{ji} - O$ \\
+      Base Level & 		$B_{i} = log \frac{p_{i}}{1-p_{i}}$ \\
+      Strength Assoc. &		$S_{ji} = log \frac{p(i|j)}{p(i))} = log \frac{NN_{ji}}{N_{Row}(j)N_{Col}(i)}$ \\
+      Co-occurrence &		$N_{ji} = \sum_{}^{}{observed_{ji}}$ \\
+      Observations &		$N = \sum_{}^{}{\sum_{}^{}{N_{ji}}}$ \\
+      Attentional Weight& 	$W_{j} = W \frac{E_{j}} {\sum_{}^{} {E_{j}}} $ \\
+      Scaled Entropy & 		$E_{j} = 1-\frac{H_{j}}{H_{max}}$ \\
+      Entropy & 		$H_{j} = -\sum_{i=1}^{N}p(i|j)log\left (  p(i|j) \right )$ \\
+      Offset & 			$O = \frac{1}{5}\sum_{i\in top 5}^{ } A_{i}$ \\
+      \hline
+    \end{tabu}
+  }
+\end{table}
+
+A formal description of the modified ACT-R Bayesian model from \textcite{Stanley2013} is included in Table \ref{tabModACTRModel}.
+The activation of each tag ($A_{i}$) is a function of four components:
+That tag's base level activation ($B_{i}$), contextual activation for the words in the title, activation for words in the body, and an offset term ($O$).
+This model has been modified from the standard ACT-R model (Table \ref{tabACT-RModel}) in three ways:
+Two separate contextual compoennts were used (words in title and body of post), an offset term was added, and an entropy metric was used to compute the attential weight ($W_{j}$).
+
+The offset term was added to normalize the mean activation across retrievals.
+This allowed the use of a logistical reggresion statistical technique to calibrate the weights for each of the terms.
+The title and body contextual components were separated since it seemed plausible that the words in the title would be better predictors of the tag used than the words in the body.
+It actually turned out that the words in the body were a better predictor of tag use \parencite{Stanley2013}, most likely because there are many more words in the body than the title of the post.
+The entropy metric was used to compute the attentional weight for two reasons:
+Stop words could be included in the analysis, and more predictive words of some tag (e.g., the word ``PHP'' in a post) were given higher weight.
+Using an entropy metric (as opposed to weighting each word equally in the post) allows the model to allocate limited attentional resources ($W$) to important contextual elements.
+
 \subsection{Latent Semantic Analysis Memory Theory}
 
 Latent Semantic Analysis \parencite{Landauer1997} is a technique that has mathematical roots in factor analysis and also measures strength of association between two terms.
@@ -580,16 +616,36 @@ BEAGLE with unordered context and word order was also more correllated to the Wo
 Further, it was shown that incorporating word-order information into the same representation resulted in minimal data loss (less than 1 percent of total predictive variance).
 This model provided an efficient algorithm for using a single representation for unordered and ordered informaiton that showed performance similar to if not better than LSA.
 
-\subsubsection{Random Permutations}
+\subsubsection{Random Permutation Model}
 
 In order to represent word order information, a funciton must be used that converts an environment vector for a set of words and positions (e.g., ``stack $\Phi$'') into a new uncorrelated environment vector.
 The BEAGLE model uses circular convolution and inverse correlation as the encoding and decoding operations.
 Howerver, that is certainly not the only operation that can generate new uncorrelated vectors from a set of memory vectors and positions.
 \textcite{Sahlgren2008} used a much simpler random permutation method for this operation.
 
-With random permutations, each word environment vector is a large sparse vector of zeros with a few $[1,-1]$s in random locations. 
-In order to create a new environment vector for a word that preceded another word in a sentence, that word's environment vector is bit shifted to the left one position.
-This produces a new environment vector for the combination of the word and the position that is uncorrelated with the original word's environment vector and all other environment vectors.
+\begin{table}[!ht]
+  \caption{Random Permutation Model}
+  \label{tabRandPermModel}
+  {\tabulinesep=1.2mm
+    \begin{tabu}{ll}
+      \hline
+      Common Name &  Equation \\
+      \hline
+      Activation &		$A_{i} = r(m_{C},m_{i})$ \\
+      Memory Vector &		$m_{i} = \sum_{i \in all past} c_{i} + \sum_{i \in all past} \sum_{l \in locations} o_{i,l}$ \\
+      Unordered Context &	$c_{i} = e_{i}$ \\
+      Ordered Context &		$o_{i,l} = e_{i^{-l}}$ \\
+      Context Memory Vector &	$m_{C} = \sum_{i \in C} c_{i} + \sum_{i \in C} \sum_{l \in locations} o_{i,l}$ \\
+      Environment Vector & 	$e_{i} = rand$ \\
+      \hline
+    \end{tabu}
+  }
+\end{table}
+
+A formal description of the random permutation model in \textcite{Sahlgren2008} is included in Table \ref{tabRandPermModel}.
+With random permutations, each word environment vector ($e_{i}$) is a large sparse vector of zeros with a few $[1,-1]$s in random locations. 
+In order to create a new environment vector for a word that preceded another word in a sentence, that word's environment vector ($e_{i}$) is bit shifted to the left one position ($^{-1}$).
+This produces a new environment vector ($e_{i^{-1}}$) for the combination of the word and the position that is uncorrelated with the original word's environment vector and all other environment vectors.
 
 For example, suppose that the words ``stack overflow'' appear in a sentence, and we want to represent that ``stack'' preceded the word ``overflow''.
 The ``stack'' environment vector ($e_{stack}$) is bit shifted one to the left, producing an environment vector for ``stack'' preceding a word ($e_{stack^{-1}}$).
@@ -597,8 +653,8 @@ That environment vector is then added to the memory vector for ``overflow'' ($m_
 
 A retrieval for a word following ``stack'' (``stack $\Phi$'') is done by creating a memory vector out of all information in context.
 In this case, assume only a single piece of order information is available, that ``stack'' precedes the word to retrieve.
-So the memory vector for context is the environment vector for one-back ``stack'' ($m_{context} = e_{stack^{-1}}$).
-The memory vector for ``overflow'' will be correlated the highest with this context vector since ``overflow'' contains this vector.
+So the memory vector for context is the environment vector for one-back ``stack'' ($m_{C} = e_{stack^{-1}}$).
+The memory vector for ``overflow'' ($m_{overflow}$) will be correlated the highest with this context vector ($m_{C}$) since ``overflow'' contains this vector.
 
 \subsubsection{Comparison between BEAGLE and Random Permutations}
 
@@ -686,71 +742,13 @@ But it may be the case that using Bayesian computation on a compressed vector-ba
 
 Two models will be evaluated for hashtag prediction on both the Twitter and StackOverflow datasets:
 A vector-based model and Bayesian retrieval model.
-The random permutation model described in \textcite{Sahlgren2008} will be used for the vector-based model, since it has shown to perform better than the BEAGLE model \parencite{Recchia2010}.
-The modified ACT-R Bayesian model described in \textcite{Stanley2013} will be used for the Bayesian model, since it has already been applied to tag use on StackOverflow posts.
+The random permutation model \parencite{Sahlgren2008} in Table \ref{tabRandPermModel} will be used for the vector-based model, since it has shown to perform better than the BEAGLE model \parencite{Recchia2010}.
+The modified ACT-R Bayesian model \parencite{Stanley2013} in Table \ref{tabModACTRMOdel} will be used for the Bayesian model, since it has already been applied to tag use on StackOverflow posts.
 
-\subsubsection{ACT-R Bayesian Model}
-
-\begin{table}[!ht]
-  \caption{The StackOverflow tag prediction model}
-  \label{tabModACTRModel}
-  {\tabulinesep=1.2mm
-    \begin{tabu}{ll}
-      \hline
-      Common Name &  Equation \\
-      \hline
-      Activation & 		$A_{i} = B_{i} + \sum_{j\in T}^{ } W_{j} S_{ji} + \sum_{j\in B}^{ } W_{j} S_{ji} - O$ \\
-      Base Level & 		$B_{i} = log \frac{p_{i}}{1-p_{i}}$ \\
-      Strength Assoc. &		$S_{ji} = log \frac{p(i|j)}{p(i))} = log \frac{NN_{ji}}{N_{Row}(j)N_{Col}(i)}$ \\
-      Co-occurrence &		$N_{ji} = \sum_{}^{}{observed_{ji}}$ \\
-      Observations &		$N = \sum_{}^{}{\sum_{}^{}{N_{ji}}}$ \\
-      Attentional Weight& 	$W_{j} = W \frac{E_{j}} {\sum_{}^{} {E_{j}}} $ \\
-      Scaled Entropy & 		$E_{j} = 1-\frac{H_{j}}{H_{max}}$ \\
-      Entropy & 		$H_{j} = -\sum_{i=1}^{N}p(i|j)log\left (  p(i|j) \right )$ \\
-      Offset & 			$O = \frac{1}{5}\sum_{i\in top 5}^{ } A_{i}$ \\
-      \hline
-    \end{tabu}
-  }
-\end{table}
-
-A formal description of the modified ACT-R Bayesian model from \textcite{Stanley2013} is included in Table \ref{tabModACTRModel}.
-The activation of each tag ($A_{i}$) is a function of four components:
-That tag's base level activation ($B_{i}$), contextual activation for the words in the title, activation for words in the body, and an offset term ($O$).
-This model has been modified from the standard ACT-R model (Table \ref{tabACT-RModel}) in three ways:
-Two separate contextual compoennts were used (words in title and body of post), an offset term was added, and an entropy metric was used to compute the attential weight ($W_{j}$).
-
-The offset term was added to normalize the mean activation across retrievals.
-This allowed the use of a logistical reggresion statistical technique to calibrate the weights for each of the terms.
-The title and body contextual components were separated since it seemed plausible that the words in the title would be better predictors of the tag used than the words in the body.
-It actually turned out that the words in the body were a better predictor of tag use \parencite{Stanley2013}, most likely because there are many more words in the body than the title of the post.
-The entropy metric was used to compute the attentional weight for two reasons:
-Stop words could be included in the analysis, and more predictive words of some tag (e.g., the word ``PHP'' in a post) were given higher weight.
-Using an entropy metric (as opposed to weighting each word equally in the post) allows the model to allocate limited attentional resources ($W$) to important contextual elements.
-
-\subsubsection{Random Permutation Model}
-
-\begin{table}[!ht]
-  \caption{Random Permutation Model}
-  \label{tabRandPermModel}
-  {\tabulinesep=1.2mm
-    \begin{tabu}{ll}
-      \hline
-      Common Name &  Equation \\
-      \hline
-      Activation &		$A_{i} = r(m_{C},m_{i})$ \\
-      Memory Vector &		$m_{i} = e_{i} + \sum_{j \in all past} c_{j} + \sum_{j \in all past} \sum_{k \in locations} o_{j,k}$ \\
-      Unordered Context &	$c_{i} = e_{i}$ \\
-      Ordered Context &		$o_{i,k} = e_{i^{-k}}$ \\
-      Context Memory Vector &	$m_{C} = \sum_{j \in C} c_{j} + \sum_{j \in C} \sum_{j \in locations} o_{j,k}$ \\
-      Environment Vector & 	$e_{i} = rand$ \\
-      \hline
-    \end{tabu}
-  }
-\end{table}
-
-A formal description of the random permutation model in \textcite{Sahlgren2008} is included in Table \ref{tabRandPermModel}.
-
-TODO: Formal description of each model.
+These models will be the starting point for modeling tag use on the Twitter and StackOverflow sites.
+The models may be modified during testing if the data indicate that slight modifications are needed to improve model performance.
+Also there are planned modifications to each model as part of the research:
+incorporating user prior information into the vector-based model, and incorporating word order information into the Bayesian model.
 
 \section{Methods}
 
