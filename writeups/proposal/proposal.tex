@@ -816,11 +816,31 @@ So tag words in the post and used tags for the post will be converted to their r
 
 \subsection{Stop Words and Entropy Weighting}
 
-TODO: Explore entropy weighting instead of stop word removal \cite{Dumais1991}
+``Stop words'' are commonly-used words that co-occur with all tags (i.e., have little to no discriminating power).
+It is typically recommended \parencite{Bird2009} to remove stop words such as ``the'', ``a'', ``or'' when building the co-occurrence matrix.
+Otherwise the matrix may not scale as well since there are more words to keep track of. 
+Also for vector-based systems, memory vectors will become overly saturated with the environment vectors of the commonly-occuring stop words.
+\textcite{Sahlgren2008} removed stop words for the random-permutation vector-based model, for example.
+\textcite{Jones2007} did as well for the circular-correlation model, but also mentioned that an entrop weighting technique has also been used previously to attentuate (rather than remove) stop words.
 
-\subsection{Attentuating Spam Posts}
+\textcite{Stanley2013} used the entropy weighting technique recommended in \textcite{Dumais1991} for the StackOverflow dataset to reduce the weight of low-predictor stop words instead of removing them.
+This data-driven technique identifies stop words by calculating the discriminating power (i.e., entropy) of each word to predict any tag.
+The result maps cleanly to the ACT-R DM theory by modifying each word's attentional weight ($W_{j}$) parameter.
+It also seems less arbitrary than explicitly identifying a list of stop words to remove from the analysis.
+This technique worked well fo rthe StackOverflow model, and will be further explored for Twitter hashtag prediction.
+However, if it becomes computationally infeasable to compute this weighting for Twitter, then teh stop words will simply be removed, as was done for previous research.
 
-\cite{Mazzia2009}
+\subsection{Attentuating Twitter Spam Tweets}
+
+Although Twitter has an infrastructure to easily report and remove spam accounts, the spam that does get through can contain tweets with numerous hashtags.
+For example, some spam accounts generate tweets where all words in the tweet are hashtags, or generate multiple tweets with repeating content and hashtags.
+Feeding these spam tweets into statistical models that generate hashtag predictions can bais the models' chosen hashtags.
+
+\textcite{Mazzia2009} developed a novel approach to dealing with hashtag spam on Twitter.
+When training his model, it attentuates the importance of multiple tweets from teh same user that contain the same hashtags.
+As a user generates more than 10 tweets that contain the same hashtag, all tweets afterwards that contain this hashtag will be attentuated so that the overall weight is no more than that for 10 tweets.
+When testing the model, only at most 1 post from a user is included in the test set, since it is much easier to suggest relevant hashtags to a spammer than it is for an actual user.
+This exact technique may not be used for this analysis, but certainly some form of attentuating or identifying twitter spam tweets will be explored.
 
 \subsection{Experiments}
 
