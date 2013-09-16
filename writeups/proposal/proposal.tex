@@ -846,20 +846,49 @@ This exact technique may not be used for this analysis, but certainly some form 
 
 \subsubsection{StackOverflow Dataset Modifications}
 
-TODO: Use newest dataset
-TODO: Chunk tags
+\textcite{Stanley2013} developed a model for the StackOverflow dataset that was based on all posts up to April, 2011.
+This model will be used for this research, but the dataset will be updated to the most recent release.
+When moving from the older dataset to the newest dataset, several performance assessments will be made.
+
+First, model performance will be compared between the newest dataset and the Apr' 11 dataset to ensure that performance is consistent.
+Also this is a way to verify that the newest dataset was correctly pre-processed and loaded.
+
+Next, incremental improvements will be made to the pre-processing stages and performance will be compared after each change.
+For example, in \textcite{Stanley2013} the technique used to chunk the words does not ensure that tags appearing in the post remain as a single word unit.
+So a word like \emph{C\#} in a post was chunked as two separate words (\emph{C} and \emph{\#}).
+This reduces predictive power of the model since it muddles the highly-predictive co-occurrence observations where a tag appears in the post.
+So the chunking technique will be changed to take into account tags in the post, and its effect on performance will be evaluated.
 
 \subsubsection{Analyze Recency for User-Generated Hashtags}
 
-TODO: Use stackoverflow and twitter popular-users dataset
+How does a user's prior hashtag use influence their likelihood of choosing that hashtag in the future?
+The ACT-R theory places strong constraints on the lifetime and growth characteristics of chunks in declarative memory.
+The more recently and frequently used chunks have higher prior activations, and are more likely to be needed in the future.
+It is an open question if this ACT-R theory of chunk growth and decay accurately reflects hashtag growth and decay for each user on Twitter and StackOverflow.
+
+The full StackOverflow dataset and Twitter popular-users dataset will be used to characterize tag growth and decay for a user on each site.
+Afterwards, the predicted results from the ACT-R theory will be compared against the observed data and evaluated.
+If the ACT-R theory of decay rate and frequency/recency affects fits the data reasonably well, then the prior activation components for the models developed in this research will be based on this theory.
+However, if the theory does not fit hashtag growth and decay for each user, then an alternative model will be proposed that is a better fit, and that model will be used instead.
 
 \subsubsection{Incorporating Recency Into Random Permutations}
 
-TODO: Use stackoverflow dataset only for random permutations
+How can prior likelihood of a user choosing a particular tag be incorporated in the random permutations vector-based model?
+Currently vector-based models generate activations for each tag that are based purely on context.
+That is, if a particular tag has been used 10 times more often than the other tags by a specific user, that information is not included in a vector-based model.
+It seems plausible that performance should improve for vector-based models if this prior tag activation is included.
+Adding a prior activation term for the Bayesian StackOverflow model certainly improved performance \parencite{Stanley2013}.
+So a method to incorporate a user's prior tag history into a random permutation model will be developed and then tested on the full StackOverflow dataset and Twitter popular-users dataset.
 
 \subsubsection{Incorporating Word Order Into ACT-R}
 
-TODO: Use twitter common-hashtags dataset only for ACT-R
+How can word-order information be incorporated into the ACT-R Bayesian model?
+Currently ACT-R uses a word co-occurrence matrix that does not include word position.
+A co-occurrence is counted if a word and a tag co-occur anywhere in a tweet or post.
+However for Twitter in particular, it may be the case that the few words immediately preceding hashtags are highly predictive, and the word position for those words should be included in the model.
+So a method to include word order into a Bayesian model will be developed.
+This updated model will then be evaluated on only teh Twitter common-hashtags dataset, since this dataset contains hashtags that occur in positions throughout the tweet (e.g., embedded within or at the end of a tweet).
+This model will not be evaluated on the StackOverflow dataset since chosen tags for a StackOverflow post are not embedded and mixed within a post, so word-order information is unavailable and most likely unused.
 
 \subsubsection{Top Hashtag Prediction}
 
