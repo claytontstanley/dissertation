@@ -844,7 +844,16 @@ This exact technique may not be used for this analysis, but certainly some form 
 
 \subsection{Experiments}
 
-\subsubsection{StackOverflow Dataset Modifications}
+Each proposed experiment aims to answer a specific research question in this study.
+The results from Experiment 1 will show how a user's prior hashtag use influences their likelihood of using that hashtag in the future, and test whether the observed data fit the ACT-R frequency/recency decay rate theory.
+The output from Experiment 1 will be a model of how a user's prior hashtag use influences the probability of using that hashtag in the future for both the Twitter and StackOverflow datasets.
+Experiment 2 will use the results from Experiment 1 and develop the best method to incorporate user's past tagging history in the random-permutations model, where user history is currently not being used.
+Experiment 3 will explore various methods for incorporating word order information into the ACT-R Bayesian model, where this information is currently not being used.
+The outputs of Experiment 2 and 3 are improved ACT-R and random-permutation models that have properly incorporated the strengths of each other: word-order strength from random permutations and user history from ACT-R.
+Finally, Experiments 4 and 5 will directly compare model accuracy between the two models and evaluate overall performance.
+Experiment 4 is focused primarily on hashtag prediction when no user prior history is available, while Experiment 5 will test how much performance improves when that history is available.
+
+\subsubsection{Preparation Experiment: StackOverflow Dataset Modifications}
 
 \textcite{Stanley2013} developed a model for the StackOverflow dataset that was based on all posts up to April, 2011.
 This model will be used for this research, but the dataset will be updated to the most recent release.
@@ -859,7 +868,7 @@ So a word like \emph{C\#} in a post was chunked as two separate words (\emph{C} 
 This reduces predictive power of the model since it muddles the highly-predictive co-occurrence observations where a tag appears in the post.
 So the chunking technique will be changed to take into account tags in the post, and its effect on performance will be evaluated.
 
-\subsubsection{Analyze Recency for User-Generated Hashtags}
+\subsubsection{Experiment 1: Analyze Recency for User-Generated Hashtags}
 
 How does a user's prior hashtag use influence their likelihood of choosing that hashtag in the future?
 The ACT-R theory places strong constraints on the lifetime and growth characteristics of chunks in declarative memory.
@@ -871,7 +880,7 @@ Afterwards, the predicted results from the ACT-R theory will be compared against
 If the ACT-R theory of decay rate and frequency/recency affects fits the data reasonably well, then the prior activation components for the models developed in this research will be based on this theory.
 However, if the theory does not fit hashtag growth and decay for each user, then an alternative model will be proposed that is a better fit, and that model will be used instead.
 
-\subsubsection{Incorporating Recency Into Random Permutations}
+\subsubsection{Experiment 2: Incorporating Recency Into Random Permutations}
 
 How can prior likelihood of a user choosing a particular tag be incorporated in the random permutations vector-based model?
 Currently vector-based models generate activations for each tag that are based purely on context.
@@ -880,7 +889,7 @@ It seems plausible that performance should improve for vector-based models if th
 Adding a prior activation term for the Bayesian StackOverflow model certainly improved performance \parencite{Stanley2013}.
 So a method to incorporate a user's prior tag history into a random permutation model will be developed and then tested on the full StackOverflow dataset and Twitter popular-users dataset.
 
-\subsubsection{Incorporating Word Order Into ACT-R}
+\subsubsection{Experiment 3: Incorporating Word Order Into ACT-R}
 
 How can word-order information be incorporated into the ACT-R Bayesian model?
 Currently ACT-R uses a word co-occurrence matrix that does not include word position.
@@ -890,16 +899,27 @@ So a method to include word order into a Bayesian model will be developed.
 This updated model will then be evaluated on only teh Twitter common-hashtags dataset, since this dataset contains hashtags that occur in positions throughout the tweet (e.g., embedded within or at the end of a tweet).
 This model will not be evaluated on the StackOverflow dataset since chosen tags for a StackOverflow post are not embedded and mixed within a post, so word-order information is unavailable and most likely unused.
 
-\subsubsection{Top Hashtag Prediction}
+\subsubsection{Experiment 4: Top Hashtag Prediction}
 
-TODO: vector-based and act-r head to head on twitter common-hashtags
-TODO: head to head without word order on twitter common-hashtags
-TODO: head to head on stackoverflow
+After incorporating the relative strengths of each model into the other, the accuracy of the two models will be compared directly.
+Both models will be evaluated on predicting hashtags for tweets in the popular-hashtags dataset and predicting tags for posts on StackOverflow.
+However, the user prior hashtag use will not be available for the popular-hashtags dataset, since this subset was collected across the entire twitter user population.
 
-\subsubsection{User-Customized Hashtag Prediction}
+\subsubsection{Experiment 5: User-Customized Hashtag Prediction}
 
-TODO: head to head on twitter popular-users dataset
-TODO: head to head on stackoverflow
+In order to directly cmopare performance differences for each model when generating user-customized tag predictions, the models will be tested on the StackOverflow dataset and the Twitter popular-users dataset.
+Each dataset contains the entire tag history of either all users (StackOverflow) or the most popular users (Twitter).
+The main evaluation will be the amount of performance gain achieved when the models generate tags that are based on past user behavior compared to models that generate tags that are bases purely on context.
+
+\subsection{Summary}
+
+The end result of this research will be a better understanding of how a user's past tagging history influences future tag use,
+as well as two cognitively-plausible models for making user-customized tag predictions for StackOverflow posts and Twitter tweets. 
+Overall performance differences between an ACT-R's Bayesian retrieval model and a random-permutation vector-based model will be directly compared.
+Improvements made in each model in order to increase performance at this tagging task may suggest model modifications that could be made to improve model performance for other tasks.
+Further, these improvements may uncover model modifications that could improve model fit across all tasks (i.e., suggest cognitive architectural modifications).
+In addition, if model accuracy is high enough, then these developed models may be applied to general tag recommendation systems for either Twitter or StackOverflow,
+and possibly for other sites where users generate and tag content.
 
 \begingroup
 \setstretch{1}
