@@ -128,11 +128,39 @@ ACT-R's declarative memory retrieval theory and random permutation vector-based 
 
 We will compare these two memory systems across two domains where users generate tags for posts: Twitter and StackOverflow.
 Twitter is a micro-blogging service where users create 140 character tweets and broadcast those messages out to the users who follow their posts.
+A user is free to annotate important concepts or words in the tweet by preceding words with hashtags ``\#''.
 User-created hashtags on Twitter are embedded into the tweet, and can be used to connect the tweet to other tweets about the same topic through common hashtag use.
+After the tweet is created the hashtags become hyperlinks, and if clicked on will take a user to a summary feed of all of the tweets across Twitter that have used that hashtag.
 Some recent and often-used hashtags for Twitter are \emph{\#photography}, \emph{\#startup}, \emph{\#4change}, \emph{\#android}, and \emph{\#solar}.
+
+% FIXME: Use better tweet figures
+\begin{figure}[!htbp]
+  \hfill
+  \subfigure[]{\includegraphics[width=8cm]{twitterTweetExample1.pdf}}
+  \hfill
+  \subfigure[]{\includegraphics[width=8cm]{twitterTweetExample2.pdf}}
+  \hfill
+  \caption{Example tweets on Twitter.com}
+  \label{figTweetExample}
+\end{figure}
+
+FIXME: Write summary paragraph for twitter tweets figures.
+
 StackOverflow is a question and answer site for computer programming where users ask programming-related questions and fellow members of the community provide answers.
+A user with a programming-related question creates a post with their question and tags the post with a few specific programming-related tags. 
 User-chosen tags on the StackOverflow site represent the primary topic of the question, such as a specific programming language, tool, software package, or framework.
 Some example tags for StackOverflow are \emph{PHP}, \emph{Arrays}, \emph{MVC}, \emph{C\#}, or \emph{Common Lisp}.
+
+% FIXME: Use a different example figure
+\begin{figure}[!htbp]
+  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{visPost-2977094-screen-crop.pdf}}}
+  \caption{Example post on stackoverflow.com}
+  \label{figSOExample}
+\end{figure}
+
+An example StackOverflow post is included in Figure \ref{figSOExample}.
+The site requires that for each post, the user must associate at least one tag with the post.
+The author used 4 tags for this post: \emph{javascript}, \emph{firefox}, \emph{dom}, and \emph{svg}, and the average number of tags per post is around 3.
 
 These two datasets were chosen because the content of the human-generated content is quite different between them, and we are interested in retrieval models that generalize across different task domains.
 However, they are also quite similar on several accounts:
@@ -268,6 +296,14 @@ Nonetheless, it is encouraging that StackExchange finds tag recommendation model
 \subsubsection{Google+}
 
 The hashtag recommendation system deployed for the Google+ micro-blogging service is probably the most ambitious model of user-created hashtags to date \parencite{GoogleKeynote2013}.
+The user interface for this recommenation system for an example Google+ post is shown in Figure \ref{figGoogle+Hashtags}.
+
+\begin{figure}[!htbp]
+  \scalebox{.4}{\resizebox{\linewidth}{!}{\includegraphics{google+HashtagExample.pdf}}}
+  \caption{Example post on google+. The system recommended \emph{\#SFGiants} and \emph{\#BusterPosey} as hashtags for the user-generated post}
+  \label{figGoogle+Hashtags}
+\end{figure}
+
 The workflow and user interface provided for recommending hashtags for Google+ is similar to how a hashtag recommendation system for Twitter might look.
 When generating content on Google+, the system automatically associates the most likely relevant hashtags with that post.
 The user is free to remove any or all of the tags that the system has associated with the post, and can also use tags that were not included in the recommended set.
@@ -760,51 +796,24 @@ Accuracy will be assessed by comparing model performance with the human data.
 
 \subsection{StackOverflow Dataset}
 
-% FIXME: Verify these numbers
 The most recent quarterly-published StackOverflow dataset \parencite{DataDump2013} will be used to test the models on user-chosen tags for posts.
-This dataset contains around 5 million posts and \num{30000} unique tags.
-The site requires that for each post, the user must associate at least one tag with the post.
-The post author is allowed to choose multiple tags for the post.
-The average number of tags per post is around 3.
-
-% FIXME: Use a different example figure
-\begin{figure}[ht]
-  \resizebox{\linewidth}{!}{\includegraphics{visPost-2977094-screen-crop.pdf}}
-  \caption{Example post on stackoverflow.com}
-  \label{figSOExample}
-\end{figure}
-
-An example StackOverflow post is included in Figure \ref{figSOExample}.
-The author used 4 tags for this post: \emph{javascript}, \emph{firefox}, \emph{dom}, and \emph{svg}.
+This dataset contains around \num{5.7} million posts and \num{34377} unique tags.
 
 \subsection{Twitter Dataset}
 
-% FIXME: Verify these numbers
 Unlike StackOverflow, the entire Twitter dataset is not released to the public.
-Due to this and the sheer size of all of Twitter, subsets of the Twitter dataset must be collected.
-So two Twitter datasets will be collected for model evaluation:
-A common-hashtags and popular-users dataset.
-The common-hashtags dataset contains approximately 2 million tweets containing at least one of the 20 most popular hashtags.
-This dataset was collected over a period of 2 days.
+Due to this and the sheer size of Twitter, subsets of the Twitter dataset must be collected.
+So two Twitter datasets will be collected for model evaluation: a common-hashtags and popular-users dataset.
+The common-hashtags dataset will contain approximately 2 million tweets where at least one of the 100 most popular hashtags are used.
+This dataset will be collected in real time until the tweet quota is reached, which should take just a few days.
 The purpose of this dataset is to test the accuracy of each model's predicted most likely hashtag(s) for a tweet.
 
 The popular-users dataset will contain all of the tweets from the top \num{2000} users on Twitter.
+This dataset will be collected by fetching all tweet history for each of the top users.
+Due to Twitter's query limitation for their API, it is estimated that this process will take about a week.
 This dataset will be used to explore the growth and decay characteristics of a hashtag for a single user.
 The temporal dynamics of ACT-R's decay rate model for a chunk will be evaluated against this data.
 As a result, the most appropriate model of user-centered frequency and recency effects (i.e., each hashtag's prior likelihood given a particular user) will be determined.
-
-% FIXME: Use actual tweet figures
-\begin{figure}[ht]
-  \hfill
-  \subfigure[Title A]{\includegraphics[width=8cm]{tweet-screen-crop.pdf}}
-  \hfill
-  \subfigure[Title B]{\includegraphics[width=8cm]{tweet-screen-crop.pdf}}
-  \hfill
-  \caption{Example tweets on Twitter.com}
-  \label{figTweetExample}
-\end{figure}
-
-% FIXME: Write summary paragraph for twitter tweets figures.
 
 \subsection{Pre-processing the Text}
 
