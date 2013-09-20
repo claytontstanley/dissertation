@@ -6,7 +6,6 @@
 \usepackage[utf8]{inputenc}
 
 %\usepackage[compact]{titlesec}
-
 \usepackage{tabu}
 \usepackage{amssymb,amsmath}
 \usepackage{setspace}
@@ -133,18 +132,29 @@ User-created hashtags on Twitter are embedded into the tweet, and can be used to
 After the tweet is created the hashtags become hyperlinks, and if clicked on will take a user to a summary feed of all of the tweets across Twitter that have used that hashtag.
 Some recent and often-used hashtags for Twitter are \emph{\#photography}, \emph{\#startup}, \emph{\#4change}, \emph{\#android}, and \emph{\#solar}.
 
-% FIXME: Use better tweet figures
 \begin{figure}[!htbp]
-  \hfill
-  \subfigure[]{\includegraphics[width=8cm]{twitterTweetExample1.pdf}}
-  \hfill
-  \subfigure[]{\includegraphics[width=8cm]{twitterTweetExample2.pdf}}
-  \hfill
-  \caption{Example tweets on Twitter.com}
-  \label{figTweetExample}
+  {%
+    \setlength{\fboxsep}{0pt}%
+    \setlength{\fboxrule}{1pt}%
+    \hfill
+    \subfigure[]{\fbox{\includegraphics[width=8cm]{twitterTweetExample1-crop.pdf}}}
+    \hfill
+    \subfigure[]{\fbox{\includegraphics[width=8cm]{twitterTweetExample3-crop.pdf}}}
+    \hfill
+    \vfill
+    \hfill
+    \subfigure[]{\fbox{\includegraphics[width=8cm]{twitterTweetExample4-crop.pdf}}}
+    \hfill
+    \subfigure[]{\fbox{\includegraphics[width=8cm]{twitterTweetExample5-crop.pdf}}}
+    \hfill
+    \caption{Example tweets on Twitter.com}
+    \label{figTweetExample}
+  }%
 \end{figure}
 
-FIXME: Write summary paragraph for twitter tweets figures.
+Some example tweets on Twitter are included in Figure \ref{figTweetExample}.
+Note how users both add hashtags to the end of a tweet as a summary of the message and emphasize important concepts words in the tweet by turning them into hashtags.
+That is, hashtags are both intermixed within the words of the tweet and added to the end of the message.
 
 StackOverflow is a question and answer site for computer programming where users ask programming-related questions and fellow members of the community provide answers.
 A user with a programming-related question creates a post with their question and tags the post with a few specific programming-related tags. 
@@ -299,7 +309,7 @@ The hashtag recommendation system deployed for the Google+ micro-blogging servic
 The user interface for this recommenation system for an example Google+ post is shown in Figure \ref{figGoogle+Hashtags}.
 
 \begin{figure}[!htbp]
-  \scalebox{.4}{\resizebox{\linewidth}{!}{\includegraphics{google+HashtagExample.pdf}}}
+  \scalebox{.4}{\resizebox{\linewidth}{!}{\includegraphics{google+HashtagExample-crop.pdf}}}
   \caption{Example post on google+. The system recommended \emph{\#SFGiants} and \emph{\#BusterPosey} as hashtags for the user-generated post}
   \label{figGoogle+Hashtags}
 \end{figure}
