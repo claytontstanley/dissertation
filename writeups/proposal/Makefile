@@ -23,5 +23,3 @@ ${figPdfs}: %-crop.pdf: %.pdf
 	pdfcrop --verbose $*
 	#R -q -e 'embedFonts("$*-crop.pdf", format="pdfwrite", options="-dSubsetFonts=true -dEmbedAllFonts=true -dPDFSETTINGS=/printer")'
 
-foo:
-	echo "${figPdfs}"
