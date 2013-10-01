@@ -253,7 +253,7 @@ Recommendation systems based on the content of user-created posts have been succ
 The recommendation system would then suggest other Twitter users to follow that had similar profiles to a particular user.
 The profiles were created by generating a word frequency matrix of words x (user + followers + followees), and then providing that matrix as input into the Lucine text search engine framework.
 When the system needed to recommend a set of individuals for a user to follow, it would take all of the words used in posts from that user to construct a search query to be provided to Lucine.
-That search query would return the most likely users that share similar words in posts within their twitter network with the words provided in the query.
+That search query would return the most likely users that share similar words in posts within their Twitter network with the words provided in the query.
 Using this simple technique based on a standard text search engine allowed the recommendation system to accurately predict the people that a particular user will follow at 25\% accuracy.
 
 \subsubsection{Hashtags for Recommendation Systems}
@@ -799,7 +799,7 @@ The random permutation model \parencite{Sahlgren2008} in Table \ref{tabRandPermM
 The modified ACT-R Bayesian model \parencite{Stanley2013} in Table \ref{tabModACTRModel} will be used for the Bayesian model, since it has already been applied to tag use on StackOverflow posts.
 
 These models will be the starting point for modeling tag use on the Twitter and StackOverflow sites.
-The models may be modified during testing if the data indicate that slight modifications are needed to improve model performance.
+The models may be modified during testing if the data indicate that modifications are needed to improve model performance.
 Also there are planned modifications to each model as part of the research:
 incorporating user prior information into the vector-based model, and incorporating word order information into the Bayesian model.
 
@@ -807,7 +807,7 @@ incorporating user prior information into the vector-based model, and incorporat
 
 A modified ACT-R declarative memory retrieval model and random-permutation vector-based model will be evaluated on predicting user-chosen tags for Twitter tweets and StackOverflow posts.
 Parameters for each model will be calibrated on a large subset of the Twitter and StackOverflow datasets.
-Each model will be tested by evaluating the accuracy of model-chosen-tags on a fresh test subset of the datasets.
+Each model will be tested by evaluating the accuracy of model-chosen tags on a fresh test subset of the datasets.
 Accuracy will be assessed by comparing model performance with the human data.
 
 \subsection{StackOverflow Dataset}
@@ -829,23 +829,23 @@ This dataset will be collected by fetching all tweet history for each of the top
 Due to Twitter's query limitation for their API, it is estimated that this process will take about a week.
 This dataset will be used to explore the growth and decay characteristics of a hashtag for a single user.
 The temporal dynamics of ACT-R's decay rate model for a chunk will be evaluated against this data.
-As a result, the most appropriate model of user-centered frequency and recency effects (i.e., each hashtag's prior likelihood given a particular user) will be determined.
+Afterwards, the most appropriate model of user-centered frequency and recency effects (i.e., each hashtag's prior likelihood given a particular user) will be determined.
 
 \subsection{Pre-processing the Text}
 
-The text from all dataset will be pre-processed using standard natural-language processing techniques.
+The text from each dataset will be pre-processed using standard natural language processing techniques.
 The Python Natural Language Processing (NLP) toolkit \parencite{Bird2009} will be used to tokenize (chunk) and lemmatize (convert to root form) each word.
-The standard chunking algorithm will be modified, so that it also ensures that hashtags and tag words (e.g., the word \emph{PHP} in a post) are not separated into multiple chunks.
+The standard chunking algorithm will be modified, so that it also ensures that Twitter hashtags and StackOverflow tag words (e.g., the word \emph{PHP} in a post) are not separated into multiple chunks.
 With the StackOverflow dataset, it is possible to convert synonym tags to canonical base tags, since the community maintains a tag-synonym database.
 So tag words in the post and used tags for the post will be converted to their root tag when applicable.
 
 \subsection{Stop Words and Entropy Weighting}
 
-``Stop words'' are commonly-used words that co-occur with all tags (i.e., have little to no discriminating power).
+``Stop words'' are commonly used words that co-occur with all tags (i.e., have little to no discriminating power).
 It is typically recommended \parencite{Bird2009} to remove stop words such as ``the'', ``a'', ``or'' when building the co-occurrence matrix.
-Otherwise the matrix may not scale as well since there are more words to keep track of. 
+Otherwise the matrix may not scale as well since these low-predictor stop words commonly appear in text.
 Also for vector-based systems, memory vectors will become overly saturated with the environment vectors of the commonly-occurring stop words.
-\textcite{Sahlgren2008} removed stop words for the random-permutation vector-based model, for example.
+\textcite{Sahlgren2008} removed stop words for the random-permutation vector-based model to handle this issue.
 \textcite{Jones2007} did as well for the circular-correlation model, but also mentioned that an entropy weighting technique has also been used previously to attenuate (rather than remove) stop words.
 
 \textcite{Stanley2013} used the entropy weighting technique recommended in \textcite{Dumais1991} for the StackOverflow dataset to reduce the weight of low-predictor stop words instead of removing them.
@@ -865,7 +865,7 @@ Feeding these spam tweets into statistical models that generate hashtag predicti
 When training his model, it attenuates the importance of multiple tweets from the same user that contain the same hashtags.
 As a user generates more than 10 tweets that contain the same hashtag, all tweets afterwards that contain this hashtag will be attenuated so that the overall weight is no more than that for 10 tweets.
 When testing the model, only at most 1 post from a user is included in the test set, since it is much easier to suggest relevant hashtags to a spammer than it is for an actual user.
-This exact technique may not be used for this analysis, but certainly some form of attenuating or identifying twitter spam tweets will be explored.
+This exact technique may not be used for this analysis, but certainly some form of attenuating or identifying Twitter spam tweets will be explored.
 
 \subsection{Experiments}
 
@@ -885,7 +885,7 @@ This model will be used for this research, but the dataset will be updated to th
 When moving from the older dataset to the newest dataset, several performance assessments will be made.
 
 First, model performance will be compared between the newest dataset and the Apr' 11 dataset to ensure that performance is consistent.
-Also this is a way to verify that the newest dataset was correctly pre-processed and loaded.
+This is also a way to verify that the newest dataset was correctly pre-processed and loaded.
 
 Next, incremental improvements will be made to the pre-processing stages and performance will be compared after each change.
 For example, in \textcite{Stanley2013} the technique used to chunk the words does not ensure that tags appearing in the post remain as a single word unit.
@@ -927,23 +927,25 @@ This model will not be evaluated on the StackOverflow dataset since chosen tags 
 \subsubsection{Experiment 4: Top Hashtag Prediction}
 
 After incorporating the relative strengths of each model into the other, the accuracy of the two models will be compared directly.
-Both models will be evaluated on predicting hashtags for tweets in the popular-hashtags dataset and predicting tags for posts on StackOverflow.
-However, the user prior hashtag use will not be available for the popular-hashtags dataset, since this subset was collected across the entire twitter user population.
+First both models will be evaluated on predicting tags based purely on context (i.e., no prior user history), using the popular-hashtags, popular-users, and StackOverflow datasets.
+The results will show the performance differences for the contextual component of each model.
 
 \subsubsection{Experiment 5: User-Customized Hashtag Prediction}
 
-In order to directly compare performance differences for each model when generating user-customized tag predictions, the models will be tested on the StackOverflow dataset and the Twitter popular-users dataset.
-Each dataset contains the entire tag history of either all users (StackOverflow) or the most popular users (Twitter).
-The main evaluation will be the amount of performance gain achieved when the models generate tags that are based on past user behavior compared to models that generate tags that are bases purely on context.
+Next the full models (prior and context components) will be tested on the Twitter popular-users dataset and the StackOverflow dataset.
+The popular-hashtags dataset will not be included in this analysis, since this subset was collected across the entire Twitter user population, so prior hashtag use is not available.
+This test will directly compare performance differences for each model when generating user-customized tag predictions.
+The main evaluation will be the amount of performance gain achieved when the models generate tags that are based on past user behavior compared to models that generate tags that are based purely on context.
 
 \subsection{Summary}
 
 The end result of this research will be a better understanding of how a user's past tagging history influences future tag use,
 as well as two cognitively-plausible models for making user-customized tag predictions for StackOverflow posts and Twitter tweets. 
-Overall performance differences between an ACT-R's Bayesian retrieval model and a random-permutation vector-based model will be directly compared.
-Improvements made in each model in order to increase performance at this tagging task may suggest model modifications that could be made to improve model performance for other tasks.
-Further, these improvements may uncover model modifications that could improve model fit across all tasks (i.e., suggest cognitive architectural modifications).
-In addition, if model accuracy is high enough, then these developed models may be applied to general tag recommendation systems for either Twitter or StackOverflow,
+Overall performance differences between an ACT-R's Bayesian retrieval model and a random-permutation vector-based model will be directly compared on a real-world tagging task, which has never been done previously.
+The strengths of each model (word order and user prior likelihood) will be incorporated into the other, and performance differences will be evaluated.
+The main two proposed model modifications (incorporating word order into ACT-R and user history into vector-based representations) have not been tested before, and seem likely to significantly improve performance.
+Further, these two modifications in particular are aimed at the architectural level of each model, may very well be task independent, and may generalize and improve model fit across other tasks.
+Finally, if model accuracy is high enough, then the developed models may be applied to general tag recommendation systems for either Twitter or StackOverflow,
 and possibly for other sites where users generate and tag content.
 
 \begingroup
