@@ -23,6 +23,7 @@
 \usepackage{csquotes}
 \usepackage[style=apa,sortcites=true,sorting=nyt,backend=biber,doi=false,uniquename=false]{biblatex}
 \DeclareLanguageMapping{american}{american-apa}
+
 \addbibresource{bibliography.bib}
 
 % Needed to ensure periods are placed at the end of every bibliography entry in the references section
@@ -46,6 +47,8 @@
   }
 }
 
+% Don't let biblatex change any of the casing in the bibliography file
+\DeclareRobustCommand{\MakeSentenceCase*}[1]{{#1}}
 
 % If the toc is too detailed, try limiting the depth of printed sections in the TOC:
 %\setcounter{tocdepth}{2}
