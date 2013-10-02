@@ -103,7 +103,7 @@ These user-created hashtags are a key indicator to a user's goals on a social me
 
 These hashtags relate to a user's goals and interests because they are a form of human-based document tagging \parencite{Chang2010}.
 Further, people are using hashtags as a way to create information streams on social media sites \parencite{Kwak2010}.
-Twitter users for example, commonly create and use hashtags for upcoming political events that interst them, such as debates and races \parencite{Diakopoulos2010}.
+Twitter users for example, commonly create and use hashtags for upcoming political events that interest them, such as debates and races \parencite{Diakopoulos2010}.
 So if we can predict what hashtags a user is interested in, we have a better understanding of the information streams that they care about.
 With that understanding, we can tailor the system to suggest hashtags that they may not yet know about but are of likely interest to them.
 We can help aid in their discovery of fresh and relevant information that match their goals on the site.
@@ -404,7 +404,7 @@ That is, given the task of retrieving a chunk of information from long-term decl
 the current context (i.e., external and internal environment state), and past experience (i.e., prior memories and exposure), 
 what is the optimal behavior (i.e., the optimal chunk to retrieve from memory)?
 Using Bayesian reasoning, each chunk of information in declarative memory can be assigned a prior likelihood of being retrieved again, given the prior history of exposure to the chunk.
-These chunk prior probabilities are then adjusted for the current context, so that the posterior probabilities represent the likelihood that a chunk is needed, given prior odds and adusted by current environment state.
+These chunk prior probabilities are then adjusted for the current context, so that the posterior probabilities represent the likelihood that a chunk is needed, given prior odds and adjusted by current environment state.
 
 \subsubsection{ACT-R DM Model}
 
@@ -536,7 +536,7 @@ This allowed the use of a logistical regression statistical technique to calibra
 The title and body contextual components were separated since it seemed plausible that the words in the title would be better predictors of the tag used than the words in the body.
 It actually turned out that the words in the body were a better predictor of tag use \parencite{Stanley2013}, most likely because there are many more words in the body than the title of the post.
 The entropy measure was used to compute the attentional weight for two reasons:
-Stop words could be statistically derived and attentuated in the analysis, and more predictive words of some tag (e.g., the word ``PHP'' in a post) were given higher weight.
+Stop words could be statistically derived and attenuated in the analysis, and more predictive words of some tag (e.g., the word ``PHP'' in a post) were given higher weight.
 Using an entropy measure (as opposed to weighting each word equally in the post) allows the model to allocate limited attentional resources ($W$) to important contextual elements.
 
 \subsection{Latent Semantic Analysis Memory Theory}
@@ -716,7 +716,7 @@ The memory vector for ``overflow'' ($m_{overflow}$) will be correlated the highe
 
 \subsubsection{Comparison between BEAGLE and Random Permutations}
 
-Random permutations usees one of simplest permutations possible to create a new environment vector.
+Random permutations uses one of simplest permutations possible to create a new environment vector.
 This operation is much less costly than circular convolution used by the BEAGLE model, which allows random permutations to scale better and handle larger datasets.
 However, even though random permutations is a simpler representation than BEAGLE, it also performs better when trained on the same sized corpus. 
 
