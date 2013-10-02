@@ -82,10 +82,9 @@ However, a single user of a social media site is most likely interested in only 
 One general question to support the user in this domain is:
 How can we quickly and effectively connect users to the content that they care about?
 
-% FIXME: Fix cite for Bauer2012
 One traditional technique is to provide the user with a powerful search engine so that they can actively look for content that interests them.
 However, users are not forming the same search queries that work so effectively on search engines like Google.
-A growing number of users on social media sites are searching for information that is happening now, in real time \parencites{Bauer2012,Jansen2011}.
+A growing number of users on social media sites are searching for information that is happening now, in real time \parencite{Jansen2011}.
 In other words, users on social-media sites want the fresh \emph{stream} of information about a particular topic.
 This can certainly be seen in the main user-interface views that these social media site provide:
 Twitter's homepage showing your followers' tweets, Facebook's homepage showing your friends' posts, StackOverflow's daily digest of posts for particular tags.
@@ -162,7 +161,6 @@ A user with a programming-related question creates a post with their question an
 User-chosen tags on the StackOverflow site represent the primary topic of the question, such as a specific programming language, tool, software package, or framework.
 Some example tags for StackOverflow are \emph{PHP}, \emph{Arrays}, \emph{MVC}, \emph{C\#}, or \emph{Common Lisp}.
  
-% FIXME: Use vector-graphics for this figure 
 \begin{figure}[!htbp]
   \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{stackoverflowPostExample1-crop.pdf}}}
   \caption{Example post on stackoverflow.com}
@@ -237,7 +235,6 @@ Recommendation systems are used to tailor the information presented to what is m
 
 \subsubsection{The Netflix Prize}
 
-% FIXME: Fix cite for Bennett2007
 The Netflix Prize \parencite{Bennett2007} is an example of a recommendation system where prior user behavior and current context was used to present the most relevant information to the user.
 Netflix is an online-subscription service where users can stream their favorite television episodes and movies.
 Each user of the site is only interested in a small portion of the entire library of content that Netflix provides.
@@ -294,16 +291,21 @@ It is interesting that in both research papers the best performing model was bas
 This suggests that more cognitively-plausible memory retrieval models may outperform more general machine-learning approaches in this particular task domain:
 predicting the user-chosen tags for human-created content on social media sites.
 
-% FIXME: Add figure for LaTeX tag suggestion example
-
-A tag suggestion tool has been deployed for the \url{http://tex.stackexchange.org} site \parencite{LatexTags2013}.
-Both the \LaTeX site and StackOverflow are part of the broader StackExchange network of question and answer sites, and they provide the same user interface and workflow when asking questions.
-Once a user has created a question on the Latex site, the site provides subdued text of suggested tags in the text field where the user fills in the tags to associate with the question.
+A tag suggestion tool has been deployed for the \url{http://tex.stackexchange.org} \parencite{LatexTags2013} and \url{http://superuser.com} \parencite{SuperUserTags2013} StackExchange sites.
+\LaTeX, SuperUser, and StackOverflow are all part of the broader StackExchange network of question and answer sites, and they provide the same user interface and workflow when asking questions.
+For the two sites where a tag suggestion tool has been deployed, once a user has created a question, suggested tags appear just below the text field where the user types the tags to associate with the question.
 The post author is not forced to use the suggested tags, and is free to choose tags from them or tags not represented in the suggested set.
+An example of the interface for a created post on the SuperUser site is included in Figure \ref{figSuperUserSuggestion}.
 
-The Latex site is not nearly as popular as StackOverflow currently.
-The site has roughly \num{50000} questions compared to \num{5000000} questions on StackOverflow.
-It may be the case that the StackExchange company decided to try out a tag recommendation system on one of their smaller sites first, before deploying this type of system on their most popular StackOverflow site.
+\begin{figure}[!htbp]
+  \scalebox{.9}{\resizebox{\linewidth}{!}{\includegraphics{superUserTagSuggestion.pdf}}}
+  \caption{Example of tag suggestions when creating a post on the SuperUser site}
+  \label{figSuperUserSuggestion}
+\end{figure}
+
+The Latex and SuperUser sites are not nearly as popular as StackOverflow currently.
+The sites have roughly \num{50000} and \num{189000} questions respectively compared to \num{5000000} questions on StackOverflow.
+It may be the case that StackExchange decided to try out a tag recommendation system on a few of their smaller sites first, before deploying this type of system on their most popular StackOverflow site.
 Or it is possible that their current tag recommendation system is not efficient enough to work with the demand of the StackOverflow site.
 Nonetheless, it is encouraging that StackExchange finds tag recommendation models beneficial enough to the user to start adding them to their question and answer sites. 
 
