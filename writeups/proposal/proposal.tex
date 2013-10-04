@@ -5,10 +5,19 @@
 \usepackage[american]{babel}
 \usepackage[utf8]{inputenc}
 
+% ref: http://tex.stackexchange.com/questions/28516/how-to-change-the-title-of-toc
+\addto\captionsamerican{% Replace ``english'' with the language you use
+  \renewcommand{\contentsname}%
+  {Table of Contents}%
+}
+
 %\usepackage[compact]{titlesec}
 \usepackage{tabu}
 \usepackage{amssymb,amsmath}
 \usepackage{setspace}
+
+% ref: http://tex.stackexchange.com/questions/48509/insert-list-of-figures-in-the-table-of-contents
+\usepackage[nottoc,numbib]{tocbibind}
 
 \usepackage[hyphens]{url}
 %\usepackage{hyperref}
@@ -53,24 +62,34 @@
 % If the toc is too detailed, try limiting the depth of printed sections in the TOC:
 %\setcounter{tocdepth}{2}
 
-\title{User-customized hashtag/tag prediction on Twitter and StackOverflow:\protect \\ Comparing vector-based and Bayesian models of tag retrieval}
-\shorttitle{Tag prediction on Twitter and StackOverflow}
+\title{User-customized hashtag/tag prediction on Twitter and StackOverflow:\protect \\ Comparing vector-based and ACT-R Bayesian models of tag retrieval}
+%\shorttitle{Tag prediction on Twitter and StackOverflow}
+\shorttitle{}
 
 \author{Clayton Stanley}
 \affiliation{Rice University}
 
 \leftheader{Beitzel}
 
-\abstract{
-  FIXME
-}
 
 \keywords{FIXME}
 
 \begin{document}
+
+\abstract{
+  FIXME
+}
+
+
 \maketitle
 
 \tableofcontents
+\newpage
+
+\listoftables
+\newpage
+
+\listoffigures
 \newpage
 
 \section{Motivation}
@@ -146,7 +165,7 @@ Some recent and often-used hashtags for Twitter are \emph{\#photography}, \emph{
     \hfill
     \subfigure[]{\fbox{\includegraphics[width=8cm]{twitterTweetExample5-crop.pdf}}}
     \hfill
-    \caption{Example tweets on Twitter.com}
+    \caption{Example tweets on twitter.com}
     \label{figTweetExample}
   }%
 \end{figure}
@@ -316,12 +335,13 @@ The user interface for this recommendation system for an example Google+ post is
 
 \begin{figure}[!htbp]
   \scalebox{.4}{\resizebox{\linewidth}{!}{\includegraphics{google+HashtagExample-crop.pdf}}}
-  \caption{Example post on Google+. The system recommended \emph{\#SFGiants} and \emph{\#BusterPosey} as hashtags for the user-created post}
+  \caption{Example post on Google+}
   \label{figGoogle+Hashtags}
 \end{figure}
 
 The workflow and user interface provided for recommending hashtags for Google+ is similar to how a hashtag recommendation system for Twitter might look.
 When generating content on Google+, the system automatically associates the most likely relevant hashtags with that post.
+For the example in Figure \ref{figGoogle+Hashtags}, the system recommended \emph{\#SFGiants} and \emph{\#BusterPosey} as hashtags for the user-created post.
 The user is free to remove any or all of the tags that the system has associated with the post, and can also use tags that were not included in the recommended set.
 
 Google is apparently highly confident in the accuracy of their system.
@@ -409,7 +429,7 @@ These chunk prior probabilities are then adjusted for the current context, so th
 \subsubsection{ACT-R DM Model}
 
 \begin{table}[!ht]
-  \caption{ACT-R Declarative Memory Model}
+  \caption{ACT-R declarative memory model}
   \label{tabACT-RModel}
   {\tabulinesep=1.2mm
     \begin{tabu}{ll}
@@ -682,7 +702,7 @@ However, that is certainly not the only operation that can generate new uncorrel
 \textcite{Sahlgren2008} used a much simpler random permutation method for this operation.
 
 \begin{table}[!ht]
-  \caption{Random Permutation Model}
+  \caption{Random permutation model}
   \label{tabRandPermModel}
   {\tabulinesep=1.2mm
     \begin{tabu}{ll}
@@ -956,7 +976,8 @@ and possibly for other sites where users generate and tag content.
 \begingroup
 \setstretch{1}
 \setlength\bibitemsep{12pt}
-\printbibliography
+\clearpage
+\printbibliography[heading=bibintoc]
 \endgroup
 
 \end{document}
