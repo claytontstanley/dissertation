@@ -155,7 +155,7 @@ Some example tweets on Twitter are included in Figure \ref{figTweetExample}.
 Note how users both add hashtags to the end of a tweet as a summary of the message and emphasize important concepts words in the tweet by turning them into hashtags.
 That is, hashtags are both intermixed within the words of the tweet and added to the end of the message.
 
-Alongside testing these declarative memory retrieval models on Twitter hashtag use, they will be tested on tag use for StackOverflow posts.
+Alongside testing these declarative memory retrieval models on Twitter hashtag use, they will also be tested on tag use for StackOverflow posts.
 StackOverflow is a question and answer site for computer programming where users ask programming-related questions and fellow members of the community provide answers.
 A user with a programming-related question creates a post with their question and tags the post with a few specific programming-related tags. 
 User-chosen tags on the StackOverflow site represent the primary topic of the question, such as a specific programming language, tool, software package, or framework.
@@ -216,7 +216,7 @@ The expectation is that this cycle will match ACT-R's decay rate used in the dec
 The end goal of this work is to identify a memory retrieval model that can suggest relevant hashtags to users when they wish to retrieve one.
 These hashtags should be customized to their specific interests and relevant to the content of the post that they are currently creating.
 This will undoubtedly require a combination of two primary model components:
-[1] A user's prior likelihood of choosing a particular hashtag, given their previous content, and [2] the likelihood that a particular hashtag is related to the context of the post being created. 
+[1] A user's prior likelihood of choosing a particular hashtag, given their previous hashtag use, and [2] the likelihood that a particular hashtag is related to the context of the post being created. 
 
 A user's prior hashtag use will be an essential model component for domains such as Twitter, where the number of possible hashtags is practically infinite.
 In these domains, the model can utilize a user's prior hashtag use as a way to prune the infinite space of possible hashtags, and generate a much smaller and more manageable set for prediction.
@@ -242,7 +242,7 @@ In order to provide a high-quality user experience on the site, Netflix created 
 This tool recommends to the user movies and television episodes that most likely match their specific interests.
 
 Netflix wanted to improve the accuracy of their recommendation system, so they held a competition where teams could try to improve on the accuracy of the service.
-The winning team utilized a statistical model that performed a type of factor analysis to identify important dimensions in the data (e.g., drama, action, cult classic) and place each user along each dimension. 
+The winning team utilized a statistical model that performed a type of factor analysis to identify important dimensions in the data (e.g., drama, action, cult classic) and place values for each user along each dimension. 
 This method used prior user behavior to classify a user along the dimensions of the reduced space, and current user behavior (e.g., just watched) to understand what they were interested in watching at that moment.
 By using a factor-analysis technique and combining these indicators, the model improved on Netflix's original recommendation system by 10\%.
 
@@ -270,7 +270,7 @@ Although this model does not predict hashtags directly when composing a tweet, a
 
 More specific hashtag-recommendation models that attempt to predict a user's chosen hashtag have also been created and tested for a few social media sites.
 Google has even deployed a hashtag-recommendation model to help users properly tag posts for their Google+ social media site \parencite{GoogleKeynote2013}.
-A tag-suggestion tool has also been deployed for the \url{http://tex.stackexchange.org} site.
+A tag-suggestion tool has also been deployed for the \url{http://tex.stackexchange.org} and \url{http://superuser.com} StackExchange sites.
 Models for Twitter and StackOverflow are also being proposed and tested, but none have yet been deployed.
 
 \subsubsection{StackOverflow}
@@ -307,7 +307,7 @@ The Latex and SuperUser sites are not nearly as popular as StackOverflow current
 The sites have roughly \num{50000} and \num{189000} questions respectively compared to \num{5000000} questions on StackOverflow.
 It may be the case that StackExchange decided to try out a tag recommendation system on a few of their smaller sites first, before deploying this type of system on their most popular StackOverflow site.
 Or it is possible that their current tag recommendation system is not efficient enough to work with the demand of the StackOverflow site.
-Nonetheless, it is encouraging that StackExchange finds tag recommendation models beneficial enough to the user to start adding them to their question and answer sites. 
+Nonetheless, it is encouraging that StackExchange finds tag recommendation models beneficial to the user and have started to add them to their question and answer sites. 
 
 \subsubsection{Google+}
 
@@ -347,7 +347,7 @@ This tweet-centered approach is quite different than the hashtag-centered approa
 With a hashtag-centered approach, a direct association is built between the words in a tweet and hashtags that occur in tweets.
 With a tweet-centered approach, that association between words and hashtags is indirect:
 The relationship is built between a tweet and its content, and then similar tweets are assumed to use similar hashtags.
-One problem with the tweet-centered approach is that the storage size grows with the number of tweets, as a vector representation of the content in each tweet has to be maintained to later compute tweet similarity.
+One problem with the tweet-centered approach is that the storage size grows with the number of tweets, as a representation of the content in each tweet has to be maintained to later compute tweet similarity.
 The storage size for a hashtag-centered approach grows with the number of hashtags, but it seems reasonable that this will grow slower than the number of tweets and asymptote after collecting a large sample of tweets.
 So from the perspective of efficient information storage and retrieval, it seems more likely that the hashtag-centered approach used in \textcite{Mazzia2009} will scale as Twitter grows in size and use.
 
@@ -537,14 +537,14 @@ The title and body contextual components were separated since it seemed plausibl
 It actually turned out that the words in the body were a better predictor of tag use \parencite{Stanley2013}, most likely because there are many more words in the body than the title of the post.
 The entropy measure was used to compute the attentional weight for two reasons:
 Stop words could be statistically derived and attenuated in the analysis, and more predictive words of some tag (e.g., the word ``PHP'' in a post) were given higher weight.
-Using an entropy measure (as opposed to weighting each word equally in the post) allows the model to allocate limited attentional resources ($W$) to important contextual elements.
+Using an entropy measure (as opposed to weighting each word equally in the post) for the attentional weight term allows the model to allocate limited attentional resources ($W$) to important contextual elements.
 
 \subsection{Latent Semantic Analysis Memory Theory}
 
 Latent Semantic Analysis \parencite{Landauer1997} (LSA) is a technique that has mathematical roots in factor analysis and also measures strength of association between two terms.
 The process starts with a set of N documents.
 A word x document co-occurrence matrix is built by counting the number of times each word appears in each document.
-The dimensionality of the full word frequency co-occurrence matrix is then reduced and forced to be represented on a smaller set of dimensions.
+The dimensionality of the full word frequency co-occurrence matrix is then forced to be represented on a smaller set of dimensions.
 This process is similar to how factor analysis takes a data table and finds the most efficient way to represent that data with as few dimensions as possible.
 The strength of association between two words is measured by the cosine of the two word vectors across the reduced dimension space.
 
@@ -569,13 +569,13 @@ Although the LSA model has been shown to perform well as a way to measure simila
 This means that the model does not account for or pay attention to word order when building the base word x document matrix or consequently, when performing the SVD dimension reduction.
 Other models that can account for word order have been shown to perform better than ``bag of words'' models on tasks that do not even appear to require grammatical structure such as word order to do well.
 For example, \textcite{Jones2007} compared a vector-based model called BEAGLE directly to LSA, training and testing both models on the same corpus used in \textcite{Landauer1997}.
-The context-only BEAGLE model (no word order) performed slightly better than the LSA model at the task (55.6\% vs. 55.3\%).
+The context-only BEAGLE model (no word order) performed nearly equivalent to the LSA model at the task (55.6\% vs. 55.3\%).
 However, even in a multiple-choice domain where the task is to identify synonyms (very little grammatical structure in the task), adding word order when training the model improved task performance to 57.5\%.
 It seems reasonable to expect that task performance will improve much more on tasks where word order is used (e.g., generating a Twitter hashtag in the middle of a sentence).
 
 \subsubsection{Scaling Issues}
 
-Another issue with LSA is the SVD matrix decomposition technique is computationally very expensive.
+Another issue with LSA is that the SVD matrix decomposition technique is computationally very expensive.
 As the size of the original word x document matrix increases, the SVD computation becomes more and more time consuming.
 If the domains where LSA is being applied contained small enough datasets where SVD computation could be computed in a reasonable amount of time, then this would not be much of a concern.
 However, with large-scale human-created datasets such as Twitter, Stackoverflow, and Wikipedia, the total size of the dataset far exceeds the maximum size that can even be computed by an LSA approach.
@@ -721,7 +721,7 @@ This operation is much less costly than circular convolution used by the BEAGLE 
 Further, even though random permutations is a simpler representation than BEAGLE, it also performs better when trained on the same sized corpus. 
 
 \textcite{Recchia2010} found that random permutations could use smaller vectors to produce equivalent performance (better compression), and scale to larger datasets (better computational efficiency).
-The vector x performance tradeoff was tested on a simple paired associative retrieval task. 
+The vector length x performance tradeoff was tested on a simple paired associative retrieval task. 
 Retrieval accuracy for the vector-based models remained high even after reducing each environment vector's length from \num{2048} to \num{1024}.
 This indicates that vector-based representations using random permutations compress better than those using circular convolution.
 
@@ -758,7 +758,7 @@ This approach might be worth investigating, as it would reduce computational req
 \subsection{Comparison of Vector-Based Models and ACT-R}
 
 Vector-based models can be thought of as a compressed representation of the full co-occurrence matrix used for the ACT-R declarative memory system.
-Each model computes an activation for each word to retrieve, given prior knowledge and context.
+Each model computes an activation for each word to retrieve, given context and (for ACT-R's Bayesian model) prior knowledge.
 Since both models produce activations for each chunk, one can be swapped out for another and used as the declarative memory component of the ACT-R infrastructure.
 For example, \textcite{Rutledge2007} used a variant of the BEAGLE vector-based model as the DM component of ACT-R.
 \textcite{Rutledge2008} showed that an ACT-R theory with a vector-based memory system can successfully model the fan effect, which is a psychological phenomena that ACT-R's current Bayesian DM system can model as well.
