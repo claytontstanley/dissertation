@@ -722,7 +722,7 @@ However, that is certainly not the only operation that can generate new uncorrel
 \end{table}
 
 A formal description of the random permutation model in \textcite{Sahlgren2008} is included in Table \ref{tabRandPermModel}.
-With random permutations, each word environment vector ($e_{i}$) is a large sparse vector of zeros with a few $<1,-1>$s in random locations. 
+With random permutations, each word environment vector ($e_{i}$) is a large sparse vector of zeros with a few $\{1,-1\}$s in random locations. 
 In order to create a new environment vector for a word that preceded another word in a sentence, that word's environment vector ($e_{i}$) is bit shifted to the left one position ($^{-1}$).
 This produces a new environment vector ($e_{i^{-1}}$) for the combination of the word and the position that is uncorrelated with the original word's environment vector and all other environment vectors.
 
@@ -762,7 +762,7 @@ For the StackOverflow and Twitter datasets, the number of documents are the numb
 For random permutations, each tag is represented by a compressed vector with a length much less than the number of words.
 Note that if the length of a word's environment vector was the number of unique words, then each word could be represented by associating it with a particular row in the column vector.
 If done in this way, building a matrix of all words' environment vectors x tags would recover the original word x document matrix \parencite{Kanerva2000}.
-However, each word's environment vector is compressed using a length much less than the number of unique words and using a combination of a few $<1,-1>$s to represent the word.
+However, each word's environment vector is compressed using a length much less than the number of unique words and using a combination of a few $\{1,-1\}$s to represent the word.
 
 Information is lost with this compression in both cases: by starting with a compressed representation with random permutations or by reducing to a compressed representation with LSA.
 However, the way that the compression works in these two cases is not the same.
