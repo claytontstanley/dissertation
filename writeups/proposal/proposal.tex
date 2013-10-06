@@ -141,7 +141,7 @@ Several memory retrieval models are based on this broad methodology, where a cou
 Two of the current state-of-the-art memory models are based on a co-occurrence methodology, and I'll be comparing these two models for hashtag prediction:
 ACT-R's declarative memory retrieval theory and random permutation vector-based memory systems.
 
-\subsubsection{StackOverflow and Twitter Task Domains}
+\subsubsection{StackOverflow and Twitter}
 
 I will compare these two memory systems across two domains where users generate tags for posts: Twitter and StackOverflow.
 Twitter is a microblogging service where users create 140 character tweets and broadcast those messages out to the users who follow their posts.
@@ -190,12 +190,12 @@ An example StackOverflow post is included in Figure \ref{figSOExample}.
 The site requires that for each post the user must associate at least one tag with the post, and the average number of tags per post is around 3.
 The author used 4 tags for this post: \emph{javascript}, \emph{html}, \emph{internet-explorer}, and \emph{xhtml}.
 
-The StackOverflow and Twitter datasets were chosen because the human-created content between them is quite different, and I am interested in retrieval models that generalize across different task domains.
+The StackOverflow and Twitter datasets were chosen because the human-created content between them is quite different, and I am interested in retrieval models that generalize across tasks.
 However, they are also similar on several accounts:
 Both domains have amassed large amounts of user-created content, users generate tags for posts when creating content on the site (hashtags and tags for Twitter and StackOverflow respectively),
 and the user data from the datasets are publicly available for analysis.
 
-Also, studying user-based tag generation on these sites is a relevant task domain.
+Also, studying user-based tag generation on these sites has relevant real-world application.
 Models that can accurately predict the tags that users will generate on Twitter and StackOverflow can be used as the foundation for recommendations systems on these very popular sites.
 These systems can also help newer users by recommending proper tags for their newest content.
 On the StackOverflow site for example, experts often subscribe to specific hashtags that interest them, and receive a daily digest of posts that are tagged with those hashtags.
@@ -306,9 +306,9 @@ The model was based on ACT-R's declarative memory retrieval theory, which at the
 However, this model scaled much better than the co-occurrence model presented in \textcite{Kuo2011}.
 Because of this, 100 times more posts were used to build the co-occurrence matrix (\num{1000000} versus \num{10000}), which significantly increased the model's performance.
 After scaling up the model, this model can successfully predict a user's tag for a post at 65\% accuracy.
-It is interesting that in both research papers the best performing model was based on a Bayesian co-occurrence framework, since that is precisely the framework from which ACT-R's declarative memory system is built.
-This suggests that more cognitively-plausible memory retrieval models may outperform more general machine-learning approaches in this particular task domain:
-predicting the user-chosen tags for human-created content on social media sites.
+It is interesting that in both research papers the best performing model was based on a Bayesian co-occurrence framework, since that is precisely the framework from which ACT-R's declarative memory system is based.
+This suggests that more cognitively-plausible memory retrieval models may outperform more general machine-learning approaches in this particular environment
+(i.e., when predicting the user-chosen tags for human-created content on social media sites).
 
 A tag suggestion tool has been deployed for the \url{http://tex.stackexchange.org} \parencite{LatexTags2013} and \url{http://superuser.com} \parencite{SuperUserTags2013} StackExchange sites.
 \LaTeX, SuperUser, and StackOverflow are all part of the broader StackExchange network of question and answer sites, and they provide the same user interface and workflow when asking questions.
@@ -966,7 +966,7 @@ The main evaluation will be the amount of performance gain achieved when the mod
 
 The end result of this research will be a better understanding of how a user's past tagging history influences future tag use,
 as well as two cognitively-plausible models for making user-customized tag predictions for StackOverflow posts and Twitter tweets. 
-Overall performance differences between an ACT-R's Bayesian retrieval model and a random-permutation vector-based model will be directly compared on a real-world tagging task, which has never been done previously.
+Overall performance differences between an ACT-R's Bayesian retrieval model and a random-permutation vector-based model will be directly compared on two real-world tagging tasks, which has never been done previously.
 The strengths of each model (word order and user prior likelihood) will be incorporated into the other, and performance differences will be evaluated.
 The main two proposed model modifications (incorporating word order into ACT-R and user history into vector-based representations) have not been tested before, and seem likely to significantly improve performance.
 Further, these two modifications in particular are aimed at the architectural level of each model, may very well be task independent, and may generalize and improve model fit across other tasks.
