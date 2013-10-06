@@ -423,7 +423,7 @@ The equations that make up this system can be derived through a rational analysi
 That is, given the task of retrieving a chunk of information from long-term declarative memory,
 the current context (i.e., external and internal environment state), and past experience (i.e., prior memories and exposure), 
 what is the optimal behavior (i.e., the optimal chunk to retrieve from memory)?
-Using Bayesian reasoning, each chunk of information in declarative memory can be assigned a prior likelihood of being retrieved again, given the prior history of exposure to the chunk.
+Using Bayesian reasoning, each chunk of information in declarative memory can be assigned a prior likelihood of needing retrieval again, given the prior history of exposure to the chunk.
 These chunk prior probabilities are then adjusted for the current context, so that the posterior probabilities represent the likelihood that a chunk is needed, given prior odds and adjusted by current environment state.
 
 \subsubsection{ACT-R DM Model}
@@ -466,7 +466,7 @@ Although the popularity of various programming languages has certainly changed s
 C\#, Python, and Java are still a few of the most popular languages, Common Lisp has not gained or lost much ground in popularity over the past few years.
 
 Further, if this is a reasonable assumption to make, it greatly simplifies the computation of the base-level activation for chunks, and can turn the computation into a tractable problem for large datasets.
-In these time-constant domains, one can compute the log prior odds of needing each chunk directly as the log odds ratio of being exposed to that chunk compared to all other chunk exposures.
+In these time-constant domains, one can compute the log prior odds of needing each chunk directly as the log odds ratio of exposure to that chunk compared to exposure to all other chunks.
 For example, if the StackOverflow tag \emph{PHP} has been used four times as often as the tag \emph{Common Lisp}, then the prior odds of needing \emph{PHP} again is $\frac{.8}{.2}=4$ times that of \emph{Common Lisp}.
 
 \subsubsection{Strength of Association}
@@ -598,7 +598,7 @@ It seems reasonable to expect that task performance will improve much more on ta
 
 Another issue with LSA is that the SVD matrix decomposition technique is computationally very expensive.
 As the size of the original word x document matrix increases, the SVD computation becomes more and more time consuming.
-If the domains where LSA is being applied contained small enough datasets where SVD computation could be computed in a reasonable amount of time, then this would not be much of a concern.
+If the domains where LSA is applied contained small enough datasets where SVD computation could be computed in a reasonable amount of time, then this would not be much of a concern.
 However, with large-scale human-created datasets such as Twitter, Stackoverflow, and Wikipedia, the total size of the dataset far exceeds the maximum size that can even be computed by an LSA approach.
 \textcite{Budiu2007} used the first six million pages of the Stanford WebBase corpus to compare performance between LSA and PMI on the TOEFL, and the LSA model could not be implemented with this size training dataset.
 Instead, they compared the measures on the TOEFL by training on the smaller Touchstone Applied Science Associates (TASA) corpus created from \num{60527} samples of text from high school to early college textbooks.
@@ -615,7 +615,7 @@ This suggests that simpler models may be preferred to more complex (yet more acc
 \subsubsection{Cost of Incremental Updating}
 
 Another issue with LSA is that adding additional observations to an already-computed reduced representation requires rerunning the SVD \parencite{Farahat2004}.
-Since computing the SVD is the most computationally-expensive operation with LSA, it is difficult to see how LSA could be implemented in incremental domains where information is periodically being added.
+Since computing the SVD is the most computationally-expensive operation with LSA, it is difficult to see how LSA could be implemented in incremental domains where information is periodically added.
 For Twitter and StackOverflow, it might certainly be useful to update the strength of association representation when new information arrives, especially for Twitter, where hashtag use and news content change rapidly.
 
 \subsection{Vector-Based Memory Systems}
