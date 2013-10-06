@@ -20,9 +20,19 @@
 \usepackage[nottoc,numbib]{tocbibind}
 
 \usepackage[hyphens]{url}
-%\usepackage{hyperref}
-%\usepackage{breakurl}
 
+% ref: http://tex.stackexchange.com/questions/73862/how-can-i-make-a-clickable-table-of-contents
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks,
+  citecolor=black,
+  filecolor=black,
+  linkcolor=black,
+  urlcolor=black
+}
+%\hypersetup{linktocpage}
+
+%\usepackage{breakurl}
 \usepackage{subfigure}
 \usepackage{graphicx}
 \usepackage[group-separator={,}]{siunitx}
@@ -63,8 +73,8 @@
 %\setcounter{tocdepth}{2}
 
 \title{User-customized hashtag/tag prediction on Twitter and StackOverflow:\protect \\ Comparing vector-based and ACT-R Bayesian models of tag retrieval}
-%\shorttitle{Tag prediction on Twitter and StackOverflow}
-\shorttitle{}
+\shorttitle{Tag prediction on Twitter and StackOverflow}
+%\shorttitle{}
 
 \author{Clayton Stanley}
 \affiliation{Rice University}
@@ -80,6 +90,7 @@
   FIXME
 }
 
+\note{\today}
 
 \maketitle
 
@@ -309,6 +320,8 @@ After scaling up the model, this model can successfully predict a user's tag for
 It is interesting that in both research papers the best performing model was based on a Bayesian co-occurrence framework, since that is precisely the framework from which ACT-R's declarative memory system is based.
 This suggests that more cognitively-plausible memory retrieval models may outperform more general machine-learning approaches in this particular environment
 (i.e., when predicting the user-chosen tags for human-created content on social media sites).
+
+\subsubsection{StackExchange}
 
 A tag suggestion tool has been deployed for the \url{http://tex.stackexchange.org} \parencite{LatexTags2013} and \url{http://superuser.com} \parencite{SuperUserTags2013} StackExchange sites.
 \LaTeX, SuperUser, and StackOverflow are all part of the broader StackExchange network of question and answer sites, and they provide the same user interface and workflow when asking questions.

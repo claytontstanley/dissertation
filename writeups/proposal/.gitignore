@@ -12,6 +12,7 @@
 *.xml
 *.lof
 *.lot
+*.out
 *.fdb_latexmk
 *(Autosaved).R
 *.RData
