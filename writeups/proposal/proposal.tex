@@ -441,6 +441,8 @@ These chunk prior probabilities are then adjusted for the current context, so th
 
 \subsubsection{ACT-R DM Model}
 
+A formal description of the ACT-R Declarative Memory model is included in Table \ref{tabACT-RModel}.
+
 \begin{table}[!ht]
   \caption{ACT-R declarative memory model}
   \label{tabACT-RModel}
@@ -460,7 +462,6 @@ These chunk prior probabilities are then adjusted for the current context, so th
   }
 \end{table}
 
-A formal description of the ACT-R Declarative Memory model is included in Table \ref{tabACT-RModel}.
 The total activation ($A_{i}$) for a chunk in declarative memory is a function of two components: base level activation ($B_{i}$) and strength of association ($S_{ji}$).
 The recall probability ($P_{i}$ that a chunk will be retrieved from memory increases with total activation ($A_{i}$).
 
@@ -716,6 +717,8 @@ The BEAGLE model uses circular convolution and inverse correlation as the encodi
 However, that is certainly not the only operation that can generate new uncorrelated vectors from a set of memory vectors and positions.
 \textcite{Sahlgren2008} used a much simpler random permutation method for this operation.
 
+A formal description of the random permutation model in \textcite{Sahlgren2008} is included in Table \ref{tabRandPermModel}.
+
 \begin{table}[!ht]
   \caption{Random permutation model}
   \label{tabRandPermModel}
@@ -735,7 +738,6 @@ However, that is certainly not the only operation that can generate new uncorrel
   }
 \end{table}
 
-A formal description of the random permutation model in \textcite{Sahlgren2008} is included in Table \ref{tabRandPermModel}.
 With random permutations, each word environment vector ($e_{i}$) is a large sparse vector of zeros with a few $\{1,-1\}$s in random locations. 
 In order to create a new environment vector for a word that preceded another word in a sentence, that word's environment vector ($e_{i}$) is bit shifted to the left one position ($^{-1}$).
 This produces a new environment vector ($e_{i^{-1}}$) for the combination of the word and the position that is uncorrelated with the original word's environment vector and all other environment vectors.
