@@ -72,7 +72,7 @@
 % If the toc is too detailed, try limiting the depth of printed sections in the TOC:
 %\setcounter{tocdepth}{2}
 
-\title{User-customized hashtag/tag prediction on Twitter and StackOverflow:\protect \\ Comparing vector-based and ACT-R Bayesian models of tag retrieval}
+\title{User-customized hashtag/tag prediction on Twitter and StackOverflow:\protect \\ Comparing vector-based and ACT-R memory models of tag retrieval}
 \shorttitle{Tag prediction on Twitter and StackOverflow}
 %\shorttitle{}
 
@@ -82,12 +82,21 @@
 \leftheader{Beitzel}
 
 
-\keywords{FIXME}
+%\keywords{}
 
 \begin{document}
 
 \abstract{
-  FIXME
+  The amount of user-created content on social media sites continues to grow.
+  To help organize and structure this information, many users create tags for documents to help connect their content to other posts on similar topics and other users that might have interest.
+  If an accurate model of the tags users choose when creating content is available, then the system can recommend tags for a user to use, in order to connect the user to similar topics and people as quickly as possible.
+  This works aims to develop and compare tag-recommendation models for users choosing hashtags when composing a tweet on Twitter and choosing tags when asking a question on the StackOverflow site.
+  Two cognitively-plausible memory models will be evaluated: an ACT-R inspired Bayesian model and a random-permutation vector-based model.
+  Experiments will be aimed to [1] discover the best way to leverage a user's prior hashtag use as a future predictor, [2] improve the models so that each model's strengths are incorporated into the other,
+  and [3] formally evaluate and compare each model's performance when recommending hashtags on Twitter and tags on StackOverflow.
+  This research will focus on developing user-customized models of hashtag prediction, that best balance a user's past hashtag use and the current content in a post being created to predict the chosen hashtags.
+  Planned modifications to the two memory models are aimed at the architectural level, and may suggest architectural modifications that generalize to other tasks.
+  Finally, the user-customized tag-recommendation models developed with this research may be immediately useful for tag-recommendation systems on the popular Twitter and StackOverflow social media sites.
 }
 
 \note{\today}
@@ -203,7 +212,7 @@ The author used 4 tags for this post: \emph{javascript}, \emph{html}, \emph{inte
 
 The StackOverflow and Twitter datasets were chosen because the human-created content between them is quite different, and I am interested in retrieval models that generalize across tasks.
 However, they are also similar on several accounts:
-Both domains have amassed large amounts of user-created content, users generate tags for posts when creating content on the site (hashtags and tags for Twitter and StackOverflow respectively),
+Both domains have amassed large amounts of user-created content, users generate tags for posts when creating content on the site (hashtags for Twitter and tags for StackOverflow),
 and the user data from the datasets are publicly available for analysis.
 
 Also, studying user-based tag generation on these sites has relevant real-world application.
@@ -212,7 +221,7 @@ These systems can also help newer users by recommending proper tags for their ne
 On the StackOverflow site for example, experts often subscribe to specific hashtags that interest them, and receive a daily digest of posts that are tagged with those hashtags.
 Helping the user properly tag posts on StackOverflow ensures that right community sees the post, which greatly increases the chance that the question on the post will be answered quickly and correctly.
 For Twitter, hashtags represent streams of information that are possibly interesting to the user.
-Having a recommendation system that can suggest relevant hashtags to the user provides a way for the user to connect to and discover new information streams.
+Having a recommendation system that can suggest relevant hashtags to the user provides a way for the user to connect to and discover new information streams that interest them.
 
 \subsubsection{Comparison Between ACT-R and Vector-Based Memory Systems}
 
@@ -294,12 +303,12 @@ The system then retrieved the most likely hashtags that were associated with tha
 The model is based on building a word co-occurrence matrix of words x hashtags, and then uses that matrix to assign a similarity score for each hashtag when provided with a search query.
 Participants graded how relevant the hashtags returned were to each search query.
 The results suggest that hashtags contain useful information that help classify the gist of a post. 
-Although this model does not predict hashtags directly when composing a tweet, a model like this could certainly be tailored for that purpose.
+Although this model does not predict the specific hashtags used when composing a tweet, a model like this could certainly be tailored for that purpose.
 
 \subsection{Hashtag Prediction}
 
 More specific hashtag-recommendation models that attempt to predict a user's chosen hashtag have also been created and tested for a few social media sites.
-Google has even deployed a hashtag-recommendation model to help users properly tag posts for their Google+ social media site \parencite{GoogleKeynote2013}.
+Google has even deployed a hashtag-recommendation model to help users properly tag posts on their Google+ social media site \parencite{GoogleKeynote2013}.
 A tag-suggestion tool has also been deployed for the \url{http://tex.stackexchange.org} and \url{http://superuser.com} StackExchange sites.
 Models for Twitter and StackOverflow are also being proposed and tested, but none have yet been deployed.
 
@@ -369,7 +378,7 @@ Several hashtag recommendation models for Twitter have been developed recently.
 One of the first models used a Bayesian co-occurrence statistical technique to predict the most likely hashtag associated with a post as a function of prior hashtag use and context. \parencite{Mazzia2009}
 The model presented by \textcite{Mazzia2009} is very similar to an ACT-R declarative retrieval model.
 The main potential difference is that the global prior likelihood of a hashtag is computed without taking into account the specific user's past history.
-Instead, the global prior is an overall average frequency of hashtag use.
+Instead, the global prior is an overall average frequency of hashtag use across users.
 
 Several other models have taken a tweet-centered approach to hashtag prediction, where suggested hashtags are collected from hashtags used from similar tweets.
 \textcites{Li2011, Zangerle2011, Kywe2012} all store a content vector for each tweet, and then compute a word co-occurrence-based similarity score between a composed tweet and the rest of the tweets in the database.
@@ -420,13 +429,19 @@ It seems quite likely that words used just before a hashtag in a tweet (combined
 To our knowledge, word order has not yet been taken into account for any of the Twitter hashtag-prediction models that have already been tested.
 It will be interesting to see how much (if at all) accuracy improves when incorporating word-order information into the model.
 
-There has been a mix of co-occurrence and latent-based models created to predict hashtags use on Twitter, and the results are encouraging.
+There has been a mix of co-occurrence and latent-based models created to predict hashtag use on Twitter, and the results are encouraging.
 However, there has been very little research on how a specific user's past hashtag use should influence the model's prediction when that user is composing a tweet.
 \textcite{Kywe2012} did take a user-centered view with their model, but the hashtags predicted by the user and content were analyzed separately and then the top from each group were combined for prediction.
 The ACT-R declarative memory retrieval theory shows how past user behavior and current context combine to produce the most likely retrieval.
 Each component is summed together to generate a total activation, and then the likelihood of chunks are ranked by that summed activation.
 This technique allows for a more natural combination of the two components, where weights can be assigned to each component depending on how strongly each term predicts performance.
 This type of weighted additive model that combines past user behavior and current tweet context to predict the most likely hashtags has not yet been explored for Twitter.
+
+Both StackOverflow models \parencites{Stanley2013,Kuo2011} did not take into account the specific user's prior history when generating tag predictions.
+Rather their models, much like \textcite{Mazzia2009}'s Twitter model, uses the aggregate tag history across all users as the model's prior activation for each tag.
+One of the main purposes of this research is to improve on these user-agnostic Bayesian models and include each specific user's past tagging history as a model component.
+Using customized priors that are tailored to a user's specific tagging history should be crucial for sites like Twitter where the possible tag space is infinite,
+but should also improve performance for more constrained sites like StackOverflow since each user is not interested in all of the possible tags on the site. 
 
 \subsection{ACT-R Declarative Memory Theory}
 
@@ -463,7 +478,7 @@ A formal description of the ACT-R Declarative Memory model is included in Table 
 \end{table}
 
 The total activation ($A_{i}$) for a chunk in declarative memory is a function of two components: base level activation ($B_{i}$) and strength of association ($S_{ji}$).
-The recall probability ($P_{i}$ that a chunk will be retrieved from memory increases with total activation ($A_{i}$).
+The recall probability ($P_{i})$ that a chunk will be retrieved from memory increases with total activation ($A_{i}$).
 
 \subsubsection{Base-Level Activation}
 
@@ -487,7 +502,7 @@ For example, if the StackOverflow tag \emph{PHP} has been used four times as oft
 
 Strength of association ($S_{ji}$) reflects the amount of log odds adjustment to the activation of a chunk, given the current context (i.e., external environment and internal state).
 Context for the StackOverflow domain for example is represented as each word in the title and body of a post.
-Context for the Twitter domain are the words in a Tweet.
+Context for the Twitter domain are the words in a tweet.
 Association strength between a chunk in memory and a single contextual element can be computed directly by calculating its context-adjusted odds ratio:
 The likelihood a chunk occurred with the current context ($p(i|j)$) over the likelihood that the chunk occurred in any of the other contexts ($p(i|\overline{j})$).
 For large datasets, the likelihood that a chunk occurs in any particular context reaches near-zero values ($p(j) \Rightarrow 0$).
@@ -525,14 +540,15 @@ ACT-R's strength of association ($S_{ji}$) and the equivalent pointwise mutual i
 The wall-clock time required for a declarative memory retrieval request scaled linearly with the size of declarative memory with this implementation.
 Retrieval times were around one second with the largest declarative memory that contained over one million associations (co-occurrence pairs).
 
+As one of the largest tests, \textcite{Farahat2004} used the PMI index based on a 118GB local database of 10 million pages of the Stanford WebBase Project.
+So this implementation did not fit completely in RAM, but a spinning-disk database implementation still scaled well enough for reasonably fast retrieval times for $\mathit{PMI}_{ji}$ values.
+
 The SNIF-ACT framework \parencites{Fu2007,Pirolli2003} is also based on the large-scale version of $S_{ji}$, and scales well when working with a large-scale search query database for internet search.
-\textcite{Farahat2004} used $S_{ji}$ values based on a 118GB local database of 10 million pages of the Stanford WebBase Project.
-So this implementation did not fit completely in RAM, but a spinning-disk database implementation still scaled well enough for reasonably fast retrieval times for $S_{ji}$ values.
+The SNIF-ACT model uses strength of association to measure the relationship between the words in a search query and the words contained in each query result.
+A higher $S_{ji}$ between a query and a result means that the result is a better fit for the query, and that the user is more likely to click on that link.
+The links that user chose in experimental testing were largely predictive of the strength of association measure.
 
 %TODO: This paragraph doesn't fit well after the previous one, and in the scaling section
-%The SNIF-ACT model uses strength of association to measure the relationship between the words in a search query and the words contained in each query result.
-%A higher $S_{ji}$ between a query and a result means that the result is a better fit for the query, and that the user is more likely to click on that link.
-%The links that user chose in experimental testing were largely predictive of the strength of association measure.
 %The predictive power of the SNIF-ACT model went above and beyond what would be predicted by simply assuming that the user always clicks on the first link in the search results page.
 
 % ref: http://tex.stackexchange.com/questions/53513/hyperref-token-not-allowed
@@ -580,12 +596,12 @@ Using an entropy measure (as opposed to weighting each word equally in the post)
 Latent Semantic Analysis \parencite{Landauer1997} (LSA) is a technique that has mathematical roots in factor analysis and also measures strength of association between two terms.
 The process starts with a set of N documents.
 A word x document co-occurrence matrix is built by counting the number of times each word appears in each document.
-The dimensionality of the full word frequency co-occurrence matrix is then forced to be represented on a smaller set of dimensions.
+The dimensionality of the full word frequency co-occurrence matrix is then reduced, while maintaining as much of the variance in the original full matrix as possible.
 This process is similar to how factor analysis takes a data table and finds the most efficient way to represent that data with as few dimensions as possible.
 The strength of association between two words is measured by the cosine of the two word vectors across the reduced dimension space.
 
 Usually information is lost when the data are restructured into a smaller set of latent dimensions.
-However it was shown that this process actually improves productiveness and reduces noise by allowing the frequency count of highly similar concepts (words) to be pooled together and represented by a single dimension.
+However it was shown that this process actually improves prediction and reduces noise by allowing the frequency count of highly similar concepts (words) to be pooled together and represented by a single dimension.
 \textcite{Landauer1997} tested the LSA model on the Test of English as a Foreign Language (TOEFL) task of choosing the best of four possible synonyms to a target word.
 Model results were on par with a large sample of applicants to american universities from non-English speaking countries (64.4\% compared to 64.5\%).
 Model performance also improved when the original dimensionality of the data was reduced, but only up to a point.
@@ -607,7 +623,7 @@ Other models that can account for word order have been shown to perform better t
 For example, \textcite{Jones2007} compared a vector-based model called BEAGLE directly to LSA, training and testing both models on the same corpus used in \textcite{Landauer1997}.
 The context-only BEAGLE model (no word order) performed nearly equivalent to the LSA model at the task (55.6\% vs. 55.3\%).
 However, even in a multiple-choice domain where the task is to identify synonyms (very little grammatical structure in the task), adding word order when training the model improved task performance to 57.5\%.
-It seems reasonable to expect that task performance will improve much more on tasks where word order is used (e.g., generating a Twitter hashtag in the middle of a sentence).
+It seems reasonable to expect that task performance will improve much more on tasks where word order is used (e.g., generating a hashtag in the middle of a sentence when composing a tweet).
 
 \subsubsection{Scaling Issues}
 
@@ -739,11 +755,11 @@ A formal description of the random permutation model in \textcite{Sahlgren2008} 
 \end{table}
 
 With random permutations, each word environment vector ($e_{i}$) is a large sparse vector of zeros with a few $\{1,-1\}$s in random locations. 
-In order to create a new environment vector for a word that preceded another word in a sentence, that word's environment vector ($e_{i}$) is bit shifted to the left one position ($^{-1}$).
+In order to create a new environment vector for a word that preceded another word in a sentence, that word's environment vector ($e_{i}$) is shifted to the left one position ($^{-1}$).
 This produces a new environment vector ($e_{i^{-1}}$) for the combination of the word and the position that is uncorrelated with the original word's environment vector and all other environment vectors.
 
 For example, suppose that the words ``stack overflow'' appear in a sentence, and I want to represent that ``stack'' preceded the word ``overflow''.
-The ``stack'' environment vector ($e_{stack}$) is bit shifted one to the left, producing an environment vector for ``stack'' preceding a word ($e_{stack^{-1}}$).
+The ``stack'' environment vector ($e_{stack}$) is shifted one to the left, producing an environment vector for ``stack'' preceding a word ($e_{stack^{-1}}$).
 That environment vector is then added to the memory vector for ``overflow'' ($m_{overflow} = m_{overflow'} + e_{stack^{-1}}$), so that ``overflow'' remembers that ``stack'' has preceded it in a sentence.
 
 A retrieval for a word following ``stack'' (``stack $\Phi$'') is done by creating a memory vector out of all information in context.
