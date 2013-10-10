@@ -159,7 +159,7 @@ The process of suggesting a relevant hashtag to a user can be thought of as a me
 Co-occurrence-based modeling has been shown as a potentially useful approach when predicting Twitter hashtag use \parencite{Efron2010}.
 Several memory retrieval models are based on this broad methodology, where a count is maintained of the times each contextual element (such as a word in a post) co-occur with a tag.
 Two of the current state-of-the-art memory retrieval models are based on a co-occurrence methodology, and I'll be comparing these two models for hashtag prediction:
-ACT-R's declarative memory retrieval theory and random permutation vector-based memory systems.
+ACT-R's declarative memory (DM) retrieval theory and random permutation vector-based memory systems.
 
 \subsubsection{StackOverflow and Twitter}
 
@@ -540,7 +540,7 @@ ACT-R's strength of association ($S_{ji}$) and the equivalent pointwise mutual i
 The wall-clock time required for a declarative memory retrieval request scaled linearly with the size of declarative memory with this implementation.
 Retrieval times were around one second with the largest declarative memory that contained over one million associations (co-occurrence pairs).
 
-The SNIF-ACT framework \parencites{Fu2007,Pirolli2003} is also based on the large-scale version of $S_{ji}$, and scales well when working with a large-scale search query database for internet search.
+The SNIF-ACT framework \parencites{Fu2007,Pirolli2003} is also based on the large-scale version of $S_{ji}$, and scaled well when working with a large-scale search query database for internet search.
 
 As one of the largest tests, \textcite{Farahat2004} used the PMI index based on a 118GB local database of 10 million pages of the Stanford WebBase Project.
 So this implementation did not fit completely in RAM, but a spinning-disk database implementation still scaled well enough for reasonably fast retrieval times for $\mathit{PMI}_{ji}$ values.
@@ -763,7 +763,7 @@ For example, suppose that the words ``stack overflow'' appear in a sentence, and
 The ``stack'' environment vector ($e_{stack}$) is shifted one to the left, producing an environment vector for ``stack'' preceding a word ($e_{stack^{-1}}$).
 That environment vector is then added to the memory vector for ``overflow'' ($m_{overflow} = m_{overflow'} + e_{stack^{-1}}$), so that ``overflow'' remembers that ``stack'' has preceded it in a sentence.
 
-A retrieval for a word following ``stack'' (``stack $\Phi$'') is done by creating a memory vector out of all information in context.
+A resonance retrieval for a word following ``stack'' (``stack $\Phi$'') is done by creating a memory vector out of all information in context.
 In this case, assume only a single piece of order information is available, that ``stack'' precedes the word to retrieve.
 So the memory vector for context is the environment vector for one-back ``stack'' ($m_{C} = e_{stack^{-1}}$).
 The memory vector for ``overflow'' ($m_{overflow}$) will be correlated the highest with this context vector ($m_{C}$) since ``overflow'' contains this vector.
