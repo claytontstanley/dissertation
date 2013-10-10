@@ -849,7 +849,7 @@ These two computations are certainly not equivalent, even though they are most l
 It may be interesting to explore how model performance changes when one calculation is swapped out for another.
 For example, a vector-based model could generate a compressed (reduced dimension) co-occurrence matrix, and then Bayesian calculations could be performed on that matrix to compute adjusted odd likelihoods.
 Alternatively, a vector representation of the current context could be correlated with each column in a full co-occurrence matrix.
-It's unlikely that the latter technique will improve performance, as \textcite{Landauer1997} has shown that performing correlations on uncompressed co-occurrence matrices does not perform well.
+It is unlikely that the latter technique will improve performance, as \textcite{Landauer1997} has shown that performing correlations on uncompressed co-occurrence matrices does not perform well.
 But it may be the case that using Bayesian computation on a compressed vector-based model improves performance.
 
 \section{Models}
