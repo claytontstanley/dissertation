@@ -669,14 +669,13 @@ Over time, memory vectors accumulate a distributed representation of the most co
 Retrieving the most likely chunk given context can be done in two ways: decoding and resonance \parencite{Jones2007}.
 Decoding takes the memory vector for context and decodes it back into an environment vector.
 The cosine between that decoded environment vector and all other environment vectors is computed and ranked, and the chunk with the environment vector with the highest cosine is retrieved.
-For example, assume that a user has written the word ``zend'' in a post.
-``zend'' has co-occurred with \emph{PHP}, so the unordered memory vector for ``zend'' ($c_{zend}$) contains the unordered environment vector for \emph{PHP} ($e_{\mathit{PHP}}$).
-Since the environment vector for \emph{PHP} was added to the memory vector for ``zend'' without any encoding, no decoding is necessary.
-So the cosine between the environment vector \emph{PHP} ($e_{\mathit{PHP}}$) and decoded memory vector for ``zend'' ($c_{zend}$) will be high, and most likely \emph{PHP} will be retrieved through decoding.
 
 Resonance is the opposite retrieval process, where a memory vector is created from the context, and then that context memory vector is compared to all memory vectors.
-For the \emph{PHP} and ``zend'' example, the context memory vector would consist of the unordered environment vector for ``zend''.
-Since the memory vector for \emph{PHP} contains the ``zend'' environment vector, it is likely that the correlation between these two memory vectors will be high.
+For example, assume that a user has written the word ``zend'' in a post, and she wants to assign a tag for the post.
+``zend'' has co-occurred with the tag \emph{PHP} many times previously, so the unordered memory vector for ``PHP'' ($c_{\mathit{PHP}}$) contains the unordered environment vector for \emph{zend} ($e_{zend}$).
+To determine the most correlated memory vector with context, a memory vector is created from the current context ($e_{zend}$).
+The cosine between that context memory vector and the memory vector for \emph{PHP} will be high, since the \emph{PHP} memory vector ($c_{\mathit{PHP}}$) often contains the context environment vector ($e_{zend}$).
+Since the cosine is high, the tag \emph{PHP} will most likely be returned as the vector that resonates highest with the current context.
 
 The resonance and decoding processes are inversions of each other.
 Usually both resonance and decoding will return very similar rank orderings of most likely chunks given context.
