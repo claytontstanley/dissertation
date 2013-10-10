@@ -694,7 +694,7 @@ Order information is lost if a simply co-occurrence counting technique is used.
 
 With vector-based systems, order information is included by creating an environment vector ($e_{bind(i,\Phi)}$) that is a function of environment vectors for both the word ($e_{i}$) and location ($\Phi$).
 This function has the useful property that the resulting environment vector and the location vector can be inverted to return the original word's environment vector.
-Convolution and inverse convolution (i.e., circular correlation) are used by \textcite{Plate1995} and \textcite{Jones2007} to implement these operations.
+Circular convolution and inverse circular convolution (i.e., circular correlation) are used by \textcite{Plate1995} and \textcite{Jones2007} to implement these operations.
 This allows for retrieval requests such as ``playing \#$\Phi$'', ``just read \#$\Phi$'', and ``vector-based $\Phi$ systems''.
 
 For example, suppose that a retrieval request is made for ``martin $\Phi$'' given that the model was trained on the TASA corpus.
