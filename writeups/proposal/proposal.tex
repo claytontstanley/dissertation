@@ -87,16 +87,14 @@
 \begin{document}
 
 \abstract{
-  The amount of user-created content on social media sites continues to grow.
-  To help organize and structure this information, many users create tags for documents to help connect their content to other posts on similar topics and other users that might have similar interests.
-  If an accurate model of the tags users choose when creating content is available, then the system can recommend tags for a user to use, in order to connect the user to similar topics and people as quickly as possible.
-  This works aims to develop and compare tag-recommendation models for users choosing hashtags when composing a tweet on Twitter and choosing tags when asking a question on the StackOverflow site.
-  Two state-of-the-art memory models will be evaluated: an ACT-R inspired Bayesian model and a random-permutation vector-based model.
-  Experiments will be aimed to [1] discover the best way to leverage a user's prior hashtag use as a future predictor, [2] improve the models so that each model's strengths are incorporated into the other,
+  This research aims to develop and compare tag-recommendation models for users choosing hashtags when composing a tweet on Twitter and choosing tags when asking a question on the StackOverflow site.
+  Two state-of-the-art cognitively-plausible memory models will be evaluated on how accurate they predict a user's chosen tags: an ACT-R inspired Bayesian model and a random-permutation vector-based model.
+  Experiments are designed to [1] discover the best way to leverage a user's prior hashtag use as a future predictor, [2] improve the models so that each model's strengths are incorporated into the other,
   and [3] formally evaluate and compare each model's performance when recommending hashtags on Twitter and tags on StackOverflow.
-  This research will focus on developing user-customized models of hashtag prediction, that best balance a user's past hashtag use and the current content in a post being created to predict the chosen hashtags.
-  Planned modifications to the two memory models are aimed at the architectural level, and may suggest architectural modifications that generalize to other tasks.
-  Finally, the user-customized tag-recommendation models developed with this research may be immediately useful for tag-recommendation systems on the popular Twitter and StackOverflow social media sites.
+  The user-customized tag-recommendation models developed with this research should be immediately useful for tag-recommendation systems on the popular Twitter and StackOverflow social media sites.
+  Further, the planned performance modifications to the two memory models are aimed at the architectural level of each model.
+  If these architectural modifications to two cognitively-plausible memory models significantly improve performance,
+  they may suggest task-independent general modifications that can help improve model fit to human data in a much wider range of domains.
 }
 
 \note{\today}
