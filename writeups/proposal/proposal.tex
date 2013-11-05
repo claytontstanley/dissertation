@@ -78,7 +78,7 @@
 % If the toc is too detailed, try limiting the depth of printed sections in the TOC:
 %\setcounter{tocdepth}{2}
 
-\title{User-customized hashtag/tag prediction on Twitter and StackOverflow:\protect \\ Comparing vector-based and ACT-R memory models of tag retrieval}
+\title{Comparing vector-based and ACT-R memory models of tag retrieval:\protect\\User-customized hashtag/tag prediction on Twitter and StackOverflow}
 \shorttitle{Tag prediction on Twitter and StackOverflow}
 %\shorttitle{}
 
@@ -118,18 +118,16 @@
 
 \section{Motivation}
 
-Social media sites such as Twitter, Facebook, StackOverflow, Google+, and Yelp, are composed almost entirely of human-created content.
+Social media sites such as Twitter, Facebook, StackOverflow, Google+, and Yelp are composed almost entirely of human-created content.
 The amount of user content on these sites is staggering, and continues to grow.
-Users of Twitter's microblogging service for example, generate half a billion tweets per day \parencite{TwitterReport2012}.
+Users of Twitter's microblogging service, for example, generate half a billion tweets per day \parencite{TwitterReport2012}.
 However, a single user of a social media site is most likely interested in only a small fragment of this large amount of information.
 One general question to support the user in this domain is:
 How can we quickly and effectively connect users to the content that they care about?
 
-One traditional technique is to provide the user with a powerful search engine so that they can actively look for content that interests them.
-However, users are not forming the same search queries that work so effectively on search engines like Google.
-A growing number of users on social media sites are searching for information that is happening now, in real time \parencite{Jansen2011}.
+A growing number of users on social media sites are searching for information that is happening in real time \parencite{Jansen2011}.
 In other words, users on social-media sites want the fresh \emph{stream} of information about a particular topic.
-This can certainly be seen in the main user-interface views that these social media site provide:
+This can certainly be seen in the main user-interface views that these social media sites provide:
 Twitter's homepage showing your followees' tweets, Facebook's homepage showing your friends' posts, StackOverflow's daily digest of posts for particular tags.
 
 So how can we ensure that users are connected to the information streams that they care most about?
@@ -138,22 +136,22 @@ If we have a better understanding of a user's goals, then we can tailor the info
 For example, Twitter might suggest other users and hashtags for the user to follow, Facebook could suggest pages to like, Yelp could recommend businesses to check out.
 Researchers are currently looking for ways to automate the goal-identification task for more general search queries like those generated for Google \parencites{Jansen2008}{Lee2005}.
 
-However, social media sites have an advantage for identifying user goals over traditional search engines: human-created content.
+However, social media sites have an advantage over traditional search engines for identifying user goals: human-created content.
 Twitter has more than just the tweet that a user is currently composing to try and identify that user's goals.
 The site also has all of the user's previous content, and can use that information to provide a much better prediction of a user's goals.
-Further, sites like Twitter, StackOverflow, Google+, and Facebook support ways for the user to explicitly identify their precise goals when creating content: Hashtags.
+Further, sites like Twitter, StackOverflow, Google+, and Facebook support ways for the user to explicitly identify their precise goals when creating content: hashtags.
 These user-created hashtags are a key indicator of a user's goals on a social media site. 
 
 These hashtags relate to a user's goals and interests because they are a form of human-based document tagging \parencite{Chang2010}.
 Further, people are using hashtags as a way to create information streams on social media sites \parencite{Kwak2010}.
-Twitter users for example, commonly create and use hashtags for upcoming political events that interest them, such as debates and races \parencite{Diakopoulos2010}.
+Twitter users, for example, commonly create and use hashtags for upcoming political events that interest them, such as debates and races \parencite{Diakopoulos2010}.
 So if we can predict what hashtags a user is interested in, we have a better understanding of the information streams that they care about.
 With that understanding, we can tailor the system to suggest hashtags that they may not yet know about but are of likely interest to them.
 We can help aid in their discovery of fresh and relevant information that match their goals on the site.
 
 \subsection{Research Questions}
 
-The core research question I am interested in is:
+The core research question motivating this proposal is:
 What kinds of cognitively-plausible models can best predict the human-created tags that a user on a social media site uses?
 This question can be tested by generating a prediction for the most likely used hashtag whenever a user is about to generate a hashtag, and then comparing the user's chosen hashtag to the model's prediction.
 This process can be framed as a memory retrieval problem.
@@ -162,7 +160,7 @@ The process of suggesting a relevant hashtag to a user can be thought of as a me
 
 Co-occurrence-based modeling has been shown as a potentially useful approach when predicting Twitter hashtag use \parencite{Efron2010}.
 Several memory retrieval models are based on this broad methodology, where a count is maintained of the times each contextual element (such as a word in a post) co-occur with a tag.
-Two of the current state-of-the-art memory retrieval models are based on a co-occurrence methodology, and I'll be comparing these two models for hashtag prediction:
+Two of the current state-of-the-art memory retrieval models are based on a co-occurrence methodology, and I will be comparing these two models for hashtag prediction:
 ACT-R's declarative memory (DM) retrieval theory and random permutation vector-based memory systems.
 
 \subsubsection{StackOverflow and Twitter}
@@ -222,7 +220,7 @@ and the user data from the datasets are publicly available for analysis.
 Also, studying user-based tag generation on these sites has relevant real-world application.
 Models that can accurately predict the tags that users will generate on Twitter and StackOverflow can be used as the foundation for recommendations systems on these very popular sites.
 These systems can also help newer users by recommending proper tags for their newest content.
-On the StackOverflow site for example, experts often subscribe to specific hashtags that interest them, and receive a daily digest of posts that are tagged with those hashtags.
+On the StackOverflow site, for example, experts often subscribe to specific hashtags that interest them, and receive a daily digest of posts that are tagged with those hashtags.
 Helping the user properly tag posts on StackOverflow ensures that right community sees the post, which greatly increases the chance that the question on the post will be answered quickly and correctly.
 For Twitter, hashtags represent streams of information that are possibly interesting to the user.
 Having a recommendation system that can suggest relevant hashtags to the user provides a way for the user to connect to and discover new information streams that interest them.
@@ -232,7 +230,7 @@ Having a recommendation system that can suggest relevant hashtags to the user pr
 ACT-R's declarative memory and vector-based memory systems are substantially different in their mathematical structure.
 Nonetheless, both can successfully model classic behavioral patterns found in word pairing experiments (e.g., \cite{Rutledge2008} modeling the ``fan effect'').
 I will extend the work done by \citeauthor{Rutledge2008} by formally comparing these two models on large-scale hashtag prediction tasks.
-I'll also replace the vector-based model used by \citeauthor{Rutledge2008} with an improved and simplified random-permutation model \parencite{Sahlgren2008}.
+I will also replace the vector-based model used by \citeauthor{Rutledge2008} with an improved and simplified random-permutation model \parencite{Sahlgren2008}.
 The primary objective is to compare the random-permutation vector-based model to ACT-R's declarative memory theory.
 
 An advantage of vector-based models is that word order can be easily incorporated into the single co-occurrence representation \parencite{Jones2007}.
@@ -264,7 +262,7 @@ This will undoubtedly require a combination of two primary model components:
 A user's prior hashtag use will be an essential model component for domains such as Twitter, where the number of possible hashtags is practically infinite.
 In these domains, the model can utilize a user's hashtag history as a way to prune the infinite space of possible hashtags, and generate a much smaller and more manageable set for prediction.
 However, not only should the model properly take into account a user's prior hashtag use, but it should also generate new hashtag predictions when a user is most likely choosing a hashtag they have never used before.
-Calibrating the models to properly balance this exploitation of prior hashtag use versus exploration of new hashtags will be a primary research focus.
+Calibrating the models to properly balance this exploitation of prior hashtag use versus exploration of new hashtags will be a primary research question.
 The end goal is to have a model that can properly balance the user's tag history with the contextual cues in the post in order to generate an accurate prediction.
 
 \section{Prior Research}
@@ -840,7 +838,7 @@ It may certainly be the case that vector-based models can be modified to incorpo
 \subsubsection{Word Order}
 
 One strength of a vector-based model over ACT-R's Bayesian DM model is that word order can be naturally represented alongside unordered co-occurrence information.
-With the ACT-R model for example, it is unclear how to represent that a particular word appeared just before a hashtag. 
+With the ACT-R model, for example, it is unclear how to represent that a particular word appeared just before a hashtag. 
 It may be that multiple co-occurrence matrices must be used to represent word-order co-occurrences and unordered co-occurrences separately.
 However, it would be more parsimonious if these matrices could be combined into a single matrix representation, much like how this information is combined for vector-based models.
 
