@@ -292,8 +292,12 @@ By using a factor-analysis technique and combining these indicators, the model i
 Recommendation systems based on the content of user-created posts have been successful in recommending people on Twitter for a user to follow.
 \textcite{Hannon2010} built a Twitter follower recommendation system by creating a profile of each user based on the words they used in previous posts.
 The recommendation system would then suggest other Twitter users to follow that had similar profiles to a particular user.
-The profiles were created by generating a word frequency matrix of words by (user + followers + followees), and then providing that matrix as input into the Lucine text search engine framework.
-When the system needed to recommend a set of individuals for a user to follow, it would take all of the words used in posts from that user to construct a search query to be provided to Lucine.
+The profiles were created by generating a word frequency matrix of words by (user + followers + followees), and then providing that matrix as input into the Lucene text search engine framework.
+
+Lucene \parencite{McCandless2010} is a commonly-used open-source software tool that measures the similarity between a query and candidate documents in a database.
+It uses the term frequency--inverse document frequency co-occurrence measure to quantify the similarity between a word in the query and a possible document to retrieve.
+
+When the system needed to recommend a set of individuals for a user to follow, it would take all of the words used in posts from that user to construct a search query to be provided to Lucene.
 That search query would return the most likely users that share similar words in posts within their Twitter network with the words provided in the query.
 Using this simple technique based on a standard text search engine allowed the recommendation system to accurately predict the people that a particular user follows at 25\% accuracy.
 
@@ -312,7 +316,7 @@ Although this model does not predict the specific hashtags used when composing a
 More specific hashtag-recommendation models that attempt to predict a user's chosen hashtag have also been created and tested for a few social media sites.
 Google has even deployed a hashtag-recommendation model to help users properly tag posts on their Google+ social media site \parencite{GoogleKeynote2013}.
 A tag-suggestion tool has also been deployed for the \url{http://tex.stackexchange.org} and \url{http://superuser.com} StackExchange sites.
-Models for Twitter and StackOverflow are also being proposed and tested, but none have yet been deployed.
+Models for Twitter and StackOverflow have also been proposed and tested, but none have yet been deployed.
 
 \subsubsection{StackOverflow}
 
@@ -384,7 +388,7 @@ Instead, the global prior is an overall average frequency of hashtag use across 
 
 Several other models have taken a tweet-centered approach to hashtag prediction, where suggested hashtags are collected from hashtags used from similar tweets.
 \textcites{Li2011, Zangerle2011, Kywe2012} all store a content vector for each tweet, and then compute a word co-occurrence-based similarity score between a composed tweet and the rest of the tweets in the database.
-\textcites{Zangerle2011, Kywe2012} use the Apache Lucine infrastructure to compute the similarity score, while \textcite{Li2011} uses a custom similarity score derived from the WordNet database to compute similarities.
+\textcites{Zangerle2011, Kywe2012} use the Apache Lucene infrastructure to compute the similarity score, while \textcite{Li2011} uses a custom similarity score derived from the WordNet database to compute similarities.
 Regardless of the method to compute the similarity between tweets, each method collects the hashtags used from a set of the most similar tweets, then ranks the set, and presents the top 5-10 hashtags to the user.
 
 This tweet-centered approach is quite different than the hashtag-centered approach presented in \textcite{Mazzia2009}.
