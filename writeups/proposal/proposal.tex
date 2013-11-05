@@ -329,9 +329,15 @@ This Bayesian model can accurately predict a user-chosen tag at 47\% accuracy.
 
 \textcite{Stanley2013} also modeled a user's chosen tags for a post on the StackOverflow site.
 The model was based on ACT-R's declarative memory retrieval theory, which at the core is also a Bayesian co-occurrence model.
-However, this model scaled much better than the co-occurrence model presented in \textcite{Kuo2011}.
+However several modifications to the model were made from the standard Bayesian ACT-R declarative memory theory, so it was more sophisticated than the standard ACT-R model and the model used by \textcite{Kuo2011}.
+\citeauthor{Stanley2013} used a data-driven entropy weighting measure to attenuate low-predictor words and increase the weighting of high-predictor words in the body and title of a post.
+An offset term was also included which leveled the model's overall prediction for each post and enabled the use of a logistic regression statistical technique to calibrate the model's parameters.
+A separate model component was used for the words in the body and title of the post, and it was unclear if \citeauthor{Kuo2011} used the words in the body of the post for his models.
+
+\citeauthor{Stanley2013}'s model also scaled much better than \citeauthor{Kuo2011}'s co-occurrence model. 
 Because of this, 100 times more posts were used to build the co-occurrence matrix (\num{1000000} versus \num{10000}), which significantly increased the model's performance.
-After scaling up the model, this model can successfully predict a user's tag for a post at 65\% accuracy.
+After including the modifications and scaling up the model, the model can successfully predict a user's tag for a post at 65\% accuracy.
+
 It is interesting that in both research papers the best performing model was based on a Bayesian co-occurrence framework, since that is precisely the framework from which ACT-R's declarative memory system is based.
 This suggests that more cognitively-plausible memory retrieval models may outperform more general machine-learning approaches in this particular environment
 (i.e., when predicting the user-chosen tags for human-created content on social media sites).
@@ -339,7 +345,7 @@ This suggests that more cognitively-plausible memory retrieval models may outper
 \subsubsection{StackExchange}
 
 A tag suggestion tool has been deployed for the \url{http://tex.stackexchange.org} \parencite{LatexTags2013} and \url{http://superuser.com} \parencite{SuperUserTags2013} StackExchange sites.
-\LaTeX, SuperUser, and StackOverflow are all part of the broader StackExchange network of question and answer sites, and they provide the same user interface and workflow when asking questions.
+LaTeX, SuperUser, and StackOverflow are all part of the broader StackExchange network of question and answer sites, and they provide the same user interface and workflow when asking questions.
 For the two sites where a tag suggestion tool has been deployed, once a user has created a question, suggested tags appear just below the text field where the user types the tags to associate with the question.
 The post author is not forced to use the suggested tags, and is free to choose tags from them or tags not represented in the suggested set.
 An example of the interface for a created post on the SuperUser site is included in Figure \ref{figSuperUserSuggestion}.
