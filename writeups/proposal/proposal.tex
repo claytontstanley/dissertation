@@ -356,10 +356,13 @@ An example of the interface for a created post on the SuperUser site is included
   \label{figSuperUserSuggestion}
 \end{figure}
 
+The exact tag-recommendation algorithm used for the LaTeX and SuperUser sites is not publicized.
+StackExchange appears to be using something more sophisticated than simply looking for words in the title and body of the post that are tags, as the algorithm has not yet been deployed for the busiest StackOverflow site.
 The Latex and SuperUser sites are not nearly as popular as StackOverflow currently.
 The sites have roughly \num{50000} and \num{189000} questions respectively compared to \num{5000000} questions on StackOverflow.
-It may be the case that StackExchange decided to try out a tag recommendation system on a few of their smaller sites first, before deploying this type of system on their most popular StackOverflow site.
-Or it is possible that their current tag recommendation system is not efficient enough to work with the demand of the StackOverflow site.
+
+So it stands to reason that the algorithm is relatively complex, and there are possible scaling and efficiency concerns with the algorithm's implementation.
+Or it is also possible that StackExchange decided to try out a tag recommendation system on a few of their smaller sites first, before deploying this type of system on their most popular StackOverflow site.
 Nonetheless, it is encouraging that StackExchange finds tag recommendation models beneficial to the user and has started to add them to their question and answer sites. 
 
 \subsubsection{Google+}
@@ -377,6 +380,11 @@ The workflow and user interface provided for recommending hashtags for Google+ i
 When generating content on Google+, the system automatically associates the most likely relevant hashtags with that post.
 For the example in Figure \ref{figGoogle+Hashtags}, the system recommended \emph{\#SFGiants} and \emph{\#BusterPosey} as hashtags for the user-created post.
 The user is free to remove any or all of the tags that the system has associated with the post, and can also use tags that were not included in the recommended set.
+
+Google+'s tag-recommendation algorithm is not publicized, but it appears to be rather sophisticated.
+Looking at the example post in Figure \ref{figGoogle+Hashtags}, \#BusterPosey is suggested without having that specific word in the post.
+Also \textcite{GoogleKeynote2013} mentioned that Google uses its sophisticated image recognition software to suggest hashtags for images that are included in the post (e.g., \#EiffelTower),
+even when the post does not have any keywords to provide additional context.
 
 Google is apparently highly confident in the accuracy of their system.
 On the Latex site, the user interface provides subdued suggestions to the user, but requires the user to explicitly choose each tag he/she wants to associated with the post.
