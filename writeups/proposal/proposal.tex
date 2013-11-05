@@ -994,6 +994,13 @@ It seems plausible that performance should improve for vector-based models if th
 Adding a prior activation term for the Bayesian StackOverflow model certainly improved performance \parencite{Stanley2013}.
 So a method to incorporate a user's prior tag history into a random permutation model will be developed and then tested on the full StackOverflow dataset and Twitter popular-users dataset.
 
+One straightforward way to include a user's prior tag history into a random permutation model is to include ACT-R's base-level activation term ($B_{i}$) as an additional term in the model.
+However this may not be the most mathematically appropriate thing to do, since the base-level activation is represented as a log odds value,
+and the usual single strength of association term in a random permutation model is a correlation metric.
+It may be more appropriate to somehow attenuate the memory vectors over time,
+so that an association between a word in a post and a tag (i.e., a memory vector) that has long passed is no longer included in that memory vector's representation.
+I will try these ideas and any others that are discovered during the model development process, and the one that is the most cognitively plausible and accurate will be chosen.
+
 \subsubsection{Experiment 3: Incorporating Word Order Into ACT-R}
 
 How can word-order information be incorporated into the ACT-R Bayesian model?
@@ -1001,6 +1008,18 @@ Currently ACT-R uses a word co-occurrence matrix that does not include word posi
 A co-occurrence is counted if a word and a tag co-occur anywhere in a tweet or post.
 However for Twitter in particular, it may be the case that the few words immediately preceding hashtags are highly predictive, and the word position for those words should be included in the model.
 So a method to include word order into a Bayesian model will be developed.
+
+One method to include word order in a Bayesian co-occurrence matrix is to represent word position on a third, orthogonal dimension, and turn the matrix into a 3-dimensional array.
+So a co-occurrence is represented by a triplet: context word by word position relative to tag by tag.
+When a retrieval request for a tag is made, the strength of association between each word in context (and its position) and the tags in the co-occurrence array would be computed.
+That computation could be made tractable by storing only a small set of orders on the dimension axis and binning.
+
+For example, one could store only three: near, medium, far, which is equivalent to storing three separate co-occurrence matrices.
+So when a retrieval request is made (e.g., when a user writes the \# character when composing a tweet), the strength of association for each word would be computed using the appropriate matrix.
+That is, the ``far'' matrix would be used for words far away from the cursor position, ``near'' for words just written, and ``medium'' for words mid distance from the current focus point.
+This method seems straightforward to implement, but it is slightly unsatisfying since information is lost when binning is used.
+So I will try to discover a better technique to incorporate word order information into the ACT-R Bayesian model than the one just described, but will fall back to this technique if a better method is not found.
+
 This updated model will then be evaluated on only the Twitter common-hashtags dataset, since this dataset contains hashtags that occur in positions throughout the tweet (e.g., embedded within or at the end of a tweet).
 This model will not be evaluated on the StackOverflow dataset since chosen tags for a StackOverflow post are not embedded and mixed within a post, so word-order information is unavailable and most likely unused.
 
