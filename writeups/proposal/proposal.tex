@@ -292,7 +292,7 @@ By using a factor-analysis technique and combining these indicators, the model i
 Recommendation systems based on the content of user-created posts have been successful in recommending people on Twitter for a user to follow.
 \textcite{Hannon2010} built a Twitter follower recommendation system by creating a profile of each user based on the words they used in previous posts.
 The recommendation system would then suggest other Twitter users to follow that had similar profiles to a particular user.
-The profiles were created by generating a word frequency matrix of words x (user + followers + followees), and then providing that matrix as input into the Lucine text search engine framework.
+The profiles were created by generating a word frequency matrix of words by (user + followers + followees), and then providing that matrix as input into the Lucine text search engine framework.
 When the system needed to recommend a set of individuals for a user to follow, it would take all of the words used in posts from that user to construct a search query to be provided to Lucine.
 That search query would return the most likely users that share similar words in posts within their Twitter network with the words provided in the query.
 Using this simple technique based on a standard text search engine allowed the recommendation system to accurately predict the people that a particular user follows at 25\% accuracy.
@@ -302,7 +302,7 @@ Using this simple technique based on a standard text search engine allowed the r
 \textcite{Efron2010} showed how hashtags might be used as a type of recommendation system for Twitter.
 Users constructed a query of text that represented a search for a topic that they were interested in.
 The system then retrieved the most likely hashtags that were associated with that search query.
-The model is based on building a word co-occurrence matrix of words x hashtags, and then uses that matrix to assign a similarity score for each hashtag when provided with a search query.
+The model is based on building a word co-occurrence matrix of words by hashtags, and then uses that matrix to assign a similarity score for each hashtag when provided with a search query.
 Participants graded how relevant the hashtags returned were to each search query.
 The results suggest that hashtags contain useful information that help classify the gist of a post. 
 Although this model does not predict the specific hashtags used when composing a tweet, a model like this could certainly be tailored for that purpose.
@@ -599,7 +599,7 @@ Using an entropy measure (as opposed to weighting each word equally in the post)
 
 Latent Semantic Analysis \parencite{Landauer1997} (LSA) is a technique that has mathematical roots in factor analysis and also measures strength of association between two terms.
 The process starts with a set of N documents.
-A word x document co-occurrence matrix is built by counting the number of times each word appears in each document.
+A word by document co-occurrence matrix is built by counting the number of times each word appears in each document.
 The dimensionality of the full word frequency co-occurrence matrix is then reduced, while maintaining as much of the variance in the original full matrix as possible.
 This process is similar to how factor analysis takes a data table and finds the most efficient way to represent that data with as few dimensions as possible.
 The strength of association between two words is measured by the cosine of the two word vectors across the reduced dimension space.
@@ -613,7 +613,7 @@ Afterwards further reductions in the dimensionality of the data began to degrade
 
 \subsubsection{Singular Value Decomposition}
 
-LSA uses the Singular Value Decomposition process to reduce the dimensionality of the word x document co-occurrence matrix.
+LSA uses the Singular Value Decomposition process to reduce the dimensionality of the word by document co-occurrence matrix.
 The technique attempts to maximize the amount of variability in the data left after forcing the original dimensionality of the data to be reduced.
 The best way to remove a dimension while maintaining the most variability is to look for words with highly-similar co-occurrence patterns and deduce that these words represent the same concept.
 For example, synonyms such as \emph{\#photograph} and \emph{\#photo} would appear interchangeably across documents, so these terms would be collapsed to a single dimension and frequency counts would be pooled.
@@ -622,7 +622,7 @@ By pooling co-occurrence counts the model is able to generate better predictions
 \subsubsection{Word Order}
 
 Although the LSA model has been shown to perform well as a way to measure similarity between two terms, one of the main criticisms is that it is a ``bag of words'' model.
-This means that the model does not account for or pay attention to word order when building the base word x document matrix or consequently, when performing the SVD dimension reduction.
+This means that the model does not account for or pay attention to word order when building the base word by document matrix or consequently, when performing the SVD dimension reduction.
 Other models that can account for word order have been shown to perform better than ``bag of words'' models on tasks that do not even appear to require grammatical structure such as word order to do well.
 For example, \textcite{Jones2007} compared a vector-based model called BEAGLE directly to LSA, training and testing both models on the same corpus used in \textcite{Landauer1997}.
 The context-only BEAGLE model (no word order) performed nearly equivalent to the LSA model at the task (55.6\% vs. 55.3\%).
@@ -632,7 +632,7 @@ It seems reasonable to expect that task performance will improve much more on ta
 \subsubsection{Scaling Issues}
 
 Another issue with LSA is that the SVD matrix decomposition technique is computationally very expensive.
-As the size of the original word x document matrix increases, the SVD computation becomes more and more time consuming.
+As the size of the original word by document matrix increases, the SVD computation becomes more and more time consuming.
 If the domains where LSA is applied contained small enough datasets where SVD computation could be computed in a reasonable amount of time, then this would not be much of a concern.
 However, with large-scale human-created datasets such as Twitter, Stackoverflow, and Wikipedia, the total size of the dataset far exceeds the maximum size that can even be computed by an LSA approach.
 \textcite{Budiu2007} used the first six million pages of the Stanford WebBase corpus to compare performance between LSA and PMI on the TOEFL, and the LSA model could not be implemented with this size training dataset.
@@ -715,9 +715,9 @@ Quite simply, the different types of memory vectors can be summed to create a si
 \subsubsection{Addressing Scalability}
 
 Vector-based representations compute chunk likelihoods by performing a correlation operation directly on the memory vectors.
-Each memory vector can be thought of as a column on a context word x tag co-occurrence matrix used for a Bayesian representation.
-Further, the number of rows for a vector-based representation are fixed and set much smaller than the number of rows in the full word x tag co-occurrence matrix.
-Since Bayesian representations have been shown to scale to over hundreds of millions of word x tag co-occurrences \parencite{Stanley2013}, the compressed vector-based representations should scale as well or better.
+Each memory vector can be thought of as a column on a context word by tag co-occurrence matrix used for a Bayesian representation.
+Further, the number of rows for a vector-based representation are fixed and set much smaller than the number of rows in the full word by tag co-occurrence matrix.
+Since Bayesian representations have been shown to scale to over hundreds of millions of word by tag co-occurrences \parencite{Stanley2013}, the compressed vector-based representations should scale as well or better.
 
 \subsubsection{BEAGLE}
 
@@ -778,7 +778,7 @@ Further, even though random permutations is a simpler representation than BEAGLE
 
 \textcite{Recchia2010} found that random permutations could use smaller vectors than circular convolution approaches (e.g., BEAGLE) to produce equivalent performance (better compression),
 and also scale to larger datasets (better computational efficiency).
-The vector length x performance tradeoff was tested on a simple paired associative retrieval task. 
+The vector length by performance tradeoff was tested on a simple paired associative retrieval task. 
 Retrieval accuracy for the random-permutation vector-based models remained high relative to the circular convolution model even after reducing each environment vector's length from \num{2048} to \num{1024}.
 This indicates that vector-based representations using random permutations compress better than those using circular convolution.
 
@@ -792,12 +792,12 @@ These results make a strong case to favor random-permutations over circular conv
 \subsubsection{Connection to LSA}
 
 Both random permutations and LSA calculate word similarity on a reduced matrix.
-For LSA, the original word x document matrix is compressed to a factor x document matrix and the number of factors are much less than the number of words.
+For LSA, the original word by document matrix is compressed to a factor by document matrix and the number of factors are much less than the number of words.
 For the StackOverflow and Twitter datasets, the number of documents are the number of different tags.
 
 For random permutations, each tag is represented by a compressed vector with a length much less than the number of words.
 Note that if the length of a word's environment vector was the number of unique words, then each word could be represented by associating it with a particular row in the column vector.
-If done in this way, building a matrix of all words' environment vectors x tags would recover the original word x document matrix \parencite{Kanerva2000}.
+If done in this way, building a matrix of all words' environment vectors by tags would recover the original word by document matrix \parencite{Kanerva2000}.
 However, each word's environment vector is compressed using a length much less than the number of unique words and using a combination of a few $\{1,-1\}$s to represent the word.
 
 Information is lost with this compression in both cases: by starting with a compressed representation with random permutations or by reducing to a compressed representation with LSA.
