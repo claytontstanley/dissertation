@@ -267,202 +267,6 @@ The end goal is to have a model that can properly balance the user's tag history
 
 \section{Prior Research}
 
-\subsection{Recommendation Systems}
-
-A model that predicts a user-chosen hashtag is a specific type of a recommendation system.
-These general recommendation systems have grown in need with the growth of the web.
-Users on a site need quick access to specific pieces of information, and the site contains much more information than they can process or care about.
-Recommendation systems are used to tailor the information presented to what is most relevant to the user \parencite{Pazzani2007}.
-
-\subsubsection{The Netflix Prize}
-
-The Netflix Prize \parencite{Bennett2007} is an example of a recommendation system where prior user behavior and current context was used to present the most relevant information to the user.
-Netflix is an online-subscription service where users can stream their favorite television episodes and movies.
-Each user of the site is only interested in a small portion of the entire library of content that Netflix provides.
-In order to provide a high-quality user experience on the site, Netflix created a content-recommendation service.
-This tool recommends to the user movies and television episodes that most likely match their specific interests.
-
-Netflix wanted to improve the accuracy of their recommendation system, so they held a competition where teams could try to improve on the accuracy of the service.
-The winning team utilized a statistical model that performed a type of factor analysis to identify important dimensions in the data (e.g., drama, action, cult classic) and place values for each user along each dimension. 
-This method used prior user behavior to classify a user along the dimensions of the reduced space, and current user behavior (e.g., just watched) to understand what they were interested in watching at that moment.
-By using a factor-analysis technique and combining these indicators, the model improved on Netflix's original recommendation system by 10\%.
-
-\subsubsection{Recommending Followers on Twitter}
-
-Recommendation systems based on the content of user-created posts have been successful in recommending people on Twitter for a user to follow.
-\textcite{Hannon2010} built a Twitter follower recommendation system by creating a profile of each user based on the words they used in previous posts.
-The recommendation system would then suggest other Twitter users to follow that had similar profiles to a particular user.
-The profiles were created by generating a word frequency matrix of words by (user + followers + followees), and then providing that matrix as input into the Lucene text search engine framework.
-
-Lucene \parencite{McCandless2010} is a commonly-used open-source software tool that measures the similarity between a query and candidate documents in a database.
-It uses the term frequency--inverse document frequency co-occurrence measure to quantify the similarity between a word in the query and a possible document to retrieve.
-
-When the system needed to recommend a set of individuals for a user to follow, it would take all of the words used in posts from that user to construct a search query to be provided to Lucene.
-That search query would return the most likely users that share similar words in posts within their Twitter network with the words provided in the query.
-Using this simple technique based on a standard text search engine allowed the recommendation system to accurately predict the people that a particular user follows at 25\% accuracy.
-
-\subsubsection{Hashtags for Recommendation Systems}
-
-\textcite{Efron2010} showed how hashtags might be used as a type of recommendation system for Twitter.
-Users constructed a query of text that represented a search for a topic that they were interested in.
-The system then retrieved the most likely hashtags that were associated with that search query.
-The model is based on building a word co-occurrence matrix of words by hashtags, and then uses that matrix to assign a similarity score for each hashtag when provided with a search query.
-Participants graded how relevant the hashtags returned were to each search query.
-The results suggest that hashtags contain useful information that help classify the gist of a post. 
-Although this model does not predict the specific hashtags used when composing a tweet, a model like this could certainly be tailored for that purpose.
-
-\subsection{Hashtag Prediction}
-
-More specific hashtag-recommendation models that attempt to predict a user's chosen hashtag have also been created and tested for a few social media sites.
-Google has even deployed a hashtag-recommendation model to help users properly tag posts on their Google+ social media site \parencite{GoogleKeynote2013}.
-A tag-suggestion tool has also been deployed for the \url{http://tex.stackexchange.org} and \url{http://superuser.com} StackExchange sites.
-Models for Twitter and StackOverflow have also been proposed and tested, but none have yet been deployed.
-
-\subsubsection{StackOverflow}
-
-\textcite{Kuo2011} was the first to model tag use for StackOverflow posts.
-His set of models were originally designed for next-word prediction for large text document collections.
-In order to structure the models to work for StackOverflow tag prediction, the models would request the most-likely next word after a user created a post, and restrict the space of possible words to only tags.
-He tested the set of next-word prediction models to generate predictions for the most likely tags that a user would choose when asking a question on the site.
-Interestingly, the Bayesian co-occurrence model outperformed the more complicated and computationally expensive Singular Value Decomposition and K-nearest-neighbors models.
-This Bayesian model can accurately predict a user-chosen tag at 47\% accuracy.
-
-\textcite{Stanley2013} also modeled a user's chosen tags for a post on the StackOverflow site.
-The model was based on ACT-R's declarative memory retrieval theory, which at the core is also a Bayesian co-occurrence model.
-However several modifications to the model were made from the standard Bayesian ACT-R declarative memory theory, so it was more sophisticated than the standard ACT-R model and the model used by \textcite{Kuo2011}.
-\citeauthor{Stanley2013} used a data-driven entropy weighting measure to attenuate low-predictor words and increase the weighting of high-predictor words in the body and title of a post.
-An offset term was also included which leveled the model's overall prediction for each post and enabled the use of a logistic regression statistical technique to calibrate the model's parameters.
-A separate model component was used for the words in the body and title of the post, and it was unclear if \citeauthor{Kuo2011} used the words in the body of the post for his models.
-
-\citeauthor{Stanley2013}'s model also scaled much better than \citeauthor{Kuo2011}'s co-occurrence model. 
-Because of this, 100 times more posts were used to build the co-occurrence matrix (\num{1000000} versus \num{10000}), which significantly increased the model's performance.
-After including the modifications and scaling up the model, the model can successfully predict a user's tag for a post at 65\% accuracy.
-
-It is interesting that in both research papers the best performing model was based on a Bayesian co-occurrence framework, since that is precisely the framework from which ACT-R's declarative memory system is based.
-This suggests that more cognitively-plausible memory retrieval models may outperform more general machine-learning approaches in this particular environment
-(i.e., when predicting the user-chosen tags for human-created content on social media sites).
-
-\subsubsection{StackExchange}
-
-A tag suggestion tool has been deployed for the \url{http://tex.stackexchange.org} \parencite{LatexTags2013} and \url{http://superuser.com} \parencite{SuperUserTags2013} StackExchange sites.
-LaTeX, SuperUser, and StackOverflow are all part of the broader StackExchange network of question and answer sites, and they provide the same user interface and workflow when asking questions.
-For the two sites where a tag suggestion tool has been deployed, once a user has created a question, suggested tags appear just below the text field where the user types the tags to associate with the question.
-The post author is not forced to use the suggested tags, and is free to choose tags from them or tags not represented in the suggested set.
-An example of the interface for a created post on the SuperUser site is included in Figure \ref{figSuperUserSuggestion}.
-
-\begin{figure}[!htbp]
-  \scalebox{.9}{\resizebox{\linewidth}{!}{\includegraphics{superUserTagSuggestion-crop.pdf}}}
-  \caption{Example of tag suggestions when creating a post on the SuperUser site}
-  \label{figSuperUserSuggestion}
-\end{figure}
-
-The exact tag-recommendation algorithm used for the LaTeX and SuperUser sites is not publicized.
-StackExchange appears to be using something more sophisticated than simply looking for words in the title and body of the post that are tags, as the algorithm has not yet been deployed for the busiest StackOverflow site.
-The Latex and SuperUser sites are not nearly as popular as StackOverflow currently.
-The sites have roughly \num{50000} and \num{189000} questions respectively compared to \num{5000000} questions on StackOverflow.
-
-So it stands to reason that the algorithm is relatively complex, and there are possible scaling and efficiency concerns with the algorithm's implementation.
-Or it is also possible that StackExchange decided to try out a tag recommendation system on a few of their smaller sites first, before deploying this type of system on their most popular StackOverflow site.
-Nonetheless, it is encouraging that StackExchange finds tag recommendation models beneficial to the user and has started to add them to their question and answer sites. 
-
-\subsubsection{Google+}
-
-The hashtag recommendation system deployed for the Google+ microblogging service is probably the most ambitious model of user-created hashtags to date \parencite{GoogleKeynote2013}.
-The user interface for this recommendation system for an example Google+ post is shown in Figure \ref{figGoogle+Hashtags}.
-
-\begin{figure}[!htbp]
-  \scalebox{.4}{\resizebox{\linewidth}{!}{\includegraphics{google+HashtagExample-crop.pdf}}}
-  \caption{Example post on Google+}
-  \label{figGoogle+Hashtags}
-\end{figure}
-
-The workflow and user interface provided for recommending hashtags for Google+ is similar to how a hashtag recommendation system for Twitter might look.
-When generating content on Google+, the system automatically associates the most likely relevant hashtags with that post.
-For the example in Figure \ref{figGoogle+Hashtags}, the system recommended \emph{\#SFGiants} and \emph{\#BusterPosey} as hashtags for the user-created post.
-The user is free to remove any or all of the tags that the system has associated with the post, and can also use tags that were not included in the recommended set.
-
-Google+'s tag-recommendation algorithm is not publicized, but it appears to be rather sophisticated.
-Looking at the example post in Figure \ref{figGoogle+Hashtags}, \emph{\#BusterPosey} is suggested without having that specific word in the post.
-Also \textcite{GoogleKeynote2013} mentioned that the algorithm uses Google's sophisticated image recognition software to suggest hashtags for images that are included in the post (e.g., \emph{\#EiffelTower}),
-even when the post does not have any keywords to provide additional context.
-
-Google is apparently highly confident in the accuracy of their system.
-On the Latex site, the user interface provides subdued suggestions to the user, but requires the user to explicitly choose each tag he/she wants to associated with the post.
-For Google+, the user interface automatically tags a user's post, and then requires the user to explicitly change those tags if he/she wants to use a different set.
-If tag accuracy is high enough, the Google+ technique is certainly favorable since the user does not have to spend time figuring out which tags best represent this post.
-However, if the model makes even just a few errors, users may become annoyed and frustrated with the recommendation system since they will have to explicitly correct it every time they generate a post.
-
-\subsubsection{Twitter}
-
-Several hashtag recommendation models for Twitter have been developed recently.
-One of the first models used a Bayesian co-occurrence statistical technique to predict the most likely hashtag associated with a post as a function of prior hashtag use and context \parencite{Mazzia2009}.
-The model presented by \textcite{Mazzia2009} is very similar to an ACT-R declarative retrieval model.
-The main potential difference is that the global prior likelihood of a hashtag is computed without taking into account the specific user's past history.
-Instead, the global prior is an overall average frequency of hashtag use across users.
-
-Several other models have taken a tweet-centered approach to hashtag prediction, where suggested hashtags are collected from hashtags used from similar tweets.
-\textcites{Li2011, Zangerle2011, Kywe2012} all store a content vector for each tweet, and then compute a word co-occurrence-based similarity score between a composed tweet and the rest of the tweets in the database.
-\textcites{Zangerle2011, Kywe2012} use the Apache Lucene infrastructure to compute the similarity score, while \textcite{Li2011} uses a custom similarity score derived from the WordNet database to compute similarities.
-Regardless of the method to compute the similarity between tweets, each method collects the hashtags used from a set of the most similar tweets, then ranks the set, and presents the top 5-10 hashtags to the user.
-
-This tweet-centered approach is quite different than the hashtag-centered approach presented in \textcite{Mazzia2009}.
-With a hashtag-centered approach, a direct association is built between the words in a tweet and hashtags that occur in tweets.
-With a tweet-centered approach, that association between words and hashtags is indirect:
-The relationship is built between a tweet and its content, and then similar tweets are assumed to use similar hashtags.
-One problem with the tweet-centered approach is that the storage size grows with the number of tweets, as a representation of the content in each tweet has to be maintained to later compute tweet similarity.
-The storage size for a hashtag-centered approach grows with the number of hashtags, but it seems reasonable that this will grow slower than the number of tweets and asymptote after collecting a large sample of tweets.
-So from the perspective of efficient information storage and retrieval, it seems more likely that the hashtag-centered approach used in \textcite{Mazzia2009} will scale as Twitter grows in size and use.
-
-\textcite{Kywe2012} also customized their tag prediction model to the user's past hashtag use, and was one of the first to do so when developing a hashtag-prediction model for Twitter.
-The set of recommended hashtags was the union of hashtags used in similar tweets and hashtags used by similar users.
-This was done by storing a content vector of hashtag use for each user (user-centered approach) alongside the content vectors of hashtag use for each tweet (tweet-centered approach).
-To generate recommended hashtags, the model would return the top-ranked hashtags from the hashtags used in 0-50 similar tweets and 0-4 similar users.
-Prediction accuracy improved when the model combined recommendations based on hashtags in both similar tweets and the top few similar users compared to basing recommendations on similar tweets alone. 
-
-A topics-based approach was used by \textcite{Godin2013}, where the model predicted the most likely set of topics that were associated with a tweet, and tested if these topics matched the tweet by using human raters.
-The latent topics for the collection of tweets were generated using a Latent Dirichlet Allocation (LDA) statistical methodology.
-This is similar to a factor analysis approach in that the most likely hidden dimensions (i.e., topics) of the data are discovered by searching for reduced representations of the data that cover most of the variance. 
-Human graders rated how well the models generated topics for a tweet related to the content in the tweet.
-The LDA model performed well, and generated relevant topics.
-When the model produced five most-likely hashtags for each tweet, 80\% of the time at least one of those hashtags was suitable (as determined by human raters).
-
-However, a topic-generating model is not performing the same task as a hashtag-prediction model.
-The authors argued that these general topics could be used to categorize the post, in addition to the hashtags already used by the author in the post.
-It is unclear though if a user would want to label their tweet with these general topics.
-Perhaps they would rather use more specific hashtags to be more precise in how they label the tweet and how that tweet is associated with tweets within the rest of the community.
-In fact, they have already chosen to be more precise in the specific labels that they use for the tweet, since they chose to label the tweet with specific hashtags instead of general topics.
-Now it is certainly the case that the topics generated by a latent-based model may be similar to the hashtags used in the post.
-However, it seems a bit indirect to build a model that predicts general topics, since embedded in the data are the exact ``topics'' (i.e., hashtags) that each user chose to use for each tweet.
-Why not take those topics already present in the data and build a model that produces them?
-In other words, the topics data are already in the tweet, so why not use them?
-
-\subsubsection{State of Research on StackOverflow and Twitter}
-
-Although recent work has been done to model human tagging on the StackOverflow site, to our knowledge no vector-based holographic memory model has been tested or used.
-I am curious to see the prediction difference between a vector-based model and current co-occurrence models on the StackOverflow dataset.
-Both types of models are neurologically plausible, and both have been successfully incorporated as the declarative memory component of the ACT-R cognitive architecture \parencite{Rutledge2007}. 
-Given that the Bayesian cognitively-plausible models have done so well to predict tag use on StackOverflow, it will be interesting to see how a cognitively-plausible vector-based model performs at the task.
-
-Also, a vector-based retrieval model has not yet been tested on Twitter.
-One of the advantages of vector-based models is that word order can be easily incorporated into the single co-occurrence representation \parencite{Jones2007}.
-It seems quite likely that words used just before a hashtag in a tweet (combined with their position) will be highly predictive of the hashtag chosen.
-To our knowledge, word order has not yet been taken into account for any of the Twitter hashtag-prediction models that have already been tested.
-It will be interesting to see how much (if at all) accuracy improves when incorporating word-order information into the model.
-
-There has been a mix of co-occurrence and latent-based models created to predict hashtag use on Twitter, and the results are encouraging.
-However, there has been very little research on how a specific user's past hashtag use should influence the model's prediction when that user is composing a tweet.
-\textcite{Kywe2012} did take a user-centered view with their model, but the hashtags predicted by the user and content were analyzed separately and then the top from each group were combined for prediction.
-The ACT-R declarative memory retrieval theory shows how past user behavior and current context combine to produce the most likely retrieval.
-Each component is summed together to generate a total activation, and then the likelihood of chunks are ranked by that summed activation.
-This technique is compensatory and allows for a more natural combination of the two components, where weights can be assigned to each component depending on how strongly each term predicts performance.
-This type of weighted additive model that combines past user behavior and current tweet context to predict the most likely hashtags has not yet been explored for Twitter.
-
-Both StackOverflow models \parencites{Stanley2013,Kuo2011} did not take into account the specific user's prior history when generating tag predictions.
-Rather their models, much like \textcite{Mazzia2009}'s Twitter model, uses the aggregate tag history across all users as the model's prior activation for each tag.
-One of the main purposes of this research is to improve on these user-agnostic Bayesian models and include each specific user's past tagging history as a model component.
-Using customized priors that are tailored to a user's specific tagging history should be crucial for sites like Twitter where the possible tag space is infinite,
-but should also improve performance for more constrained sites like StackOverflow since each user is not interested in all of the possible tags on the site. 
-
 \subsection{ACT-R Declarative Memory Theory}
 
 ACT-R \parencite{Anderson2004} is a cognitive architecture that formalizes how each cognitive process of the brain (e.g., memory, learning, visual and motor) interacts to produce behavior.
@@ -564,54 +368,6 @@ The SNIF-ACT framework \parencites{Fu2007,Pirolli2003} is also based on the larg
 
 As one of the largest tests, \textcite{Farahat2004} used the PMI index based on a 118GB local database of 10 million pages of the Stanford WebBase Project.
 So this implementation did not fit completely in RAM, but a spinning-disk database implementation still scaled well enough for reasonably fast retrieval times for $\mathit{PMI}_{ji}$ values.
-
-%The SNIF-ACT model uses strength of association to measure the relationship between the words in a search query and the words contained in each query result.
-%A higher $S_{ji}$ between a query and a result means that the result is a better fit for the query, and that the user is more likely to click on that link.
-%The links that user chose in experimental testing were largely predictive of the strength of association measure.
-
-%TODO: This paragraph doesn't fit well after the previous one, and in the scaling section
-%The predictive power of the SNIF-ACT model went above and beyond what would be predicted by simply assuming that the user always clicks on the first link in the search results page.
-
-% ref: http://tex.stackexchange.com/questions/53513/hyperref-token-not-allowed
-\subsubsection{\texorpdfstring{\textcite{Stanley2013}}{Stanley2013}'s ACT-R DM Model for StackOverflow}
-
-\textcite{Stanley2013} modified the standard ACT-R model in Table \ref{tabACT-RModel} in order to more accurately predict tag use on StackOverflow.
-A formal description of the modified ACT-R Bayesian model is included in Table \ref{tabModACTRModel}.
-
-\begin{table}[!ht]
-  \caption{StackOverflow tag prediction model}
-  \label{tabModACTRModel}
-  {\tabulinesep=1.2mm
-    \begin{tabu}{ll}
-      \hline
-      Common Name &  Equation \\
-      \hline
-      Activation & 		$A_{i} = B_{i} + \sum_{j\in T}^{ } W_{j} S_{ji} + \sum_{j\in B}^{ } W_{j} S_{ji} - O$ \\
-      Base Level & 		$B_{i} = log \frac{p_{i}}{1-p_{i}}$ \\
-      Strength Assoc. &		$S_{ji} = log \frac{p(i|j)}{p(i))} = log \frac{NN_{ji}}{N_{Row}(j)N_{Col}(i)}$ \\
-      Co-occurrence &		$N_{ji} = \sum_{}^{}{observed_{ji}}$ \\
-      Observations &		$N = \sum_{}^{}{\sum_{}^{}{N_{ji}}}$ \\
-      Attentional Weight& 	$W_{j} = W \frac{E_{j}} {\sum_{}^{} {E_{j}}} $ \\
-      Scaled Entropy & 		$E_{j} = 1-\frac{H_{j}}{H_{max}}$ \\
-      Entropy & 		$H_{j} = -\sum_{i=1}^{N}p(i|j)log\left (  p(i|j) \right )$ \\
-      Offset & 			$O = \frac{1}{5}\sum_{i\in top 5}^{ } A_{i}$ \\
-      \hline
-    \end{tabu}
-  }
-\end{table}
-
-The activation of each tag ($A_{i}$) is a function of four components:
-That tag's base level activation ($B_{i}$), contextual activation for the words in the title, activation for words in the body, and an offset term ($O$).
-This model has been modified from the standard ACT-R model (Table \ref{tabACT-RModel}) in three ways:
-Two separate contextual components were used (words in title and body of post), an offset term was added, and an entropy measure was used to compute the attentional weight ($W_{j}$).
-
-The offset term was added to normalize the mean activation across retrievals.
-This allowed the use of a logistical regression statistical technique to calibrate the weights for each of the terms.
-The title and body contextual components were separated since it seemed plausible that the words in the title would be better predictors of the tag used than the words in the body.
-It turned out that the words in the body were a better predictor of tag use \parencite{Stanley2013}, most likely because there are many more words in the body than the title of the post.
-The entropy measure was used to compute the attentional weight for two reasons:
-Stop words could be statistically derived and attenuated in the analysis, and more predictive words of some tag (e.g., the word ``PHP'' in a post) were given higher weight.
-Using an entropy measure (as opposed to weighting each word equally in the post) for the attentional weight term allows the model to allocate limited attentional resources ($W$) to important contextual elements.
 
 \subsection{Latent Semantic Analysis Memory Theory}
 
@@ -870,6 +626,245 @@ For example, a vector-based model could generate a compressed (reduced dimension
 Alternatively, a vector representation of the current context could be correlated with each column in a full co-occurrence matrix.
 It is unlikely that the latter technique will improve performance, as \textcite{Landauer1997} has shown that performing correlations on uncompressed co-occurrence matrices does not perform well.
 But it may be the case that using Bayesian computation on a compressed vector-based model improves performance.
+
+\subsection{Recommendation Systems}
+
+A model that predicts a user-chosen hashtag is a specific type of a recommendation system.
+These general recommendation systems have grown in need with the growth of the web.
+Users on a site need quick access to specific pieces of information, and the site contains much more information than they can process or care about.
+Recommendation systems are used to tailor the information presented to what is most relevant to the user \parencite{Pazzani2007}.
+
+\subsubsection{The Netflix Prize}
+
+The Netflix Prize \parencite{Bennett2007} is an example of a recommendation system where prior user behavior and current context was used to present the most relevant information to the user.
+Netflix is an online-subscription service where users can stream their favorite television episodes and movies.
+Each user of the site is only interested in a small portion of the entire library of content that Netflix provides.
+In order to provide a high-quality user experience on the site, Netflix created a content-recommendation service.
+This tool recommends to the user movies and television episodes that most likely match their specific interests.
+
+Netflix wanted to improve the accuracy of their recommendation system, so they held a competition where teams could try to improve on the accuracy of the service.
+The winning team utilized a statistical model that performed a type of factor analysis to identify important dimensions in the data (e.g., drama, action, cult classic) and place values for each user along each dimension. 
+This method used prior user behavior to classify a user along the dimensions of the reduced space, and current user behavior (e.g., just watched) to understand what they were interested in watching at that moment.
+By using a factor-analysis technique and combining these indicators, the model improved on Netflix's original recommendation system by 10\%.
+
+\subsubsection{Recommending Followers on Twitter}
+
+Recommendation systems based on the content of user-created posts have been successful in recommending people on Twitter for a user to follow.
+\textcite{Hannon2010} built a Twitter follower recommendation system by creating a profile of each user based on the words they used in previous posts.
+The recommendation system would then suggest other Twitter users to follow that had similar profiles to a particular user.
+The profiles were created by generating a word frequency matrix of words by (user + followers + followees), and then providing that matrix as input into the Lucene text search engine framework.
+
+Lucene \parencite{McCandless2010} is a commonly-used open-source software tool that measures the similarity between a query and candidate documents in a database.
+It uses the term frequency--inverse document frequency co-occurrence measure to quantify the similarity between a word in the query and a possible document to retrieve.
+
+When the system needed to recommend a set of individuals for a user to follow, it would take all of the words used in posts from that user to construct a search query to be provided to Lucene.
+That search query would return the most likely users that share similar words in posts within their Twitter network with the words provided in the query.
+Using this simple technique based on a standard text search engine allowed the recommendation system to accurately predict the people that a particular user follows at 25\% accuracy.
+
+\subsubsection{Hashtags for Recommendation Systems}
+
+\textcite{Efron2010} showed how hashtags might be used as a type of recommendation system for Twitter.
+Users constructed a query of text that represented a search for a topic that they were interested in.
+The system then retrieved the most likely hashtags that were associated with that search query.
+The model is based on building a word co-occurrence matrix of words by hashtags, and then uses that matrix to assign a similarity score for each hashtag when provided with a search query.
+Participants graded how relevant the hashtags returned were to each search query.
+The results suggest that hashtags contain useful information that help classify the gist of a post. 
+Although this model does not predict the specific hashtags used when composing a tweet, a model like this could certainly be tailored for that purpose.
+
+\subsection{Hashtag Prediction}
+
+More specific hashtag-recommendation models that attempt to predict a user's chosen hashtag have also been created and tested for a few social media sites.
+Google has even deployed a hashtag-recommendation model to help users properly tag posts on their Google+ social media site \parencite{GoogleKeynote2013}.
+A tag-suggestion tool has also been deployed for the \url{http://tex.stackexchange.org} and \url{http://superuser.com} StackExchange sites.
+Models for Twitter and StackOverflow have also been proposed and tested, but none have yet been deployed.
+
+\subsubsection{StackOverflow}
+
+\textcite{Kuo2011} was the first to model tag use for StackOverflow posts.
+His set of models were originally designed for next-word prediction for large text document collections.
+In order to structure the models to work for StackOverflow tag prediction, the models would request the most-likely next word after a user created a post, and restrict the space of possible words to only tags.
+He tested the set of next-word prediction models to generate predictions for the most likely tags that a user would choose when asking a question on the site.
+Interestingly, the Bayesian co-occurrence model outperformed the more complicated and computationally expensive Singular Value Decomposition and K-nearest-neighbors models.
+This Bayesian model can accurately predict a user-chosen tag at 47\% accuracy.
+
+% ref: http://tex.stackexchange.com/questions/53513/hyperref-token-not-allowed
+\paragraph{\texorpdfstring{\textcite{Stanley2013}}{Stanley2013}'s ACT-R DM Model for StackOverflow}
+
+\textcite{Stanley2013} also modeled a user's chosen tags for a post on the StackOverflow site.
+They modified the standard ACT-R model in Table \ref{tabACT-RModel} in order to more accurately predict tag use on StackOverflow.
+A formal description of the modified ACT-R Bayesian model is included in Table \ref{tabModACTRModel}.
+
+\begin{table}[!ht]
+  \caption{StackOverflow tag prediction model}
+  \label{tabModACTRModel}
+  {\tabulinesep=1.2mm
+    \begin{tabu}{ll}
+      \hline
+      Common Name &  Equation \\
+      \hline
+      Activation & 		$A_{i} = B_{i} + \sum_{j\in T}^{ } W_{j} S_{ji} + \sum_{j\in B}^{ } W_{j} S_{ji} - O$ \\
+      Base Level & 		$B_{i} = log \frac{p_{i}}{1-p_{i}}$ \\
+      Strength Assoc. &		$S_{ji} = log \frac{p(i|j)}{p(i))} = log \frac{NN_{ji}}{N_{Row}(j)N_{Col}(i)}$ \\
+      Co-occurrence &		$N_{ji} = \sum_{}^{}{observed_{ji}}$ \\
+      Observations &		$N = \sum_{}^{}{\sum_{}^{}{N_{ji}}}$ \\
+      Attentional Weight& 	$W_{j} = W \frac{E_{j}} {\sum_{}^{} {E_{j}}} $ \\
+      Scaled Entropy & 		$E_{j} = 1-\frac{H_{j}}{H_{max}}$ \\
+      Entropy & 		$H_{j} = -\sum_{i=1}^{N}p(i|j)log\left (  p(i|j) \right )$ \\
+      Offset & 			$O = \frac{1}{5}\sum_{i\in top 5}^{ } A_{i}$ \\
+      \hline
+    \end{tabu}
+  }
+\end{table}
+
+The activation of each tag ($A_{i}$) is a function of four components:
+That tag's base level activation ($B_{i}$), contextual activation for the words in the title, activation for words in the body, and an offset term ($O$).
+This model has been modified from the standard ACT-R model (Table \ref{tabACT-RModel}) in three ways:
+Two separate contextual components were used (words in title and body of post), an offset term was added, and an entropy measure was used to compute the attentional weight ($W_{j}$).
+
+The offset term was added to normalize the mean activation across retrievals.
+This allowed the use of a logistical regression statistical technique to calibrate the weights for each of the terms.
+The title and body contextual components were separated since it seemed plausible that the words in the title would be better predictors of the tag used than the words in the body.
+It turned out that the words in the body were a better predictor of tag use \parencite{Stanley2013}, most likely because there are many more words in the body than the title of the post.
+The entropy measure was used to compute the attentional weight for two reasons:
+Stop words could be statistically derived and attenuated in the analysis, and more predictive words of some tag (e.g., the word ``PHP'' in a post) were given higher weight.
+Using an entropy measure (as opposed to weighting each word equally in the post) for the attentional weight term allows the model to allocate limited attentional resources ($W$) to important contextual elements.
+
+\paragraph{Comparison Between \citeauthor{Kuo2011}'s and \citeauthor{Stanley2013}'s Models}
+
+\textcite{Stanley2013}'s model was based on ACT-R's declarative memory retrieval theory, which at the core is also a Bayesian co-occurrence model.
+However several modifications to the model were made from the standard Bayesian ACT-R declarative memory theory, so it was more sophisticated than the standard ACT-R model and the model used by \textcite{Kuo2011}.
+\citeauthor{Stanley2013} used a data-driven entropy weighting measure to attenuate low-predictor words and increase the weighting of high-predictor words in the body and title of a post.
+An offset term was also included which leveled the model's overall prediction for each post and enabled the use of a logistic regression statistical technique to calibrate the model's parameters.
+A separate model component was used for the words in the body and title of the post, and it was unclear if \citeauthor{Kuo2011} used the words in the body of the post for his models.
+
+\citeauthor{Stanley2013}'s model also scaled much better than \citeauthor{Kuo2011}'s co-occurrence model. 
+Because of this, 100 times more posts were used to build the co-occurrence matrix (\num{1000000} versus \num{10000}), which significantly increased the model's performance.
+After including the modifications and scaling up the model, the model can successfully predict a user's tag for a post at 65\% accuracy.
+
+It is interesting that in both research papers the best performing model was based on a Bayesian co-occurrence framework, since that is precisely the framework from which ACT-R's declarative memory system is based.
+This suggests that more cognitively-plausible memory retrieval models may outperform more general machine-learning approaches in this particular environment
+(i.e., when predicting the user-chosen tags for human-created content on social media sites).
+
+\subsubsection{StackExchange}
+
+A tag suggestion tool has been deployed for the \url{http://tex.stackexchange.org} \parencite{LatexTags2013} and \url{http://superuser.com} \parencite{SuperUserTags2013} StackExchange sites.
+LaTeX, SuperUser, and StackOverflow are all part of the broader StackExchange network of question and answer sites, and they provide the same user interface and workflow when asking questions.
+For the two sites where a tag suggestion tool has been deployed, once a user has created a question, suggested tags appear just below the text field where the user types the tags to associate with the question.
+The post author is not forced to use the suggested tags, and is free to choose tags from them or tags not represented in the suggested set.
+An example of the interface for a created post on the SuperUser site is included in Figure \ref{figSuperUserSuggestion}.
+
+\begin{figure}[!htbp]
+  \scalebox{.9}{\resizebox{\linewidth}{!}{\includegraphics{superUserTagSuggestion-crop.pdf}}}
+  \caption{Example of tag suggestions when creating a post on the SuperUser site}
+  \label{figSuperUserSuggestion}
+\end{figure}
+
+The exact tag-recommendation algorithm used for the LaTeX and SuperUser sites is not publicized.
+StackExchange appears to be using something more sophisticated than simply looking for words in the title and body of the post that are tags, as the algorithm has not yet been deployed for the busiest StackOverflow site.
+The Latex and SuperUser sites are not nearly as popular as StackOverflow currently.
+The sites have roughly \num{50000} and \num{189000} questions respectively compared to \num{5000000} questions on StackOverflow.
+
+So it stands to reason that the algorithm is relatively complex, and there are possible scaling and efficiency concerns with the algorithm's implementation.
+Or it is also possible that StackExchange decided to try out a tag recommendation system on a few of their smaller sites first, before deploying this type of system on their most popular StackOverflow site.
+Nonetheless, it is encouraging that StackExchange finds tag recommendation models beneficial to the user and has started to add them to their question and answer sites. 
+
+\subsubsection{Google+}
+
+The hashtag recommendation system deployed for the Google+ microblogging service is probably the most ambitious model of user-created hashtags to date \parencite{GoogleKeynote2013}.
+The user interface for this recommendation system for an example Google+ post is shown in Figure \ref{figGoogle+Hashtags}.
+
+\begin{figure}[!htbp]
+  \scalebox{.4}{\resizebox{\linewidth}{!}{\includegraphics{google+HashtagExample-crop.pdf}}}
+  \caption{Example post on Google+}
+  \label{figGoogle+Hashtags}
+\end{figure}
+
+The workflow and user interface provided for recommending hashtags for Google+ is similar to how a hashtag recommendation system for Twitter might look.
+When generating content on Google+, the system automatically associates the most likely relevant hashtags with that post.
+For the example in Figure \ref{figGoogle+Hashtags}, the system recommended \emph{\#SFGiants} and \emph{\#BusterPosey} as hashtags for the user-created post.
+The user is free to remove any or all of the tags that the system has associated with the post, and can also use tags that were not included in the recommended set.
+
+Google+'s tag-recommendation algorithm is not publicized, but it appears to be rather sophisticated.
+Looking at the example post in Figure \ref{figGoogle+Hashtags}, \emph{\#BusterPosey} is suggested without having that specific word in the post.
+Also \textcite{GoogleKeynote2013} mentioned that the algorithm uses Google's sophisticated image recognition software to suggest hashtags for images that are included in the post (e.g., \emph{\#EiffelTower}),
+even when the post does not have any keywords to provide additional context.
+
+Google is apparently highly confident in the accuracy of their system.
+On the Latex site, the user interface provides subdued suggestions to the user, but requires the user to explicitly choose each tag he/she wants to associated with the post.
+For Google+, the user interface automatically tags a user's post, and then requires the user to explicitly change those tags if he/she wants to use a different set.
+If tag accuracy is high enough, the Google+ technique is certainly favorable since the user does not have to spend time figuring out which tags best represent this post.
+However, if the model makes even just a few errors, users may become annoyed and frustrated with the recommendation system since they will have to explicitly correct it every time they generate a post.
+
+\subsubsection{Twitter}
+
+Several hashtag recommendation models for Twitter have been developed recently.
+One of the first models used a Bayesian co-occurrence statistical technique to predict the most likely hashtag associated with a post as a function of prior hashtag use and context \parencite{Mazzia2009}.
+The model presented by \textcite{Mazzia2009} is very similar to an ACT-R declarative retrieval model.
+The main potential difference is that the global prior likelihood of a hashtag is computed without taking into account the specific user's past history.
+Instead, the global prior is an overall average frequency of hashtag use across users.
+
+Several other models have taken a tweet-centered approach to hashtag prediction, where suggested hashtags are collected from hashtags used from similar tweets.
+\textcites{Li2011, Zangerle2011, Kywe2012} all store a content vector for each tweet, and then compute a word co-occurrence-based similarity score between a composed tweet and the rest of the tweets in the database.
+\textcites{Zangerle2011, Kywe2012} use the Apache Lucene infrastructure to compute the similarity score, while \textcite{Li2011} uses a custom similarity score derived from the WordNet database to compute similarities.
+Regardless of the method to compute the similarity between tweets, each method collects the hashtags used from a set of the most similar tweets, then ranks the set, and presents the top 5-10 hashtags to the user.
+
+This tweet-centered approach is quite different than the hashtag-centered approach presented in \textcite{Mazzia2009}.
+With a hashtag-centered approach, a direct association is built between the words in a tweet and hashtags that occur in tweets.
+With a tweet-centered approach, that association between words and hashtags is indirect:
+The relationship is built between a tweet and its content, and then similar tweets are assumed to use similar hashtags.
+One problem with the tweet-centered approach is that the storage size grows with the number of tweets, as a representation of the content in each tweet has to be maintained to later compute tweet similarity.
+The storage size for a hashtag-centered approach grows with the number of hashtags, but it seems reasonable that this will grow slower than the number of tweets and asymptote after collecting a large sample of tweets.
+So from the perspective of efficient information storage and retrieval, it seems more likely that the hashtag-centered approach used in \textcite{Mazzia2009} will scale as Twitter grows in size and use.
+
+\textcite{Kywe2012} also customized their tag prediction model to the user's past hashtag use, and was one of the first to do so when developing a hashtag-prediction model for Twitter.
+The set of recommended hashtags was the union of hashtags used in similar tweets and hashtags used by similar users.
+This was done by storing a content vector of hashtag use for each user (user-centered approach) alongside the content vectors of hashtag use for each tweet (tweet-centered approach).
+To generate recommended hashtags, the model would return the top-ranked hashtags from the hashtags used in 0-50 similar tweets and 0-4 similar users.
+Prediction accuracy improved when the model combined recommendations based on hashtags in both similar tweets and the top few similar users compared to basing recommendations on similar tweets alone. 
+
+A topics-based approach was used by \textcite{Godin2013}, where the model predicted the most likely set of topics that were associated with a tweet, and tested if these topics matched the tweet by using human raters.
+The latent topics for the collection of tweets were generated using a Latent Dirichlet Allocation (LDA) statistical methodology.
+This is similar to a factor analysis approach in that the most likely hidden dimensions (i.e., topics) of the data are discovered by searching for reduced representations of the data that cover most of the variance. 
+Human graders rated how well the models generated topics for a tweet related to the content in the tweet.
+The LDA model performed well, and generated relevant topics.
+When the model produced five most-likely hashtags for each tweet, 80\% of the time at least one of those hashtags was suitable (as determined by human raters).
+
+However, a topic-generating model is not performing the same task as a hashtag-prediction model.
+The authors argued that these general topics could be used to categorize the post, in addition to the hashtags already used by the author in the post.
+It is unclear though if a user would want to label their tweet with these general topics.
+Perhaps they would rather use more specific hashtags to be more precise in how they label the tweet and how that tweet is associated with tweets within the rest of the community.
+In fact, they have already chosen to be more precise in the specific labels that they use for the tweet, since they chose to label the tweet with specific hashtags instead of general topics.
+Now it is certainly the case that the topics generated by a latent-based model may be similar to the hashtags used in the post.
+However, it seems a bit indirect to build a model that predicts general topics, since embedded in the data are the exact ``topics'' (i.e., hashtags) that each user chose to use for each tweet.
+Why not take those topics already present in the data and build a model that produces them?
+In other words, the topics data are already in the tweet, so why not use them?
+
+\subsubsection{State of Research on StackOverflow and Twitter}
+
+Although recent work has been done to model human tagging on the StackOverflow site, to our knowledge no vector-based holographic memory model has been tested or used.
+I am curious to see the prediction difference between a vector-based model and current co-occurrence models on the StackOverflow dataset.
+Both types of models are neurologically plausible, and both have been successfully incorporated as the declarative memory component of the ACT-R cognitive architecture \parencite{Rutledge2007}. 
+Given that the Bayesian cognitively-plausible models have done so well to predict tag use on StackOverflow, it will be interesting to see how a cognitively-plausible vector-based model performs at the task.
+
+Also, a vector-based retrieval model has not yet been tested on Twitter.
+One of the advantages of vector-based models is that word order can be easily incorporated into the single co-occurrence representation \parencite{Jones2007}.
+It seems quite likely that words used just before a hashtag in a tweet (combined with their position) will be highly predictive of the hashtag chosen.
+To our knowledge, word order has not yet been taken into account for any of the Twitter hashtag-prediction models that have already been tested.
+It will be interesting to see how much (if at all) accuracy improves when incorporating word-order information into the model.
+
+There has been a mix of co-occurrence and latent-based models created to predict hashtag use on Twitter, and the results are encouraging.
+However, there has been very little research on how a specific user's past hashtag use should influence the model's prediction when that user is composing a tweet.
+\textcite{Kywe2012} did take a user-centered view with their model, but the hashtags predicted by the user and content were analyzed separately and then the top from each group were combined for prediction.
+The ACT-R declarative memory retrieval theory shows how past user behavior and current context combine to produce the most likely retrieval.
+Each component is summed together to generate a total activation, and then the likelihood of chunks are ranked by that summed activation.
+This technique is compensatory and allows for a more natural combination of the two components, where weights can be assigned to each component depending on how strongly each term predicts performance.
+This type of weighted additive model that combines past user behavior and current tweet context to predict the most likely hashtags has not yet been explored for Twitter.
+
+Both StackOverflow models \parencites{Stanley2013,Kuo2011} did not take into account the specific user's prior history when generating tag predictions.
+Rather their models, much like \textcite{Mazzia2009}'s Twitter model, uses the aggregate tag history across all users as the model's prior activation for each tag.
+One of the main purposes of this research is to improve on these user-agnostic Bayesian models and include each specific user's past tagging history as a model component.
+Using customized priors that are tailored to a user's specific tagging history should be crucial for sites like Twitter where the possible tag space is infinite,
+but should also improve performance for more constrained sites like StackOverflow since each user is not interested in all of the possible tags on the site. 
 
 \section{Models}
 
