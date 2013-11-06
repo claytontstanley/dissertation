@@ -79,7 +79,7 @@
 %\setcounter{tocdepth}{2}
 
 \title{Comparing vector-based and ACT-R memory models of tag retrieval:\protect\\User-customized hashtag/tag prediction on Twitter and StackOverflow}
-\shorttitle{Tag prediction on Twitter and StackOverflow}
+\shorttitle{Comparing memory models of tag retrieval}
 %\shorttitle{}
 
 \author{Clayton Stanley}
@@ -1039,14 +1039,37 @@ The main evaluation will be the amount of performance gain achieved when the mod
 
 \subsection{Summary}
 
-The end result of this research will be a better understanding of how a user's past tagging history influences future tag use,
-as well as two cognitively-plausible models for making user-customized tag predictions for StackOverflow posts and Twitter tweets. 
-Overall performance differences between an ACT-R's Bayesian retrieval model and a random-permutation vector-based model will be directly compared on two real-world tagging tasks, which has never been done previously.
-The strengths of each model (word order and user prior likelihood) will be incorporated into the other, and performance differences will be evaluated.
+The end result of this research will be [1] a better understanding of how a user's past tagging history influences future tag use,
+[2] a more thorough evaluation of the strengths, weaknesses, and differences between two cognitively-plausible memory models on a large-scale real-world retrieval task,
+[3] improvements to each memory model where the strengths of each model (word order and user prior likelihood) are incorporated into the other,
+and [4] two efficient implementations of the models for making user-customized tag predictions for StackOverflow posts and Twitter tweets. 
+
+The tag-recommendation models developed through this research should be immediately relevant for real-world tasks.
+If model accuracy is high enough, then the developed models may be directly deployed as tag recommendation systems for either Twitter or StackOverflow.
+It is also likely that the developed models will scale if deployed to these two sites, since during development they will be tested on a large portion of each site's currently available data.
+
+This research also aims to find task-agnostic memory models that can be applied across a wide range of domains.
+As much as possible, the two developed models that are evaluated on the StackOverflow and Twitter datasets will not differ across the datasets.
+This should help ensure that the developed models are accurate in general, and can potentially be used as tag recommendation systems for other domains.
+Examples of similar tagging tasks are hashtag use on Facebook, flagging (i.e., tagging) Wikipedia articles for content issues or overly-opinionated material,
+auto labeling incoming mail and placing it into appropriate folders, and spam filtering.
+Having an accurate, efficient co-occurrence memory model that correctly retrieves relevant tags can be applied to a wide variety of real-world tasks.
+
+This research also has numerous components that are relevant to improving our understanding of declarative memory.
+It should be emphasized that it has only recently become possible to evaluate psychological theories of declarative memory (e.g., ACT-R Bayesian, random-permutation vector based)
+on large-scale real-world tasks where the theory can be tested on hundreds of millions of data points.
+These information-rich large-scale environments provide a unique opportunity to really stress test and explore the impacts of the psychological constraints of each theory on a much larger scale than was previously possible.
+This environment will allow, for example, overall performance differences between an ACT-R Bayesian retrieval model and a random-permutation vector-based model to be directly compared on two real-world tagging tasks,
+which has never been done previously.
+
+This data-rich environment will also enable the proposed modifications to each model to be quickly evaluated, so that further model improvements can be iteratively proposed and tested.
 The main two proposed model modifications (incorporating word order into ACT-R and user history into vector-based representations) have not been tested before, and seem likely to significantly improve performance.
-Further, these two modifications in particular are aimed at the architectural level of each model, may very well be task independent, and may generalize and improve model fit across other tasks.
-Finally, if model accuracy is high enough, then the developed models may be applied to general tag recommendation systems for either Twitter or StackOverflow,
-and possibly for other sites where users generate and tag content.
+
+Further, the proposed model modifications are aimed at the architectural level, may very well be task independent, and may generalize and improve model fit across other tasks.
+Discovering an effective way to represent the time decay of information in a vector-based model could improve model fit on other tasks where the memory model has been tested. 
+Finding a task-agnostic way to represent word order information in a Bayesian ACT-R model could improve model accuracy when applied to other domains where it seems plausible that participants are utilizing word order.
+Introducing, exploring, and evaluating reasonable architectural modifications to two commonly-used memory models is worth the effort:
+It will increase our understanding of how the effects of imposing specific architectural constraints on memory models influence what information is retrieved. 
 
 \begingroup
 \setstretch{1}
