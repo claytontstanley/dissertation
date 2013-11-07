@@ -990,8 +990,8 @@ Adding a prior activation term for the Bayesian StackOverflow model certainly im
 So a method to incorporate a user's prior tag history into a random permutation model will be developed and then tested on the full StackOverflow dataset and Twitter popular-users dataset.
 
 One straightforward way to include a user's prior tag history into a random permutation model is to include ACT-R's base-level activation term ($B_{i}$) as an additional term in the model.
-However this may not be the most mathematically appropriate thing to do, since the base-level activation is represented as a log odds value,
-and the usual single strength of association term in a random permutation model is a correlation metric.
+However this may not be the most mathematically appropriate thing to do, since base-level activation is represented as a log odds value,
+and the single strength of association term in a random permutation model is computed by a correlation.
 It may be more appropriate to somehow attenuate the memory vectors over time,
 so that an association between a word in a post and a tag (i.e., a memory vector) that has long passed is no longer included in that memory vector's representation.
 I will try these ideas and any others that are discovered during the model development process, and the one that is the most cognitively plausible and accurate will be chosen.
@@ -1007,9 +1007,9 @@ So a method to include word order into a Bayesian model will be developed.
 One method to include word order in a Bayesian co-occurrence matrix is to represent word position on a third, orthogonal dimension, and turn the matrix into a 3-dimensional array.
 So a co-occurrence is represented by a triplet: context word by word position relative to tag by tag.
 When a retrieval request for a tag is made, the strength of association between each word in context (and its position) and the tags in the co-occurrence array would be computed.
-That computation could be made tractable by storing only a small set of values on the order axis and binning.
+That computation could be made tractable by storing only a small set of values on the order axis and binning over that dimension.
 
-For example, one could store only three: near, medium, far, which is equivalent to storing three separate co-occurrence matrices.
+For example, one could store only three word order values: near, medium, far, which is equivalent to storing three separate co-occurrence matrices.
 So when a retrieval request is made (e.g., when a user writes the \# character when composing a tweet), the strength of association for each word would be computed using the appropriate matrix.
 That is, the ``far'' matrix would be used for words far away from the cursor position, ``near'' for words just written, and ``medium'' for words mid distance from the current focus point.
 This method seems straightforward to implement, but it is slightly unsatisfying since information is lost when binning is used.
@@ -1039,8 +1039,8 @@ The end result of this research will be [1] a better understanding of how a user
 [3] improvements to each memory model where the strengths of each model (word order and user prior likelihood) are incorporated into the other,
 and [4] two efficient implementations of the models for making user-customized tag predictions for StackOverflow posts and Twitter tweets. 
 
-The tag-recommendation models developed through this research should be immediately relevant for real-world tasks.
-If model accuracy is high enough, then the developed models may be directly deployed as tag recommendation systems for either Twitter or StackOverflow.
+The tag-recommendation models developed through this research should be immediately relevant to real-world tasks.
+If model accuracy is high enough, then the developed models may be used as a foundation for tag recommendation systems that are deployed on Twitter or StackOverflow.
 It is also likely that the developed models will scale if deployed to these two sites, since during development they will be tested on a large portion of each site's currently available data.
 
 This research also aims to find task-agnostic memory models that can be applied across a wide range of domains.
@@ -1051,9 +1051,9 @@ auto labeling incoming mail and placing it into appropriate folders, and spam fi
 Having an accurate, efficient co-occurrence memory model that correctly retrieves relevant tags can be applied to a wide variety of real-world tasks.
 
 This research also has numerous components that are relevant to improving our understanding of declarative memory.
-It should be emphasized that it has only recently become possible to evaluate psychological theories of declarative memory (e.g., ACT-R Bayesian, random-permutation vector based)
-on large-scale real-world tasks where the theory can be tested on hundreds of millions of data points.
-These information-rich large-scale environments provide a unique opportunity to really stress test and explore the impacts of the psychological constraints of each theory on a much larger scale than was previously possible.
+It should be emphasized that it has only recently become possible to evaluate psychological theories of declarative memory on large-scale real-world tasks where the theory can be tested on hundreds of millions of data points.
+These information-rich large-scale environments provide a unique opportunity to really stress test and explore the impacts of the psychological constraints of each theory
+on a much larger scale than has previously been possible.
 This environment will allow, for example, overall performance differences between an ACT-R Bayesian retrieval model and a random-permutation vector-based model to be directly compared on two real-world tagging tasks,
 which has never been done previously.
 
@@ -1061,7 +1061,7 @@ This data-rich environment will also enable the proposed modifications to each m
 The main two proposed model modifications (incorporating word order into ACT-R and user history into vector-based representations) have not been tested before, and seem likely to significantly improve performance.
 
 Further, the proposed model modifications are aimed at the architectural level, may very well be task independent, and may generalize and improve model fit across other tasks.
-Discovering an effective way to represent the time decay of information in a vector-based model could improve model fit on other tasks where the memory model has been tested. 
+Discovering an effective way to represent the time decay of information in a vector-based model could improve model fit on other tasks where the memory model has been used. 
 Finding a task-agnostic way to represent word order information in a Bayesian ACT-R model could improve model accuracy when applied to other domains where it seems plausible that participants are utilizing word order.
 Introducing, exploring, and evaluating reasonable architectural modifications to two commonly-used memory models is worth the effort:
 It will increase our understanding of how the effects of imposing specific architectural constraints on memory models influence what information is retrieved. 
