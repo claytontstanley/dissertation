@@ -866,8 +866,8 @@ Rather their models, much like \textcite{Mazzia2009}'s Twitter model, uses the a
 As some preliminary research, I have developed and tested a user-customized model for StackOverflow by modifying the model in \textcite{Stanley2013}.
 To incorporate the user's prior tag history into the model, the base-level activation term was modified from the original equation in ACT-R.
 $B_{i}$ is based on log odds occurrence, which in turn is based on frequency of tag use, or probability of tag use $p_{i}$.
-The change to incorporate user's priors was to compute a weighted average for $p_{i}$,
-where the probability of using tag $i$ would range from the global probability ($pGlobal_{i}$) to the user's specific probability ($pUser_{i}$) as the user's total tag count ($count$) increases.
+To incorporate a user's prior, a weighted average for $p_{i}$ was used,
+where the probability of using tag $i$ ranges from the global probability ($pGlobal_{i}$) to the user's specific probability ($pUser_{i}$) as the user's total tag count increases.
 Overall model accuracy improved by 5\% after incorporating the user's prior tag history into the model.
 
 This preliminary research is encouraging, and suggests that model fit can improve when tag predictions are customized to the specific user's past tagging history.
