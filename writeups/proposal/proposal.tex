@@ -280,11 +280,11 @@ These chunk prior probabilities are then adjusted for the current context, so th
 
 \subsubsection{ACT-R DM Model}
 
-A formal description of the ACT-R Declarative Memory model is included in Table \ref{tabACT-RModel}.
+A formal description of the ACT-R Declarative Memory model is included in Table \ref{tabACTRModel}.
 
 \begin{table}[!ht]
   \caption{ACT-R declarative memory model}
-  \label{tabACT-RModel}
+  \label{tabACTRModel}
   {\tabulinesep=1.2mm
     \begin{tabu}{ll}
       \hline
@@ -307,7 +307,7 @@ The recall probability ($P_{i})$ that a chunk will be retrieved from memory incr
 \subsubsection{Base-Level Activation}
 
 Base-level activation reflects the log prior odds of needing an observed chunk again.
-The primary way to calculate these log prior odds is to use the standard base level equation in Table \ref{tabACT-RModel}.
+The primary way to calculate these log prior odds is to use the standard base level equation in Table \ref{tabACTRModel}.
 This equation formalizes how log prior odds are a function of both frequency and recency of prior exposure to a particular chunk.
 Chunks used more frequently (either through exposure or from a retrieval) are more likely to be needed for retrieval again.
 However, as time progresses and a particular chunk is no longer used, the activation for that chunk decays.
@@ -691,7 +691,7 @@ This Bayesian model can accurately predict a user-chosen tag at 47\% accuracy.
 \paragraph{\texorpdfstring{\textcite{Stanley2013}}{Stanley2013}'s ACT-R DM Model for StackOverflow}
 
 \textcite{Stanley2013} also modeled a user's chosen tags for a post on the StackOverflow site.
-They modified the standard ACT-R model in Table \ref{tabACT-RModel} in order to more accurately predict tag use on StackOverflow.
+They modified the standard ACT-R model in Table \ref{tabACTRModel} in order to more accurately predict tag use on StackOverflow.
 A formal description of the modified ACT-R Bayesian model is included in Table \ref{tabModACTRModel}.
 
 \begin{table}[!ht]
@@ -718,7 +718,7 @@ A formal description of the modified ACT-R Bayesian model is included in Table \
 
 The activation of each tag ($A_{i}$) is a function of four components:
 That tag's base level activation ($B_{i}$), contextual activation for the words in the title, activation for words in the body, and an offset term ($O$).
-This model has been modified from the standard ACT-R model (Table \ref{tabACT-RModel}) in three ways:
+This model has been modified from the standard ACT-R model (Table \ref{tabACTRModel}) in three ways:
 Two separate contextual components were used (words in title and body of post), an offset term was added, and an entropy measure was used to compute the attentional weight ($W_{j}$).
 
 The offset term was added to normalize the mean activation across retrievals.
@@ -862,6 +862,20 @@ This type of weighted additive model that combines past user behavior and curren
 
 Both StackOverflow models \parencites{Stanley2013,Kuo2011} did not take into account the specific user's prior history when generating tag predictions.
 Rather their models, much like \textcite{Mazzia2009}'s Twitter model, uses the aggregate tag history across all users as the model's prior activation for each tag.
+
+As some preliminary research, I have developed and tested a user-customized model for StackOverflow by modifying the model in \textcite{Stanley2013}.
+To incorporate the user's prior tag history into the model, the base-level activation term was modified from the original equation in ACT-R.
+$B_{i}$ is based on log odds occurrence, which in turn is based on frequency of tag use, or probability of tag use $p_{i}$.
+The change to incorporate user's priors was to compute a weighted average for $p_{i}$,
+where the probability of using tag $i$ would range from the global probability ($pGlobal_{i}$) to the user's specific probability ($pUser_{i}$) as the user's total tag count ($count$) increases.
+Overall model accuracy improved by 5\% after incorporating the user's prior tag history into the model.
+
+This preliminary research is encouraging, and suggests that model fit can improve when tag predictions are customized to the specific user's past tagging history.
+It also seems plausible that model accuracy can improve an even greater amount by
+[1] figuring out the optimal way to combine global tag history with a user's past tagging history, and
+[2] using the time-dependent form of the base level component in Table \ref{tabACTRModel}, in order to account for the fact that a user's tagging preferences change over time.
+So these proposed modifications will be explored further when incorporating a user's past tagging history into the models for this research.
+
 One of the main purposes of this research is to improve on these user-agnostic Bayesian models and include each specific user's past tagging history as a model component.
 Using customized priors that are tailored to a user's specific tagging history should be crucial for sites like Twitter where the possible tag space is infinite,
 but should also improve performance for more constrained sites like StackOverflow since each user is not interested in all of the possible tags on the site. 
