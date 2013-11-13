@@ -657,8 +657,8 @@ The profiles were created by generating a word frequency matrix of words by (use
 Lucene \parencite{McCandless2010} is a commonly-used open-source software tool that measures the similarity between a query and candidate documents in a database.
 It uses the term frequency---inverse document frequency co-occurrence measure to quantify the similarity between a word in the query and a possible document to retrieve.
 
-When the system needed to recommend a set of individuals for a user to follow, it would take all of the words used in posts from that user to construct a search query to be provided to Lucene.
-That search query would return the most likely users that share similar words in posts within their Twitter network with the words provided in the query.
+When \citeauthor{Hannon2010}'s system recommended a set of individuals for a user to follow, it collected all of the words used in posts from that user, constructed a search query, and provided that query to Lucene.
+Lucene then returned the most likely users that share similar words in posts within their Twitter network with the words provided in the query.
 Using this simple technique based on a standard text search engine allowed the recommendation system to accurately predict the people that a particular user follows at 25\% accuracy.
 
 \subsubsection{Hashtags for Recommendation Systems}
