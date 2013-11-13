@@ -722,7 +722,7 @@ This model has been modified from the standard ACT-R model (Table \ref{tabACT-RM
 Two separate contextual components were used (words in title and body of post), an offset term was added, and an entropy measure was used to compute the attentional weight ($W_{j}$).
 
 The offset term was added to normalize the mean activation across retrievals.
-This allowed the use of a logistical regression statistical technique to calibrate the weights for each of the terms.
+This allowed the use of a logistic regression statistical technique to calibrate the weights for each of the terms.
 The title and body contextual components were separated since it seemed plausible that the words in the title would be better predictors of the tag used than the words in the body.
 It turned out that the words in the body were a better predictor of tag use \parencite{Stanley2013}, most likely because there are many more words in the body than the title of the post.
 The entropy measure was used to compute the attentional weight for two reasons:
@@ -748,7 +748,7 @@ This suggests that more cognitively-plausible memory retrieval models may outper
 \subsubsection{StackExchange}
 
 A tag suggestion tool has been deployed for the \url{http://tex.stackexchange.org} \parencite{LatexTags2013} and \url{http://superuser.com} \parencite{SuperUserTags2013} StackExchange sites.
-LaTeX, SuperUser, and StackOverflow are all part of the broader StackExchange network of question and answer sites, and they provide the same user interface and workflow when asking questions.
+Latex, SuperUser, and StackOverflow are all part of the broader StackExchange network of question and answer sites, and they provide the same user interface and workflow when asking questions.
 For the two sites where a tag suggestion tool has been deployed, once a user has created a question, suggested tags appear just below the text field where the user types the tags to associate with the question.
 The post author is not forced to use the suggested tags, and is free to choose tags from them or tags not represented in the suggested set.
 An example of the interface for a created post on the SuperUser site is included in Figure \ref{figSuperUserSuggestion}.
@@ -759,7 +759,7 @@ An example of the interface for a created post on the SuperUser site is included
   \label{figSuperUserSuggestion}
 \end{figure}
 
-The exact tag-recommendation algorithm used for the LaTeX and SuperUser sites is not publicized.
+The exact tag-recommendation algorithm used for the Latex and SuperUser sites is not publicized.
 StackExchange appears to be using something more sophisticated than simply looking for words in the title and body of the post that are tags, as the algorithm has not yet been deployed for the busiest StackOverflow site.
 The Latex and SuperUser sites are not nearly as popular as StackOverflow currently.
 The sites have roughly \num{50000} and \num{189000} questions respectively compared to \num{5000000} questions on StackOverflow.
