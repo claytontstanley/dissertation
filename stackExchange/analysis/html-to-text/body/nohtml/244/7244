@@ -1,6 +1,0 @@
-What I want to do is something like this: I have enums with combined flagged values.
-public static class EnumExtension {     public static bool IsSet<T>( this T input, T matchTo )          where T:enum //the constraint I want that doesn't exist in C#3     {          return (input & matchTo) != 0;     } }
-So then I could do:
-MyEnum tester = MyEnum.FlagA | MyEnum.FlagB  if( tester.IsSet( MyEnum.FlagA ) )     //act on flag a
-Unfortunately C#'s generic where constraints have no enum restriction, only class and struct. C# doesn't see enums as structs (even though they are value types) so I can't add extension types like this.
-Anyone know a workaround?

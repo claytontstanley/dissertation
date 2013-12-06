@@ -1,5 +1,0 @@
-<p>Have you used OpenID in anger?</p>
-
-<p>I'm going to be using OpenID for authentication on my site.  Which provider should I recommend to my users?</p>
-
-<p>I'm thinking, based on the feedback that the OpenID auth is getting on StackOverflow, that I'd want to <strong>recommend one that does attribute exchange properly.</strong>  So: who's that?</p>

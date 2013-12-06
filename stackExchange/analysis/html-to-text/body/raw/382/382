@@ -1,3 +1,0 @@
-<p>What is the meaning of the Java warning "Type safety: The cast from Object to List is actually checking against the erased type List"?  I get it when I try to cast an Object to a type with generic information, such as in the following code:</p>
-
-<pre><code>Object object = getMyList();<br>List&lt;Integer&gt; list = (List&lt;Integer&gt;) object;<br></code></pre>

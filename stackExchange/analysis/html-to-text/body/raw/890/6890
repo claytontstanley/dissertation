@@ -1,7 +1,0 @@
-<p>I have some code for starting a thread on the .NET CF 2.0:</p>
-
-<p>ThreadStart tStart = new ThreadStart(MyMethod);
-Thread t = new Thread(tStart);
-t.Start();</p>
-
-<p>If I call this inside a loop the items complete out of order. How do introduce a wait after t.Start(), so that the work on the thread completes before the code continues? Will BeginInvoke/EndInvoke be a better option for this than manually creating threads?</p>

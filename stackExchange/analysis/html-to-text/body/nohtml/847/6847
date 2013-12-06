@@ -1,2 +1,0 @@
-When writing code do you consciously program defensively to ensure high program quality and to avoid the possibility of your code being exploited maliciously, e.g. through buffer overflow exploits or code injection ?
-What's the "minimum" level of quality you'll always apply to your code ?

@@ -1,6 +1,0 @@
-<p>I am currently working on a project and my goal is to locate text in an image. OCR'ing the text is not my intention as of yet. I want to basically obtain the bounds of text within an image. I am using the AForge.Net imaging component for manipulation. Any assistance in some sense or another?</p>
-
-<p>Update 2/5/09:
-I've since went along another route in my project. However I did attempt to obtain text using MODI (Microsoft Office Document Imaging). It allows you to OCR an image and pull text from it with some ease.</p>
-
-<p>Thanks.</p>

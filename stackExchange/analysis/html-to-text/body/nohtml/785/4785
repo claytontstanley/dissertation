@@ -1,4 +1,0 @@
-In a installation of WebSphere Application Server with Network Deployment, a node is:
-a physical machine
-an instance of operative system
-a logical set of WAS instances that is independent of physical machine or OS instance

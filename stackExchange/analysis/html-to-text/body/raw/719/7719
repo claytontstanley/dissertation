@@ -1,7 +1,0 @@
-<p>Is there any way to capture the MouseDown even from the .NET 2.0 TextBox control?
-I know the inherited Control class has the event, but it's not exposed in TextBox.
-Is there a way to override the event handler?</p>
-
-<p>I also tried the OpenNETCF TextBox2 control which does have the MouseDown event exposed, but no matter what I do, it doesn't fire the handler.</p>
-
-<p>Any suggestions?</p>

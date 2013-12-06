@@ -1,3 +1,0 @@
-<P>I am writing an application that needs to bring window of an external app to the foreground, and not necessarily steal focus (there is a setting the user can toggle to steal/not steal focus).</P>
-<P>What is the best way to go about this using the win32 API? I have tried SetForeground() but it always steals focus and does not consistenly work.</P>
-<P>What is the best way to go about this? Any thoughts?</P>

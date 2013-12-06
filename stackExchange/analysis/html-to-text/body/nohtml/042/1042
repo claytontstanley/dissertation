@@ -1,5 +1,0 @@
-For instance, my query is like the following using SQL Server 2005:
-SELECT * FROM Table WHERE FREETEXT(SearchField, 'c#')
-I have a full text index defined to use the column SearchField which returns results when using:
-SELECT * FROM Table WHERE SearchField LIKE '%c#%'
-I believe # is a special letter, so how do I allow FREETEXT to work correctly for the query above?

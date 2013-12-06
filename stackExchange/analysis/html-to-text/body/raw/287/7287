@@ -1,6 +1,0 @@
-<p>Lately I had to change some code on older systems where not all of the code has unit tests.<br />
-Before making the changes I want to write tests, but each class created a lot of dependencies and other anti-patterns which made testing quite hard.<br />
-Obviously, I wanted to refactor the code to make it easier to test, write the tests and then change it.<br />
-Is this the way you'd do it? Or would you spend a lot of time writing the hard-to-write tests that would be mostly removed after the refactoring will be completed?</p>
-
-<p>Any insights are welcome!</p>

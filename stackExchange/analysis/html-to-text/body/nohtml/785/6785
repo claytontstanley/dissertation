@@ -1,9 +1,0 @@
-Suppose I have a stringbuilder in C# that does this:
-StringBuilder sb = new StringBuilder(); string cat = "cat"; sb.Append("the ").Append(cat).(" in the hat"); string s = sb.ToString();
-would that be as efficient or any more efficient as having:
-string cat = "cat"; string s = String.Format("The {0} in the hat", cat);
-If so, why?
-EDIT
-After some interesting answers I realised I probably should have been a little clearer in what I was asking. I wasn't so much asking for which was quicker at concatenating a string, but which is quicker at injecting one string into another.
-In both cases above I want to inject one or more strings into the middle of a predefined template string.
-Sorry for the confusion

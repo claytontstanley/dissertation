@@ -1,2 +1,0 @@
-When I try to print a Unicode string in a windows console, I get a "UnicodeEncodeError: 'charmap' codec can't encode character ...." error.  I assume this is because the Windows console does not accept Unicode-only characters.  What's the best way around this?  Is there any way I can make Python automatically print a "?" instead of failing in this situation?
-Edit: I'm using Python 2.5.

@@ -1,3 +1,0 @@
-I'm using MSVE, and I have my own tiles I'm displaying in layers on top. Problem is, there's a ton of them, and they're on a network server. In certain directories, there are something on the order of 30,000+ files. Initially I called Directory.GetFiles, but once I started testing in a pseudo-real environment, it timed out.
-What's the best way to programatically list, and iterate through, this many files?
-Edit: My coworker suggested using the MS indexing service. Has anyone tried this approach, and (how) has it worked?

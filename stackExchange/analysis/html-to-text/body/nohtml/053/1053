@@ -1,2 +1,0 @@
-Most mathematicians agree that e ** (πi) + 1 = 0. However, most floating point implementations disagree. How well can we settle this dispute?
-I'm keen to hear about different languages and implementations, and various methods to make the result as close to zero as possible. Be creative!

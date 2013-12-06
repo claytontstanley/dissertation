@@ -1,3 +1,0 @@
-<P>I started trying to play with Mono, mostly for fun at the moment. I first tried to use the VS plugin that will convert a csproj into a makefile, but there seemed to be no version available for VS2005. I also read about the MonoDevelop IDE, which sounded nice. Unfortunately, there's no pre-fab Windows package for it. I tried to follow some instructions to build it by combining dependencies from other semi-related installs. It didn't work, but that's probably because I'm a Windows-oriented guy and can barely spell "makefile".</P>
-<P>So, my question is this: what's the lowest-energy way to get up and running to try some Mono-based development on Windows?</P>
-<P>thanks! Chris</P>

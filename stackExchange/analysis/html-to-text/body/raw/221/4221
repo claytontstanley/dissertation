@@ -1,4 +1,0 @@
-<P>I'd like to use a LinqDataSource control on a page and limit the amount of records returned. I know if I use code behind I could do something like this:</P>IEnumerable&lt;int&gt; values = Enumerable.Range(0, 10);<BR>IEnumerable&lt;int&gt; take3 = values.Take(3);<BR>
-<P>Does anyone know if something like this is possible with a LinqDataSource control?</P>
-<P><STRONG>[Update]</STRONG></P>
-<P>I'm going to use the LinqDataSource with the ListView control, <EM>not</EM> a GridView or Repeater. The LinqDataSource wizard does not provide the ability to limit the number of records return. The Advanced options only allow you to enabled deletes, inserts, and updates.</P>

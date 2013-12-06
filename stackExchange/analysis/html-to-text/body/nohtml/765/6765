@@ -1,5 +1,0 @@
-I'm going to start a new project - rewriting an existing system (PHP + SQL Server) from scratch because of some very serious limitations by design.
-We have some quite good knowledge of SQL Server (currently we're using SQL Server 2000 in existing system) and we would like to employ its newer version (2008 I guess) in our new project.
-I am really fond of technologies that Java offers - particularly Spring Framework and Wicket and I am quite familiar with Java from others projects and assignments before. Therefore, we consider using Java and Microsoft SQL Server.
-There are two JDBC drivers for SQL Server - jTDS and Microsoft's one - http://msdn.microsoft.com/en-us/data/aa937724.aspx . I think we should test both of them.
-Are there any limitations in such solution I should know of? Has someone experience with such a technology combination?

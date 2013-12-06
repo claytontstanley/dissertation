@@ -1,9 +1,0 @@
-<p>I'm working on a project which uses .NET Remoting for communication between the client application and an object server. For development, the client, server, and MSSQL database are all running on my local development machine. </p>
-
-<p>When I'm working at the office, the responsiveness is just fine. </p>
-
-<p>However, when I work from home the speed is <strong><em>significantly</em></strong> slower. If I disconnect from the VPN, it speeds up (I believe, but maybe that's just wishful thinking). If I turn off my wireless connection completely it immediately speeds up to full throttle.</p>
-
-<p>My assumption is that the remoting traffic is being routed through some point that is slowing everything down, albeit my home router and/or the VPN.</p>
-
-<p>Does anyone have any ideas of how to force the remoting traffic to remain completely localized?</p>

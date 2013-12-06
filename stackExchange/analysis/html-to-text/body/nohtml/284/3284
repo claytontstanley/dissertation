@@ -1,1 +1,0 @@
-I've been working with providers a fair bit lately, and I came across an interesting situation where I wanted to have an abstract class that had an abstract static method. I read a few posts on the topic, and it sort of made sense, but is there a nice clear explanation?

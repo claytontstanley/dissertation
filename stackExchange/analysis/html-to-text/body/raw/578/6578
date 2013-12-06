@@ -1,5 +1,0 @@
-<p>I'm just beginning to have a look at Objective C and Cocoa with a view to playing with he iPhone SDK. I'm reasonably comfortable with C's malloc and free concept, but Cocoa's references counting scheme has me rather confused. I'm told it's very elegant once you understand it, but I'm just not over the hump yet.</p>
-
-<p>I guess my question is, can anyone briefly explain release, retain and autorelease and the conventions about their use in a way which makes it click for me?</p>
-
-<p>(Or failing that, what did you read which helped you get it?)</p>

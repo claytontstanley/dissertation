@@ -1,4 +1,0 @@
-Every week I put up a bunch of .jpg screen captures on my project's wiki to show the difference between this week's status and last weeks.
-The files are called things like ProgrammerAtasks_current.jpg and ProgrammerBtasks_lastweek.jpg so there is a pair of *_current.jpg and *_lastweek.jpg for each status.
-Each week I delete the old *_lastweek.jpg and then rename the old *current to *lastweek.
-I can use rm *_lastweek* to do the first part of the task, but how do I automate renaming *_current.jpg to *_lastweek.jpg?

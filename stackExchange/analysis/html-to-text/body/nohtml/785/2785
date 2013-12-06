@@ -1,5 +1,0 @@
-Should you set all the objects to null (Nothing in VB.NET) once you have finished with them?
-I understand that in .NET it is essential to dispose of any instances of objects that implement the Idisposable interface to release some resources. Although the object can still be something after it is disposed (hence the isDisposed property in forms) so I assume it can still reside in memory or at least in part?
-I also know that when an object goes out of scope it is then marked for collection ready for the next pass of the garbage collector (although this may take time).
-So with this in mind will setting it to null speed up the system releasing the memory as it does not have to work out that it is no longer in scope and are they any bad side effects?
-MSDN articles never do this in examples and currently I do this as I cannot  see the harm. However I have come across a mixture of opinions so any comments are useful.

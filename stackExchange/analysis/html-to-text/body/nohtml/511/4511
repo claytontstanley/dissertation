@@ -1,2 +1,0 @@
-New version of Management Studio (i.e. the one that ships with SQL Server 2008) finally has a Transact-SQL IntelliSense feature. However, out-of-the-box it only works with SQL Server 2008 instances.
-Is there some workaround for this?

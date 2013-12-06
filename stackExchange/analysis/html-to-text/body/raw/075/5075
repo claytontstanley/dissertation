@@ -1,3 +1,0 @@
-<p>Char's are great because they are fixed size and thus make for a faster table. They are however limited to 255 characters. I want to hold 500 characters but a blob is variable length and that's not what I want.</p>
-
-<p>Is there some way to have a fixed length field of 500 characters in MySQL or am I going to have to use 2 char fields?</p>

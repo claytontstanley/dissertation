@@ -1,7 +1,0 @@
-I have a Prolite LED sign that I like to set up to show scrolling search queries from a apache logs and other fun statistics. The problem is, my G5 does not have a serial port, so I have to use a usb to serial dongle. It shows up as /dev/cu.usbserial and /dev/tty.usbserial .
-When i do this everything seems to be hunky-dory:
-stty -f /dev/cu.usbserial speed 9600 baud; lflags: -icanon -isig -iexten -echo iflags: -icrnl -ixon -ixany -imaxbel -brkint oflags: -opost -onlcr -oxtabs cflags: cs8 -parenb
-Everything also works when I use the serial port tool to talk to it.
-If I run this piece of code while the above mentioned serial port tool, everthing also works. But as soon as I disconnect the tool the connection gets lost.
-#!/usr/bin/python  import serial  ser = serial.Serial('/dev/cu.usbserial', 9600, timeout=10)  ser.write("<ID01><PA> \r\n")  read_chars = ser.read(20) print read_chars  ser.close()
-So the question is, what magicks do I need to perform to start talking to the serial port without the serial port tool? Is that a permissions problem? Also, what's the difference between /dev/cu.usbserial and /dev/tty.usbserial?

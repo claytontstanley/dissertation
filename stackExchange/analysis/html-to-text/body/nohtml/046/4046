@@ -1,4 +1,0 @@
-I'm trying to convince my providers to use ANT instead of Rational Application Development so anyone can recompile, recheck, redeploy the solution anyplace, anytime, anyhow. :P
-I started a build.xml for a project that generates a JAR file but stopped there and I need real examples to compare notes. My good friends! I don't have anyone close to chat about this!
-This is my build.xml so far.
-(*) I edited my question based in the suggestion of to use pastebin.ca

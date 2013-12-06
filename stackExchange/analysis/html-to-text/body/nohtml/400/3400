@@ -1,5 +1,0 @@
-Note: I am using SQL's Full-text search capabilities, CONTAINS clauses and all - the * is the wildcard in full-text, % is for LIKE clauses only.
-I've read in several places now that "leading wildcard" searches (e.g. using "*overflow" to match "stackoverflow") is not supported in MS SQL.  I'm considering using a CLR function to add regex matching , but I'm curious to see what other solutions people might have.
-More Info: You can add the asterisk only at the end of the word or phrase. - along with my empirical experience:  When matching "myvalue", "my*" works, but "(asterisk)value" returns no match, when doing a query as simple as:
-SELECT * FROM TABLENAME WHERE CONTAINS(TextColumn, '"*searchterm"');
-Thus, my need for a workaround.  I'm only using search in my site on an actual search page - so it needs to work basically the same way that Google works (in the eyes on a Joe Sixpack-type user). Not nearly as complicated, but this sort of match really shouldn't fail.

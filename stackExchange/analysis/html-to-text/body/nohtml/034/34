@@ -1,9 +1,0 @@
-Does anyone know how to forcefully unload a ByteArray from memory in AS3?
-I have tried (without success):
-byteArray.length = 0;
-byteArray = new ByteArray();
-and
-for ( var i:int=0; i<byteArray.length; i++ ) {
-byteArray[i] = null;
-}
-Any ideas?

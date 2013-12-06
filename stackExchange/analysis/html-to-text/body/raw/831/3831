@@ -1,7 +1,0 @@
-<p>I need to detect when a session has expired in my Visuial Basic web application.  This is what I'm using...</p>
-
-<pre><code>Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load<br><br>    If CurrentSession.IsNew AndAlso (Not Page.Request.Headers("Cookie") Is Nothing) AndAlso (Page.Request.Headers("Cookie").IndexOf("ASP.NET_SessionId") &gt;= 0) Then<br>        Response.Redirect("TimeOut.aspx")<br>    End If<br><br>    ...do something...<br><br>End Sub<br></code></pre>
-
-<p>Note: CurrentSession.IsNew returns HttpContext.Current.Session.IsNewSession</p>
-
-<p>This seems to work well for Internet Explorer, but seems to fail with Firefox.</p>

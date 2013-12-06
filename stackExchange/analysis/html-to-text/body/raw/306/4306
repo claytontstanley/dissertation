@@ -1,5 +1,0 @@
-<p>Hi everyone, I am working on a project that requires the manipulation of enourmous matrices, particularly pyramidal summation for a copula calculation.  In short, I need to keep track of a relatively small number of values (usually a value of 1, and in rare cases more than 1) in a sea of zeros in the matrix (multidimensional array).  A sparse array allows the user to store a small number of values, and assume all undefined records to be a preset value.  Since is is not physically possibly to store all values in memory (greater in number than the number of particles in the universe :p ), I need to store only the few non-zero elements.    This could be several million entries.  I am currently working on a system that uses a binary search tree (b-tree) to store entries.  Does anyone know of a better system?  Thanks in advance. </p>
-
-<p>EDIT: Speed is a huge priority.   </p>
-
-<p>EDIT2 : I like that solution.  How would I go about dynamically choosing the number of variables in the class at runtime?  [edit by MH: good question, updated in the answer]  </p>

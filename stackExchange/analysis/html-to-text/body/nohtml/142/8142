@@ -1,2 +1,0 @@
-I just read up on a performance of LINQ, and there is a HUGE amount to be gained by using Compiled LINQ.
-Now, why won't I always use compiled LINQ?

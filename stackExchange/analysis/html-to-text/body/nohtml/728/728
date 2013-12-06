@@ -1,3 +1,0 @@
-I need to display a map of the U.S. with states shown in different colors according to underlying data. I'd also like to have this map contain some facility for subscribing to hover/click events on each state in javascript, presumably using an imagemap.
-The data won't be changing in any kind of AJAX-y way, so ideally this component would generate a static image that would be cacheable.
-Any suggestions?

@@ -1,4 +1,0 @@
-Here on Stack Overflow, I would like to be able to use the tab key within the WMD editor text box to tab over 4 spaces. The way it is now, the tab key jumps my cursor down to the Tags.
-Vote for this feature at UserVoice: http://stackoverflow.uservoice.com/pages/general/suggestions/15889
-Is there some JavaScript that will capture the TAB key in the text box before it bubbles up to the UI?
-I understand some browsers (i.e. FireFox) may not allow this. How about a custom key-combo like Shift-TAB, or Ctrl-Q?

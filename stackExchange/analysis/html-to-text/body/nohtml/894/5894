@@ -1,6 +1,0 @@
-I've been tasked (by my wife) with creating a program to allow her to track the family trees on both sides of our family.
-Does anyone know of a cost effective (free) control to represent this type of information.
-What I'm looking for is a modified org-chart type chart/tree. The modification is that any node should have 2 parent nodes (E.G. a child should have a Mother/Father).
-The solution I've came up with so far is to have 2 trees, an ancestor tree and a descendants tree, with the individual being inspected as the root node for each tree. It works, but is sort of clunky.
-I'm working primarily in c# WinForms, so .Net type controls or source code is preferrable.
-Thanks.

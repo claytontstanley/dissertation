@@ -1,6 +1,0 @@
-What I'd like to do is something like the following:
-FooClass.prototype.method = function():String {     return "Something"; }  var foo:FooClass = new FooClass(); foo.method();
-Which is to say, I'd like to extend a generated class with a single method, not via inheritance but via the prototype.
-The class is generated from a WSDL, it's not a dynamic class, and I don't want to touch the generated code because it will be overwritten anyway.
-Long story short, I'd like to have the moral equivalent of C# 3:s Extension Methods for AS3.
-Edit: I accepted aib's answer, because it fits what I was asking best -- although upon further reflection it doesn't really solve my problem, but that's my fault for asking the wrong question. :) Also, upmods for the good suggestions.

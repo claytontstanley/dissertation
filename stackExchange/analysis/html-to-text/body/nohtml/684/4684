@@ -1,9 +1,0 @@
-I'm currently experimenting with build script, and since I have an ASP.net Web Part under source control, my build script should do that at the end:
-Grab the "naked" Windows 2003 IIS VMWare or Virtual PC Image from the Network
-Boot it up
-Copy the Files from the Build Folder to the Server
-Install it
-Do whatever else is needed
-I have never tried automating a Virtual Machine, but I saw that both VMWare and Virtual Server offer automation facilities. While I cannot use Virtual Server (Windows XP Home :-(), Virtual PC works.
-Does anyone here have experience with either VMWare Server or Virtual PC 2007 SP1 in terms of automation?
-Which one is better suited (I run windows, so the Platform-independence of VMWare does not count) and easier to automate?

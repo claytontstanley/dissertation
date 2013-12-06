@@ -1,5 +1,0 @@
-<p>When learning a new programming language, one of the possible roadblocks you might encounter is the question whether the language is, by default, <em>pass-by-value or pass-by-reference</em></p>
-
-<p>So here is my question to all of you, in your favorite language, <em>how</em> is it actually done? and what are the <em>possible pitfalls</em>?</p>
-
-<p>your favorite language can, of course, be anything you have ever played with: <a href="http://www.ruby-lang.org/en/" rel="nofollow">popular</a>, <a href="http://www.devtopics.com/a-obscure-programming-language-of-the-month/" rel="nofollow">obscure</a>, <a href="http://en.wikipedia.org/wiki/Brainfuck" rel="nofollow">esoteric</a>, <a href="http://www.nvidia.com/object/cuda_get.html" rel="nofollow">new</a>, <a href="http://en.wikipedia.org/wiki/FORTRAN" rel="nofollow">old</a> ...</p>

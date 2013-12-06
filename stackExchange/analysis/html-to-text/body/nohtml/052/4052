@@ -1,8 +1,0 @@
-I am trying to enable Full-text indexing in SQL Server 2005 Express. I am running this on my laptop with Vista Ultimate.
-I understand that the standard version of SQL Server Express does not have full-text indexing. I have already downloaded and installed "Microsoft SQL Server 2005 Express Edition with Advanced Services Service Pack 2" ( download ).
-I have also ensured that both the "SQL Server (instance)" and "SQL Server FullText Search (instance)" services are running on the same account which is "Network Service".
-I have also selected the option to "Use full-text indexing" in the Database Properties > Files area.
-I can run the sql query "SELECT fulltextserviceproperty('IsFulltextInstalled');" and return 1.
-The problem I am having is that when I have my table open in design view and select "Manage FullText Index"; the full-text index window displays the message...
-"Creation of the full-text index is not available. Check that you have the correct permissions or that full-text catalogs are defined."
-Any ideas on what to check or where to go next?

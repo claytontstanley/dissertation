@@ -1,7 +1,0 @@
-I've just come across this in a WHERE clause:
-AND NOT (t.id = @id)
-How does this compare with:
-AND t.id != @id
-Or with:
-AND t.id <> @id
-I'd always write the latter myself, but clearly someone else thinks differently. Is one going to perform any better than the other? I know that using <> or != is going to bust any hopes for using an index that I might have had, but surely the first approach above will suffer the same problem?

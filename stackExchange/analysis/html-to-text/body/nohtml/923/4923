@@ -1,3 +1,0 @@
-I'm using ClodFusion(sic) to populate a template that includes HTML lists (<ul>'s).
-Most of these aren't that long, but a few have ridiculously long lengths and could really stand to be in 2-3 columns.
-Is there an HTML, ColdFusion or perhaps JavaScript (I have jQuery available) way to do this easily?  It's not worth some over-complicated heavy weight solution to save some scrolling.

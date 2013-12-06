@@ -1,4 +1,0 @@
-I need to be able to manipulate a large (10^7 nodes) graph in python. The data corresponding to each node/edge is minimal, say, a small number of strings. What is the most efficient, in terms of memory and speed, way of doing this?
-A dict of dicts is more flexible and simpler to implement, but I intuitively expect a list of lists to be faster. The list option would also require that I keep the data separate from the structure, while dicts would allow for something of the sort:
-graph[I][J]["Property"]="value"
-What would you suggest?

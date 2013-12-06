@@ -1,7 +1,0 @@
-<p>If I have .Net Form with a component/object such as a textbox that I need to access from a parent or other form I obviously need to "upgrade" the modifier to this component to an Internal or Public level variable.</p>
-
-<p>Now, if I were providing a public variable of an int or string type etc. in my form class I wouldn't think twice about using Getters and (maybe) Setters around this, even if they didn't do anything other than provide direct access to the variable.</p>
-
-<p>However, the VS designer doesn't seem to implement such Getters/Setters for those public objects that are components on a form (and therefore does not comply with good programming practice).</p>
-
-<p>So, the question is; In order to do the "right thing" should I wrap such VS designer components or objects in a Getter and/or Setter??</p>

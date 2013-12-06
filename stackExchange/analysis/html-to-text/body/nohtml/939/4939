@@ -1,3 +1,0 @@
-LINQ to SQL allows table mappings to automatically convert back and forth to Enums by specifying the type for the column - this works for strings or integers.
-Is there a way to make the conversion case insensitive or add a custom mapping class or extenstion method into the mix so that I can specify what the string should look like in more detail.
-Reasons for doing so might be in order to supply a nicer naming convention inside some new funky C# code in a system where the data schema is already set (and is being relied upon by some legacy apps) so the actual text in the database can't be changed.

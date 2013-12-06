@@ -1,2 +1,0 @@
-I am trying to grab the capital letters of a couple of words and wrap them in spans. I am using preg_replace, but it's not outputting anything.
-preg_replace("/[A-Z]/", "<span class=\"initial\">$1</span>", $str)

@@ -1,3 +1,0 @@
-<p>Any one know decent way to reference a SQLite database using the above mentioned tools? I tried using ODBC (the SQLite driver) but while the connection is good, I get no data returned. Like I can't see any tables in Data Connection (VS 2008). Is there a better way?</p>
-
-<p><em>Edit: corrected typos</em></p>

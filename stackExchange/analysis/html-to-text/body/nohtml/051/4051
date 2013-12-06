@@ -1,2 +1,0 @@
-In C can I pass a multidimensional array to a function as a single argument when I don't know what the dimensions of the array are going to be ?
-In addition my multidimensional array may contain types other than strings.

@@ -1,3 +1,0 @@
-<p>SQL:</p>
-
-<pre><code>select <br>   u.id,<br>   u.name,<br>   isnull(MAX(h.dateCol), '1900-01-01') dateColWithDefault<br>from universe u<br>left join history h <br>   on u.id=h.id <br>   and h.dateCol&lt;GETDATE()-1<br>group by u.Id, u.name<br></code></pre>

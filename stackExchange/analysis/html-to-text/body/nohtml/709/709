@@ -1,4 +1,0 @@
-I'm looking to introduce a unit testing framework into the mix at my job.  We're using Visual Studio 2005 (though we may be moving to 2008 within the next 6 months) and work primarily in C#.  If the framework has some kind of IDE integration that would be best, but I'm open to frameworks that don't have integration but are still relatively simple to get set up.  I'm going to get resistance to it one way or another, so if I can make sure what I'm pushing isn't a pain in the neck, that would help my case.
-The obvious choice from the research I've done so far points to nUnit, but I'd like to get the impressions of someone who's actually used it before recommending it to my team.
-Has anyone out there used nUnit?  If so, are there any pitfalls or limitations of which I should be aware?  Are there other good options out there?  If so, if you've used both nUnit at that, I'd greatly appreciate an idea of the strengths and weaknesses of them.
-Eric Sipple

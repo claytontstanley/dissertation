@@ -1,1 +1,0 @@
-All the articles I've found via google are either obsolete or contradict one another, what's the easiest way to print a form or, say, a richtextbox in c#? I think it's using the PrintDiaglog class by setting the Document, but how does this get converted?

@@ -1,3 +1,0 @@
-I have a web reference for our report server embedded in our application. The server that the reports live on could change though, and I'd like to be able to change it "on the fly" if necessary.
-I know I've done this before, but can't seem to remember how. Thanks for your help.
-update - I've manually driven around this for the time being. It's not a big deal to set the URL in the code, but I'd like to figure out what the "proper" way of doing this in VS 2008 is. Could anyone provide any further insights? Thanks!

@@ -1,1 +1,0 @@
-I'm writing some data acquisition software and need a gui plotting library that is fast enough to do realtime updated graphs.  I've been using Nplot which is pretty good for a free library, but I'm wondering if there are any better libraries (preferably free or cheap).

@@ -1,9 +1,0 @@
-pre-build
-task
--
-deleting
-the
-working
-copy
-in
-cruisecontrol.net

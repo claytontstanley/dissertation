@@ -1,2 +1,0 @@
-I've created some MbUnit Test Fixtures that have SetUp methods marked with the SetUp attribute.  These methods run before the tests just fine using the MbUnit GUI, the console runner, and the ReSharper MbUnit plugin.  However, when I run the tests with TestDriven.NET it does not run the SetUp methods at all.
-Does anyone know if this is a bug with TestDriven.NET or if I have something setup wrong?

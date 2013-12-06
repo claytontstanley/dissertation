@@ -1,5 +1,0 @@
-<p>When I have two mysql servers that have different jobs (holding different databases) but want to be able to use one of them to slip in when the other one fails, what would you suggest how I keep the data on both of them equal "close to realtime"? </p>
-
-<p>Obviously it's not possible to make a full database dump every x minutes.</p>
-
-<p>I've read about the <a href="http://dev.mysql.com/doc/refman/5.0/en/binary-log.html" rel="nofollow" title="Cocoa Programming for Mac OSX">Binary Log</a>, is that the way that I need to go? Will that not slow down the fallback server a lot? Is there a way to not include some tables in the binary log - where it doesn't matter that the data has changed?</p>

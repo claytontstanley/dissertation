@@ -1,1 +1,0 @@
-<p>One may not always know the Type of an object at compile-time, but may need to create an instance of the Type.  How do you get a new object instance from a Type?</p>

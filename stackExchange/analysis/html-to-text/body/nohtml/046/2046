@@ -1,6 +1,0 @@
-As a novice in practicing test-driven development, I often end up on a quandary as to how to unit test persistence to a database.
-I know that technically this would technically be an integration test (not a unit test), but I want to find out the best strategies for the ff:
-Testing queries.
-Testing inserts. How do I know that it is the insert that has gone wrong if it fails? I may test it by inserting and then querying -- how do I know that it isn't the querying that went wrong?
-Testing updates and deletes -- same as testing inserts
-What are the best practices doing these?

@@ -1,2 +1,0 @@
-What is the best way to transcode audio and video to show on the web?
-I need to do it programmatically.  I'd like to do something like YouTube or Google Video where users can upload whatever format they want, and I encode it to flv, mp3, and/or mp4.  I could do it on our server, but I would rather use an EC2 instance or even a web service.  We have a Windows 2008 server.

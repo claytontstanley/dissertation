@@ -1,2 +1,0 @@
-Occasionally, I've come across a webpage that tries to pop open a new window (for user input, or something important), but the popup blocker prevents this from happening.
-What methods can the calling window use to make sure the new window launched properly?

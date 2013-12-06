@@ -1,3 +1,0 @@
-<p>I'm talking about <a href="http://en.wikipedia.org/wiki/Quality_of_service" rel="nofollow">http://en.wikipedia.org/wiki/Quality_of_service</a>. With streaming stackoverflow podcasts and downloading the lastest updates to ubuntu, I would like to have QoS working so I can use stackoverflow without my http connections timing out or taking forever.</p>
-
-<p>I'm using an iConnect 624 ADSL modem which has QoS built-in but I can't seem to get it to work. Is it even possible to control the downstream (ie. from ISP to your modem)?</p>

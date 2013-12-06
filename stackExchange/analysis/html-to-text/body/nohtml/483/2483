@@ -1,4 +1,0 @@
-What is actually the difference between these two casts?
-SomeClass sc = (SomeClass)SomeObject;
-SomeClass sc2 = SomeObject as SomeClass;
-Normally, they should both be explicit casts to the specified type?

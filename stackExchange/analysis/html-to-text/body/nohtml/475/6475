@@ -1,7 +1,0 @@
-In a machine with AIX without PERL I need to filter records that will be considered duplicated if they have the same id and if they were registered between a period of four hours.
-I implemented this filter using AWK and work pretty well but I need a solution much faster:
-# Generar lista de Duplicados awk 'BEGIN { FS=","  } /OK/ {      old[$8] = f[$8];     f[$8] = mktime($4, $3, $2, $5, $6, $7);      x[$8]++; } /OK/ && x[$8]>1 && f[$8]-old[$8] < 14400 {     print $0; } function mktime (y,m,d,hh,mm,ss) {     return ss + (mm*60) + (hh*3600) + (d*86400) + (m*2592000) + (y*31536000); } ' the.big.file.txt
-Any suggestions? Are there ways to improve the environment (preloading the file or someting like that)?
-The input file is already sorted.
-With the corrections suggested by jj33 I made a new version with better treatment of dates, still maintaining a low profile for incorporating more operations:
-awk 'BEGIN {     FS=",";      SECSPERMINUTE=60;     SECSPERHOUR=3600;     SECSPERDAY=86400;     split("0 31 59 90 120 151 181 212 243 273 304 334", DAYSTOMONTH, " ");     split("0 366 731 1096 1461 1827 2192 2557 2922 3288 3653 4018 4383 4749 5114 5479 5844 6210 6575 6940 7305", DAYSTOYEAR, " "); } /OK/ {      old[$8] = f[$8];     f[$8] = mktime($4, $3, $2, $5, $6, $7);      x[$8]++; } /OK/ && x[$8]>1 && f[$8]-old[$8]  2 ) && ( ((y % 4 == 0) && (y % 100 != 0)) || (y % 400 == 0) ) ) {      d2m = d2m + 1;     }     d2y = DAYSTOYEAR[ y - 1999 ];     return ss + (mm*SECSPERMINUTE) + (hh*SECSPEROUR) + (d*SECSPERDAY) + (d2m*SECSPERDAY) + (d2y*SECSPERDAY); } '

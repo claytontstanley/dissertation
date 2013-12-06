@@ -1,3 +1,0 @@
-If i have a file like the following:
-Data Data   Data   [Start]    Data i want   [End]   Data
-Whats the regex to pull out the data between the [start] and [end] tags

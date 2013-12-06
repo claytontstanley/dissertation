@@ -1,5 +1,0 @@
-<p>When attempting to compile my C# project, I get the following error:</p>
-
-<pre><code>'C:\Documents and Settings\Dan\Desktop\Rowdy Pixel\Apps\CleanerMenu\CleanerMenu\obj\Debug\CSC97.tmp' is not a valid Win32 resource file.<br></code></pre>
-
-<p>Having gone through many Google searches, I have determined that this is usually caused by a 256x256 image inside an icon used by the project. I've gone through all the icons and removed the 256x256 versions, but the error persists. Any ideas on how to get rid of this?</p>

@@ -1,2 +1,0 @@
-I'm a new Windows programmer and I'm not sure where I should store user configurable application settings.  I understand the need to provide a user friendly means for the user to change application settings, like an Edit | Settings form or similar.  But where should I store the values after the user hits the Apply button on that form?
-What are the pros and cons of storing settings in the Windows registry vs. storing them in a local INI file or config file or similar?

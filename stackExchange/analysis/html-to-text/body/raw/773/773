@@ -1,5 +1,0 @@
-<p>I haven't been able to find an understandable explanation of how to actually use Python's itertools.groupby() function.  What I'm trying to do is this:  take a list - in this case, the children of an objectified lxml element - divide it into groups based on some criteria, and then later iterate over each of these groups separately.</p>
-
-<p>I've reviewed the documentation (<a href="http://docs.python.org/lib/itertools-functions.html" rel="nofollow">http://docs.python.org/lib/itertools-functions.html</a>), and the examples, (<a href="http://docs.python.org/lib/itertools-example.html" rel="nofollow">http://docs.python.org/lib/itertools-example.html</a>), but I've had trouble trying to apply them beyond a simple list of numbers. </p>
-
-<p>So, how do I use of itertools.groupby()?  Is there another technique I should be using?  Pointers to good "prerequisite" reading would also be appreciated.</p>

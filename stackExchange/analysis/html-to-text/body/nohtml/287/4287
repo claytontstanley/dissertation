@@ -1,1 +1,0 @@
-I have a process in erlang that is supposed to do something immediately after spawn, then send the result back to the parent when it is finished.  How do I figure out the PID of the process that spawned it?

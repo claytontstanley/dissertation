@@ -1,6 +1,0 @@
-<p>I have an array in Perl:</p>
-
-<pre><code>@my_array = ("one","two","three","two","three")
-</code></pre>
-
-<p>How do I remove the duplicates from the array?</p>

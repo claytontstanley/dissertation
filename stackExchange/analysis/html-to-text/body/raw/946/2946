@@ -1,7 +1,0 @@
-<p><em>Finally I get to post my <strong>ı</strong>'s and <strong>İ</strong>'s as promised...</em></p>
-
-<p>I've found that MS Indexing Service returns incomplete results when searching for documents with Turkish content. It seems to choke especially regarding the (incorrectly-named) <a href="http://en.wikipedia.org/wiki/Turkish_dotted_and_dotless_I" rel="nofollow">4I problem</a>. </p>
-
-<p>Apparently, MS has fixed this problem with a Windows 2000 <a href="http://support.microsoft.com/kb/325333" rel="nofollow">http://support.microsoft.com/kb/325333</a> service pack, but the bug seems to be resurrected with Windows XP &amp; 2003.</p>
-
-<p>Anybody uses Indexing Service in their line of work? Similar problems with other non-English locales? Any solutions?</p>

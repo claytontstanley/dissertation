@@ -1,7 +1,0 @@
-<p>I've been having trouble getting my ASP.NET application to automatically log users into the Intranet site I'm building.  No matter the googling or the experimentation I applied, there is always a login box displayed by IE7.</p>
-
-<p>I've got Windows authentication mode set in the Web.config, disabled anonymous access and configured the correct default domain in IIS, but it's still asking the user to log in and, more annoyingly, the user is required to provide the domain too (<em>DOMAIN\auser</em>), which is causing problems with non-technical visitors.  Thank Zeus for password remembering functionality.</p>
-
-<p>I'm not the network administrator so it's possible that something about Active Directory is set up incorrectly, or it could just be me missing something very simple.  Please note that I don't want to impersonate the user, I just need to know that the IPrincipal.Name property matches that of a valid record in my user database, hence authenticating the user to my application.</p>
-
-<p>To this end, it would be very useful to have a checklist of all configuration requirements for AD, ASP.NET and IIS to work together in this manner as a reference for debugging and hopefully reducing some user friction.</p>

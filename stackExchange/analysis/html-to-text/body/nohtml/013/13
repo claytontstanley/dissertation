@@ -1,2 +1,0 @@
-Is there a standard way for a web server to determine what time zone offset a user is in?
-From an HTTP header or part of the user-agent description, perhaps?

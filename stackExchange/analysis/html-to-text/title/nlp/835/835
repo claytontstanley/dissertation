@@ -1,9 +1,0 @@
-cruisecontrol.net
-,
-msbuild
-,
-/p
-:
-outputpath
-and
-ccnetartifactdirectory

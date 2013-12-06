@@ -1,7 +1,0 @@
-<p>I'm trying to convince my providers to use ANT instead of Rational Application Development so anyone can recompile, recheck, redeploy the solution anyplace, anytime, anyhow. :P</p>
-
-<p>I started a build.xml for a project that generates a JAR file but stopped there and I need real examples to compare notes. My good friends! I don't have anyone close to chat about this! </p>
-
-<p>This is my <a href="http://pastebin.ca/1094382" rel="nofollow">build.xml</a> so far. </p>
-
-<p><i>(*) I edited my question based in the <a href="http://stackoverflow.com/questions/4046/can-someone-give-me-a-working-example-of-a-buildxml-for-an-ear-that-deploys-in-#4298" rel="nofollow">suggestion</a> of to use pastebin.ca</i></p>

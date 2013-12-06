@@ -1,7 +1,0 @@
-I've got a website that I've just uploaded onto the interwebs, and it's displaying differently using Firefox 3.0.1 on Ubuntu and WinXP.
-Two things I've noticed on Ubuntu:
-The favicon is missing
-The background color isn't displaying (it's set in the stylesheet)
-What have I done wrong?  The CSS file is being fetched under Ubuntu, so why isn't it applying all of the stylesheet, just the bits it likes?  And why isn't the favicon displaying?  Are they the same problem?
-The answer on the background color: invalid HTML.  But I'd love for someone to explain why it works under Windows and not Ubuntu.
-The answer on favicon: previously, there was no favicon.  The browser cached the lack of favicon. Clear the Firefox cache , and all is well.

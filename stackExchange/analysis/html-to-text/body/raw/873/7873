@@ -1,3 +1,0 @@
-<p>I'm making a webform using a loginview, the problem is that because the control includes a grey bar telling you what type of control it is it throws of correctly formatting the page (It has LoginView1 at the top), is there a way to hide this on the LoginView as the contentPlaceholder does an excellent job for this.</p>
-
-<p>I've found that you can Remove the ID, but that seems like a hack as it stops programatic access</p>

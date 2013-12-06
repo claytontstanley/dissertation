@@ -1,9 +1,0 @@
-I'm just getting into creating some WCF services, but I have a requirement to make them backward compatible for legacy (.NET 1.1 and 2.0) client applications.
-I've managed to get the services to run correctly for 3.0 and greater clients, but when I publish the services using a basicHttpBinding endpoint (which I believe is required for the compatibility I need), the service refactors my method signatures.  e.g.
-public bool MethodToReturnTrue(string seedValue);
-appears to the client apps as
-public void MethodToReturnTrue(string seedValue, out bool result, out bool MethodToReturnTrueResultSpecified);
-I've tried every configuration parameter I can think of in the app.config for my self-hosting console app, but I can't seem to make this function as expected.  I suppose this might lead to the fact that my expectations are flawed, but I'd be surprised that a WCF service is incapable of handling a bool return type to a down-level client.
-My current app.config looks like this.
-<?xml version="1.0" encoding="utf-8" ?> <configuration> <system.serviceModel> <services> <service behaviorConfiguration="MyServiceTypeBehaviors" Name="MyCompany.Services.CentreService.CentreService"> <clear /> <endpoint address="http://localhost:8080/CSMEX"    binding="basicHttpBinding" bindingConfiguration="" contract="IMetadataExchange" /> <endpoint address="http://localhost:8080/CentreService" binding="basicHttpBinding" bindingName="Compatible" name="basicEndpoint" contract="MyCompany.Services.CentreService.ICentreService" /> </service> </services> <behaviors> <serviceBehaviors> <behavior name="MyServiceTypeBehaviors" > <serviceMetadata httpGetEnabled="true" /> </behavior> </serviceBehaviors> </behaviors> </system.serviceModel> </configuration>
-Can anyone advise, please?

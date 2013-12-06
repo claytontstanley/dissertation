@@ -1,1 +1,0 @@
-I'm looking for a simple algorithm to 'serialize' a directed graph. In particular I've got a set of files with interdependencies on their execution order, and I want to find the correct order at compile time. I know it must be a fairly common thing to do - compilers do it all the time - but my google-fu has been weak today. What's the 'go-to' algorithm for this?

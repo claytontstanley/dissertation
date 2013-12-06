@@ -1,8 +1,0 @@
-So in my simple learning website, I use the built in ASP.NET authentication system.
-I am adding now a user table to save stuff like his zip, DOB etc'. My question is:
-In the new table, should the key be the user name (the string) or the user ID which is that GUID looking number they use in the asp_ tables.
-If the best practice is to use that ugly guid, anyone knows how to get it? it seems to not be accessible as easily as the name (System.Web.HttpContext.Current.User.Identity.Name)
-If you suggest I use neither (not the guid nor the userName fields provided by ASP.NET authentication) then how do I do it with ASP.NET authentication? One option I like is to use the email address of the user as login, but how to I make ASP.NET authentication system use an email address instead of a user name? (or there is nothing to do there, it is just me deciding I "know" userName is actually an email address?
-Please note:
-I am not asking on how to get a GUID in .NET, I am just refering to the userID column in the asp_ tables as guid.
-The user name is unique in ASP.NET authentication

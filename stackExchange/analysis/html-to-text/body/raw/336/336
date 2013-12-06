@@ -1,7 +1,0 @@
-<p>So I hear a lot of opinions about this, and I wanted to see if there was anything resembling a consensus. When is it appropriate to use an unsigned variable over a signed one? What about in a <strong>for</strong> loop?</p>
-
-<pre><code>for (unsigned int i = 0; i &lt; someThing.length(); i++) {  <br>    SomeThing var = someThing.at(i);  <br>    // You get the idea.  <br>}<br></code></pre>
-
-<p>As I said, I hear a lot of opinions, but not a lot of consensus. I know Java doesn't have unsigned values, and that must have been a concious decision on Sun's part. </p>
-
-<p>Looking forward to hearing everybody's opinion. </p>

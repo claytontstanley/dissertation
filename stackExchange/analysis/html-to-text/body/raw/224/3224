@@ -1,1 +1,0 @@
-<p>CSS and Javascript files don't change very often, so I want them to be cached by the web browser. But I also want the web browser to see changes made to these files without requiring the user to clear their browser cache. Also want a solution that works well with version control system such as Subversion.</p>

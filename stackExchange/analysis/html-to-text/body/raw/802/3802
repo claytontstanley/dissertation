@@ -1,2 +1,0 @@
-<P>Something I've run into posting on SO: when you refer to a function with arguments, what is the best way to typeset it for readibility, brevity, and accuracy? I tend to put empty parentheses after the function name like <CODE>func()</CODE>, even if there are actually arguments for the function. I have trouble including the arguments and still feeling like the paragraph is readable.</P>
-<P>Any thoughts on best practices for this?</P>

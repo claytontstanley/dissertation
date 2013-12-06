@@ -1,5 +1,0 @@
-<p>OK. This is a bit of a vanity app, but I had a situation today at work where I was in a training class and the machine was set to lock every 10 minutes.  Well, if the trainers got excited about talking - as opposed to changing slides - the machine would lock up.</p>
-
-<p>I'd like to write a teeny app that has nothing but a taskbar icon that does nothing but move the mouse by 1 pixel every 4 minutes.  </p>
-
-<p>I can do that in 3 ways with Delphi (my strong language) but I'm moving to C# for work and I'd like to know the path of least resistance there.</p>

@@ -1,2 +1,0 @@
-Hey guys, just had a bug submitted for a site I maintain which heavily uses the viewstate (not my code). However on certain pages when the viewstate is extra bloated Safari is throwhing the usual "Validation of viewstate MAC failed" error.
-Any ideas?? Only happens in Safari, Firefox, IE, Opera all fine.

@@ -1,1 +1,0 @@
-I'm trying to customize some TFS work items via the VS2008 xml editor, but every time I open a work item xml file it jumps to the graphical designer.  All that gives me is a "View XML" button that doesn't let you edit the xml directly.

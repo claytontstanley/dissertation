@@ -1,4 +1,0 @@
-Let's say that there is a solution that contains two projects (Project1 and Project2).
-Project1 is set as a StartUp Project (its name is displayed in a bold font). I double-click some file in Project2 to open it. The file opens, but something else happens too - Project2 gets set as a StartUp Project.
-I tried to find an option in configuration to change it, but I found none.
-Can this feature (though it's more like a bug to me) be disabled?

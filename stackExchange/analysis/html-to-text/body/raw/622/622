@@ -1,9 +1,0 @@
-<p>I want to print the first 10000 prime numbers.
-Can anyone give me the most efficient code for this?
-Clarifications:</p>
-
-<ol>
-<li>It does not matter if your code is inefficient for n &gt;10000.</li>
-<li>The size of the code does not matter.</li>
-<li>You cannot just hard code the values in any manner.</li>
-</ol>

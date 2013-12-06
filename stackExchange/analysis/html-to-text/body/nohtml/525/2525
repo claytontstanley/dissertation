@@ -1,6 +1,0 @@
-My product is both ASP.NET, Windows forms app and Windows service.  95% of code is .NET (VB if you must know).
-For IP reasons, I need to obfuscate the code. I am using an old dotfuscator (over 5 years old) and thinking it is time to move to a new gen. Anyone can recommend from their personal experience (please don't just give me a list of vendors, I already have that) what works best for them?
-Taking into account real life issues like:
-Dealing with the old problem of serialization/de-serialization: Currently, I simply tell the tool not to obfuscate any class data members. The pain of not being able to load data that was previously serialized with an old version is just to big
-Integrating the tool into the build process?
-Working with ASP.NET which is a story since depending on the settings, you don't always have the same dll names (and you have lots of them, one per page), and not all tools handle this well.

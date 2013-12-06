@@ -1,9 +1,0 @@
-I've always preferred to use long integers as primary keys in databases, for simplicity and (assumed) speed. But when using a REST or Rails-like URL scheme for object instances, I'd then end up with URLs like this:
-http://example.com/user/783
-And then the assumption is that there are also users with IDs of 782, 781, ..., 2, and 1. Assuming that the web app in question is secure enough to prevent people entering other numbers to view other users without authorization, a simple sequentially-assigned surrogate key also "leaks" the total number of instances (older than this one), in this case users, which might be privileged information. (For instance, I am user #726 in stackoverflow.)
-Would a UUID /GUID be a better solution? Then I could set up URLs like this:
-http://example.com/user/035a46e0-6550-11dd-ad8b-0800200c9a66
-Not exactly succinct, but there's less implied information about users on display. Sure, it smacks of "security through obscurity" which is no substitute for proper security, but it seems at least a little more secure.
-Is that benefit worth the cost and complexity of implementing UUIDs for web-addressable object instances? I think that I'd still want to use integer columns as database PKs just to speed up joins.
-There's also the question of in-database representation of UUIDs. I know MySQL stores them as 36-character strings. Postgres seems to have a more efficient internal representation (128 bits?) but I haven't tried it myself. Anyone have any experience with this?
-Update: for those who asked about just using the user name in the URL (e.g., http://example.com/user/yukondude), that works fine for object instances with names that are unique, but what about the zillions of web app objects that can really only be identified by number? Orders, transactions, invoices, duplicate image names, stackoverflow questions, ...

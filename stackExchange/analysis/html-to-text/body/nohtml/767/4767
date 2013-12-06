@@ -1,7 +1,0 @@
-Recently I've been playing with an Arduino board as one of my hobbies, I'm having lots of fun with it and I'd like to get into circuits etc in a much bigger way. I've done a lot of research on various avenues I could go down, but I'm sure some of you guys know which books/sites are best.
-I'm comfortable in c++ and c# , I know there's a board that you can write c# code for (also see the net Micro Framework ) and most chips use c, please feel free to answer any number of the following questions.
-1) What are the best books/sites for someone looking to break into writing for microcontrollers, eg I've heard avrFreaks has lots of info (Most important question)
-2) Is it true that for the majority of controllers C is the only choice? No OO possible?
-3) Is there any emulation software that would give me a virtual microcontroller and let me try out code with different components etc connected to the controller, so I don't have to buy them to play with em?
-4) I live in england, what sites do you know of that have a wide range of parts/good prices for components etc?
-It seems like other users have interest in this as well, so I'm hoping someone in the know notices this. Thanks in advance !

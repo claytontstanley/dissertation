@@ -1,5 +1,0 @@
-<P>I have a quad core machine and would like to write some code to parse a text file that takes advantage of all four cores. The text file basically contains one record per line.</P>
-<P>Multithreading isn't my forte so I'm wondering if anyone could give me some patterns that I might be able to use to parse the file in an optimal manner.</P>
-<P>My first thoughts are to read all the lines into some sort of queue and then spin up threads to pull the lines off the queue and process them, but that means the queue would have to exist in memory and these are faily large files so I'm not so keen on that idea.</P>
-<P>My next thoughts are to have some sort of controller that will read in a line and assign it a thread to parse, but I'm not sure if the controller will end up being a bottleneck if the threads are processing the lines faster than it can read and assign them.</P>
-<P>I know there's probably another simpler solution than both of these but at the moment I'm just not seeing it.</P>

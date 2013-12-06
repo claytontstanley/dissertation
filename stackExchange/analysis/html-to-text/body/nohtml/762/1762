@@ -1,5 +1,0 @@
-I am trying to set a flag to show or hide a page element, but it always displays even when the expression is false.
-$canMerge = ($condition1 && $condition2) ? 'true' : 'false';
-...
-<?php if ($canMerge) { ?>Stuff<?php } ?>
-What's up?

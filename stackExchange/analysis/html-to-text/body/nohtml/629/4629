@@ -1,4 +1,0 @@
-I can do an eval("something()"); to execute the code dynamically in JavaScript. Is there a way for me to do the same thing in C#?
-What I am exactly trying to do is that I have an integer variable (say i) and I have multiple properties by the names: "Property1","Property2","Property3" etc. Now, I want to perform some operations on the " Propertyi " property depending on the value of i.
-This is really simple with Javascript. Is there any way to do this with C#?
-Edit: Oh, and I am using C# 2.0

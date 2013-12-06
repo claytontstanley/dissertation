@@ -1,2 +1,0 @@
-On one Linux Server running Apache and PHP 5, we got multiple Virtual Hosts with separate logfiles and everything. The only thing we cannot seem to separate between virtual hosts is the php error_log. Overriding this setting in the <Location> of the httpd.conf does not seem to do anything.
-Did I overlook something? Is there a way to have separate php error_logs for each Virtual Host?

@@ -1,4 +1,0 @@
-Given the constraint of only using T-Sql in Sql Server 2005, is there a better way to remove the decimal point from a money datatype than a conversion to a varchar (here implicitly) and then a replace of the decimal point?
-Here is what I have currently.
-SELECT REPLACE(1.23, '.', ''), REPLACE(19.99, '.', '')
-Which returns the desired 123 and 1999, but I was wondering if there was a better way.  Any thoughts?

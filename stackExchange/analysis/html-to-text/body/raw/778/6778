@@ -1,5 +1,0 @@
-<p>This page from Adobe says to add a "wmode" parameter and set its value to "transparent": <a href="http://kb.adobe.com/selfservice/viewContent.do?externalId=tn_14201" rel="nofollow">http://kb.adobe.com/selfservice/viewContent.do?externalId=tn_1420</a></p>
-
-<p>This works flawlessly in IE.  The background renders correctly in Firefox and Safari, however as soon as you use the browser's scroll bar then mouse over the Flash control you must click once to activate the control.  You can see this behavior if you try to hit the play button in Adobe's example.</p>
-
-<p>Anyone know a way around this?</p>

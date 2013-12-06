@@ -1,5 +1,0 @@
-<p>How do I make <a href="http://logging.apache.org/log4net/index.html" rel="nofollow">Log4net</a> only log Info level logs? Is that even possible? Can you only set a threshold? </p>
-
-<p>This is what i have, and it logs Info and above as i would expect. Is there anything i can do to make it only log info.</p>
-
-<pre><code>&lt;logger name="BrokerCollection.Model.XmlDocumentCreationTask"&gt;<br>  &lt;appender-ref ref="SubmissionAppender"/&gt;<br>  &lt;level value="Info" /&gt;<br>&lt;/logger&gt;<br></code></pre>

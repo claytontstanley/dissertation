@@ -1,6 +1,0 @@
-Does anyone have some good hints for writing test code for database-backend development where there is a heavy dependency on state?
-Specifically, I want to write tests for code that retrieve records from the database, but the answers will depend on the data in the database (which may change over time).
-Do people usually make a separate development system with a 'frozen' database so that any given function should always return the exact same result set?
-I am quite sure this is not a new issue, so I would be very interested to learn from other people's experience.
-Are there good articles out there that discuss this issue of web-based development in general?
-I usually write PHP code, but I would expect all of these issues are largely language and framework agnostic.

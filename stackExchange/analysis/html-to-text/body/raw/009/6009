@@ -1,1 +1,0 @@
-<p>Let's say you have a typical web app and with a file configuration.whatever. Every developer working on the project will have one version for their dev boxes, there will be a dev, prod and stage versions. How do you deal with this in source control? Not check in this file at all, check it with different names or do something fancy altogether?</p>

@@ -1,3 +1,0 @@
-<p>Given that indexing is so important as your dataset increases in size, can someone explain how indexing works at a database agnostic level?</p>
-
-<p>For information on queries to index a field, check out <a href="http://stackoverflow.com/questions/1156/how-do-i-index-a-database-field" rel="nofollow">http://stackoverflow.com/questions/1156/how-do-i-index-a-database-field</a></p>

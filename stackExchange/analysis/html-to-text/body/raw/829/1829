@@ -1,9 +1,0 @@
-<p>I've got a menu in python. That part was easy. I'm using raw_input() to get the selection from the user. </p>
-
-<p>The problem is that raw_input (and input) require the user to press Enter after they make a selection. Is there any way to make the program act immediately upon a keystroke? Here's what I've got so far:</p>
-
-<pre><code>import sys<br>print """Menu<br>1) Say Foo<br>2) Say Bar"""<br>answer = raw_input("Make a selection&gt; ")<br><br>if "1" in answer: print "foo"<br>elif "2" in answer: print "bar"<br></code></pre>
-
-<p>It would be great to have something like</p>
-
-<pre><code>print menu<br>while lastKey = "":<br>    lastKey = check_for_recent_keystrokes()<br>if "1" in lastKey: #do stuff...<br></code></pre>

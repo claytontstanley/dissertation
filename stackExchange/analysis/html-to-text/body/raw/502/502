@@ -1,3 +1,0 @@
-<p>I have a cross platform (python) application which needs to generate a jpeg preview of the first page of a PDF.</p>
-
-<p>On the mac I am spawning <a href="http://developer.apple.com/documentation/Darwin/Reference/ManPages/man1/sips.1.html" rel="nofollow">sips</a>.  Is there something similarly simple I can do on Windows?</p>

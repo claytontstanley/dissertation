@@ -1,3 +1,0 @@
-<p>Are there any popular and/or public websites that utilize the <a href="http://en.wikipedia.org/wiki/JavaServer%5FFaces" rel="nofollow">JavaServer Faces</a> framework? I don't ever recall stumbling across any ever on the Internet. In my experience JavaServer Faces is usually reserved for non-public enterprise and business level applications.</p>
-
-<p>I am curious to know because I am researching how terrible of an idea it would be to construct - for example - an online dating website utilizing MVC with JSF and (let's say for the sake of argument) <a href="http://en.wikipedia.org/wiki/Enterprise%5FJavaBean" rel="nofollow">EJB</a> 3.0.</p>

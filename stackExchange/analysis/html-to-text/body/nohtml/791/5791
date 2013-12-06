@@ -1,2 +1,0 @@
-Does anyone here use VB.NET and have a strong preference for or against using 'IsNothing' as opposed to 'Is Nothing' (for example, 'If IsNothing(anObject)' or If anObject Is Nothing...')? If so, why?
-EDIT: If you think they're both equally acceptable, do you think it's best to pick one and stick with it, or is it OK to mix them?

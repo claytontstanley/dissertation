@@ -1,3 +1,0 @@
-In interpreted programming languages, such as PHP and JavaScript, what are the repercussions of going with an Object Oriented approach over a Procedural approach?
-Specifically what I am looking for is a checklist of things to consider when creating a web application and choosing between Procedural and Object Oriented approaches, to optimize not only for speed, but maintainability as well. Cited research and test cases would be helpful as well if you know of any articles exploring this further.
-Bottom line: how big (if any) is the performance hit really, when going with OO vs. Procedural in an interpreted language?

@@ -1,3 +1,0 @@
-What is the fastest, yet secure way to encrypt passwords in (PHP Prefered), and for which ever method you choose is it portable?
-In other words if I later migrate my website to a different server will my passwords continue to work?
-The method I am using now I was told is dependent on the exact versions of the libraries installed on the server.

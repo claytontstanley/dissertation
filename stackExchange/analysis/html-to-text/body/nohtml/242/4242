@@ -1,6 +1,0 @@
-I want to convert a primitive to a string, and I tried:
-myInt.toString();
-This fails with the error:
-int cannot be dereferenced
-Now, I get that primitives are not reference types (ie, not an Object) and so cannot have methods.  However, Java 5 introduced autoboxing and unboxing (a la C#... which I never liked in C#, but that's beside the point).  So with autoboxing, I would expect the above to convert myInt to an Integer and then call toString() on that.
-Furthermore, I believe C# allows such a call, unless I remember incorrectly.  Is this just an unfortunate shortcoming of Java's autoboxing/unboxing specification, or is there a good reason for this?

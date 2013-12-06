@@ -1,7 +1,0 @@
-Is there a way to implement a singleton object in C++ that is:
-Lazily constructed in a thread safe manner (two threads might simultaneously be the first user of the singleton - it should still only be constructed once).
-Doesn't rely on static variables being constructed beforehand (so the singleton object is itself safe to use during the construction of static variables).
-(I don't know my C++ well enough, but is it the case that integral and constant static variables are initialized before any code is executed (ie, even before static constructors are executed - their values may already be "initialized" in the program image)?  If so - perhaps this can be exploited to implement a singleton mutex - which can in turn be used to guard the creation of the real singleton..)
-Excellent, it seems that I have a couple of good answers now (shame I can't mark 2 or 3 as being the answer).  There appears to be two broad solutions:
-Use static initialisation (as opposed to dynamic initialisation) of a POD static variable, and implementing my own mutex with that using the builtin atomic instructions.  This was the type of solution I was hinting at in my question, and I believe I knew already.
-Use some other library function like pthread_once or boost::call_once .  These I certainly didn't know about - and am very grateful for the answers posted.

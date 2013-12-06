@@ -1,7 +1,0 @@
-I'm trying to setup CruiseControl.net at the moment. So far it works nice, but I have a Problem with the MSBuild Task.
-According to the Documentation , it passes CCNetArtifactDirectory to MSBuild. But how do I use it?
-I tried this:
-<buildArgs>/noconsolelogger /p:OutputPath=$(CCNetArtifactDirectory)\test</buildArgs>
-But that does not work. In fact, it kills the service with this error:
-ThoughtWorks.CruiseControl.Core.Config.Preprocessor.EvaluationException: Reference to unknown symbol CCNetArtifactDirectory
-Documentation is rather sparse, and google und mainly offers modifying the .sln Project file, which is what I want to avoid in order to be able to manually build this project later - I would really prefer /p:OutputPath.

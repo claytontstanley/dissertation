@@ -1,2 +1,0 @@
-I'm wondering if it's a good idea to make verifications in getters and setters or elsewhere in the code.
-This might surprise you be when it comes to optimizations and speed-ing up the code, I think you should not made verifications in getters and setters but in the code where your're updating your files or database. Am I wrong ?

@@ -1,3 +1,0 @@
-I use rsync to synchronize files to Windows clients in a server agnostic way. What methods are available to send the progress of rsync to the parent process for display in a gui progress bar?
-I imagine two or three choices exist. (1) Watch STDOUT (2) Watch rsync.exe log file, similar to unix tail (3) Watch rsync console output in memory.
-Which one is best/preferred?

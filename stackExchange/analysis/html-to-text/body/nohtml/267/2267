@@ -1,3 +1,0 @@
-I am building a web page to show a customer what software they purchased and to give them a link to download said software.  Unfortunately, the data on what was purchased and the download information are in separate databases so I can't just take care of it with joins in a query.
-The common item is SKU.  I'll be pulling back a list of SKUs from the customer purchases database, and on the download table is a comma deleted list of SKUs associated with that download.  My intention, at the moment, is to create from this one datatable to populate a GridView.
-Any suggestions on how to do this efficiently would be appreciated.  If it helps, I can pretty easily pull back the data as a DataSet or a DataReader, if either one would be better for this purpose.

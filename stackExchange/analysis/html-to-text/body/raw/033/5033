@@ -1,2 +1,0 @@
-<P>I am about to dip my toe into DI/IoC for the first time with part of an app we have in production. I've spent the last month or so researching DI/IoC and will most likely use the Castle Windsor Container although NInject may be an option.</P>
-<P>Any of you folks out there got any advice &amp; guidance on best practices, typical pinch/pain points, gotchas, anti-patterns.</P>

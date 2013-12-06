@@ -1,9 +1,0 @@
-<p>I am refactoring a project and I want to make it conform to the MVC pattern (model view control). There are three objects: </p>
-
-<ol>
-<li><p>a <strong>ServerList</strong> (maintains a list of servers that are active) - this guy will be the controller</p></li>
-<li><p>a <strong>Form</strong> - this is your standard .NET GUI</p></li>
-<li><p>a <strong>DatabaseThingy</strong> - wrapper class that reads/writes to database. (don't ask me what it does, I can't touch or change this class)</p></li>
-</ol>
-
-<p>my question is: to follow proper MVC design, it seems that the <strong>ServerList</strong> should hold references to <strong>Form</strong> and <strong>DatabaseThingy</strong>. But when creating a .NET app, it seems that we are forced to make the Form (the view of MVC) the owner of <strong>ServerList</strong> and <strong>DatabaseThingy</strong>. How would I properly break this down into an MVC design and who should "own" what?</p>

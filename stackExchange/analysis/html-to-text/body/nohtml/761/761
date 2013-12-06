@@ -1,3 +1,0 @@
-What is the best way to localise a date format descriptor?
-As anyone from a culture which does not use the mm/dd/yyyy format knows, it is annoying to have to enter dates in this format. The .NET framework provides some very good localisation support, so it's trivial to parse dates according to the users culture, but you often want to also display a helpful hint as to the format required (especially to distinguish between yy and yyyy which is interchangeable in most cultures).
-What is the best way to do this with results that make sense to most users (i.e. dd/M/yyy is confusing because of the change in case and the switching between two and one letters).

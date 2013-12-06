@@ -1,3 +1,0 @@
-<p>Is <em>CompileAssemblyFromDom</em> faster than <em>CompileAssemblyFromSource</em>?</p>
-
-<p>It <em>should</em> be as it presumably bypasses the compiler front-end.</p>

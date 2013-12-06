@@ -1,5 +1,0 @@
-I'm using a Dictionary<string, int> where the int is a count of the key.
-Now, I need to access the last-inserted Key inside the Dictionary, but i do not know the name of it. The obvious attempt:
-int LastCount = mydict[mydict.keys[mydict.keys.Count]];
-does not work, because Dictionary.Keys does not implement a []-indexer.
-I just wonder if there is any similar class? I thought about using a Stack, but that only stores a string. I could now create my own struct and then use a Stack<MyStruct>, but I wonder if there is another alternative, essentially a Dictionary that implements an []-indexer on the Keys?

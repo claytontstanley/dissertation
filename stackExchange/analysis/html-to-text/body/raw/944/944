@@ -1,7 +1,0 @@
-<p>I'm maintaining a .NET 1.1 application, and one of the things I've been tasked with is making sure the user doesn't see any unfriendly error notifications.</p>
-
-<p>I've added handlers to Application.ThreadException and AppDomain.CurrentDomain.UnhandledException, which do get called. My problem is that the standard CLR error dialog is still displayed (before the exception handler is called).</p>
-
-<p>Jeff talks about this problem on his blog <a href="http://www.codinghorror.com/blog/archives/000201.html" rel="nofollow">here</a> and <a href="http://www.codinghorror.com/blog/archives/000216.html" rel="nofollow">here</a>. But there's no solution. So what is the standard way in .NET 1.1 to handle uncaught exceptions and display a friendly dialog box?</p>
-
-<p><strong>Edit</strong>: Jeff's response was marked as the correct answer, because the link he provided has the most complete information on how to do what's required.</p>

@@ -1,2 +1,0 @@
-My gut feel is that document based web services are preferred in practice - is this other peoples experience? are they easier to support? (I noted that Sharepoint uses Any for the "document type" in its WSDL interface, I guess that makes it Document based).
-Also - are people offering both WSDL and Rest type services now for the same functionality? WSDL is popular for code generation, but for front ends like PHP and Rails they seem to prefer rest.

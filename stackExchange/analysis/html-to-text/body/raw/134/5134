@@ -1,7 +1,0 @@
-<p>What is the best approach to write <strong>hooks</strong> for <strong>Subversion</strong> in <strong>Windows</strong>? As far as I know, only executable files can be used. So what is the best choice? </p>
-
-<ul>
-<li>Plain batch files (very limited but perhaps OK for very simple solutions)</li>
-<li>Dedicated compiled executable applications (sledgehammer to crack a nutshell?)</li>
-<li>Some other hybrid choice (like a batch file running a Powershell script)</li>
-</ul>

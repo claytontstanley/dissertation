@@ -1,6 +1,0 @@
-This gets the value of whatever is selected in my dropdown menu.
-document.getElementById('newSkill').value
-I cannot however find out what property to go after for the text that's currently displayed by the drop down menu. I tried "text" then looked at W3Schools but that didn't have the answer, does anybody here know?
-For those not sure, here's the HTML for a drop down box.
-<select name="newSkill" id="newSkill"> <option value="1">A skill</option> <option value="2">Another skill</option> <option value="3">Yet another skill</option> </select>
-Thanks

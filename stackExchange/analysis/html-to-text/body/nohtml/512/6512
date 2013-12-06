@@ -1,2 +1,0 @@
-I'm working on a Scheme interpreter written in C. Currently it uses the C runtime stack as its own stack, which is presenting a minor problem with implementing continuations. My current solution is manual copying of the C stack to the heap then copying it back when needed. Aside from not being standard C, this solution is hardly ideal.
-What is the simplest way to implement continuations for Scheme in C?

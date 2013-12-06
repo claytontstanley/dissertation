@@ -1,7 +1,0 @@
-<p>I often run into the following problem.</p>
-
-<p>I work on some changes to a project that require new tables or columns in the database. I make the database modifications and continue my work. Usually, I remember to write down the changes so that they can be replicated on the live system. However, I don't always remember what I've changed and I don't always remember to write it down.</p>
-
-<p>So, I make a push to the live system and get a big, obvious error that there is no NewColumnX. Ugh.</p>
-
-<p>Regardless of the fact that this may not be the best practice for this situation, is there a version control system for databases? I don't care about the specific database technology. I just want to know if one exists. If it happens to work with MS SQL Server, then great.</p>

@@ -1,1 +1,0 @@
-<p>In a .net system I'm building, there is a need for automated e-mail notifications. These should be editable by an admin. What's the easiest way to do this? SQL table and WYSIWIG for editing?</p>

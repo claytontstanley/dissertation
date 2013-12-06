@@ -1,5 +1,0 @@
-My dilemma is, basically, how to share an enumeration between two applications.
-The users upload documents through a front-end application that is on the web. This application calls a web service of the back-end application and passes the document to it. The back-end app saves the document and inserts a row in the Document table.
-The document type (7 possible document types: Invoice, Contract etc.) is passed as a parameter to the web service's UploadDocument method. The question is, what should the type (and possible values) of this parameter be?
-Since you need to hardcode these values in both applications, I think it is O.K. to use a descriptive string (Invoice, Contract, WorkOrder, SignedWorkOrder).
-Is it maybe a better approach to create a DocumentTypes enumeration in the first application, and to reproduce it also in the second application, and then pass the corresponding integer value to the web service between them?

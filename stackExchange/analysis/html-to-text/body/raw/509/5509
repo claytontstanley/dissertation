@@ -1,5 +1,0 @@
-<p>So my company uses a delightfully buggy program called Rational Purify (as a plugin to Microsoft Visual Developer Studio) to manage memory leaks.  The program is deigned to let you click on a memory leak after you have encountered it, and then jump to the line that the leak occurs on.</p>
-
-<p>Unfortunately Purify is malfunctioning and Purify will not jump to the place that the leak occurred it only mentions the class and method that the leak occurs in.  Unfortunately, sometimes this is about as useful as hiring a guide to help you hunt bears and having him point to the forest and tell you there are bears there.</p>
-
-<p>Does anyone with Purify experience have any idea how I might fix this problem or have a good manual to look though?</p>

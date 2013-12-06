@@ -1,2 +1,0 @@
-I'm writing an AJAX app, but as the user moves through the app, I'd like the URL in the address bar to update despite the lack of page reloads. Basically, I'd like for them to be able to bookmark at any point and thereby return to the current state.
-How are people handling maintaining RESTfulness in AJAX apps? Thanks in advance.

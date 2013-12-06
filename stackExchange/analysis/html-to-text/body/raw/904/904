@@ -1,8 +1,0 @@
-<p>give a relatively simple css:</p>
-
-<pre><code>&lt;div style="width:150px;"&gt;
-  12333-2333-233-23339392-332332323
-&lt;/div&gt;
-</code></pre>
-
-<p>How do I make it so that the string stays constrained to the width of 150, and simply wraps to a newline on the hyphen?</p>

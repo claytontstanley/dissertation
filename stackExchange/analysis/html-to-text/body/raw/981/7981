@@ -1,8 +1,0 @@
-<p>I'm working on bringing some old code from 1998 up to the 21st century.  One of the first steps in the process is converting the printf statements to <a href="http://doc.trolltech.com/4.4/qstring.html" rel="nofollow" title="The Subversion Book: Repository hooks">QString</a> variables.  No matter how many times I look back at printf though, I always end up forgetting one thing or the other.  So, for fun, let's decode it together, for ole' times sake and in the process create the first little <strong>'printf primer'</strong> for Stackoverflow.</p>
-
-<p>In the code, I came across this little gem,</p>
-
-<pre><code>printf("%4u\t%016.1f\t%04X\t%02X\t%1c\t%1c\t%4s", a, b, c, d, e, f, g);
-</code></pre>
-
-<p>How will the variables a, b, c, d, e, f, g be formatted?</p>

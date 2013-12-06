@@ -1,1 +1,0 @@
-What is the correct way to get the process size on Solaris, HP-UX and AIX? Should we use top or ps -o vsz or something else?

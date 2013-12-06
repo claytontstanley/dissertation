@@ -1,4 +1,0 @@
-Here's what I use:
-SELECT CAST(FLOOR(CAST(getdate() as FLOAT)) as DATETIME)
-I'm thinking there may be a better/more elegant way.
-Requirements:   - It has to be as fast as possible (the less casting the better)   - Final result has to be a datetime type, not a string

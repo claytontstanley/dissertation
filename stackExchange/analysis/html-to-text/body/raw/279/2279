@@ -1,3 +1,0 @@
-<p>How can I add rules to Visual Studio (2005 and up) for validating property markup (HTML) for a vendor's proprietary controls?</p>
-
-<p>My client uses a control which requires several properties to be set as tags in the aspx file which generates something like 215 validation errors on each build. It's not preventing me from building, but real errors are getting lost in the noise.</p>

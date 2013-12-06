@@ -1,7 +1,0 @@
-<p>Using Firebug v1.20b7 with Firefox v3.0.1 I use firebug a lot for web devlopment.</p>
-
-<p>I have very often the problem that Firebug won't show its web console for seeing the POSTs and GETs. I can view all the other tabs, including the NET tab that gives me a lot of the same information that the CONSOLE tab does.</p>
-
-<p>Curious if anyone else has had this problem, and maybe a solution, or maybe this is a bug of Firebug.</p>
-
-<p>Thanks</p>

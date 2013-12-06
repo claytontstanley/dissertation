@@ -1,3 +1,0 @@
-<p>Any good recommendations for a platform agnostic (i.e. Javascript) grid control/plugin that will accept pasted Excel data and can emit Excel-compliant clipboard data during a Copy?</p>
-
-<p>I believe Excel data is formatted as CSV during "normal" clipboard operations.</p>

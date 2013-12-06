@@ -1,3 +1,0 @@
-<P>Is:</P><PRE><CODE>For i = LBound(arr) To UBound(arr)</CODE></PRE>
-<P>The best way?</P>
-<P>What is the point in asking for LBound? Surely that is always 0 isn't it?</P>

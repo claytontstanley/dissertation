@@ -1,8 +1,0 @@
-Let's say you create a Wizard in an HTML form.  One button goes back and one goes forward.  Since the "back" button appears first in the markup, when you press Enter it will use that button to submit the form.
-Ex:
-<form>
-<input type="text" name="field1" /> <!-- put your cursor in this field and press Enter -->
-<input type="submit" name="prev" value="Previous Page" /> <!-- This is the button that will submit -->
-<input type="submit" name="next" value="Next Page" /> <!-- But this is the button that I WANT to submit -->
-</form>
-What I would LIKE to do, is get to decide which button is used to submit the form when a user presses Enter.  That way, when you press Enter the Wizard will move to the next page, not the previous.  Do you have to use tabindex to do this?

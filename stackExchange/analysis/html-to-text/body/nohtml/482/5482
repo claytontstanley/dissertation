@@ -1,3 +1,0 @@
-The ASP.NET AJAX ModalPopupExtender has OnCancelScript and OnOkScript properties, but it doesn't seem to have an OnShowScript property.  I'd like to specify a javascript function to run each time the popup is shown.
-In past situations, I set the TargetControlID to a dummy control and provide my own control that first does some JS code and then uses the JS methods to show the popup.  But in this case, I am showing the popup from both client and server side code.
-Anyone know of a way to do this?

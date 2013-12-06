@@ -1,3 +1,0 @@
-The discussion of Dual vs. Quadcore is as old as the Quadcores itself and the answer is usually "it depends on your scenario". So here the scenario is a Web Server (Windows 2003 (not sure if x32 or x64), 4 GB RAM, IIS, ASP.net 3.0).
-My impression is that the CPU in a Webserver does not need to be THAT fast because requests are usually rather lightweight, so having more (slower) cores should be a better choice as we got many small requests.
-But since I do not have much experience with IIS load balancing and since I don't want to spend a lot of money only to find out I've made the wrong choice, can someone who has a bit more experience comment on whether or not More Slower or Fewer Faster cores is better?

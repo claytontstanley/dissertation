@@ -1,3 +1,0 @@
-I'd like to be able to test a function with a tuple from a set of fringe cases and normal values. For example, in testing a function that returns true when given three lengths that form a valid triangle, I'd have specific cases, negative numbers, small numbers, large numbers, values close-to being overflowed, etcetera. Then generating combinations of these values, with or without repetition, to get a set of test data.
-(inf,0,-1), (5,10,1000), (10,5,5), (0,-1,5), (1000,inf,inf), ...
-(I actually know the answer to this, but it might be helpful for others, and a challenge for people here! --will post my answer(s) later on.)

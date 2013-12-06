@@ -1,4 +1,0 @@
-Original Question
-I am looking for a function that attempts to quantify how "distant" (or distinct) two colors are. This question is really in two parts:
-What color space best represents human vision?
-What distance metric in that space best represents human vision (euclidean?)

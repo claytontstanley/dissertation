@@ -1,3 +1,0 @@
-<p>When writing a T-SQL script that I plan on re-running, often times I use temporary tables to store temporary data.  Since the temp table is created on the fly, I'd like to be able to drop that table only if it exists (before I create it).</p>
-
-<p>I'll post the method that I use, but I'd like to see if there is a better way.</p>

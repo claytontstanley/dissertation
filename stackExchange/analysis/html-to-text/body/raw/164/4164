@@ -1,7 +1,0 @@
-<p>I'm about to start a project for a customer who wants CMS-like functionality. They want users to be able to log in, modify a profile, and a basic forum. They also wish to be able to submit things to a front page.</p>
-
-<p>Is there a framework or barebones CMS that I could expand on or tailor to my needs? I don't need anything as feature-rich or fancy as Drupal or Joomla. I would actually prefer a framework as opposed to a pre-packaged CMS.</p>
-
-<p>I am confident I could code all this from scratch, but would prefer not to, as something like a framework would significantly cut down on my time spent coding, and more on design and layout.</p>
-
-<p>Edit: I should have been more specific. I'm looking for a Content Management System that will be run on a Debian server. So no .net preferably.</p>

@@ -1,5 +1,0 @@
-<p>A few months back my team switched our source control over to <a href="http://subversion.tigris.org/" rel="nofollow">Subversion</a> from <a href="http://msdn.microsoft.com/en-us/vs2005/aa718670.aspx" rel="nofollow">Visual SourceSafe</a>, and we haven't been happier.  Recently I've been looking at <a href="http://msdn.microsoft.com/en-us/tfs2008/default.aspx" rel="nofollow">Team Foundation Server</a>, and at least on the surface, it seems very impressive.  There is some great integration with Visual Studio, and lots of great tools for DBA's, testers, project managers, etc.</p>
-
-<p>The most obvious difference between these two products is price.  It's hard to beat Subversion (free).  Team Foundation Server is quite expensive, so the extra features would really have to kick Subversion in the pants.</p>
-
-<p>My question is: does anyone have practical experience with both?  How do they compare, and is Team Foundation Server actually worth all the money?</p>

@@ -1,3 +1,0 @@
-<p>I've been wanting to get my databases under version control.  Does anyone have any advice or recommended articles to get me started?</p>
-
-<p>I'll always want to have at least <em>some</em> data in there (as <a href="http://stackoverflow.com/users/80/alumb" rel="nofollow">alumb</a> mentions: user types and administrators).  And I'll probably often want a large collection of generated test data for performance measurement.</p>

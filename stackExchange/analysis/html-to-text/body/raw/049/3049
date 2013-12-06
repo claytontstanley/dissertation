@@ -1,5 +1,0 @@
-<p>I need to send and receive data over serial connections (RS-232 and RS-422).</p>
-
-<p>How do I set up and communicate with such a connection?  How do I figure out what the configuration settings (e.g. baud rate) should be and how do I set them?</p>
-
-<p>In particular I am looking to do this in Java, C/C++, or one of the major Unix shells but I also have some interest in serial programming using Windows/Hyperterminal.</p>

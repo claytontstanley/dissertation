@@ -1,3 +1,0 @@
-<p>I'd like to allow a user to set up an SSH tunnel to a particular machine on a particular port (say, 5000), but I want to restrict this user as much as possible. (Authentication will be with public/private keypair).</p>
-
-<p>I know I need to edit the relevant ~/.ssh/authorized_keys file, but I'm not sure exactly what content to put in there (other than the public key).</p>

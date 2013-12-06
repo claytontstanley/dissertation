@@ -1,5 +1,0 @@
-<p>We have a php project that we would like to version control. Right now there are three of us working on a "Dev" version of the project that all have our Eclipse linked to it with just an external folder, and thus no version control.</p>
-
-<p>What is the right way, and what is the best way, to version control this (not necessarily the same I dont think)</p>
-
-<p>We have a SVN set up but just need to find a good way to check in and check out that lets us test on the dev server. Any ideas?</p>

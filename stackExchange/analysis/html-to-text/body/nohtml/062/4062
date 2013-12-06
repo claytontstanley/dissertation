@@ -1,4 +1,0 @@
-Currently I know of only two ways to cache data (I use PHP but I assume that the same will apply to most languages).
-Save the cache to a file
-Save the cache to a large DB field
-Are there any other (perhaps better) ways of caching or is it really just this simple?

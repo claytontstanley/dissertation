@@ -1,3 +1,0 @@
-<p>First, let's get the security considerations out of the way. I'm using simple authentication under Apache for a one-off, internal use only, non-internet connected lan, php web app.</p>
-
-<p>How can get I the HTTP authenticated user name in PHP?</p>

@@ -1,4 +1,0 @@
-Has anyone got anything better than creating a copy of the original datatable and then looping through it to create a distinct view ?
-From what I've read and attempted, the dataview doesn't support distinct (currently system is in Studio.NET 2003 - looking to move to 2005 shortly but 2008 isn't on the radar - so if newer versions do, please accept my ineptitude as a sign of old age!).
-I know I could create another Oracle procedure to create the distinct version but I'm trying to keep my calls down as certain parts of the system are being pushed down the whole new world of hurt that is known as PDA/Mobile route - so it's possible I may lose connection anyway and I know I can save stuff out to XML, etc - but one step at a time.
-Any thoughts/pointers gratefully accepted.

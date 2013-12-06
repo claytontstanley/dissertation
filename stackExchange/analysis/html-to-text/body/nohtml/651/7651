@@ -1,3 +1,0 @@
-I have an array in Perl:
-@my_array = ("one","two","three","two","three")
-How do I remove the duplicates from the array?

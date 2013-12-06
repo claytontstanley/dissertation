@@ -1,5 +1,0 @@
-<p>How do I escape the underscore character?</p>
-
-<p>I am writing something like the following where clause and want to be able to find actual entries with _d at the end.</p>
-
-<pre><code>Where Username Like '%_d'<br></code></pre>

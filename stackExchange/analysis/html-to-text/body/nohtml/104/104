@@ -1,7 +1,0 @@
-In .NET perspective:
-What is a Memory Leak ?
-How to understand whether your application leaks? What are the effects?
-How to prevent a memory leak?
-If your application has memory leak, does it go away when the process exits or killed? Or do memory leaks in your application affects other processes on the system even after process completion?
-And what about unmanaged code accessed via COM Interop and/or P/Invoke?
-These are the questions that I have some answers myself but not complete. What do you think?

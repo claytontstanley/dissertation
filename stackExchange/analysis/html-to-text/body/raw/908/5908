@@ -1,5 +1,0 @@
-<p>Greetings all,</p>
-
-<p>I need to get a log of user access to our SQL Server so I can track average and peak concurrency usage. Is there a hidden table or something I'm missing that has this information for me? To my knowledge the application I'm looking at does not track this at the application level.</p>
-
-<p>I'm currently working on SQL Server 2000, but will moving to 2005 shortly, so solutions for both are greatly appreciated.</p>

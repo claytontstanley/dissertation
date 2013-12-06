@@ -1,4 +1,0 @@
-When looking beyond the RAD (drag-drop and configure) way of building User Interfaces that many tools encourage you are likely to come across 2 design patterns called Model-View-Controller and Model-View-Presenter. My question has two parts to it:
-What issues do these patterns address?
-How are they similar?
-How are they different?

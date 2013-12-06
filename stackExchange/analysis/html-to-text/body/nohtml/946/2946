@@ -1,4 +1,0 @@
-Finally I get to post my ı's and İ's as promised...
-I've found that MS Indexing Service returns incomplete results when searching for documents with Turkish content. It seems to choke especially regarding the (incorrectly-named) 4I problem .
-Apparently, MS has fixed this problem with a Windows 2000 http://support.microsoft.com/kb/325333 service pack, but the bug seems to be resurrected with Windows XP & 2003.
-Anybody uses Indexing Service in their line of work? Similar problems with other non-English locales? Any solutions?

@@ -1,7 +1,0 @@
-I am building a server control that will search our db and return results.  The server control is contains an ASP:Panel.  I have set the default button on the panel equal to my button id and have set the form default button equal to my button id.
-On the Panel:
-MyPanel.DefaultButton = SearchButton.ID
-On the Control:
-Me.Page.Form.DefaultButton = SearchButton.UniqueID
-Works fine in IE & Safari I can type a search term and hit the enter key and it searches fine.  If I do it in FireFox I get an alert box saying "Object reference not set to an instance of an a object.
-Anyone run across this before?

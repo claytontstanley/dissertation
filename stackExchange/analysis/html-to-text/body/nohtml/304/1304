@@ -1,1 +1,0 @@
-Is there any way to check whether a file is locked without using a try catch block?  Right now, the only way I know of is to just open the file and catch any System.IO.IOException.

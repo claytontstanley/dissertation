@@ -1,9 +1,0 @@
-<p>Given a specific <code>DateTime</code> value, how do I display relative time, like</p>
-
-<ul>
-<li>2 hours ago</li>
-<li>3 days ago</li>
-<li>a month ago</li>
-</ul>
-
-<p>etc, etc...?</p>

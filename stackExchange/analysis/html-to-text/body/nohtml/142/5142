@@ -1,9 +1,0 @@
-I created a view on a machine using the substring function from Firebird, and it worked.  When I copied the database to a different machine, the view was broken.  This is the way I used it:
-SELECT SUBSTRING(field FROM 5 FOR 15) FROM table;
-And this is the output on the machine that does not accept the function:
-token unknown:  FROM
-Both computers have this configuration:
-IB Expert version 2.5.0.42 to run the queries and deal with the database.
-Firebird version 1.5 as server to database.
-BDE Administration version 5.01 installed, with Interbase 4.0 drivers.
-Any ideas about why it's behaving differently on these machines?

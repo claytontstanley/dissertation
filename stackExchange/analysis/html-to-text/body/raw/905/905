@@ -1,3 +1,0 @@
-<p>We're upgrading an existing program from Win2k/SQL Server 2k to Windows 2003 and SQL Server 2005 as well as purchasing a new program that also uses 2k3/2k5. The vendor says that for us to host both databases we need to get the Enterprise version because the softwares clients use different collation for the connections and only Enterprise supports this.</p>
-
-<p>I cannot find anything on MS's site to support this and, honestly, don't want to pay the extra for Enterprise if the Standard edition works. Am I missing some not talked about feature of SQL Server or is this, as I suspect, a vendor trying to upsell me?</p>

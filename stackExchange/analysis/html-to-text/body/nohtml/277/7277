@@ -1,6 +1,0 @@
-I'm generating some XML documents and when it comes to the address part I have fragments that look like this:
-<Address>15 Sample St Example Bay Some Country</Address>
-The XSLT that I have for converting this to XHTML has some funky recursive template to convert newline characters within strings to <br/> tags.
-This is all working fine; but is it considered "bad practice" to rely on linebreaks within XML documents?  If so, is it recommended that I do this instead?
-<Address><Line>15 Sample St</Line> <Line>Example Bay</Line> <Line>Some Country</Line></Address>
-Seems like it'd be really awkward to wrap every place where my text may be multiple lines with tags like that..

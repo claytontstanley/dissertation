@@ -1,8 +1,0 @@
-When using IE, you cannot put an absolutely positioned div over a select input element. That's because the select element is considered an ActiveX object and is on top of every HTML element in the page.
-I already saw people hiding selects when opening a popup div, that leads to pretty bad user experience having controls disappearing.
-FogBugz actually had a pretty smart solution (before v6) of turning every select into text boxes when a popup was displayed. This solved the bug and tricked the user eye but the behavior was not perfect.
-Another solution is in FogBugz 6 where they no more use the select element and recoded it everywhere.
-Last solution I currently use is messing up the IE rendering engine and force it to render the absolutely positioned div as an ActiveX element too, ensuring it can live over a select element. This is achieved by placing an invisible iframe inside the div and styling it with:
-#MyDiv iframe {     position: absolute;     z-index: -1;     filter: mask();     border: 0;     margin: 0;     padding: 0;     top: 0;     left: 0;     width: 9999px;     height: 9999px;     overflow: hidden; }
-Anyone has a even better solution than this one ?
-EDIT: The purpose of this question is as much informative as it is a real question. I find the iframe trick to be a good solution but I am still looking for improvement like removing this ugly useless iframe tag that degrade accessibility.

@@ -1,9 +1,0 @@
-<p>In the past few months I began my first serious JavaScript development, as I began developing XUL applications.  I use Notepad++ as my editor, but I was pretty appalled to find (as far as I can tell) that Venkman/Javascript Debugger is <strong>the</strong> tool for debugging.  It seems like a poor replacement to Visual Studio for .Net languages.</p>
-
-<p>Am I missing something?  What are the best tools and best practices for JavaScript development?  Is there some killer IDE/debugger/editor combination I'm not aware of?  </p>
-
-<p>It has to be easier than this, though.</p>
-
-<p>I've heard some mention of Eclipse - is it a good choice here? I know very little about it.</p>
-
-<p><em>Edit:  Some of you have pointed out Firebug - I guess my problem was that I'm not actually using JavaScript for web development for which Firebug seems to be <strong>the tool</strong> -- instead I'm using it for XUL development in xulrunner.  Which may simply be a weakness or <a href="http://starkravingfinkle.org/blog/2007/03/developing-with-xulrunner-devday-breakout/" rel="nofollow">immaturity of xulrunner</a>.</em></p>

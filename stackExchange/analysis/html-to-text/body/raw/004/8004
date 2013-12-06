@@ -1,5 +1,0 @@
-<p>I use <a href="http://rsync.samba.org/" rel="nofollow" title="The Subversion Book: Repository hooks">rsync</a> to synchronize files to Windows clients in a server agnostic way. What methods are available to send the progress of rsync to the parent process for display in a gui progress bar?</p>
-
-<p>I imagine two or three choices exist. (1) Watch STDOUT (2) Watch rsync.exe log file, similar to unix <code>tail</code> (3) Watch rsync console output in memory.</p>
-
-<p>Which one is best/preferred?</p>

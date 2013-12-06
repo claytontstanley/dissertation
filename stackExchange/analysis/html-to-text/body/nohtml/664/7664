@@ -1,5 +1,0 @@
-I am wrapping existing C++ code from a BSD project in our own custom wrapper and I want to integrate it to our code with as few changes as possible.  This code uses fprintf to print to stderr in order to log / report errors.
-I want to redirect this to an alternative place within the same process.  On unix I have done this with a socketpair and a thread: one end of the socket is where I send stderr (via a call to dup2) and the other end is monitored in a thread, where I can then process the output.
-This does not work on windows though because a socket is not the same as a file handle.
-All documents I have found on the web show how to redirect output from a child process, which is not what I want.  How can I redirect stderr within the same process getting a callback of some sort when output is written?  (and before you say so, I've tried SetStdHandle but cannot find any way to make this work)...
-Thanks!

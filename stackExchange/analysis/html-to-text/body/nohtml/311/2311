@@ -1,4 +1,0 @@
-I had an PHP script to update the webserver from a local directory. I'm migrating the script into Python, it works almost OK but after a PUT command the size of the file in the server isn't the same as the local file. Once I download again the file from the FTP server, the only difference is the CR/LF mark. It annoys me because the same script is comparing the size of the files to update. Also, it works perfectly in PHP vía ftp_put.
-from ftplib import FTP  ftpserver = "myserver" ftpuser = "myuser" ftppass = "mypwd"  locfile =  "g:/test/style.css" ftpfile =  "/temp/style.css"  try:     ftp = FTP(ftpserver, ftpuser, ftppass) except:     exit ("Cannot connect")  f = open (locfile, "r") try:     ftp.delete (ftpfile) except:     pass  # ftp.sendcmd ("TYPE I") # ftp.storlines("STOR %s" % ftpfile, f) ftp.storbinary("STOR %s" % ftpfile, f) f.close()  ftp.dir (ftpfile) ftp.quit()  ###
-Any suggestions?
-TIA, Pablo

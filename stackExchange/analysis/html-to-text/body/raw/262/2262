@@ -1,3 +1,0 @@
-<p>How do I rewrite URL's in ASP.NET?</p>
-
-<p>I would like users to be able to goto <strong><a href="http://www.website.com/users/smith" rel="nofollow">http://www.website.com/users/smith</a></strong> instead of <strong><a href="http://www.website.com/?user=smith" rel="nofollow">http://www.website.com/?user=smith</a></strong></p>

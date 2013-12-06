@@ -1,5 +1,0 @@
-Original Question
-If you are given N maximally distant colors (and some associated distance metric), can you come up with a way to sort those colors into some order such that the first M are also reasonably close to being a maximally distinct set?
-In other words, given a bunch of distinct colors, come up with an ordering so I can use as many colors as I need starting at the beginning and be reasonably assured that they are all distinct and that nearby colors are also very distinct (e.g., bluish red isn't next to reddish blue).
-Randomizing is OK but certainly not optimal.
-Clarification: Given some large and visually distinct set of colors (say 256, or 1024), I want to sort them such that when I use the first, say, 16 of them that I get a relatively visually distinct subset of colors. This is equivalent, roughly, to saying I want to sort this list of 1024 so that the closer individual colors are visually, the farther apart they are on the list.

@@ -1,7 +1,0 @@
-I need to import a csv file into Firebird and I've spent a couple of hours trying out some tools and none fit my needs.
-The main problem is that all the tools I've been trying like EMS Data Import and Firebird Data Wizard expect that my csv file contains all the information needed by my Table.
-I need to write some custom SQL in the insert statement, for example, I have a cvs file with the city name, but as my database already has all the cities in another table (normalized), I need to write a subselect in the insert statement to lookup for the city and write its ID, also I have a stored procedure to cread GUIDS.
-My Insert statement would be something like this:
-INSERT INTO PERSON (ID, NAME, CITYID) VALUES((SELECT NEWGUID FROM CREATEGUID), :NAME, (SELECT CITYID FROM CITY WHERE NAME = :CITY_NAME)
-I know that it is very easy to write an application to do this, but I don't like to reinvent the wheel, and I'm sure that there are some tools out there to do it.
-Can you guys give me some advice?

@@ -1,3 +1,0 @@
-<P>I have a simple page with my ScriptManager and my UpdatePanel, and my ContentTemplate has one ListBox and one Label. I am just trying to catch its OnSelectionChanged so I can update the text in the Label. No matter what settings I try to tweak, I always get a full-page postback.</P>
-<P>Is this really not going to work, or am I just screwing this up?</P>
-<P>thanks, Chris</P>

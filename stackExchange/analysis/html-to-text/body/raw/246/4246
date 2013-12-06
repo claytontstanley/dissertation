@@ -1,5 +1,0 @@
-<p>What is the best method for executing FTP commands from a SQL Server stored procedure? we currently use something like this:</p>
-
-<pre><code>EXEC master..xp_cmdshell 'ftp -n -s:d:\ftp\ftpscript.xmt 172.1.1.1'<br></code></pre>
-
-<p>The problem is that the command seems to succeed even if the FTP ended in error. Also, the use of xp_cmdshell requires special permissions and may leave room for security issues.</p>

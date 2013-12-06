@@ -1,6 +1,0 @@
-How can I make prototype methods in C#.Net?
-In JavaScript, I can do the following to create a trim method for the string object:
-String.prototype.trim = function() {
-return this.replace(/^\s+|\s+$/g,"");
-}
-How can I go about doing this in C#.Net

@@ -1,7 +1,0 @@
-<p>[Assuming you write code on a team]</p>
-
-<p>Does your team actually agree on a coding style standard? Independent of what language you are using, I'm curious to know A) do you agree and B) are the styles something you created as a group or did you decide to use a "third party's" style guide?</p>
-
-<p>Our team uses C# primarily, and we've taken to using <a href="http://blogs.msdn.com/sourceanalysis/archive/2008/05/23/announcing-the-release-of-microsoft-source-analysis.aspx" rel="nofollow">Microsoft's StyleCop</a>. Not because it's necessarily THE way to do it, but because it's something we [generally] agree with and it's easy to enforce.</p>
-
-<p>I'm also interested to know of style-compliance tools in other languages.</p>

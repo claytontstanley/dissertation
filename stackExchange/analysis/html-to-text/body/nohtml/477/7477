@@ -1,4 +1,0 @@
-I'm currently working on an internal sales application for the company I work for, and I've got a form that allows the user to change the delivery address.
-Now I think it would look much nicer, if the textarea I'm using for the main address details would just take up the area of the text in it, and automatically resize if the text was changed.
-Here's a screenshot of it currently.
-Any ideas?

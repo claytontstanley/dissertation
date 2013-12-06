@@ -1,9 +1,0 @@
-<p>I'm compiling a NAnt project on linux with TeamCity Continuous Integration server. I have been able to generate a test report by running NAnt on mono thru a Command Line Runner but don't have the options of using the report like a NAnt Runner. I'm also using MBUnit for the testing framework.</p>
-
-<p>How can I merge in the test report and display "Tests failed: 1 (1 new), passed: 3049" for the build?</p>
-
-<p><strong>Update:</strong> take a look at MBUnitTask its a NAnt task that uses sends messages that TeamCity expects from NUnit so it lets you use all of TeamCity's features for tests.</p>
-
-<p><a href="http://code.google.com/p/nant-extensions/wiki/MbUnitTask" rel="nofollow">MBUnitTask</a></p>
-
-<p><strong>Update:</strong> Galio has better support so you just have to reference the Galio MBUnit 3.5 dlls instead of the MBUnit 3.5 dlls and switch to the galio runner to make it work.</p>

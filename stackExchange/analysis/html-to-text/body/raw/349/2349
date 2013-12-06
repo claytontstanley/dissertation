@@ -1,1 +1,0 @@
-<p>In Windows, in any windows form / web browser, you can use the tab button to switch focus through all of the form fields. It will stop on textboxes, radiobuttons, checkboxes, dropdown menus, etc. However, in Mac OSX, tab skips dropdown menus. Is there anyway to change this behavior, or access them any other way without using a mouse?</p>

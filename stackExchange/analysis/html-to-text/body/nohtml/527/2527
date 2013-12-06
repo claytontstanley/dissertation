@@ -1,1 +1,0 @@
-How can I find out which node in a tree list the context menu has been activated for. i.e. right-clicking a node and selecting an option from the menu.  I can't use the TreeViews' SelectedNode because the its only been right-clicked and not selected.

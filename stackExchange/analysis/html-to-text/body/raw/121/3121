@@ -1,3 +1,0 @@
-<P>I'm running 32-bit Windows 2003 R2 in VMware 6.0.3 on my Windows XP 32-bit host OS. I have run all the Windows updates, but haven't done any other tweaking. About once every hour (but not quite on a schedule) my CPU usage goes to 100%, slowing everything down for about 1 minute. When I can get taskmgr up, I see that usually a process called "SYSTEM" is using most of the CPU. Occasionally taskmgr itself is using up almost all of it. What is causing this, and how can I avoid it?</P>
-<P>The host machine is an older Pentium D with 3 gigs RAM. The VM is running from a relatively fast SATA drive. Memory usage in either the host or the guest doesn't seem to be a factor in whether or not these slowdowns will occur.</P>
-<P>thanks! Chris</P>

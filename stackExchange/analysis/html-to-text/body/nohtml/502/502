@@ -1,2 +1,0 @@
-I have a cross platform (python) application which needs to generate a jpeg preview of the first page of a PDF.
-On the mac I am spawning sips .  Is there something similarly simple I can do on Windows?

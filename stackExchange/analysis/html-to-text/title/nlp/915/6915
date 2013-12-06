@@ -1,9 +1,0 @@
-thread
-safe
-lazy
-contruction
-of
-a
-singleton
-in
-c++

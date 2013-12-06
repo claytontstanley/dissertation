@@ -1,3 +1,0 @@
-Using ASP.NET MVC there are situations (such as form submission) that may require a RedirectToAction.
-One such situation is when you encounter validation errors after a form submission and need to redirect back to the form, but would like the URL to reflect the URL of the form, not the action page it submits to.
-As I require the form to contain the originally POSTed data, for user convenience, as well as validation purposes, how can I pass the data through the RedirectToAction()?  If I use the viewData parameter, my POST parameters will be changed to GET parameters.

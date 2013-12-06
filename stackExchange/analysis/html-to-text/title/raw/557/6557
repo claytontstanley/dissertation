@@ -1,1 +1,0 @@
-In C#, why can't a List<string> object be stored in a List<object> variable

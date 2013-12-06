@@ -1,5 +1,0 @@
-So I have a Sybase stored proc that takes 1 parameter that's a comma separated list of strings and runs a query with in in an IN() clause:
-CREATE PROCEDURE getSomething @keyList varchar(4096) AS SELECT * FROM mytbl WHERE name IN (@keyList)
-How do I call my stored proc with more than 1 value in the list? So far I've tried
-exec getSomething 'John'         -- works but only 1 value exec getSomething 'John','Tom'   -- doesn't work - expects two variables exec getSomething "'John','Tom'" -- doesn't work - doesn't find anything exec getSomething '"John","Tom"' -- doesn't work - doesn't find anything exec getSomething '\'John\',\'Tom\'' -- doesn't work - syntax error
-EDIT: I actually found this page that has a great reference of the various ways to pas an array to a sproc

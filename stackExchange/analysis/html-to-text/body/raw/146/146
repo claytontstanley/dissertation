@@ -1,3 +1,0 @@
-<p>I have a website that plays mp3's in a flash player. If a user clicks 'play' the flash player automatically downloads an mp3 and starts playing it. </p>
-
-<p>Is there an easy way to track how many times a particular song clip (or any binary file) is downloaded?</p>

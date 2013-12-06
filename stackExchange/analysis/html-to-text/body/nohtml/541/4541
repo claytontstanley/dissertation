@@ -1,7 +1,0 @@
-To analyze lots of text logs I did some hackery that looks like this
-Locally import logs into Access
-Reprocess Cube link to previous mdb in Analisis Service 2000 (yes it is 2k)
-Use Excel to visualize Cube (it is not big - up to milions raw entries)
-My hackery is a succes and more people are demanding an access to my Tool. As you see I see more automating and easier deployment.
-Do you now some tools/libraries that would give me the same but with easier deployment? Kind of embedded OLAP serwice?
-Edit: I heard of Mondrian but we don't do much with Java. Have you seen something similiar done for .Net/Win32 ? Comercial is also OK.

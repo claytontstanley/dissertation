@@ -1,3 +1,0 @@
-Does anyone know of a good method for editing PDFs in PHP? Preferably open-source/zero-license cost methods. :)
-I am thinking along the lines of opening a PDF file, replacing text in the PDF and then writing out the modified version of the PDF?
-I have programmatically created PDF files in the past using FPDF, but found it a little unwieldy at times.

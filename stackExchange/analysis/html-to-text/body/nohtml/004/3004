@@ -1,8 +1,0 @@
-I am using ASP.NET Dynamic Data for a project and I have a table that has two seperate fields that link to the same foreign key in a different table.
-This relationship works fine in SQL Server.
-However, in the LINQ to SQL model in the ASP.NET Dynamic Data model, only the first field's relationship is reflected.  If I attempt to add the second relationship manually, it complains that it "Cannot create an association "ForeignTable_BaseTable".  The same property is listed more than once: "Id"."
-This MSDN article gives such helpful advice as:
-Examine the message and note the property specified in the message.
-Click OK to dismiss the message box.
-Inspect the Association Properties and remove the duplicate entries.
-Click OK.

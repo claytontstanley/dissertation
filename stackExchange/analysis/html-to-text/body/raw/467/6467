@@ -1,9 +1,0 @@
-<p>I need to do date arithmetic in Unix shell scripts that I use to control the execution of third party programs. </p>
-
-<p>I'm using a function to increment a day and another to decrement: </p>
-
-<pre><code>IncrementaDia(){<br>echo $1 | awk '<br>BEGIN {<br>        diasDelMes[1] = 31<br>        diasDelMes[2] = 28<br>        diasDelMes[3] = 31<br>        diasDelMes[4] = 30<br>        diasDelMes[5] = 31<br>        diasDelMes[6] = 30<br>        diasDelMes[7] = 31<br>        diasDelMes[8] = 31<br>        diasDelMes[9] = 30<br>        diasDelMes[10] = 31<br>        diasDelMes[11] = 30<br>        diasDelMes[12] = 31<br>}<br>{<br>        anio=substr($1,1,4)<br>        mes=substr($1,5,2)<br>        dia=substr($1,7,2)<br><br>        if((anio % 4 == 0 &amp;&amp; anio % 100 != 0) || anio % 400 == 0)<br>        {<br>                diasDelMes[2] = 29;<br>        }<br><br>        if( dia == diasDelMes[int(mes)] ) {<br>                if( int(mes) == 12 ) {<br>                        anio = anio + 1<br>                        mes = 1<br>                        dia = 1<br>                } else {<br>                        mes = mes + 1<br>                        dia = 1<br>                }<br>        } else {<br>                dia = dia + 1<br>        }<br>}<br>END {<br>        printf("%04d%02d%02d", anio, mes, dia)<br>}<br>'<br>}<br><br>if [ $# -eq 1 ]; then<br>        tomorrow=$1<br>else<br>        today=$(date +"%Y%m%d")<br>        tomorrow=$(IncrementaDia $hoy)<br>fi<br></code></pre>
-
-<p>but now I need to do more complex arithmetic. </p>
-
-<p>What it's the best and more compatible way to do this?</p>

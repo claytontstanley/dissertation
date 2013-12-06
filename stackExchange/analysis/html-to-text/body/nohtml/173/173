@@ -1,2 +1,0 @@
-I've been wanting to get my databases under version control.  Does anyone have any advice or recommended articles to get me started?
-I'll always want to have at least some data in there (as alumb mentions: user types and administrators).  And I'll probably often want a large collection of generated test data for performance measurement.

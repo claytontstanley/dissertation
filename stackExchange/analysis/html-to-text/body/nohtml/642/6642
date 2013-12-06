@@ -1,3 +1,0 @@
-I was trying to add a favicon to a website earlier and looked for a better way to implement this than to dump a favicon.ico file in the root of the website.
-I found this nice little guide: How to Add a Favicon . However, the preferred method did not work in IE (7) and the second method is the old fashioned way (which I resigned myself to use).
-Is there a third method that works across all the most popular browsers?

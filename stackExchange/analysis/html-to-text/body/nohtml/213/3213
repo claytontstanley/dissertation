@@ -1,4 +1,0 @@
-Is there an efficient method of converting an integer into the written numbers for example:
-String Written = IntegerToWritten(21);
-would return "Twenty One"
-Is there any way of doing this that doesn't involve a massive lookup table?

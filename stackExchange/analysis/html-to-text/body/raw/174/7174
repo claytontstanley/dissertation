@@ -1,9 +1,0 @@
-<p>Recently I had to develop a SharePoint workflow, and I found the experience quite honestly the most painful programming task I've ever had to tackle. One big problem I had was the problems I encountered when I had to step through it in the debugger.</p>
-
-<p>There's an article on how to debug a SharePoint workflow <a href="http://www.andrewconnell.com/blog/archive/2008/06/11/SharePoint-Debugging-and-Logging-Tips-and-Tricks.aspx" rel="nofollow" title="BenQ X-Touch">here</a> that tells you how to set breakpoints etc. This involves copying the .pdb file into the GAC alongside the .dll file containing your workflow. You have to do this from a command prompt (or a batch file) because Windows Explorer doesn't let you view the relevant subdirectory of c:\windows\assembly.</p>
-
-<p>However, if you do this, the next time you try to deploy the workflow from within Visual Studio, it complains that it can't be deployed because "the file may not be signed" and if you attempt to copy the new version of the dll into the GAC, it tells you that the .dll file is locked.</p>
-
-<p>I've found that some of the time, you can get round this by doing an iisreset, but on other occasions you have to restart Visual Studio and there have been frequent times when I've even had to reboot the computer altogether because some mystery process has locked the file. When I don't use the debugger, on the other hand, everything works just fine.</p>
-
-<p>Does anyone know of a simpler way of debugging workflows than this?</p>

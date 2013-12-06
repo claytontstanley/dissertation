@@ -1,3 +1,0 @@
-<p>I switched locally from subversion 1.4 to 1.5, our server still runs 1.4. Since then every merge takes ages to perform. What took only a couple of seconds is now in the area of 5-10 minutes (or more). There is no difference between the command line client and tortoise (so we talk about the windows versions).</p>
-
-<p>Has anybody else this strange phenomenon?</p>

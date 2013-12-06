@@ -1,7 +1,0 @@
-I am prototyping some C# 3 collection filters and came across this. I have a collection of products:
-public class MyProduct     {         public string Name { get; set; }         public Double Price { get; set; }         public string Description { get; set; }     }      var MyProducts = new  List<MyProduct> {          new  MyProduct         {             Name = "Surfboard",             Price = 144.99,             Description = "Most important thing you will ever own."         },         new MyProduct         {             Name = "Leash",             Price = 29.28,             Description = "Keep important things close to you."         }         ,         new MyProduct         {             Name = "Sun Screen",             Price = 15.88,             Description = "1000 SPF! Who Could ask for more?"         }     };
-Now if I use LINQ to filter it works as expected:
-var d = (from mp in MyProducts              where mp.Price < 50d              select mp);
-And if I use the Where extension method combined with a Lambda the filter works as well:
-var f = MyProducts.Where(mp => mp.Price < 50d).ToList();
-Question: What is the difference, and why use one over the other?

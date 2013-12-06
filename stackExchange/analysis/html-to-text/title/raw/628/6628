@@ -1,1 +1,0 @@
-PHP array indexing: $array[$index] vs $array["$index"] vs $array["{$index}"]

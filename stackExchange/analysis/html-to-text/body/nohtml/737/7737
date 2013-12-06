@@ -1,3 +1,0 @@
-Is there a good way for displaying unicode text in opengl under Windows? For example, when you have to deal with different languages. The most common approach like
-#define FONTLISTRANGE 128 GLuint list; list = glGenLists(FONTLISTRANGE); wglUseFontBitmapsW(hDC, 0, FONTLISTRANGE, list);
-just won't do because you can't create enough lists for all unicode characters.

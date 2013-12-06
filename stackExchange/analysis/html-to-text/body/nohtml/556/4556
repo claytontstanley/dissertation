@@ -1,7 +1,0 @@
-Which of the following has the best performance?
-I have seen method two implemented in JavaScript with huge performance gains, however, I was unable to measure any gain in C# and was wondering if the compiler already does method 2 even when written like method 1.
-The theory behind method 2 is that the code doesn't have to access DataTable.Rows.Count on every iteration, it can simple access the int c.
-Method 1
-for (int i = 0; i < DataTable.Rows.Count; i++) {     // Do Something }
-Method 2
-for (int i = 0, c = DataTable.Rows.Count; i < c; i++) {     // Do Something }

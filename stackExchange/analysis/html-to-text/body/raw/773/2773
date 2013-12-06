@@ -1,5 +1,0 @@
-<p>I've followed this otherwise <a href="http://howtoforge.com/ubuntu-8.04-server-install-xen-from-ubuntu-repositories" rel="nofollow">excellent tutorial</a> on getting Xen working with Ubuntu but am not able to get a console into my virtual machine (domU). I've got the <code>extra = '2 console=xvc0'</code> line in my /etc/xen/<strong>hostname_here</strong>.cfg file like they say, but am not able to get a console on it.</p>
-
-<p>If I statically assign an IP to the VM I can SSH to it, but for now I need to be able to use DHCP to give it an address (and since that's what I'm trying to debug, there's the problem). I know I've got a free DHCP address (although I'm getting more at the moment), so I don't think that's the problem. I've looked on Google and the Xen forums to no avail as well.</p>
-
-<p>Any ideas?</p>

@@ -1,9 +1,0 @@
-We recently discovered that the Google Maps API does not play nicely with SSL.  Fair enough, but what are some options for overcoming this that others have used effectively?
-Will the Maps API work over SSL (HTTPS)?
-At this time, the Maps API is not   available over a secure (SSL)   connection. If you are running the   Maps API on a secure site, the browser   may warn the user about non-secure   objects on the screen.
-We have considered the following options
-Splitting the page so that credit card collection (the requirement for SSL) is not on the same page as the Google Map.
-Switching to another map provider, such as Virtual Earth.  Rumor has it that they support SSL.
-Playing tricks with IFRAMEs.  Sounds kludgy.
-Proxying the calls to Google.  Sounds like a lot of overhead.
-Are there other options, or does anyone have insight into the options that we have considered?

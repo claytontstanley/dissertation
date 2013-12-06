@@ -1,4 +1,0 @@
-<P>Let's say that we have an ARGB color</P>Color argb = Color.FromARGB(127, 69, 12, 255); //Light Urple.<BR>
-<P>When this is painted on top of an existing color, the colors will blend. So blended with white, the resulting color is Color.FromARGB(255, 162, 133, 255);</P>
-<P>The solution should work like this</P>Color blend = Color.White; <BR>Color argb = Color.FromARGB(127, 69, 12, 255); //Light Urple. <BR>Color rgb = ToRGB(argb, blend); //Same as Color.FromARGB(255, 162, 133, 255);<BR>
-<P>What is ToRGB's implementation?</P>

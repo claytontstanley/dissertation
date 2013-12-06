@@ -1,3 +1,0 @@
-In a Win32 environment, you can use the GetLastInputInfo API call see msdn doc .  Basically, this method returns the last tick that corresponds with when the user last provided input, and you have to compare that to the current tick to determine how long ago that was.
-Xavi23cr has a good example for C# at codeproject .
-Any suggestions for other environments?

@@ -1,3 +1,0 @@
-<p>Using VS2008, C#, .Net 2 and Winforms how can I make a regular Button look "pressed"?
-Imagine this button is an on/off switch. 
-ToolStripButton has the Checked property, but the regular Button does not.</p>

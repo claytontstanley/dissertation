@@ -1,3 +1,0 @@
-<p>Hi,</p>
-
-<p>I recently encountered a problem where a value was null if accessed with Request.Form but fine if retrieved with Request.Params.  What are the differences between these methods that could cause this?</p>

@@ -1,7 +1,0 @@
-<p>After upgrading a rails 1.2 website to 2.1, the <a href="http://agilewebdevelopment.com/plugins/exception_notifier" rel="nofollow">ExceptionNotifier plugin</a> no longer works, complaining about this error:</p>
-
-<pre><code>ActionView::TemplateFinder::InvalidViewPath: 
-Unprocessed view path found: "/path/to/appname/vendor/plugins/exception_notification/lib/../views".  Set your view paths with #append_view_path, #prepend_view_path, or #view_paths=.
-</code></pre>
-
-<p>What causes it and how do I fix it?</p>

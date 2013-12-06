@@ -1,4 +1,0 @@
-I have a control that is modelled on a ComboBox. I want to render the control so that the control border looks like that of a standard Windows ComboBox. Specifically, I have followed the MSDN documentation and all the rendering of the control is correct except for rendering when the control is disabled.
-Just to be clear, this is for a system with Visual Styles enabled.  Also, all parts of the control render properly except the border around a disabled control, which does not match the disabled ComboBox border colour.
-I am using the VisualStyleRenderer class. MSDN suggests using the VisualStyleElement.TextBox element for the TextBox part of the ComboBox control but a standard disabled TextBox and a standard disabled ComboBox draw slightly differently (one has a light grey border, the other a light blue border).
-How can I get correct rendering of the control in a disabled state?
