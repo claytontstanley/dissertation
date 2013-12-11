@@ -1,0 +1,11 @@
+
+Try to stay entirely in R.
+- Use TM package for data mining (chunking, lemmetization)
+- Use RPostGreSQL package to store persistant db objects
+	Also use to store and access initial SO data
+- data.table package for munging
+- rjson to import tweet data
+
+May need Python for
+- tweepy to grab Python data in json format
+	Then most likely load into R via rjson and then into postgres for persistance
