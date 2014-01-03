@@ -125,10 +125,10 @@ However, a single user of a social media site is most likely interested in only 
 One general question to support the user in this domain is:
 How can we quickly and effectively connect users to the content that they care about?
 
-A growing number of users on social media sites are searching for information that is happening in real time \parencite{Jansen2011}.
-In other words, users on social-media sites want the fresh \emph{stream} of information about a particular topic.
+A growing number of users on social media sites are focusing on and looking for recently created information when performing a search \parencite{Jansen2011}.
+In other words, users on social media sites want the fresh \emph{stream} of information about a particular topic.
 This can certainly be seen in the main user-interface views that these social media sites provide:
-Twitter's homepage showing your followees' tweets, Facebook's homepage showing your friends' posts, StackOverflow's daily digest of posts for particular tags.
+Twitter's homepage showing followees' tweets, Facebook's homepage showing friends' posts, and StackOverflow's daily digest of posts for particular tags.
 
 So how can we ensure that users are connected to the information streams that they care most about?
 One promising approach is to model and predict the user's goals when using and searching these social media sites \parencite{Rose2004}.
@@ -246,10 +246,10 @@ I will explore how a user's prior knowledge influences the likelihood that a par
 \subsubsection{Lifetime of a Hashtag for a Specific User}
 
 Prior research has examined the growth and decay cycle of hashtag use across users \parencite{Tsur2012}.
-However, much less is known about hashtag lifetime within a single user.
-It may not necessarily follow that a hashtag's life cycle for a single user matches the life cycle across users.
+However, much less is known about hashtag lifetime for individual users.
+It may not necessarily follow that a hashtag's life cycle for individual users matches the life cycle across users.
 Further, modeling a hashtag's life within users is much more applicable to hashtag prediction, since that model can be directly incorporated into a specific user's prior likelihood of hashtag use.
-So I will characterize the hashtag growth and decay cycle for a single user.
+So I will characterize the hashtag growth and decay cycle for individual users.
 The expectation is that this cycle will match ACT-R's decay rate used in the declarative memory system to compute a particular memory item's prior.
 
 \subsubsection{User-Customized Hashtag Prediction}
@@ -801,12 +801,13 @@ Several hashtag recommendation models for Twitter have been developed recently.
 One of the first models used a Bayesian co-occurrence statistical technique to predict the most likely hashtag associated with a post as a function of prior hashtag use and context \parencite{Mazzia2009}.
 The model presented by \textcite{Mazzia2009} is very similar to an ACT-R declarative retrieval model.
 The main potential difference is that the global prior likelihood of a hashtag is computed without taking into account the specific user's past history.
-Instead, the global prior is an overall average frequency of hashtag use across users.
+Instead, the global prior is an overall average frequency of hashtag use across all users.
 
 Several other models have taken a tweet-centered approach to hashtag prediction, where suggested hashtags are collected from hashtags used from similar tweets.
 \textcites{Li2011, Zangerle2011, Kywe2012} all store a content vector for each tweet, and then compute a word co-occurrence-based similarity score between a composed tweet and the rest of the tweets in the database.
 \textcites{Zangerle2011, Kywe2012} use the Apache Lucene infrastructure to compute the similarity score, while \textcite{Li2011} uses a custom similarity score derived from the WordNet database to compute similarities.
-Regardless of the method to compute the similarity between tweets, each method collects the hashtags used from a set of the most similar tweets, then ranks the set, and presents the top 5-10 hashtags to the user.
+Regardless of the method to compute the similarity between tweets,
+each method collects the hashtags used from a set of the most similar tweets, then ranks the hashtags in the set, and presents the top 5-10 hashtags to the user.
 
 This tweet-centered approach is quite different than the hashtag-centered approach presented in \textcite{Mazzia2009}.
 With a hashtag-centered approach, a direct association is built between the words in a tweet and hashtags that occur in tweets.
@@ -916,7 +917,7 @@ The purpose of this dataset is to test the accuracy of each model's predicted mo
 The popular-users dataset will contain all of the tweets from the top \num{2000} users on Twitter.
 This dataset will be collected by fetching all tweet history for each of the top users.
 Due to Twitter's query limitation for their API, it is estimated that this process will take about a week.
-This dataset will be used to explore the growth and decay characteristics of a hashtag for a single user.
+This dataset will be used to explore the growth and decay characteristics of a hashtag for individual users.
 The temporal dynamics of ACT-R's decay rate model for a chunk will be evaluated against this data.
 Afterwards, the most appropriate model of user-centered frequency and recency effects (i.e., each hashtag's prior likelihood given a particular user) will be determined.
 
@@ -1069,7 +1070,7 @@ It should be emphasized that it has only recently become possible to evaluate ps
 These information-rich large-scale environments provide a unique opportunity to really stress test and explore the impacts of the psychological constraints of each theory
 on a much larger scale than has previously been possible.
 This environment will allow, for example, overall performance differences between an ACT-R Bayesian retrieval model and a random-permutation vector-based model to be directly compared on two real-world tagging tasks,
-which has never been done previously.
+which has not been done previously.
 
 This data-rich environment will also enable the proposed modifications to each model to be quickly evaluated, so that further model improvements can be iteratively proposed and tested.
 The main two proposed model modifications (incorporating word order into ACT-R and user history into vector-based representations) have not been tested before, and seem likely to significantly improve performance.
