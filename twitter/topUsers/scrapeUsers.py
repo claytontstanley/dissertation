@@ -49,8 +49,6 @@ def storeTopUsers(dir, file):
     cmd = string.Template(cmd).substitute(locals())
     cur.query(cmd)
 
-#generateTopUsersCSV()
-#storeTopUsers(_dir, file)
 
 
 consumer_key="vKbz24SqytZnYO33FNkR7w"
@@ -71,22 +69,28 @@ includeRetweets = True
 def getRemainingHits():
     return api.rate_limit_status()['resources']['statuses']['/statuses/user_timeline']['remaining']
 
+def getTweets(screen_name, **kwargs):
+    return api.user_timeline(screen_name=screen_name,include_rts=includeRetweets,**kwargs)
+
+def isRetweet(tweet):
+    return hasattr(tweet, 'retweeted_status')
+
 def getAllTweets(screen_name):
     def getTweetsBetween(greaterThanID, lessThanID):
         alltweets = []
         while True:
-            print "at rate limit %s: getting tweets from %s that are later than %s but before %s" % (getRemainingHits(), screen_name, greaterThanID, lessThanID)
-            newTweets = api.user_timeline(screen_name = screen_name,count=200,max_id=lessThanID-1, since_id=greaterThanID+1, include_rts=includeRetweets)
+            print "getting tweets from %s that are later than %s but before %s" % (screen_name, greaterThanID, lessThanID)
+            newTweets = getTweets(screen_name, count=200, max_id=lessThanID-1, since_id=greaterThanID+1)
             if len(newTweets) == 0:
                 break
             alltweets.extend(newTweets)
             lessThanID = alltweets[-1].id
             print "...%s tweets downloaded so far" % (len(alltweets))
         return alltweets
-    print "getting tweets for %s" % (screen_name)
+    print "getting tweets for %s at rate limit %s" % (screen_name, getRemainingHits())
     alltweets = []
     userID = api.get_user(screen_name).id
-    lessThanID = api.user_timeline(screen_name=screen_name, count=1, include_rts=includeRetweets)[-1].id + 1
+    lessThanID = getTweets(screen_name, count=1)[-1].id+1
     cmd = string.Template("select id from tweets where user_id = '${userID}' order by id desc limit 1").substitute(locals())
     res = cur.query(cmd).getresult()
     if len(res) == 0:
@@ -102,7 +106,8 @@ def getAllTweets(screen_name):
     else:
         lessThanID = int(res[0][0])
     alltweets.extend(getTweetsBetween(0, lessThanID))
-    outTweets = [[tweet.id_str, tweet.user.id, tweet.user.screen_name, tweet.created_at, tweet.retweeted, tweet.in_reply_to_status_id_str, tweet.text.encode("utf-8")] for tweet in alltweets]
+    outTweets = [[tweet.id_str, tweet.user.id, tweet.user.screen_name, tweet.created_at, isRetweet(tweet), tweet.in_reply_to_status_id_str,
+                  tweet.lang, tweet.truncated, tweet.text.encode("utf-8")] for tweet in alltweets]
     #print(outTweets)
     file = '/tmp/%s_tweets.csv' % screen_name
     print "writing %s results to temp file: %s" % (len(outTweets), file)
@@ -110,7 +115,7 @@ def getAllTweets(screen_name):
         writer = csv.writer(f, quoting=csv.QUOTE_ALL)
         writer.writerows(outTweets)
     print "updating database with results in temp file"
-    cmd = "copy tweets (id, user_id, user_screen_name, created_at, retweeted, in_reply_to_status_id, text) from '${file}' delimiters ',' csv"
+    cmd = "copy tweets (id, user_id, user_screen_name, created_at, retweeted, in_reply_to_status_id, lang, truncated,text) from '${file}' delimiters ',' csv"
     cmd = string.Template(cmd).substitute(locals())
     cur.query(cmd)
 
@@ -119,19 +124,25 @@ def userAlreadyCollected (user_screen_name):
     return len(res) > 0
 
 def getAllTweetsForTopUsers ():
-    res = cur.query('select (user_screen_name) from topUsers limit 100').getresult()
+    res = cur.query('select (user_screen_name) from topUsers').getresult()
     screenNames = [[user[0]] for user in res]
     screenNames = itertools.chain(*screenNames)
     for screenName in screenNames:
         if userAlreadyCollected(screenName):
             print "already collected tweets for %s; moving to next user" % (screenName)
             continue
-        if getRemainingHits() > 15:
+        try:
+            while getRemainingHits() <= 30:
+                print "only %s remaining hits; waiting until greater than 30" % (getRemainingHits())
+                time.sleep(60)
             getAllTweets(screenName)
-        else:
-            print "only %s remaining hits; waiting until greater than 15" % (getRemainingHits())
+        except Exception as e:
+            print "couldn't do it: %s" % e
             time.sleep(60)
+            pass
 
+#generateTopUsersCSV()
+#storeTopUsers(_dir, file)
 #getAllTweets('claytonstanley1')
 getAllTweetsForTopUsers()
 
