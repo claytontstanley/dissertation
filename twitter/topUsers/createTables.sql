@@ -14,8 +14,9 @@ create table if not exists tweets (
 	created_at varchar(255) not null,
 	retweeted varchar(255) not null,
 	in_reply_to_status_id varchar(255) not null,
-	text varchar(255) not null,
+	text varchar(355) not null,
 	primary key (id)
 	);
 
+create index user_screen_name_index_tweets on tweets (user_screen_name);
 

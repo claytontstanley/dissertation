@@ -75,7 +75,7 @@ def getAllTweets(screen_name):
     def getTweetsBetween(greaterThanID, lessThanID):
         alltweets = []
         while True:
-            print "at rate limit %s: getting tweets later than %s but before %s" % (getRemainingHits(), greaterThanID, lessThanID)
+            print "at rate limit %s: getting tweets from %s that are later than %s but before %s" % (getRemainingHits(), screen_name, greaterThanID, lessThanID)
             newTweets = api.user_timeline(screen_name = screen_name,count=200,max_id=lessThanID-1, since_id=greaterThanID+1, include_rts=includeRetweets)
             if len(newTweets) == 0:
                 break
@@ -126,10 +126,10 @@ def getAllTweetsForTopUsers ():
         if userAlreadyCollected(screenName):
             print "already collected tweets for %s; moving to next user" % (screenName)
             continue
-        if getRemainingHits() > 10:
+        if getRemainingHits() > 15:
             getAllTweets(screenName)
         else:
-            print "only %s remaining hits; waiting until greater than 10" % (getRemainingHits())
+            print "only %s remaining hits; waiting until greater than 15" % (getRemainingHits())
             time.sleep(60)
 
 #getAllTweets('claytonstanley1')
