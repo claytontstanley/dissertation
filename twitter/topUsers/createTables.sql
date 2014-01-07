@@ -22,3 +22,17 @@ create table if not exists tweets (
 
 create index user_screen_name_index_tweets on tweets (user_screen_name);
 
+drop table if exists twitter_users;
+create table if not exists twitter_users (
+	id bigint not null,
+	created_at varchar(255) not null,
+	description text not null,
+	followers_count integer not null,
+	friends_count integer not null,
+	lang varchar(255) not null,
+	location varchar(255) not null,
+	name varchar(255) not null,
+	user_screen_name varchar(255) not null,
+	verified varchar(255) not null,
+	primary key (id)
+	);

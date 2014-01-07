@@ -94,6 +94,21 @@ def getTweets(screen_name, **kwargs):
 def isRetweet(tweet):
     return hasattr(tweet, 'retweeted_status')
 
+def write2csv(res, file):
+    with open(file, 'wb') as f:
+        writer = csv.writer(f, quoting=csv.QUOTE_ALL)
+        writer.writerows(res)
+
+def getInfoForUser(screen_name):
+    user = _api.get_user(screen_name)
+    res = [[user.id, user.created_at, user.description.encode('utf-8'), user.followers_count, user.friends_count,
+            user.lang, user.location.encode('utf-8'), user.name.encode('utf-8'), user.screen_name.lower(), user.verified]]
+    file = '/tmp/%s_user.csv' % screen_name
+    print "writing %s results to file: %s" % (len(res), file)
+    write2csv(res, file)
+    print "updating database with results in temp file"
+    _cur.query("copy twitter_users (id,created_at,description,followers_count,friends_count,lang,location,name,user_screen_name,verified) from '%s' delimiters ',' csv" % (file))
+
 def getAllTweets(screen_name):
     def getTweetsBetween(greaterThanID, lessThanID):
         alltweets = []
@@ -127,41 +142,46 @@ def getAllTweets(screen_name):
     alltweets.extend(getTweetsBetween(0, lessThanID))
     outTweets = [[tweet.id_str, tweet.user.id, tweet.user.screen_name.lower(), tweet.created_at, isRetweet(tweet), tweet.in_reply_to_status_id_str,
                   tweet.lang, tweet.truncated, tweet.text.encode("utf-8")] for tweet in alltweets]
-    #print(outTweets)
     file = '/tmp/%s_tweets.csv' % screen_name
-    print "writing %s results to temp file: %s" % (len(outTweets), file)
-    with open(file, 'wb') as f:
-        writer = csv.writer(f, quoting=csv.QUOTE_ALL)
-        writer.writerows(outTweets)
+    print "writing %s results to file: %s" % (len(outTweets), file)
+    write2csv(outTweets, file)
     print "updating database with results in temp file"
-    cmd = "copy tweets (id, user_id, user_screen_name, created_at, retweeted, in_reply_to_status_id, lang, truncated,text) from '${file}' delimiters ',' csv"
-    cmd = string.Template(cmd).substitute(locals())
-    _cur.query(cmd)
+    _cur.query("copy tweets (id, user_id, user_screen_name, created_at, retweeted, in_reply_to_status_id, lang, truncated,text) from '%s' delimiters ',' csv" % (file))
 
 def userAlreadyCollected (user_screen_name):
     res = _cur.query(string.Template("select * from tweets where user_screen_name='${user_screen_name}' limit 1").substitute(locals())).getresult()
     return len(res) > 0
 
-def getAllTweetsForTopUsers ():
+def userInfoAlreadyCollected (user_screen_name):
+    res = _cur.query(string.Template("select * from twitter_users where user_screen_name='${user_screen_name}' limit 1").substitute(locals())).getresult()
+    return len(res) > 0
+
+def getForTopUsers (alreadyCollectedFun, getForUserFun, hitsAlwaysGreaterThan):
     res = _cur.query('select (user_screen_name) from topUsers order by rank asc limit 10000').getresult()
     screenNames = [[user[0]] for user in res]
     screenNames = itertools.chain(*screenNames)
     for screenName in screenNames:
-        if userAlreadyCollected(screenName):
+        if alreadyCollectedFun(screenName):
             print "already collected tweets for %s; moving to next user" % (screenName)
             continue
         try:
-            while getRemainingHits() <= 30:
-                print "only %s remaining hits; waiting until greater than 30" % (getRemainingHits())
+            while getRemainingHits() <= hitsAlwaysGreaterThan:
+                print "only %s remaining hits; waiting until greater than %" % (getRemainingHits(), hitsAlwaysGreaterThan)
                 time.sleep(60)
-            getAllTweets(screenName)
+            getForUserFun(screenName)
         except Exception as e:
-            print "couldn't do it: %s" % e
+            print "couldn't do it for %s: %s" % (screenName, e)
             time.sleep(60)
             pass
 
-generateTopUsers(scrapeFun=generateTopUsersSocialBakers, topUsersFile='top10000SocialBakers.csv')
+def getAllTweetsForTopUsers ():
+    getForTopUsers(alreadyCollectedFun=userAlreadyCollected, getForUserFun=getAllTweets, hitsAlwaysGreaterThan=30)
+
+def getUserInfoForTopUsers ():
+    getForTopUsers(alreadyCollectedFun=userInfoAlreadyCollected, getForUserFun=getInfoForUser, hitsAlwaysGreaterThan=5)
+
+#generateTopUsers(scrapeFun=generateTopUsersSocialBakers, topUsersFile='top10000SocialBakers.csv')
 #generateTopUsers(scrapeFun=lambda : generateTopUsersSocialBakers(numUsers=100000), topUsersFile='top100000SocialBakers.csv')
 #getAllTweets('claytonstanley1')
-#getAllTweetsForTopUsers()
-
+getAllTweetsForTopUsers()
+#getUserInfoForTopUsers()
