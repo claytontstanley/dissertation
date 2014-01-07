@@ -143,7 +143,7 @@ def userAlreadyCollected (user_screen_name):
     return len(res) > 0
 
 def getAllTweetsForTopUsers ():
-    res = _cur.query('select (user_screen_name) from topUsers order by rank asc').getresult()
+    res = _cur.query('select (user_screen_name) from topUsers order by rank asc limit 10000').getresult()
     screenNames = [[user[0]] for user in res]
     screenNames = itertools.chain(*screenNames)
     for screenName in screenNames:
@@ -160,7 +160,8 @@ def getAllTweetsForTopUsers ():
             time.sleep(60)
             pass
 
-#generateTopUsers(scrapeFun=generateTopUsersSocialBakers, topUsersFile='top10000SocialBakers.csv')
+generateTopUsers(scrapeFun=generateTopUsersSocialBakers, topUsersFile='top10000SocialBakers.csv')
+#generateTopUsers(scrapeFun=lambda : generateTopUsersSocialBakers(numUsers=100000), topUsersFile='top100000SocialBakers.csv')
 #getAllTweets('claytonstanley1')
 #getAllTweetsForTopUsers()
 
