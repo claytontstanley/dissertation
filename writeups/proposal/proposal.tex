@@ -118,6 +118,42 @@
 
 \section{Motivation}
 
+The ACT-R cognitive architecture \parencite{Anderson2004} contains one of the leading theories of human declarative memory.
+The declarative memory component in ACT-R is a Bayesian statistical model.
+This is the same type of co-occurrence Naive Bayes statistical model that is prominent in the more general machine-learning field.
+When these Bayesian models are used for machine learning, it is common to use a large number of observations to construct the co-occurrence matrix that is the foundation for the model.
+The primary reason for this is that the stability of statistical models increase as sample size increases.
+
+However it is much less common in the cognitive modeling community to use a large number of observations to build up declarative memory when creating ACT-R models.
+If a cognitive modeler is using the declarative memory component of ACT-R,
+it is common to either construct the co-occurrences by hand, or use a small training set of data to initially build up the declarative memory system.
+This approach can and has worked well.
+Essentially the modeler is only including the observations in declarative memory that are relevant to the specific task that they are studying.
+
+This approach is problematic for two main reasons.
+First, it means that the declarative memory system for every developed model must be hand crafted and customized for that model, which takes enormous time and effort.
+Second, it means that modelers are continuing to use small sample sizes for the declarative memory components in their models.
+This has important implications for understanding declarative memory:
+It means that we do yet fully understand how well the ACT-R declarative memory theory scales when the number of chunks begins to approach the number of chunks that are actually stored in human declarative memory.
+
+There is, however, an opportunity to change this approach.
+With the massive growth of human-created content on social media sites (e.g., Twitter, StackOverflow, Wikipedia), and public access to many of those databases,
+it is now possible to evaluate psychological theories of declarative memory on large-scale real-world tasks where the theory can be tested on hundreds of millions to billions of data points.
+This will provide a way to test if these models scale, and evaluate the psychological validity of these models as the number of observations used increases by orders of magnitude.
+
+There have already been a few researchers that have used these large databases to evaluate how well declarative memory models scale,
+for both ACT-R Bayesian models \parencites{Fu2007,Pirolli2003,Stanley2013,Douglass2010} and vector-based memory models \parencites{Jones2007,Rutledge2008,Recchia2010,Sahlgren2008}.
+
+The work for this proposal will expand on the knowledge gained from previous work that has tested retrieval models on large-scale datasets.
+It will focus specifically on how two state-of-the-art declarative memory retrieval models (ACT-R Bayesian and random permutations) can be improved further, by testing these models on two real-world tagging tasks.
+One primary objective is to compare the random-permutation vector-based model to ACT-R's declarative memory theory when the datasets used for each model contain hundreds of millions to billions of data points.
+Another objective is to test how much improvement is gained by incorporating the strengths of each model into the other (i.e., modifying model components).
+For example, it is currently unexplored how a vector-based model can be modified to retrieve results that are based not only on context, but also on the prior odds that a particular item in memory will be needed again.
+Since large datasets will be used, a rich volume of data will be available to test the models.
+This enables constraints and assumptions for each theory to be rapidly tested and new model components to be hypothesized and quickly evaluated.
+
+\subsection{Motivation for Task}
+
 Social media sites such as Twitter, Facebook, StackOverflow, Google+, and Yelp are composed almost entirely of human-created content.
 The amount of user content on these sites is staggering, and continues to grow.
 Users of Twitter's microblogging service, for example, generate half a billion tweets per day \parencite{TwitterReport2012}.
@@ -231,7 +267,6 @@ ACT-R's declarative memory and vector-based memory systems are substantially dif
 Nonetheless, both can successfully model classic behavioral patterns found in word pairing experiments (e.g., \cite{Rutledge2008} modeling the ``fan effect'').
 I will extend the work done by \citeauthor{Rutledge2008} by formally comparing these two models on large-scale hashtag prediction tasks.
 I will also replace the vector-based model used by \citeauthor{Rutledge2008} with an improved and simplified random-permutation model \parencite{Sahlgren2008}.
-The primary objective is to compare the random-permutation vector-based model to ACT-R's declarative memory theory.
 
 An advantage of vector-based models is that word order can be easily incorporated into the single co-occurrence representation \parencite{Jones2007}.
 Word-order information on sites like Twitter may contain highly-predictive pieces of information, as it is likely that specific words immediately precede specific hashtags.
@@ -262,7 +297,6 @@ This will undoubtedly require a combination of two primary model components:
 A user's prior hashtag use will be an essential model component for domains such as Twitter, where the number of possible hashtags is practically infinite.
 In these domains, the model can utilize a user's hashtag history as a way to prune the infinite space of possible hashtags, and generate a much smaller and more manageable set for prediction.
 However, not only should the model properly take into account a user's prior hashtag use, but it should also generate new hashtag predictions when a user is most likely choosing a hashtag they have never used before.
-Calibrating the models to properly balance this exploitation of prior hashtag use versus exploration of new hashtags will be a primary research question.
 The end goal is to have a model that can properly balance the user's tag history with the contextual cues in the post in order to generate an accurate prediction.
 
 \section{Prior Research}
