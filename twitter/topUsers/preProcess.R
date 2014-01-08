@@ -2,6 +2,7 @@ library(RPostgreSQL)
 library(stringr)
 library(sqldf)
 library(data.table)
+library(reshape2)
 PATH = getPathToThisFile()
 
 options(sqldf.RPostgreSQL.user = 'claytonstanley',
@@ -24,12 +25,29 @@ data.table(sqldf("select * from twitter_users"))
 twitter_users = data.table(read.csv(str_c(PATH, "/data/tables/twitter_users.csv")))
 topUsers = data.table(read.csv(str_c(PATH, "/data/tables/topUsers.csv")))
 twitter_users[created_at=='2010-10-29 19:05:25',]
-?fread
-fread('col1,col2\n5,"4\n3"')
+#fread('col1,col2\n5,"4\n3"')
 
+findHashtags = function(str) {
+	regex = "#(\\d|\\w)+"
+	matches = gregexpr(regex, str)
+	hashtags = regmatches(str,matches)
+	list(hashtag=hashtags[[1]], start=unlist(matches[[1]]))
+}
+findHashtags('foo #bar #baz')
 
+addHashtagsToTweets = function(tweetsTbl) {
+	hashtags = tweetsTbl[, findHashtags(text), by=id]
+	setkey(hashtags,id)
+	setkey(tweetsTbl,id)
+	tweetsTbl[hashtags, `:=`(hashtag = hashtag, start=start)]
+	invisible()
+}
+
+tweetsTbl = data.table(sqldf("select * from tweets limit 10000"))
 tweetsTbl
-tweetsTbl = data.table(sqldf("select * from tweets"))
+addHashtagsToTweets(tweetsTbl)
+tweetsTbl
+
 tweetsTbl[, list(N=.N), by=retweeted]
 tweetsTbl[, .N, by=lang]
 tables()
