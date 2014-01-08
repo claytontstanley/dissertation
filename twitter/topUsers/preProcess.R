@@ -1,4 +1,5 @@
 library(RPostgreSQL)
+library(stringr)
 library(sqldf)
 library(data.table)
 PATH = getPathToThisFile()
@@ -20,6 +21,12 @@ sqldf('select retweeted,count(*) as count from tweets group by retweeted order b
 sqldf('select truncated,count(*) as count from tweets group by truncated order by count desc')
 sqldf("select * from topUsers")[1:100,]
 data.table(sqldf("select * from twitter_users"))
+twitter_users = data.table(read.csv(str_c(PATH, "/data/tables/twitter_users.csv")))
+topUsers = data.table(read.csv(str_c(PATH, "/data/tables/topUsers.csv")))
+twitter_users[created_at=='2010-10-29 19:05:25',]
+?fread
+fread('col1,col2\n5,"4\n3"')
+
 
 tweetsTbl
 tweetsTbl = data.table(sqldf("select * from tweets"))

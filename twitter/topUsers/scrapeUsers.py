@@ -72,6 +72,13 @@ def generateTopUsers (scrapeFun=generateTopUsersTwitaholic, topUsersFile='top100
     generateTopUsersCSV(scrapeFun=scrapeFun, topUsersFile=topUsersFile)
     storeTopUsers(topUsersFile=topUsersFile)
 
+def backupTables ():
+    tableNames = ['topUsers', 'twitter_users']
+    for tableName in tableNames:
+        file = "%s/data/tables/%s.csv" % (_dir, tableName)
+        cmd = string.Template("copy ${tableName} to '${file}' delimiter ',' csv header").substitute(locals())
+        _cur.query(cmd)
+
 def getTweepyAPI ():
     consumer_key="vKbz24SqytZnYO33FNkR7w"
     consumer_secret="jjobro8Chy9aKMzo8szYMz9tHftONLRkjNnrxk0"
@@ -206,5 +213,6 @@ def getUserInfoForTopUsers ():
 #generateTopUsers(scrapeFun=generateTopUsersSocialBakers, topUsersFile='top10000SocialBakers.csv')
 #generateTopUsers(scrapeFun=lambda : generateTopUsersSocialBakers(numUsers=100000), topUsersFile='top100000SocialBakers.csv')
 #getAllTweets('claytonstanley1')
-getAllTweetsForTopUsers()
+#getAllTweetsForTopUsers()
 #getUserInfoForTopUsers()
+backupTables()
