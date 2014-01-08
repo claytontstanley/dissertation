@@ -19,6 +19,7 @@ sqldf('select lang,count(*) as count from tweets group by lang order by count de
 sqldf('select retweeted,count(*) as count from tweets group by retweeted order by count desc')
 sqldf('select truncated,count(*) as count from tweets group by truncated order by count desc')
 sqldf("select * from topUsers")[1:100,]
+data.table(sqldf("select * from twitter_users"))
 
 tweetsTbl
 tweetsTbl = data.table(sqldf("select * from tweets"))
