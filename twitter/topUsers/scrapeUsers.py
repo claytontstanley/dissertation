@@ -1,3 +1,5 @@
+import itertools
+from itertools import izip_longest
 import time
 import sys
 import argparse
@@ -81,8 +83,13 @@ def getTweepyAPI ():
 
 _api = getTweepyAPI()
 
-def getRemainingHits():
-    return _api.rate_limit_status()['resources']['statuses']['/statuses/user_timeline']['remaining']
+def getRemainingHitsUserTimeline():
+    stat = _api.rate_limit_status()
+    return stat['resources']['statuses']['/statuses/user_timeline']['remaining']
+
+def getRemainingHitsGetUser():
+    stat = _api.rate_limit_status()
+    return stat['resources']['users']['/users/lookup']['remaining']
 
 def getTweets(screen_name, **kwargs):
     # w.r.t include_rts: ref: https://dev.twitter.com/docs/api/1.1/get/statuses/user_timeline
@@ -99,17 +106,17 @@ def write2csv(res, file):
         writer = csv.writer(f, quoting=csv.QUOTE_ALL)
         writer.writerows(res)
 
-def getInfoForUser(screen_name):
-    user = _api.get_user(screen_name)
+def getInfoForUser(screenNames):
+    users = _api.lookup_users(screen_names=screenNames)
     res = [[user.id, user.created_at, user.description.encode('utf-8'), user.followers_count, user.friends_count,
-            user.lang, user.location.encode('utf-8'), user.name.encode('utf-8'), user.screen_name.lower(), user.verified]]
-    file = '/tmp/%s_user.csv' % screen_name
+            user.lang, user.location.encode('utf-8'), user.name.encode('utf-8'), user.screen_name.lower(), user.verified] for user in users]
+    file = '/tmp/%s..%s_user.csv' % (screenNames[0], screenNames[-1])
     print "writing %s results to file: %s" % (len(res), file)
     write2csv(res, file)
     print "updating database with results in temp file"
     _cur.query("copy twitter_users (id,created_at,description,followers_count,friends_count,lang,location,name,user_screen_name,verified) from '%s' delimiters ',' csv" % (file))
 
-def getAllTweets(screen_name):
+def getAllTweets(screenNames):
     def getTweetsBetween(greaterThanID, lessThanID):
         alltweets = []
         while True:
@@ -121,7 +128,9 @@ def getAllTweets(screen_name):
             lessThanID = alltweets[-1].id
             print "...%s tweets downloaded so far" % (len(alltweets))
         return alltweets
-    print "getting tweets for %s at rate limit %s" % (screen_name, getRemainingHits())
+    assert len(screenNames) == 1, "Passed more than one screen name into function"
+    screen_name = screenNames[0]
+    print "getting tweets for %s" % (screen_name)
     alltweets = []
     userID = _api.get_user(screen_name).id
     lessThanID = getTweets(screen_name, count=1)[-1].id+1
@@ -156,29 +165,43 @@ def userInfoAlreadyCollected (user_screen_name):
     res = _cur.query(string.Template("select * from twitter_users where user_screen_name='${user_screen_name}' limit 1").substitute(locals())).getresult()
     return len(res) > 0
 
-def getForTopUsers (alreadyCollectedFun, getForUserFun, hitsAlwaysGreaterThan):
+# ref: http://stackoverflow.com/questions/434287/what-is-the-most-pythonic-way-to-iterate-over-a-list-in-chunks/434411#434411
+def chunker(seq, size):
+    return (seq[pos:pos + size] for pos in xrange(0, len(seq), size))
+
+def getForTopUsers (alreadyCollectedFun, getForUserFun, getRemainingHitsFun, hitsAlwaysGreaterThan, groupFun=lambda x: chunker(x,1)):
     res = _cur.query('select (user_screen_name) from topUsers order by rank asc limit 10000').getresult()
     screenNames = [[user[0]] for user in res]
-    screenNames = itertools.chain(*screenNames)
-    for screenName in screenNames:
-        if alreadyCollectedFun(screenName):
-            print "already collected tweets for %s; moving to next user" % (screenName)
+    screenNames = list(itertools.chain(*screenNames))
+    screenNameGroups = groupFun(screenNames)
+    for screenNameGroup in screenNameGroups:
+        newScreenNames = []
+        for screenName in screenNameGroup:
+            if alreadyCollectedFun(screenName):
+                print "already collected tweets for %s; moving to next user" % (screenName)
+                continue
+            newScreenNames.append(screenName)
+        if len(newScreenNames) == 0:
             continue
         try:
-            while getRemainingHits() <= hitsAlwaysGreaterThan:
-                print "only %s remaining hits; waiting until greater than %" % (getRemainingHits(), hitsAlwaysGreaterThan)
+            while True:
+                remainingHits = getRemainingHitsFun()
+                if remainingHits > hitsAlwaysGreaterThan:
+                    break
+                print "only %s remaining hits; waiting until greater than %s" % (remainingHits, hitsAlwaysGreaterThan)
                 time.sleep(60)
-            getForUserFun(screenName)
+            print "calling %s with %s at %s remaining hits" % (getForUserFun, newScreenNames, remainingHits)
+            getForUserFun(newScreenNames)
         except Exception as e:
-            print "couldn't do it for %s: %s" % (screenName, e)
-            time.sleep(60)
+            print "couldn't do it for %s: %s" % (newScreenNames, e)
+            time.sleep(1)
             pass
 
 def getAllTweetsForTopUsers ():
-    getForTopUsers(alreadyCollectedFun=userAlreadyCollected, getForUserFun=getAllTweets, hitsAlwaysGreaterThan=30)
+    getForTopUsers(alreadyCollectedFun=userAlreadyCollected, getForUserFun=getAllTweets, getRemainingHitsFun=getRemainingHitsUserTimeline, hitsAlwaysGreaterThan=30)
 
 def getUserInfoForTopUsers ():
-    getForTopUsers(alreadyCollectedFun=userInfoAlreadyCollected, getForUserFun=getInfoForUser, hitsAlwaysGreaterThan=5)
+    getForTopUsers(alreadyCollectedFun=userInfoAlreadyCollected, getForUserFun=getInfoForUser, getRemainingHitsFun=getRemainingHitsGetUser, hitsAlwaysGreaterThan=30, groupFun=lambda x: chunker(x, 100))
 
 #generateTopUsers(scrapeFun=generateTopUsersSocialBakers, topUsersFile='top10000SocialBakers.csv')
 #generateTopUsers(scrapeFun=lambda : generateTopUsersSocialBakers(numUsers=100000), topUsersFile='top100000SocialBakers.csv')
