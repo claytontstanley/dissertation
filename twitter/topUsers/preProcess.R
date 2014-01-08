@@ -3,6 +3,7 @@ library(stringr)
 library(sqldf)
 library(data.table)
 library(reshape2)
+library(assertthat)
 PATH = getPathToThisFile()
 
 options(sqldf.RPostgreSQL.user = 'claytonstanley',
@@ -28,18 +29,20 @@ twitter_users[created_at=='2010-10-29 19:05:25',]
 #fread('col1,col2\n5,"4\n3"')
 
 findHashtags = function(str) {
+	assert_that(length(str) == 1) # code isn't yet vectorized
 	regex = "#(\\d|\\w)+"
 	matches = gregexpr(regex, str)
 	hashtags = regmatches(str,matches)
 	list(hashtag=hashtags[[1]], start=unlist(matches[[1]]))
 }
+
 findHashtags('foo #bar #baz')
 
 addHashtagsToTweets = function(tweetsTbl) {
 	hashtags = tweetsTbl[, findHashtags(text), by=id]
 	setkey(hashtags,id)
 	setkey(tweetsTbl,id)
-	tweetsTbl[hashtags, `:=`(hashtag = hashtag, start=start)]
+	tweetsTbl[hashtags, `:=`(hashtag=hashtag, start=start)]
 	invisible()
 }
 
