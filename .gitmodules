@@ -4,3 +4,6 @@
 [submodule "submodules/lisp-dev"]
 	path = submodules/lisp-dev
 	url = ssh://chil/srv/git/lisp-dev
+[submodule "submodules/dissertationData"]
+	path = submodules/dissertationData
+	url = ssh://raid@raid/srv/git/dissertationData
