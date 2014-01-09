@@ -50,21 +50,24 @@ def generateTopUsersSocialBakers (numUsers=10000):
         res.append(scrape_socialbakers(url))
     return res
 
+_topUsersDir = "%s/dissertationData/topRankedUsers" % (_dir)
+
 def generateTopUsersCSV (scrapeFun, topUsersFile):
     res = scrapeFun()
-    res = itertools.chain(*res)
-    res = list(OrderedDict.fromkeys(res))
+    res = list(itertools.chain(*res))
+    res = [x.lower() for x in res]
+    res = OrderedDict.fromkeys(res)
     res = filter(None, res)
-    with open(topUsersFile, 'wb') as csvfile:
+    with open("%s/%s" % (_topUsersDir, topUsersFile), 'wb') as csvfile:
         csvWriter = csv.writer(csvfile, quoting=csv.QUOTE_ALL)
         rank = 0
         for item in res:
             rank = rank + 1
-            csvWriter.writerow([item.lower(), rank])
+            csvWriter.writerow([item, rank])
 
 def storeTopUsers(topUsersFile):
-    dir = _dir
-    cmd = "copy topUsers (user_screen_name, rank) from '${dir}/${topUsersFile}' delimiters ',' csv"
+    topUsersDir = _topUsersDir
+    cmd = "copy topUsers (user_screen_name, rank) from '${topUsersDir}/${topUsersFile}' delimiters ',' csv"
     cmd = string.Template(cmd).substitute(locals())
     _cur.query(cmd)
 
@@ -211,7 +214,9 @@ def getUserInfoForTopUsers ():
     getForTopUsers(alreadyCollectedFun=userInfoAlreadyCollected, getForUserFun=getInfoForUser, getRemainingHitsFun=getRemainingHitsGetUser, hitsAlwaysGreaterThan=30, groupFun=lambda x: chunker(x, 100))
 
 #generateTopUsers(scrapeFun=generateTopUsersSocialBakers, topUsersFile='top10000SocialBakers.csv')
+#generateTopUsers(scrapeFun=generateTopUsersTwitaholic, topUsersFile='top1000Twitaholic.csv')
 #generateTopUsers(scrapeFun=lambda : generateTopUsersSocialBakers(numUsers=100000), topUsersFile='top100000SocialBakers.csv')
+#storeTopUsers(topUsersFile='top100000SocialBakers.csv')
 #getAllTweets('claytonstanley1')
 #getAllTweetsForTopUsers()
 #getUserInfoForTopUsers()
