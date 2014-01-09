@@ -46,17 +46,22 @@ getTokenizedTbl = function(tweetsTbl) {
 
 foo = getTokenizedTbl(data.table(id=c(1,2,3), text=c('kfkf idid','','ie #2')))
 
-tweetsTbl = data.table(sqldf("select * from tweets limit 1000000"))
-setkey(tweetsTbl, id)
-tweetsTbl
-tokenizedTbl = getTokenizedTbl(tweetsTbl)
-tokenizedTbl
-htOfTokenizedTbl= tokenizedTbl[grepl('^#', chunk),]
-setkey(htOfTokenizedTbl,id)
-hashtagsTbl = htOfTokenizedTbl[tweetsTbl, list(hashtag=chunk, pos=pos, created_at=created_at, user_id=user_id, user_screen_name=user_screen_name), nomatch=0]
-hashtagsTbl
-hashtagsTbl[,.N,by=user_screen_name]
-hashtagsTbl[user_screen_name=='katyperry',]
+curWS = function() {
+	tweetsTbl = data.table(sqldf("select * from tweets limit 10000"))
+	setkey(tweetsTbl, id)
+	tweetsTbl
+	tokenizedTbl = getTokenizedTbl(tweetsTbl)
+	tokenizedTbl
+	htOfTokenizedTbl= tokenizedTbl[grepl('^#', chunk),]
+	htOfTokenizedTbl
+	setkey(htOfTokenizedTbl,id)
+	hashtagsTbl = htOfTokenizedTbl[tweetsTbl, list(hashtag=chunk, pos=pos, created_at=created_at, user_id=user_id, user_screen_name=user_screen_name), nomatch=0]
+	hashtagsTbl
+	hashtagsTbl[,.N,by=user_screen_name]
+	hashtagsTbl[user_screen_name=='katyperry',]
+}
+
+curWS()
 
 break()
 
