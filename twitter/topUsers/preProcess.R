@@ -4,6 +4,8 @@ library(sqldf)
 library(data.table)
 library(reshape2)
 library(assertthat)
+library(tm)
+library(tau)
 PATH = getPathToThisFile()
 
 options(sqldf.RPostgreSQL.user = 'claytonstanley',
@@ -28,28 +30,35 @@ topUsers = data.table(read.csv(str_c(PATH, "/data/tables/topUsers.csv")))
 twitter_users[created_at=='2010-10-29 19:05:25',]
 #fread('col1,col2\n5,"4\n3"')
 
-findHashtags = function(str) {
-	assert_that(length(str) == 1) # code isn't yet vectorized
-	regex = "#(\\d|\\w)+"
-	matches = gregexpr(regex, str)
-	hashtags = regmatches(str,matches)
-	list(hashtag=hashtags[[1]], start=unlist(matches[[1]]))
+getTokenizedTbl = function(tweetsTbl) {
+	regex = '\\S+'
+	matches = with(tweetsTbl, regmatches(text, gregexpr(regex, text, perl=T)))
+	wideTbl = data.table(id=tweetsTbl$id, matches=matches)[length(unlist(matches)) > 0,]
+	extractMatches = function (m) {
+		if (length(m) == 0) {
+			list(chunk=NULL, pos=NULL)
+		} else {
+			list(chunk=m, pos=1:length(m))
+		}
+	}
+	wideTbl[,extractMatches(unlist(matches)), by=id]
 }
 
-findHashtags('foo #bar #baz')
+foo = getTokenizedTbl(data.table(id=c(1,2,3), text=c('kfkf idid','','ie #2')))
 
-addHashtagsToTweets = function(tweetsTbl) {
-	hashtags = tweetsTbl[, findHashtags(text), by=id]
-	setkey(hashtags,id)
-	setkey(tweetsTbl,id)
-	tweetsTbl[hashtags, `:=`(hashtag=hashtag, start=start)]
-	invisible()
-}
+tweetsTbl = data.table(sqldf("select * from tweets limit 1000000"))
+setkey(tweetsTbl, id)
+tweetsTbl
+tokenizedTbl = getTokenizedTbl(tweetsTbl)
+tokenizedTbl
+htOfTokenizedTbl= tokenizedTbl[grepl('^#', chunk),]
+setkey(htOfTokenizedTbl,id)
+hashtagsTbl = htOfTokenizedTbl[tweetsTbl, list(hashtag=chunk, pos=pos, created_at=created_at, user_id=user_id, user_screen_name=user_screen_name), nomatch=0]
+hashtagsTbl
+hashtagsTbl[,.N,by=user_screen_name]
+hashtagsTbl[user_screen_name=='katyperry',]
 
-tweetsTbl = data.table(sqldf("select * from tweets limit 10000"))
-tweetsTbl
-addHashtagsToTweets(tweetsTbl)
-tweetsTbl
+break()
 
 tweetsTbl[, list(N=.N), by=retweeted]
 tweetsTbl[, .N, by=lang]
