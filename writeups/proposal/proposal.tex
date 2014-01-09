@@ -731,7 +731,7 @@ They modified the standard ACT-R model in Table \ref{tabACTRModel} in order to m
 A formal description of the modified ACT-R Bayesian model is included in Table \ref{tabModACTRModel}.
 
 \begin{table}[!ht]
-  \caption{StackOverflow tag prediction model}
+  \caption{\citeauthor{Stanley2013}'s StackOverflow tag prediction model}
   \label{tabModACTRModel}
   {\tabulinesep=1.2mm
     \begin{tabu}{ll}
@@ -836,7 +836,7 @@ However, if the model makes even just a few errors, users may become annoyed and
 Several hashtag recommendation models for Twitter have been developed recently.
 One of the first models used a Bayesian co-occurrence statistical technique to predict the most likely hashtag associated with a post as a function of prior hashtag use and context \parencite{Mazzia2009}.
 The model presented by \textcite{Mazzia2009} is very similar to an ACT-R declarative retrieval model.
-The main potential difference is that the global prior likelihood of a hashtag is computed without taking into account the specific user's past history.
+The main potential difference is that --- like \textcite{Kuo2011} and \textcite{Stanley2013} --- the global prior likelihood of a hashtag is computed without taking into account the specific user's past history.
 Instead, the global prior is an overall average frequency of hashtag use across all users.
 
 Several other models have taken a tweet-centered approach to hashtag prediction, where suggested hashtags are collected from hashtags used from similar tweets.
@@ -913,7 +913,7 @@ It also seems plausible that model accuracy can improve an even greater amount b
 [2] using the time-dependent form of the base level component in Table \ref{tabACTRModel}, in order to account for the fact that a user's tagging preferences change over time.
 So these proposed modifications will be explored further when incorporating a user's past tagging history into the models for this research.
 
-One of the main purposes of this research is to improve on these user-agnostic Bayesian models and include each specific user's past tagging history as a model component.
+One of the main purposes of this research is to improve on these user-agnostic statistical models and include each specific user's past tagging history as a model component.
 Using customized priors that are tailored to a user's specific tagging history should be crucial for sites like Twitter where the possible tag space is infinite,
 but should also improve performance for more constrained sites like StackOverflow since each user is not interested in all of the possible tags on the site. 
 
@@ -936,26 +936,24 @@ Parameters for each model will be calibrated on a large subset of the Twitter an
 Each model will be tested by evaluating the accuracy of model-chosen tags on a fresh test subset of the datasets.
 Accuracy will be assessed by comparing model performance with the human data.
 
-\subsection{StackOverflow Dataset}
+\subsubsection{StackOverflow Dataset}
 
 The most recent quarterly-published StackOverflow dataset \parencite{DataDump2013} will be used to test the models on user-chosen tags for posts.
 This dataset contains around \num{5.7} million posts and \num{34377} unique tags.
 
-\subsection{Twitter Dataset}
+\subsubsection{Twitter Dataset}
 
 Unlike StackOverflow, the entire Twitter dataset is not released to the public.
 Due to this and the sheer size of Twitter, subsets of the Twitter dataset must be collected.
-So two Twitter datasets will be collected for model evaluation: a common-hashtags and popular-users dataset.
-The common-hashtags dataset will contain approximately 2 million tweets where at least one of the 500 most popular hashtags are used.
-This dataset will be collected in real time until the tweet quota is reached, which should take just a few days.
+So two Twitter datasets will be collected for model evaluation: a popular-hashtags and popular-users dataset.
+The popular-hashtags dataset will contain approximately 2 million tweets where at least one of the 500 most popular hashtags are used.
+This dataset will be collected in real time until the tweet quota is reached.
 The purpose of this dataset is to test the accuracy of each model's predicted most likely hashtag(s) for a tweet.
 
 The popular-users dataset will contain all of the tweets from the top \num{2000} users on Twitter.
 This dataset will be collected by fetching all tweet history for each of the top users.
-Due to Twitter's query limitation for their API, it is estimated that this process will take about a week.
-This dataset will be used to explore the growth and decay characteristics of a hashtag for individual users.
+It will be used to explore the growth and decay characteristics of a hashtag for individual users.
 The temporal dynamics of ACT-R's decay rate model for a chunk will be evaluated against this data.
-Afterwards, the most appropriate model of user-centered frequency and recency effects (i.e., each hashtag's prior likelihood given a particular user) will be determined.
 
 \subsection{Pre-processing the Text}
 
@@ -1067,7 +1065,7 @@ This method seems straightforward to implement, but it is slightly unsatisfying 
 It also does not scale, since an additional 2-dimensional sparse matrix must be added for every additional value stored on the word order dimension.
 So I will try to discover a better technique to incorporate word order information into the ACT-R Bayesian model than the one just described, but will fall back to this technique if a better method is not found.
 
-This updated model will then be evaluated on only the Twitter common-hashtags dataset, since this dataset contains hashtags that occur in positions throughout the tweet (e.g., embedded within or at the end of a tweet).
+This updated model will then be evaluated on only the Twitter popular-hashtags dataset, since this dataset contains a large (yet not infinite) set of hashtags that occur in various positions throughout the tweet.
 This model will not be evaluated on the StackOverflow dataset since chosen tags for a StackOverflow post are not embedded and mixed within a post, so word-order information is unavailable and most likely unused.
 
 \subsubsection{Experiment 4: Top Hashtag Prediction}
@@ -1099,7 +1097,7 @@ As much as possible, the two developed models that are evaluated on the StackOve
 This should help ensure that the developed models are accurate in general, and can potentially be used as tag recommendation systems for other domains.
 Examples of similar tagging tasks are hashtag use on Facebook, flagging (i.e., tagging) Wikipedia articles for content issues or overly-opinionated material,
 auto labeling incoming mail and placing it into appropriate folders, and spam filtering.
-Having an accurate, efficient co-occurrence memory model that correctly retrieves relevant tags can be applied to a wide variety of real-world tasks.
+Having an accurate and efficient co-occurrence memory model that correctly retrieves relevant tags can be applied to a wide variety of real-world tasks.
 
 This research also has numerous components that are relevant to improving our understanding of declarative memory.
 It should be emphasized that it has only recently become possible to evaluate psychological theories of declarative memory on large-scale real-world tasks where the theory can be tested on hundreds of millions of data points.
