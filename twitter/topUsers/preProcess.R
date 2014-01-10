@@ -40,6 +40,7 @@ getTokenizedTbl = function(tweetsTbl) {
 		} else {
 			list(chunk=m, pos=1:length(m))
 		}
+	}
 	wideTbl[, extractMatches(unlist(matches)), by=id]
 }
 
