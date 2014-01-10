@@ -1,20 +1,16 @@
 import itertools
-from itertools import izip_longest
 import time
-import sys
-import argparse
 import urllib2
 from bs4 import BeautifulSoup
-import itertools
 import csv
-import os, errno
+import os
 import os.path
 import string
 import pg
 from collections import OrderedDict
 import tweepy
-import codecs
-from pylama.main import parse_options
+
+# lint_ignore=E302,E501
 
 _dir = os.path.dirname(os.path.abspath(__file__))
 _cur = pg.connect(host="127.0.0.1")
@@ -35,7 +31,7 @@ def scrape_socialbakers(url):
     print "grabbed %s results from url %s" % (len(res), url)
     return res
 
-def generateTopUsersTwitaholic ():
+def generateTopUsersTwitaholic():
     res = []
     for i in range(10):
         i = i + 1
@@ -43,16 +39,16 @@ def generateTopUsersTwitaholic ():
         res.append(scrape_twitaholic(url))
     return res
 
-def generateTopUsersSocialBakers (numUsers=10000):
+def generateTopUsersSocialBakers(numUsers=10000):
     res = []
-    for i in range(numUsers/50):
-        url = 'http://socialbakers.com/twitter/page-' + str(i+1) + '/'
+    for i in range(numUsers / 50):
+        url = 'http://socialbakers.com/twitter/page-' + str(i + 1) + '/'
         res.append(scrape_socialbakers(url))
     return res
 
 _topUsersDir = "%s/dissertationData/topRankedUsers" % (_dir)
 
-def generateTopUsersCSV (scrapeFun, topUsersFile):
+def generateTopUsersCSV(scrapeFun, topUsersFile):
     res = scrapeFun()
     res = list(itertools.chain(*res))
     res = [x.lower() for x in res]
@@ -71,20 +67,20 @@ def storeTopUsers(topUsersFile):
     cmd = string.Template(cmd).substitute(locals())
     _cur.query(cmd)
 
-def generateTopUsers (scrapeFun=generateTopUsersTwitaholic, topUsersFile='top1000Twitaholic.csv'):
+def generateTopUsers(scrapeFun=generateTopUsersTwitaholic, topUsersFile='top1000Twitaholic.csv'):
     generateTopUsersCSV(scrapeFun=scrapeFun, topUsersFile=topUsersFile)
     storeTopUsers(topUsersFile=topUsersFile)
 
-def backupTables ():
+def backupTables():
     tableNames = ['topUsers', 'twitter_users']
     for tableName in tableNames:
         file = "%s/dissertationData/tables/%s.csv" % (_dir, tableName)
         cmd = string.Template("copy ${tableName} to '${file}' delimiter ',' csv header").substitute(locals())
         _cur.query(cmd)
 
-def getTweepyAPI ():
-    consumer_key="vKbz24SqytZnYO33FNkR7w"
-    consumer_secret="jjobro8Chy9aKMzo8szYMz9tHftONLRkjNnrxk0"
+def getTweepyAPI():
+    consumer_key = "vKbz24SqytZnYO33FNkR7w"
+    consumer_secret = "jjobro8Chy9aKMzo8szYMz9tHftONLRkjNnrxk0"
     access_key = "363361813-FKSdmwSbzuUzHWg326fTGJM7Bu2hTviqEetjMgu8"
     access_secret = "VKgzDnTvDUWR1csliUR3BiMOI2oqO9NzocNKX1jPd4"
     auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
@@ -106,7 +102,7 @@ def getTweets(screen_name, **kwargs):
     # When set to false, the timeline will strip any native retweets (though they
     # will still count toward both the maximal length of the timeline and the slice
     # selected by the count parameter).
-    return _api.user_timeline(screen_name=screen_name,include_rts=True,**kwargs)
+    return _api.user_timeline(screen_name=screen_name, include_rts=True, **kwargs)
 
 def isRetweet(tweet):
     return hasattr(tweet, 'retweeted_status')
@@ -131,7 +127,7 @@ def getAllTweets(screenNames):
         alltweets = []
         while True:
             print "getting tweets from %s that are later than %s but before %s" % (screen_name, greaterThanID, lessThanID)
-            newTweets = getTweets(screen_name, count=200, max_id=lessThanID-1, since_id=greaterThanID+1)
+            newTweets = getTweets(screen_name, count=200, max_id=lessThanID - 1, since_id=greaterThanID + 1)
             if len(newTweets) == 0:
                 break
             alltweets.extend(newTweets)
@@ -143,7 +139,7 @@ def getAllTweets(screenNames):
     print "getting tweets for %s" % (screen_name)
     alltweets = []
     userID = _api.get_user(screen_name).id
-    lessThanID = getTweets(screen_name, count=1)[-1].id+1
+    lessThanID = getTweets(screen_name, count=1)[-1].id + 1
     cmd = string.Template("select id from tweets where user_id = '${userID}' order by id desc limit 1").substitute(locals())
     res = _cur.query(cmd).getresult()
     if len(res) == 0:
@@ -167,11 +163,11 @@ def getAllTweets(screenNames):
     print "updating database with results in temp file"
     _cur.query("copy tweets (id, user_id, user_screen_name, created_at, retweeted, in_reply_to_status_id, lang, truncated,text) from '%s' delimiters ',' csv" % (file))
 
-def userAlreadyCollected (user_screen_name):
+def userAlreadyCollected(user_screen_name):
     res = _cur.query(string.Template("select * from tweets where user_screen_name='${user_screen_name}' limit 1").substitute(locals())).getresult()
     return len(res) > 0
 
-def userInfoAlreadyCollected (user_screen_name):
+def userInfoAlreadyCollected(user_screen_name):
     res = _cur.query(string.Template("select * from twitter_users where user_screen_name='${user_screen_name}' limit 1").substitute(locals())).getresult()
     return len(res) > 0
 
@@ -179,7 +175,7 @@ def userInfoAlreadyCollected (user_screen_name):
 def chunker(seq, size):
     return (seq[pos:pos + size] for pos in xrange(0, len(seq), size))
 
-def getForTopUsers (alreadyCollectedFun, getForUserFun, getRemainingHitsFun, hitsAlwaysGreaterThan, groupFun=lambda x: chunker(x,1)):
+def getForTopUsers(alreadyCollectedFun, getForUserFun, getRemainingHitsFun, hitsAlwaysGreaterThan, groupFun=lambda x: chunker(x, 1)):
     res = _cur.query('select (user_screen_name) from topUsers order by rank asc limit 10000').getresult()
     screenNames = [[user[0]] for user in res]
     screenNames = list(itertools.chain(*screenNames))
@@ -207,10 +203,10 @@ def getForTopUsers (alreadyCollectedFun, getForUserFun, getRemainingHitsFun, hit
             time.sleep(1)
             pass
 
-def getAllTweetsForTopUsers ():
+def getAllTweetsForTopUsers():
     getForTopUsers(alreadyCollectedFun=userAlreadyCollected, getForUserFun=getAllTweets, getRemainingHitsFun=getRemainingHitsUserTimeline, hitsAlwaysGreaterThan=30)
 
-def getUserInfoForTopUsers ():
+def getUserInfoForTopUsers():
     getForTopUsers(alreadyCollectedFun=userInfoAlreadyCollected, getForUserFun=getInfoForUser, getRemainingHitsFun=getRemainingHitsGetUser, hitsAlwaysGreaterThan=30, groupFun=lambda x: chunker(x, 100))
 
 #generateTopUsers(scrapeFun=generateTopUsersSocialBakers, topUsersFile='top10000SocialBakers.csv')
@@ -220,4 +216,4 @@ def getUserInfoForTopUsers ():
 #getAllTweets('claytonstanley1')
 #getAllTweetsForTopUsers()
 #getUserInfoForTopUsers()
-#backupTables()
+backupTables()
