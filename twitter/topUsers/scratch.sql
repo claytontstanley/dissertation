@@ -7,8 +7,6 @@ select * from tweets where user_screen_name = 'JLo' limit 10;
 select count(*) from topUsers; 
 select count(*) from twitter_users;
 
-delete from topUsers;
-delete from twitter_users;
 select * from tweets;
 select user_screen_name from twitter_users;
 select count(*) from tweets;
