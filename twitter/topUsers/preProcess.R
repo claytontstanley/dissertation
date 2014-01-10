@@ -33,15 +33,9 @@ twitter_users[created_at=='2010-10-29 19:05:25',]
 getTokenizedTbl = function(tweetsTbl) {
 	regex = '\\S+'
 	matches = with(tweetsTbl, regmatches(text, gregexpr(regex, text, perl=T)))
-	wideTbl = data.table(id=tweetsTbl$id, matches=matches)[length(unlist(matches)) > 0,]
-	extractMatches = function (m) {
-		if (length(m) == 0) {
-			list(chunk=NULL, pos=NULL)
-		} else {
-			list(chunk=m, pos=1:length(m))
-		}
-	}
-	wideTbl[,extractMatches(unlist(matches)), by=id]
+	wideTbl = data.table(id=tweetsTbl$id, matches=matches)
+	extractMatches = function(m) if (length(m) == 0) list(chunk=NULL, pos=NULL) else list(chunk=m, pos=1:length(m))
+	wideTbl[, extractMatches(unlist(matches)), by=id]
 }
 
 foo = getTokenizedTbl(data.table(id=c(1,2,3), text=c('kfkf idid','','ie #2')))
