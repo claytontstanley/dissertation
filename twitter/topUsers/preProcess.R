@@ -12,23 +12,25 @@ options(sqldf.RPostgreSQL.user = 'claytonstanley',
 	sqldf.RPostgreSQL.dbname = 'claytonstanley')
 options("scipen"=100, "digits"=4)
 
-sqldf("select * from tweets where user_screen_name = 'claytonstanley1'")
-sqldf('select count(*) from tweets')
-sqldf('select count(*) from topUsers')
-sqldf('select * from topUsers')
-data.table(sqldf('select t.user_screen_name,rank from tweets as t join topusers as u on t.user_screen_name = u.user_screen_name group by t.user_screen_name,u.rank order by rank'))
-data.table(sqldf('select * from topusers order by rank'))
-sqldf("select * from tweets where user_screen_name='jlo'")
-sqldf('select user_screen_name,count(*) from tweets group by user_screen_name')
-sqldf('select lang,count(*) as count from tweets group by lang order by count desc')
-sqldf('select retweeted,count(*) as count from tweets group by retweeted order by count desc')
-sqldf('select truncated,count(*) as count from tweets group by truncated order by count desc')
-sqldf("select * from topUsers")[1:100,]
-data.table(sqldf("select * from twitter_users"))
-twitter_users = data.table(read.csv(str_c(PATH, "/data/tables/twitter_users.csv")))
-topUsers = data.table(read.csv(str_c(PATH, "/data/tables/topUsers.csv")))
-twitter_users[created_at=='2010-10-29 19:05:25',]
-#fread('col1,col2\n5,"4\n3"')
+sqlScratch = function() {
+	sqldf("select * from tweets where user_screen_name = 'claytonstanley1'")
+	sqldf('select count(*) from tweets')
+	sqldf('select count(*) from topUsers')
+	sqldf('select * from topUsers')
+	#data.table(sqldf('select t.user_screen_name,rank from tweets as t join topusers as u on t.user_screen_name = u.user_screen_name group by t.user_screen_name,u.rank order by rank'))
+	data.table(sqldf('select * from topusers order by rank'))
+	sqldf("select * from tweets where user_screen_name='jlo'")
+	sqldf('select user_screen_name,count(*) from tweets group by user_screen_name')
+	sqldf('select lang,count(*) as count from tweets group by lang order by count desc')
+	sqldf('select retweeted,count(*) as count from tweets group by retweeted order by count desc')
+	sqldf('select truncated,count(*) as count from tweets group by truncated order by count desc')
+	sqldf("select * from topUsers")[1:100,]
+	data.table(sqldf("select * from twitter_users"))
+	twitter_users = data.table(read.csv(str_c(PATH, "/dissertationData/tables/twitter_users.csv")))
+	topUsers = data.table(read.csv(str_c(PATH, "/dissertationData/tables/topUsers.csv")))
+	twitter_users[created_at=='2010-10-29 19:05:25',]
+	#fread('col1,col2\n5,"4\n3"')
+}
 
 getTokenizedTbl = function(tweetsTbl) {
 	regex = '\\S+'
@@ -65,6 +67,7 @@ curWS()
 
 break()
 
+sessionInfo()
 tweetsTbl[, list(N=.N), by=retweeted]
 tweetsTbl[, .N, by=lang]
 tables()
