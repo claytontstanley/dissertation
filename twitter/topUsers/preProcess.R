@@ -36,12 +36,12 @@ getTokenizedTbl = function(tweetsTbl) {
 	regex = '\\S+'
 	matches = with(tweetsTbl, regmatches(text, gregexpr(regex, text, perl=T)))
 	wideTbl = data.table(id=tweetsTbl$id, matches=matches)
-	extractMatches = function(m) list(chunk=m, pos=seq(from=1, to=length(m), length.out=length(m)))
+	extractMatches = function(m) list(chunk=m, pos=seq(from=1, by=1, length.out=length(m)))
 	wideTbl[, extractMatches(unlist(matches)), by=id]
 }
 
-foo = getTokenizedTbl(data.table(id=c(1,2,3,4), text=c('kfkf idid','','ie #2', 'kdkd')))
-foo
+getTokenizedTbl(data.table(id=c(1,2,3,4), text=c('kfkf idid','  ','ie #2', 'kdkd')))
+
 
 curWS = function() {
 	tweetsTbl = data.table(sqldf("select * from tweets limit 10000"))
