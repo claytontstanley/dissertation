@@ -34,7 +34,12 @@ getTokenizedTbl = function(tweetsTbl) {
 	regex = '\\S+'
 	matches = with(tweetsTbl, regmatches(text, gregexpr(regex, text, perl=T)))
 	wideTbl = data.table(id=tweetsTbl$id, matches=matches)
-	extractMatches = function(m) if (length(m) == 0) list(chunk=NULL, pos=NULL) else list(chunk=m, pos=1:length(m))
+	extractMatches = function(m) {
+		if (length(m) == 0) {
+			list(chunk=NULL, pos=NULL)
+		} else {
+			list(chunk=m, pos=1:length(m))
+		}
 	wideTbl[, extractMatches(unlist(matches)), by=id]
 }
 
