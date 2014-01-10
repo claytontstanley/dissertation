@@ -220,4 +220,4 @@ def getUserInfoForTopUsers ():
 #getAllTweets('claytonstanley1')
 #getAllTweetsForTopUsers()
 #getUserInfoForTopUsers()
-backupTables()
+#backupTables()
