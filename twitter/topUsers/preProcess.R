@@ -96,19 +96,6 @@ curWS = function() {
 	hashtagsTbl
 }
 
-htmlParse("RT @PowerByService: We've been getting so many good ideas 4 a #NewLook4Edu that we're extending the deadline! &lt;--Reading them now URIV", asText=T)
-htmlParse('<p>isn&apos;t</p>', asText=T)
-( x <- paste("i", "s", "n", "&", "a", "p", "o", "s", ";", "t", sep = "") )
-html2txt(x)
-htmlParse(x)
-?htmlParse
-
-html2txt <- function(str) {
-	xpathApply(htmlParse(sprintf('<p>%s</p>', str), asText=TRUE),
-		   "//body//text()", 
-		   xmlValue)[[1]] 
-}
-
 curWS()
 
 break()
