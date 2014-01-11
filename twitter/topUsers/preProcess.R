@@ -31,7 +31,7 @@ sqlScratch = function() {
 	twitter_users[created_at=='2010-10-29 19:05:25',]
 	#fread('col1,col2\n5,"4\n3"')
 }
-=
+
 getTokenizedTbl = function(tweetsTbl, from) {
 	regex = '\\S+'
 	matches = regmatches(tweetsTbl[[from]], gregexpr(regex, tweetsTbl[[from]], perl=T))
@@ -42,12 +42,12 @@ getTokenizedTbl = function(tweetsTbl, from) {
 	tokenizedTbl
 }
 
-getTokenizedTbl(data.table(id=c(1,2,3,4), text=c('kfkf idid!!','  ','ie #2', 'kdkd')))
+getTokenizedTbl(data.table(id=c(1,2,3,4), text=c('kfkf idid!!','  ','ie #2', 'kdkd')), from='text')
 
 
 
 getTweetsTbl = function() {
-	tweetsTbl = data.table(sqldf("select * from tweets limit 10000"))
+	tweetsTbl = data.table(sqldf("select * from tweets limit 50000"))
 	setkey(tweetsTbl, id)
 	tweetsTbl[, text := gsub(pattern='(\t|\n|\r)', replacement=' ', x=text),]
 	fileConn = file(str_c(PATH, '/res.json'))
@@ -80,7 +80,6 @@ curWS = function() {
 	tweetsTbl <<- getTweetsTbl()
 	tweetsTbl
 	hashtagsTbl <<- getHashtagsTbl(tweetsTbl, from='tokenText')
-	hashtagsTbl
 	hashtagsTbl[,.N,by=user_screen_name]
 	hashtagsTbl[user_screen_name=='katyperry',]
 	tusersTbl <<- getTusersTbl()
