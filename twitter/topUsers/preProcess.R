@@ -6,6 +6,7 @@ library(reshape2)
 library(assertthat)
 library(tm)
 library(tau)
+library(XML)
 PATH = getPathToThisFile()
 
 options(sqldf.RPostgreSQL.user = 'claytonstanley',
@@ -20,7 +21,7 @@ sqlScratch = function() {
 	#data.table(sqldf('select t.user_screen_name,rank from tweets as t join topusers as u on t.user_screen_name = u.user_screen_name group by t.user_screen_name,u.rank order by rank'))
 	data.table(sqldf('select * from topusers order by rank'))
 	sqldf("select * from tweets where user_screen_name='jlo'")
-	sqldf('select user_screen_name,count(*) from tweets group by user_screen_name')
+	sqldf('select * from (select user_screen_name,count(*) from tweets group by user_screen_name) as t join topUsers as u on t.user_screen_name = u.user_screen_name order by rank limit 10')
 	sqldf('select lang,count(*) as count from tweets group by lang order by count desc')
 	sqldf('select retweeted,count(*) as count from tweets group by retweeted order by count desc')
 	sqldf('select truncated,count(*) as count from tweets group by truncated order by count desc')
@@ -44,18 +45,23 @@ getTokenizedTbl = function(tweetsTbl, from) {
 
 getTokenizedTbl(data.table(id=c(1,2,3,4), text=c('kfkf idid!!','  ','ie #2', 'kdkd')), from='text')
 
-
+addTokenText = function(tweetsTbl) {
+	stripDelimiters = function(text) gsub(pattern='(\t|\n|\r)', replacement=' ', x=text)
+	rawTweetsFile = 'rawTweets.txt'
+	tokenizedTweetsFile = 'tokenizedTweets.txt'
+	with(tweetsTbl, writeLines(stripDelimiters(text), sprintf('/tmp/%s', rawTweetsFile), useBytes=T)) 
+	cmd = sprintf('%s/bin/ark-tweet-nlp-0.3.2/runTagger.sh --no-confidence --just-tokenize --quiet /tmp/%s > /tmp/%s', PATH, rawTweetsFile, tokenizedTweetsFile)
+	foo = system(cmd)
+	?writeLines
+	?read.delim
+	tokenizedTbl = data.table(read.delim(sprintf('/tmp/%s', tokenizedTweetsFile), sep='\t', quote="", header=F, stringsAsFactors=F))
+	tweetsTbl[, tokenText := tokenizedTbl[[1]]]
+}
 
 getTweetsTbl = function() {
-	tweetsTbl = data.table(sqldf("select * from tweets limit 50000"))
+	tweetsTbl = data.table(sqldf("select * from tweets limit 10000"))
+	addTokenText(tweetsTbl)
 	setkey(tweetsTbl, id)
-	tweetsTbl[, text := gsub(pattern='(\t|\n|\r)', replacement=' ', x=text),]
-	fileConn = file(str_c(PATH, '/res.json'))
-	with(tweetsTbl, writeLines(text, fileConn))
-	close(fileConn)
-	foo = system(str_c('~/Downloads/ark-tweet-nlp-0.3.2/runTagger.sh --no-confidence --just-tokenize --quiet ', PATH, '/res.json  > ', PATH, '/out.json'))
-	res2 = data.table(read.delim(str_c(PATH, '/out.json'), sep='\t', quote="", header=F))
-	tweetsTbl[, tokenText := res2[[1]]]
 	tweetsTbl
 }
 
@@ -86,11 +92,22 @@ curWS = function() {
 	tusersTbl
 	setkey(hashtagsTbl, user_id)
 	hashtagsTbl[tusersTbl, list(user_screen_name=user_screen_name[1], totHashtags=.N, difHashtags=length(unique(hashtag))), nomatch=0]
-	table(hashtagsTbl[user_screen_name=='barackobama',hashtag])
+	table(hashtagsTbl[user_screen_name=='khloekardashian',hashtag])
 	hashtagsTbl
-	tweetsTbl
 }
 
+htmlParse("RT @PowerByService: We've been getting so many good ideas 4 a #NewLook4Edu that we're extending the deadline! &lt;--Reading them now URIV", asText=T)
+htmlParse('<p>isn&apos;t</p>', asText=T)
+( x <- paste("i", "s", "n", "&", "a", "p", "o", "s", ";", "t", sep = "") )
+html2txt(x)
+htmlParse(x)
+?htmlParse
+
+html2txt <- function(str) {
+	xpathApply(htmlParse(sprintf('<p>%s</p>', str), asText=TRUE),
+		   "//body//text()", 
+		   xmlValue)[[1]] 
+}
 
 curWS()
 
