@@ -97,8 +97,8 @@ compareHashtagTbls = function() {
 curWS = function() {
 	tweetsTbl <<- getTweetsTbl()
 	tweetsTbl
-	hashtagsTbl <<- getHashtagsTbl(tweetsTbl, from='tokenText')
 	hashtagsTbl <<- getHashtagsTbl(tweetsTbl, from='text')
+	hashtagsTbl <<- getHashtagsTbl(tweetsTbl, from='tokenText')
 	compareHashtagTbls()[N!=N.1]
 	getHashtagEntropy(hashtagsTbl)
 	tusersTbl <<- getTusersTbl()
