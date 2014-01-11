@@ -21,7 +21,7 @@ sqlScratch = function() {
 	#data.table(sqldf('select t.user_screen_name,rank from tweets as t join topusers as u on t.user_screen_name = u.user_screen_name group by t.user_screen_name,u.rank order by rank'))
 	data.table(sqldf('select * from topusers order by rank'))
 	sqldf("select * from tweets where user_screen_name='jlo'")
-	sqldf('select * from (select user_screen_name,count(*) from tweets group by user_screen_name) as t join topUsers as u on t.user_screen_name = u.user_screen_name order by rank limit 10')
+	data.table(sqldf('select * from (select user_screen_name,count(*) from tweets group by user_screen_name) as t join topUsers as u on t.user_screen_name = u.user_screen_name order by rank'))
 	sqldf('select lang,count(*) as count from tweets group by lang order by count desc')
 	sqldf('select retweeted,count(*) as count from tweets group by retweeted order by count desc')
 	sqldf('select truncated,count(*) as count from tweets group by truncated order by count desc')
@@ -39,7 +39,6 @@ getTokenizedTbl = function(tweetsTbl, from) {
 	wideTbl = data.table(id=tweetsTbl$id, matches=matches)
 	extractMatches = function(m) list(chunk=m, pos=seq(from=1, by=1, length.out=length(m)))
 	tokenizedTbl = wideTbl[, extractMatches(unlist(matches)), by=id]
-	tokenizedTbl[, chunk := sub('[!.?,:”]+$', "", chunk)]
 	tokenizedTbl
 }
 
@@ -51,9 +50,7 @@ addTokenText = function(tweetsTbl) {
 	tokenizedTweetsFile = 'tokenizedTweets.txt'
 	with(tweetsTbl, writeLines(stripDelimiters(text), sprintf('/tmp/%s', rawTweetsFile), useBytes=T)) 
 	cmd = sprintf('%s/bin/ark-tweet-nlp-0.3.2/runTagger.sh --no-confidence --just-tokenize --quiet /tmp/%s > /tmp/%s', PATH, rawTweetsFile, tokenizedTweetsFile)
-	foo = system(cmd)
-	?writeLines
-	?read.delim
+	cmdOut = system(cmd)
 	tokenizedTbl = data.table(read.delim(sprintf('/tmp/%s', tokenizedTweetsFile), sep='\t', quote="", header=F, stringsAsFactors=F))
 	tweetsTbl[, tokenText := tokenizedTbl[[1]]]
 }
@@ -68,8 +65,7 @@ getTweetsTbl = function(sqlStr="select * from tweets limit 10000") {
 getHashtagsTbl = function(tweetsTbl, from='tokenText') {
 	tokenizedTbl = getTokenizedTbl(tweetsTbl, from=from)
 	tokenizedTbl[, chunk := tolower(chunk)]
-	htOfTokenizedTbl= tokenizedTbl[grepl('^#', chunk),]
-	htOfTokenizedTbl
+	htOfTokenizedTbl = tokenizedTbl[grepl('^#', chunk),]
 	setkey(htOfTokenizedTbl,id)
 	hashtagsTbl = htOfTokenizedTbl[tweetsTbl, list(hashtag=chunk, pos=pos, created_at=created_at, user_id=user_id, user_screen_name=user_screen_name), nomatch=0]
 	hashtagsTbl
@@ -85,11 +81,7 @@ getTusersTbl = function() {
 getHashtagEntropy = function(hashtagsTbl) {
 	countTbl = hashtagsTbl[, as.data.table(table(hashtag)) , by=user_id]
 	countTbl[, p := N/sum(N), by=user_id]
-	countTbl
 	HTbl = countTbl[, list(N=sum(N), NUnique=.N, H = - sum(p * log(p))), by=user_id]
-	countTbl[user_id==17461978,]
-	hashtagsTbl[user_id==17461978,]
-	hashtagsTbl[, .N, by=user_id]
 	HTbl
 }
 
