@@ -109,14 +109,9 @@ curWS = function() {
 	hashtagsTbl <<- getHashtagsTbl(tweetsTbl, from='text')
 	compareHashtagTbls()[N!=N.1]
 	getHashtagEntropy(hashtagsTbl)
-	as.data.frame(hashtagsTbl[, as.data.table(table(hashtag)), by=user_id])
-	hashtagsTbl[,.N,by=user_screen_name]
-	hashtagsTbl[user_screen_name=='katyperry',]
 	tusersTbl <<- getTusersTbl()
 	tusersTbl
 	setkey(hashtagsTbl, user_id)
-	hashtagsTbl[tusersTbl, list(user_screen_name=user_screen_name[1], totHashtags=.N, difHashtags=length(unique(hashtag))), nomatch=0]
-	table(hashtagsTbl[user_screen_name=='khloekardashian',hashtag])
 	hashtagsTbl
 }
 
