@@ -58,8 +58,8 @@ addTokenText = function(tweetsTbl) {
 	tweetsTbl[, tokenText := tokenizedTbl[[1]]]
 }
 
-getTweetsTbl = function() {
-	tweetsTbl = data.table(sqldf("select * from tweets limit 10000"))
+getTweetsTbl = function(sqlStr="select * from tweets limit 10000") {
+	tweetsTbl = data.table(sqldf(sqlStr))
 	addTokenText(tweetsTbl)
 	setkey(tweetsTbl, id)
 	tweetsTbl
@@ -82,10 +82,34 @@ getTusersTbl = function() {
 	tusersTbl
 }
 
+getHashtagEntropy = function(hashtagsTbl) {
+	countTbl = hashtagsTbl[, as.data.table(table(hashtag)) , by=user_id]
+	countTbl[, p := N/sum(N), by=user_id]
+	countTbl
+	HTbl = countTbl[, list(N=sum(N), NUnique=.N, H = - sum(p * log(p))), by=user_id]
+	countTbl[user_id==17461978,]
+	hashtagsTbl[user_id==17461978,]
+	hashtagsTbl[, .N, by=user_id]
+	HTbl
+}
+
+compareHashtagTbls = function() {
+	hashtagTblText = getHashtagsTbl(tweetsTbl, from='text')[, as.data.table(table(hashtag)), by=user_id]
+	hashtagTblTokenText = getHashtagsTbl(tweetsTbl, from='tokenText')[, as.data.table(table(hashtag)), by=user_id]
+	setkeyv(hashtagTblText, c('user_id', 'hashtag'))
+	setkeyv(hashtagTblTokenText, c('user_id', 'hashtag'))
+	hashtagTblText
+	hashtagTblText[hashtagTblTokenText]
+}
+
 curWS = function() {
 	tweetsTbl <<- getTweetsTbl()
 	tweetsTbl
 	hashtagsTbl <<- getHashtagsTbl(tweetsTbl, from='tokenText')
+	hashtagsTbl <<- getHashtagsTbl(tweetsTbl, from='text')
+	compareHashtagTbls()[N!=N.1]
+	getHashtagEntropy(hashtagsTbl)
+	as.data.frame(hashtagsTbl[, as.data.table(table(hashtag)), by=user_id])
 	hashtagsTbl[,.N,by=user_screen_name]
 	hashtagsTbl[user_screen_name=='katyperry',]
 	tusersTbl <<- getTusersTbl()
