@@ -31,32 +31,67 @@ sqlScratch = function() {
 	twitter_users[created_at=='2010-10-29 19:05:25',]
 	#fread('col1,col2\n5,"4\n3"')
 }
-
-getTokenizedTbl = function(tweetsTbl) {
+=
+getTokenizedTbl = function(tweetsTbl, from) {
 	regex = '\\S+'
-	matches = with(tweetsTbl, regmatches(text, gregexpr(regex, text, perl=T)))
+	matches = regmatches(tweetsTbl[[from]], gregexpr(regex, tweetsTbl[[from]], perl=T))
 	wideTbl = data.table(id=tweetsTbl$id, matches=matches)
 	extractMatches = function(m) list(chunk=m, pos=seq(from=1, by=1, length.out=length(m)))
-	wideTbl[, extractMatches(unlist(matches)), by=id]
+	tokenizedTbl = wideTbl[, extractMatches(unlist(matches)), by=id]
+	tokenizedTbl[, chunk := sub('[!.?,:”]+$', "", chunk)]
+	tokenizedTbl
 }
 
-getTokenizedTbl(data.table(id=c(1,2,3,4), text=c('kfkf idid','  ','ie #2', 'kdkd')))
+getTokenizedTbl(data.table(id=c(1,2,3,4), text=c('kfkf idid!!','  ','ie #2', 'kdkd')))
 
 
-curWS = function() {
+
+getTweetsTbl = function() {
 	tweetsTbl = data.table(sqldf("select * from tweets limit 10000"))
 	setkey(tweetsTbl, id)
+	tweetsTbl[, text := gsub(pattern='(\t|\n|\r)', replacement=' ', x=text),]
+	fileConn = file(str_c(PATH, '/res.json'))
+	with(tweetsTbl, writeLines(text, fileConn))
+	close(fileConn)
+	foo = system(str_c('~/Downloads/ark-tweet-nlp-0.3.2/runTagger.sh --no-confidence --just-tokenize --quiet ', PATH, '/res.json  > ', PATH, '/out.json'))
+	res2 = data.table(read.delim(str_c(PATH, '/out.json'), sep='\t', quote="", header=F))
+	tweetsTbl[, tokenText := res2[[1]]]
 	tweetsTbl
-	tokenizedTbl = getTokenizedTbl(tweetsTbl)
-	tokenizedTbl
+}
+
+getHashtagsTbl = function(tweetsTbl, from='tokenText') {
+	tokenizedTbl = getTokenizedTbl(tweetsTbl, from=from)
+	tokenizedTbl[, chunk := tolower(chunk)]
 	htOfTokenizedTbl= tokenizedTbl[grepl('^#', chunk),]
 	htOfTokenizedTbl
 	setkey(htOfTokenizedTbl,id)
 	hashtagsTbl = htOfTokenizedTbl[tweetsTbl, list(hashtag=chunk, pos=pos, created_at=created_at, user_id=user_id, user_screen_name=user_screen_name), nomatch=0]
 	hashtagsTbl
+}
+
+getTusersTbl = function() {
+	tusersTbl = data.table(sqldf('select * from twitter_users'))
+	tusersTbl[, rank := order(followers_count, decreasing=T)]
+	setkey(tusersTbl, id)
+	tusersTbl
+}
+
+curWS = function() {
+	tweetsTbl <<- getTweetsTbl()
+	tweetsTbl
+	hashtagsTbl <<- getHashtagsTbl(tweetsTbl, from='tokenText')
+	hashtagsTbl
 	hashtagsTbl[,.N,by=user_screen_name]
 	hashtagsTbl[user_screen_name=='katyperry',]
+	tusersTbl <<- getTusersTbl()
+	tusersTbl
+	setkey(hashtagsTbl, user_id)
+	hashtagsTbl[tusersTbl, list(user_screen_name=user_screen_name[1], totHashtags=.N, difHashtags=length(unique(hashtag))), nomatch=0]
+	table(hashtagsTbl[user_screen_name=='barackobama',hashtag])
+	hashtagsTbl
+	tweetsTbl
 }
+
 
 curWS()
 

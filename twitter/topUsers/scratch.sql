@@ -6,6 +6,7 @@ select rank, t.user_screen_name, count(*) from tweets as t join topUsers as u on
 select * from tweets where user_screen_name = 'JLo' limit 10;
 select count(*) from topUsers; 
 select count(*) from twitter_users;
+select * from twitter_users;
 
 select * from tweets;
 select user_screen_name from twitter_users;
