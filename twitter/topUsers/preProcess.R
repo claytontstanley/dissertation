@@ -124,17 +124,6 @@ tweetsTbl[, containsHashtag := 0]
 tweetsTbl[grepl('#', text), containsHashtag := 1]
 tweetsTbl[, list(numWithHashtags=sum(containsHashtag), numOfTweets=.N), by=user_screen_name][, propWithHashtags := numWithHashtags/numOfTweets][,][,hist(propWithHashtags)]
 tweetsTbl
-library(devtools)
-install_github('jalvesaq/VimCom')
-install_github('hadley/devtools')
-install.packages('devtools')
-?install.packages
-install.packages('data.table')
-install.packages('data.table', repos="http://R-Forge.R-project.org")
-
-install.packages("data.table", type='source', repos="http://R-Forge.R-project.org")
-?install.packages
-library(data.table)
 
 #sqldf("select user_screen_name,id,created_at,text from tweets where user_screen_name = 'katyperry' order by id desc limit 10")
 #sqldf("select user_screen_name,id,created_at,text from tweets where user_screen_name = 'BarackObama' order by id desc limit 10")
