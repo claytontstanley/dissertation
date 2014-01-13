@@ -55,7 +55,7 @@ addTokenText <- function(tweetsTbl) {
 	tweetsTbl[, tokenText := tokenizedTbl[[1]]]
 }
 
-getTweetsTbl < function(sqlStr="select * from tweets limit 10000") {
+getTweetsTbl <- function(sqlStr="select * from tweets limit 10000") {
 	tweetsTbl = data.table(sqldf(sqlStr))
 	addTokenText(tweetsTbl)
 	setkey(tweetsTbl, id)
