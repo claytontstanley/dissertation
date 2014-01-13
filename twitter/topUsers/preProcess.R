@@ -13,7 +13,7 @@ options(sqldf.RPostgreSQL.user = 'claytonstanley',
 	sqldf.RPostgreSQL.dbname = 'claytonstanley')
 options("scipen"=100, "digits"=4)
 
-sqlScratch = function() {
+sqlScratch <- function() {
 	sqldf("select * from tweets where user_screen_name = 'claytonstanley1'")
 	sqldf('select count(*) from tweets')
 	sqldf('select count(*) from topUsers')
@@ -33,7 +33,7 @@ sqlScratch = function() {
 	#fread('col1,col2\n5,"4\n3"')
 }
 
-getTokenizedTbl = function(tweetsTbl, from) {
+getTokenizedTbl <- function(tweetsTbl, from) {
 	regex = '\\S+'
 	matches = regmatches(tweetsTbl[[from]], gregexpr(regex, tweetsTbl[[from]], perl=T))
 	wideTbl = data.table(id=tweetsTbl$id, matches=matches)
@@ -44,7 +44,7 @@ getTokenizedTbl = function(tweetsTbl, from) {
 
 getTokenizedTbl(data.table(id=c(1,2,3,4), text=c('kfkf idid!!','  ','ie #2', 'kdkd')), from='text')
 
-addTokenText = function(tweetsTbl) {
+addTokenText <- function(tweetsTbl) {
 	stripDelimiters = function(text) gsub(pattern='(\t|\n|\r)', replacement=' ', x=text)
 	rawTweetsFile = 'rawTweets.txt'
 	tokenizedTweetsFile = 'tokenizedTweets.txt'
@@ -55,14 +55,14 @@ addTokenText = function(tweetsTbl) {
 	tweetsTbl[, tokenText := tokenizedTbl[[1]]]
 }
 
-getTweetsTbl = function(sqlStr="select * from tweets limit 10000") {
+getTweetsTbl < function(sqlStr="select * from tweets limit 10000") {
 	tweetsTbl = data.table(sqldf(sqlStr))
 	addTokenText(tweetsTbl)
 	setkey(tweetsTbl, id)
 	tweetsTbl
 }
 
-getHashtagsTbl = function(tweetsTbl, from='tokenText') {
+getHashtagsTbl <- function(tweetsTbl, from='tokenText') {
 	tokenizedTbl = getTokenizedTbl(tweetsTbl, from=from)
 	tokenizedTbl[, chunk := tolower(chunk)]
 	htOfTokenizedTbl = tokenizedTbl[grepl('^#', chunk),]
@@ -71,21 +71,21 @@ getHashtagsTbl = function(tweetsTbl, from='tokenText') {
 	hashtagsTbl
 }
 
-getTusersTbl = function() {
+getTusersTbl <- function() {
 	tusersTbl = data.table(sqldf('select * from twitter_users'))
 	tusersTbl[, rank := order(followers_count, decreasing=T)]
 	setkey(tusersTbl, id)
 	tusersTbl
 }
 
-getHashtagEntropy = function(hashtagsTbl) {
+getHashtagEntropy <- function(hashtagsTbl) {
 	countTbl = hashtagsTbl[, as.data.table(table(hashtag)) , by=user_id]
 	countTbl[, p := N/sum(N), by=user_id]
 	HTbl = countTbl[, list(N=sum(N), NUnique=.N, H = - sum(p * log(p))), by=user_id]
 	HTbl
 }
 
-compareHashtagTbls = function() {
+compareHashtagTbls <- function() {
 	hashtagTblText = getHashtagsTbl(tweetsTbl, from='text')[, as.data.table(table(hashtag)), by=user_id]
 	hashtagTblTokenText = getHashtagsTbl(tweetsTbl, from='tokenText')[, as.data.table(table(hashtag)), by=user_id]
 	setkeyv(hashtagTblText, c('user_id', 'hashtag'))
@@ -94,7 +94,7 @@ compareHashtagTbls = function() {
 	hashtagTblText[hashtagTblTokenText]
 }
 
-curWS = function() {
+curWS <- function() {
 	tweetsTbl <<- getTweetsTbl()
 	tweetsTbl
 	hashtagsTbl <<- getHashtagsTbl(tweetsTbl, from='text')

@@ -214,6 +214,6 @@ def getUserInfoForTopUsers():
 #generateTopUsers(scrapeFun=lambda : generateTopUsersSocialBakers(numUsers=100000), topUsersFile='top100000SocialBakers.csv')
 #storeTopUsers(topUsersFile='top100000SocialBakers.csv')
 #getAllTweets('claytonstanley1')
-#getAllTweetsForTopUsers()
+getAllTweetsForTopUsers()
 #getUserInfoForTopUsers()
-backupTables()
+#backupTables()
