@@ -59,6 +59,10 @@ getTweetsTbl <- function(sqlStr="select * from tweets limit 10000") {
 	tweetsTbl = data.table(sqldf(sqlStr))
 	addTokenText(tweetsTbl)
 	setkey(tweetsTbl, id)
+	getDiffTimeSinceFirst <- function(ts) {
+		difftime(ts, ts[1], units='secs')
+	}
+	tweetsTbl[, dt := getDiffTimeSinceFirst(created_at), by=user_screen_name]
 	tweetsTbl
 }
 
@@ -67,7 +71,7 @@ getHashtagsTbl <- function(tweetsTbl, from='tokenText') {
 	tokenizedTbl[, chunk := tolower(chunk)]
 	htOfTokenizedTbl = tokenizedTbl[grepl('^#', chunk),]
 	setkey(htOfTokenizedTbl,id)
-	hashtagsTbl = htOfTokenizedTbl[tweetsTbl, list(hashtag=chunk, pos=pos, created_at=created_at, user_id=user_id, user_screen_name=user_screen_name), nomatch=0]
+	hashtagsTbl = htOfTokenizedTbl[tweetsTbl, list(hashtag=chunk, pos=pos, created_at=created_at, dt=dt, user_id=user_id, user_screen_name=user_screen_name), nomatch=0]
 	hashtagsTbl
 }
 
@@ -99,12 +103,19 @@ curWS <- function() {
 	tweetsTbl
 	hashtagsTbl <<- getHashtagsTbl(tweetsTbl, from='text')
 	hashtagsTbl <<- getHashtagsTbl(tweetsTbl, from='tokenText')
+	print(hashtagsTbl, topn=50)
 	compareHashtagTbls()[N!=N.1]
 	getHashtagEntropy(hashtagsTbl)
 	tusersTbl <<- getTusersTbl()
 	tusersTbl
-	setkey(hashtagsTbl, user_id)
-	hashtagsTbl
+	visHashtags(hashtagsTbl)
+	print(hashtagsTbl[user_screen_name=='iamsrk'], nrow=500)
+}
+
+visHashtags <- function(hashtagsTbl) {
+	setkey(hashtagsTbl, id)
+	hashtagsTbl[, {dev.new(); plot(dt, main=user_screen_name)}, by=user_screen_name]
+	hashtagsTbl[, {dev.new(); plot(factor(hashtag), dt)}, by=user_id]
 }
 
 curWS()
