@@ -9,6 +9,7 @@ library(tau)
 library(XML)
 library(Matrix)
 library(utils)
+library(testthat)
 PATH = getPathToThisFile()
 
 options(sqldf.RPostgreSQL.user = 'claytonstanley',
@@ -62,7 +63,7 @@ getTweetsTbl <- function(sqlStr="select * from tweets limit 10000") {
 	addTokenText(tweetsTbl)
 	setkey(tweetsTbl, id)
 	getDiffTimeSinceFirst <- function(ts) {
-		difftime(ts, ts[1], units='secs')
+		as.numeric(difftime(ts, ts[1], units='secs'))
 	}
 	tweetsTbl[, dt := getDiffTimeSinceFirst(created_at), by=user_screen_name]
 	tweetsTbl
@@ -102,18 +103,25 @@ compareHashtagTbls <- function() {
 
 
 debugP = F
+
 myPrint <- function(str) {
 	if (debugP == T) {
+		print(substitute(str))
 		print(str)
 	}
 }
 
-computeActs <- function(hashtagsHash, dt) {
-	cTime = as.numeric(dt[length(dt)])
-	dt = cTime - as.numeric(dt)
+computeActs <- function(hashtagsHash, dt, d) {
+	myPrint('here')
+	myPrint(hashtagsHash)
+	myPrint(dt)
+	myPrint(d)
+	cTime = dt[length(dt)]
+	myPrint(cTime)
+	dt = cTime - dt
+	myPrint('after subtractino')
 	indeces = dt>0
 	myPrint(dt)
-	d = .5
 	hashtagsSubHash = hashtagsHash[indeces] 
 	dtSub = dt[indeces]
 	myPrint(hashtagsSubHash)
@@ -121,39 +129,28 @@ computeActs <- function(hashtagsHash, dt) {
 	list(hashtag=hashtagsSubHash, partialAct=dtSub^(-d), dt=rep(cTime, length(hashtagsSubHash)))
 }
 
-computeActsForUser <- function(hashtag, dt) {
+
+computeActsForUser <- function(hashtag, dt, d) {
 	retIndeces = which(!duplicated(dt))[-1]
 	if (length(retIndeces) == 0) {
 		return(list(hashtag=c(), partialAct=c(), dt=c()))
 	}
 	partialRes = data.table(i=retIndeces)
-	partialRes = partialRes[, computeActs(hashtag[1:i], dt[1:i]), by=i]
+	myPrint(partialRes)
+	partialRes = partialRes[, computeActs(hashtag[1:i], dt[1:i], d=d), by=i]
 	partialRes[, i := NULL]
 	partialRes
 }
 
-computeActsByUser <- function(hashtagsTbl) {
+computeActsByUser <- function(hashtagsTbl, d) {
 	Rprof()
 	hashtagsTbl
-	computeActsForUser(c(1), c(1))
-	partialRes = hashtagsTbl[, computeActsForUser(hashtag, dt), by=user_id]
+	partialRes = hashtagsTbl[, computeActsForUser(hashtag, dt, d), by=user_id]
 	partialRes
 	res = partialRes[, list(N=.N, act=log(sum(partialAct))), by=list(dt, hashtag, user_id)]
 	Rprof(NULL)
 	print(summaryRprof())
 	res
-}
-
-getPriorActivations <- function(hashtagsTbl, d) {
-	debugP = T 
-	debugP = F 
-	act = computeActsByUser(hashtagsTbl)
-	act
-	table(act$N)
-	hashtagsTbl
-	hashtagsTbl[dt==12152515]
-	act[dt==12152515]
-	tables()
 }
 
 visHashtags <- function(hashtagsTbl) {
@@ -162,20 +159,38 @@ visHashtags <- function(hashtagsTbl) {
 	hashtagsTbl[, {dev.new(); plot(factor(hashtag), dt)}, by=user_id]
 }
 
+testPriorActivations <- function() {
+	testHashtagsTbl = data.table(user_id=c(1,1,1,1), dt=c(0,2,3,4), hashtag=c('a', 'b', 'a', 'b'))
+	expectedAct = data.table(dt=c(2,3,3,4,4), hashtag=c('a','a','b','a','b'), user_id=c(1,1,1,1,1), N=c(1,1,1,2,1), act=c(log(2^(-.5)), log(3^(-.5)), log(1), log(4^(-.5)+1), log(2^(-.5))))
+	act = computeActsByUser(testHashtagsTbl, d=.5)
+	expect_that(act, is_equivalent_to(expectedAct))
+	testHashtagsTbl = data.table(user_id=c(1,1,2,2), dt=c(0,2,0,3), hashtag=c('a','b','b','b'))
+	act = computeActsByUser(testHashtagsTbl, d=.5)
+	expectedAct = data.table(dt=c(2,3), hashtag=c('a','b'), user_id=c(1,2), N=c(1,1), act=c(log(2^(-.5)), log(3^(-.5))))
+	expect_that(act, is_equivalent_to(expectedAct))
+}
+
+runTests <- function() {
+	testPriorActivations()
+}
+
 curWS <- function() {
-	tweetsTbl <<- getTweetsTbl('select * from tweets limit 100000')
+	debugP <<- F
+	runTests()
+	tweetsTbl <<- getTweetsTbl('select * from tweets limit 10000')
 	tweetsTbl
 	hashtagsTbl <<- getHashtagsTbl(tweetsTbl, from='text')
 	hashtagsTbl <<- getHashtagsTbl(tweetsTbl, from='tokenText')
+	lapply(tweetsTbl, class)
 	print(hashtagsTbl, topn=50)
 	compareHashtagTbls()[N!=N.1]
 	getHashtagEntropy(hashtagsTbl)
 	tusersTbl <<- getTusersTbl()
 	tusersTbl
-	visHashtags(hashtagsTbl)
-	print(hashtagsTbl[user_screen_name=='iamsrk'], nrow=500)
+	#visHashtags(hashtagsTbl)
+	act = computeActsByUser(hashtagsTbl, d=.5)
+	act
 }
-
 
 curWS()
 
