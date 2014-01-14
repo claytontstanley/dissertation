@@ -111,24 +111,21 @@ myPrint <- function(str) {
 	}
 }
 
-computeActs <- function(hashtagsHash, dt, d) {
-	myPrint('here')
-	myPrint(hashtagsHash)
+computeActs <- function(hashtags, dt, d) {
+	myPrint(hashtags)
 	myPrint(dt)
 	myPrint(d)
 	cTime = dt[length(dt)]
 	myPrint(cTime)
 	dt = cTime - dt
-	myPrint('after subtractino')
-	indeces = dt>0
 	myPrint(dt)
-	hashtagsSubHash = hashtagsHash[indeces] 
+	indeces = dt>0
+	hashtagsSub = hashtags[indeces] 
+	myPrint(hashtagsSub)
 	dtSub = dt[indeces]
-	myPrint(hashtagsSubHash)
 	myPrint(dtSub)
-	list(hashtag=hashtagsSubHash, partialAct=dtSub^(-d), dt=rep(cTime, length(hashtagsSubHash)))
+	list(hashtag=hashtagsSub, partialAct=dtSub^(-d), dt=rep(cTime, length(hashtagsSub)))
 }
-
 
 computeActsForUser <- function(hashtag, dt, d) {
 	retIndeces = which(!duplicated(dt))[-1]
@@ -149,7 +146,7 @@ computeActsByUser <- function(hashtagsTbl, d) {
 	partialRes
 	res = partialRes[, list(N=.N, act=log(sum(partialAct))), by=list(dt, hashtag, user_id)]
 	Rprof(NULL)
-	print(summaryRprof())
+	myPrint(summaryRprof())
 	res
 }
 
@@ -177,7 +174,7 @@ runTests <- function() {
 curWS <- function() {
 	debugP <<- F
 	runTests()
-	tweetsTbl <<- getTweetsTbl('select * from tweets limit 10000')
+	tweetsTbl <<- getTweetsTbl('select * from tweets limit 100000')
 	tweetsTbl
 	hashtagsTbl <<- getHashtagsTbl(tweetsTbl, from='text')
 	hashtagsTbl <<- getHashtagsTbl(tweetsTbl, from='tokenText')
