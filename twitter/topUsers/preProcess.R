@@ -7,6 +7,8 @@ library(assertthat)
 library(tm)
 library(tau)
 library(XML)
+library(Matrix)
+library(utils)
 PATH = getPathToThisFile()
 
 options(sqldf.RPostgreSQL.user = 'claytonstanley',
@@ -110,6 +112,49 @@ curWS <- function() {
 	tusersTbl
 	visHashtags(hashtagsTbl)
 	print(hashtagsTbl[user_screen_name=='iamsrk'], nrow=500)
+}
+
+debugP = F
+myPrint <- function(str) {
+	if (debugP == T) {
+		print(str)
+	}
+}
+
+getPriorActivations <- function(hashtagsTbl, d) {
+	computeActs <- function(hashtagsHash, dt) {
+		cTime = as.numeric(dt[length(dt)])
+		dt = cTime - as.numeric(dt)
+		indeces = dt>0
+		myPrint(dt)
+		d = .5
+		hashtagsSubHash = hashtagsHash[indeces] 
+		dtSub = dt[indeces]
+		myPrint(hashtagsSubHash)
+		myPrint(dtSub)
+		list(hashtag=hashtagsSubHash, partialAct=dtSub^(-d), t=rep(cTime, length(hashtagsSubHash)))
+	}
+	computeActsForUser <- function(hashtag, dt) {
+		retIndeces = which(!duplicated(dt))[-1]
+		if (length(retIndeces) == 0) {
+			return(list(hashtag=c(), partialAct=c(), t=c()))
+		}
+		partialRes = data.table(rbindlist(lapply(retIndeces, function(i) computeActs(hashtag[1:i], dt[1:i]))))
+		partialRes
+	}
+	computeActsByUser <- function(hashtagsTbl) {
+		Rprof()
+		hashtagsTbl
+		partialRes = hashtagsTbl[, computeActsForUser(hashtag, dt), by=user_id]
+		res = partialRes[, list(act=log(sum(partialAct))), by=list(t, hashtag, user_id)]
+		Rprof(NULL)
+		print(summaryRprof())
+		res
+	}
+	debugP = T 
+	debugP = F 
+	computeActsByUser(hashtagsTbl)
+	foo
 }
 
 visHashtags <- function(hashtagsTbl) {
