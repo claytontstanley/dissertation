@@ -174,7 +174,7 @@ runTests <- function() {
 curWS <- function() {
 	debugP <<- F
 	runTests()
-	tweetsTbl <<- getTweetsTbl('select * from tweets limit 100000')
+	tweetsTbl <<- getTweetsTbl('select * from tweets limit 10000')
 	tweetsTbl
 	hashtagsTbl <<- getHashtagsTbl(tweetsTbl, from='text')
 	hashtagsTbl <<- getHashtagsTbl(tweetsTbl, from='tokenText')
