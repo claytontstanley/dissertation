@@ -121,44 +121,48 @@ myPrint <- function(str) {
 	}
 }
 
+computeActs <- function(hashtagsHash, dt) {
+	cTime = as.numeric(dt[length(dt)])
+	dt = cTime - as.numeric(dt)
+	indeces = dt>0
+	myPrint(dt)
+	d = .5
+	hashtagsSubHash = hashtagsHash[indeces] 
+	dtSub = dt[indeces]
+	myPrint(hashtagsSubHash)
+	myPrint(dtSub)
+	list(hashtag=hashtagsSubHash, partialAct=dtSub^(-d), dt=rep(cTime, length(hashtagsSubHash)))
+}
+
+computeActsForUser <- function(hashtag, dt) {
+	retIndeces = which(!duplicated(dt))[-1]
+	if (length(retIndeces) == 0) {
+		return(list(hashtag=c(), partialAct=c(), dt=c()))
+	}
+	partialRes = data.table(i=retIndeces)
+	partialRes = partialRes[, computeActs(hashtag[1:i], dt[1:i]), by=i]
+	partialRes[, i := NULL]
+	partialRes
+}
+
+computeActsByUser <- function(hashtagsTbl) {
+	Rprof()
+	hashtagsTbl
+	computeActsForUser(c(1), c(1))
+	partialRes = hashtagsTbl[, computeActsForUser(hashtag, dt), by=user_id]
+	partialRes
+	res = partialRes[, list(N=.N, act=log(sum(partialAct))), by=list(dt, hashtag, user_id)]
+	Rprof(NULL)
+	print(summaryRprof())
+	res
+}
+
 getPriorActivations <- function(hashtagsTbl, d) {
-	computeActs <- function(hashtagsHash, dt) {
-		cTime = as.numeric(dt[length(dt)])
-		dt = cTime - as.numeric(dt)
-		indeces = dt>0
-		myPrint(dt)
-		d = .5
-		hashtagsSubHash = hashtagsHash[indeces] 
-		dtSub = dt[indeces]
-		myPrint(hashtagsSubHash)
-		myPrint(dtSub)
-		list(hashtag=hashtagsSubHash, partialAct=dtSub^(-d), dt=rep(cTime, length(hashtagsSubHash)))
-	}
-	computeActsForUser <- function(hashtag, dt) {
-		retIndeces = which(!duplicated(dt))[-1]
-		if (length(retIndeces) == 0) {
-			return(list(hashtag=c(), partialAct=c(), dt=c()))
-		}
-		partialRes = data.table(i=retIndeces)
-		partialRes = partialRes[, computeActs(hashtag[1:i], dt[1:i]), by=i]
-		partialRes[, i := NULL]
-		partialRes
-	}
-	computeActsByUser <- function(hashtagsTbl) {
-		Rprof()
-		hashtagsTbl
-		computeActsForUser(c(1), c(1))
-		partialRes = hashtagsTbl[, computeActsForUser(hashtag, dt), by=user_id]
-		partialRes
-		res = partialRes[, list(act=log(sum(partialAct))), by=list(dt, hashtag, user_id)]
-		Rprof(NULL)
-		print(summaryRprof())
-		res
-	}
 	debugP = T 
 	debugP = F 
 	act = computeActsByUser(hashtagsTbl)
 	act
+	table(act$N)
 	hashtagsTbl
 	hashtagsTbl[dt==12152515]
 	act[dt==12152515]
