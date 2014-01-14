@@ -153,7 +153,7 @@ computeActsByUser <- function(hashtagsTbl, d) {
 visHashtags <- function(hashtagsTbl) {
 	setkey(hashtagsTbl, id)
 	hashtagsTbl[, {dev.new(); plot(dt, main=user_screen_name)}, by=user_screen_name]
-	hashtagsTbl[, {dev.new(); plot(factor(hashtag), dt)}, by=user_id]
+	hashtagsTbl[, {dev.new(); plot(factor(hashtag), as.POSIXct(dt, origin="1960-01-01"))}, by=user_id]
 }
 
 testPriorActivations <- function() {
@@ -184,7 +184,7 @@ curWS <- function() {
 	getHashtagEntropy(hashtagsTbl)
 	tusersTbl <<- getTusersTbl()
 	tusersTbl
-	#visHashtags(hashtagsTbl)
+	visHashtags(hashtagsTbl)
 	act = computeActsByUser(hashtagsTbl, d=.5)
 	act
 }
