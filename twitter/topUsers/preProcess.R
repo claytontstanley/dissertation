@@ -100,19 +100,6 @@ compareHashtagTbls <- function() {
 	hashtagTblText[hashtagTblTokenText]
 }
 
-curWS <- function() {
-	tweetsTbl <<- getTweetsTbl()
-	tweetsTbl
-	hashtagsTbl <<- getHashtagsTbl(tweetsTbl, from='text')
-	hashtagsTbl <<- getHashtagsTbl(tweetsTbl, from='tokenText')
-	print(hashtagsTbl, topn=50)
-	compareHashtagTbls()[N!=N.1]
-	getHashtagEntropy(hashtagsTbl)
-	tusersTbl <<- getTusersTbl()
-	tusersTbl
-	visHashtags(hashtagsTbl)
-	print(hashtagsTbl[user_screen_name=='iamsrk'], nrow=500)
-}
 
 debugP = F
 myPrint <- function(str) {
@@ -174,6 +161,21 @@ visHashtags <- function(hashtagsTbl) {
 	hashtagsTbl[, {dev.new(); plot(dt, main=user_screen_name)}, by=user_screen_name]
 	hashtagsTbl[, {dev.new(); plot(factor(hashtag), dt)}, by=user_id]
 }
+
+curWS <- function() {
+	tweetsTbl <<- getTweetsTbl('select * from tweets limit 100000')
+	tweetsTbl
+	hashtagsTbl <<- getHashtagsTbl(tweetsTbl, from='text')
+	hashtagsTbl <<- getHashtagsTbl(tweetsTbl, from='tokenText')
+	print(hashtagsTbl, topn=50)
+	compareHashtagTbls()[N!=N.1]
+	getHashtagEntropy(hashtagsTbl)
+	tusersTbl <<- getTusersTbl()
+	tusersTbl
+	visHashtags(hashtagsTbl)
+	print(hashtagsTbl[user_screen_name=='iamsrk'], nrow=500)
+}
+
 
 curWS()
 
