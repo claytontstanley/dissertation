@@ -132,29 +132,37 @@ getPriorActivations <- function(hashtagsTbl, d) {
 		dtSub = dt[indeces]
 		myPrint(hashtagsSubHash)
 		myPrint(dtSub)
-		list(hashtag=hashtagsSubHash, partialAct=dtSub^(-d), t=rep(cTime, length(hashtagsSubHash)))
+		list(hashtag=hashtagsSubHash, partialAct=dtSub^(-d), dt=rep(cTime, length(hashtagsSubHash)))
 	}
 	computeActsForUser <- function(hashtag, dt) {
 		retIndeces = which(!duplicated(dt))[-1]
 		if (length(retIndeces) == 0) {
-			return(list(hashtag=c(), partialAct=c(), t=c()))
+			return(list(hashtag=c(), partialAct=c(), dt=c()))
 		}
-		partialRes = data.table(rbindlist(lapply(retIndeces, function(i) computeActs(hashtag[1:i], dt[1:i]))))
+		partialRes = data.table(i=retIndeces)
+		partialRes = partialRes[, computeActs(hashtag[1:i], dt[1:i]), by=i]
+		partialRes[, i := NULL]
 		partialRes
 	}
 	computeActsByUser <- function(hashtagsTbl) {
 		Rprof()
 		hashtagsTbl
+		computeActsForUser(c(1), c(1))
 		partialRes = hashtagsTbl[, computeActsForUser(hashtag, dt), by=user_id]
-		res = partialRes[, list(act=log(sum(partialAct))), by=list(t, hashtag, user_id)]
+		partialRes
+		res = partialRes[, list(act=log(sum(partialAct))), by=list(dt, hashtag, user_id)]
 		Rprof(NULL)
 		print(summaryRprof())
 		res
 	}
 	debugP = T 
 	debugP = F 
-	computeActsByUser(hashtagsTbl)
-	foo
+	act = computeActsByUser(hashtagsTbl)
+	act
+	hashtagsTbl
+	hashtagsTbl[dt==12152515]
+	act[dt==12152515]
+	tables()
 }
 
 visHashtags <- function(hashtagsTbl) {
