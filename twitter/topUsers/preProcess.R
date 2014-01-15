@@ -280,9 +280,10 @@ genAggModelVsPredTbl <- function(hashtagsTbl, ds=c(0,.1,.2,.3,.4,.5,.6,.7,.8,.9,
 	}
 	singleHashtagUsers = hashtagsTbl[, list(uniqueDTs=length(unique(dt)) <= 1), by=user_screen_name][uniqueDTs==T]$user_screen_name
 	print(sprintf('not running users (%s) since they all have less than two dt hashtag observations', paste(singleHashtagUsers, sep=',', collapse=NULL)))
-	users = data.table(cur_user_screen_name=Filter(function(v) !(v %in% singleHashtagUsers), unique(hashtagsTbl$user_screen_name)))
+	users = data.table(user_screen_name=Filter(function(v) !(v %in% singleHashtagUsers), unique(hashtagsTbl$user_screen_name)))
 	users
-	res = users[, genModelVsPredTbl(hashtagsTbl[user_screen_name==cur_user_screen_name], ds, cur_user_screen_name), by=cur_user_screen_name]
+	setkey(hashtagsTbl, user_screen_name)
+	res = users[, genModelVsPredTbl(hashtagsTbl[user_screen_name], ds, user_screen_name), by=user_screen_name]
 	res
 }
 
@@ -305,7 +306,10 @@ curWS <- function() {
 	unique(hashtagsTbl$user_screen_name)
 	visCompare(hashtagsTbl[user_screen_name=='billcosby'], modelHashtagsTbl[topHashtag==T & user_screen_name=='billcosby',], db)
 	summarizeExtremes(modelHashtagsTbl)
-	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl)
+
+	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl[user_screen_name=='billcosby' | user_screen_name=='icarly'])
+	modelVsPredTblBig = modelVsPredTbl 
+	modelVsPredTbl
 	modelVsPredTbl[d < 10 & maxNP==T & topHashtag & hashtagUsedP][, plot(N, d)]
 	modelVsPredTbl
 	tables()
