@@ -214,11 +214,11 @@ curWS <- function() {
 	getHashtagEntropy(hashtagsTbl)
 	tusersTbl <<- getTusersTbl()
 	tusersTbl
-	db = makeDB(do.call(function(x) sample(x, length(x)), list(unique(hashtagsTbl$hashtag))))
+	db <<- makeDB(do.call(function(x) sample(x, length(x)), list(unique(hashtagsTbl$hashtag))))
 	visHashtags(hashtagsTbl, db)
-	act = computeActsByUser(hashtagsTbl, d=.00001)
-	act
-	modelHashtagsTbl = act[, list(hashtag=hashtag[act==max(act)]), by=list(dt, user_screen_name)]
+	act <<- computeActsByUser(hashtagsTbl, d=.00001)
+	modelHashtagsTbl <<- act[, list(hashtag=hashtag[act==max(act)]), by=list(dt, user_screen_name)]
+	modelHashtagsTbl
 	visHashtags(modelHashtagsTbl, db)
 	visCompare(hashtagsTbl, modelHashtagsTbl, db)
 }
