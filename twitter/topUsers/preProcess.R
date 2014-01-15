@@ -17,6 +17,35 @@ options(sqldf.RPostgreSQL.user = 'claytonstanley',
 	sqldf.RPostgreSQL.dbname = 'claytonstanley')
 options("scipen"=100, "digits"=4)
 
+# Interface to retrieve chunkHash for chunk name
+getHashes = function(vals, db) {
+	ret = db[match(vals, names(db))]
+	ret = ret[!is.na(ret)]
+	#stopifnot(length(ret) > 0)
+	myPrint(str_c(length(vals), "->", length(ret)))
+	return(ret)
+}
+
+# And vice versa
+getVals = function(hashes, db) {
+	return(names(db[match(hashes, db)]))
+}
+
+makeDB <- function(vals) {
+	db = seq(from = 1, by=1, length=length(vals))
+	names(db) = vals
+	db
+}
+
+debugP = F
+
+myPrint <- function(str) {
+	if (debugP == T) {
+		print(substitute(str))
+		print(str)
+	}
+}
+
 sqlScratch <- function() {
 	sqldf("select * from tweets where user_screen_name = 'claytonstanley1'")
 	sqldf('select count(*) from tweets')
@@ -102,16 +131,6 @@ compareHashtagTbls <- function() {
 	hashtagTblText[hashtagTblTokenText]
 }
 
-
-debugP = F
-
-myPrint <- function(str) {
-	if (debugP == T) {
-		print(substitute(str))
-		print(str)
-	}
-}
-
 computeActs <- function(hashtags, dt, d) {
 	myPrint(hashtags)
 	myPrint(dt)
@@ -180,28 +199,6 @@ testPriorActivations <- function() {
 
 runTests <- function() {
 	testPriorActivations()
-}
-
-
-# Interface to retrieve chunkHash for chunk name
-getHashes = function(vals, db) {
-	ret = db[match(vals, names(db))]
-	ret = ret[!is.na(ret)]
-	#stopifnot(length(ret) > 0)
-	myPrint(str_c(length(vals), "->", length(ret)))
-	return(ret)
-}
-
-# And vice versa
-getVals = function(hashes, db) {
-	return(names(db[match(hashes, db)]))
-}
-
-
-makeDB <- function(vals) {
-	db = seq(from = 1, by=1, length=length(vals))
-	names(db) = vals
-	db
 }
 
 curWS <- function() {
