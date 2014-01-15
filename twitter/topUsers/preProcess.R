@@ -184,17 +184,18 @@ visCompare <- function(hashtagsTbl, modelHashtagsTbl, db) {
 
 	}
 	lapply(unique(hashtagsTbl$user_screen_name), function(usr) plotFun(hashtagsTbl[user_screen_name==usr], modelHashtagsTbl[user_screen_name==usr], usr))
+	return()
 }
 
 testPriorActivations <- function() {
 	testHashtagsTbl = data.table(user_screen_name=c(1,1,1,1), dt=c(0,2,3,4), hashtag=c('a', 'b', 'a', 'b'))
-	expectedAct = data.table(dt=c(2,3,3,4,4), hashtag=c('a','a','b','a','b'), user_screen_name=c(1,1,1,1,1), N=c(1,1,1,2,1), act=c(log(2^(-.5)), log(3^(-.5)), log(1), log(4^(-.5)+1), log(2^(-.5))))
-	act = computeActsByUser(testHashtagsTbl, d=.5)
-	expect_that(act, is_equivalent_to(expectedAct))
+	expectedActTbl = data.table(dt=c(2,3,3,4,4), hashtag=c('a','a','b','a','b'), user_screen_name=c(1,1,1,1,1), N=c(1,1,1,2,1), act=c(log(2^(-.5)), log(3^(-.5)), log(1), log(4^(-.5)+1), log(2^(-.5))))
+	actTbl = computeActsByUser(testHashtagsTbl, d=.5)
+	expect_that(actTbl, is_equivalent_to(expectedActTbl))
 	testHashtagsTbl = data.table(user_screen_name=c(1,1,2,2), dt=c(0,2,0,3), hashtag=c('a','b','b','b'))
-	act = computeActsByUser(testHashtagsTbl, d=.5)
-	expectedAct = data.table(dt=c(2,3), hashtag=c('a','b'), user_screen_name=c(1,2), N=c(1,1), act=c(log(2^(-.5)), log(3^(-.5))))
-	expect_that(act, is_equivalent_to(expectedAct))
+	actTbl = computeActsByUser(testHashtagsTbl, d=.5)
+	expectedActTbl = data.table(dt=c(2,3), hashtag=c('a','b'), user_screen_name=c(1,2), N=c(1,1), act=c(log(2^(-.5)), log(3^(-.5))))
+	expect_that(actTbl, is_equivalent_to(expectedActTbl))
 }
 
 runTests <- function() {
@@ -216,11 +217,13 @@ curWS <- function() {
 	tusersTbl
 	db <<- makeDB(do.call(function(x) sample(x, length(x)), list(unique(hashtagsTbl$hashtag))))
 	visHashtags(hashtagsTbl, db)
-	act <<- computeActsByUser(hashtagsTbl, d=.00001)
-	modelHashtagsTbl <<- act[, list(hashtag=hashtag[act==max(act)]), by=list(dt, user_screen_name)]
+	modelHashtagsTbl <<- computeActsByUser(hashtagsTbl, d=.00001)
+	modelHashtagsTbl[, topHashtag := act==max(act), by=list(dt, user_screen_name)]
+	modelHashtagsTbl[, NTopHashtag := .N, by=list(dt, user_screen_name, topHashtag)]
 	modelHashtagsTbl
-	visHashtags(modelHashtagsTbl, db)
-	visCompare(hashtagsTbl, modelHashtagsTbl, db)
+	visHashtags(modelHashtagsTbl[topHashtag==T,], db)
+	visCompare(hashtagsTbl, modelHashtagsTbl[topHashtag==T,], db)
+	tables()
 }
 
 curWS()
