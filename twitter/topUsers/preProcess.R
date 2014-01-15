@@ -253,8 +253,8 @@ visMetrics <- function(modelHashtagsTbl) {
 
 summarizeExtremes <- function(modelHashtagsTbl) {
 	frequencyTbl = modelHashtagsTbl[hashtagUsedP==T & d==min(d), .N, by=list(user_screen_name,d,hashtag)][, list(N=max(N), hashtag=hashtag[N==max(N)]), by=list(user_screen_name,d)]
-	modelHashtagsTbl[, hashtagUsedRecentlyP := .SD[.SD[,list(dt=dt-.1)], roll=T]$hashtagUsedP, by=list(user_screen_name, hashtag)]
 	setkeyv(modelHashtagsTbl, c('dt', 'hashtagUsedP'))
+	modelHashtagsTbl[, hashtagUsedRecentlyP := .SD[.SD[,list(dt=dt-.1)], roll=T]$hashtagUsedP, by=list(user_screen_name, hashtag)]
 	recencyTbl = modelHashtagsTbl[hashtagUsedP==T & hashtagUsedRecentlyP==T, .N, by=list(user_screen_name,d,hashtagUsedRecentlyP,hashtagUsedP)][d==min(d)]
 	list(recencyTbl=recencyTbl, frequencyTbl=frequencyTbl)
 }
