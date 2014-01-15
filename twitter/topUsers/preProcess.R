@@ -12,6 +12,7 @@ library(utils)
 library(testthat)
 PATH = getPathToThisFile()
 
+
 options(sqldf.RPostgreSQL.user = 'claytonstanley',
 	sqldf.RPostgreSQL.dbname = 'claytonstanley')
 options("scipen"=100, "digits"=4)
@@ -142,33 +143,66 @@ computeActsForUser <- function(hashtag, dt, d) {
 computeActsByUser <- function(hashtagsTbl, d) {
 	Rprof()
 	hashtagsTbl
-	partialRes = hashtagsTbl[, computeActsForUser(hashtag, dt, d), by=user_id]
+	partialRes = hashtagsTbl[, computeActsForUser(hashtag, dt, d), by=user_screen_name]
 	partialRes
-	res = partialRes[, list(N=.N, act=log(sum(partialAct))), by=list(dt, hashtag, user_id)]
+	res = partialRes[, list(N=.N, act=log(sum(partialAct))), by=list(dt, hashtag, user_screen_name)]
 	Rprof(NULL)
 	myPrint(summaryRprof())
 	res
 }
 
-visHashtags <- function(hashtagsTbl) {
-	setkey(hashtagsTbl, id)
+visHashtags <- function(hashtagsTbl, db) {
 	hashtagsTbl[, {dev.new(); plot(dt, main=user_screen_name)}, by=user_screen_name]
-	hashtagsTbl[, {dev.new(); plot(factor(hashtag), as.POSIXct(dt, origin="1960-01-01"))}, by=user_id]
+	hashtagsTbl[, {dev.new(); plot(getHashes(hashtag, db), dt, main=user_screen_name)}, by=user_screen_name]
 }
 
+visCompare <- function(hashtagsTbl, modelHashtagsTbl, db) {
+	expect_that(sort(unique(hashtagsTbl$user_screen_name)), is_equivalent_to(sort(unique(modelHashtagsTbl$user_screen_name))))
+	plotFun <- function(hashtagsTbl, modelHashtagsTbl, userScreenName) {
+		dev.new()
+		with(hashtagsTbl, plot(getHashes(hashtag, db), dt, main=userScreenName))
+		with(modelHashtagsTbl, lines(getHashes(hashtag, db), dt, col='red', typ='p', pch=4, cex=.1))
+
+	}
+	lapply(unique(hashtagsTbl$user_screen_name), function(usr) plotFun(hashtagsTbl[user_screen_name==usr], modelHashtagsTbl[user_screen_name==usr], usr))
+}
+
+
 testPriorActivations <- function() {
-	testHashtagsTbl = data.table(user_id=c(1,1,1,1), dt=c(0,2,3,4), hashtag=c('a', 'b', 'a', 'b'))
-	expectedAct = data.table(dt=c(2,3,3,4,4), hashtag=c('a','a','b','a','b'), user_id=c(1,1,1,1,1), N=c(1,1,1,2,1), act=c(log(2^(-.5)), log(3^(-.5)), log(1), log(4^(-.5)+1), log(2^(-.5))))
+	testHashtagsTbl = data.table(user_screen_name=c(1,1,1,1), dt=c(0,2,3,4), hashtag=c('a', 'b', 'a', 'b'))
+	expectedAct = data.table(dt=c(2,3,3,4,4), hashtag=c('a','a','b','a','b'), user_screen_name=c(1,1,1,1,1), N=c(1,1,1,2,1), act=c(log(2^(-.5)), log(3^(-.5)), log(1), log(4^(-.5)+1), log(2^(-.5))))
 	act = computeActsByUser(testHashtagsTbl, d=.5)
 	expect_that(act, is_equivalent_to(expectedAct))
-	testHashtagsTbl = data.table(user_id=c(1,1,2,2), dt=c(0,2,0,3), hashtag=c('a','b','b','b'))
+	testHashtagsTbl = data.table(user_screen_name=c(1,1,2,2), dt=c(0,2,0,3), hashtag=c('a','b','b','b'))
 	act = computeActsByUser(testHashtagsTbl, d=.5)
-	expectedAct = data.table(dt=c(2,3), hashtag=c('a','b'), user_id=c(1,2), N=c(1,1), act=c(log(2^(-.5)), log(3^(-.5))))
+	expectedAct = data.table(dt=c(2,3), hashtag=c('a','b'), user_screen_name=c(1,2), N=c(1,1), act=c(log(2^(-.5)), log(3^(-.5))))
 	expect_that(act, is_equivalent_to(expectedAct))
 }
 
 runTests <- function() {
 	testPriorActivations()
+}
+
+
+# Interface to retrieve chunkHash for chunk name
+getHashes = function(vals, db) {
+	ret = db[match(vals, names(db))]
+	ret = ret[!is.na(ret)]
+	#stopifnot(length(ret) > 0)
+	myPrint(str_c(length(vals), "->", length(ret)))
+	return(ret)
+}
+
+# And vice versa
+getVals = function(hashes, db) {
+	return(names(db[match(hashes, db)]))
+}
+
+
+makeDB <- function(vals) {
+	db = seq(from = 1, by=1, length=length(vals))
+	names(db) = vals
+	db
 }
 
 curWS <- function() {
@@ -184,9 +218,12 @@ curWS <- function() {
 	getHashtagEntropy(hashtagsTbl)
 	tusersTbl <<- getTusersTbl()
 	tusersTbl
-	visHashtags(hashtagsTbl)
+	db = makeDB(do.call(function(x) sample(x, length(x)), list(unique(hashtagsTbl$hashtag))))
+	visHashtags(hashtagsTbl, db)
 	act = computeActsByUser(hashtagsTbl, d=.5)
-	act
+	modelHashtagsTbl = act[, list(hashtag=hashtag[act==max(act)]), by=list(dt, user_screen_name)]
+	visHashtags(modelHashtagsTbl, db)
+	visCompare(hashtagsTbl, modelHashtagsTbl, db)
 }
 
 curWS()
