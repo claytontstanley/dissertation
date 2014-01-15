@@ -251,5 +251,3 @@ tweetsTbl
 #write.csv(tweetsTbl, file=str_c(PATH, "/currentTweets.csv"))
 #tweetsTbl
 #tweetsTbl[in_reply_to_status_id != "",]
-
-
