@@ -273,6 +273,7 @@ getModelVsPredTbl <- function(modelHashtagsTbl) {
 genAggModelVsPredTbl <- function(hashtagsTbl, ds=c(0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2,5,20)) {
 	genModelVsPredTbl <- function(hashtagsTbl, d, userScreenName) {
 		print(sprintf('generating model predictions for user %s', userScreenName))
+		print(hashtagsTbl)
 		modelHashtagsTbl = computeActsByUser(hashtagsTbl, d=d)
 		addMetrics(hashtagsTbl, modelHashtagsTbl)
 		modelVsPredTbl = getModelVsPredTbl(modelHashtagsTbl)	
@@ -280,10 +281,11 @@ genAggModelVsPredTbl <- function(hashtagsTbl, ds=c(0,.1,.2,.3,.4,.5,.6,.7,.8,.9,
 	}
 	singleHashtagUsers = hashtagsTbl[, list(uniqueDTs=length(unique(dt)) <= 1), by=user_screen_name][uniqueDTs==T]$user_screen_name
 	print(sprintf('not running users (%s) since they all have less than two dt hashtag observations', paste(singleHashtagUsers, sep=',', collapse=NULL)))
-	users = data.table(user_screen_name=Filter(function(v) !(v %in% singleHashtagUsers), unique(hashtagsTbl$user_screen_name)))
+	users = data.table(cur_user_screen_name=Filter(function(v) !(v %in% singleHashtagUsers), unique(hashtagsTbl$user_screen_name)))
 	users
 	setkey(hashtagsTbl, user_screen_name)
-	res = users[, genModelVsPredTbl(hashtagsTbl[user_screen_name], ds, user_screen_name), by=user_screen_name]
+	res = users[, genModelVsPredTbl(hashtagsTbl[cur_user_screen_name], ds, cur_user_screen_name), by=cur_user_screen_name]
+	res[, cur_user_screen_name := NULL]
 	res
 }
 
