@@ -210,7 +210,7 @@ curWS <- function() {
 	hashtagsTbl <<- getHashtagsTbl(tweetsTbl, from='text')
 	hashtagsTbl <<- getHashtagsTbl(tweetsTbl, from='tokenText')
 	lapply(tweetsTbl, class)
-	print(hashtagsTbl, topn=50)
+	print(hashtagsTbl, topn=5)
 	compareHashtagTbls()[N!=N.1]
 	getHashtagEntropy(hashtagsTbl)
 	tusersTbl <<- getTusersTbl()
@@ -218,6 +218,7 @@ curWS <- function() {
 	db <<- makeDB(do.call(function(x) sample(x, length(x)), list(unique(hashtagsTbl$hashtag))))
 	visHashtags(hashtagsTbl, db)
 	modelHashtagsTbl <<- computeActsByUser(hashtagsTbl, d=.00001)
+	modelHashtagsTbl
 	modelHashtagsTbl[, topHashtag := act==max(act), by=list(dt, user_screen_name)]
 	modelHashtagsTbl[, NTopHashtag := .N, by=list(dt, user_screen_name, topHashtag)]
 	modelHashtagsTbl
