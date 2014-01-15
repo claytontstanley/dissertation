@@ -154,10 +154,9 @@ computeActs <- function(hashtags, dt, d) {
 }
 
 computeActsForUser <- function(hashtag, dt, ds) {
+	myPrint(hashtag)
 	retIndeces = which(!duplicated(dt))[-1]
-	if (length(retIndeces) == 0) {
-		return(list(hashtag=c(), partialAct=c(), dt=c()))
-	}
+	expect_true(length(retIndeces) > 0)
 	partialRes = data.table(i=retIndeces)
 	myPrint(partialRes)
 	partialRes = partialRes[, computeActs(hashtag[1:i], dt[1:i], d=ds), by=i]
@@ -167,13 +166,12 @@ computeActsForUser <- function(hashtag, dt, ds) {
 
 computeActsByUser <- function(hashtagsTbl, ds) {
 	Rprof()
-	hashtagsTbl
 	partialRes = hashtagsTbl[, computeActsForUser(hashtag, dt, ds), by=user_screen_name]
 	myPrint(partialRes)
 	res = partialRes[, list(N=.N, act=log(sum(partialAct))), by=list(dt, hashtag, d, user_screen_name)]
 	with(res, expect_that(any(is.infinite(act)), is_false()))
 	Rprof(NULL)
-	print(summaryRprof())
+	myPrint(summaryRprof())
 	res
 }
 
@@ -185,7 +183,6 @@ visHashtags <- function(hashtagsTbl, db) {
 visCompare <- function(hashtagsTbl, modelHashtagsTbl, db) {
 	expect_that(sort(unique(hashtagsTbl$user_screen_name)), is_equivalent_to(sort(unique(modelHashtagsTbl$user_screen_name))))
 	plotDFun <- function(hashtagsTbl, modelHashtagsTbl, userScreenName, d) {
-		print(modelHashtagsTbl)
 		dev.new()
 		with(hashtagsTbl, plot(getHashes(hashtag, db), dt, main=sprintf('%s, %f', userScreenName, d)))
 		with(modelHashtagsTbl, lines(getHashes(hashtag, db), dt, col='red', typ='p', pch=4, cex=.1))
@@ -219,7 +216,12 @@ testPriorActivations <- function() {
 
 	testHashtagsTbl = data.table(user_screen_name=c(1,1), dt=c(0,100000), hashtag=c('a','a'))
 	expect_that(computeActsByUser(testHashtagsTbl, d=50000), throws_error())
+
+	testHashtagsTbl = data.table(user_screen_name=c(1,2,2), dt=c(0,0,2), hashtag=c('a','a','a'))
+	expectedActTbl = data.table(dt=2,hashtag='a',d=.5,user_screen_name=2,N=1,act=log(2^(-.5)))
+	expect_that(computeActsByUser(testHashtagsTbl, d=.5), throws_error())
 }
+
 
 runTests <- function() {
 	testPriorActivations()
@@ -247,7 +249,7 @@ visMetrics <- function(modelHashtagsTbl) {
 		
 		#plot(perf, main=sprintf('%s, %f', user_screen_name, d))
 	}
-	modelHashtagsTbl[topHashtag==T & hashtagUsedP==T, .N, by=list(user_screen_name, topHashtag, hashtagUsedP, d)]
+	modelHashtagsTbl[, .N, by=list(user_screen_name, topHashtag, hashtagUsedP, d)]
 	#modelHashtagsTbl[, plotForUserAndD(.SD, user_screen_name, d), by=list(user_screen_name, d)]
 }
 
@@ -259,32 +261,57 @@ summarizeExtremes <- function(modelHashtagsTbl) {
 	list(recencyTbl=recencyTbl, frequencyTbl=frequencyTbl)
 }
 
+getModelVsPredTbl <- function(modelHashtagsTbl) {
+	modelVsPredTbl = visMetrics(modelHashtagsTbl)
+	setkeyv(modelVsPredTbl, c('user_screen_name', 'd', 'topHashtag', 'hashtagUsedP'))
+	modelVsPredTbl[, maxNP := N==max(N), by=list(user_screen_name, topHashtag, hashtagUsedP)]
+	modelVsPredTbl[maxNP==T, maxNP := abs(d-mean(d)) == min(abs(d-mean(d))), by=list(user_screen_name, topHashtag, hashtagUsedP)]
+	myPrint(modelVsPredTbl[topHashtag==T & hashtagUsedP==T])
+	modelVsPredTbl
+}
+
+genAggModelVsPredTbl <- function(hashtagsTbl, ds=c(0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2,5,20)) {
+	genModelVsPredTbl <- function(hashtagsTbl, d, userScreenName) {
+		print(sprintf('generating model predictions for user %s', userScreenName))
+		modelHashtagsTbl = computeActsByUser(hashtagsTbl, d=d)
+		addMetrics(hashtagsTbl, modelHashtagsTbl)
+		modelVsPredTbl = getModelVsPredTbl(modelHashtagsTbl)	
+		modelVsPredTbl
+	}
+	singleHashtagUsers = hashtagsTbl[, list(uniqueDTs=length(unique(dt)) <= 1), by=user_screen_name][uniqueDTs==T]$user_screen_name
+	print(sprintf('not running users (%s) since they all have less than two dt hashtag observations', paste(singleHashtagUsers, sep=',', collapse=NULL)))
+	users = data.table(cur_user_screen_name=Filter(function(v) !(v %in% singleHashtagUsers), unique(hashtagsTbl$user_screen_name)))
+	users
+	res = users[, genModelVsPredTbl(hashtagsTbl[user_screen_name==cur_user_screen_name], ds, cur_user_screen_name), by=cur_user_screen_name]
+	res
+}
+
 curWS <- function() {
 	debugP = F
 	runTests()
-	tweetsTbl = getTweetsTbl('select * from tweets limit 10000')
+	tweetsTbl = getTweetsTbl('select * from tweets limit 100000')
 	tweetsTbl
-	hashtagsTbl = getHashtagsTbl(tweetsTbl, from='text')
+	#hashtagsTbl = getHashtagsTbl(tweetsTbl, from='text')
 	hashtagsTbl = getHashtagsTbl(tweetsTbl, from='tokenText')
-	lapply(tweetsTbl, class)
-	print(hashtagsTbl, topn=5)
 	compareHashtagTbls()[N!=N.1]
 	getHashtagEntropy(hashtagsTbl)
 	tusersTbl = getTusersTbl()
 	tusersTbl
 	db = makeDB(do.call(function(x) sample(x, length(x)), list(unique(hashtagsTbl$hashtag))))
 	visHashtags(hashtagsTbl, db)
-	modelHashtagsTbl = computeActsByUser(hashtagsTbl, d=c(0,.2,.9,1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2,5,20))
-	modelHashtagsTbl = computeActsByUser(hashtagsTbl, d=c(.5))
-	addMetrics(hashtagsTbl, modelHashtagsTbl)
-	visMetrics(modelHashtagsTbl)#user_screen_name=='serenawilliams'])
+	modelHashtagsTbl = computeActsByUser(hashtagsTbl, d=c(0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2,5,20))
+	#modelHashtagsTbl = computeActsByUser(hashtagsTbl, d=c(.5))
 	visHashtags(modelHashtagsTbl[topHashtag==T,], db)
-	visCompare(hashtagsTbl[user_screen_name=='serenawilliams'], modelHashtagsTbl[topHashtag==T & user_screen_name=='serenawilliams',], db)
+	unique(hashtagsTbl$user_screen_name)
+	visCompare(hashtagsTbl[user_screen_name=='billcosby'], modelHashtagsTbl[topHashtag==T & user_screen_name=='billcosby',], db)
 	summarizeExtremes(modelHashtagsTbl)
+	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl)
+	modelVsPredTbl[d < 10 & maxNP==T & topHashtag & hashtagUsedP][, plot(N, d)]
+	modelVsPredTbl
 	tables()
 }
 
-curWS()
+#curWS()
 
 break()
 
