@@ -14,7 +14,6 @@ library(testthat)
 library(ROCR)
 PATH = getPathToThisFile()
 
-
 options(sqldf.RPostgreSQL.user = 'claytonstanley',
 	sqldf.RPostgreSQL.dbname = 'claytonstanley')
 options("scipen"=100, "digits"=4)
@@ -310,7 +309,6 @@ curWS <- function() {
 	unique(hashtagsTbl$user_screen_name)
 	visCompare(hashtagsTbl[user_screen_name=='icarly'], modelHashtagsTbl[topHashtag==T & user_screen_name=='icarly',], db)
 	summarizeExtremes(modelHashtagsTbl)
-
 	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl[user_screen_name=='billcosby' | user_screen_name=='icarly'])
 	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl)
 	modelVsPredTblBig = modelVsPredTbl 
