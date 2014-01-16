@@ -118,13 +118,13 @@
 
 \section{Motivation}
 
-The ACT-R cognitive architecture \parencite{Anderson2004} contains one of the leading theories of human declarative memory.
+The ACT-R cognitive architecture \parencite{Anderson2007} contains one of the leading theories of human declarative memory.
 The declarative memory component in ACT-R is a Bayesian statistical model.
 This is the same type of co-occurrence Naive Bayes statistical model that is prominent in the more general machine-learning field.
 When these Bayesian models are used for machine learning, it is common to use a large number of observations to construct the co-occurrence matrix that is the foundation for the model.
 The primary reason for this is that the stability of statistical models increase as sample size increases.
 
-However it is much less common in the cognitive modeling community to use a large number of observations to build up declarative memory when creating ACT-R models.
+However, it is much less common in the cognitive modeling community to use a large number of observations to build up declarative memory when creating ACT-R models.
 If a cognitive modeler is using the declarative memory component of ACT-R,
 it is common to either construct the co-occurrences by hand, or use a small training set of data to initially build up the declarative memory system.
 This approach can and has worked well.
@@ -146,13 +146,13 @@ This will provide a way to test if these models scale, and evaluate the psycholo
 A few researchers have started to use these large databases to evaluate how well declarative memory models scale,
 for both ACT-R Bayesian models \parencites{Fu2007,Pirolli2003,Stanley2013,Douglass2010} and vector-based memory models \parencites{Jones2007,Rutledge2008,Recchia2010,Sahlgren2008}.
 
-The work for this proposal will expand on the knowledge gained from previous work that has tested retrieval models on large-scale datasets.
-It will focus specifically on how two state-of-the-art declarative memory retrieval models (ACT-R Bayesian and random permutations) can be improved further, by testing these models on two real-world tagging tasks.
-One primary objective is to compare the random-permutation vector-based model to ACT-R's declarative memory theory when the datasets used for each model contain hundreds of millions to billions of data points.
-Another objective is to test how much improvement is gained by incorporating the strengths of each model into the other (i.e., modifying model components).
+The work for this proposal will expand on previous work that has tested retrieval models on large-scale datasets.
+It will focus specifically on how two state-of-the-art declarative memory retrieval models (ACT-R Bayesian and random permutations) can be improved, by testing these models on two real-world tagging tasks.
+One primary objective is to compare the random-permutation vector-based model to ACT-R's declarative memory theory when large datasets are used for each model. 
+Another objective is to improve each model, and measure how incorporating the strengths of each model into the other (i.e., modifying model components) influences accuracy.
 For example, it is currently unexplored how a vector-based model can be modified to retrieve results that are based not only on context, but also on the prior odds that a particular item in memory will be needed again.
-Since large datasets will be used, a rich volume of data will be available to test the models.
-This enables constraints and assumptions for each theory to be rapidly tested and new model components to be hypothesized and quickly evaluated.
+Large-scale datasets will be used throughout the model development and evaluation process.
+This provides an ideal testing environment for constraints and assumptions for each theory to be rapidly tested and new model components to be hypothesized and quickly evaluated.
 
 \subsection{Motivation for Task}
 
@@ -185,7 +185,7 @@ Further, people are using hashtags as a way to create information streams on soc
 Twitter users, for example, commonly create and use hashtags for upcoming political events that interest them, such as debates and races \parencite{Diakopoulos2010}.
 So if we can predict what hashtags a user is interested in, we have a better understanding of the information streams that they care about.
 With that understanding, we can tailor the system to suggest hashtags that they may not yet know about but are of likely interest to them.
-We can help aid in their discovery of fresh and relevant information that match their goals on the site.
+We can help aid in their discovery of fresh and relevant information that matches their goals on the site.
 
 \subsection{Research Questions}
 
@@ -234,7 +234,7 @@ Some example tweets on Twitter are included in Figure \ref{figTweetExample}.
 Note how users both add hashtags to the end of a tweet as a summary of the message and emphasize important concepts words in the tweet by turning them into hashtags.
 That is, hashtags are both intermixed within the words of the tweet and added to the end of the message.
 
-Alongside testing these memory retrieval models on Twitter hashtag use, they will also be tested on tag use for StackOverflow posts.
+These memory retrieval models will also be tested on tag use for StackOverflow posts.
 StackOverflow is a question and answer site for computer programming where users ask programming-related questions and fellow members of the community provide answers.
 A user with a programming-related question creates a post with their question and tags the post with a few specific programming-related tags. 
 User-chosen tags on the StackOverflow site represent the primary topic of the question, such as a specific programming language, tool, software package, or framework.
@@ -275,7 +275,7 @@ Word-order information on sites like Twitter may contain highly-predictive piece
 However, it is unclear and unexplored how word order can be represented in the ACT-R declarative memory theory.
 I will explore how the word-order strength of vector-based models can be incorporated into the ACT-R theory when testing the models on hashtag prediction tasks.
 
-ACT-R's declarative memory system places strong constraints on how a user's prior knowledge and experience influences the likelihood that a particular memory item is retrieved \parencite{Anderson2004}.
+ACT-R's declarative memory system places strong constraints on how a user's prior knowledge and experience influences the likelihood that a particular memory item is retrieved \parencite{Anderson2007}.
 This decay rate equation formalizes how recency and frequency of hashtag use relate to the prior probability that a hashtag will be retrieved.
 However, it is unexplored how a user's prior knowledge should influence retrieval for vector-based models.
 I will explore how a user's prior knowledge influences the likelihood that a particular hashtag is chosen for both ACT-R's memory theory and vector-based models.
@@ -296,7 +296,7 @@ These hashtags should be customized to their specific interests and relevant to 
 This will undoubtedly require a combination of two primary model components:
 [1] A user's prior likelihood of choosing a particular hashtag, given their previous hashtag use, and [2] the likelihood that a particular hashtag is related to the context of the post being created. 
 
-A user's prior hashtag use will be an essential model component for domains such as Twitter, where the number of possible hashtags is practically infinite.
+A user's prior hashtag use will be an essential model component for domains such as Twitter, where the number of possible hashtags is effectively infinite.
 In these domains, the model can utilize a user's hashtag history as a way to prune the infinite space of possible hashtags, and generate a much smaller and more manageable set for prediction.
 However, not only should the model properly take into account a user's prior hashtag use, but it should also generate new hashtag predictions when a user is most likely choosing a hashtag they have never used before.
 The end goal is to have a model that can properly balance the user's tag history with the contextual cues in the post in order to generate an accurate prediction.
@@ -305,7 +305,7 @@ The end goal is to have a model that can properly balance the user's tag history
 
 \subsection{ACT-R Declarative Memory Theory}
 
-ACT-R \parencite{Anderson2004} is a cognitive architecture that formalizes how each cognitive process of the brain (e.g., memory, learning, visual and motor) interacts to produce behavior.
+ACT-R \parencite{Anderson2007} is a cognitive architecture that formalizes how each cognitive process of the brain (e.g., memory, learning, visual and motor) interacts to produce behavior.
 The declarative memory system is a component of that architecture that models the timing, learning, and forgetting processes that make up long-term declarative memory retrieval.
 The equations that make up this system can be derived through a rational analysis of long-term memory retrieval.
 That is, given the task of retrieving a chunk of information from long-term declarative memory,
@@ -415,7 +415,7 @@ This process is similar to how factor analysis takes a data table and finds the 
 The strength of association between two words is measured by the cosine of the two word vectors across the reduced dimension space.
 
 Usually information is lost when the data are restructured into a smaller set of latent dimensions.
-However it was shown that this process actually improves prediction and reduces noise by allowing the frequency count of highly similar concepts (words) to be pooled together and represented by a single dimension.
+However, it was shown that this process actually improves prediction and reduces noise by allowing the frequency count of highly similar concepts (words) to be pooled together and represented by a single dimension.
 \textcite{Landauer1997} tested the LSA model on the Test of English as a Foreign Language (TOEFL) task of choosing the best of four possible synonyms to a target word.
 Model results were on par with a large sample of applicants to american universities from non-English speaking countries (64.4\% compared to 64.5\%).
 Model performance also improved when the original dimensionality of the data was reduced, but only up to a point.
@@ -473,7 +473,7 @@ However, vector-based memory systems represent information in a much more compac
 For vector-based systems, each word is represented by an environment vector $e_{i}$ that is nearly orthogonal to all other words' environment vectors.
 The number of dimensions for these vectors is much less than the number of rows in a full word co-occurrence matrix, which is how vector-based systems represent information in a much more compact space.
 Paired with each environment vector ($e_{i}$) is a memory vector ($m_{i}$) that contains the summed representation of all other environment vectors that have co-occurred with that $e_{i}$ environment vector.
-These memory vectors can contain environment vectors from bag-of-words co-occurrence information ($c_{i}$) and word order information ($o_{i}$), which can be combined into a single representation ($m_{i}$).
+These memory vectors can contain environment vectors from position-independent word co-occurrence information ($c_{i}$) and word order information ($o_{i}$), which can be combined into a single representation ($m_{i}$).
 Over time, memory vectors accumulate a distributed representation of the most common environment vectors that co-occurred with them.
 
 \subsubsection{Retrieval Process}
@@ -709,10 +709,10 @@ Although this model does not predict the specific hashtags used when composing a
 
 \subsection{Hashtag Prediction}
 
-More specific hashtag-recommendation models that attempt to predict a user's chosen hashtag have also been created and tested for a few social media sites.
+Recommendation models that attempt to predict a user's chosen hashtag have recently been created and tested for a few social media sites.
 Google has even deployed a hashtag-recommendation model to help users properly tag posts on their Google+ social media site \parencite{GoogleKeynote2013}.
 A tag-suggestion tool has also been deployed for the \url{http://tex.stackexchange.org} and \url{http://superuser.com} StackExchange sites.
-Models for Twitter and StackOverflow have also been proposed and tested, but none have yet been deployed.
+Models for Twitter and StackOverflow have been proposed and tested, but none have yet been deployed.
 
 \subsubsection{StackOverflow}
 
@@ -767,8 +767,8 @@ Using an entropy measure (as opposed to weighting each word equally in the post)
 
 \paragraph{Comparison Between \citeauthor{Kuo2011}'s and \citeauthor{Stanley2013}'s Models}
 
-\textcite{Stanley2013}'s model was based on ACT-R's declarative memory retrieval theory, which at the core is also a Bayesian co-occurrence model.
-However several modifications to the model were made from the standard Bayesian ACT-R declarative memory theory, so it was more sophisticated than the standard ACT-R model and the model used by \textcite{Kuo2011}.
+Several modifications to \textcite{Stanley2013}'s model were made from the standard Bayesian ACT-R declarative memory theory,
+so it was more sophisticated than the standard ACT-R model and the model used by \textcite{Kuo2011}.
 \citeauthor{Stanley2013} used a data-driven entropy weighting measure to attenuate low-predictor words and increase the weighting of high-predictor words in the body and title of a post.
 An offset term was also included which leveled the model's overall prediction for each post and enabled the use of a logistic regression statistical technique to calibrate the model's parameters.
 A separate model component was used for the words in the body and title of the post, and it was unclear if \citeauthor{Kuo2011} used the words in the body of the post for his models.
@@ -878,7 +878,7 @@ In other words, the topics data are already in the tweet, so why not use them?
 
 \subsubsection{State of Research on StackOverflow and Twitter}
 
-\textcite{Stanley2013} used an ACT-R inspired Bayesian memory model to predict human tagging on the StackOverflow site, but to our knowledge no vector-based holographic memory model has been tested or used.
+\textcite{Stanley2013} used an ACT-R inspired Bayesian memory model to predict human tagging on the StackOverflow site, but to our knowledge no vector-based memory model has been tested or used.
 Both types of models are neurologically plausible, and both have been successfully incorporated as the declarative memory component of the ACT-R cognitive architecture \parencite{Rutledge2007}. 
 Given that the Bayesian cognitively-plausible models have done so well to predict tag use on StackOverflow, it will be interesting to see how a cognitively-plausible vector-based model performs at the task.
 Prediction differences between the two models may help reveal ways where the constraints of each model can be adjusted in order to improve accuracy.
@@ -889,7 +889,7 @@ It seems quite likely that words used just before a hashtag in a tweet (combined
 To our knowledge, word order has not yet been taken into account for any of the Twitter hashtag-prediction models that have already been tested.
 It will be interesting to see how much (if at all) accuracy improves when incorporating word-order information into the model.
 
-There has been a mix of co-occurrence and latent-based models created to predict hashtag use on Twitter, and the results are encouraging.
+There has been a mix of co-occurrence models created to predict hashtag use on Twitter, and the results are encouraging.
 However, there has been very little research on how a specific user's past hashtag use should influence the model's prediction when that user is composing a tweet.
 \textcite{Kywe2012} did take a user-centered view with their model, but the hashtags predicted by the user and content were analyzed separately and then the top from each group were combined for prediction.
 The ACT-R declarative memory retrieval theory shows how past user behavior and current context combine to produce the most likely retrieval.
@@ -931,7 +931,7 @@ incorporating user prior information into the vector-based model and incorporati
 
 \section{Methods}
 
-A modified ACT-R declarative memory retrieval model and random-permutation vector-based model will be evaluated on predicting user-chosen tags for Twitter tweets and StackOverflow posts.
+The two memory models will be evaluated on predicting user-chosen tags for Twitter tweets and StackOverflow posts.
 Parameters for each model will be calibrated on a large subset of the Twitter and StackOverflow datasets.
 Each model will be tested by evaluating the accuracy of model-chosen tags on a fresh test subset of the datasets.
 Accuracy will be assessed by comparing model performance with the human data.
@@ -1039,7 +1039,7 @@ Adding a prior activation term for the Bayesian StackOverflow model certainly im
 So a method to incorporate a user's prior tag history into a random permutation model will be developed and then tested on the full StackOverflow dataset and Twitter popular-users dataset.
 
 One straightforward way to include a user's prior tag history into a random permutation model is to include ACT-R's base-level activation term ($B_{i}$) as an additional term in the model.
-However this may not be the most mathematically appropriate thing to do, since base-level activation is represented as a log odds value,
+However, this may not be the most mathematically appropriate thing to do, since base-level activation is represented as a log odds value,
 and the single strength of association term in a random permutation model is computed by a correlation.
 It may be more appropriate to somehow attenuate the memory vectors over time,
 so that an association between a word in a post and a tag (i.e., a memory vector) that has long passed is no longer included in that memory vector's representation.
@@ -1050,7 +1050,7 @@ I will try these ideas and any others that are discovered during the model devel
 How can word-order information be incorporated into the ACT-R Bayesian model?
 Currently ACT-R uses a word co-occurrence matrix that does not include word position.
 A co-occurrence is counted if a word and a tag co-occur anywhere in a tweet or post.
-However for Twitter in particular, it may be the case that the few words immediately preceding hashtags are highly predictive, and the word position for those words should be included in the model.
+However, for Twitter in particular, it may be the case that the few words immediately preceding hashtags are highly predictive, and the word position for those words should be included in the model.
 So a method to include word order into a Bayesian model will be developed.
 
 One method to include word order in a Bayesian co-occurrence matrix is to represent word position on a third, orthogonal dimension, and turn the matrix into a 3-dimensional array.
@@ -1083,23 +1083,7 @@ The main evaluation will be the amount of performance gain achieved when the mod
 
 \subsection{Summary}
 
-The end result of this research will be [1] a better understanding of how a user's past tagging history influences future tag use,
-[2] a more thorough evaluation of the strengths, weaknesses, and differences between two cognitively-plausible memory models on large-scale real-world retrieval tasks,
-[3] improvements to each memory model where the strengths of each model (word order and user prior likelihood) are incorporated into the other,
-and [4] two efficient implementations of the models for making user-customized tag predictions for StackOverflow posts and Twitter tweets. 
-
-The tag-recommendation models developed through this research should be immediately relevant to real-world tasks.
-If model accuracy is high enough, then the developed models may be used as a foundation for tag recommendation systems that are deployed on Twitter or StackOverflow.
-It is also likely that the developed models will scale if deployed to these two sites, since during development they will be tested on a large portion of each site's currently available data.
-
-This research also aims to find task-agnostic memory models that can be applied across a wide range of domains.
-As much as possible, the two developed models that are evaluated on the StackOverflow and Twitter datasets will not differ across the datasets.
-This should help ensure that the developed models are accurate in general, and can potentially be used as tag recommendation systems for other domains.
-Examples of similar tagging tasks are hashtag use on Facebook, flagging (i.e., tagging) Wikipedia articles for content issues or overly-opinionated material,
-auto labeling incoming mail and placing it into appropriate folders, and spam filtering.
-Having an accurate and efficient co-occurrence memory model that correctly retrieves relevant tags can be applied to a wide variety of real-world tasks.
-
-This research also has numerous components that are relevant to improving our understanding of declarative memory.
+This research has numerous components that are relevant to improving our understanding of declarative memory.
 It should be emphasized that it has only recently become possible to evaluate psychological theories of declarative memory on large-scale real-world tasks where the theory can be tested on hundreds of millions of data points.
 These information-rich large-scale environments provide a unique opportunity to really stress test and explore the impacts of the psychological constraints of each theory
 on a much larger scale than has previously been possible.
@@ -1112,8 +1096,21 @@ The main two proposed model modifications (incorporating word order into ACT-R a
 Further, the proposed model modifications are aimed at the architectural level, may very well be task independent, and may generalize and improve model fit across other tasks.
 Discovering an effective way to represent the time decay of information in a vector-based model could improve model fit on other tasks where the memory model has been used. 
 Finding a task-agnostic way to represent word order information in a Bayesian ACT-R model could improve model accuracy when applied to other domains where it seems plausible that participants are utilizing word order.
+
+Additionally, the tag-recommendation models developed through this research should be immediately relevant to real-world tasks.
+If model accuracy is high enough, then the developed models may be used as a foundation for tag recommendation systems that are deployed on Twitter or StackOverflow.
+
+Also since the developed models will be task agnostic, they can potentially be used as tag recommendation systems for other domains.
+Examples of similar tagging tasks are hashtag use on Facebook, flagging (i.e., tagging) Wikipedia articles for content issues or overly-opinionated material,
+auto labeling incoming mail and placing it into appropriate folders, and spam filtering.
+Having an accurate and efficient co-occurrence memory model that correctly retrieves relevant tags can be applied to a wide variety of real-world tasks.
+
+The end result of this research will be [1] a better understanding of how a user's past tagging history influences future tag use,
+[2] a more thorough evaluation of the strengths, weaknesses, and differences between two cognitively-plausible memory models on large-scale real-world retrieval tasks,
+[3] improvements to each memory model where the strengths of each model (word order and user prior likelihood) are incorporated into the other,
+and [4] two efficient implementations of the models for making user-customized tag predictions for StackOverflow posts and Twitter tweets. 
 Introducing, exploring, and evaluating reasonable architectural modifications to two commonly-used memory models is worth the effort:
-It will increase our understanding of how the effects of imposing specific architectural constraints on memory models influence what information is retrieved. 
+It will increase our understanding of how the effects of imposing specific architectural constraints on memory models influence what information is retrieved.
 
 \begingroup
 \setstretch{1}
