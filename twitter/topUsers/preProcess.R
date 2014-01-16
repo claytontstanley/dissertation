@@ -301,18 +301,18 @@ curWS <- function() {
 	tusersTbl
 	db = makeDB(do.call(function(x) sample(x, length(x)), list(unique(hashtagsTbl$hashtag))))
 	visHashtags(hashtagsTbl, db)
-	modelHashtagsTbl = computeActsByUser(hashtagsTbl, d=c(0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2,5,20))
-	#modelHashtagsTbl = computeActsByUser(hashtagsTbl, d=c(.5))
+	modelHashtagsTbl = computeActsByUser(hashtagsTbl[user_screen_name=='icarly'], d=c(.5,.7))
+	addMetrics(hashtagsTbl, modelHashtagsTbl)
 	visHashtags(modelHashtagsTbl[topHashtag==T,], db)
 	unique(hashtagsTbl$user_screen_name)
-	visCompare(hashtagsTbl[user_screen_name=='billcosby'], modelHashtagsTbl[topHashtag==T & user_screen_name=='billcosby',], db)
+	visCompare(hashtagsTbl[user_screen_name=='icarly'], modelHashtagsTbl[topHashtag==T & user_screen_name=='icarly',], db)
 	summarizeExtremes(modelHashtagsTbl)
 
 	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl[user_screen_name=='billcosby' | user_screen_name=='icarly'])
 	modelVsPredTblBig = modelVsPredTbl 
 	modelVsPredTbl
 	modelVsPredTbl[d < 10 & maxNP==T & topHashtag & hashtagUsedP][, plot(N, d)]
-	modelVsPredTbl
+	modelVsPredTbl[topHashtag & hashtagUsedP]
 	tables()
 }
 
