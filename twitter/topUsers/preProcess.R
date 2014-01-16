@@ -76,8 +76,6 @@ getTokenizedTbl <- function(tweetsTbl, from) {
 	tokenizedTbl
 }
 
-getTokenizedTbl(data.table(id=c(1,2,3,4), text=c('kfkf idid!!','  ','ie #2', 'kdkd')), from='text')
-
 addTokenText <- function(tweetsTbl) {
 	stripDelimiters = function(text) gsub(pattern='(\t|\n|\r)', replacement=' ', x=text)
 	rawTweetsFile = 'rawTweets.txt'
@@ -221,9 +219,15 @@ testPriorActivations <- function() {
 	expect_that(computeActsByUser(testHashtagsTbl, d=.5), throws_error())
 }
 
+testGetTokenizedTbl <- function() {
+	testTokenizedTbl = getTokenizedTbl(data.table(id=c(1,2,3,4), text=c('kfkf idid!!','  ','ie #2', 'kdkd')), from='text')
+	expectedTokenizedTbl = data.table(id=c(1,1,3,3,4), chunk=c('kfkf','idid!!','ie','#2','kdkd'), pos=c(1,2,1,2,1))
+	expect_equivalent(testTokenizedTbl, expectedTokenizedTbl)
+}
 
 runTests <- function() {
 	testPriorActivations()
+	testGetTokenizedTbl()
 }
 
 addMetrics <- function(hashtagsTbl, modelHashtagsTbl) {
