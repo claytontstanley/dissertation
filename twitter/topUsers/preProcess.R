@@ -309,10 +309,11 @@ curWS <- function() {
 	summarizeExtremes(modelHashtagsTbl)
 
 	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl[user_screen_name=='billcosby' | user_screen_name=='icarly'])
+	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl)
 	modelVsPredTblBig = modelVsPredTbl 
 	modelVsPredTbl
-	modelVsPredTbl[d < 10 & maxNP==T & topHashtag & hashtagUsedP][, plot(N, d)]
-	modelVsPredTbl[topHashtag & hashtagUsedP]
+	modelVsPredTblBig[d < 10 & maxNP==T & topHashtag & hashtagUsedP][, plot(N, d)]
+	modelVsPredTblBig[topHashtag & hashtagUsedP]
 	tables()
 }
 
