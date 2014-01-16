@@ -65,7 +65,6 @@ sqlScratch <- function() {
 	twitter_users = data.table(read.csv(str_c(PATH, "/dissertationData/tables/twitter_users.csv")))
 	topUsers = data.table(read.csv(str_c(PATH, "/dissertationData/tables/topUsers.csv")))
 	twitter_users[created_at=='2010-10-29 19:05:25',]
-	#fread('col1,col2\n5,"4\n3"')
 }
 
 getTokenizedTbl <- function(tweetsTbl, from) {
