@@ -20,7 +20,7 @@ options(sqldf.RPostgreSQL.user = 'claytonstanley',
 options("scipen"=100, "digits"=4)
 
 # Interface to retrieve chunkHash for chunk name
-getHashes = function(vals, db) {
+getHashes <- function(vals, db) {
 	ret = db[match(vals, names(db))]
 	ret = ret[!is.na(ret)]
 	#stopifnot(length(ret) > 0)
@@ -29,7 +29,7 @@ getHashes = function(vals, db) {
 }
 
 # And vice versa
-getVals = function(hashes, db) {
+getVals <- function(hashes, db) {
 	return(names(db[match(hashes, db)]))
 }
 
