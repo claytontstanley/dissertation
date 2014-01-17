@@ -1,4 +1,5 @@
 library(RPostgreSQL)
+library(microbenchmark)
 library(popbio)
 library(stringr)
 library(sqldf)
@@ -46,6 +47,12 @@ myPrint <- function(str) {
 		print(str)
 	}
 }
+
+flushPrint <- function(str) {
+	on.exit(flush.console())
+	print(str)
+}
+
 
 sqlScratch <- function() {
 	sqldf("select * from tweets where user_screen_name = 'claytonstanley1'")
@@ -152,25 +159,26 @@ computeActs <- function(hashtags, dt, cTime, d) {
 }
 
 computeActsForUser <- function(hashtag, dt, ds, user_screen_name) {
-	print(sprintf('computing partial activation for user %s', user_screen_name))
+	flushPrint(sprintf('computing partial activation for user %s', user_screen_name))
 	retIndeces = which(!duplicated(dt))[-1]
 	expect_true(length(retIndeces) > 0)
 	partialRes = data.table(i=retIndeces)
-	myPrint(partialRes)
 	partialRes = partialRes[, list(hashtag=hashtag[1:i], dt=dt[1:i], cTime=dt[i]), by=i]
 	partialRes = with(partialRes, as.data.table(computeActs(hashtag, dt, cTime, d=ds)))
 	partialRes
 }
 
 computeActsByUser <- function(hashtagsTbl, ds) {
-	Rprof()
 	partialRes = hashtagsTbl[, computeActsForUser(hashtag, dt, ds, user_screen_name), by=user_screen_name]
 	myPrint(partialRes)
-	print('computing activations across table')
-	res = partialRes[, list(N=.N, act=log(sum(partialAct))), by=list(dt, hashtag, d, user_screen_name)]
-	with(res, expect_that(any(is.infinite(act)), is_false()))
+	Rprof()
+	flushPrint('setting key for partial table')
+	setkeyv(partialRes, c('user_screen_name','d','dt','hashtag'))
+	flushPrint('computing activations across table')
+	res = partialRes[, list(N=.N, act=log(sum(partialAct))), keyby=list(user_screen_name, d, dt, hashtag)]
 	Rprof(NULL)
-	print(summaryRprof())
+	flushPrint(summaryRprof())
+	with(res, expect_that(any(is.infinite(act)), is_false()))
 	res
 }
 
@@ -195,32 +203,34 @@ visCompare <- function(hashtagsTbl, modelHashtagsTbl, db) {
 }
 
 testPriorActivations <- function() {
+	sortExpectedTbl <- function(tbl) {
+		setcolorder(tbl, c('user_screen_name', 'd', 'dt', 'hashtag', 'N', 'act'))
+		setkey(tbl, user_screen_name, d, dt, hashtag, N, act)
+		tbl
+	}
 	testHashtagsTbl = data.table(user_screen_name=c(1,1,1,1), dt=c(0,2,3,4), hashtag=c('a', 'b', 'a', 'b'))
-	expectedActTbl = data.table(dt=c(2,3,3,4,4), hashtag=c('a','a','b','a','b'), d=c(.5,.5,.5,.5,.5),
-				    user_screen_name=c(1,1,1,1,1), N=c(1,1,1,2,1), act=c(log(2^(-.5)), log(3^(-.5)), log(1), log(4^(-.5)+1), log(2^(-.5))))
+	expectedActTbl = sortExpectedTbl(data.table(dt=c(2,3,3,4,4), hashtag=c('a','a','b','a','b'), d=c(.5,.5,.5,.5,.5),
+						    user_screen_name=c(1,1,1,1,1), N=c(1,1,1,2,1), act=c(log(2^(-.5)), log(3^(-.5)), log(1), log(4^(-.5)+1), log(2^(-.5)))))
 	actTbl = computeActsByUser(testHashtagsTbl, d=.5)
 	expect_that(actTbl, is_equivalent_to(expectedActTbl))
-	
+
 	testHashtagsTbl = data.table(user_screen_name=c(1,1,2,2), dt=c(0,2,0,3), hashtag=c('a','b','b','b'))
-	expectedActTbl = data.table(dt=c(2,3), hashtag=c('a','b'), d=c(.5, .5), user_screen_name=c(1,2), N=c(1,1), act=c(log(2^(-.5)), log(3^(-.5))))
+	expectedActTbl = sortExpectedTbl(data.table(dt=c(2,3), hashtag=c('a','b'), d=c(.5, .5), user_screen_name=c(1,2), N=c(1,1), act=c(log(2^(-.5)), log(3^(-.5)))))
 	actTbl = computeActsByUser(testHashtagsTbl, d=.5)
 	expect_that(actTbl, is_equivalent_to(expectedActTbl))
 
 	testHashtagsTbl = data.table(user_screen_name=c(1,1), dt=c(0,2), hashtag=c('a','b'))
-	expectedActTbl = data.table(dt=c(2,2,2,2), hashtag=c('a','a','a','a'), d=c(.5,.4,.3,.2),
-				    user_screen_name=c(1,1,1,1), N=c(1,1,1,1), act=c(log(2^(-.5)), log(2^(-.4)), log(2^(-.3)), log(2^(-.2))))
-	actTbl = computeActsByUser(testHashtagsTbl, d=c(.5,.4,.3,.2))
-	expectedActTbl
+	expectedActTbl = sortExpectedTbl(data.table(dt=c(2,2,2,2), hashtag=c('a','a','a','a'), d=c(.2,.3,.4,.5),
+						    user_screen_name=c(1,1,1,1), N=c(1,1,1,1), act=c(log(2^(-.2)), log(2^(-.3)), log(2^(-.4)), log(2^(-.5)))))
+	actTbl = computeActsByUser(testHashtagsTbl, d=c(.2,.3,.4,.5))
 	expect_that(actTbl, is_equivalent_to(expectedActTbl))
 
 	testHashtagsTbl = data.table(user_screen_name=c(1,1,1), dt=c(0,2,3), hashtag=c('a','b','c'))
-	expectedActTbl = data.table(dt=c(2,3,3,2,3,3), hashtag=c('a','a','b','a','a','b'), d=c(.5,.5,.5,.4,.4,.4),
-				    user_screen_name=c(1,1,1,1,1,1), N=c(1,1,1,1,1,1),
-				    act=c(log(2^(-.5)), log(3^(-.5)), log(1^(-.5)),
-					  log(2^(-.4)), log(3^(-.4)), log(1^(-.4))))
+	expectedActTbl = sortExpectedTbl(data.table(dt=c(2,3,3,2,3,3), hashtag=c('a','a','b','a','a','b'), d=c(.5,.5,.5,.4,.4,.4),
+						    user_screen_name=c(1,1,1,1,1,1), N=c(1,1,1,1,1,1),
+						    act=c(log(2^(-.5)), log(3^(-.5)), log(1^(-.5)),
+							  log(2^(-.4)), log(3^(-.4)), log(1^(-.4)))))
 	actTbl = computeActsByUser(testHashtagsTbl, d=c(.5,.4))
-	actTbl
-	expectedActTbl
 	expect_that(actTbl, is_equivalent_to(expectedActTbl))
 
 
@@ -244,7 +254,7 @@ runTests <- function() {
 }
 
 addMetrics <- function(hashtagsTbl, modelHashtagsTbl) {
-	print('adding metrics for modelHashtagsTbl')
+	flushPrint('adding metrics for modelHashtagsTbl')
 	modelHashtagsTbl[, topHashtag := act==max(act), by=list(d, dt, user_screen_name)]
 	modelHashtagsTbl[, NTopHashtag := .N, by=list(d, dt, user_screen_name, topHashtag)]
 	setkeyv(modelHashtagsTbl, c('user_screen_name', 'dt', 'hashtag'))
@@ -289,14 +299,14 @@ getModelVsPredTbl <- function(modelHashtagsTbl) {
 
 genAggModelVsPredTbl <- function(hashtagsTbl, ds=c(0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2,5,20)) {
 	genModelVsPredTbl <- function(hashtagsTbl, d, userScreenName) {
-		print(sprintf('generating model predictions for user %s', userScreenName))
+		flushPrint(sprintf('generating model predictions for user %s', userScreenName))
 		modelHashtagsTbl = computeActsByUser(hashtagsTbl, d=d)
 		addMetrics(hashtagsTbl, modelHashtagsTbl)
 		modelVsPredTbl = getModelVsPredTbl(modelHashtagsTbl)	
 		modelVsPredTbl
 	}
 	singleHashtagUsers = hashtagsTbl[, list(uniqueDTs=length(unique(dt)) <= 1), by=user_screen_name][uniqueDTs==T]$user_screen_name
-	print(sprintf('not running users (%s) since they all have less than two dt hashtag observations', paste(singleHashtagUsers, sep=',', collapse=NULL)))
+	flushPrint(sprintf('not running users (%s) since they all have less than two dt hashtag observations', paste(singleHashtagUsers, sep=',', collapse=NULL)))
 	users = data.table(cur_user_screen_name=Filter(function(v) !(v %in% singleHashtagUsers), unique(hashtagsTbl$user_screen_name)))
 	users
 	setkey(hashtagsTbl, user_screen_name)
@@ -324,7 +334,7 @@ curWS <- function() {
 	unique(hashtagsTbl$user_screen_name)
 	visCompare(hashtagsTbl[user_screen_name=='icarly'], modelHashtagsTbl[topHashtag==T & user_screen_name=='icarly',], db)
 	summarizeExtremes(modelHashtagsTbl)
-	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl[user_screen_name=='billcosby' | user_screen_name=='icarly'])
+	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl[user_screen_name=='icarly' | user_screen_name=='icarly'])
 	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl)
 	modelVsPredTblBig = modelVsPredTbl 
 	modelVsPredTbl
