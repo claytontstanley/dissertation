@@ -342,7 +342,8 @@ curWS <- function() {
 	visHashtags(modelHashtagsTbl[topHashtag==T,], db)
 	unique(hashtagsTbl$user_screen_name)
 	visCompare(hashtagsTbl[user_screen_name=='joelmchale'], modelHashtagsTbl[topHashtag==T & user_screen_name=='joelmchale',], db)
-	foo = hashtagsTbl[user_screen_name=='joelmchale'][, .N, by=hashtag]
+	hashtagsTbl[user_screen_name=='joelmchale'][, .N, by=hashtag][, sum(N)]
+
 	setkey(foo, N)
 	as.data.frame(foo)
 	print(foo, nrows=50)
@@ -353,6 +354,7 @@ curWS <- function() {
 	modelVsPredTbl[d==0]
 	visModelVsPredTbl(modelVsPredTbl)
 	modelVsPredTbl[topHashtag & hashtagUsedP & user_screen_name=='joelmchale']
+	modelVsPredTbl[hashtagUsedP & d==0 & user_screen_name=='joelmchale']
 }
 
 #curWS()
