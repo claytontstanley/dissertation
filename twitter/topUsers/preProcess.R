@@ -293,6 +293,7 @@ getModelVsPredTbl <- function(hashtagsTbl, modelHashtagsTbl) {
 	modelVsPredTbl = visMetrics(modelHashtagsTbl)
 	modelVsPredTbl[, maxNP := N==max(N), by=list(user_screen_name, topHashtag, hashtagUsedP)]
 	modelVsPredTbl[maxNP==T, maxNP := abs(d-mean(d)) == min(abs(d-mean(d))), by=list(user_screen_name, topHashtag, hashtagUsedP)]
+	# FIXME: Figure out a better way to do this
 	modelVsPredTbl[hashtagUsedP==T, totN := length(hashtagsTbl[user_screen_name]$user_screen_name), by=user_screen_name]
 	modelVsPredTbl[hashtagUsedP==F, totN := sum(N), by=list(user_screen_name, d, hashtagUsedP)]
 	myPrint(modelVsPredTbl[topHashtag==T & hashtagUsedP==T])
