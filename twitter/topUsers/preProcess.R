@@ -129,34 +129,34 @@ compareHashtagTbls <- function() {
 	hashtagTblText[hashtagTblTokenText]
 }
 
-computeActs <- function(hashtags, dt, d) {
+computeActs <- function(hashtags, dt, cTime, d) {
 	myPrint(hashtags)
 	myPrint(dt)
 	myPrint(d)
-	cTime = dt[length(dt)]
+	#cTime = dt[length(dt)]
 	myPrint(cTime)
 	dt = cTime - dt
 	myPrint(dt)
 	indeces = dt>0
 	hashtagsSub = hashtags[indeces] 
 	myPrint(hashtagsSub)
+	cTimeSub = cTime[indeces]
 	dtSub = dt[indeces]
 	dtSubRep = rep(dtSub, times=length(d))
 	dRep = rep(d, each=length(dtSub))
 	hashtagsSubRep = rep(hashtagsSub)
 	myPrint(dtSubRep)
 	myPrint(dRep)
-	list(hashtag=hashtagsSubRep, partialAct=dtSubRep^(-dRep), dt=rep(cTime, length(hashtagsSubRep)), d=dRep)
+	list(hashtag=hashtagsSubRep, partialAct=dtSubRep^(-dRep), dt=cTimeSub, d=dRep)
 }
 
 computeActsForUser <- function(hashtag, dt, ds) {
-	myPrint(hashtag)
 	retIndeces = which(!duplicated(dt))[-1]
 	expect_true(length(retIndeces) > 0)
 	partialRes = data.table(i=retIndeces)
 	myPrint(partialRes)
-	partialRes = partialRes[, computeActs(hashtag[1:i], dt[1:i], d=ds), by=i]
-	partialRes[, i := NULL]
+	partialRes = partialRes[, list(hashtag=hashtag[1:i], dt=dt[1:i], cTime=dt[i]), by=i]
+	partialRes = with(partialRes, as.data.table(computeActs(hashtag, dt, cTime, d=ds)))
 	partialRes
 }
 
@@ -167,7 +167,7 @@ computeActsByUser <- function(hashtagsTbl, ds) {
 	res = partialRes[, list(N=.N, act=log(sum(partialAct))), by=list(dt, hashtag, d, user_screen_name)]
 	with(res, expect_that(any(is.infinite(act)), is_false()))
 	Rprof(NULL)
-	myPrint(summaryRprof())
+	print(summaryRprof())
 	res
 }
 
