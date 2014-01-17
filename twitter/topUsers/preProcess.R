@@ -205,8 +205,9 @@ visCompare <- function(hashtagsTbl, modelHashtagsTbl, db) {
 
 testPriorActivations <- function() {
 	sortExpectedTbl <- function(tbl) {
-		setcolorder(tbl, c('user_screen_name', 'd', 'dt', 'hashtag', 'N', 'act'))
-		setkey(tbl, user_screen_name, d, dt, hashtag, N, act)
+		cols = c('user_screen_name', 'dt', 'hashtag', 'd', 'N', 'act')
+		setcolorder(tbl, cols) 
+		setkeyv(tbl, cols) 
 		tbl
 	}
 	testHashtagsTbl = data.table(user_screen_name=c(1,1,1,1), dt=c(0,2,3,4), hashtag=c('a', 'b', 'a', 'b'))
@@ -296,7 +297,7 @@ getModelVsPredTbl <- function(modelHashtagsTbl) {
 	modelVsPredTbl
 }
 
-genAggModelVsPredTbl <- function(hashtagsTbl, ds=c(0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2,5,20)) {
+genAggModelVsPredTbl <- function(hashtagsTbl, ds=c(0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1.0,1.1,1.2,1.3,1.4,1.5,1.6,1.8,2,5,10,20)) {
 	genModelVsPredTbl <- function(hashtagsTbl, d, userScreenName) {
 		flushPrint(sprintf('generating model predictions for user %s', userScreenName))
 		modelHashtagsTbl = computeActsByUser(hashtagsTbl, d=d)
