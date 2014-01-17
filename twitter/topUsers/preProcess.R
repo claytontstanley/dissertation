@@ -141,16 +141,18 @@ computeActs <- function(hashtags, dt, cTime, d) {
 	hashtagsSub = hashtags[indeces] 
 	myPrint(hashtagsSub)
 	cTimeSub = cTime[indeces]
+	cTimeSubRep = rep(cTimeSub, times=length(d))
 	dtSub = dt[indeces]
 	dtSubRep = rep(dtSub, times=length(d))
 	dRep = rep(d, each=length(dtSub))
 	hashtagsSubRep = rep(hashtagsSub)
 	myPrint(dtSubRep)
 	myPrint(dRep)
-	list(hashtag=hashtagsSubRep, partialAct=dtSubRep^(-dRep), dt=cTimeSub, d=dRep)
+	list(hashtag=hashtagsSubRep, partialAct=dtSubRep^(-dRep), dt=cTimeSubRep, d=dRep)
 }
 
-computeActsForUser <- function(hashtag, dt, ds) {
+computeActsForUser <- function(hashtag, dt, ds, user_screen_name) {
+	print(sprintf('computing partial activation for user %s', user_screen_name))
 	retIndeces = which(!duplicated(dt))[-1]
 	expect_true(length(retIndeces) > 0)
 	partialRes = data.table(i=retIndeces)
@@ -162,8 +164,9 @@ computeActsForUser <- function(hashtag, dt, ds) {
 
 computeActsByUser <- function(hashtagsTbl, ds) {
 	Rprof()
-	partialRes = hashtagsTbl[, computeActsForUser(hashtag, dt, ds), by=user_screen_name]
+	partialRes = hashtagsTbl[, computeActsForUser(hashtag, dt, ds, user_screen_name), by=user_screen_name]
 	myPrint(partialRes)
+	print('computing activations across table')
 	res = partialRes[, list(N=.N, act=log(sum(partialAct))), by=list(dt, hashtag, d, user_screen_name)]
 	with(res, expect_that(any(is.infinite(act)), is_false()))
 	Rprof(NULL)
@@ -210,6 +213,17 @@ testPriorActivations <- function() {
 	expectedActTbl
 	expect_that(actTbl, is_equivalent_to(expectedActTbl))
 
+	testHashtagsTbl = data.table(user_screen_name=c(1,1,1), dt=c(0,2,3), hashtag=c('a','b','c'))
+	expectedActTbl = data.table(dt=c(2,3,3,2,3,3), hashtag=c('a','a','b','a','a','b'), d=c(.5,.5,.5,.4,.4,.4),
+				    user_screen_name=c(1,1,1,1,1,1), N=c(1,1,1,1,1,1),
+				    act=c(log(2^(-.5)), log(3^(-.5)), log(1^(-.5)),
+					  log(2^(-.4)), log(3^(-.4)), log(1^(-.4))))
+	actTbl = computeActsByUser(testHashtagsTbl, d=c(.5,.4))
+	actTbl
+	expectedActTbl
+	expect_that(actTbl, is_equivalent_to(expectedActTbl))
+
+
 	testHashtagsTbl = data.table(user_screen_name=c(1,1), dt=c(0,100000), hashtag=c('a','a'))
 	expect_that(computeActsByUser(testHashtagsTbl, d=50000), throws_error())
 
@@ -230,6 +244,7 @@ runTests <- function() {
 }
 
 addMetrics <- function(hashtagsTbl, modelHashtagsTbl) {
+	print('adding metrics for modelHashtagsTbl')
 	modelHashtagsTbl[, topHashtag := act==max(act), by=list(d, dt, user_screen_name)]
 	modelHashtagsTbl[, NTopHashtag := .N, by=list(d, dt, user_screen_name, topHashtag)]
 	setkeyv(modelHashtagsTbl, c('user_screen_name', 'dt', 'hashtag'))
@@ -309,7 +324,7 @@ curWS <- function() {
 	unique(hashtagsTbl$user_screen_name)
 	visCompare(hashtagsTbl[user_screen_name=='icarly'], modelHashtagsTbl[topHashtag==T & user_screen_name=='icarly',], db)
 	summarizeExtremes(modelHashtagsTbl)
-	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl[user_screen_name=='billcosby' | user_screen_name=='icarly'])
+	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl[user_screen_name=='icarly' | user_screen_name=='icarly'])
 	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl)
 	modelVsPredTblBig = modelVsPredTbl 
 	modelVsPredTbl
