@@ -293,6 +293,7 @@ getModelVsPredTbl <- function(modelHashtagsTbl) {
 	modelVsPredTbl = visMetrics(modelHashtagsTbl)
 	modelVsPredTbl[, maxNP := N==max(N), by=list(user_screen_name, topHashtag, hashtagUsedP)]
 	modelVsPredTbl[maxNP==T, maxNP := abs(d-mean(d)) == min(abs(d-mean(d))), by=list(user_screen_name, topHashtag, hashtagUsedP)]
+	modelVsPredTbl[, totN := sum(N), by=list(user_screen_name, d, hashtagUsedP)]
 	myPrint(modelVsPredTbl[topHashtag==T & hashtagUsedP==T])
 	modelVsPredTbl
 }
@@ -318,7 +319,9 @@ visModelVsPredTbl <- function(modelVsPredTbl) {
 	dev.new()
 	modelVsPredTbl[d < 10 & maxNP==T & topHashtag & hashtagUsedP][, plot(N, d)]
 	dev.new()
-	ggplot(modelVsPredTbl[topHashtag & hashtagUsedP], aes(d,N, colour=as.factor(user_screen_name)), group = as.factor(user_screen_name)) + geom_line()
+	print(ggplot(modelVsPredTbl[topHashtag & hashtagUsedP], aes(log(d),N/print(totN), colour=as.factor(user_screen_name)), group = as.factor(user_screen_name)) + geom_line())
+	dev.new()
+	print(ggplot(modelVsPredTbl[topHashtag & hashtagUsedP], aes(log(d),N, colour=as.factor(user_screen_name)), group = as.factor(user_screen_name)) + geom_line())
 }
 
 curWS <- function() {
@@ -333,17 +336,23 @@ curWS <- function() {
 	tusersTbl = getTusersTbl()
 	tusersTbl
 	db = makeDB(do.call(function(x) sample(x, length(x)), list(unique(hashtagsTbl$hashtag))))
-	visHashtags(hashtagsTbl, db)
-	modelHashtagsTbl = computeActsByUser(hashtagsTbl[user_screen_name=='icarly'], d=c(.5,.7))
+	visHashtags(hashtagsTbl[user_screen_name=='chelseafc'], db)
+	modelHashtagsTbl = computeActsByUser(hashtagsTbl[user_screen_name=='joelmchale'], d=c(0,.7,2))
 	addMetrics(hashtagsTbl, modelHashtagsTbl)
 	visHashtags(modelHashtagsTbl[topHashtag==T,], db)
 	unique(hashtagsTbl$user_screen_name)
-	visCompare(hashtagsTbl[user_screen_name=='icarly'], modelHashtagsTbl[topHashtag==T & user_screen_name=='icarly',], db)
+	visCompare(hashtagsTbl[user_screen_name=='joelmchale'], modelHashtagsTbl[topHashtag==T & user_screen_name=='joelmchale',], db)
+	foo = hashtagsTbl[user_screen_name=='joelmchale'][, .N, by=hashtag]
+	setkey(foo, N)
+	as.data.frame(foo)
+	print(foo, nrows=50)
 	summarizeExtremes(modelHashtagsTbl)
 	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl[user_screen_name %in% unique(user_screen_name)[1:20]])
 	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl)
 	modelVsPredTbl
+	modelVsPredTbl[d==0]
 	visModelVsPredTbl(modelVsPredTbl)
+	modelVsPredTbl[topHashtag & hashtagUsedP & user_screen_name=='joelmchale']
 }
 
 #curWS()
