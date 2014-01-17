@@ -110,6 +110,7 @@ getHashtagsTbl <- function(tweetsTbl, from='tokenText') {
 	htOfTokenizedTbl = tokenizedTbl[grepl('^#', chunk),]
 	setkey(htOfTokenizedTbl,id)
 	hashtagsTbl = htOfTokenizedTbl[tweetsTbl, list(hashtag=chunk, pos=pos, created_at=created_at, dt=dt, user_id=user_id, user_screen_name=user_screen_name), nomatch=0]
+	setkey(hashtagsTbl, user_screen_name, dt, hashtag)
 	hashtagsTbl
 }
 
@@ -173,9 +174,9 @@ computeActsByUser <- function(hashtagsTbl, ds) {
 	myPrint(partialRes)
 	Rprof()
 	flushPrint('setting key for partial table')
-	setkeyv(partialRes, c('user_screen_name','d','dt','hashtag'))
+	setkeyv(partialRes, c('user_screen_name','dt','hashtag','d'))
 	flushPrint('computing activations across table')
-	res = partialRes[, list(N=.N, act=log(sum(partialAct))), keyby=list(user_screen_name, d, dt, hashtag)]
+	res = partialRes[, list(N=.N, act=log(sum(partialAct))), keyby=list(user_screen_name, dt, hashtag, d)]
 	Rprof(NULL)
 	flushPrint(summaryRprof())
 	with(res, expect_that(any(is.infinite(act)), is_false()))
@@ -255,10 +256,9 @@ runTests <- function() {
 
 addMetrics <- function(hashtagsTbl, modelHashtagsTbl) {
 	flushPrint('adding metrics for modelHashtagsTbl')
-	modelHashtagsTbl[, topHashtag := act==max(act), by=list(d, dt, user_screen_name)]
-	modelHashtagsTbl[, NTopHashtag := .N, by=list(d, dt, user_screen_name, topHashtag)]
-	setkeyv(modelHashtagsTbl, c('user_screen_name', 'dt', 'hashtag'))
-	setkeyv(hashtagsTbl, c('user_screen_name', 'dt', 'hashtag'))
+	modelHashtagsTbl[, `:=`(topHashtag=act==max(act), NTopHashtag=sum(act==max(act))), by=list(user_screen_name, dt, d)]
+	expect_that(key(modelHashtagsTbl), equals(c('user_screen_name', 'dt', 'hashtag', 'd')))
+	expect_that(key(hashtagsTbl), equals(c('user_screen_name', 'dt', 'hashtag')))
 	modelHashtagsTbl[, hashtagUsedP := F]
 	modelHashtagsTbl[hashtagsTbl, hashtagUsedP := T]
 	return()
@@ -290,7 +290,6 @@ summarizeExtremes <- function(modelHashtagsTbl) {
 
 getModelVsPredTbl <- function(modelHashtagsTbl) {
 	modelVsPredTbl = visMetrics(modelHashtagsTbl)
-	setkeyv(modelVsPredTbl, c('user_screen_name', 'd', 'topHashtag', 'hashtagUsedP'))
 	modelVsPredTbl[, maxNP := N==max(N), by=list(user_screen_name, topHashtag, hashtagUsedP)]
 	modelVsPredTbl[maxNP==T, maxNP := abs(d-mean(d)) == min(abs(d-mean(d))), by=list(user_screen_name, topHashtag, hashtagUsedP)]
 	myPrint(modelVsPredTbl[topHashtag==T & hashtagUsedP==T])
@@ -309,7 +308,6 @@ genAggModelVsPredTbl <- function(hashtagsTbl, ds=c(0,.1,.2,.3,.4,.5,.6,.7,.8,.9,
 	flushPrint(sprintf('not running users (%s) since they all have less than two dt hashtag observations', paste(singleHashtagUsers, sep=',', collapse=NULL)))
 	users = data.table(cur_user_screen_name=Filter(function(v) !(v %in% singleHashtagUsers), unique(hashtagsTbl$user_screen_name)))
 	users
-	setkey(hashtagsTbl, user_screen_name)
 	res = users[, genModelVsPredTbl(hashtagsTbl[cur_user_screen_name], ds, cur_user_screen_name), by=cur_user_screen_name]
 	res[, cur_user_screen_name := NULL]
 	res
