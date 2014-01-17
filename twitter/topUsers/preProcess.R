@@ -324,7 +324,7 @@ curWS <- function() {
 	unique(hashtagsTbl$user_screen_name)
 	visCompare(hashtagsTbl[user_screen_name=='icarly'], modelHashtagsTbl[topHashtag==T & user_screen_name=='icarly',], db)
 	summarizeExtremes(modelHashtagsTbl)
-	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl[user_screen_name=='icarly' | user_screen_name=='icarly'])
+	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl[user_screen_name=='billcosby' | user_screen_name=='icarly'])
 	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl)
 	modelVsPredTblBig = modelVsPredTbl 
 	modelVsPredTbl
