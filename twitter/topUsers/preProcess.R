@@ -314,10 +314,17 @@ genAggModelVsPredTbl <- function(hashtagsTbl, ds=c(0,.1,.2,.3,.4,.5,.6,.7,.8,.9,
 	res
 }
 
+visModelVsPredTbl <- function(modelVsPredTbl) {
+	dev.new()
+	modelVsPredTbl[d < 10 & maxNP==T & topHashtag & hashtagUsedP][, plot(N, d)]
+	dev.new()
+	ggplot(modelVsPredTbl[topHashtag & hashtagUsedP], aes(d,N, colour=as.factor(user_screen_name)), group = as.factor(user_screen_name)) + geom_line()
+}
+
 curWS <- function() {
 	debugP = F
 	runTests()
-	tweetsTbl = getTweetsTbl('select * from tweets limit 100000')
+	tweetsTbl = getTweetsTbl("select * from tweets limit 100000")
 	tweetsTbl
 	#hashtagsTbl = getHashtagsTbl(tweetsTbl, from='text')
 	hashtagsTbl = getHashtagsTbl(tweetsTbl, from='tokenText')
@@ -333,13 +340,10 @@ curWS <- function() {
 	unique(hashtagsTbl$user_screen_name)
 	visCompare(hashtagsTbl[user_screen_name=='icarly'], modelHashtagsTbl[topHashtag==T & user_screen_name=='icarly',], db)
 	summarizeExtremes(modelHashtagsTbl)
-	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl[user_screen_name=='icarly' | user_screen_name=='icarly'])
+	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl[user_screen_name %in% unique(user_screen_name)[1:20]])
 	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl)
-	modelVsPredTblBig = modelVsPredTbl 
 	modelVsPredTbl
-	modelVsPredTblBig[d < 10 & maxNP==T & topHashtag & hashtagUsedP][, plot(N, d)]
-	modelVsPredTblBig[topHashtag & hashtagUsedP]
-	tables()
+	visModelVsPredTbl(modelVsPredTbl)
 }
 
 #curWS()
