@@ -256,8 +256,17 @@ runTests <- function() {
 }
 
 addMetrics <- function(hashtagsTbl, modelHashtagsTbl) {
+	tagCountTbl = hashtagsTbl[, list(tagCount=.N), by=list(user_screen_name, dt)]
+	modelHashtagsTbl[tagCountTbl, tagCount := tagCount]
+	isTopHashtag <- function(act, tagCount, d) {
+		s = sort(act, index.return=T, decreasing=T)
+		numPossible = length(act)
+		res = rep(FALSE, numPossible) 
+		res[s$i[1:min(numPossible, tagCount)]] = TRUE
+		res
+	}
 	flushPrint('adding metrics for modelHashtagsTbl')
-	modelHashtagsTbl[, `:=`(topHashtag=act==max(act), NTopHashtag=sum(act==max(act))), by=list(user_screen_name, dt, d)]
+	modelHashtagsTbl[, topHashtag := isTopHashtag(act, tagCount), by=list(user_screen_name, dt, d)]
 	expect_that(key(modelHashtagsTbl), equals(c('user_screen_name', 'dt', 'hashtag', 'd')))
 	expect_that(key(hashtagsTbl), equals(c('user_screen_name', 'dt', 'hashtag')))
 	modelHashtagsTbl[, hashtagUsedP := F]
@@ -281,17 +290,22 @@ visMetrics <- function(modelHashtagsTbl) {
 	#modelHashtagsTbl[, plotForUserAndD(.SD, user_screen_name, d), by=list(user_screen_name, d)]
 }
 
-summarizeExtremes <- function(modelHashtagsTbl) {
-	frequencyTbl = modelHashtagsTbl[hashtagUsedP==T & d==min(d), .N, by=list(user_screen_name,d,hashtag)][, list(N=max(N), hashtag=hashtag[N==max(N)]), by=list(user_screen_name,d)]
-	setkeyv(modelHashtagsTbl, c('dt', 'hashtagUsedP'))
-	modelHashtagsTbl[, hashtagUsedRecentlyP := .SD[.SD[,list(dt=dt-.1)], roll=T]$hashtagUsedP, by=list(user_screen_name, hashtag)]
-	recencyTbl = modelHashtagsTbl[hashtagUsedP==T & hashtagUsedRecentlyP==T, .N, by=list(user_screen_name,d,hashtagUsedRecentlyP,hashtagUsedP)][d==min(d)]
-	list(recencyTbl=recencyTbl, frequencyTbl=frequencyTbl)
+summarizeExtremes <- function(hashtagsTbl) {
+	frequencyTbl = hashtagsTbl[, .N, by=list(user_screen_name, hashtag)][, list(NFrequency=max(N), hashtagFrequency=hashtag[N==max(N)]), keyby=user_screen_name]
+	setkey(hashtagsTbl, dt)
+	rollTbl = hashtagsTbl[, list(dt=dt, hashtag=.SD[J(dt-.1), roll=T]$hashtag), keyby=list(user_screen_name)]
+	setkey(rollTbl, user_screen_name, dt, hashtag)
+	setkey(hashtagsTbl, user_screen_name, dt, hashtag)
+	recencyTbl = hashtagsTbl[rollTbl, list(NRecency=.N), nomatch=0, by=list(user_screen_name)]
+	setkey(recencyTbl, user_screen_name)
+	res = frequencyTbl[recencyTbl]
+	res
 }
 
 getModelVsPredTbl <- function(modelHashtagsTbl) {
 	modelVsPredTbl = visMetrics(modelHashtagsTbl)
 	modelVsPredTbl[, maxNP := N==max(N), by=list(user_screen_name, topHashtag, hashtagUsedP)]
+	# FIXME: alrogithm sets more than one to t for even numbers
 	modelVsPredTbl[maxNP==T, maxNP := abs(d-mean(d)) == min(abs(d-mean(d))), by=list(user_screen_name, topHashtag, hashtagUsedP)]
 	myPrint(modelVsPredTbl[topHashtag==T & hashtagUsedP==T])
 	modelVsPredTbl
@@ -347,15 +361,27 @@ curWS <- function() {
 	setkey(foo, N)
 	as.data.frame(foo)
 	print(foo, nrows=50)
-	summarizeExtremes(modelHashtagsTbl)
+	summarizeExtremes(hashtagsTbl)
 	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl[user_screen_name %in% unique(user_screen_name)[1:20]])
 	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl[user_screen_name == 'joelmchale'])
-	modelVsPredTblBig = modelVsPredTbl
+	modelVsPredTbl = modelVsPredTblBig
+	modelVsPredTbl
+	tables()
 	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl)
 	modelVsPredTblBig[, totN := NULL]
 	modelVsPredTbl[d==0]
 	visModelVsPredTbl(modelVsPredTblBig, hashtagsTbl)
-	modelVsPredTbl[topHashtag & hashtagUsedP & user_screen_name=='joelmchale']
+	modelVsPredTbl[topHashtag & hashtagUsedP & user_screen_name=='mchammer']
+	modelVsPredTbl[topHashtag & hashtagUsedP & maxNP, N, by=user_screen_name]
+	modelVsPredTbl[user_screen_name=='lanadelrey']
+	setkey(modelVsPredTbl, user_screen_name)
+	modelVsPredTbl[recencyTbl][hashtagUsedP & topHashtag & maxNP,]
+	recencyTbl
+	tables()
+	modelVsPredTbl[topHashtag==T & d==0, sum(N), by=list(user_screen_name)]
+	hashtagsTbl[, .N, by=list(user_screen_name)]
+	hashtagsTbl[user_screen_name=='autocorrects']
+	modelVsPredTbl
 	modelVsPredTbl[hashtagUsedP & user_screen_name=='joelmchale']
 }
 
