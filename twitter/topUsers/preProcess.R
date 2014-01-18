@@ -291,7 +291,12 @@ visMetrics <- function(modelHashtagsTbl) {
 }
 
 summarizeExtremes <- function(hashtagsTbl) {
-	frequencyTbl = hashtagsTbl[, .N, by=list(user_screen_name, hashtag)][, list(NFrequency=max(N), hashtagFrequency=hashtag[N==max(N)]), keyby=user_screen_name]
+	countTbl = hashtagsTbl[, .N, keyby=list(user_screen_name, hashtag)]
+	tagCountTbl = hashtagsTbl[, list(tagCount=.N), by=list(user_screen_name, dt)]
+	getTopNHashtags <- function(topN, user_screen_name, countTbl) {
+		countTbl[user_screen_name==user_screen_name, list(hashtags=hashtag[sort(N, decreasing=T, index.return=T)$i[1:topN]])]$hashtags
+	}
+	frequencyTbl = hashtagsTbl[tagCountTbl, list(hashtagChosenP = hashtag %in% getTopNHashtags(length(hashtag), user_screen_name, countTbl))][, list(NFrequency=sum(hashtagChosenP)), by=user_screen_name]
 	setkey(hashtagsTbl, dt)
 	rollTbl = hashtagsTbl[, list(dt=dt, hashtag=.SD[J(dt-.1), roll=T]$hashtag), keyby=list(user_screen_name)]
 	setkey(rollTbl, user_screen_name, dt, hashtag)
@@ -380,32 +385,10 @@ curWS <- function() {
 	tables()
 	modelVsPredTbl[topHashtag==T & d==0, sum(N), by=list(user_screen_name)]
 	hashtagsTbl[, .N, by=list(user_screen_name)]
-	hashtagsTbl[user_screen_name=='autocorrects']
-	modelVsPredTbl
-	modelVsPredTbl[hashtagUsedP & user_screen_name=='joelmchale']
+	hashtagsTbl[user_screen_name=='joelmchale']
+	modelVsPredTblBig[user_screen_name=='joelmchale' & topHashtag == T & hashtagUsedP, .SD, by=d]
+	modelVsPredTbl[topHashtag & user_screen_name=='joelmchale']
 }
 
 #curWS()
 
-break()
-
-sessionInfo()
-tweetsTbl[, list(N=.N), by=retweeted]
-tweetsTbl[, .N, by=lang]
-tables()
-.ls.objects()
-gc()
-tweetsTbl[, maxID := max(id), by=user_screen_name]
-tweetsTbl[, minID := min(id), by=user_screen_name]
-
-tweetsTbl[, containsHashtag := 0]
-tweetsTbl[grepl('#', text), containsHashtag := 1]
-tweetsTbl[, list(numWithHashtags=sum(containsHashtag), numOfTweets=.N), by=user_screen_name][, propWithHashtags := numWithHashtags/numOfTweets][,][,hist(propWithHashtags)]
-tweetsTbl
-
-#sqldf("select user_screen_name,id,created_at,text from tweets where user_screen_name = 'katyperry' order by id desc limit 10")
-#sqldf("select user_screen_name,id,created_at,text from tweets where user_screen_name = 'BarackObama' order by id desc limit 10")
-#sqldf("select rank, t.user_screen_name, count(*) from tweets as t join topUsers as u on t.user_screen_name = u.user_screen_name group by t.user_screen_name, rank order by rank desc")
-#write.csv(tweetsTbl, file=str_c(PATH, "/currentTweets.csv"))
-#tweetsTbl
-#tweetsTbl[in_reply_to_status_id != "",]
