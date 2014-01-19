@@ -306,7 +306,7 @@ summarizeExtremes <- function(hashtagsTbl) {
 	flatHashtagsTbl = hashtagsTbl[, list(hashtag=list(hashtag)), by=list(user_screen_name, dt)]
 	setkey(flatHashtagsTbl, dt)
 	recencyTbl = flatHashtagsTbl[, list(hashtag=hashtag, dt=dt, prevHashtag=.SD[J(dt-.1), roll=T]$hashtag), by=user_screen_name]
-	recencyTbl = recencyTbl[, list(hashtagChosenP = unlist(hashtag) %in% unlist(prevHashtag[1:length(unlist(hashtag))])), by=list(user_screen_name, dt)] 
+	recencyTbl = recencyTbl[, list(hashtag=unlist(hashtag), prevHashtag=prevHashtag, hashtagChosenP = unlist(hashtag) %in% unlist(prevHashtag)[1:length(unlist(hashtag))]), by=list(user_screen_name, dt)]
 	recencyTbl = recencyTbl[, list(NRecency=sum(hashtagChosenP)), by=list(user_screen_name)]
 	res = frequencyTbl[recencyTbl]
 	res
@@ -376,11 +376,13 @@ curWS <- function() {
 	visCompare(hashtagsTbl[user_screen_name=='joelmchale'], modelHashtagsTbl[topHashtag==T & user_screen_name=='joelmchale',], db)
 	hashtagsTbl[user_screen_name=='joelmchale'][, .N, by=hashtag][, sum(N)]
 
-	summarizeExtremes(hashtagsTbl)
+	extremesTbl = summarizeExtremes(hashtagsTbl)
+	Q
+	summarizeExtremes(hashtagsTbl[user_screen_name=='eddieizzard'])
 	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl[user_screen_name %in% unique(user_screen_name)[1:20]])
 	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl[user_screen_name == 'joelmchale'])
 	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl[user_screen_name == '1dthisisus'])
-	modelVsPredTbl = modelVsPredTblBig
+	modelVsPredTblBig = modelVsPredTbl
 	modelVsPredTbl
 	tables()
 	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl)
@@ -400,6 +402,12 @@ curWS <- function() {
 	modelVsPredTblBig[user_screen_name=='joelmchale' & topHashtag == T & hashtagUsedP, .SD, by=d]
 	modelVsPredTbl[topHashtag & user_screen_name=='joelmchale']
 	modelVsPredTblBig[maxNP == T]
+	tables()
+	modelVsPredTbl[topHashtag ==T & hashtagUsedP]
+	setkey(extremesTbl, user_screen_name)
+	setkey(modelVsPredTbl, user_screen_name, d)
+	print(modelVsPredTbl[topHashtag & hashtagUsedP][extremesTbl, allow.cartesian=T][d==0 | d==20], topn=2000)
+
 }
 
 #curWS()
