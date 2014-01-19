@@ -1,4 +1,5 @@
 library(RPostgreSQL)
+library(ggplot2)
 library(memoise)
 library(microbenchmark)
 library(popbio)
