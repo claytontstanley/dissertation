@@ -291,12 +291,17 @@ visMetrics <- function(modelHashtagsTbl) {
 }
 
 summarizeExtremes <- function(hashtagsTbl) {
-	countTbl = hashtagsTbl[, .N, keyby=list(user_screen_name, hashtag)]
 	tagCountTbl = hashtagsTbl[, list(tagCount=.N), by=list(user_screen_name, dt)]
-	getTopNHashtags <- function(topN, user_screen_name, countTbl) {
-		countTbl[user_screen_name==user_screen_name, list(hashtags=hashtag[sort(N, decreasing=T, index.return=T)$i[1:topN]])]$hashtags
+	countTbl = hashtagsTbl[, .N, keyby=list(user_screen_name, hashtag)]
+	countTbl[, rank := {i = sort(N, decreasing=T, index.return=T)$i; r=1:length(i); r[i] = 1:length(i); r}, by=user_screen_name]
+	setkey(countTbl, user_screen_name, rank)
+	getTopNHashtags <- function(topN, userScreenName) {
+		ret = countTbl[J(userScreenName,1:topN)]$hashtag
+		ret
 	}
-	frequencyTbl = hashtagsTbl[tagCountTbl, list(hashtagChosenP = hashtag %in% getTopNHashtags(length(hashtag), user_screen_name, countTbl))][, list(NFrequency=sum(hashtagChosenP)), by=user_screen_name]
+	
+	mGetTopNHashtags = memoise(getTopNHashtags)
+	frequencyTbl = hashtagsTbl[tagCountTbl, list(hashtagChosenP = hashtag %in% mGetTopNHashtags(length(hashtag), user_screen_name))][, list(NFrequency=sum(hashtagChosenP)), by=user_screen_name]
 	setkey(hashtagsTbl, dt)
 	rollTbl = hashtagsTbl[, list(dt=dt, hashtag=.SD[J(dt-.1), roll=T]$hashtag), keyby=list(user_screen_name)]
 	setkey(rollTbl, user_screen_name, dt, hashtag)
