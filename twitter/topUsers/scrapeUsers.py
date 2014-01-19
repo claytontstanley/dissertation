@@ -72,7 +72,7 @@ def generateTopUsers(scrapeFun=generateTopUsersTwitaholic, topUsersFile='top1000
     storeTopUsers(topUsersFile=topUsersFile)
 
 def backupTables():
-    tableNames = ['topUsers', 'twitter_users']
+    tableNames = ['topUsers', 'twitter_users', 'tweets']
     for tableName in tableNames:
         file = "%s/dissertationData/tables/%s.csv" % (_dir, tableName)
         cmd = string.Template("copy ${tableName} to '${file}' delimiter ',' csv header").substitute(locals())
