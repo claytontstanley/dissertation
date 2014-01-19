@@ -368,9 +368,6 @@ curWS <- function() {
 	visCompare(hashtagsTbl[user_screen_name=='joelmchale'], modelHashtagsTbl[topHashtag==T & user_screen_name=='joelmchale',], db)
 	hashtagsTbl[user_screen_name=='joelmchale'][, .N, by=hashtag][, sum(N)]
 
-	setkey(foo, N)
-	as.data.frame(foo)
-	print(foo, nrows=50)
 	summarizeExtremes(hashtagsTbl)
 	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl[user_screen_name %in% unique(user_screen_name)[1:20]])
 	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl[user_screen_name == 'joelmchale'])
