@@ -16,7 +16,7 @@ create table if not exists tweets (
 	in_reply_to_status_id varchar(255) not null,
 	lang varchar(255) not null,
 	truncated varchar(255) not null,
-	text varchar(455) not null,
+	text text not null,
 	primary key (id)
 	);
 
