@@ -361,8 +361,23 @@ curWS <- function() {
 	tusersTbl
 	db = makeDB(do.call(function(x) sample(x, length(x)), list(unique(hashtagsTbl$hashtag))))
 	visHashtags(hashtagsTbl[user_screen_name=='chelseafc'], db)
-	modelHashtagsTbl = computeActsByUser(hashtagsTbl[user_screen_name=='joelmchale'], d=c(0,.7,2))
+	modelHashtagsTbl = computeActsByUser(hashtagsTbl[user_screen_name=='joelmchale'], d=c(10))
 	addMetrics(hashtagsTbl, modelHashtagsTbl)
+	setkey(hashtagsTbl, user_screen_name, dt, hashtag)	
+	setkey(modelHashtagsTbl, user_screen_name, dt, d, act)
+	setkey(modelHashtagsTbl, user_screen_name, dt)
+	modelHashtagsTbl[topHashtag==T]
+	modelHashtagsTbl
+	print(modelHashtagsTbl, topn=40)
+	print(hashtagsTbl[modelHashtagsTbl[topHashtag==T]], topn=40)
+	d = 20
+	log(2^-d + 3^-d)
+	log(1.5^-d)
+	log(^-20) - log(2^-20)
+	log(3^-20)
+	log(4^-20)
+
+	tables()
 	visHashtags(modelHashtagsTbl[topHashtag==T,], db)
 	unique(hashtagsTbl$user_screen_name)
 	visCompare(hashtagsTbl[user_screen_name=='joelmchale'], modelHashtagsTbl[topHashtag==T & user_screen_name=='joelmchale',], db)
