@@ -301,13 +301,12 @@ summarizeExtremes <- function(hashtagsTbl) {
 		ret
 	}
 	mGetTopNHashtags = memoise(getTopNHashtags)
-	frequencyTbl = hashtagsTbl[tagCountTbl, list(hashtagChosenP = hashtag %in% mGetTopNHashtags(length(hashtag), user_screen_name))][, list(NFrequency=sum(hashtagChosenP)), by=user_screen_name]
-	setkey(hashtagsTbl, dt)
-	rollTbl = hashtagsTbl[, list(dt=dt, hashtag=.SD[J(dt-.1), roll=T]$hashtag), keyby=list(user_screen_name)]
-	setkey(rollTbl, user_screen_name, dt, hashtag)
-	setkey(hashtagsTbl, user_screen_name, dt, hashtag)
-	recencyTbl = hashtagsTbl[rollTbl, list(NRecency=.N), nomatch=0, by=list(user_screen_name)]
-	setkey(recencyTbl, user_screen_name)
+	frequencyTbl = hashtagsTbl[, list(hashtagChosenP = hashtag %in% mGetTopNHashtags(length(hashtag), user_screen_name)), by=list(user_screen_name, dt)][, list(NFrequency=sum(hashtagChosenP)), keyby=user_screen_name]
+	flatHashtagsTbl = hashtagsTbl[, list(hashtag=list(hashtag)), by=list(user_screen_name, dt)]
+	setkey(flatHashtagsTbl, dt)
+	recencyTbl = flatHashtagsTbl[, list(hashtag=hashtag, dt=dt, prevHashtag=.SD[J(dt-.1), roll=T]$hashtag), by=user_screen_name]
+	recencyTbl = recencyTbl[, list(hashtagChosenP = unlist(hashtag) %in% unlist(prevHashtag[1:length(unlist(hashtag))])), by=list(user_screen_name, dt)] 
+	recencyTbl = recencyTbl[, list(NRecency=sum(hashtagChosenP)), by=list(user_screen_name)]
 	res = frequencyTbl[recencyTbl]
 	res
 }
@@ -370,13 +369,6 @@ curWS <- function() {
 	modelHashtagsTbl
 	print(modelHashtagsTbl, topn=40)
 	print(hashtagsTbl[modelHashtagsTbl[topHashtag==T]], topn=40)
-	d = 20
-	log(2^-d + 3^-d)
-	log(1.5^-d)
-	log(^-20) - log(2^-20)
-	log(3^-20)
-	log(4^-20)
-
 	tables()
 	visHashtags(modelHashtagsTbl[topHashtag==T,], db)
 	unique(hashtagsTbl$user_screen_name)
