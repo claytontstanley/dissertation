@@ -1,4 +1,5 @@
 library(RPostgreSQL)
+library(memoise)
 library(microbenchmark)
 library(popbio)
 library(stringr)
@@ -299,7 +300,6 @@ summarizeExtremes <- function(hashtagsTbl) {
 		ret = countTbl[J(userScreenName,1:topN)]$hashtag
 		ret
 	}
-	
 	mGetTopNHashtags = memoise(getTopNHashtags)
 	frequencyTbl = hashtagsTbl[tagCountTbl, list(hashtagChosenP = hashtag %in% mGetTopNHashtags(length(hashtag), user_screen_name))][, list(NFrequency=sum(hashtagChosenP)), by=user_screen_name]
 	setkey(hashtagsTbl, dt)
