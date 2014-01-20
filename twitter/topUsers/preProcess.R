@@ -380,6 +380,17 @@ modelVsPredOutFile <- function(name) {
 	sprintf('%s/dissertationData/modelVsPred/%s.csv', PATH, name)
 }
 
+runPrior <- function(query, outFileName) {
+	outFile = modelVsPredOutFile(outFileName)
+	tweetsTbl = getTweetsTbl(query)
+	hashtagsTbl = getHashtagsTbl(tweetsTbl, from='tokenText')
+	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl, outFile=outFile)
+	modelVsPredTbl
+}
+
+
+
+
 curWS <- function() {
 	debugP = F
 	runTests()
@@ -397,9 +408,13 @@ curWS <- function() {
 	tusersTbl[order(followers_count, decreasing=T)][8000:10000][, plot(1:length(followers_count), followers_count)]
 	tusersTbl[order(followers_count, decreasing=T)][10000:11000][, plot(1:length(followers_count), followers_count)]
 	tusersTbl[order(followers_count, decreasing=T)][10000:11000][, list(min(followers_count), max(followers_count))] 
-	data.table(sqldf("select * from tweets where user_screen_name in (select user_screen_name from twitter_users where followers_count > 1000000)"))
+	runPrior("select * from tweets where user_screen_name = 'katyperry'", 'foo')
+	res = runPrior('select * from tweets where user_screen_name in (select user_screen_name from twitter_users where followers_count > 1000000 order by followers_count asc limit 100)', 'gt100k')
+	data.table(sqldf("select count(*) from tweets where user_screen_name in (select user_screen_name from twitter_users where followers_count > 1000000)"))
 	sqldf('select count(*) from twitter_users')
-	tusersTbl[order(followers_count, decreasing=T)]
+	data.table(sqldf('select user_screen_name from twitter_users where followers_count > 100000 order by followers_count asc limit 1000'))
+	data.table(sqldf('select user_screen_name from twitter_users where followers_count > 1000000 order by followers_count asc limit 100'))
+	data.table(sqldf('select * from tweets where user_screen_name in (select user_screen_name from twitter_users where followers_count < 1000000 and followers_count > 950000)'))
 	db = makeDB(do.call(function(x) sample(x, length(x)), list(unique(hashtagsTbl$hashtag))))
 	visHashtags(hashtagsTbl[user_screen_name=='chelseafc'], db)
 	modelHashtagsTbl = computeActsByUser(hashtagsTbl[user_screen_name=='joelmchale'], d=c(10))
