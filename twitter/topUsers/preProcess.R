@@ -385,8 +385,12 @@ runPrior <- function(query, ...) {
 	modelVsPredTbl
 }
 
+getQueryGT <- function(val) {
+	sprintf('select * from tweets where user_screen_name in (select user_screen_name from twitter_users where followers_count > %d order by followers_count asc limit 100)', val)
+}
+
 run1M <- function() {
-	res = runPrior('select * from tweets where user_screen_name in (select user_screen_name from twitter_users where followers_count > 1000000 order by followers_count asc limit 100)', outFile=modelVsPredOutFile('gt1M'))
+	res = runPrior(getQueryGT(1000000), outFile=modelVsPredOutFile('gt1M'))
 	res
 }
 
@@ -395,6 +399,7 @@ curWS <- function() {
 	runTests()
 	tweetsTbl = getTweetsTbl("select * from tweets limit 100000")
 	tweetsTbl = getTweetsTbl("select * from tweets where user_screen_name='eddieizzard'")
+	tweetsTbl = getTweetsTbl(getQueryGT(1000000))
 	tweetsTbl
 	#hashtagsTbl = getHashtagsTbl(tweetsTbl, from='text')
 	hashtagsTbl = getHashtagsTbl(tweetsTbl, from='tokenText')
@@ -403,35 +408,17 @@ curWS <- function() {
 	tusersTbl = getTusersTbl()
 	tusersTbl
 	tusersTbl[order(rank, decreasing=T)][20000:30000][, plot(1:length(followers_count), followers_count)]
-	tusersTbl[,cor(rank, followers_count)]
-	tusersTbl[order(followers_count, decreasing=T)][8000:10000][, plot(1:length(followers_count), followers_count)]
-	tusersTbl[order(followers_count, decreasing=T)][10000:11000][, plot(1:length(followers_count), followers_count)]
-	tusersTbl[order(followers_count, decreasing=T)][10000:11000][, list(min(followers_count), max(followers_count))] 
 	runPrior("select * from tweets where user_screen_name = 'katyperry'")
-	data.table(sqldf("select count(*) from tweets where user_screen_name in (select user_screen_name from twitter_users where followers_count > 1000000)"))
-	sqldf('select count(*) from twitter_users')
-	data.table(sqldf('select user_screen_name from twitter_users where followers_count > 100000 order by followers_count asc limit 1000'))
-	data.table(sqldf('select user_screen_name from twitter_users where followers_count > 1000000 order by followers_count asc limit 100'))
-	data.table(sqldf('select * from tweets where user_screen_name in (select user_screen_name from twitter_users where followers_count < 1000000 and followers_count > 950000)'))
 	db = makeDB(do.call(function(x) sample(x, length(x)), list(unique(hashtagsTbl$hashtag))))
 	visHashtags(hashtagsTbl[user_screen_name=='chelseafc'], db)
 	modelHashtagsTbl = computeActsByUser(hashtagsTbl[user_screen_name=='joelmchale'], d=c(10))
 	addMetrics(hashtagsTbl, modelHashtagsTbl)
-	setkey(hashtagsTbl, user_screen_name, dt, hashtag)	
-	setkey(modelHashtagsTbl, user_screen_name, dt, d, act)
-	setkey(modelHashtagsTbl, user_screen_name, dt)
-	modelHashtagsTbl[topHashtag==T]
-	modelHashtagsTbl
-	print(modelHashtagsTbl, topn=40)
-	print(hashtagsTbl[modelHashtagsTbl[topHashtag==T]], topn=40)
 	tables()
 	visHashtags(modelHashtagsTbl[topHashtag==T,], db)
-	unique(hashtagsTbl$user_screen_name)
 	visCompare(hashtagsTbl[user_screen_name=='joelmchale'], modelHashtagsTbl[topHashtag==T & user_screen_name=='joelmchale',], db)
 	hashtagsTbl[user_screen_name=='joelmchale'][, .N, by=hashtag][, sum(N)]
 
 	extremesTbl = summarizeExtremes(hashtagsTbl)
-	extremesTbl
 	extremesTbl
 	Q
 
@@ -441,7 +428,10 @@ curWS <- function() {
 	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl[user_screen_name == 'eddieizzard'], ds=40)
 	modelVsPredTblBig = modelVsPredTbl
 	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl)
-	visModelVsPredTbl(modelVsPredTblSmall[DVName=='topHashtag'], hashtagsTbl)
+	visModelVsPredTbl(fread(modelVsPredOutFile('gt1M'))[DVName=='topHashtag'], hashtagsTbl)
+	modelVsPredTbl = fread(modelVsPredOutFile('gt1M'))
+	modelVsPredTbl
+	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagAct'][user_screen_name %in% sample(unique(user_screen_name), size=10)], hashtagsTbl)
 	visModelVsPredTbl(modelVsPredTbl, hashtagsTbl)
 	setkey(modelVsPredTbl, user_screen_name)
 	modelVsPredTbl[topHashtag ==T & hashtagUsedP]
@@ -449,12 +439,8 @@ curWS <- function() {
 	setkey(modelVsPredTbl, user_screen_name, d)
 	print(modelVsPredTblBig[topHashtag & hashtagUsedP])
 	print(modelVsPredTblBig[topHashtag & hashtagUsedP][extremesTbl, allow.cartesian=T][d==0 | d==20], topn=2000)
-	foo1 = modelVsPredTbl[topHashtag ==T, sum(N), by=list(user_screen_name, d)][, list(mean(V1), sd(V1)), by=list(user_screen_name)]
-	foo2 = hashtagsTbl[, .N, keyby=user_screen_name]
 	tables()
 	foo2[foo1][, N-V1]
-	modelVsPredTbl[maxNP==T, sum(maxNP), by=list(user_screen_name, d)]
-	modelVsPredTbl[user_screen_name=='veja']
 	tables()
 	modelVsPredTblSmall[topHashtag==T & hashtagUsedP]
 
