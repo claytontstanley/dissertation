@@ -415,6 +415,11 @@ curWS <- function() {
 	setkey(modelVsPredTbl, user_screen_name, d)
 	print(modelVsPredTblBig[topHashtag & hashtagUsedP])
 	print(modelVsPredTblBig[topHashtag & hashtagUsedP][extremesTbl, allow.cartesian=T][d==0 | d==20], topn=2000)
+	foo1 = modelVsPredTbl[topHashtag ==T, sum(N), by=list(user_screen_name, d)][, list(mean(V1), sd(V1)), by=list(user_screen_name)]
+	foo2 = hashtagsTbl[, .N, keyby=user_screen_name]
+	tables()
+	foo2[foo1][, N-V1]
+
 	joinTbl = modelVsPredTblBig[topHashtag & hashtagUsedP][extremesTbl, allow.cartesian=T][maxNP==T]
 	joinTbl[, list(user_screen_name, best=N/totN, r=NRecency/totN, f=NFrequency/totN)][, list(user_screen_name, best-r, best-f)][, lapply(list(V2, V3), mean),]
 	joinTbl[, list(user_screen_name, best=N/totN, r=NRecency/totN, f=NFrequency/totN)][, list(user_screen_name, best-r, best-f)][, hist(V2)]
