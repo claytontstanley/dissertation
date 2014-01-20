@@ -274,16 +274,9 @@ addMetrics <- function(hashtagsTbl, modelHashtagsTbl) {
 	tagCountTbl = hashtagsTbl[, list(tagCountN=.N), by=list(user_screen_name, dt)]
 	modelHashtagsTbl[tagCountTbl, tagCount := tagCountN]
 	modelHashtagsTbl[tagCountTbl[, list(tagCountUserN=sum(tagCountN)), keyby=user_screen_name], tagCountUser := tagCountUserN]
-	isTopHashtag <- function(act, tagCount) {
-		s = sort(act, index.return=T, decreasing=T)
-		numPossible = length(act)
-		res = rep(FALSE, numPossible) 
-		res[s$i[1:min(numPossible, tagCount)]] = TRUE
-		res
-	}
 	flushPrint('adding metrics for modelHashtagsTbl')
-	modelHashtagsTbl[, topHashtagPost := isTopHashtag(act, tagCount[1]), by=list(user_screen_name, dt, d)]
-	modelHashtagsTbl[, topHashtagAct := isTopHashtag(act, tagCountUser[1]), by=list(user_screen_name, d)]
+	modelHashtagsTbl[order(act, decreasing=T), topHashtagPost := 1:length(act) <= tagCount[1], by=list(user_screen_name, dt, d)]
+	modelHashtagsTbl[order(act, decreasing=T), topHashtagAct := 1:length(act) <= tagCountUser[1], by=list(user_screen_name, d)]
 	expect_that(key(modelHashtagsTbl), equals(c('user_screen_name', 'dt', 'hashtag', 'd')))
 	expect_that(key(hashtagsTbl), equals(c('user_screen_name', 'dt', 'hashtag')))
 	modelHashtagsTbl[, hashtagUsedP := F]
@@ -382,18 +375,18 @@ modelVsPredOutFile <- function(name) {
 	sprintf('%s/dissertationData/modelVsPred/%s.csv', PATH, name)
 }
 
-runPrior <- function(query, outFile) {
+runPrior <- function(query, ...) {
 	Rprof()
 	tweetsTbl = getTweetsTbl(query)
 	hashtagsTbl = getHashtagsTbl(tweetsTbl, from='tokenText')
-	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl, outFile=outFile)
+	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl, ...)
 	Rprof(NULL)
 	flushPrint(summaryRprof())
 	modelVsPredTbl
 }
 
 run1M <- function() {
-	res = runPrior('select * from tweets where user_screen_name in (select user_screen_name from twitter_users where followers_count > 1000000 order by followers_count asc limit 100)', modelVsPredOutFile('gt1M'))
+	res = runPrior('select * from tweets where user_screen_name in (select user_screen_name from twitter_users where followers_count > 1000000 order by followers_count asc limit 100)', outFile=modelVsPredOutFile('gt1M'))
 	res
 }
 
@@ -414,7 +407,7 @@ curWS <- function() {
 	tusersTbl[order(followers_count, decreasing=T)][8000:10000][, plot(1:length(followers_count), followers_count)]
 	tusersTbl[order(followers_count, decreasing=T)][10000:11000][, plot(1:length(followers_count), followers_count)]
 	tusersTbl[order(followers_count, decreasing=T)][10000:11000][, list(min(followers_count), max(followers_count))] 
-	runPrior("select * from tweets where user_screen_name = 'katyperry'", 'foo')
+	runPrior("select * from tweets where user_screen_name = 'katyperry'")
 	data.table(sqldf("select count(*) from tweets where user_screen_name in (select user_screen_name from twitter_users where followers_count > 1000000)"))
 	sqldf('select count(*) from twitter_users')
 	data.table(sqldf('select user_screen_name from twitter_users where followers_count > 100000 order by followers_count asc limit 1000'))
