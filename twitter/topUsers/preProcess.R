@@ -267,8 +267,9 @@ runTests <- function() {
 }
 
 addMetrics <- function(hashtagsTbl, modelHashtagsTbl) {
-	tagCountTbl = hashtagsTbl[, list(tagCount=.N), by=list(user_screen_name, dt)]
-	modelHashtagsTbl[tagCountTbl, tagCount := tagCount]
+	tagCountTbl = hashtagsTbl[, list(tagCountN=.N), by=list(user_screen_name, dt)]
+	modelHashtagsTbl[tagCountTbl, tagCount := tagCountN]
+	modelHashtagsTbl[tagCountTbl[, list(tagCountUserN=sum(tagCountN)), keyby=user_screen_name], tagCountUser := tagCountUserN]
 	isTopHashtag <- function(act, tagCount) {
 		s = sort(act, index.return=T, decreasing=T)
 		numPossible = length(act)
@@ -278,7 +279,7 @@ addMetrics <- function(hashtagsTbl, modelHashtagsTbl) {
 	}
 	flushPrint('adding metrics for modelHashtagsTbl')
 	modelHashtagsTbl[, topHashtag := isTopHashtag(act, tagCount), by=list(user_screen_name, dt, d)]
-	modelHashtagsTbl[, topHashtagAct := isTopHashtag(act, sum(.SD[, list(tc=tagCount[1]), by=dt]$tc)), by=list(user_screen_name, d)]
+	modelHashtagsTbl[, topHashtagAct := isTopHashtag(act, tagCountUser), by=list(user_screen_name, d)]
 	expect_that(key(modelHashtagsTbl), equals(c('user_screen_name', 'dt', 'hashtag', 'd')))
 	expect_that(key(hashtagsTbl), equals(c('user_screen_name', 'dt', 'hashtag')))
 	modelHashtagsTbl[, hashtagUsedP := F]
