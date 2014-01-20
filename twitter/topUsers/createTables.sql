@@ -9,7 +9,7 @@ create table if not exists topUsers (
 drop table if exists tweets cascade;
 create table if not exists tweets (
 	id bigint not null,
-	user_id integer not null,
+	user_id bigint not null,
 	user_screen_name varchar(255) not null,
 	created_at varchar(255) not null,
 	retweeted varchar(255) not null,
