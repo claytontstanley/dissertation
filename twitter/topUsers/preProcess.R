@@ -317,7 +317,7 @@ onlyFirstT <- function(bool) {
 }
 
 getModelVsPredTbl <- function(modelHashtagsTbl) {
-	modelVsPredTbl = modelHashtagsTbl[, list(NCell=.N), by=list(user_screen_name, topHashtag, hashtagUsedP, d)]
+	modelVsPredTbl = modelHashtagsTbl[, list(NCell=.N, DVName='topHashtag'), by=list(user_screen_name, topHashtag, hashtagUsedP, d)]
 	modelVsPredTbl[, maxNP := NCell==max(NCell), by=list(user_screen_name, topHashtag, hashtagUsedP)]
 	modelVsPredTbl[maxNP==T, maxNP := onlyFirstT(abs(d-mean(d)) == min(abs(d-mean(d)))), by=list(user_screen_name, topHashtag, hashtagUsedP)]
 	modelVsPredTbl
