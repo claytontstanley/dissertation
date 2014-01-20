@@ -355,7 +355,7 @@ compareModelVsExtreme <-function(modelHashtagsTbl, extremesTbl) {
 	fooTbl
 }
 
-genAggModelVsPredTbl <- function(hashtagsTbl, ds=c(0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1.0,1.1,1.2,1.3,1.4,1.5,1.6,1.8,2,5,10,20)) {
+genAggModelVsPredTbl <- function(hashtagsTbl, ds=c(0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1.0,1.1,1.2,1.3,1.4,1.5,1.6,1.8,2,5,10,20), outFile='/tmp/modelVsPred.csv') {
 	genModelVsPredTbl <- function(hashtagsTbl, d, userScreenName) {
 		flushPrint(sprintf('generating model predictions for user %s', userScreenName))
 		modelHashtagsTbl = computeActsByUser(hashtagsTbl, d=d)
@@ -366,9 +366,9 @@ genAggModelVsPredTbl <- function(hashtagsTbl, ds=c(0,.1,.2,.3,.4,.5,.6,.7,.8,.9,
 	singleHashtagUsers = hashtagsTbl[, list(uniqueDTs=length(unique(dt)) <= 1), by=user_screen_name][uniqueDTs==T]$user_screen_name
 	flushPrint(sprintf('not running users (%s) since they all have less than two dt hashtag observations', paste(singleHashtagUsers, sep=',', collapse=NULL)))
 	users = data.table(cur_user_screen_name=Filter(function(v) !(v %in% singleHashtagUsers), unique(hashtagsTbl$user_screen_name)))
-	users
 	res = users[, genModelVsPredTbl(hashtagsTbl[cur_user_screen_name], ds, cur_user_screen_name), by=cur_user_screen_name]
 	res[, cur_user_screen_name := NULL]
+	write.csv(res, row.names=F, file=outFile)
 	res
 }
 
@@ -380,6 +380,10 @@ visModelVsPredTbl <- function(modelVsPredTbl, hashtagsTbl) {
 	print(ggplot(modelVsPredTbl[topHashtag & hashtagUsedP], aes(log(d),N/totN, colour=as.factor(user_screen_name)), group = as.factor(user_screen_name)) + geom_line())
 	dev.new()
 	print(ggplot(modelVsPredTbl[topHashtag & hashtagUsedP], aes(log(d),N, colour=as.factor(user_screen_name)), group = as.factor(user_screen_name)) + geom_line())
+}
+
+modelVsPredOutFile <- function(name) {
+	sprintf('%s/dissertationData/modelVsPred/%s.csv', PATH, name)
 }
 
 curWS <- function() {
@@ -417,10 +421,11 @@ curWS <- function() {
 	Q
 	summarizeExtremes(hashtagsTbl[user_screen_name=='eddieizzard'])
 	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl[user_screen_name %in% unique(user_screen_name)[1:25]])
-	modelVsPredTblSmall = genAggModelVsPredTbl(hashtagsTbl[user_screen_name == 'ap'])
+	modelVsPredTblSmall = genAggModelVsPredTbl(hashtagsTbl[user_screen_name == 'ap'], outFile = modelVsPredOutFile('testing1'))
 	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl[user_screen_name == 'eddieizzard'], ds=40)
 	modelVsPredTblBig = modelVsPredTbl
 	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl)
+	modelVsPredTblSmall
 	visModelVsPredTbl(modelVsPredTbl, hashtagsTbl)
 	setkey(modelVsPredTbl, user_screen_name)
 	modelVsPredTbl[topHashtag ==T & hashtagUsedP]
