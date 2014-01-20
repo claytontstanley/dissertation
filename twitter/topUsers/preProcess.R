@@ -411,12 +411,8 @@ curWS <- function() {
 	runPrior("select * from tweets where user_screen_name = 'katyperry'")
 	db = makeDB(do.call(function(x) sample(x, length(x)), list(unique(hashtagsTbl$hashtag))))
 	visHashtags(hashtagsTbl[user_screen_name=='chelseafc'], db)
-	modelHashtagsTbl = computeActsByUser(hashtagsTbl[user_screen_name=='joelmchale'], d=c(10))
-	addMetrics(hashtagsTbl, modelHashtagsTbl)
-	tables()
 	visHashtags(modelHashtagsTbl[topHashtag==T,], db)
 	visCompare(hashtagsTbl[user_screen_name=='joelmchale'], modelHashtagsTbl[topHashtag==T & user_screen_name=='joelmchale',], db)
-	hashtagsTbl[user_screen_name=='joelmchale'][, .N, by=hashtag][, sum(N)]
 
 	extremesTbl = summarizeExtremes(hashtagsTbl)
 	extremesTbl
@@ -424,15 +420,13 @@ curWS <- function() {
 
 	summarizeExtremes(hashtagsTbl[user_screen_name=='eddieizzard'])
 	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl[user_screen_name %in% unique(user_screen_name)[1:25]])
-	modelVsPredTblSmall = genAggModelVsPredTbl(hashtagsTbl[user_screen_name == 'ap'], outFile = modelVsPredOutFile('testing1'))
-	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl[user_screen_name == 'eddieizzard'], ds=40)
 	modelVsPredTblBig = modelVsPredTbl
 	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl)
-	visModelVsPredTbl(fread(modelVsPredOutFile('gt1M'))[DVName=='topHashtag'], hashtagsTbl)
 	modelVsPredTbl = fread(modelVsPredOutFile('gt1M'))
 	modelVsPredTbl
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagAct'][user_screen_name %in% sample(unique(user_screen_name), size=10)], hashtagsTbl)
 	visModelVsPredTbl(modelVsPredTbl, hashtagsTbl)
+	
 	setkey(modelVsPredTbl, user_screen_name)
 	modelVsPredTbl[topHashtag ==T & hashtagUsedP]
 	setkey(extremesTbl, user_screen_name)
