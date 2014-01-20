@@ -14,6 +14,8 @@ select user_screen_name from twitter_users;
 select count(*) from tweets;
 select * from tweets where user_screen_name=(select user_screen_name from topUsers where rank=1100);
 
+select count(*) from tweets;
+select user_screen_name from twitter_users where followers_count > 260000 and followers_count < 290000;
 insert into tweets (id, created_at, text) values (5, 'created', 'text');
 insert into tweets (id, created_at, text) values (10, 'created', 'text');
 

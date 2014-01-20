@@ -392,6 +392,14 @@ curWS <- function() {
 	getHashtagEntropy(hashtagsTbl)
 	tusersTbl = getTusersTbl()
 	tusersTbl
+	tusersTbl[order(rank, decreasing=T)][20000:30000][, plot(1:length(followers_count), followers_count)]
+	tusersTbl[,cor(rank, followers_count)]
+	tusersTbl[order(followers_count, decreasing=T)][8000:10000][, plot(1:length(followers_count), followers_count)]
+	tusersTbl[order(followers_count, decreasing=T)][10000:11000][, plot(1:length(followers_count), followers_count)]
+	tusersTbl[order(followers_count, decreasing=T)][10000:11000][, list(min(followers_count), max(followers_count))] 
+	data.table(sqldf("select * from tweets where user_screen_name in (select user_screen_name from twitter_users where followers_count > 1000000)"))
+	sqldf('select count(*) from twitter_users')
+	tusersTbl[order(followers_count, decreasing=T)]
 	db = makeDB(do.call(function(x) sample(x, length(x)), list(unique(hashtagsTbl$hashtag))))
 	visHashtags(hashtagsTbl[user_screen_name=='chelseafc'], db)
 	modelHashtagsTbl = computeActsByUser(hashtagsTbl[user_screen_name=='joelmchale'], d=c(10))

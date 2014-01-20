@@ -175,10 +175,12 @@ def userInfoAlreadyCollected(user_screen_name):
 def chunker(seq, size):
     return (seq[pos:pos + size] for pos in xrange(0, len(seq), size))
 
-def getForTopUsers(alreadyCollectedFun, getForUserFun, getRemainingHitsFun, hitsAlwaysGreaterThan, groupFun=lambda x: chunker(x, 1)):
-    res = _cur.query('select (user_screen_name) from topUsers order by rank asc limit 10000').getresult()
+def getForTopUsers(alreadyCollectedFun, getForUserFun, getRemainingHitsFun, hitsAlwaysGreaterThan, groupFun=lambda x: chunker(x, 1),
+                   userQuery='select (user_screen_name) from topUsers order by rank asc limit 100000'):
+    res = _cur.query(userQuery).getresult()
     screenNames = [[user[0]] for user in res]
     screenNames = list(itertools.chain(*screenNames))
+    print "getting tweets for %s users" % len(screenNames)
     screenNameGroups = groupFun(screenNames)
     for screenNameGroup in screenNameGroups:
         newScreenNames = []
@@ -206,6 +208,11 @@ def getForTopUsers(alreadyCollectedFun, getForUserFun, getRemainingHitsFun, hits
 def getAllTweetsForTopUsers():
     getForTopUsers(alreadyCollectedFun=userAlreadyCollected, getForUserFun=getAllTweets, getRemainingHitsFun=getRemainingHitsUserTimeline, hitsAlwaysGreaterThan=30)
 
+def getAllTweetsFor100kUsers():
+    getForTopUsers(alreadyCollectedFun=userAlreadyCollected, getForUserFun=getAllTweets, getRemainingHitsFun=getRemainingHitsUserTimeline, hitsAlwaysGreaterThan=30,
+                   userQuery='select user_screen_name from twitter_users where followers_count > 260000 and followers_count < 290000')
+
+
 def getUserInfoForTopUsers():
     getForTopUsers(alreadyCollectedFun=userInfoAlreadyCollected, getForUserFun=getInfoForUser, getRemainingHitsFun=getRemainingHitsGetUser, hitsAlwaysGreaterThan=30, groupFun=lambda x: chunker(x, 100))
 
@@ -214,6 +221,7 @@ def getUserInfoForTopUsers():
 #generateTopUsers(scrapeFun=lambda : generateTopUsersSocialBakers(numUsers=100000), topUsersFile='top100000SocialBakers.csv')
 #storeTopUsers(topUsersFile='top100000SocialBakers.csv')
 #getAllTweets('claytonstanley1')
-getAllTweetsForTopUsers()
+#getAllTweetsForTopUsers()
+getAllTweetsFor100kUsers()
 #getUserInfoForTopUsers()
 #backupTables()
