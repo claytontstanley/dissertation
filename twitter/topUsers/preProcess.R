@@ -288,21 +288,6 @@ addMetrics <- function(hashtagsTbl, modelHashtagsTbl) {
 	return()
 }
 
-visMetrics <- function(modelHashtagsTbl) {
-	plotForUserAndD <- function(modelHashtagsTbl, user_screen_name, d) {
-		pred = with(modelHashtagsTbl, prediction(act, hashtagUsedP))
-		perf = performance(pred, 'ppv')
-		return()
-		#dev.new()
-		#with(modelHashtagsTbl, logi.hist.plot(act, hashtagUsedP, boxp=T, type='hist', col='gray', las.h=0, xlabel='Activation'))
-		#density_plot(pred)
-		#modelHashtagsTbl[, {print(sprintf('%s, %f, %s', user_screen_name, d, hashtagUsedP)); print(summary(act))}, by=hashtagUsedP]
-		
-		#plot(perf, main=sprintf('%s, %f', user_screen_name, d))
-	}
-	#modelHashtagsTbl[, plotForUserAndD(.SD, user_screen_name, d), by=list(user_screen_name, d)]
-}
-
 summarizeExtremes <- function(hashtagsTbl) {
 	tagCountTbl = hashtagsTbl[, list(tagCount=.N), by=list(user_screen_name, dt)]
 	countTbl = hashtagsTbl[, .N, keyby=list(user_screen_name, hashtag)]
@@ -332,7 +317,7 @@ onlyFirstT <- function(bool) {
 }
 
 getModelVsPredTbl <- function(modelHashtagsTbl) {
-	modelVsPredTbl = modelHashtagsTbl[, NCell=.N, by=list(user_screen_name, topHashtag, hashtagUsedP, d)]
+	modelVsPredTbl = modelHashtagsTbl[, list(NCell=.N), by=list(user_screen_name, topHashtag, hashtagUsedP, d)]
 	modelVsPredTbl[, maxNP := NCell==max(NCell), by=list(user_screen_name, topHashtag, hashtagUsedP)]
 	modelVsPredTbl[maxNP==T, maxNP := onlyFirstT(abs(d-mean(d)) == min(abs(d-mean(d)))), by=list(user_screen_name, topHashtag, hashtagUsedP)]
 	modelVsPredTbl
