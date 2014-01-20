@@ -174,13 +174,10 @@ computeActsForUser <- function(hashtag, dt, ds, user_screen_name) {
 computeActsByUser <- function(hashtagsTbl, ds) {
 	partialRes = hashtagsTbl[, computeActsForUser(hashtag, dt, ds, user_screen_name), by=user_screen_name]
 	myPrint(partialRes)
-	Rprof()
 	flushPrint('setting key for partial table')
 	setkeyv(partialRes, c('user_screen_name','dt','hashtag','d'))
 	flushPrint('computing activations across table')
 	res = partialRes[, list(N=.N, act=log(sum(partialAct))), keyby=list(user_screen_name, dt, hashtag, d)]
-	Rprof(NULL)
-	flushPrint(summaryRprof())
 	with(res, expect_that(any(is.infinite(act)), is_false()))
 	res
 }
@@ -260,10 +257,17 @@ testOnlyFirstT <- function() {
 	expect_error(onlyFirstT(c()))
 }
 
+testModelVsPred <- function() {
+	expectedTbl = fread(modelVsPredOutFile('testing1'))
+	resTbl = runPrior("select * from tweets where user_screen_name = 'ap'", outFile='/tmp/modelVsPred.csv')
+	expect_equivalent(expectedTbl, resTbl)
+}
+
 runTests <- function() {
 	testPriorActivations()
 	testGetTokenizedTbl()
 	testOnlyFirstT()
+	testModelVsPred()
 }
 
 addMetrics <- function(hashtagsTbl, modelHashtagsTbl) {
@@ -271,8 +275,6 @@ addMetrics <- function(hashtagsTbl, modelHashtagsTbl) {
 	modelHashtagsTbl[tagCountTbl, tagCount := tagCountN]
 	modelHashtagsTbl[tagCountTbl[, list(tagCountUserN=sum(tagCountN)), keyby=user_screen_name], tagCountUser := tagCountUserN]
 	isTopHashtag <- function(act, tagCount) {
-		expect_true(all(tagCount[1] == tagCount))
-		tagCount = tagCount[1]
 		s = sort(act, index.return=T, decreasing=T)
 		numPossible = length(act)
 		res = rep(FALSE, numPossible) 
@@ -280,8 +282,8 @@ addMetrics <- function(hashtagsTbl, modelHashtagsTbl) {
 		res
 	}
 	flushPrint('adding metrics for modelHashtagsTbl')
-	modelHashtagsTbl[, topHashtagPost := isTopHashtag(act, tagCount), by=list(user_screen_name, dt, d)]
-	modelHashtagsTbl[, topHashtagAct := isTopHashtag(act, tagCountUser), by=list(user_screen_name, d)]
+	modelHashtagsTbl[, topHashtagPost := isTopHashtag(act, tagCount[1]), by=list(user_screen_name, dt, d)]
+	modelHashtagsTbl[, topHashtagAct := isTopHashtag(act, tagCountUser[1]), by=list(user_screen_name, d)]
 	expect_that(key(modelHashtagsTbl), equals(c('user_screen_name', 'dt', 'hashtag', 'd')))
 	expect_that(key(hashtagsTbl), equals(c('user_screen_name', 'dt', 'hashtag')))
 	modelHashtagsTbl[, hashtagUsedP := F]
@@ -380,16 +382,18 @@ modelVsPredOutFile <- function(name) {
 	sprintf('%s/dissertationData/modelVsPred/%s.csv', PATH, name)
 }
 
-runPrior <- function(query, outFileName) {
-	outFile = modelVsPredOutFile(outFileName)
+runPrior <- function(query, outFile) {
+	Rprof()
 	tweetsTbl = getTweetsTbl(query)
 	hashtagsTbl = getHashtagsTbl(tweetsTbl, from='tokenText')
 	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl, outFile=outFile)
+	Rprof(NULL)
+	flushPrint(summaryRprof())
 	modelVsPredTbl
 }
 
 run1M <- function() {
-	res = runPrior('select * from tweets where user_screen_name in (select user_screen_name from twitter_users where followers_count > 1000000 order by followers_count asc limit 100)', 'gt1M')
+	res = runPrior('select * from tweets where user_screen_name in (select user_screen_name from twitter_users where followers_count > 1000000 order by followers_count asc limit 100)', modelVsPredOutFile('gt1M'))
 	res
 }
 
