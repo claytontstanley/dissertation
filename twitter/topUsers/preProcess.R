@@ -355,6 +355,7 @@ genAggModelVsPredTbl <- function(hashtagsTbl, ds=c(0,.1,.2,.3,.4,.5,.6,.7,.8,.9,
 	users = data.table(cur_user_screen_name=Filter(function(v) !(v %in% singleHashtagUsers), unique(hashtagsTbl$user_screen_name)))
 	res = users[, genModelVsPredTbl(hashtagsTbl[cur_user_screen_name], ds, cur_user_screen_name), by=cur_user_screen_name]
 	res[, cur_user_screen_name := NULL]
+	setkey(res, user_screen_name, DVName, d)
 	write.csv(res, row.names=F, file=outFile)
 	res
 }
@@ -413,7 +414,7 @@ curWS <- function() {
 	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl[user_screen_name == 'eddieizzard'], ds=40)
 	modelVsPredTblBig = modelVsPredTbl
 	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl)
-	visModelVsPredTbl(modelVsPredTblSmall[DVName=='topHashtagAct'], hashtagsTbl)
+	visModelVsPredTbl(modelVsPredTblSmall[DVName=='topHashtag'], hashtagsTbl)
 	visModelVsPredTbl(modelVsPredTbl, hashtagsTbl)
 	setkey(modelVsPredTbl, user_screen_name)
 	modelVsPredTbl[topHashtag ==T & hashtagUsedP]
@@ -427,6 +428,8 @@ curWS <- function() {
 	foo2[foo1][, N-V1]
 	modelVsPredTbl[maxNP==T, sum(maxNP), by=list(user_screen_name, d)]
 	modelVsPredTbl[user_screen_name=='veja']
+	tables()
+	modelVsPredTblSmall[topHashtag==T & hashtagUsedP]
 
 	joinTbl = modelVsPredTblBig[topHashtag & hashtagUsedP][extremesTbl, allow.cartesian=T][maxNP==T]
 	joinTbl[, list(user_screen_name, best=N/totN, r=NRecency/totN, f=NFrequency/totN)][, list(user_screen_name, best-r, best-f)][, lapply(list(V2, V3), mean),]
