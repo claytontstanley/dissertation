@@ -252,9 +252,18 @@ testGetTokenizedTbl <- function() {
 	expect_equivalent(testTokenizedTbl, expectedTokenizedTbl)
 }
 
+testOnlyFirstT <- function() {
+	expect_equal(onlyFirstT(c(F,F,T,T,F,F)), c(F,F,T,F,F,F))
+	expect_error(onlyFirstT(c(F,F)))
+	expect_equal(onlyFirstT(c(T,T)), c(T,F))
+	expect_equal(onlyFirstT(c(F,F,T,F,F)), c(F,F,T,F,F))
+	expect_error(onlyFirstT(c()))
+}
+
 runTests <- function() {
 	testPriorActivations()
 	testGetTokenizedTbl()
+	testOnlyFirstT()
 }
 
 addMetrics <- function(hashtagsTbl, modelHashtagsTbl) {
@@ -315,10 +324,16 @@ summarizeExtremes <- function(hashtagsTbl) {
 	res
 }
 
+onlyFirstT <- function(bool) {
+	expect_true(any(bool == T))
+	ret = rep(F, length(bool))
+	ret[which(bool)[1]] = T
+	ret
+}
 
 getModelVsPredTbl <- function(modelHashtagsTbl) {
 	modelVsPredTbl = visMetrics(modelHashtagsTbl)
-	modelVsPredTbl[, maxNP := N==max(N), by=list(user_screen_name, topHashtag, hashtagUsedP)]
+	modelVsPredTbl[, maxNP := onlyFirstT(N==max(N)), by=list(user_screen_name, topHashtag, hashtagUsedP)]
 	# FIXME: alrogithm sets more than one to t for even numbers
 	modelVsPredTbl[maxNP==T, maxNP := abs(d-mean(d)) == min(abs(d-mean(d))), by=list(user_screen_name, topHashtag, hashtagUsedP)]
 	myPrint(modelVsPredTbl[topHashtag==T & hashtagUsedP==T])
@@ -403,10 +418,9 @@ curWS <- function() {
 	Q
 	summarizeExtremes(hashtagsTbl[user_screen_name=='eddieizzard'])
 	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl[user_screen_name %in% unique(user_screen_name)[1:25]])
-	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl[user_screen_name == 'joelmchale'])
+	modelVsPredTblSmall = genAggModelVsPredTbl(hashtagsTbl[user_screen_name == 'ap'])
 	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl[user_screen_name == 'eddieizzard'], ds=40)
 	modelVsPredTblBig = modelVsPredTbl
-	modelVsPredTbl
 	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl)
 	visModelVsPredTbl(modelVsPredTbl, hashtagsTbl)
 	setkey(modelVsPredTbl, user_screen_name)
@@ -419,6 +433,8 @@ curWS <- function() {
 	foo2 = hashtagsTbl[, .N, keyby=user_screen_name]
 	tables()
 	foo2[foo1][, N-V1]
+	modelVsPredTbl[maxNP==T, sum(maxNP), by=list(user_screen_name, d)]
+	modelVsPredTbl[user_screen_name=='veja']
 
 	joinTbl = modelVsPredTblBig[topHashtag & hashtagUsedP][extremesTbl, allow.cartesian=T][maxNP==T]
 	joinTbl[, list(user_screen_name, best=N/totN, r=NRecency/totN, f=NFrequency/totN)][, list(user_screen_name, best-r, best-f)][, lapply(list(V2, V3), mean),]
