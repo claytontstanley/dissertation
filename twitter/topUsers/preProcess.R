@@ -273,6 +273,8 @@ addMetrics <- function(hashtagsTbl, modelHashtagsTbl) {
 	expect_that(key(hashtagsTbl), equals(c('user_screen_name', 'dt', 'hashtag')))
 	modelHashtagsTbl[, hashtagUsedP := F]
 	modelHashtagsTbl[hashtagsTbl, hashtagUsedP := T]
+	#wideTbl = hashtagsTbl[, list(usedHashtags=list(hashtag)), by=list(user_screen_name, dt)]
+	#modelHashtagsTbl[wideTbl, usedHashtags := usedHashtags]
 	return()
 }
 
@@ -304,13 +306,14 @@ summarizeExtremes <- function(hashtagsTbl) {
 	mGetTopNHashtags = memoise(getTopNHashtags)
 	frequencyTbl = hashtagsTbl[, list(hashtagChosenP = hashtag %in% mGetTopNHashtags(length(hashtag), user_screen_name)), by=list(user_screen_name, dt)][, list(NFrequency=sum(hashtagChosenP)), keyby=user_screen_name]
 	flatHashtagsTbl = hashtagsTbl[, list(hashtag=list(hashtag)), by=list(user_screen_name, dt)]
-	setkey(flatHashtagsTbl, dt)
-	recencyTbl = flatHashtagsTbl[, list(hashtag=hashtag, dt=dt, prevHashtag=.SD[J(dt-.1), roll=T]$hashtag), by=user_screen_name]
-	recencyTbl = recencyTbl[, list(hashtag=unlist(hashtag), prevHashtag=prevHashtag, hashtagChosenP = unlist(hashtag) %in% unlist(prevHashtag)[1:length(unlist(hashtag))]), by=list(user_screen_name, dt)]
+	joinTbl = hashtagsTbl[, list(userScreenName=user_screen_name, dt1=dt, hashtag=hashtag)]
+	setkey(joinTbl, userScreenName, dt1)
+	recencyTbl = hashtagsTbl[, list(hashtags=list(hashtag), prevHashtags=list(unique(rev(joinTbl[J(user_screen_name),][dt1 < dt,]$hashtag)))), by=list(user_screen_name, dt)]
 	recencyTbl = recencyTbl[, list(NRecency=sum(hashtagChosenP)), by=list(user_screen_name)]
 	res = frequencyTbl[recencyTbl]
 	res
 }
+
 
 getModelVsPredTbl <- function(modelHashtagsTbl) {
 	modelVsPredTbl = visMetrics(modelHashtagsTbl)
@@ -326,6 +329,22 @@ genAggModelVsPredTbl <- function(hashtagsTbl, ds=c(0,.1,.2,.3,.4,.5,.6,.7,.8,.9,
 		flushPrint(sprintf('generating model predictions for user %s', userScreenName))
 		modelHashtagsTbl = computeActsByUser(hashtagsTbl, d=d)
 		addMetrics(hashtagsTbl, modelHashtagsTbl)
+		modelHashtagsTbl[d==20][topHashtag==T][hashtagUsedP==T][, .N]
+
+		browser()
+		print(modelHashtagsTbl[d==20][topHashtag==T], topn=20)
+		tables()
+		setkey(extremesTbl, user_screen_name, dt, hashtag)
+		extremesTbl
+		modelHashtagsTbl
+		?data.table
+		fooTbl = extremesTbl[modelHashtagsTbl[d==20], allow.cartesian=T, nomatch=0][, list(tagCount, user_screen_name, dt, hashtag, hashtagChosenP, topHashtag, lapply(prevHashtags, function(x) x[1:4]))]
+		fooTbl
+		extremesTbl
+		print(fooTbl, topn=500)
+		fooTbl[, sum(topHashtag)]
+		fooTbl
+
 		modelVsPredTbl = getModelVsPredTbl(modelHashtagsTbl)	
 		modelVsPredTbl
 	}
@@ -352,6 +371,7 @@ curWS <- function() {
 	debugP = F
 	runTests()
 	tweetsTbl = getTweetsTbl("select * from tweets limit 100000")
+	tweetsTbl = getTweetsTbl("select * from tweets where user_screen_name='eddieizzard'")
 	tweetsTbl
 	#hashtagsTbl = getHashtagsTbl(tweetsTbl, from='text')
 	hashtagsTbl = getHashtagsTbl(tweetsTbl, from='tokenText')
@@ -377,11 +397,13 @@ curWS <- function() {
 	hashtagsTbl[user_screen_name=='joelmchale'][, .N, by=hashtag][, sum(N)]
 
 	extremesTbl = summarizeExtremes(hashtagsTbl)
+	extremesTbl
+	extremesTbl
 	Q
 	summarizeExtremes(hashtagsTbl[user_screen_name=='eddieizzard'])
-	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl[user_screen_name %in% unique(user_screen_name)[1:20]])
+	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl[user_screen_name %in% unique(user_screen_name)[1:40]])
 	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl[user_screen_name == 'joelmchale'])
-	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl[user_screen_name == '1dthisisus'])
+	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl[user_screen_name == 'eddieizzard'], ds=40)
 	modelVsPredTblBig = modelVsPredTbl
 	modelVsPredTbl
 	tables()
@@ -406,6 +428,7 @@ curWS <- function() {
 	modelVsPredTbl[topHashtag ==T & hashtagUsedP]
 	setkey(extremesTbl, user_screen_name)
 	setkey(modelVsPredTbl, user_screen_name, d)
+	print(modelVsPredTbl[topHashtag & hashtagUsedP])
 	print(modelVsPredTbl[topHashtag & hashtagUsedP][extremesTbl, allow.cartesian=T][d==0 | d==20], topn=2000)
 
 }
