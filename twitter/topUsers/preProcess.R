@@ -323,7 +323,6 @@ getModelVsPredTbl <- function(modelHashtagsTbl) {
 	tempTbl = modelHashtagsTbl[, list(NCell=.N, DVName='topHashtagPost'), by=list(user_screen_name, topHashtagPost, hashtagUsedP, d)]
 	tempTbl[, topHashtag := topHashtagPost]
 	tempTbl[, topHashtagPost := NULL]
-	setcolorder(tempTbl, c("user_screen_name","topHashtag","hashtagUsedP","d","NCell","DVName"))
 	modelVsPredTbl = tempTbl
 	tempTbl = modelHashtagsTbl[, list(NCell=.N, DVName='topHashtagAct'), by=list(user_screen_name, topHashtagAct, hashtagUsedP, d)]
 	tempTbl[, topHashtag := topHashtagAct]
