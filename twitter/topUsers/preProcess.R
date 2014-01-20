@@ -271,6 +271,8 @@ addMetrics <- function(hashtagsTbl, modelHashtagsTbl) {
 	modelHashtagsTbl[tagCountTbl, tagCount := tagCountN]
 	modelHashtagsTbl[tagCountTbl[, list(tagCountUserN=sum(tagCountN)), keyby=user_screen_name], tagCountUser := tagCountUserN]
 	isTopHashtag <- function(act, tagCount) {
+		expect_true(all(tagCount[1] == tagCount))
+		tagCount = tagCount[1]
 		s = sort(act, index.return=T, decreasing=T)
 		numPossible = length(act)
 		res = rep(FALSE, numPossible) 
