@@ -269,7 +269,7 @@ runTests <- function() {
 addMetrics <- function(hashtagsTbl, modelHashtagsTbl) {
 	tagCountTbl = hashtagsTbl[, list(tagCount=.N), by=list(user_screen_name, dt)]
 	modelHashtagsTbl[tagCountTbl, tagCount := tagCount]
-	isTopHashtag <- function(act, tagCount, d) {
+	isTopHashtag <- function(act, tagCount) {
 		s = sort(act, index.return=T, decreasing=T)
 		numPossible = length(act)
 		res = rep(FALSE, numPossible) 
@@ -278,6 +278,7 @@ addMetrics <- function(hashtagsTbl, modelHashtagsTbl) {
 	}
 	flushPrint('adding metrics for modelHashtagsTbl')
 	modelHashtagsTbl[, topHashtag := isTopHashtag(act, tagCount), by=list(user_screen_name, dt, d)]
+	modelHashtagsTbl[, topHashtagAct := isTopHashtag(act, sum(tagCount)), by=list(user_screen_name, d)]
 	expect_that(key(modelHashtagsTbl), equals(c('user_screen_name', 'dt', 'hashtag', 'd')))
 	expect_that(key(hashtagsTbl), equals(c('user_screen_name', 'dt', 'hashtag')))
 	modelHashtagsTbl[, hashtagUsedP := F]
@@ -299,7 +300,6 @@ visMetrics <- function(modelHashtagsTbl) {
 		
 		#plot(perf, main=sprintf('%s, %f', user_screen_name, d))
 	}
-	modelHashtagsTbl[, .N, by=list(user_screen_name, topHashtag, hashtagUsedP, d)]
 	#modelHashtagsTbl[, plotForUserAndD(.SD, user_screen_name, d), by=list(user_screen_name, d)]
 }
 
@@ -332,10 +332,9 @@ onlyFirstT <- function(bool) {
 }
 
 getModelVsPredTbl <- function(modelHashtagsTbl) {
-	modelVsPredTbl = visMetrics(modelHashtagsTbl)
-	modelVsPredTbl[, maxNP := N==max(N), by=list(user_screen_name, topHashtag, hashtagUsedP)]
+	modelVsPredTbl = modelHashtagsTbl[, NCell=.N, by=list(user_screen_name, topHashtag, hashtagUsedP, d)]
+	modelVsPredTbl[, maxNP := NCell==max(NCell), by=list(user_screen_name, topHashtag, hashtagUsedP)]
 	modelVsPredTbl[maxNP==T, maxNP := onlyFirstT(abs(d-mean(d)) == min(abs(d-mean(d)))), by=list(user_screen_name, topHashtag, hashtagUsedP)]
-	myPrint(modelVsPredTbl[topHashtag==T & hashtagUsedP==T])
 	modelVsPredTbl
 }
 
