@@ -324,27 +324,27 @@ getModelVsPredTbl <- function(modelHashtagsTbl) {
 	modelVsPredTbl
 }
 
+compareModelVsExtreme <-function(modelHashtagsTbl, extremesTbl) {
+	browser()
+	print(modelHashtagsTbl[d==20][topHashtag==T], topn=20)
+	tables()
+	setkey(extremesTbl, user_screen_name, dt, hashtag)
+	extremesTbl
+	modelHashtagsTbl
+	?data.table
+	fooTbl = extremesTbl[modelHashtagsTbl[d==20], allow.cartesian=T, nomatch=0][, list(tagCount, user_screen_name, dt, hashtag, hashtagChosenP, topHashtag, lapply(prevHashtags, function(x) x[1:4]))]
+	fooTbl
+	extremesTbl
+	print(fooTbl, topn=500)
+	fooTbl[, sum(topHashtag)]
+	fooTbl
+}
+
 genAggModelVsPredTbl <- function(hashtagsTbl, ds=c(0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1.0,1.1,1.2,1.3,1.4,1.5,1.6,1.8,2,5,10,20)) {
 	genModelVsPredTbl <- function(hashtagsTbl, d, userScreenName) {
 		flushPrint(sprintf('generating model predictions for user %s', userScreenName))
 		modelHashtagsTbl = computeActsByUser(hashtagsTbl, d=d)
 		addMetrics(hashtagsTbl, modelHashtagsTbl)
-		modelHashtagsTbl[d==20][topHashtag==T][hashtagUsedP==T][, .N]
-
-		browser()
-		print(modelHashtagsTbl[d==20][topHashtag==T], topn=20)
-		tables()
-		setkey(extremesTbl, user_screen_name, dt, hashtag)
-		extremesTbl
-		modelHashtagsTbl
-		?data.table
-		fooTbl = extremesTbl[modelHashtagsTbl[d==20], allow.cartesian=T, nomatch=0][, list(tagCount, user_screen_name, dt, hashtag, hashtagChosenP, topHashtag, lapply(prevHashtags, function(x) x[1:4]))]
-		fooTbl
-		extremesTbl
-		print(fooTbl, topn=500)
-		fooTbl[, sum(topHashtag)]
-		fooTbl
-
 		modelVsPredTbl = getModelVsPredTbl(modelHashtagsTbl)	
 		modelVsPredTbl
 	}
