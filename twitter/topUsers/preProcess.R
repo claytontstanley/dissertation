@@ -321,12 +321,11 @@ onlyFirstT <- function(bool) {
 
 getModelVsPredTbl <- function(modelHashtagsTbl) {
 	tempTbl = modelHashtagsTbl[, list(NCell=.N, DVName='topHashtagPost'), by=list(user_screen_name, topHashtagPost, hashtagUsedP, d)]
-	tempTbl[, topHashtag := topHashtagPost]
-	tempTbl[, topHashtagPost := NULL]
+	setnames(tempTbl, 'topHashtagPost', 'topHashtag')
+	setcolorder(tempTbl, c("user_screen_name","hashtagUsedP","d","NCell","DVName","topHashtag"))
 	modelVsPredTbl = tempTbl
 	tempTbl = modelHashtagsTbl[, list(NCell=.N, DVName='topHashtagAct'), by=list(user_screen_name, topHashtagAct, hashtagUsedP, d)]
-	tempTbl[, topHashtag := topHashtagAct]
-	tempTbl[, topHashtagAct := NULL]
+	setnames(tempTbl, 'topHashtagAct', 'topHashtag')
 	modelVsPredTbl = rbind(modelVsPredTbl, tempTbl, use.names=T)
 	modelVsPredTbl[, maxNP := NCell==max(NCell), by=list(user_screen_name, topHashtag, hashtagUsedP, DVName)]
 	modelVsPredTbl[maxNP==T, maxNP := onlyFirstT(abs(d-mean(d)) == min(abs(d-mean(d)))), by=list(user_screen_name, topHashtag, hashtagUsedP, DVName)]
