@@ -309,6 +309,7 @@ summarizeExtremes <- function(hashtagsTbl) {
 	joinTbl = hashtagsTbl[, list(userScreenName=user_screen_name, dt1=dt, hashtag=hashtag)]
 	setkey(joinTbl, userScreenName, dt1)
 	recencyTbl = hashtagsTbl[, list(hashtags=list(hashtag), prevHashtags=list(unique(rev(joinTbl[J(user_screen_name),][dt1 < dt,]$hashtag)))), by=list(user_screen_name, dt)]
+	recencyTbl = recencyTbl[, list(hashtag=unlist(hashtags), prevHashtag=prevHashtags, hashtagChosenP = unlist(hashtags) %in% unlist(prevHashtags)[1:length(unlist(hashtags))]), by=list(user_screen_name, dt)]
 	recencyTbl = recencyTbl[, list(NRecency=sum(hashtagChosenP)), by=list(user_screen_name)]
 	res = frequencyTbl[recencyTbl]
 	res
@@ -401,35 +402,19 @@ curWS <- function() {
 	extremesTbl
 	Q
 	summarizeExtremes(hashtagsTbl[user_screen_name=='eddieizzard'])
-	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl[user_screen_name %in% unique(user_screen_name)[1:40]])
+	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl[user_screen_name %in% unique(user_screen_name)[1:25]])
 	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl[user_screen_name == 'joelmchale'])
 	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl[user_screen_name == 'eddieizzard'], ds=40)
 	modelVsPredTblBig = modelVsPredTbl
 	modelVsPredTbl
-	tables()
 	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl)
-	modelVsPredTblBig[, totN := NULL]
-	modelVsPredTbl[d==0]
 	visModelVsPredTbl(modelVsPredTblBig, hashtagsTbl)
-	modelVsPredTbl[topHashtag & hashtagUsedP & user_screen_name=='mchammer']
-	modelVsPredTbl[topHashtag & hashtagUsedP & maxNP, N, by=user_screen_name]
-	modelVsPredTbl[user_screen_name=='lanadelrey']
 	setkey(modelVsPredTbl, user_screen_name)
-	modelVsPredTbl[recencyTbl][hashtagUsedP & topHashtag & maxNP,]
-	recencyTbl
-	tables()
-	modelVsPredTbl[topHashtag==T & d==0, sum(N), by=list(user_screen_name)]
-	hashtagsTbl[, .N, by=list(user_screen_name)]
-	hashtagsTbl[user_screen_name=='joelmchale']
-	modelVsPredTblBig[user_screen_name=='joelmchale' & topHashtag == T & hashtagUsedP, .SD, by=d]
-	modelVsPredTbl[topHashtag & user_screen_name=='joelmchale']
-	modelVsPredTblBig[maxNP == T]
-	tables()
 	modelVsPredTbl[topHashtag ==T & hashtagUsedP]
 	setkey(extremesTbl, user_screen_name)
 	setkey(modelVsPredTbl, user_screen_name, d)
-	print(modelVsPredTbl[topHashtag & hashtagUsedP])
-	print(modelVsPredTbl[topHashtag & hashtagUsedP][extremesTbl, allow.cartesian=T][d==0 | d==20], topn=2000)
+	print(modelVsPredTblBig[topHashtag & hashtagUsedP])
+	print(modelVsPredTblBig[topHashtag & hashtagUsedP][extremesTbl, allow.cartesian=T][d==0 | d==20], topn=2000)
 
 }
 
