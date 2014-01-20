@@ -319,17 +319,15 @@ onlyFirstT <- function(bool) {
 	ret
 }
 
-?data.table
-
-modelVsPredForDV <- function(modelHashtagsTbl, DVName2) {
-	tempTbl = modelHashtagsTbl[, list(NCell=.N, DVName=DVName2), by=c('user_screen_name', DVName2, 'hashtagUsedP', 'd')]
-	setnames(tempTbl, DVName2, 'topHashtag')
+modelVsPredForDV <- function(modelHashtagsTbl, DVName) {
+	tempTbl = modelHashtagsTbl[, list(NCell=.N, DVName=DVName), by=c('user_screen_name', DVName, 'hashtagUsedP', 'd')]
+	setnames(tempTbl, DVName, 'topHashtag')
 	tempTbl
 }
 
 getModelVsPredTbl <- function(modelHashtagsTbl) {
-	rbind(modelVsPredForDV(modelHashtagsTbl, 'topHashtagPost'), 
-	      modelVsPredForDV(modelHashtagsTbl, 'topHashtagAct'))
+	modelVsPredTbl = rbind(modelVsPredForDV(modelHashtagsTbl, 'topHashtagPost'), 
+			       modelVsPredForDV(modelHashtagsTbl, 'topHashtagAct'))
 	modelVsPredTbl[, maxNP := NCell==max(NCell), by=list(user_screen_name, topHashtag, hashtagUsedP, DVName)]
 	modelVsPredTbl[maxNP==T, maxNP := onlyFirstT(abs(d-mean(d)) == min(abs(d-mean(d)))), by=list(user_screen_name, topHashtag, hashtagUsedP, DVName)]
 	modelVsPredTbl
