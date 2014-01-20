@@ -280,7 +280,7 @@ addMetrics <- function(hashtagsTbl, modelHashtagsTbl) {
 		res
 	}
 	flushPrint('adding metrics for modelHashtagsTbl')
-	modelHashtagsTbl[, topHashtag := isTopHashtag(act, tagCount), by=list(user_screen_name, dt, d)]
+	modelHashtagsTbl[, topHashtagPost := isTopHashtag(act, tagCount), by=list(user_screen_name, dt, d)]
 	modelHashtagsTbl[, topHashtagAct := isTopHashtag(act, tagCountUser), by=list(user_screen_name, d)]
 	expect_that(key(modelHashtagsTbl), equals(c('user_screen_name', 'dt', 'hashtag', 'd')))
 	expect_that(key(hashtagsTbl), equals(c('user_screen_name', 'dt', 'hashtag')))
@@ -320,7 +320,11 @@ onlyFirstT <- function(bool) {
 }
 
 getModelVsPredTbl <- function(modelHashtagsTbl) {
-	modelVsPredTbl = modelHashtagsTbl[, list(NCell=.N, DVName='topHashtag'), by=list(user_screen_name, topHashtag, hashtagUsedP, d)]
+	tempTbl = modelHashtagsTbl[, list(NCell=.N, DVName='topHashtagPost'), by=list(user_screen_name, topHashtagPost, hashtagUsedP, d)]
+	tempTbl[, topHashtag := topHashtagPost]
+	tempTbl[, topHashtagPost := NULL]
+	setcolorder(tempTbl, c("user_screen_name","topHashtag","hashtagUsedP","d","NCell","DVName"))
+	modelVsPredTbl = tempTbl
 	tempTbl = modelHashtagsTbl[, list(NCell=.N, DVName='topHashtagAct'), by=list(user_screen_name, topHashtagAct, hashtagUsedP, d)]
 	tempTbl[, topHashtag := topHashtagAct]
 	tempTbl[, topHashtagAct := NULL]
