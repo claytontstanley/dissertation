@@ -408,7 +408,7 @@ curWS <- function() {
 	modelVsPredTblBig = modelVsPredTbl
 	modelVsPredTbl
 	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl)
-	visModelVsPredTbl(modelVsPredTblBig, hashtagsTbl)
+	visModelVsPredTbl(modelVsPredTbl, hashtagsTbl)
 	setkey(modelVsPredTbl, user_screen_name)
 	modelVsPredTbl[topHashtag ==T & hashtagUsedP]
 	setkey(extremesTbl, user_screen_name)
