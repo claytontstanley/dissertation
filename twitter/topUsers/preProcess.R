@@ -278,7 +278,7 @@ addMetrics <- function(hashtagsTbl, modelHashtagsTbl) {
 	}
 	flushPrint('adding metrics for modelHashtagsTbl')
 	modelHashtagsTbl[, topHashtag := isTopHashtag(act, tagCount), by=list(user_screen_name, dt, d)]
-	modelHashtagsTbl[, topHashtagAct := isTopHashtag(act, sum(tagCount)), by=list(user_screen_name, d)]
+	modelHashtagsTbl[, topHashtagAct := isTopHashtag(act, sum(.SD[, list(tc=tagCount[1]), by=dt]$tc)), by=list(user_screen_name, d)]
 	expect_that(key(modelHashtagsTbl), equals(c('user_screen_name', 'dt', 'hashtag', 'd')))
 	expect_that(key(hashtagsTbl), equals(c('user_screen_name', 'dt', 'hashtag')))
 	modelHashtagsTbl[, hashtagUsedP := F]
@@ -322,13 +322,12 @@ getModelVsPredTbl <- function(modelHashtagsTbl) {
 	tempTbl[, topHashtag := topHashtagAct]
 	tempTbl[, topHashtagAct := NULL]
 	modelVsPredTbl = rbind(modelVsPredTbl, tempTbl, use.names=T)
-	modelVsPredTbl[, maxNP := NCell==max(NCell), by=list(user_screen_name, topHashtag, hashtagUsedP)]
-	modelVsPredTbl[maxNP==T, maxNP := onlyFirstT(abs(d-mean(d)) == min(abs(d-mean(d)))), by=list(user_screen_name, topHashtag, hashtagUsedP)]
+	modelVsPredTbl[, maxNP := NCell==max(NCell), by=list(user_screen_name, topHashtag, hashtagUsedP, DVName)]
+	modelVsPredTbl[maxNP==T, maxNP := onlyFirstT(abs(d-mean(d)) == min(abs(d-mean(d)))), by=list(user_screen_name, topHashtag, hashtagUsedP, DVName)]
 	modelVsPredTbl
 }
 
 compareModelVsExtreme <-function(modelHashtagsTbl, extremesTbl) {
-	browser()
 	print(modelHashtagsTbl[d==20][topHashtag==T], topn=20)
 	tables()
 	setkey(extremesTbl, user_screen_name, dt, hashtag)
@@ -363,11 +362,11 @@ genAggModelVsPredTbl <- function(hashtagsTbl, ds=c(0,.1,.2,.3,.4,.5,.6,.7,.8,.9,
 visModelVsPredTbl <- function(modelVsPredTbl, hashtagsTbl) {
 	modelVsPredTbl[hashtagUsedP==T, totN := length(hashtagsTbl[user_screen_name]$user_screen_name), by=user_screen_name]
 	dev.new()
-	modelVsPredTbl[d < 10 & maxNP==T & topHashtag & hashtagUsedP][, plot(N, d)]
+	modelVsPredTbl[d < 10 & maxNP==T & topHashtag & hashtagUsedP][, plot(NCell, d)]
 	dev.new()
-	print(ggplot(modelVsPredTbl[topHashtag & hashtagUsedP], aes(log(d),N/totN, colour=as.factor(user_screen_name)), group = as.factor(user_screen_name)) + geom_line())
+	print(ggplot(modelVsPredTbl[topHashtag & hashtagUsedP], aes(log(d),NCell/totN, colour=as.factor(user_screen_name)), group = as.factor(user_screen_name)) + geom_line())
 	dev.new()
-	print(ggplot(modelVsPredTbl[topHashtag & hashtagUsedP], aes(log(d),N, colour=as.factor(user_screen_name)), group = as.factor(user_screen_name)) + geom_line())
+	print(ggplot(modelVsPredTbl[topHashtag & hashtagUsedP], aes(log(d),NCell, colour=as.factor(user_screen_name)), group = as.factor(user_screen_name)) + geom_line())
 }
 
 modelVsPredOutFile <- function(name) {
@@ -407,13 +406,14 @@ curWS <- function() {
 	extremesTbl
 	extremesTbl
 	Q
+
 	summarizeExtremes(hashtagsTbl[user_screen_name=='eddieizzard'])
 	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl[user_screen_name %in% unique(user_screen_name)[1:25]])
 	modelVsPredTblSmall = genAggModelVsPredTbl(hashtagsTbl[user_screen_name == 'ap'], outFile = modelVsPredOutFile('testing1'))
 	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl[user_screen_name == 'eddieizzard'], ds=40)
 	modelVsPredTblBig = modelVsPredTbl
 	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl)
-	modelVsPredTblSmall
+	visModelVsPredTbl(modelVsPredTblSmall[DVName=='topHashtagAct'], hashtagsTbl)
 	visModelVsPredTbl(modelVsPredTbl, hashtagsTbl)
 	setkey(modelVsPredTbl, user_screen_name)
 	modelVsPredTbl[topHashtag ==T & hashtagUsedP]
