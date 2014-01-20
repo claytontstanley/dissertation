@@ -334,7 +334,6 @@ onlyFirstT <- function(bool) {
 getModelVsPredTbl <- function(modelHashtagsTbl) {
 	modelVsPredTbl = visMetrics(modelHashtagsTbl)
 	modelVsPredTbl[, maxNP := onlyFirstT(N==max(N)), by=list(user_screen_name, topHashtag, hashtagUsedP)]
-	# FIXME: alrogithm sets more than one to t for even numbers
 	modelVsPredTbl[maxNP==T, maxNP := abs(d-mean(d)) == min(abs(d-mean(d))), by=list(user_screen_name, topHashtag, hashtagUsedP)]
 	myPrint(modelVsPredTbl[topHashtag==T & hashtagUsedP==T])
 	modelVsPredTbl
