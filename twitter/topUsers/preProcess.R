@@ -451,6 +451,7 @@ curWS <- function() {
 	foo2[foo1][, N-V1]
 	tables()
 	modelVsPredTblSmall[topHashtag==T & hashtagUsedP]
+	setkey(modelVsPredTbl, user_screen_name)
 
 	joinTbl = modelVsPredTblBig[topHashtag & hashtagUsedP][extremesTbl, allow.cartesian=T][maxNP==T]
 	joinTbl[, list(user_screen_name, best=N/totN, r=NRecency/totN, f=NFrequency/totN)][, list(user_screen_name, best-r, best-f)][, lapply(list(V2, V3), mean),]
