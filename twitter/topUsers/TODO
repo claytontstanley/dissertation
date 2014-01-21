@@ -1,0 +1,3 @@
+remove vis dependency on hashtagsTbl (add col to modelPred tble)
+convert plots to ggplot2
+add histogram of best ds
