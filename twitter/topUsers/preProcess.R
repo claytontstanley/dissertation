@@ -86,12 +86,13 @@ getTokenizedTbl <- function(tweetsTbl, from) {
 
 addTokenText <- function(tweetsTbl) {
 	stripDelimiters = function(text) gsub(pattern='(\t|\n|\r)', replacement=' ', x=text)
-	rawTweetsFile = 'rawTweets.txt'
-	tokenizedTweetsFile = 'tokenizedTweets.txt'
-	with(tweetsTbl, writeLines(stripDelimiters(text), sprintf('/tmp/%s', rawTweetsFile), useBytes=T)) 
-	cmd = sprintf('%s/bin/ark-tweet-nlp-0.3.2/runTagger.sh --no-confidence --just-tokenize --quiet /tmp/%s > /tmp/%s', PATH, rawTweetsFile, tokenizedTweetsFile)
+	rawTweetsFile = tempfile(pattern='rawTweets-', tmpdir='/tmp', fileext='.txt')
+	tokenizedTweetsFile = tempfile(pattern='tokenizedTweets-', tmpdir='/tmp', fileext='.txt')
+	with(tweetsTbl, writeLines(stripDelimiters(text), rawTweetsFile, useBytes=T)) 
+	cmd = sprintf('%s/bin/ark-tweet-nlp-0.3.2/runTagger.sh --no-confidence --just-tokenize --quiet %s > %s', PATH, rawTweetsFile, tokenizedTweetsFile)
+	flushPrint(sprintf('running tagger with in/out temp files: %s, %s', rawTweetsFile, tokenizedTweetsFile))
 	cmdOut = system(cmd)
-	tokenizedTbl = data.table(read.delim(sprintf('/tmp/%s', tokenizedTweetsFile), sep='\t', quote="", header=F, stringsAsFactors=F))
+	tokenizedTbl = data.table(read.delim(tokenizedTweetsFile, sep='\t', quote="", header=F, stringsAsFactors=F))
 	tweetsTbl[, tokenText := tokenizedTbl[[1]]]
 }
 
@@ -331,7 +332,7 @@ getModelVsPredTbl <- function(modelHashtagsTbl, hashtagsTbl) {
 }
 
 compareModelVsExtreme <-function(modelHashtagsTbl, extremesTbl) {
-	print(modelHashtagsTbl[d==20][topHashtag==T], topn=20)
+	modelHashtagsTbl[d==20][topHashtag==T]
 	tables()
 	setkey(extremesTbl, user_screen_name, dt, hashtag)
 	extremesTbl
@@ -340,7 +341,7 @@ compareModelVsExtreme <-function(modelHashtagsTbl, extremesTbl) {
 	fooTbl = extremesTbl[modelHashtagsTbl[d==20], allow.cartesian=T, nomatch=0][, list(tagCount, user_screen_name, dt, hashtag, hashtagChosenP, topHashtag, lapply(prevHashtags, function(x) x[1:4]))]
 	fooTbl
 	extremesTbl
-	print(fooTbl, topn=500)
+	fooTbl
 	fooTbl[, sum(topHashtag)]
 	fooTbl
 }
@@ -364,24 +365,24 @@ genAggModelVsPredTbl <- function(hashtagsTbl, ds=c(0,.1,.2,.3,.4,.5,.6,.7,.8,.9,
 }
 
 visModelVsPredTbl <- function(modelVsPredTbl, hashtagsTbl) {
-	print(ggplot(modelVsPredTbl[maxNP==T & topHashtag & hashtagUsedP], aes(totN, d)) +
+	flushPrint(ggplot(modelVsPredTbl[maxNP==T & topHashtag & hashtagUsedP], aes(totN, d)) +
 	      geom_point() +
 	      xlab('total number of hashtags for user'))
 	modelVsPredTbl[topHashtag & hashtagUsedP, meanPC := mean(NCell/totN), by=user_screen_name]
 	modelVsPredTbl[topHashtag & hashtagUsedP, relPC := NCell/totN - mean(NCell/totN), by=user_screen_name]
 	modelVsPredTbl[topHashtag & hashtagUsedP, meanRelPC := mean(relPC), by=d]
 	dev.new()
-	print(ggplot(modelVsPredTbl[topHashtag & hashtagUsedP], aes(log(d),relPC)) +
+	flushPrint(ggplot(modelVsPredTbl[topHashtag & hashtagUsedP], aes(log(d),relPC)) +
 	      geom_point() +
 	      geom_line(aes(log(d), meanRelPC, group=user_screen_name[1])) +
 	      xlab('log(d)') +
 	      ylab('change in proportion correct from mean for user'))
 	dev.new()
-	print(ggplot(modelVsPredTbl[topHashtag & hashtagUsedP & user_screen_name %in% sample(unique(user_screen_name), size=20)],
+	flushPrint(ggplot(modelVsPredTbl[topHashtag & hashtagUsedP & user_screen_name %in% sample(unique(user_screen_name), size=20)],
 		     aes(log(d),NCell/totN, group=as.factor(user_screen_name))) + geom_line() +
 	      ylab('proportion correct'))
 	dev.new()
-	print(ggplot(modelVsPredTbl[topHashtag & hashtagUsedP & maxNP], aes(d)) +
+	flushPrint(ggplot(modelVsPredTbl[topHashtag & hashtagUsedP & maxNP], aes(d)) +
 	      geom_histogram(aes(y = ..density..)) +
 	      geom_density())
 }
@@ -452,8 +453,8 @@ curWS <- function() {
 	modelVsPredTbl[topHashtag ==T & hashtagUsedP]
 	setkey(extremesTbl, user_screen_name)
 	setkey(modelVsPredTbl, user_screen_name, d)
-	print(modelVsPredTblBig[topHashtag & hashtagUsedP])
-	print(modelVsPredTblBig[topHashtag & hashtagUsedP][extremesTbl, allow.cartesian=T][d==0 | d==20], topn=2000)
+	modelVsPredTblBig[topHashtag & hashtagUsedP]
+	modelVsPredTblBig[topHashtag & hashtagUsedP][extremesTbl, allow.cartesian=T][d==0 | d==20]
 	tables()
 	foo2[foo1][, N-V1]
 	tables()
