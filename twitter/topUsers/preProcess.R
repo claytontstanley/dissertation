@@ -419,6 +419,20 @@ curWS <- function() {
 	tweetsTbl = getTweetsTbl("select * from tweets limit 100000")
 	tweetsTbl = getTweetsTbl("select * from tweets where user_screen_name='eddieizzard'")
 	tweetsTbl
+	sessionInfo()
+
+	testFun <- function(testTbl) {
+	}
+	testTbl = data.table(x=sample(1:1e7, 1e7), y=sample(1:1e7,1e7), z=sample(1:1e7,1e7))
+	Rprof()
+	setkey(testTbl, x, y, z)
+	#system.time(testFun(testTbl))
+	Rprof(NULL)
+	summaryRprof()
+
+	
+
+
 	#hashtagsTbl = getHashtagsTbl(tweetsTbl, from='text')
 	hashtagsTbl = getHashtagsTbl(tweetsTbl, from='tokenText')
 	compareHashtagTbls()[N!=N.1]
