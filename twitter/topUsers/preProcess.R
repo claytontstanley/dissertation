@@ -262,6 +262,9 @@ testModelVsPred <- function() {
 	expectedTbl = fread(modelVsPredOutFile('testing1'))
 	resTbl = runPrior("select * from tweets where user_screen_name = 'ap'", outFile='/tmp/modelVsPred.csv')
 	expect_equivalent(expectedTbl, resTbl)
+	expectedTbl = fread(modelVsPredOutFile('testing2'))
+	resTbl = runPrior("select * from tweets where user_screen_name = 'thebucktlist'", outFile='/tmp/modelVsPred.csv')
+	expect_equivalent(expectedTbl, resTbl)
 }
 
 runTests <- function() {
@@ -442,9 +445,9 @@ curWS <- function() {
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagRank'][user_screen_name %in% sample(unique(user_screen_name), size=10)], hashtagsTbl)
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & !(user_screen_name %in% c('cokguzelhareket', 'pmoindia')),], hashtagsTbl)
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & !(user_screen_name %in% lowUsers)], hashtagsTbl)
-	
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost'], hashtagsTbl)
-	modelVsPredTbl[user_screen_name == '4kmiddlebrook']
+
+	modelVsPredTbl[, list(f=unique(user_screen_name), !(unique(user_screen_name) %in% unique(modelVsPredTbl[hashtagUsedP==T,user_screen_name])))]
 	modelVsPredTbl[DVName=='topHashtagPost' & maxNP & topHashtag & hashtagUsedP][,hist(d)]
 	modelVsPredTbl[topHashtag == T][, list(totN, sum(NCell)), by=list(user_screen_name,d)]
 	# Check that totN calculated makes sense	
