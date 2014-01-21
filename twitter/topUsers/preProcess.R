@@ -320,11 +320,12 @@ modelVsPredForDV <- function(modelHashtagsTbl, DVName) {
 	tempTbl
 }
 
-getModelVsPredTbl <- function(modelHashtagsTbl) {
+getModelVsPredTbl <- function(modelHashtagsTbl, hashtagsTbl) {
 	modelVsPredTbl = rbind(modelVsPredForDV(modelHashtagsTbl, 'topHashtagPost'), 
 			       modelVsPredForDV(modelHashtagsTbl, 'topHashtagAct'))
 	modelVsPredTbl[, maxNP := NCell==max(NCell), by=list(user_screen_name, topHashtag, hashtagUsedP, DVName)]
 	modelVsPredTbl[maxNP==T, maxNP := onlyFirstT(abs(d-mean(d)) == min(abs(d-mean(d)))), by=list(user_screen_name, topHashtag, hashtagUsedP, DVName)]
+	modelVsPredTbl[hashtagUsedP==T, totN := length(hashtagsTbl[user_screen_name]$user_screen_name), by=user_screen_name]
 	modelVsPredTbl
 }
 
@@ -348,7 +349,7 @@ genAggModelVsPredTbl <- function(hashtagsTbl, ds=c(0,.1,.2,.3,.4,.5,.6,.7,.8,.9,
 		flushPrint(sprintf('generating model predictions for user %s', userScreenName))
 		modelHashtagsTbl = computeActsByUser(hashtagsTbl, d=d)
 		addMetrics(hashtagsTbl, modelHashtagsTbl)
-		modelVsPredTbl = getModelVsPredTbl(modelHashtagsTbl)	
+		modelVsPredTbl = getModelVsPredTbl(modelHashtagsTbl, hashtagsTbl)	
 		modelVsPredTbl
 	}
 	singleHashtagUsers = hashtagsTbl[, list(uniqueDTs=length(unique(dt)) <= 1), by=user_screen_name][uniqueDTs==T]$user_screen_name
@@ -437,8 +438,6 @@ curWS <- function() {
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost'], hashtagsTbl)
 	modelVsPredTbl[DVName=='topHashtagPost' & maxNP & topHashtag & hashtagUsedP][,hist(d)]
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & user_screen_name == 'cokguzelhareket'], hashtagsTbl)
-	modelVsPredTbl[maxNP==T & DVName==
-	modelVsPredTbl
 	
 	setkey(modelVsPredTbl, user_screen_name)
 	modelVsPredTbl[topHashtag ==T & hashtagUsedP]
