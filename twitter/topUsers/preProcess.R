@@ -363,7 +363,6 @@ genAggModelVsPredTbl <- function(hashtagsTbl, ds=c(0,.1,.2,.3,.4,.5,.6,.7,.8,.9,
 }
 
 visModelVsPredTbl <- function(modelVsPredTbl, hashtagsTbl) {
-	modelVsPredTbl[hashtagUsedP==T, totN := length(hashtagsTbl[user_screen_name]$user_screen_name), by=user_screen_name]
 	modelVsPredTbl[maxNP==T & topHashtag & hashtagUsedP][, plot(NCell, d)]
 	modelVsPredTbl[topHashtag & hashtagUsedP, meanPC := mean(NCell/totN), by=user_screen_name]
 	modelVsPredTbl[topHashtag & hashtagUsedP, meanPCByD := mean(NCell/totN), by=d]
@@ -433,12 +432,15 @@ curWS <- function() {
 	modelVsPredTbl
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagRank'][user_screen_name %in% sample(unique(user_screen_name), size=10)], hashtagsTbl)
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & !(user_screen_name %in% c('cokguzelhareket', 'pmoindia')),], hashtagsTbl)
-	lowUsers = modelVsPredTbl[maxNP==T & topHashtag & hashtagUsedP][NCell < 40]$user_screen_name
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & !(user_screen_name %in% lowUsers)], hashtagsTbl)
+	
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost'], hashtagsTbl)
+	modelVsPredTbl[user_screen_name == '4kmiddlebrook']
 	modelVsPredTbl[DVName=='topHashtagPost' & maxNP & topHashtag & hashtagUsedP][,hist(d)]
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & user_screen_name == 'cokguzelhareket'], hashtagsTbl)
-	
+	modelVsPredTbl[topHashtag == T][, list(totN, sum(NCell)), by=list(user_screen_name,d)]
+	# Check that totN calculated makes sense	
+	modelVsPredTbl[topHashtag == T][, list(totN, sum(NCell)), by=list(user_screen_name,d, DVName)][d==0][!is.na(totN)][,totN-V2]
 	setkey(modelVsPredTbl, user_screen_name)
 	modelVsPredTbl[topHashtag ==T & hashtagUsedP]
 	setkey(extremesTbl, user_screen_name)
