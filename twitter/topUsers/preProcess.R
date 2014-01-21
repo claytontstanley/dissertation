@@ -405,7 +405,6 @@ curWS <- function() {
 	runTests()
 	tweetsTbl = getTweetsTbl("select * from tweets limit 100000")
 	tweetsTbl = getTweetsTbl("select * from tweets where user_screen_name='eddieizzard'")
-	tweetsTbl = getTweetsTbl(getQueryGT(1000000))
 	tweetsTbl
 	#hashtagsTbl = getHashtagsTbl(tweetsTbl, from='text')
 	hashtagsTbl = getHashtagsTbl(tweetsTbl, from='tokenText')
