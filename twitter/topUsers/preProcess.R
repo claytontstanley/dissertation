@@ -363,18 +363,25 @@ genAggModelVsPredTbl <- function(hashtagsTbl, ds=c(0,.1,.2,.3,.4,.5,.6,.7,.8,.9,
 }
 
 visModelVsPredTbl <- function(modelVsPredTbl, hashtagsTbl) {
-	modelVsPredTbl[maxNP==T & topHashtag & hashtagUsedP][, plot(NCell, d)]
-	modelVsPredTbl[topHashtag & hashtagUsedP, meanPC := mean(NCell/totN), by=user_screen_name]
-	modelVsPredTbl[topHashtag & hashtagUsedP, meanPCByD := mean(NCell/totN), by=d]
-	dev.new()
-	print(ggplot(modelVsPredTbl[topHashtag & hashtagUsedP], aes(log(d),NCell/totN - meanPC)) +
+	print(ggplot(modelVsPredTbl[maxNP==T & topHashtag & hashtagUsedP], aes(totN, d)) +
 	      geom_point() +
-	      geom_line(aes(log(d), meanPCByD - mean(meanPCByD), group=user_screen_name[1])) +
+	      xlab('total number of hashtags for user'))
+	modelVsPredTbl[topHashtag & hashtagUsedP, meanPC := mean(NCell/totN), by=user_screen_name]
+	modelVsPredTbl[topHashtag & hashtagUsedP, relPC := NCell/totN - mean(NCell/totN), by=user_screen_name]
+	modelVsPredTbl[topHashtag & hashtagUsedP, meanRelPC := mean(relPC), by=d]
+	dev.new()
+	print(ggplot(modelVsPredTbl[topHashtag & hashtagUsedP], aes(log(d),relPC)) +
+	      geom_point() +
+	      geom_line(aes(log(d), meanRelPC, group=user_screen_name[1])) +
 	      xlab('log(d)') +
-	      ylab('change in percent correct from mean for user'))
+	      ylab('change in proportion correct from mean for user'))
 	dev.new()
 	print(ggplot(modelVsPredTbl[topHashtag & hashtagUsedP & user_screen_name %in% sample(unique(user_screen_name), size=20)],
-		     aes(log(d),NCell/totN, group=as.factor(user_screen_name))) + geom_line())
+		     aes(log(d),NCell/totN, group=as.factor(user_screen_name))) + geom_line() +
+	      ylab('proportion correct'))
+	dev.new()
+	print(ggplot(modelVsPredTbl[topHashtag & hashtagUsedP & maxNP], aes(d)) +
+	      geom_histogram())
 }
 
 modelVsPredOutFile <- function(name) {
@@ -436,7 +443,6 @@ curWS <- function() {
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost'], hashtagsTbl)
 	modelVsPredTbl[user_screen_name == '4kmiddlebrook']
 	modelVsPredTbl[DVName=='topHashtagPost' & maxNP & topHashtag & hashtagUsedP][,hist(d)]
-	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & user_screen_name == 'cokguzelhareket'], hashtagsTbl)
 	modelVsPredTbl[topHashtag == T][, list(totN, sum(NCell)), by=list(user_screen_name,d)]
 	# Check that totN calculated makes sense	
 	modelVsPredTbl[topHashtag == T][, list(totN, sum(NCell)), by=list(user_screen_name,d, DVName)][d==0][!is.na(totN)][,totN-V2]
