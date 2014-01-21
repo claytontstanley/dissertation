@@ -381,7 +381,8 @@ visModelVsPredTbl <- function(modelVsPredTbl, hashtagsTbl) {
 	      ylab('proportion correct'))
 	dev.new()
 	print(ggplot(modelVsPredTbl[topHashtag & hashtagUsedP & maxNP], aes(d)) +
-	      geom_histogram())
+	      geom_histogram(aes(y = ..density..)) +
+	      geom_density())
 }
 
 modelVsPredOutFile <- function(name) {
