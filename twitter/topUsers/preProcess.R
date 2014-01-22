@@ -69,6 +69,7 @@ sqlScratch <- function() {
 	sqldf('select retweeted,count(*) as count from tweets group by retweeted order by count desc')
 	sqldf('select truncated,count(*) as count from tweets group by truncated order by count desc')
 	sqldf("select * from topUsers")[1:100,]
+	sqldf("select * from tweets where 1=1 and user_screen_name='katyperry' limit 10")
 	data.table(sqldf("select * from twitter_users"))
 	twitter_users = data.table(read.csv(str_c(PATH, "/dissertationData/tables/twitter_users.csv")))
 	topUsers = data.table(read.csv(str_c(PATH, "/dissertationData/tables/topUsers.csv")))
@@ -404,8 +405,8 @@ runPrior <- function(query, ...) {
 	modelVsPredTbl
 }
 
-getQueryGT <- function(val) {
-	sprintf('select * from tweets where user_screen_name in (select user_screen_name from twitter_users where followers_count > %d order by followers_count asc limit 100)', val)
+getQueryGT <- function(val, filters='1=1') {
+	sprintf('select * from tweets as t where %s and user_screen_name in (select user_screen_name from twitter_users where followers_count > %d order by followers_count asc limit 100)', filters, val)
 }
 
 run1M <- function() {
@@ -417,14 +418,15 @@ run100k <- function() {
 	runPrior(getQueryGT(100000), outFile=modelVsPredOutFile('gt100k'))
 }
 
-run10M <- function() runPrior(getQueryGT(10000000), outFile=modelVsPredOutFile('gt10M'))
+run10M <- function() {
+	runPrior(getQueryGT(10000000, 't.id != 12466832063'), outFile=modelVsPredOutFile('gt10M'))
+}
 
 curWS <- function() {
 	debugP = F
 	runTests()
 	tweetsTbl = getTweetsTbl("select * from tweets limit 100000")
 	tweetsTbl = getTweetsTbl("select * from tweets where user_screen_name='eddieizzard'")
-	sqldf('select user_screen_name from tweets group by user_screen_name')
 	# Checking that tweets for twitter users from each followers_count scale are being collected properly
 	usersWithTweetsTbl = data.table(sqldf("select distinct on (user_id) t.user_screen_name,u.followers_count from tweets as t join twitter_users as u on t.user_screen_name = u.user_screen_name"))
 	usersWithTweetsTbl[order(followers_count), plot(log10(followers_count))]
@@ -438,6 +440,8 @@ curWS <- function() {
 	tusersTbl
 	tusersTbl[order(rank, decreasing=T)][20000:30000][, plot(1:length(followers_count), followers_count)]
 	runPrior("select * from tweets where user_screen_name = 'katyperry'")
+	runPrior(getQueryGT(10000000))
+	run1M()
 	db = makeDB(do.call(function(x) sample(x, length(x)), list(unique(hashtagsTbl$hashtag))))
 	visHashtags(hashtagsTbl[user_screen_name=='chelseafc'], db)
 	visHashtags(modelHashtagsTbl[topHashtag==T,], db)
