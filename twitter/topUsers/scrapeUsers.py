@@ -175,8 +175,7 @@ def userInfoAlreadyCollected(user_screen_name):
 def chunker(seq, size):
     return (seq[pos:pos + size] for pos in xrange(0, len(seq), size))
 
-def getForTopUsers(alreadyCollectedFun, getForUserFun, getRemainingHitsFun, hitsAlwaysGreaterThan, groupFun=lambda x: chunker(x, 1),
-                   userQuery='select (user_screen_name) from topUsers order by rank asc limit 100000'):
+def getForTopUsers(alreadyCollectedFun, getForUserFun, getRemainingHitsFun, hitsAlwaysGreaterThan, userQuery, groupFun=lambda x: chunker(x, 1)):
     res = _cur.query(userQuery).getresult()
     screenNames = [[user[0]] for user in res]
     screenNames = list(itertools.chain(*screenNames))
@@ -205,15 +204,19 @@ def getForTopUsers(alreadyCollectedFun, getForUserFun, getRemainingHitsFun, hits
             time.sleep(1)
             pass
 
+def getAllTweetsDefault(userQuery):
+    getForTopUsers(alreadyCollectedFun=userAlreadyCollected, getForUserFun=getAllTweets, getRemainingHitsFun=getRemainingHitsUserTimeline, hitsAlwaysGreaterThan=30, userQuery=userQuery)
+
 def getAllTweetsForTopUsers():
-    getForTopUsers(alreadyCollectedFun=userAlreadyCollected, getForUserFun=getAllTweets, getRemainingHitsFun=getRemainingHitsUserTimeline, hitsAlwaysGreaterThan=30)
+    getAllTweetsDefault(userQuery='select (user_screen_name) from topUsers order by rank asc limit 100000')
 
 def getAllTweetsFor100kUsers():
-    getForTopUsers(alreadyCollectedFun=userAlreadyCollected, getForUserFun=getAllTweets, getRemainingHitsFun=getRemainingHitsUserTimeline, hitsAlwaysGreaterThan=30,
-                   userQuery='select user_screen_name from twitter_users where followers_count > 100000 order by followers_count asc limit 1000')
+    getAllTweetsDefault(userQuery='select user_screen_name from twitter_users where followers_count > 100000 order by followers_count asc limit 1000')
 
 def getUserInfoForTopUsers():
-    getForTopUsers(alreadyCollectedFun=userInfoAlreadyCollected, getForUserFun=getInfoForUser, getRemainingHitsFun=getRemainingHitsGetUser, hitsAlwaysGreaterThan=30, groupFun=lambda x: chunker(x, 100))
+    getForTopUsers(alreadyCollectedFun=userInfoAlreadyCollected, getForUserFun=getInfoForUser, getRemainingHitsFun=getRemainingHitsGetUser, hitsAlwaysGreaterThan=30, groupFun=lambda x: chunker(x, 100),
+                   userQuery='select (user_screen_name) from topUsers order by rank asc limit 100000')
+
 
 #generateTopUsers(scrapeFun=generateTopUsersSocialBakers, topUsersFile='top10000SocialBakers.csv')
 #generateTopUsers(scrapeFun=generateTopUsersTwitaholic, topUsersFile='top1000Twitaholic.csv')
