@@ -230,6 +230,6 @@ def getUserInfoForTopUsers():
 #storeTopUsers(topUsersFile='top100000SocialBakers.csv')
 #getAllTweets('claytonstanley1')
 #getAllTweetsForTopUsers()
-getAllTweetsFor10kUsers()
+#getAllTweetsFor10kUsers()
 #getUserInfoForTopUsers()
-#backupTables()
+backupTables()
