@@ -424,6 +424,7 @@ curWS <- function() {
 	testFun <- function(testTbl) {
 	}
 	testTbl = data.table(x=sample(1:1e7, 1e7), y=sample(1:1e7,1e7), z=sample(1:1e7,1e7))
+	testTbl = data.table(x=sample(1:1e6, 1e6), y=sample(1:1e6,1e6), z=sample(1:1e6,1e6))
 	Rprof()
 	setkey(testTbl, x, y, z)
 	#system.time(testFun(testTbl))
