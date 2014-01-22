@@ -413,11 +413,20 @@ run1M <- function() {
 	res
 }
 
+run100k <- function() {
+	runPrior(getQueryGT(100000), outFile=modelVsPredOutFile('gt100k'))
+}
+
+
 curWS <- function() {
 	debugP = F
 	runTests()
 	tweetsTbl = getTweetsTbl("select * from tweets limit 100000")
 	tweetsTbl = getTweetsTbl("select * from tweets where user_screen_name='eddieizzard'")
+	sqldf('select user_screen_name from tweets group by user_screen_name')
+	# Checking that tweets for twitter users from each followers_count scale are being collected properly
+	usersWithTweetsTbl = data.table(sqldf("select distinct on (user_id) t.user_screen_name,u.followers_count from tweets as t join twitter_users as u on t.user_screen_name = u.user_screen_name"))
+	usersWithTweetsTbl[order(followers_count), plot(log10(followers_count))]
 	tweetsTbl
 	#hashtagsTbl = getHashtagsTbl(tweetsTbl, from='text')
 	hashtagsTbl = getHashtagsTbl(tweetsTbl, from='tokenText')

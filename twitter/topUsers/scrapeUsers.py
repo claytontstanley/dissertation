@@ -213,6 +213,9 @@ def getAllTweetsForTopUsers():
 def getAllTweetsFor100kUsers():
     getAllTweetsDefault(userQuery='select user_screen_name from twitter_users where followers_count > 100000 order by followers_count asc limit 1000')
 
+def getAllTweetsFor10kUsers():
+    getAllTweetsDefault(userQuery='select user_screen_name from twitter_users where followers_count > 10000 order by followers_count asc limit 1000')
+
 def getUserInfoForTopUsers():
     getForTopUsers(alreadyCollectedFun=userInfoAlreadyCollected, getForUserFun=getInfoForUser, getRemainingHitsFun=getRemainingHitsGetUser, hitsAlwaysGreaterThan=30, groupFun=lambda x: chunker(x, 100),
                    userQuery='select (user_screen_name) from topUsers order by rank asc limit 100000')
@@ -224,6 +227,6 @@ def getUserInfoForTopUsers():
 #storeTopUsers(topUsersFile='top100000SocialBakers.csv')
 #getAllTweets('claytonstanley1')
 #getAllTweetsForTopUsers()
-getAllTweetsFor100kUsers()
+getAllTweetsFor10kUsers()
 #getUserInfoForTopUsers()
 #backupTables()
