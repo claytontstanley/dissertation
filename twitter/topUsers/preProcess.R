@@ -367,7 +367,7 @@ genAggModelVsPredTbl <- function(hashtagsTbl, ds=c(0,.1,.2,.3,.4,.5,.6,.7,.8,.9,
 	res
 }
 
-visModelVsPredTbl <- function(modelVsPredTbl, hashtagsTbl) {
+visModelVsPredTbl <- function(modelVsPredTbl) {
 	flushPrint(ggplot(modelVsPredTbl[maxNP==T & topHashtag & hashtagUsedP], aes(totN, d)) +
 	      geom_point() +
 	      xlab('total number of hashtags for user'))
@@ -408,6 +408,11 @@ getQueryGT <- function(val) {
 	sprintf('select * from tweets where user_screen_name in (select user_screen_name from twitter_users where followers_count > %d order by followers_count asc limit 100)', val)
 }
 
+run10M <- function() {
+	runPrior(getQueryGT(10000000), outFile=modelVsPredOutFile('gt100k'))
+}
+
+
 run1M <- function() {
 	res = runPrior(getQueryGT(1000000), outFile=modelVsPredOutFile('gt1M'))
 	res
@@ -427,6 +432,7 @@ curWS <- function() {
 	# Checking that tweets for twitter users from each followers_count scale are being collected properly
 	usersWithTweetsTbl = data.table(sqldf("select distinct on (user_id) t.user_screen_name,u.followers_count from tweets as t join twitter_users as u on t.user_screen_name = u.user_screen_name"))
 	usersWithTweetsTbl[order(followers_count), plot(log10(followers_count))]
+	usersWithTweetsTbl[order(followers_count),][followers_count > 10000000]
 	tweetsTbl
 	#hashtagsTbl = getHashtagsTbl(tweetsTbl, from='text')
 	hashtagsTbl = getHashtagsTbl(tweetsTbl, from='tokenText')
@@ -450,11 +456,12 @@ curWS <- function() {
 	modelVsPredTblBig = modelVsPredTbl
 	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl)
 	modelVsPredTbl = fread(modelVsPredOutFile('gt1M'))
+	modelVsPredTbl = fread(modelVsPredOutFile('gt100k'))
 	modelVsPredTbl
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagRank'][user_screen_name %in% sample(unique(user_screen_name), size=10)], hashtagsTbl)
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & !(user_screen_name %in% c('cokguzelhareket', 'pmoindia')),], hashtagsTbl)
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & !(user_screen_name %in% lowUsers)], hashtagsTbl)
-	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost'], hashtagsTbl)
+	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost'])
 
 	modelVsPredTbl[, user_screen_name, by=user_screen_name]
 	modelVsPredTbl[, list(f=unique(user_screen_name), !(unique(user_screen_name) %in% unique(modelVsPredTbl[hashtagUsedP==T,user_screen_name])))]
