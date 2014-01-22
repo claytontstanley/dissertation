@@ -408,11 +408,6 @@ getQueryGT <- function(val) {
 	sprintf('select * from tweets where user_screen_name in (select user_screen_name from twitter_users where followers_count > %d order by followers_count asc limit 100)', val)
 }
 
-run10M <- function() {
-	runPrior(getQueryGT(10000000), outFile=modelVsPredOutFile('gt100k'))
-}
-
-
 run1M <- function() {
 	res = runPrior(getQueryGT(1000000), outFile=modelVsPredOutFile('gt1M'))
 	res
@@ -422,6 +417,7 @@ run100k <- function() {
 	runPrior(getQueryGT(100000), outFile=modelVsPredOutFile('gt100k'))
 }
 
+run10M <- function() runPrior(getQueryGT(10000000), outFile=modelVsPredOutFile('gt10M'))
 
 curWS <- function() {
 	debugP = F
