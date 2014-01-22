@@ -1,4 +1,5 @@
 library(RPostgreSQL)
+library(Rmisc)
 library(ggplot2)
 library(memoise)
 library(microbenchmark)
@@ -422,6 +423,26 @@ run10M <- function() {
 	runPrior(getQueryGT(10000000, 't.id != 12466832063'), outFile=modelVsPredOutFile('gt10M'))
 }
 
+buildTables <- function(outFileNames) {
+	buildTable <- function(outFileName) {
+		tbl = fread(modelVsPredOutFile(outFileName))
+		tbl[, datasetName := outFileName]
+		tbl
+	}
+	rbindlist(lapply(outFileNames, buildTable))
+}
+
+CIVar <- function(vals) {
+	sSize = length(vals)	
+	sVar = sd(vals)^2
+	ci = .95
+	df = sSize - 1
+	halfalpha = (1 - ci) / 2
+	ub = sVar * df / qchisq(halfalpha,df)
+	ua = sVar * df / qchisq(1-halfalpha,df)
+	c(upper=ub, mean=sVar, lower=ua)
+}
+
 curWS <- function() {
 	debugP = F
 	runTests()
@@ -443,7 +464,6 @@ curWS <- function() {
 	tusersTbl[order(rank, decreasing=T)][20000:30000][, plot(1:length(followers_count), followers_count)]
 	runPrior("select * from tweets where user_screen_name = 'katyperry'")
 	runPrior(getQueryGT(10000000))
-	run1M()
 	db = makeDB(do.call(function(x) sample(x, length(x)), list(unique(hashtagsTbl$hashtag))))
 	visHashtags(hashtagsTbl[user_screen_name=='chelseafc'], db)
 	visHashtags(modelHashtagsTbl[topHashtag==T,], db)
@@ -457,14 +477,18 @@ curWS <- function() {
 	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl[user_screen_name %in% unique(user_screen_name)[1:25]])
 	modelVsPredTblBig = modelVsPredTbl
 	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl)
-	modelVsPredTbl = fread(modelVsPredOutFile('gt1M'))
 	modelVsPredTbl = fread(modelVsPredOutFile('gt100k'))
+	modelVsPredTbl = fread(modelVsPredOutFile('gt1M'))
+	modelVsPredTbl = fread(modelVsPredOutFile('gt10M'))
+	modelVsPredTbl = buildTables(c('gt100k', 'gt1M', 'gt10M'))
 	modelVsPredTbl
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagRank'][user_screen_name %in% sample(unique(user_screen_name), size=10)], hashtagsTbl)
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & !(user_screen_name %in% c('cokguzelhareket', 'pmoindia')),], hashtagsTbl)
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & !(user_screen_name %in% lowUsers)], hashtagsTbl)
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost'])
 
+	# Summary table of optimal d values and sample variance
+	modelVsPredTbl[DVName=='topHashtagPost' & topHashtag & hashtagUsedP & maxNP & d < 2][, list(mean=mean(d), sd=sd(d), meanCI=CI(d), sdCI=sqrt(CIVar(d))), by=datasetName]
 	modelVsPredTbl[, user_screen_name, by=user_screen_name]
 	modelVsPredTbl[, list(f=unique(user_screen_name), !(unique(user_screen_name) %in% unique(modelVsPredTbl[hashtagUsedP==T,user_screen_name])))]
 	modelVsPredTbl[DVName=='topHashtagPost' & maxNP & topHashtag & hashtagUsedP][,hist(d)]
