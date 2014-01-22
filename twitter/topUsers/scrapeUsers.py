@@ -208,13 +208,16 @@ def getAllTweetsDefault(userQuery):
     getForTopUsers(alreadyCollectedFun=userAlreadyCollected, getForUserFun=getAllTweets, getRemainingHitsFun=getRemainingHitsUserTimeline, hitsAlwaysGreaterThan=30, userQuery=userQuery)
 
 def getAllTweetsForTopUsers():
-    getAllTweetsDefault(userQuery='select (user_screen_name) from topUsers order by rank asc limit 100000')
+    getAllTweetsDefault(userQuery='select (user_screen_name) from topUsers order by rank asc limit 10000')
 
 def getAllTweetsFor100kUsers():
     getAllTweetsDefault(userQuery='select user_screen_name from twitter_users where followers_count > 100000 order by followers_count asc limit 1000')
 
 def getAllTweetsFor10kUsers():
     getAllTweetsDefault(userQuery='select user_screen_name from twitter_users where followers_count > 10000 order by followers_count asc limit 1000')
+
+def getAllTweetsFor1kUsers():
+    getAllTweetsDefault(userQuery='select user_screen_name from twitter_users where followers_count > 1000 order by followers_count asc limit 1000')
 
 def getUserInfoForTopUsers():
     getForTopUsers(alreadyCollectedFun=userInfoAlreadyCollected, getForUserFun=getInfoForUser, getRemainingHitsFun=getRemainingHitsGetUser, hitsAlwaysGreaterThan=30, groupFun=lambda x: chunker(x, 100),
