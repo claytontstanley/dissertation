@@ -443,6 +443,15 @@ CIVar <- function(vals) {
 	c(upper=ub, mean=sVar, lower=ua)
 }
 
+CIVar2 <- function(vals) {
+	library(lavaan)
+	df = data.frame(x=vals)
+	model = 'x ~~ x'
+	fit = sem(model, data=df, likelihood = "wishart" )
+	res = print(parameterEstimates(fit))
+	with(res, c(upper=ci.upper, mean=est, lower=ci.lower))
+}
+
 curWS <- function() {
 	debugP = F
 	runTests()
@@ -488,7 +497,7 @@ curWS <- function() {
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost'])
 
 	# Summary table of optimal d values and sample variance
-	modelVsPredTbl[DVName=='topHashtagPost' & topHashtag & hashtagUsedP & maxNP & d < 2][, list(mean=mean(d), sd=sd(d), meanCI=CI(d), sdCI=sqrt(CIVar(d))), by=datasetName]
+	modelVsPredTbl[DVName=='topHashtagPost' & topHashtag & hashtagUsedP & maxNP & d < 2][, list(mean=mean(d), sd=sd(d), meanCI=CI(d), sdCI=sqrt(CIVar(d)), sdCI2=sqrt(CIVar2(d))), by=datasetName]
 	modelVsPredTbl[, user_screen_name, by=user_screen_name]
 	modelVsPredTbl[, list(f=unique(user_screen_name), !(unique(user_screen_name) %in% unique(modelVsPredTbl[hashtagUsedP==T,user_screen_name])))]
 	modelVsPredTbl[DVName=='topHashtagPost' & maxNP & topHashtag & hashtagUsedP][,hist(d)]
