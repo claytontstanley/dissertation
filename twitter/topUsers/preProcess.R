@@ -1,4 +1,5 @@
 library(RPostgreSQL)
+library(lavaan)
 library(Rmisc)
 library(ggplot2)
 library(memoise)
@@ -444,7 +445,6 @@ CIVar <- function(vals) {
 }
 
 CIVar2 <- function(vals) {
-	library(lavaan)
 	df = data.frame(x=vals)
 	model = 'x ~~ x'
 	fit = sem(model, data=df, likelihood = "wishart" )
