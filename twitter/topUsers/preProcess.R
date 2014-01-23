@@ -416,6 +416,8 @@ run1M <- function() {
 	res
 }
 
+run1Mr2 <- function() runPrior(getQueryGT(1000000, "retweeted = 'False'"), outFile=modelVsPrdOutFile('gt1Mr2'))
+
 run100k <- function() {
 	runPrior(getQueryGT(100000), outFile=modelVsPredOutFile('gt100k'))
 }
