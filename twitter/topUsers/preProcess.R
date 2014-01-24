@@ -71,6 +71,7 @@ sqlScratch <- function() {
 	sqldf('select retweeted,count(*) as count from tweets group by retweeted order by count desc')
 	sqldf('select truncated,count(*) as count from tweets group by truncated order by count desc')
 	sqldf("select * from topUsers")[1:100,]
+	data.table(sqldf("select retweeted, count(*) from tweets group by retweeted"))[, min(count) / (max(count) + min(count))]
 	sqldf("select * from tweets where 1=1 and user_screen_name='katyperry' limit 10")
 	data.table(sqldf("select * from twitter_users"))
 	twitter_users = data.table(read.csv(str_c(PATH, "/dissertationData/tables/twitter_users.csv")))
@@ -416,7 +417,7 @@ run1M <- function() {
 	res
 }
 
-run1Mr2 <- function() runPrior(getQueryGT(1000000, "retweeted = 'False'"), outFile=modelVsPrdOutFile('gt1Mr2'))
+run1Mr2 <- function() runPrior(getQueryGT(1000000, "retweeted = 'False'"), outFile=modelVsPredOutFile('gt1Mr2'))
 
 run100k <- function() {
 	runPrior(getQueryGT(100000), outFile=modelVsPredOutFile('gt100k'))
@@ -490,8 +491,9 @@ curWS <- function() {
 	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl)
 	modelVsPredTbl = fread(modelVsPredOutFile('gt100k'))
 	modelVsPredTbl = fread(modelVsPredOutFile('gt1M'))
+	modelVsPredTbl = fread(modelVsPredOutFile('gt1Mr2'))
 	modelVsPredTbl = fread(modelVsPredOutFile('gt10M'))
-	modelVsPredTbl = buildTables(c('gt100k', 'gt1M', 'gt10M'))
+	modelVsPredTbl = buildTables(c('gt100k', 'gt1M', 'gt1Mr2', 'gt10M'))
 	modelVsPredTbl
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagRank'][user_screen_name %in% sample(unique(user_screen_name), size=10)], hashtagsTbl)
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & !(user_screen_name %in% c('cokguzelhareket', 'pmoindia')),], hashtagsTbl)
