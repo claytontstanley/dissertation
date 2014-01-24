@@ -263,10 +263,11 @@ testOnlyFirstT <- function() {
 }
 
 testModelVsPred <- function() {
-	expectedTbl = fread(modelVsPredOutFile('testing1'))
+	expectedTbl = data.table(read.csv(modelVsPredOutFile('testing1'), stringsAsFactors=F))
 	resTbl = runPrior("select * from tweets where user_screen_name = 'ap'", outFile='/tmp/modelVsPred.csv')
 	expect_equivalent(expectedTbl, resTbl)
-	expectedTbl = fread(modelVsPredOutFile('testing2'))
+	expectedTbl = data.table(read.csv(modelVsPredOutFile('testing2'), stringsAsFactors=F))
+	expectedTbl[, totN := as.integer(totN)]
 	resTbl = runPrior("select * from tweets where user_screen_name = 'thebucktlist'", outFile='/tmp/modelVsPred.csv')
 	expect_equivalent(expectedTbl, resTbl)
 }
