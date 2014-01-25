@@ -270,6 +270,9 @@ testModelVsPred <- function() {
 	expectedTbl[, totN := as.integer(totN)]
 	resTbl = runPrior("select * from tweets where user_screen_name = 'thebucktlist'", outFile='/tmp/modelVsPred.csv')
 	expect_equivalent(expectedTbl, resTbl)
+	expectedTbl = data.table(read.csv(modelVsPredOutFile('twitter_ru'), stringsAsFactors=F))
+	resTbl = runPrior("select * from tweets where user_screen_name = 'twitter_ru'", outFile='/tmp/modelVsPred.csv')
+	expect_equivalent(expectedTbl, resTbl)
 }
 
 runTests <- function() {
