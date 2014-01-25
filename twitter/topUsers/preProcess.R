@@ -439,6 +439,7 @@ run10M <- function() {
 }
 
 runTwitter_ru <- function() runPrior("select * from tweets where user_screen_name='twitter_ru'", outFile=modelVsPredOutFile('twitter_ru'))
+#runTwitter_ru()
 
 run10Mr2 <- function() runPrior(getQueryGTNoRetweets(10000000, 't.id != 12466832063'), outFile=modelVsPredOutFile('gt10Mr2'))
 
