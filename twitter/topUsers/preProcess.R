@@ -506,6 +506,7 @@ curWS <- function() {
 	modelVsPredTblBig = modelVsPredTbl
 	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl)
 	modelVsPredTbl
+	write.csv(modelVsPredTbl, sprintf('%s/tmp.csv', PATH))
 	modelVsPredTbl = fread(modelVsPredOutFile('gt100k'))
 	modelVsPredTbl = fread(modelVsPredOutFile('gt1M'))
 	modelVsPredTbl = fread(modelVsPredOutFile('gt1Mr2'))
