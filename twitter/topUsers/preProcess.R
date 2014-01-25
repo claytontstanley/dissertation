@@ -413,20 +413,32 @@ getQueryGT <- function(val, filters='1=1') {
 	sprintf('select * from tweets as t where %s and user_screen_name in (select user_screen_name from twitter_users where followers_count > %d order by followers_count asc limit 100)', filters, val)
 }
 
+combineFilters <- function(f1, f2) {
+	paste(f1, f2, sep=' and ')
+}
+
+getQueryGTNoRetweets <- function(val, filters='1=1') {
+	getQueryGT(val, combineFilters("retweeted = 'False'", filters))
+}
+
 run1M <- function() {
 	res = runPrior(getQueryGT(1000000), outFile=modelVsPredOutFile('gt1M'))
 	res
 }
 
-run1Mr2 <- function() runPrior(getQueryGT(1000000, "retweeted = 'False'"), outFile=modelVsPredOutFile('gt1Mr2'))
+run1Mr2 <- function() runPrior(getQueryGTNoRetweets(1000000), outFile=modelVsPredOutFile('gt1Mr2'))
 
 run100k <- function() {
 	runPrior(getQueryGT(100000), outFile=modelVsPredOutFile('gt100k'))
 }
 
+run100kr2 <- function() runPrior(getQueryGTNoRetweets(100000), outFile=modelVsPredOutFile('gt100kr2'))
+
 run10M <- function() {
 	runPrior(getQueryGT(10000000, 't.id != 12466832063'), outFile=modelVsPredOutFile('gt10M'))
 }
+
+run10Mr2 <- function() runPrior(getQueryGTNoRetweets(10000000, 't.id != 12466832063'), outFile=modelVsPredOutFile('gt10Mr2'))
 
 buildTables <- function(outFileNames) {
 	buildTable <- function(outFileName) {
