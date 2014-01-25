@@ -484,6 +484,7 @@ curWS <- function() {
 	tweetsTbl
 	#hashtagsTbl = getHashtagsTbl(tweetsTbl, from='text')
 	hashtagsTbl = getHashtagsTbl(tweetsTbl, from='tokenText')
+	hashtagsTbl
 	compareHashtagTbls()[N!=N.1]
 	getHashtagEntropy(hashtagsTbl)
 	tusersTbl = getTusersTbl()
@@ -504,6 +505,7 @@ curWS <- function() {
 	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl[user_screen_name %in% unique(user_screen_name)[1:25]])
 	modelVsPredTblBig = modelVsPredTbl
 	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl)
+	modelVsPredTbl
 	modelVsPredTbl = fread(modelVsPredOutFile('gt100k'))
 	modelVsPredTbl = fread(modelVsPredOutFile('gt1M'))
 	modelVsPredTbl = fread(modelVsPredOutFile('gt1Mr2'))
