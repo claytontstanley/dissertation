@@ -8,6 +8,7 @@ select count(*) from topUsers;
 select count(*) from twitter_users;
 select count(*) from (select count(user_screen_name) from tweets group by user_screen_name) as t;
 select * from twitter_users;
+select count(*) from tweets where user_screen_name = 'twitter_ru';
 
 select * from tweets;
 select user_screen_name from twitter_users;
