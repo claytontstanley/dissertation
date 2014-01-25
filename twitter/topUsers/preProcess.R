@@ -473,6 +473,8 @@ curWS <- function() {
 	runTests()
 	tweetsTbl = getTweetsTbl("select * from tweets limit 100000")
 	tweetsTbl = getTweetsTbl("select * from tweets where user_screen_name='eddieizzard'")
+	tweetsTbl = getTweetsTbl("select * from tweets where user_screen_name='twitter_ru'")
+	tweetsTbl
 	runPrior("select * from tweets where id=12466832063")
 	runPrior("select * from tweets where user_id=50393960")
 	# Checking that tweets for twitter users from each followers_count scale are being collected properly
