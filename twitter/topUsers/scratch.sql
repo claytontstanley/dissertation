@@ -14,7 +14,7 @@ select * from badges;
 select * from users;
 select * from votes;
 select * from comments;
-select * from posts;
+select * from posts limit 1;
 select * from tweets;
 select user_screen_name from twitter_users;
 select count(*) from tweets;
