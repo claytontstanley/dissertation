@@ -456,8 +456,8 @@ run100k <- function() {
 
 run100kr2 <- function() runPrior(getQueryGTNoRetweets(100000), outFile=modelVsPredOutFile('gt100kr2'))
 
-run10k <- function() runPrior(getQueryGT(10000), outFile=modelVsPredOutFile('gt10k'))
-run10kr2 <- function() runPrior(getQueryGTNoRetweets(10000), outFile=modelVsPredOutFile('gt10kr2'))
+run10k <- function() runPrior(getQueryGT(10000, "user_screen_name != 'so_pr'"), outFile=modelVsPredOutFile('gt10k'))
+run10kr2 <- function() runPrior(getQueryGTNoRetweets(10000, "user_screen_name != 'so_pr'"), outFile=modelVsPredOutFile('gt10kr2'))
 
 run10M <- function() {
 	runPrior(getQueryGT(10000000, 't.id != 12466832063'), outFile=modelVsPredOutFile('gt10M'))
