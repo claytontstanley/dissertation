@@ -140,7 +140,7 @@ def getAllTweets(screenNames):
     alltweets = []
     userID = _api.get_user(screen_name).id
     lessThanID = getTweets(screen_name, count=1)[-1].id + 1
-    cmd = string.Template("select id from tweets where user_id = '${userID}' order by id desc limit 1").substitute(locals())
+    cmd = string.Template("select id from tweets where user_id = '${userID}' order by id desc").substitute(locals())
     res = _cur.query(cmd).getresult()
     if len(res) == 0:
         newestGrabbed = 0
@@ -148,7 +148,7 @@ def getAllTweets(screenNames):
         newestGrabbed = int(res[0][0])
     res = getTweetsBetween(newestGrabbed, lessThanID)
     alltweets.extend(res)
-    cmd = string.Template("select id from tweets where user_id = '${userID}' order by id asc limit 1").substitute(locals())
+    cmd = string.Template("select id from tweets where user_id = '${userID}' order by id asc").substitute(locals())
     res = _cur.query(cmd).getresult()
     if len(res) == 0:
         lessThanID = 0
@@ -230,7 +230,7 @@ def getUserInfoForTopUsers():
 #storeTopUsers(topUsersFile='top100000SocialBakers.csv')
 #getAllTweets('claytonstanley1')
 #getAllTweetsForTopUsers()
-#getAllTweetsFor10kUsers()
-getAllTweetsFor1kUsers()
+getAllTweetsFor10kUsers()
+#getAllTweetsFor1kUsers()
 #getUserInfoForTopUsers()
 #backupTables()

@@ -21,6 +21,7 @@ create table if not exists tweets (
 	);
 
 create index user_screen_name_index_tweets on tweets (user_screen_name);
+create index user_id_index_tweets on tweets (user_id);
 
 drop table if exists twitter_users;
 create table if not exists twitter_users (
