@@ -100,6 +100,15 @@ addTokenText <- function(tweetsTbl) {
 	tweetsTbl[, tokenText := tokenizedTbl[[1]]]
 }
 
+getPostCntTbl <- function() {
+	data.table(sqldf("select Post_Type_Id, N, Owner_User_Id, Display_Name, Reputation from
+			 (select owner_user_id, Post_Type_Id, count(*) as N from Posts 
+			  where Post_Type_Id = 1
+			  group by Owner_User_Id,Post_Type_Id) as foo2
+			 join Users on Users.Id = foo2.Owner_User_Id
+			 order by Reputation desc"))
+}
+
 getTweetsTbl <- function(sqlStr="select * from tweets limit 10000") {
 	tweetsTbl = data.table(sqldf(sqlStr))
 	addTokenText(tweetsTbl)
@@ -109,6 +118,11 @@ getTweetsTbl <- function(sqlStr="select * from tweets limit 10000") {
 	}
 	tweetsTbl[, dt := getDiffTimeSinceFirst(created_at), by=user_screen_name]
 	tweetsTbl
+}
+
+getPostsTbl <- function() {
+	postsTbl = data.table(sqldf('select * from posts limit 100'))
+	postsTbl
 }
 
 getHashtagsTbl <- function(tweetsTbl, from='tokenText') {
@@ -126,6 +140,11 @@ getTusersTbl <- function() {
 	tusersTbl[, rank := order(followers_count, decreasing=T)]
 	setkey(tusersTbl, id)
 	tusersTbl
+}
+
+getSOusersTbl <- function() {
+	sousersTbl = data.table(sqldf('select * from users limit 1000'))
+	sousersTbl
 }
 
 getHashtagEntropy <- function(hashtagsTbl) {
