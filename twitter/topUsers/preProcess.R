@@ -447,8 +447,10 @@ run1M <- function() runPrior(getQueryGT(1000000), outFile=modelVsPredOutFile('gt
 run1Mr2 <- function() runPrior(getQueryGTNoRetweets(1000000), outFile=modelVsPredOutFile('gt1Mr2'))
 run100k <- function() runPrior(getQueryGT(100000), outFile=modelVsPredOutFile('gt100k'))
 run100kr2 <- function() runPrior(getQueryGTNoRetweets(100000), outFile=modelVsPredOutFile('gt100kr2'))
+# so_pr user causes segfault w/ data.table 1.8.10
 run10k <- function() runPrior(getQueryGT(10000, "user_screen_name != 'so_pr'"), outFile=modelVsPredOutFile('gt10k'))
 run10kr2 <- function() runPrior(getQueryGTNoRetweets(10000, "user_screen_name != 'so_pr'"), outFile=modelVsPredOutFile('gt10kr2'))
+# tweet 12466832063  has a corrupt utf-8 encoded string
 run10M <- function() runPrior(getQueryGT(10000000, 't.id != 12466832063'), outFile=modelVsPredOutFile('gt10M'))
 run10Mr2 <- function() runPrior(getQueryGTNoRetweets(10000000, 't.id != 12466832063'), outFile=modelVsPredOutFile('gt10Mr2'))
 
