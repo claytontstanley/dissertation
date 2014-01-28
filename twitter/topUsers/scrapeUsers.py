@@ -231,6 +231,6 @@ def getUserInfoForTopUsers():
 #getAllTweets('claytonstanley1')
 #getAllTweetsForTopUsers()
 #getAllTweetsFor10kUsers()
-#getAllTweetsFor1kUsers()
+getAllTweetsFor1kUsers()
 #getUserInfoForTopUsers()
-backupTables()
+#backupTables()
