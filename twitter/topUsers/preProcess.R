@@ -103,7 +103,8 @@ CIVar2 <- function(vals) {
 }
 
 sqlScratch <- function() {
-	#install.packages('~/src/datatable/pkg', repos=NULL, type='source')
+	install.packages('~/src/datatable/pkg', repos=NULL, type='source')
+	install.packages('~/Desktop/data.table', repos=NULL, type='source')
 	sqldf("select * from tweets where user_screen_name = 'claytonstanley1'")
 	sqldf('select count(*) from tweets')
 	sqldf('select count(*) from topUsers')
