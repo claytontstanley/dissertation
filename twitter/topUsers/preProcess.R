@@ -77,7 +77,9 @@ withProf <- function(thunk) {
 	thunk
 }
 
-# FIXME: Add interface function to read.csv over data tables, since fread in 1.8.10 isn't very good yet
+myReadCSV <- function(file) {
+	data.table(read.csv(file, stringsAsFactors=F))
+}
 
 # Computing CIs around a variance statistic
 
@@ -117,8 +119,8 @@ sqlScratch <- function() {
 	data.table(sqldf("select retweeted, count(*) from tweets group by retweeted"))[, min(count) / (max(count) + min(count))]
 	sqldf("select * from tweets where 1=1 and user_screen_name='katyperry' limit 10")
 	data.table(sqldf("select * from twitter_users"))
-	twitter_users = data.table(read.csv(str_c(PATH, "/dissertationData/tables/twitter_users.csv")))
-	topUsers = data.table(read.csv(str_c(PATH, "/dissertationData/tables/topUsers.csv")))
+	twitter_users = myReadCSV(str_c(PATH, "/dissertationData/tables/twitter_users.csv"))
+	topUsers = myReadCSV(str_c(PATH, "/dissertationData/tables/topUsers.csv"))
 	twitter_users[created_at=='2010-10-29 19:05:25',]
 }
 
@@ -464,7 +466,7 @@ runSO1k <- function() makeSORun(1000, 'SOgt1k')()
 
 buildTables <- function(outFileNames) {
 	buildTable <- function(outFileName) {
-		tbl = fread(modelVsPredOutFile(outFileName))
+		tbl = myReadCSV(modelVsPredOutFile(outFileName))
 		tbl[, datasetName := outFileName]
 		tbl
 	}
@@ -508,11 +510,11 @@ curWS <- function() {
 	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl)
 	modelVsPredTbl
 	write.csv(modelVsPredTbl, sprintf('%s/tmp2.csv', PATH))
-	modelVsPredTbl = fread(modelVsPredOutFile('gt100k'))
-	modelVsPredTbl = fread(modelVsPredOutFile('gt1M'))
-	modelVsPredTbl = fread(modelVsPredOutFile('gt1Mr2'))
-	modelVsPredTbl = fread(modelVsPredOutFile('gt10M'))
-	modelVsPredTbl = data.table(read.csv(modelVsPredOutFile('SOgt10k'), stringsAsFactors=F))
+	modelVsPredTbl = myReadCSV(modelVsPredOutFile('gt100k'))
+	modelVsPredTbl = myReadCSV(modelVsPredOutFile('gt1M'))
+	modelVsPredTbl = myReadCSV(modelVsPredOutFile('gt1Mr2'))
+	modelVsPredTbl = myReadCSV(modelVsPredOutFile('gt10M'))
+	modelVsPredTbl = myReadCSV(modelVsPredOutFile('SOgt10k'), stringsAsFactors=F)
 	modelVsPredTbl = buildTables(c('gt100k', 'gt1M', 'gt1Mr2', 'gt10M'))
 	modelVsPredTbl
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagRank'][user_screen_name %in% sample(unique(user_screen_name), size=10)], hashtagsTbl)
