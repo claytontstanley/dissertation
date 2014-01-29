@@ -147,27 +147,24 @@ getPostCntTbl <- function() {
 			 order by Reputation desc"))
 }
 
+getDiffTimeSinceFirst <- function(ts) {
+	as.numeric(difftime(ts, ts[1], units='secs'))
+}
+
 getTweetsTbl <- function(sqlStr="select * from tweets limit 10000") {
 	tweetsTbl = data.table(sqldf(sqlStr))
 	addTokenText(tweetsTbl, from='text')
 	setkey(tweetsTbl, id)
-	getDiffTimeSinceFirst <- function(ts) {
-		as.numeric(difftime(ts, ts[1], units='secs'))
-	}
 	tweetsTbl[, dt := getDiffTimeSinceFirst(created_at), by=user_screen_name]
 	tweetsTbl
 }
-
 
 getPostsTbl <- function(sqlStr) {
 	postsTbl = data.table(sqldf(sqlStr))
 	setkey(postsTbl, id)
 	expect_false(any(duplicated(postsTbl$id)))
-	# TODO: this is not vectorized
+	# TODO: this is not vectorized b/c html2txt isn't vectorized
 	postsTbl[, tagsNoHtml := html2txt(tags), by=id]
-	getDiffTimeSinceFirst <- function(ts) {
-		as.numeric(difftime(ts, ts[1], units='secs'))
-	}
 	postsTbl[, dt := getDiffTimeSinceFirst(creation_date), by=owner_user_id]
 	postsTbl
 }
