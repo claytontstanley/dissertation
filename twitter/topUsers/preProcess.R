@@ -480,6 +480,7 @@ curWS <- function() {
 	tweetsTbl
 	runPrior("select * from tweets where id=12466832063")
 	runPrior("select * from tweets where user_id=50393960")
+	runSO1k()
 	# Checking that tweets for twitter users from each followers_count scale are being collected properly
 	usersWithTweetsTbl = data.table(sqldf("select distinct on (user_id) t.user_screen_name,u.followers_count from tweets as t join twitter_users as u on t.user_screen_name = u.user_screen_name"))
 	usersWithTweetsTbl[order(followers_count), plot(log10(followers_count))]

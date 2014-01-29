@@ -37,3 +37,11 @@ create table if not exists twitter_users (
 	verified varchar(255) not null,
 	primary key (id)
 	);
+
+
+create index owner_user_id_index_posts on posts (owner_user_id);
+create index reputation_index_users on users (reputation);
+
+
+
+
