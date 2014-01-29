@@ -185,7 +185,6 @@ getTagsTbl <- function(postsTbl) {
 	tagsTbl
 }
 
-
 getTusersTbl <- function() {
 	tusersTbl = data.table(sqldf('select * from twitter_users'))
 	tusersTbl[, rank := order(followers_count, decreasing=T)]
