@@ -10,7 +10,8 @@ select count(*) from (select count(user_screen_name) from tweets group by user_s
 select * from twitter_users;
 
 select * from badges limit 10;
-select * from users limit 10;
+select * from post_types;
+select * from users order by reputation desc limit 10;
 select * from votes;
 select * from comments;
 select * from posts limit 1;

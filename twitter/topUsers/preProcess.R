@@ -57,6 +57,21 @@ flushPrint <- function(str) {
 	print(str)
 }
 
+# ref: http://stackoverflow.com/questions/5060076/convert-html-character-entity-encoding-in-r
+html2txt <- function(str) {
+	xpathApply(htmlParse(str, asText=TRUE),
+		   "//body//text()", 
+		   xmlValue)[[1]] 
+}
+
+withProf <- function(thunk) {
+	Rprof()
+	on.exit({
+		Rprof(NULL)
+		flushPrint(summaryRprof())
+	})
+	thunk
+}
 
 sqlScratch <- function() {
 	sqldf("select * from tweets where user_screen_name = 'claytonstanley1'")
@@ -79,25 +94,26 @@ sqlScratch <- function() {
 	twitter_users[created_at=='2010-10-29 19:05:25',]
 }
 
-getTokenizedTbl <- function(tweetsTbl, from) {
-	regex = '\\S+'
+getTokenizedTbl <- function(tweetsTbl, from, regex) {
 	matches = regmatches(tweetsTbl[[from]], gregexpr(regex, tweetsTbl[[from]], perl=T))
 	wideTbl = data.table(id=tweetsTbl$id, matches=matches)
 	extractMatches = function(m) list(chunk=m, pos=seq(from=1, by=1, length.out=length(m)))
 	tokenizedTbl = wideTbl[, extractMatches(unlist(matches)), by=id]
+	tokenizedTbl[, chunk := tolower(chunk)]
+	setkey(tokenizedTbl, id)
 	tokenizedTbl
 }
 
-addTokenText <- function(tweetsTbl) {
+addTokenText <- function(tweetsTbl, from) {
 	stripDelimiters = function(text) gsub(pattern='(\t|\n|\r)', replacement=' ', x=text)
 	rawTweetsFile = tempfile(pattern='rawTweets-', tmpdir='/tmp', fileext='.txt')
 	tokenizedTweetsFile = tempfile(pattern='tokenizedTweets-', tmpdir='/tmp', fileext='.txt')
-	with(tweetsTbl, writeLines(stripDelimiters(text), rawTweetsFile, useBytes=T)) 
+	writeLines(stripDelimiters(tweetsTbl[[from]]), rawTweetsFile, useBytes=T)
 	cmd = sprintf('%s/bin/ark-tweet-nlp-0.3.2/runTagger.sh --no-confidence --just-tokenize --quiet %s > %s', PATH, rawTweetsFile, tokenizedTweetsFile)
 	flushPrint(sprintf('running tagger with in/out temp files: %s, %s', rawTweetsFile, tokenizedTweetsFile))
 	cmdOut = system(cmd)
-	tokenizedTbl = data.table(read.delim(tokenizedTweetsFile, sep='\t', quote="", header=F, stringsAsFactors=F))
-	tweetsTbl[, tokenText := tokenizedTbl[[1]]]
+	tokenTextTbl = data.table(read.delim(tokenizedTweetsFile, sep='\t', quote="", header=F, stringsAsFactors=F))
+	tweetsTbl[, tokenText := tokenTextTbl[[1]]]
 }
 
 getPostCntTbl <- function() {
@@ -111,7 +127,7 @@ getPostCntTbl <- function() {
 
 getTweetsTbl <- function(sqlStr="select * from tweets limit 10000") {
 	tweetsTbl = data.table(sqldf(sqlStr))
-	addTokenText(tweetsTbl)
+	addTokenText(tweetsTbl, from='text')
 	setkey(tweetsTbl, id)
 	getDiffTimeSinceFirst <- function(ts) {
 		as.numeric(difftime(ts, ts[1], units='secs'))
@@ -120,20 +136,36 @@ getTweetsTbl <- function(sqlStr="select * from tweets limit 10000") {
 	tweetsTbl
 }
 
-getPostsTbl <- function() {
-	postsTbl = data.table(sqldf('select * from posts limit 100'))
+
+getPostsTbl <- function(sqlStr) {
+	postsTbl = data.table(sqldf(sqlStr))
+	setkey(postsTbl, id)
+	expect_false(any(duplicated(postsTbl$id)))
+	# TODO: this is not vectorized
+	postsTbl[, tagsNoHtml := html2txt(tags), by=id]
+	getDiffTimeSinceFirst <- function(ts) {
+		as.numeric(difftime(ts, ts[1], units='secs'))
+	}
+	postsTbl[, dt := getDiffTimeSinceFirst(creation_date), by=owner_user_id]
 	postsTbl
 }
 
-getHashtagsTbl <- function(tweetsTbl, from='tokenText') {
-	tokenizedTbl = getTokenizedTbl(tweetsTbl, from=from)
-	tokenizedTbl[, chunk := tolower(chunk)]
+getHashtagsTbl <- function(tweetsTbl, from) {
+	tokenizedTbl = getTokenizedTbl(tweetsTbl, from=from, regex='\\S+')
 	htOfTokenizedTbl = tokenizedTbl[grepl('^#', chunk),]
-	setkey(htOfTokenizedTbl,id)
+	expect_equal(c('id'), key(htOfTokenizedTbl))
 	hashtagsTbl = htOfTokenizedTbl[tweetsTbl, list(hashtag=chunk, pos=pos, created_at=created_at, dt=dt, user_id=user_id, user_screen_name=user_screen_name), nomatch=0]
 	setkey(hashtagsTbl, user_screen_name, dt, hashtag)
 	hashtagsTbl
 }
+
+getTagsTbl <- function(postsTbl) {
+	tokenizedTbl = getTokenizedTbl(postsTbl, from='tagsNoHtml', regex='(?<=<)[^>]+(?=>)')
+	tagsTbl = tokenizedTbl[postsTbl, list(hashtag=chunk, pos=pos, created_at=creation_date, dt=dt, user_id=owner_user_id, user_screen_name=as.character(owner_user_id)), nomatch=0]
+	setkey(tagsTbl, user_screen_name, dt, hashtag)
+	tagsTbl
+}
+
 
 getTusersTbl <- function() {
 	tusersTbl = data.table(sqldf('select * from twitter_users'))
@@ -268,7 +300,7 @@ testPriorActivations <- function() {
 }
 
 testGetTokenizedTbl <- function() {
-	testTokenizedTbl = getTokenizedTbl(data.table(id=c(1,2,3,4), text=c('kfkf idid!!','  ','ie #2', 'kdkd')), from='text')
+	testTokenizedTbl = getTokenizedTbl(data.table(id=c(1,2,3,4), text=c('kfkf idid!!','  ','ie #2', 'kdkd')), from='text', regex='\\S+')
 	expectedTokenizedTbl = data.table(id=c(1,1,3,3,4), chunk=c('kfkf','idid!!','ie','#2','kdkd'), pos=c(1,2,1,2,1))
 	expect_equivalent(testTokenizedTbl, expectedTokenizedTbl)
 }
@@ -396,39 +428,50 @@ genAggModelVsPredTbl <- function(hashtagsTbl, ds=c(0,.1,.2,.3,.4,.5,.6,.7,.8,.9,
 
 visModelVsPredTbl <- function(modelVsPredTbl) {
 	flushPrint(ggplot(modelVsPredTbl[maxNP==T & topHashtag & hashtagUsedP], aes(totN, d)) +
-	      geom_point() +
-	      xlab('total number of hashtags for user'))
+		   geom_point() +
+		   xlab('total number of hashtags for user'))
 	modelVsPredTbl[topHashtag & hashtagUsedP, meanPC := mean(NCell/totN), by=user_screen_name]
 	modelVsPredTbl[topHashtag & hashtagUsedP, relPC := NCell/totN - mean(NCell/totN), by=user_screen_name]
 	modelVsPredTbl[topHashtag & hashtagUsedP, meanRelPC := mean(relPC), by=d]
 	dev.new()
 	flushPrint(ggplot(modelVsPredTbl[topHashtag & hashtagUsedP], aes(log(d),relPC)) +
-	      geom_point() +
-	      geom_line(aes(log(d), meanRelPC, group=user_screen_name[1])) +
-	      xlab('log(d)') +
-	      ylab('change in proportion correct from mean for user'))
+		   geom_point() +
+		   geom_line(aes(log(d), meanRelPC, group=user_screen_name[1])) +
+		   xlab('log(d)') +
+		   ylab('change in proportion correct from mean for user'))
 	dev.new()
-	flushPrint(ggplot(modelVsPredTbl[topHashtag & hashtagUsedP & user_screen_name %in% sample(unique(user_screen_name), size=20)],
-		     aes(log(d),NCell/totN, group=as.factor(user_screen_name))) + geom_line() +
-	      ylab('proportion correct'))
+	flushPrint(ggplot(modelVsPredTbl[topHashtag & hashtagUsedP & user_screen_name %in% sample(unique(user_screen_name), size=min(20, length(unique(user_screen_name))))],
+			  aes(log(d),NCell/totN, group=as.factor(user_screen_name))) + geom_line() +
+		   ylab('proportion correct'))
 	dev.new()
 	flushPrint(ggplot(modelVsPredTbl[topHashtag & hashtagUsedP & maxNP], aes(d)) +
-	      geom_histogram(aes(y = ..density..)) +
-	      geom_density())
+		   geom_histogram(aes(y = ..density..)) +
+		   geom_density())
 }
 
 modelVsPredOutFile <- function(name) {
 	sprintf('%s/dissertationData/modelVsPred/%s.csv', PATH, name)
 }
 
+#query = 'select id, owner_user_id, creation_date, title, tags from posts where post_type_id = 1 and owner_user_id in (select id from users where reputation > 100000 limit 10)'
+#runPriorSO(query)
+
+runPriorSO <- function(query, ...) {
+	withProf({
+		postsTbl = getPostsTbl(query)
+		tagsTbl = getTagsTbl(postsTbl)
+		modelVsPredTbl = genAggModelVsPredTbl(tagsTbl, ...)
+		modelVsPredTbl
+	})
+}
+
 runPrior <- function(query, ...) {
-	Rprof()
-	tweetsTbl = getTweetsTbl(query)
-	hashtagsTbl = getHashtagsTbl(tweetsTbl, from='tokenText')
-	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl, ...)
-	Rprof(NULL)
-	flushPrint(summaryRprof())
-	modelVsPredTbl
+	withProf({
+		tweetsTbl = getTweetsTbl(query)
+		hashtagsTbl = getHashtagsTbl(tweetsTbl, from='tokenText')
+		modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl, ...)
+		modelVsPredTbl
+	})
 }
 
 getQueryGT <- function(val, filters='1=1') {
