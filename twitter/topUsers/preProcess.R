@@ -453,9 +453,6 @@ modelVsPredOutFile <- function(name) {
 	sprintf('%s/dissertationData/modelVsPred/%s.csv', PATH, name)
 }
 
-#query = 'select id, owner_user_id, creation_date, title, tags from posts where post_type_id = 1 and owner_user_id in (select id from users where reputation > 100000 limit 10)'
-#runPriorSO(query)
-
 runPriorSO <- function(query, ...) {
 	withProf({
 		postsTbl = getPostsTbl(query)
@@ -478,6 +475,10 @@ getQueryGT <- function(val, filters='1=1') {
 	sprintf('select * from tweets as t where %s and user_screen_name in (select user_screen_name from twitter_users where followers_count > %d order by followers_count asc limit 100)', filters, val)
 }
 
+getQueryGTSO <- function(val) {
+	sprintf('select id, owner_user_id, creation_date, title, tags from posts where post_type_id = 1 and owner_user_id in (select id from users where reputation > %d order by reputation asc limit 100)', val)
+}
+
 combineFilters <- function(f1, f2) {
 	paste(f1, f2, sep=' and ')
 }
@@ -496,6 +497,15 @@ run10kr2 <- function() runPrior(getQueryGTNoRetweets(10000, "user_screen_name !=
 # tweet 12466832063  has a corrupt utf-8 encoded string
 run10M <- function() runPrior(getQueryGT(10000000, 't.id != 12466832063'), outFile=modelVsPredOutFile('gt10M'))
 run10Mr2 <- function() runPrior(getQueryGTNoRetweets(10000000, 't.id != 12466832063'), outFile=modelVsPredOutFile('gt10Mr2'))
+
+makeSORun <- function(val, outFileName) {
+	runFun = function() runPriorSO(getQueryGTSO(val), outFile=modelVsPredOutFile(outFileName))
+	runFun
+}
+
+runSO100k <- function() makeSORun(100000, 'SOgt100k')()
+runSO10k <- function() makeSORun(10000, 'SOgt10k')()
+runSO1k <- function() makeSORun(1000, 'SOgt1k')()
 
 buildTables <- function(outFileNames) {
 	buildTable <- function(outFileName) {
