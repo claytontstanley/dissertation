@@ -18,6 +18,7 @@ library(utils)
 library(testthat)
 library(ROCR)
 PATH = getPathToThisFile()
+FILE = getNameOfThisFile()
 
 options(sqldf.RPostgreSQL.user = 'claytonstanley',
 	sqldf.RPostgreSQL.dbname = 'claytonstanley')
@@ -28,7 +29,7 @@ getHashes <- function(vals, db) {
 	ret = db[match(vals, names(db))]
 	ret = ret[!is.na(ret)]
 	#stopifnot(length(ret) > 0)
-	myPrint(str_c(length(vals), "->", length(ret)))
+	debugPrint(str_c(length(vals), "->", length(ret)))
 	return(ret)
 }
 
@@ -43,18 +44,20 @@ makeDB <- function(vals) {
 	db
 }
 
-debugP = F
+logLevel = 1
+debugLogLevel = 2
 
-myPrint <- function(str) {
-	if (debugP == T) {
-		print(substitute(str))
-		print(str)
-	}
+setLogLevel <- function(lvl) logLevel <<- lvl
+getLogLevel <-function() logLevel
+
+debugPrint <- function(str) {
+	myLog(substitute(str), debugLogLevel)
+	myLog(str, debugLogLevel)
 }
 
-flushPrint <- function(str) {
+myLog <- function(str, forLogLevel=1) {
 	on.exit(flush.console())
-	print(str)
+	if (logLevel >= forLogLevel) print(str)
 }
 
 # ref: http://stackoverflow.com/questions/5060076/convert-html-character-entity-encoding-in-r
@@ -69,7 +72,7 @@ withProf <- function(thunk) {
 	Rprof(.tempRprofOut)
 	on.exit({
 		Rprof(NULL)
-		flushPrint(summaryRprof(.tempRprofOut))
+		myLog(summaryRprof(.tempRprofOut))
 	})
 	thunk
 }
@@ -93,7 +96,7 @@ CIVar2 <- function(vals) {
 	df = data.frame(x=vals)
 	model = 'x ~~ x'
 	fit = sem(model, data=df, likelihood = "wishart" )
-	res = print(parameterEstimates(fit))
+	res = parameterEstimates(fit)
 	with(res, c(upper=ci.upper, mean=est, lower=ci.lower))
 }
 
@@ -133,10 +136,13 @@ addTokenText <- function(tweetsTbl, from) {
 	stripDelimiters = function(text) gsub(pattern='(\t|\n|\r)', replacement=' ', x=text)
 	rawTweetsFile = tempfile(pattern='rawTweets-', tmpdir='/tmp', fileext='.txt')
 	tokenizedTweetsFile = tempfile(pattern='tokenizedTweets-', tmpdir='/tmp', fileext='.txt')
+	stderFile = tempfile(pattern='stderr-', tmpdir='/tmp', fileext='.txt')
 	writeLines(stripDelimiters(tweetsTbl[[from]]), rawTweetsFile, useBytes=T)
-	cmd = sprintf('%s/bin/ark-tweet-nlp-0.3.2/runTagger.sh --no-confidence --just-tokenize --quiet %s > %s', PATH, rawTweetsFile, tokenizedTweetsFile)
-	flushPrint(sprintf('running tagger with in/out temp files: %s, %s', rawTweetsFile, tokenizedTweetsFile))
-	cmdOut = system(cmd)
+	cmd = sprintf('%s/bin/ark-tweet-nlp-0.3.2/runTagger.sh', PATH)
+	args = sprintf('--no-confidence --just-tokenize --quiet %s > %s 2>%s', rawTweetsFile, tokenizedTweetsFile, stderFile)
+	myLog(sprintf('running tagger with in/out temp files: %s, %s', rawTweetsFile, tokenizedTweetsFile))
+	cmdOut = system2(cmd, args=args)
+	myLog(paste(readLines(stderFile), sep='\n'))
 	tokenTextTbl = data.table(read.delim(tokenizedTweetsFile, sep='\t', quote="", header=F, stringsAsFactors=F))
 	tweetsTbl[, tokenText := tokenTextTbl[[1]]]
 }
@@ -165,7 +171,7 @@ getTweetsTbl <- function(sqlStr="select * from tweets limit 10000") {
 getPostsTbl <- function(sqlStr) {
 	postsTbl = data.table(sqldf(sqlStr))
 	setkey(postsTbl, id)
-	expect_false(any(duplicated(postsTbl$id)))
+	stopifnot(!duplicated(postsTbl$id))
 	# TODO: this is not vectorized b/c html2txt isn't vectorized
 	postsTbl[, tagsNoHtml := html2txt(tags), by=id]
 	postsTbl[, dt := getDiffTimeSinceFirst(creation_date), by=owner_user_id]
@@ -175,7 +181,7 @@ getPostsTbl <- function(sqlStr) {
 getHashtagsTbl <- function(tweetsTbl, from) {
 	tokenizedTbl = getTokenizedTbl(tweetsTbl, from=from, regex='\\S+')
 	htOfTokenizedTbl = tokenizedTbl[grepl('^#', chunk),]
-	expect_equal(c('id'), key(htOfTokenizedTbl))
+	stopifnot(c('id') == key(htOfTokenizedTbl))
 	hashtagsTbl = htOfTokenizedTbl[tweetsTbl, list(hashtag=chunk, pos=pos, created_at=created_at, dt=dt, user_id=user_id, user_screen_name=user_screen_name), nomatch=0]
 	setkey(hashtagsTbl, user_screen_name, dt, hashtag)
 	hashtagsTbl
@@ -217,31 +223,31 @@ compareHashtagTbls <- function() {
 }
 
 computeActs <- function(hashtags, dt, cTime, d) {
-	myPrint(hashtags)
-	myPrint(dt)
-	myPrint(d)
+	debugPrint(hashtags)
+	debugPrint(dt)
+	debugPrint(d)
 	#cTime = dt[length(dt)]
-	myPrint(cTime)
+	debugPrint(cTime)
 	dt = cTime - dt
-	myPrint(dt)
+	debugPrint(dt)
 	indeces = dt>0
 	hashtagsSub = hashtags[indeces] 
-	myPrint(hashtagsSub)
+	debugPrint(hashtagsSub)
 	cTimeSub = cTime[indeces]
 	cTimeSubRep = rep(cTimeSub, times=length(d))
 	dtSub = dt[indeces]
 	dtSubRep = rep(dtSub, times=length(d))
 	dRep = rep(d, each=length(dtSub))
 	hashtagsSubRep = rep(hashtagsSub)
-	myPrint(dtSubRep)
-	myPrint(dRep)
+	debugPrint(dtSubRep)
+	debugPrint(dRep)
 	list(hashtag=hashtagsSubRep, partialAct=dtSubRep^(-dRep), dt=cTimeSubRep, d=dRep)
 }
 
 computeActsForUser <- function(hashtag, dt, ds, user_screen_name) {
-	flushPrint(sprintf('computing partial activation for user %s', user_screen_name))
+	myLog(sprintf('computing partial activation for user %s', user_screen_name))
 	retIndeces = which(!duplicated(dt))[-1]
-	expect_true(length(retIndeces) > 0)
+	stopifnot(length(retIndeces) > 0)
 	partialRes = data.table(i=retIndeces)
 	partialRes = partialRes[, list(hashtag=hashtag[1:i], dt=dt[1:i], cTime=dt[i]), by=i]
 	partialRes = with(partialRes, as.data.table(computeActs(hashtag, dt, cTime, d=ds)))
@@ -250,12 +256,12 @@ computeActsForUser <- function(hashtag, dt, ds, user_screen_name) {
 
 computeActsByUser <- function(hashtagsTbl, ds) {
 	partialRes = hashtagsTbl[, computeActsForUser(hashtag, dt, ds, user_screen_name), by=user_screen_name]
-	myPrint(partialRes)
-	flushPrint('setting key for partial table')
+	debugPrint(partialRes)
+	myLog('setting key for partial table')
 	setkeyv(partialRes, c('user_screen_name','dt','hashtag','d'))
-	flushPrint('computing activations across table')
+	myLog('computing activations across table')
 	res = partialRes[, list(N=.N, act=log(sum(partialAct))), keyby=list(user_screen_name, dt, hashtag, d)]
-	with(res, expect_that(any(is.infinite(act)), is_false()))
+	with(res, stopifnot(!is.infinite(act)))
 	res
 }
 
@@ -279,96 +285,15 @@ visCompare <- function(hashtagsTbl, modelHashtagsTbl, db) {
 	return()
 }
 
-testPriorActivations <- function() {
-	sortExpectedTbl <- function(tbl) {
-		cols = c('user_screen_name', 'dt', 'hashtag', 'd', 'N', 'act')
-		setcolorder(tbl, cols) 
-		setkeyv(tbl, cols) 
-		tbl
-	}
-	testHashtagsTbl = data.table(user_screen_name=c(1,1,1,1), dt=c(0,2,3,4), hashtag=c('a', 'b', 'a', 'b'))
-	expectedActTbl = sortExpectedTbl(data.table(dt=c(2,3,3,4,4), hashtag=c('a','a','b','a','b'), d=c(.5,.5,.5,.5,.5),
-						    user_screen_name=c(1,1,1,1,1), N=c(1,1,1,2,1), act=c(log(2^(-.5)), log(3^(-.5)), log(1), log(4^(-.5)+1), log(2^(-.5)))))
-	actTbl = computeActsByUser(testHashtagsTbl, d=.5)
-	expect_that(actTbl, is_equivalent_to(expectedActTbl))
-
-	testHashtagsTbl = data.table(user_screen_name=c(1,1,2,2), dt=c(0,2,0,3), hashtag=c('a','b','b','b'))
-	expectedActTbl = sortExpectedTbl(data.table(dt=c(2,3), hashtag=c('a','b'), d=c(.5, .5), user_screen_name=c(1,2), N=c(1,1), act=c(log(2^(-.5)), log(3^(-.5)))))
-	actTbl = computeActsByUser(testHashtagsTbl, d=.5)
-	expect_that(actTbl, is_equivalent_to(expectedActTbl))
-
-	testHashtagsTbl = data.table(user_screen_name=c(1,1), dt=c(0,2), hashtag=c('a','b'))
-	expectedActTbl = sortExpectedTbl(data.table(dt=c(2,2,2,2), hashtag=c('a','a','a','a'), d=c(.2,.3,.4,.5),
-						    user_screen_name=c(1,1,1,1), N=c(1,1,1,1), act=c(log(2^(-.2)), log(2^(-.3)), log(2^(-.4)), log(2^(-.5)))))
-	actTbl = computeActsByUser(testHashtagsTbl, d=c(.2,.3,.4,.5))
-	expect_that(actTbl, is_equivalent_to(expectedActTbl))
-
-	testHashtagsTbl = data.table(user_screen_name=c(1,1,1), dt=c(0,2,3), hashtag=c('a','b','c'))
-	expectedActTbl = sortExpectedTbl(data.table(dt=c(2,3,3,2,3,3), hashtag=c('a','a','b','a','a','b'), d=c(.5,.5,.5,.4,.4,.4),
-						    user_screen_name=c(1,1,1,1,1,1), N=c(1,1,1,1,1,1),
-						    act=c(log(2^(-.5)), log(3^(-.5)), log(1^(-.5)),
-							  log(2^(-.4)), log(3^(-.4)), log(1^(-.4)))))
-	actTbl = computeActsByUser(testHashtagsTbl, d=c(.5,.4))
-	expect_that(actTbl, is_equivalent_to(expectedActTbl))
-
-
-	testHashtagsTbl = data.table(user_screen_name=c(1,1), dt=c(0,100000), hashtag=c('a','a'))
-	expect_that(computeActsByUser(testHashtagsTbl, d=50000), throws_error())
-
-	testHashtagsTbl = data.table(user_screen_name=c(1,2,2), dt=c(0,0,2), hashtag=c('a','a','a'))
-	expectedActTbl = data.table(dt=2,hashtag='a',d=.5,user_screen_name=2,N=1,act=log(2^(-.5)))
-	expect_that(computeActsByUser(testHashtagsTbl, d=.5), throws_error())
-}
-
-testGetTokenizedTbl <- function() {
-	testTokenizedTbl = getTokenizedTbl(data.table(id=c(1,2,3,4), text=c('kfkf idid!!','  ','ie #2', 'kdkd')), from='text', regex='\\S+')
-	expectedTokenizedTbl = data.table(id=c(1,1,3,3,4), chunk=c('kfkf','idid!!','ie','#2','kdkd'), pos=c(1,2,1,2,1))
-	expect_equivalent(testTokenizedTbl, expectedTokenizedTbl)
-}
-
-testOnlyFirstT <- function() {
-	expect_equal(onlyFirstT(c(F,F,T,T,F,F)), c(F,F,T,F,F,F))
-	expect_error(onlyFirstT(c(F,F)))
-	expect_equal(onlyFirstT(c(T,T)), c(T,F))
-	expect_equal(onlyFirstT(c(F,F,T,F,F)), c(F,F,T,F,F))
-	expect_error(onlyFirstT(c()))
-}
-
-testModelVsPred <- function() {
-	expectedTbl = data.table(read.csv(modelVsPredOutFile('testing1'), stringsAsFactors=F))
-	resTbl = runPrior("select * from tweets where user_screen_name = 'ap'", outFile='/tmp/modelVsPred.csv')
-	expect_equivalent(expectedTbl, resTbl)
-	expectedTbl = data.table(read.csv(modelVsPredOutFile('testing2'), stringsAsFactors=F))
-	expectedTbl[, totN := as.integer(totN)]
-	resTbl = runPrior("select * from tweets where user_screen_name = 'thebucktlist'", outFile='/tmp/modelVsPred.csv')
-	expect_equivalent(expectedTbl, resTbl)
-	expectedTbl = data.table(read.csv(modelVsPredOutFile('twitter_ru'), stringsAsFactors=F))
-	resTbl = runPrior("select * from tweets where user_screen_name = 'twitter_ru'", outFile='/tmp/modelVsPred.csv')
-	expect_equivalent(expectedTbl, resTbl)
-}
-
-testAggregation <- function () {
-	foo = data.table(a=rep(c(0,1,0,1),2), b=rep(c(T,T,F,F),2), c=c(1,1,1,1,1,1,1,1))
-	expect_equivalent(foo[, .N, by=list(b, a)][, list(a,b)], foo[, .N, by=list(a, b)][, list(a,b)])
-}
-
-runTests <- function() {
-	testPriorActivations()
-	testGetTokenizedTbl()
-	testOnlyFirstT()
-	testModelVsPred()
-	testAggregation()
-}
-
 addMetrics <- function(hashtagsTbl, modelHashtagsTbl) {
 	tagCountTbl = hashtagsTbl[, list(tagCountN=.N), by=list(user_screen_name, dt)]
 	modelHashtagsTbl[tagCountTbl, tagCount := tagCountN]
 	modelHashtagsTbl[tagCountTbl[, list(tagCountUserN=sum(tagCountN)), keyby=user_screen_name], tagCountUser := tagCountUserN]
-	flushPrint('adding metrics for modelHashtagsTbl')
+	myLog('adding metrics for modelHashtagsTbl')
 	modelHashtagsTbl[order(act, decreasing=T), topHashtagPost := 1:length(act) <= tagCount[1], by=list(user_screen_name, dt, d)]
 	modelHashtagsTbl[order(act, decreasing=T), topHashtagAct := 1:length(act) <= tagCountUser[1], by=list(user_screen_name, d)]
-	expect_that(key(modelHashtagsTbl), equals(c('user_screen_name', 'dt', 'hashtag', 'd')))
-	expect_that(key(hashtagsTbl), equals(c('user_screen_name', 'dt', 'hashtag')))
+	stopifnot(key(modelHashtagsTbl) == (c('user_screen_name', 'dt', 'hashtag', 'd')))
+	stopifnot(key(hashtagsTbl) == (c('user_screen_name', 'dt', 'hashtag')))
 	modelHashtagsTbl[, hashtagUsedP := F]
 	modelHashtagsTbl[hashtagsTbl, hashtagUsedP := T]
 	#wideTbl = hashtagsTbl[, list(usedHashtags=list(hashtag)), by=list(user_screen_name, dt)]
@@ -398,7 +323,7 @@ summarizeExtremes <- function(hashtagsTbl) {
 }
 
 onlyFirstT <- function(bool) {
-	expect_true(any(bool == T))
+	stopifnot(any(bool == T))
 	ret = rep(F, length(bool))
 	ret[which(bool)[1]] = T
 	ret
@@ -438,14 +363,14 @@ compareModelVsExtreme <-function(modelHashtagsTbl, extremesTbl) {
 
 genAggModelVsPredTbl <- function(hashtagsTbl, ds=c(0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1.0,1.1,1.2,1.3,1.4,1.5,1.6,1.8,2,5,10,20), outFile='/tmp/modelVsPred.csv') {
 	genModelVsPredTbl <- function(hashtagsTbl, d, userScreenName) {
-		flushPrint(sprintf('generating model predictions for user %s', userScreenName))
+		myLog(sprintf('generating model predictions for user %s', userScreenName))
 		modelHashtagsTbl = computeActsByUser(hashtagsTbl, d=d)
 		addMetrics(hashtagsTbl, modelHashtagsTbl)
 		modelVsPredTbl = getModelVsPredTbl(modelHashtagsTbl, hashtagsTbl)	
 		modelVsPredTbl
 	}
 	singleHashtagUsers = hashtagsTbl[, list(uniqueDTs=length(unique(dt)) <= 1), by=user_screen_name][uniqueDTs==T]$user_screen_name
-	flushPrint(sprintf('not running users (%s) since they all have less than two dt hashtag observations', paste(singleHashtagUsers, sep=',', collapse=NULL)))
+	myLog(sprintf('not running users (%s) since they all have less than two dt hashtag observations', paste(singleHashtagUsers, sep=',', collapse=NULL)))
 	users = data.table(cur_user_screen_name=Filter(function(v) !(v %in% singleHashtagUsers), unique(hashtagsTbl$user_screen_name)))
 	res = users[, genModelVsPredTbl(hashtagsTbl[cur_user_screen_name], ds, cur_user_screen_name), by=cur_user_screen_name]
 	res[, cur_user_screen_name := NULL]
@@ -455,24 +380,24 @@ genAggModelVsPredTbl <- function(hashtagsTbl, ds=c(0,.1,.2,.3,.4,.5,.6,.7,.8,.9,
 }
 
 visModelVsPredTbl <- function(modelVsPredTbl) {
-	flushPrint(ggplot(modelVsPredTbl[maxNP==T & topHashtag & hashtagUsedP], aes(totN, d)) +
+	myLog(ggplot(modelVsPredTbl[maxNP==T & topHashtag & hashtagUsedP], aes(totN, d)) +
 		   geom_point() +
 		   xlab('total number of hashtags for user'))
 	modelVsPredTbl[topHashtag & hashtagUsedP, meanPC := mean(NCell/totN), by=user_screen_name]
 	modelVsPredTbl[topHashtag & hashtagUsedP, relPC := NCell/totN - mean(NCell/totN), by=user_screen_name]
 	modelVsPredTbl[topHashtag & hashtagUsedP, meanRelPC := mean(relPC), by=d]
 	dev.new()
-	flushPrint(ggplot(modelVsPredTbl[topHashtag & hashtagUsedP], aes(log(d),relPC)) +
+	myLog(ggplot(modelVsPredTbl[topHashtag & hashtagUsedP], aes(log(d),relPC)) +
 		   geom_point() +
 		   geom_line(aes(log(d), meanRelPC, group=user_screen_name[1])) +
 		   xlab('log(d)') +
 		   ylab('change in proportion correct from mean for user'))
 	dev.new()
-	flushPrint(ggplot(modelVsPredTbl[topHashtag & hashtagUsedP & user_screen_name %in% sample(unique(user_screen_name), size=min(20, length(unique(user_screen_name))))],
+	myLog(ggplot(modelVsPredTbl[topHashtag & hashtagUsedP & user_screen_name %in% sample(unique(user_screen_name), size=min(20, length(unique(user_screen_name))))],
 			  aes(log(d),NCell/totN, group=as.factor(user_screen_name))) + geom_line() +
 		   ylab('proportion correct'))
 	dev.new()
-	flushPrint(ggplot(modelVsPredTbl[topHashtag & hashtagUsedP & maxNP], aes(d)) +
+	myLog(ggplot(modelVsPredTbl[topHashtag & hashtagUsedP & maxNP], aes(d)) +
 		   geom_histogram(aes(y = ..density..)) +
 		   geom_density())
 }
@@ -545,8 +470,7 @@ buildTables <- function(outFileNames) {
 }
 
 curWS <- function() {
-	debugP = F
-	runTests()
+	test_dir(PATH)
 	tweetsTbl = getTweetsTbl("select * from tweets limit 100000")
 	tweetsTbl = getTweetsTbl("select * from tweets where user_screen_name='eddieizzard'")
 	tweetsTbl
