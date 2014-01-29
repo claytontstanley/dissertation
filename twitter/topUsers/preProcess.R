@@ -65,10 +65,11 @@ html2txt <- function(str) {
 }
 
 withProf <- function(thunk) {
-	Rprof()
+	.tempRprofOut = tempfile(pattern='RProf-', tmpdir='/tmp', fileext='.out')
+	Rprof(.tempRprofOut)
 	on.exit({
 		Rprof(NULL)
-		flushPrint(summaryRprof())
+		flushPrint(summaryRprof(.tempRprofOut))
 	})
 	thunk
 }
