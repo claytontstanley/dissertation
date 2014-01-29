@@ -74,6 +74,8 @@ withProf <- function(thunk) {
 	thunk
 }
 
+# FIXME: Add interface function to read.csv over data tables, since fread in 1.8.10 isn't very good yet
+
 # Computing CIs around a variance statistic
 
 CIVar <- function(vals) {
@@ -494,7 +496,7 @@ getQueryGT <- function(val, filters='1=1') {
 }
 
 getQueryGTSO <- function(val) {
-	sprintf('select id, owner_user_id, creation_date, title, tags from posts where post_type_id = 1 and owner_user_id in (select id from users where reputation > %d order by reputation asc limit 100)', val)
+	sprintf('select id, owner_user_id, creation_date, title, tags from posts where post_type_id = 1 and owner_user_id in (select id from users where reputation > %d order by reputation asc limit 500)', val)
 }
 
 combineFilters <- function(f1, f2) {
@@ -576,6 +578,7 @@ curWS <- function() {
 	modelVsPredTbl = fread(modelVsPredOutFile('gt1M'))
 	modelVsPredTbl = fread(modelVsPredOutFile('gt1Mr2'))
 	modelVsPredTbl = fread(modelVsPredOutFile('gt10M'))
+	modelVsPredTbl = data.table(read.csv(modelVsPredOutFile('SOgt1k'), stringsAsFactors=F))
 	modelVsPredTbl = buildTables(c('gt100k', 'gt1M', 'gt1Mr2', 'gt10M'))
 	modelVsPredTbl
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagRank'][user_screen_name %in% sample(unique(user_screen_name), size=10)], hashtagsTbl)
