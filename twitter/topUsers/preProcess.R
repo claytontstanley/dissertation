@@ -407,6 +407,7 @@ getModelVsPredTbl <- function(modelHashtagsTbl, hashtagsTbl) {
 	modelVsPredTbl = rbind(modelVsPredForDV(modelHashtagsTbl, 'topHashtagPost'), 
 			       modelVsPredForDV(modelHashtagsTbl, 'topHashtagAct'))
 	modelVsPredTbl[, maxNP := NCell==max(NCell), by=list(user_screen_name, topHashtag, hashtagUsedP, DVName)]
+	# TODO: Doesn't using the maxNP closest to the center of all of the maxNP's create an artifact for low N when all ds are MaxNP's?
 	modelVsPredTbl[maxNP==T, maxNP := onlyFirstT(abs(d-mean(d)) == min(abs(d-mean(d)))), by=list(user_screen_name, topHashtag, hashtagUsedP, DVName)]
 	modelVsPredTbl[, totN := NA_integer_] # Making sure that the totN column is added, even if model never generates an activation value for a hashtag that is used
 	modelVsPredTbl[hashtagUsedP==T, totN := length(hashtagsTbl[user_screen_name]$user_screen_name), by=user_screen_name]
@@ -578,7 +579,7 @@ curWS <- function() {
 	modelVsPredTbl = fread(modelVsPredOutFile('gt1M'))
 	modelVsPredTbl = fread(modelVsPredOutFile('gt1Mr2'))
 	modelVsPredTbl = fread(modelVsPredOutFile('gt10M'))
-	modelVsPredTbl = data.table(read.csv(modelVsPredOutFile('SOgt1k'), stringsAsFactors=F))
+	modelVsPredTbl = data.table(read.csv(modelVsPredOutFile('SOgt10k'), stringsAsFactors=F))
 	modelVsPredTbl = buildTables(c('gt100k', 'gt1M', 'gt1Mr2', 'gt10M'))
 	modelVsPredTbl
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagRank'][user_screen_name %in% sample(unique(user_screen_name), size=10)], hashtagsTbl)
