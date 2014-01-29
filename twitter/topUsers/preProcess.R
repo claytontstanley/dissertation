@@ -486,13 +486,6 @@ runSOQgt200 <- function() makeSOQRun(200, 'SOQgt200')()
 runSOQgt100 <- function() makeSOQRun(100, 'SOQgt100')()
 runSOQgt050 <- function() makeSOQRun(050, 'SOQgt050')()
 
-runSO50k <- function() makeSORun(50000, 'SOgt50k')()
-runSO10k <- function() makeSORun(10000, 'SOgt10k')()
-runSO5k <- function() makeSORun(5000, 'SOgt5k')()
-runSO1k <- function() makeSORun(1000, 'SOgt1k')()
-runSO500 <- function() makeSORun(500, 'SOgt500')()
-
-
 buildTables <- function(outFileNames) {
 	buildTable <- function(outFileName) {
 		tbl = myReadCSV(modelVsPredOutFile(outFileName))
