@@ -470,7 +470,7 @@ buildTables <- function(outFileNames) {
 }
 
 curWS <- function() {
-	test_dir(PATH)
+	test_dir(sprintf("%s/%s", PATH, 'tests'))
 	tweetsTbl = getTweetsTbl("select * from tweets limit 100000")
 	tweetsTbl = getTweetsTbl("select * from tweets where user_screen_name='eddieizzard'")
 	tweetsTbl
