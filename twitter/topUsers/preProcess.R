@@ -73,6 +73,27 @@ withProf <- function(thunk) {
 	thunk
 }
 
+# Computing CIs around a variance statistic
+
+CIVar <- function(vals) {
+	sSize = length(vals)	
+	sVar = sd(vals)^2
+	ci = .95
+	df = sSize - 1
+	halfalpha = (1 - ci) / 2
+	ub = sVar * df / qchisq(halfalpha,df)
+	ua = sVar * df / qchisq(1-halfalpha,df)
+	c(upper=ub, mean=sVar, lower=ua)
+}
+
+CIVar2 <- function(vals) {
+	df = data.frame(x=vals)
+	model = 'x ~~ x'
+	fit = sem(model, data=df, likelihood = "wishart" )
+	res = print(parameterEstimates(fit))
+	with(res, c(upper=ci.upper, mean=est, lower=ci.lower))
+}
+
 sqlScratch <- function() {
 	sqldf("select * from tweets where user_screen_name = 'claytonstanley1'")
 	sqldf('select count(*) from tweets')
@@ -514,25 +535,6 @@ buildTables <- function(outFileNames) {
 		tbl
 	}
 	rbindlist(lapply(outFileNames, buildTable))
-}
-
-CIVar <- function(vals) {
-	sSize = length(vals)	
-	sVar = sd(vals)^2
-	ci = .95
-	df = sSize - 1
-	halfalpha = (1 - ci) / 2
-	ub = sVar * df / qchisq(halfalpha,df)
-	ua = sVar * df / qchisq(1-halfalpha,df)
-	c(upper=ub, mean=sVar, lower=ua)
-}
-
-CIVar2 <- function(vals) {
-	df = data.frame(x=vals)
-	model = 'x ~~ x'
-	fit = sem(model, data=df, likelihood = "wishart" )
-	res = print(parameterEstimates(fit))
-	with(res, c(upper=ci.upper, mean=est, lower=ci.lower))
 }
 
 curWS <- function() {
