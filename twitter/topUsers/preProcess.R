@@ -113,9 +113,6 @@ sqlScratch <- function() {
 	data.table(sqldf('select * from topusers order by rank'))
 	sqldf("select * from tweets where user_screen_name='jlo'")
 	data.table(sqldf('select * from (select user_screen_name,count(*) from tweets group by user_screen_name) as t join topUsers as u on t.user_screen_name = u.user_screen_name order by rank'))
-	sqldf('select lang,count(*) as count from tweets group by lang order by count desc')
-	sqldf('select retweeted,count(*) as count from tweets group by retweeted order by count desc')
-	sqldf('select truncated,count(*) as count from tweets group by truncated order by count desc')
 	sqldf("select * from topUsers")[1:100,]
 	data.table(sqldf("select retweeted, count(*) from tweets group by retweeted"))[, min(count) / (max(count) + min(count))]
 	sqldf("select * from tweets where 1=1 and user_screen_name='katyperry' limit 10")
@@ -148,15 +145,6 @@ addTokenText <- function(tweetsTbl, from) {
 	myLog(paste(readLines(stderFile), sep='\n'))
 	tokenTextTbl = data.table(read.delim(tokenizedTweetsFile, sep='\t', quote="", header=F, stringsAsFactors=F))
 	tweetsTbl[, tokenText := tokenTextTbl[[1]]]
-}
-
-getPostCntTbl <- function() {
-	data.table(sqldf("select Post_Type_Id, N, Owner_User_Id, Display_Name, Reputation from
-			 (select owner_user_id, Post_Type_Id, count(*) as N from Posts 
-			  where Post_Type_Id = 1
-			  group by Owner_User_Id,Post_Type_Id) as foo2
-			 join Users on Users.Id = foo2.Owner_User_Id
-			 order by Reputation desc"))
 }
 
 getDiffTimeSinceFirst <- function(ts) {
@@ -441,6 +429,19 @@ getQueryGTSO <- function(val) {
 	sprintf('select id, owner_user_id, creation_date, title, tags from posts where post_type_id = 1 and owner_user_id in (select id from users where reputation > %d order by reputation asc limit 500)', val)
 }
 
+getQueryQGTSO <- function(val) {
+	sprintf("select id, owner_user_id, creation_date, title, tags from posts where post_type_id = 1 and owner_user_id in 
+		(select Owner_User_Id from
+		 (select owner_user_id, Post_Type_Id, count(*) as N from Posts 
+		  where Post_Type_Id = 1
+		  group by Owner_User_Id,Post_Type_Id) as foo2
+		 join Users on Users.Id = foo2.Owner_User_Id
+		 where N > %d
+		 order by N asc
+		 limit 100)
+		 ", val)
+}
+
 combineFilters <- function(f1, f2) {
 	paste(f1, f2, sep=' and ')
 }
@@ -467,12 +468,30 @@ makeSORun <- function(val, outFileName) {
 	runFun
 }
 
+makeSOQRun <- function(val, outFileName) {
+	function() runPriorSO(getQueryQGTSO(val), outFile=modelVsPredOutFile(outFileName))
+}
+
 runSO100k <- function() makeSORun(100000, 'SOgt100k')()
 runSO50k <- function() makeSORun(50000, 'SOgt50k')()
 runSO10k <- function() makeSORun(10000, 'SOgt10k')()
 runSO5k <- function() makeSORun(5000, 'SOgt5k')()
 runSO1k <- function() makeSORun(1000, 'SOgt1k')()
 runSO500 <- function() makeSORun(500, 'SOgt500')()
+
+runSOQgt500 <- function() makeSOQRun(500, 'SOQgt500')()
+runSOQgt400 <- function() makeSOQRun(400, 'SOQgt400')()
+runSOQgt300 <- function() makeSOQRun(300, 'SOQgt300')()
+runSOQgt200 <- function() makeSOQRun(200, 'SOQgt200')()
+runSOQgt100 <- function() makeSOQRun(100, 'SOQgt100')()
+runSOQgt050 <- function() makeSOQRun(050, 'SOQgt050')()
+
+runSO50k <- function() makeSORun(50000, 'SOgt50k')()
+runSO10k <- function() makeSORun(10000, 'SOgt10k')()
+runSO5k <- function() makeSORun(5000, 'SOgt5k')()
+runSO1k <- function() makeSORun(1000, 'SOgt1k')()
+runSO500 <- function() makeSORun(500, 'SOgt500')()
+
 
 buildTables <- function(outFileNames) {
 	buildTable <- function(outFileName) {
