@@ -76,6 +76,4 @@ test_that("testAggregation", {
 	expect_equivalent(foo[, .N, by=list(b, a)][, list(a,b)], foo[, .N, by=list(a, b)][, list(a,b)])
 })
 
-context('New')
-
 setLogLevel(priorLogLevel)
