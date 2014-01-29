@@ -404,6 +404,12 @@ visModelVsPredTbl <- function(modelVsPredTbl) {
 		   geom_density())
 }
 
+tableModelVsPredTbl <- function(modelVsPredTbl) {
+	# Summary table of optimal d values and sample variance
+	modelVsPredTbl[topHashtag & hashtagUsedP & maxNP][, list(mean=mean(d), median=median(d), NCell=mean(NCell), acc=mean(NCell/totN), sd=sd(d),
+								 meanCI=CI(d), sdCI=sqrt(CIVar(d)), sdCI1=sqrt(CIVar2(d))), by=list(datasetName, DVName)]
+}
+
 modelVsPredOutFile <- function(name) {
 	sprintf('%s/dissertationData/modelVsPred/%s.csv', PATH, name)
 }
@@ -461,8 +467,11 @@ makeSORun <- function(val, outFileName) {
 }
 
 runSO100k <- function() makeSORun(100000, 'SOgt100k')()
+runSO50k <- function() makeSORun(50000, 'SOgt50k')()
 runSO10k <- function() makeSORun(10000, 'SOgt10k')()
+runSO5k <- function() makeSORun(5000, 'SOgt5k')()
 runSO1k <- function() makeSORun(1000, 'SOgt1k')()
+runSO500 <- function() makeSORun(500, 'SOgt500')()
 
 buildTables <- function(outFileNames) {
 	buildTable <- function(outFileName) {
@@ -517,14 +526,17 @@ curWS <- function() {
 	modelVsPredTbl = myReadCSV(modelVsPredOutFile('gt10M'))
 	modelVsPredTbl = myReadCSV(modelVsPredOutFile('SOgt10k'), stringsAsFactors=F)
 	modelVsPredTbl = buildTables(c('gt100k', 'gt1M', 'gt1Mr2', 'gt10M'))
+	modelVsPredTbl = buildTables(c('gt1k', 'gt1kr2', 'gt10k', 'gt10kr2', 'gt100k', 'gt100kr2', 'gt1M', 'gt1Mr2', 'gt10M', 'gt10Mr2', 'SOgt100k', 'SOgt10k', 'SOgt1k'))
+	modelVsPredTbl = buildTables(c('gt1kr2', 'gt10kr2', 'gt100kr2', 'gt1Mr2', 'gt10Mr2', 'SOgt500', 'SOgt1k', 'SOgt5k', 'SOgt10k', 'SOgt50k', 'SOgt100k'))
 	modelVsPredTbl
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagRank'][user_screen_name %in% sample(unique(user_screen_name), size=10)], hashtagsTbl)
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & !(user_screen_name %in% c('cokguzelhareket', 'pmoindia')),], hashtagsTbl)
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & !(user_screen_name %in% lowUsers)], hashtagsTbl)
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost'])
+	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & datasetName=='SOgt100k'])
 
-	# Summary table of optimal d values and sample variance
-	modelVsPredTbl[DVName=='topHashtagPost' & topHashtag & hashtagUsedP & maxNP & d < 2][, list(mean=mean(d), sd=sd(d), meanCI=CI(d), sdCI=sqrt(CIVar(d)), sdCI2=sqrt(CIVar2(d))), by=datasetName]
+
+	tableModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost'])
 	modelVsPredTbl[, user_screen_name, by=user_screen_name]
 	modelVsPredTbl[, list(f=unique(user_screen_name), !(unique(user_screen_name) %in% unique(modelVsPredTbl[hashtagUsedP==T,user_screen_name])))]
 	modelVsPredTbl[DVName=='topHashtagPost' & maxNP & topHashtag & hashtagUsedP][,hist(d)]
