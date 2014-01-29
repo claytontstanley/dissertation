@@ -98,6 +98,7 @@ CIVar2 <- function(vals) {
 }
 
 sqlScratch <- function() {
+	#install.packages('~/src/datatable/pkg', repos=NULL, type='source')
 	sqldf("select * from tweets where user_screen_name = 'claytonstanley1'")
 	sqldf('select count(*) from tweets')
 	sqldf('select count(*) from topUsers')
@@ -346,11 +347,17 @@ testModelVsPred <- function() {
 	expect_equivalent(expectedTbl, resTbl)
 }
 
+testAggregation <- function () {
+	foo = data.table(a=rep(c(0,1,0,1),2), b=rep(c(T,T,F,F),2), c=c(1,1,1,1,1,1,1,1))
+	expect_equivalent(foo[, .N, by=list(b, a)][, list(a,b)], foo[, .N, by=list(a, b)][, list(a,b)])
+}
+
 runTests <- function() {
 	testPriorActivations()
 	testGetTokenizedTbl()
 	testOnlyFirstT()
 	testModelVsPred()
+	testAggregation()
 }
 
 addMetrics <- function(hashtagsTbl, modelHashtagsTbl) {
