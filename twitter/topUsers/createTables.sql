@@ -43,6 +43,19 @@ create table if not exists twitter_users (
 create index owner_user_id_index_posts on posts (owner_user_id);
 create index reputation_index_users on users (reputation);
 
-
+drop table if exists tag_synonyms;
+create table if not exists tag_synonyms (
+	id int not null,
+	Source_Tag_Name text not null,
+	Target_Tag_Name text not null,
+	Creation_Date text not null,
+	Owner_User_Id int not null,
+	Auto_Rename_Count int not null,
+	Last_Auto_Rename text not null,
+	Score int not null,
+	Approved_By_User_Id text not null,
+	Approval_Date text not null,
+	primary key (id)
+	);
 
 

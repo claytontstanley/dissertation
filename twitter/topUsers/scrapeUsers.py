@@ -67,9 +67,18 @@ def storeTopUsers(topUsersFile):
     cmd = string.Template(cmd).substitute(locals())
     _cur.query(cmd)
 
+def storeTagSynonyms(synonymsFile):
+    cmd = "copy tag_synonyms (%s) from '%s/dissertationData/tagSynonyms/%s' delimiters ',' csv header" % (
+        "id, Source_Tag_Name, Target_Tag_Name, Creation_Date, Owner_User_Id, Auto_Rename_Count, Last_Auto_Rename, Score, Approved_By_User_Id, Approval_Date",
+        _dir, synonymsFile)
+    _cur.query(cmd)
+
 def generateTopUsers(scrapeFun=generateTopUsersTwitaholic, topUsersFile='top1000Twitaholic.csv'):
     generateTopUsersCSV(scrapeFun=scrapeFun, topUsersFile=topUsersFile)
     storeTopUsers(topUsersFile=topUsersFile)
+
+def storeCurTagSynonyms():
+    storeTagSynonyms('synonyms-2014-01-30.csv')
 
 def backupTables():
     tableNames = ['topUsers', 'twitter_users', 'tweets']
@@ -232,5 +241,6 @@ def getUserInfoForTopUsers():
 #getAllTweetsForTopUsers()
 #getAllTweetsFor10kUsers()
 #getAllTweetsFor1kUsers()
-getUserInfoForTopUsers()
+#getUserInfoForTopUsers()
+storeCurTagSynonyms()
 #backupTables()
