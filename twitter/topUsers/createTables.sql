@@ -35,6 +35,7 @@ create table if not exists twitter_users (
 	name varchar(255) not null,
 	user_screen_name varchar(255) not null,
 	verified varchar(255) not null,
+	statuses_count integer not null,
 	primary key (id)
 	);
 

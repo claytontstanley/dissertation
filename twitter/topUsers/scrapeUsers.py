@@ -115,12 +115,12 @@ def write2csv(res, file):
 def getInfoForUser(screenNames):
     users = _api.lookup_users(screen_names=screenNames)
     res = [[user.id, user.created_at, user.description.encode('utf-8'), user.followers_count, user.friends_count,
-            user.lang, user.location.encode('utf-8'), user.name.encode('utf-8'), user.screen_name.lower(), user.verified] for user in users]
+            user.lang, user.location.encode('utf-8'), user.name.encode('utf-8'), user.screen_name.lower(), user.verified, user.statuses_count] for user in users]
     file = '/tmp/%s..%s_user.csv' % (screenNames[0], screenNames[-1])
     print "writing %s results to file: %s" % (len(res), file)
     write2csv(res, file)
     print "updating database with results in temp file"
-    _cur.query("copy twitter_users (id,created_at,description,followers_count,friends_count,lang,location,name,user_screen_name,verified) from '%s' delimiters ',' csv" % (file))
+    _cur.query("copy twitter_users (id,created_at,description,followers_count,friends_count,lang,location,name,user_screen_name,verified,statuses_count) from '%s' delimiters ',' csv" % (file))
 
 def getAllTweets(screenNames):
     def getTweetsBetween(greaterThanID, lessThanID):
@@ -231,6 +231,6 @@ def getUserInfoForTopUsers():
 #getAllTweets('claytonstanley1')
 #getAllTweetsForTopUsers()
 #getAllTweetsFor10kUsers()
-getAllTweetsFor1kUsers()
-#getUserInfoForTopUsers()
+#getAllTweetsFor1kUsers()
+getUserInfoForTopUsers()
 #backupTables()
