@@ -536,17 +536,19 @@ curWS <- function() {
 	modelVsPredTbl = myReadCSV(modelVsPredOutFile('gt100k'))
 	modelVsPredTbl = myReadCSV(modelVsPredOutFile('gt1M'))
 	modelVsPredTbl = myReadCSV(modelVsPredOutFile('gt1Mr2'))
-	modelVsPredTbl = myReadCSV(modelVsPredOutFile('gt10M'))
+	modelVsPredTbl = myReadCSV(modelVsPredOutFile('SOQgt400'))
 	modelVsPredTbl = myReadCSV(modelVsPredOutFile('SOgt10k'), stringsAsFactors=F)
 	modelVsPredTbl = buildTables(c('gt100k', 'gt1M', 'gt1Mr2', 'gt10M'))
 	modelVsPredTbl = buildTables(c('gt1k', 'gt1kr2', 'gt10k', 'gt10kr2', 'gt100k', 'gt100kr2', 'gt1M', 'gt1Mr2', 'gt10M', 'gt10Mr2', 'SOgt100k', 'SOgt10k', 'SOgt1k'))
-	modelVsPredTbl = buildTables(c('gt1kr2', 'gt10kr2', 'gt100kr2', 'gt1Mr2', 'gt10Mr2', 'SOgt500', 'SOgt1k', 'SOgt5k', 'SOgt10k', 'SOgt50k', 'SOgt100k'))
+	modelVsPredTbl = buildTables(c('gt1kr2', 'gt10kr2', 'gt100kr2', 'gt1Mr2', 'gt10Mr2',
+				       'SOgt500', 'SOgt1k', 'SOgt5k', 'SOgt10k', 'SOgt50k', 'SOgt100k',
+				       'SOQgt050', 'SOQgt100', 'SOQgt200', 'SOQgt300', 'SOQgt400', 'SOQgt500'))
 	modelVsPredTbl
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagRank'][user_screen_name %in% sample(unique(user_screen_name), size=10)], hashtagsTbl)
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & !(user_screen_name %in% c('cokguzelhareket', 'pmoindia')),], hashtagsTbl)
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & !(user_screen_name %in% lowUsers)], hashtagsTbl)
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost'])
-	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & datasetName=='SOgt100k'])
+	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & datasetName=='SOQgt500'])
 
 
 	tableModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost'])
