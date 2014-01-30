@@ -59,14 +59,14 @@ test_that("testOnlyFirstT", {
 })
 
 test_that("testModelVsPred", {
-	expectedTbl = data.table(read.csv(modelVsPredOutFile('testing1'), stringsAsFactors=F))
+	expectedTbl = myReadCSV(modelVsPredOutFile('testing1'))
 	resTbl = runPrior("select * from tweets where user_screen_name = 'ap'", outFile='/tmp/modelVsPred.csv')
 	expect_equivalent(expectedTbl, resTbl)
-	expectedTbl = data.table(read.csv(modelVsPredOutFile('testing2'), stringsAsFactors=F))
+	expectedTbl = myReadCSV(modelVsPredOutFile('testing2'))
 	expectedTbl[, totN := as.integer(totN)]
 	resTbl = runPrior("select * from tweets where user_screen_name = 'thebucktlist'", outFile='/tmp/modelVsPred.csv')
 	expect_equivalent(expectedTbl, resTbl)
-	expectedTbl = data.table(read.csv(modelVsPredOutFile('twitter_ru'), stringsAsFactors=F))
+	expectedTbl = myReadCSV(modelVsPredOutFile('twitter_ru'))
 	resTbl = runPrior("select * from tweets where user_screen_name = 'twitter_ru'", outFile='/tmp/modelVsPred.csv')
 	expect_equivalent(expectedTbl, resTbl)
 })
