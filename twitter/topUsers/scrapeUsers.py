@@ -81,7 +81,7 @@ def storeCurTagSynonyms():
     storeTagSynonyms('synonyms-2014-01-30.csv')
 
 def backupTables():
-    tableNames = ['topUsers', 'twitter_users', 'tweets']
+    tableNames = ['topUsers', 'twitter_users', 'tweets', 'users', 'posts']
     for tableName in tableNames:
         file = "%s/dissertationData/tables/%s.csv" % (_dir, tableName)
         cmd = string.Template("copy ${tableName} to '${file}' delimiter ',' csv header").substitute(locals())
@@ -282,7 +282,7 @@ def generateTopUsers100k():
 # Current run selections
 #generateTopUsers100k()
 #getAllTweetsForTopUsersByFollowers()
-getAllTweetsForTopUsersByTweets()
+#getAllTweetsForTopUsersByTweets()
 #getUserInfoForTopUsers()
 #storeCurTagSynonyms()
 #backupTables()
