@@ -216,8 +216,11 @@ def getForTopUsers(alreadyCollectedFun, getForUserFun, getRemainingHitsFun, hits
 def getAllTweetsDefault(userQuery):
     getForTopUsers(alreadyCollectedFun=userAlreadyCollected, getForUserFun=getAllTweets, getRemainingHitsFun=getRemainingHitsUserTimeline, hitsAlwaysGreaterThan=30, userQuery=userQuery)
 
-def getAllTweetsForTopUsers():
-    getAllTweetsDefault(userQuery='select (user_screen_name) from topUsers order by rank asc limit 10000')
+def getAllTweetsFor10MUsers():
+    getAllTweetsDefault(userQuery='select user_screen_name from twitter_users where followers_count > 10000000 order by followers_count asc limit 1000')
+
+def getAllTweetsFor1MUsers():
+    getAllTweetsDefault(userQuery='select user_screen_name from twitter_users where followers_count > 1000000 order by followers_count asc limit 1000')
 
 def getAllTweetsFor100kUsers():
     getAllTweetsDefault(userQuery='select user_screen_name from twitter_users where followers_count > 100000 order by followers_count asc limit 1000')
@@ -227,6 +230,13 @@ def getAllTweetsFor10kUsers():
 
 def getAllTweetsFor1kUsers():
     getAllTweetsDefault(userQuery='select user_screen_name from twitter_users where followers_count > 1000 order by followers_count asc limit 1000')
+
+def getAllTweetsForTopUsersByFollowers():
+    getAllTweetsFor10MUsers()
+    getAllTweetsFor1MUsers()
+    getAllTweetsFor100kUsers()
+    getAllTweetsFor10kUsers()
+    getAllTweetsFor1kUsers()
 
 def getUserInfoForTopUsers():
     getForTopUsers(alreadyCollectedFun=userInfoAlreadyCollected, getForUserFun=getInfoForUser, getRemainingHitsFun=getRemainingHitsGetUser, hitsAlwaysGreaterThan=30, groupFun=lambda x: chunker(x, 100),
@@ -238,9 +248,7 @@ def getUserInfoForTopUsers():
 #generateTopUsers(scrapeFun=lambda : generateTopUsersSocialBakers(numUsers=100000), topUsersFile='top100000SocialBakers.csv')
 #storeTopUsers(topUsersFile='top100000SocialBakers.csv')
 #getAllTweets('claytonstanley1')
-#getAllTweetsForTopUsers()
-#getAllTweetsFor10kUsers()
-#getAllTweetsFor1kUsers()
+getAllTweetsForTopUsersByFollowers()
 #getUserInfoForTopUsers()
-storeCurTagSynonyms()
+#storeCurTagSynonyms()
 #backupTables()

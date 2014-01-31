@@ -77,6 +77,13 @@ withProf <- function(thunk) {
 	thunk
 }
 
+withKey <- function(tbl, conKey, thunk) {
+	.curKey = key(tbl)
+	on.exit(setkeyv(tbl, .curKey))
+	eval(bquote(setkey(.(substitute(tbl)), .(substitute(conKey)))), envir=parent.frame())
+	thunk
+}
+
 myReadCSV <- function(file) {
 	data.table(read.csv(file, stringsAsFactors=F))
 }
@@ -159,6 +166,12 @@ getTweetsTbl <- function(sqlStr="select * from tweets limit 10000") {
 	tweetsTbl
 }
 
+getTagSynonymsTbl <- function(sqlStr='select * from tag_synonyms') {
+	tagSynonymsTbl = data.table(sqldf(sqlStr))
+	setkey(tagSynonymsTbl, source_tag_name)
+	tagSynonymsTbl
+}
+
 getPostsTbl <- function(sqlStr) {
 	postsTbl = data.table(sqldf(sqlStr))
 	setkey(postsTbl, id)
@@ -178,8 +191,13 @@ getHashtagsTbl <- function(tweetsTbl, from) {
 	hashtagsTbl
 }
 
-getTagsTbl <- function(postsTbl) {
+getTagsTbl <- function(postsTbl, config, ...) {
 	tokenizedTbl = getTokenizedTbl(postsTbl, from='tagsNoHtml', regex='(?<=<)[^>]+(?=>)')
+	if (config$convertTagSynonymsP) {
+		withKey(tokenizedTbl, chunk,
+			{tokenizedTbl[getTagSynonymsTbl(), chunk := target_tag_name]
+			})
+	}
 	tagsTbl = tokenizedTbl[postsTbl, list(hashtag=chunk, pos=pos, created_at=creation_date, dt=dt, user_id=owner_user_id, user_screen_name=as.character(owner_user_id)), nomatch=0]
 	setkey(tagsTbl, user_screen_name, dt, hashtag)
 	tagsTbl
@@ -403,10 +421,12 @@ modelVsPredOutFile <- function(name) {
 	sprintf('%s/dissertationData/modelVsPred/%s.csv', PATH, name)
 }
 
-runPriorSO <- function(query, ...) {
+defaultSOConfig = list(convertTagSynonymsP=F)
+
+runPriorSO <- function(query, config=defaultSOConfig, ...) {
 	withProf({
 		postsTbl = getPostsTbl(query)
-		tagsTbl = getTagsTbl(postsTbl)
+		tagsTbl = getTagsTbl(postsTbl, config=config, ...)
 		modelVsPredTbl = genAggModelVsPredTbl(tagsTbl, ...)
 		modelVsPredTbl
 	})
@@ -463,28 +483,55 @@ run1kr2 <- function() runPrior(getQueryGTNoRetweets(1000), outFile=modelVsPredOu
 run10M <- function() runPrior(getQueryGT(10000000, 't.id != 12466832063'), outFile=modelVsPredOutFile('gt10M'))
 run10Mr2 <- function() runPrior(getQueryGTNoRetweets(10000000, 't.id != 12466832063'), outFile=modelVsPredOutFile('gt10Mr2'))
 
-makeSORun <- function(val, outFileName) {
-	runFun = function() runPriorSO(getQueryGTSO(val), outFile=modelVsPredOutFile(outFileName))
+modConfig <- function(config, mods) {
+	newConfig = config
+	for(modName in names(mods)) {
+		newConfig[[modName]] = mods[[modName]]
+	}
+	newConfig
+}
+
+makeSORun <- function(val, outFileName, config, ...) {
+	runFun = function() runPriorSO(config$query(val), outFile=modelVsPredOutFile(outFileName), config=config, ...)
 	runFun
 }
 
-makeSOQRun <- function(val, outFileName) {
-	function() runPriorSO(getQueryQGTSO(val), outFile=modelVsPredOutFile(outFileName))
-}
+getSOr1Config <- function () modConfig(defaultSOConfig, list(convertTagSynonymsP=F, query=getQueryGTSO))
+getSOr2Config <- function () modConfig(defaultSOConfig, list(convertTagSynonymsP=T, query=getQueryGTSO))
+getSOr3Config <- function () modConfig(defaultSOConfig, list(convertTagSynonymsP=F, query=getQueryQGTSO))
+getSOr4Config <- function () modConfig(defaultSOConfig, list(convertTagSynonymsP=T, query=getQueryQGTSO))
+makeSORunr1 <- function(val, outFileName) makeSORun(val, outFileName, config=getSOr1Config())
+makeSORunr2 <- function(val, outFileName) makeSORun(val, outFileName, config=getSOr2Config())
+makeSORunr3 <- function(val, outFileName) makeSORun(val, outFileName, config=getSOr3Config())
+makeSORunr4 <- function(val, outFileName) makeSORun(val, outFileName, config=getSOr4Config())
 
-runSO100k <- function() makeSORun(100000, 'SOgt100k')()
-runSO50k <- function() makeSORun(50000, 'SOgt50k')()
-runSO10k <- function() makeSORun(10000, 'SOgt10k')()
-runSO5k <- function() makeSORun(5000, 'SOgt5k')()
-runSO1k <- function() makeSORun(1000, 'SOgt1k')()
-runSO500 <- function() makeSORun(500, 'SOgt500')()
+runSO100k <- function() makeSORunr1(100000, 'SOgt100k')()
+runSO50k <- function() makeSORunr1(50000, 'SOgt50k')()
+runSO10k <- function() makeSORunr1(10000, 'SOgt10k')()
+runSO5k <- function() makeSORunr1(5000, 'SOgt5k')()
+runSO1k <- function() makeSORunr1(1000, 'SOgt1k')()
+runSO500 <- function() makeSORunr1(500, 'SOgt500')()
 
-runSOQgt500 <- function() makeSOQRun(500, 'SOQgt500')()
-runSOQgt400 <- function() makeSOQRun(400, 'SOQgt400')()
-runSOQgt300 <- function() makeSOQRun(300, 'SOQgt300')()
-runSOQgt200 <- function() makeSOQRun(200, 'SOQgt200')()
-runSOQgt100 <- function() makeSOQRun(100, 'SOQgt100')()
-runSOQgt050 <- function() makeSOQRun(050, 'SOQgt050')()
+runSO100kr2 <- function() makeSORunr2(100000, 'SOgt100kr2')()
+runSO50kr2 <- function() makeSORunr2(50000, 'SOgt50kr2')()
+runSO10kr2 <- function() makeSORunr2(10000, 'SOgt10kr2')()
+runSO5kr2 <- function() makeSORunr2(5000, 'SOgt5kr2')()
+runSO1kr2 <- function() makeSORunr2(1000, 'SOgt1kr2')()
+runSO500r2 <- function() makeSORunr2(500, 'SOgt500r2')()
+
+runSOQgt500 <- function() makeSORunr3(500, 'SOQgt500')()
+runSOQgt400 <- function() makeSORunr3(400, 'SOQgt400')()
+runSOQgt300 <- function() makeSORunr3(300, 'SOQgt300')()
+runSOQgt200 <- function() makeSORunr3(200, 'SOQgt200')()
+runSOQgt100 <- function() makeSORunr3(100, 'SOQgt100')()
+runSOQgt050 <- function() makeSORunr3(050, 'SOQgt050')()
+
+runSOQgt500r2 <- function() makeSORunr4(500, 'SOQgt500r2')()
+runSOQgt400r2 <- function() makeSORunr4(400, 'SOQgt400r2')()
+runSOQgt300r2 <- function() makeSORunr4(300, 'SOQgt300r2')()
+runSOQgt200r2 <- function() makeSORunr4(200, 'SOQgt200r2')()
+runSOQgt100r2 <- function() makeSORunr4(100, 'SOQgt100r2')()
+runSOQgt050r2 <- function() makeSORunr4(050, 'SOQgt050r2')()
 
 buildTables <- function(outFileNames) {
 	buildTable <- function(outFileName) {
@@ -499,10 +546,10 @@ curWS <- function() {
 	test_dir(sprintf("%s/%s", PATH, 'tests'), reporter='summary')
 	tweetsTbl = getTweetsTbl("select * from tweets limit 100000")
 	tweetsTbl = getTweetsTbl("select * from tweets where user_screen_name='eddieizzard'")
-	tweetsTbl
 	runPrior("select * from tweets where id=12466832063")
 	runPrior("select * from tweets where user_id=50393960")
-	runSO1k()
+	runSOQgt050r2()
+	runPriorSO(query = 'select * from posts where owner_user_id = 39677', config = getSOr2Config())
 	# Checking that tweets for twitter users from each followers_count scale are being collected properly
 	usersWithTweetsTbl = data.table(sqldf("select distinct on (user_id) t.user_screen_name,u.followers_count from tweets as t join twitter_users as u on t.user_screen_name = u.user_screen_name"))
 	usersWithTweetsTbl[order(followers_count), plot(log10(followers_count))]
@@ -537,9 +584,10 @@ curWS <- function() {
 	modelVsPredTbl = myReadCSV(modelVsPredOutFile('gt1M'))
 	modelVsPredTbl = myReadCSV(modelVsPredOutFile('gt1Mr2'))
 	modelVsPredTbl = myReadCSV(modelVsPredOutFile('SOQgt050'))
-	modelVsPredTbl = myReadCSV(modelVsPredOutFile('SOgt10k'), stringsAsFactors=F)
 	modelVsPredTbl = buildTables(c('gt100k', 'gt1M', 'gt1Mr2', 'gt10M'))
 	modelVsPredTbl = buildTables(c('gt1k', 'gt1kr2', 'gt10k', 'gt10kr2', 'gt100k', 'gt100kr2', 'gt1M', 'gt1Mr2', 'gt10M', 'gt10Mr2', 'SOgt100k', 'SOgt10k', 'SOgt1k'))
+	modelVsPredTbl = buildTables(c(paste(rep(paste('SOQgt', c('050', '100', '200', '300', '400', '500'), sep=""), each=2), c('', 'r2'), sep=''),
+				       paste(rep(paste('SOgt', c('500', '1k', '5k', '10k', '50k', '100k'), sep=""), each=2), c('', 'r2'), sep='')))
 	modelVsPredTbl = buildTables(c('gt1kr2', 'gt10kr2', 'gt100kr2', 'gt1Mr2', 'gt10Mr2',
 				       'SOgt500', 'SOgt1k', 'SOgt5k', 'SOgt10k', 'SOgt50k', 'SOgt100k',
 				       'SOQgt050', 'SOQgt100', 'SOQgt200', 'SOQgt300', 'SOQgt400', 'SOQgt500'))
