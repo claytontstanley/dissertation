@@ -147,9 +147,8 @@ def getAllTweets(screenNames):
     screen_name = screenNames[0]
     print "getting tweets for %s" % (screen_name)
     alltweets = []
-    userID = _api.get_user(screen_name).id
     lessThanID = getTweets(screen_name, count=1)[-1].id + 1
-    cmd = string.Template("select id from tweets where user_id = '${userID}' order by id desc").substitute(locals())
+    cmd = string.Template("select id from tweets where user_screen_name = '${screen_name}' order by id desc").substitute(locals())
     res = _cur.query(cmd).getresult()
     if len(res) == 0:
         newestGrabbed = 0
@@ -157,7 +156,7 @@ def getAllTweets(screenNames):
         newestGrabbed = int(res[0][0])
     res = getTweetsBetween(newestGrabbed, lessThanID)
     alltweets.extend(res)
-    cmd = string.Template("select id from tweets where user_id = '${userID}' order by id asc").substitute(locals())
+    cmd = string.Template("select id from tweets where user_screen_name = '${screen_name}' order by id asc").substitute(locals())
     res = _cur.query(cmd).getresult()
     if len(res) == 0:
         lessThanID = 0
@@ -214,22 +213,49 @@ def getForTopUsers(alreadyCollectedFun, getForUserFun, getRemainingHitsFun, hits
             pass
 
 def getAllTweetsDefault(userQuery):
-    getForTopUsers(alreadyCollectedFun=userAlreadyCollected, getForUserFun=getAllTweets, getRemainingHitsFun=getRemainingHitsUserTimeline, hitsAlwaysGreaterThan=30, userQuery=userQuery)
+    return getForTopUsers(alreadyCollectedFun=userAlreadyCollected, getForUserFun=getAllTweets, getRemainingHitsFun=getRemainingHitsUserTimeline, hitsAlwaysGreaterThan=30, userQuery=userQuery)
+
+def makeUserQuery(val, col):
+    return 'select user_screen_name from twitter_users where %s > %d order by followers_count asc limit 1000' % (col, val)
+
+def makeUserQueryFollowers(val):
+    return makeUserQuery(val, 'followers_count')
+
+def makeUserQueryTweets(val):
+    return makeUserQuery(val, 'statuses_count')
 
 def getAllTweetsFor10MUsers():
-    getAllTweetsDefault(userQuery='select user_screen_name from twitter_users where followers_count > 10000000 order by followers_count asc limit 1000')
+    return getAllTweetsDefault(makeUserQueryFollowers(10000000))
 
 def getAllTweetsFor1MUsers():
-    getAllTweetsDefault(userQuery='select user_screen_name from twitter_users where followers_count > 1000000 order by followers_count asc limit 1000')
+    return getAllTweetsDefault(makeUserQueryFollowers(1000000))
 
 def getAllTweetsFor100kUsers():
-    getAllTweetsDefault(userQuery='select user_screen_name from twitter_users where followers_count > 100000 order by followers_count asc limit 1000')
+    return getAllTweetsDefault(makeUserQueryFollowers(100000))
 
 def getAllTweetsFor10kUsers():
-    getAllTweetsDefault(userQuery='select user_screen_name from twitter_users where followers_count > 10000 order by followers_count asc limit 1000')
+    return getAllTweetsDefault(makeUserQueryFollowers(10000))
 
 def getAllTweetsFor1kUsers():
-    getAllTweetsDefault(userQuery='select user_screen_name from twitter_users where followers_count > 1000 order by followers_count asc limit 1000')
+    return getAllTweetsDefault(makeUserQueryFollowers(1000))
+
+def getAllTweetsForS1e2Users():
+    return getAllTweetsDefault(makeUserQueryTweets(100))
+
+def getAllTweetsForS5e2Users():
+    return getAllTweetsDefault(makeUserQueryTweets(500))
+
+def getAllTweetsForS1e3Users():
+    return getAllTweetsDefault(makeUserQueryTweets(1000))
+
+def getAllTweetsForS5e3Users():
+    return getAllTweetsDefault(makeUserQueryTweets(5000))
+
+def getAllTweetsForS1e4Users():
+    return getAllTweetsDefault(makeUserQueryTweets(10000))
+
+def getAllTweetsForS5e4Users():
+    return getAllTweetsDefault(makeUserQueryTweets(50000))
 
 def getAllTweetsForTopUsersByFollowers():
     getAllTweetsFor10MUsers()
@@ -238,17 +264,25 @@ def getAllTweetsForTopUsersByFollowers():
     getAllTweetsFor10kUsers()
     getAllTweetsFor1kUsers()
 
+def getAllTweetsForTopUsersByTweets():
+    getAllTweetsForS1e2Users()
+    getAllTweetsForS5e2Users()
+    getAllTweetsForS1e3Users()
+    getAllTweetsForS5e3Users()
+    getAllTweetsForS1e4Users()
+    getAllTweetsForS5e4Users()
+
 def getUserInfoForTopUsers():
     getForTopUsers(alreadyCollectedFun=userInfoAlreadyCollected, getForUserFun=getInfoForUser, getRemainingHitsFun=getRemainingHitsGetUser, hitsAlwaysGreaterThan=30, groupFun=lambda x: chunker(x, 100),
                    userQuery='select (user_screen_name) from topUsers order by rank asc limit 100000')
 
+def generateTopUsers100k():
+    generateTopUsers(scrapeFun=lambda: generateTopUsersSocialBakers(numUsers=100000), topUsersFile='top100000SocialBakers.csv')
 
-#generateTopUsers(scrapeFun=generateTopUsersSocialBakers, topUsersFile='top10000SocialBakers.csv')
-#generateTopUsers(scrapeFun=generateTopUsersTwitaholic, topUsersFile='top1000Twitaholic.csv')
-#generateTopUsers(scrapeFun=lambda : generateTopUsersSocialBakers(numUsers=100000), topUsersFile='top100000SocialBakers.csv')
-#storeTopUsers(topUsersFile='top100000SocialBakers.csv')
-#getAllTweets('claytonstanley1')
-getAllTweetsForTopUsersByFollowers()
+# Current run selections
+#generateTopUsers100k()
+#getAllTweetsForTopUsersByFollowers()
+getAllTweetsForTopUsersByTweets()
 #getUserInfoForTopUsers()
 #storeCurTagSynonyms()
 #backupTables()

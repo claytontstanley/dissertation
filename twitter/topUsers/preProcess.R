@@ -123,7 +123,9 @@ sqlScratch <- function() {
 	sqldf("select * from topUsers")[1:100,]
 	data.table(sqldf("select retweeted, count(*) from tweets group by retweeted"))[, min(count) / (max(count) + min(count))]
 	sqldf("select * from tweets where 1=1 and user_screen_name='katyperry' limit 10")
-	data.table(sqldf("select * from twitter_users"))
+	foo = data.table(sqldf("select * from twitter_users"))
+	foo[order(followers_count), plot(followers_count)]
+	foo[order(statuses_count), hist(log10(statuses_count))]
 	twitter_users = myReadCSV(str_c(PATH, "/dissertationData/tables/twitter_users.csv"))
 	topUsers = myReadCSV(str_c(PATH, "/dissertationData/tables/topUsers.csv"))
 	twitter_users[created_at=='2010-10-29 19:05:25',]
@@ -182,7 +184,8 @@ getPostsTbl <- function(sqlStr) {
 	postsTbl
 }
 
-getHashtagsTbl <- function(tweetsTbl, from) {
+getHashtagsTbl <- function(tweetsTbl, config, ...) {
+	from = config$from
 	tokenizedTbl = getTokenizedTbl(tweetsTbl, from=from, regex='\\S+')
 	htOfTokenizedTbl = tokenizedTbl[grepl('^#', chunk),]
 	stopifnot(c('id') == key(htOfTokenizedTbl))
@@ -376,6 +379,8 @@ genAggModelVsPredTbl <- function(hashtagsTbl, ds=c(0,.1,.2,.3,.4,.5,.6,.7,.8,.9,
 		modelHashtagsTbl = computeActsByUser(hashtagsTbl, d=d)
 		addMetrics(hashtagsTbl, modelHashtagsTbl)
 		modelVsPredTbl = getModelVsPredTbl(modelHashtagsTbl, hashtagsTbl)	
+		rm(modelHashtagsTbl)
+		gc()
 		modelVsPredTbl
 	}
 	singleHashtagUsers = hashtagsTbl[, list(uniqueDTs=length(unique(dt)) <= 1), by=user_screen_name][uniqueDTs==T]$user_screen_name
@@ -421,35 +426,43 @@ modelVsPredOutFile <- function(name) {
 	sprintf('%s/dissertationData/modelVsPred/%s.csv', PATH, name)
 }
 
-defaultSOConfig = list(convertTagSynonymsP=F)
-
-runPriorSO <- function(query, config=defaultSOConfig, ...) {
+runPrior <- function(query, config, getPostsFun, getHashtagsFun, ...) {
 	withProf({
-		postsTbl = getPostsTbl(query)
-		tagsTbl = getTagsTbl(postsTbl, config=config, ...)
-		modelVsPredTbl = genAggModelVsPredTbl(tagsTbl, ...)
-		modelVsPredTbl
-	})
-}
-
-runPrior <- function(query, ...) {
-	withProf({
-		tweetsTbl = getTweetsTbl(query)
-		hashtagsTbl = getHashtagsTbl(tweetsTbl, from='tokenText')
+		postsTbl = getPostsFun(query)
+		hashtagsTbl = getHashtagsFun(postsTbl, config=config, ...)
 		modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl, ...)
 		modelVsPredTbl
 	})
 }
 
-getQueryGT <- function(val, filters='1=1') {
+defaultTConfig = list(from='tokenText')
+defaultSOConfig = list(convertTagSynonymsP=F)
+
+runPriorT <- function(query, config=defaultTConfig, ...) {
+	runPrior(query, config, getTweetsTbl, getHashtagsTbl, ...)
+}
+
+runPriorSO <- function(query, config=defaultSOConfig, ...) {
+	runPrior(query, config, getPostsTbl, getTagsTbl, ...)
+}
+
+modConfig <- function(config, mods) {
+	newConfig = config
+	for(modName in names(mods)) {
+		newConfig[[modName]] = mods[[modName]]
+	}
+	newConfig
+}
+
+getQueryT <- function(val, filters='1=1') {
 	sprintf('select * from tweets as t where %s and user_screen_name in (select user_screen_name from twitter_users where followers_count > %d order by followers_count asc limit 100)', filters, val)
 }
 
-getQueryGTSO <- function(val) {
+getQuerySO <- function(val) {
 	sprintf('select id, owner_user_id, creation_date, title, tags from posts where post_type_id = 1 and owner_user_id in (select id from users where reputation > %d order by reputation asc limit 500)', val)
 }
 
-getQueryQGTSO <- function(val) {
+getQuerySOQ <- function(val) {
 	sprintf("select id, owner_user_id, creation_date, title, tags from posts where post_type_id = 1 and owner_user_id in 
 		(select Owner_User_Id from
 		 (select owner_user_id, Post_Type_Id, count(*) as N from Posts 
@@ -466,72 +479,74 @@ combineFilters <- function(f1, f2) {
 	paste(f1, f2, sep=' and ')
 }
 
-getQueryGTNoRetweets <- function(val, filters='1=1') {
-	getQueryGT(val, combineFilters("retweeted = 'False'", filters))
+getQueryTNoRT <- function(val, filters='1=1') {
+	getQueryT(val, filters=combineFilters("retweeted = 'False'", filters))
 }
 
-run1M <- function() runPrior(getQueryGT(1000000), outFile=modelVsPredOutFile('gt1M'))
-run1Mr2 <- function() runPrior(getQueryGTNoRetweets(1000000), outFile=modelVsPredOutFile('gt1Mr2'))
-run100k <- function() runPrior(getQueryGT(100000), outFile=modelVsPredOutFile('gt100k'))
-run100kr2 <- function() runPrior(getQueryGTNoRetweets(100000), outFile=modelVsPredOutFile('gt100kr2'))
-# so_pr user causes segfault w/ data.table 1.8.10
-run10k <- function() runPrior(getQueryGT(10000, "user_screen_name != 'so_pr'"), outFile=modelVsPredOutFile('gt10k'))
-run10kr2 <- function() runPrior(getQueryGTNoRetweets(10000, "user_screen_name != 'so_pr'"), outFile=modelVsPredOutFile('gt10kr2'))
-run1k <- function() runPrior(getQueryGT(1000), outFile=modelVsPredOutFile('gt1k'))
-run1kr2 <- function() runPrior(getQueryGTNoRetweets(1000), outFile=modelVsPredOutFile('gt1kr2'))
-# tweet 12466832063  has a corrupt utf-8 encoded string
-run10M <- function() runPrior(getQueryGT(10000000, 't.id != 12466832063'), outFile=modelVsPredOutFile('gt10M'))
-run10Mr2 <- function() runPrior(getQueryGTNoRetweets(10000000, 't.id != 12466832063'), outFile=modelVsPredOutFile('gt10Mr2'))
-
-modConfig <- function(config, mods) {
-	newConfig = config
-	for(modName in names(mods)) {
-		newConfig[[modName]] = mods[[modName]]
-	}
-	newConfig
+makeTRun <- function(val, outFileName, config, ...) {
+	function() runPriorT(config$query(val), outFile=modelVsPredOutFile(outFileName), config=config, ...)
 }
+
+makeTRunr1 <- function(val, outFileName, ...) {
+	makeTRun(val, outFileName, config=modConfig(defaultTConfig, list(query=function(val) getQueryT(val, ...))))
+}
+
+makeTRunr2 <- function(val, outFileName, ...) {
+	makeTRun(val, outFileName, config=modConfig(defaultTConfig, list(query=function(val) getQueryTNoRT(val, ...))))
+}
+
+runT1M <- makeTRunr1(1000000, 'gt1M')
+runT1Mr2 <- makeTRunr2(1000000,'gt1Mr2')
+runT100k <- makeTRunr1(100000, 'gt100k', filters="user_screen_name != 'hermosa_brisa'") 	# hermosa_brisa causes segfault w/ data.table 1.8.10
+runT100kr2 <- makeTRunr2(100000, 'gt100kr2', filters="user_screen_name != 'hermosa_brisa'")
+runT10k <- makeTRunr1(10000, 'gt10k', filters="user_screen_name != 'so_pr'") 			# so_pr user causes segfault w/ data.table 1.8.10
+runT10kr2 <- makeTRunr2(10000,'gt10kr2', filters="user_screen_name != 'so_pr'")
+runT1k <- makeTRunr1(1000, 'gt1k')
+runT1kr2 <- makeTRunr2(1000, 'gt1kr2')
+runT10M <- makeTRunr1(10000000, 'gt10M', filters='t.id != 12466832063')				# tweet 12466832063  has a corrupt utf-8 encoded string
+runT10Mr2 <- makeTRunr2(10000000, 'gt10Mr2', filters='t.id != 12466832063')
 
 makeSORun <- function(val, outFileName, config, ...) {
 	runFun = function() runPriorSO(config$query(val), outFile=modelVsPredOutFile(outFileName), config=config, ...)
 	runFun
 }
 
-getSOr1Config <- function () modConfig(defaultSOConfig, list(convertTagSynonymsP=F, query=getQueryGTSO))
-getSOr2Config <- function () modConfig(defaultSOConfig, list(convertTagSynonymsP=T, query=getQueryGTSO))
-getSOr3Config <- function () modConfig(defaultSOConfig, list(convertTagSynonymsP=F, query=getQueryQGTSO))
-getSOr4Config <- function () modConfig(defaultSOConfig, list(convertTagSynonymsP=T, query=getQueryQGTSO))
+getSOr1Config <- function () modConfig(defaultSOConfig, list(convertTagSynonymsP=F, query=getQuerySO))
+getSOr2Config <- function () modConfig(defaultSOConfig, list(convertTagSynonymsP=T, query=getQuerySO))
+getSOr3Config <- function () modConfig(defaultSOConfig, list(convertTagSynonymsP=F, query=getQuerySOQ))
+getSOr4Config <- function () modConfig(defaultSOConfig, list(convertTagSynonymsP=T, query=getQuerySOQ))
 makeSORunr1 <- function(val, outFileName) makeSORun(val, outFileName, config=getSOr1Config())
 makeSORunr2 <- function(val, outFileName) makeSORun(val, outFileName, config=getSOr2Config())
 makeSORunr3 <- function(val, outFileName) makeSORun(val, outFileName, config=getSOr3Config())
 makeSORunr4 <- function(val, outFileName) makeSORun(val, outFileName, config=getSOr4Config())
 
-runSO100k <- function() makeSORunr1(100000, 'SOgt100k')()
-runSO50k <- function() makeSORunr1(50000, 'SOgt50k')()
-runSO10k <- function() makeSORunr1(10000, 'SOgt10k')()
-runSO5k <- function() makeSORunr1(5000, 'SOgt5k')()
-runSO1k <- function() makeSORunr1(1000, 'SOgt1k')()
-runSO500 <- function() makeSORunr1(500, 'SOgt500')()
+runSO100k <- makeSORunr1(100000, 'SOgt100k')
+runSO50k <- makeSORunr1(50000, 'SOgt50k')
+runSO10k <- makeSORunr1(10000, 'SOgt10k')
+runSO5k <- makeSORunr1(5000, 'SOgt5k')
+runSO1k <- makeSORunr1(1000, 'SOgt1k')
+runSO500 <- makeSORunr1(500, 'SOgt500')
 
-runSO100kr2 <- function() makeSORunr2(100000, 'SOgt100kr2')()
-runSO50kr2 <- function() makeSORunr2(50000, 'SOgt50kr2')()
-runSO10kr2 <- function() makeSORunr2(10000, 'SOgt10kr2')()
-runSO5kr2 <- function() makeSORunr2(5000, 'SOgt5kr2')()
-runSO1kr2 <- function() makeSORunr2(1000, 'SOgt1kr2')()
-runSO500r2 <- function() makeSORunr2(500, 'SOgt500r2')()
+runSO100kr2 <- makeSORunr2(100000, 'SOgt100kr2')
+runSO50kr2 <- makeSORunr2(50000, 'SOgt50kr2')
+runSO10kr2 <- makeSORunr2(10000, 'SOgt10kr2')
+runSO5kr2 <- makeSORunr2(5000, 'SOgt5kr2')
+runSO1kr2 <- makeSORunr2(1000, 'SOgt1kr2')
+runSO500r2 <- makeSORunr2(500, 'SOgt500r2')
 
-runSOQgt500 <- function() makeSORunr3(500, 'SOQgt500')()
-runSOQgt400 <- function() makeSORunr3(400, 'SOQgt400')()
-runSOQgt300 <- function() makeSORunr3(300, 'SOQgt300')()
-runSOQgt200 <- function() makeSORunr3(200, 'SOQgt200')()
-runSOQgt100 <- function() makeSORunr3(100, 'SOQgt100')()
-runSOQgt050 <- function() makeSORunr3(050, 'SOQgt050')()
+runSOQgt500 <- makeSORunr3(500, 'SOQgt500')
+runSOQgt400 <- makeSORunr3(400, 'SOQgt400')
+runSOQgt300 <- makeSORunr3(300, 'SOQgt300')
+runSOQgt200 <- makeSORunr3(200, 'SOQgt200')
+runSOQgt100 <- makeSORunr3(100, 'SOQgt100')
+runSOQgt050 <- makeSORunr3(050, 'SOQgt050')
 
-runSOQgt500r2 <- function() makeSORunr4(500, 'SOQgt500r2')()
-runSOQgt400r2 <- function() makeSORunr4(400, 'SOQgt400r2')()
-runSOQgt300r2 <- function() makeSORunr4(300, 'SOQgt300r2')()
-runSOQgt200r2 <- function() makeSORunr4(200, 'SOQgt200r2')()
-runSOQgt100r2 <- function() makeSORunr4(100, 'SOQgt100r2')()
-runSOQgt050r2 <- function() makeSORunr4(050, 'SOQgt050r2')()
+runSOQgt500r2 <- makeSORunr4(500, 'SOQgt500r2')
+runSOQgt400r2 <- makeSORunr4(400, 'SOQgt400r2')
+runSOQgt300r2 <- makeSORunr4(300, 'SOQgt300r2')
+runSOQgt200r2 <- makeSORunr4(200, 'SOQgt200r2')
+runSOQgt100r2 <- makeSORunr4(100, 'SOQgt100r2')
+runSOQgt050r2 <- makeSORunr4(050, 'SOQgt050r2')
 
 buildTables <- function(outFileNames) {
 	buildTable <- function(outFileName) {
@@ -546,10 +561,7 @@ curWS <- function() {
 	test_dir(sprintf("%s/%s", PATH, 'tests'), reporter='summary')
 	tweetsTbl = getTweetsTbl("select * from tweets limit 100000")
 	tweetsTbl = getTweetsTbl("select * from tweets where user_screen_name='eddieizzard'")
-	runPrior("select * from tweets where id=12466832063")
-	runPrior("select * from tweets where user_id=50393960")
 	runSOQgt050r2()
-	runPriorSO(query = 'select * from posts where owner_user_id = 39677', config = getSOr2Config())
 	# Checking that tweets for twitter users from each followers_count scale are being collected properly
 	usersWithTweetsTbl = data.table(sqldf("select distinct on (user_id) t.user_screen_name,u.followers_count from tweets as t join twitter_users as u on t.user_screen_name = u.user_screen_name"))
 	usersWithTweetsTbl[order(followers_count), plot(log10(followers_count))]
@@ -563,8 +575,6 @@ curWS <- function() {
 	tusersTbl = getTusersTbl()
 	tusersTbl
 	tusersTbl[order(rank, decreasing=T)][20000:30000][, plot(1:length(followers_count), followers_count)]
-	runPrior("select * from tweets where user_screen_name = 'katyperry'")
-	runPrior(getQueryGT(10000000))
 	db = makeDB(do.call(function(x) sample(x, length(x)), list(unique(hashtagsTbl$hashtag))))
 	visHashtags(hashtagsTbl[user_screen_name=='chelseafc'], db)
 	visHashtags(modelHashtagsTbl[topHashtag==T,], db)
