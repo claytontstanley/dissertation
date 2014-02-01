@@ -282,7 +282,7 @@ def generateTopUsers100k():
 # Current run selections
 #generateTopUsers100k()
 #getAllTweetsForTopUsersByFollowers()
-#getAllTweetsForTopUsersByTweets()
+getAllTweetsForTopUsersByTweets()
 #getUserInfoForTopUsers()
 #storeCurTagSynonyms()
 #backupTables()
