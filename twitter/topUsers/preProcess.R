@@ -561,7 +561,7 @@ curWS <- function() {
 	test_dir(sprintf("%s/%s", PATH, 'tests'), reporter='summary')
 	tweetsTbl = getTweetsTbl("select * from tweets limit 100000")
 	tweetsTbl = getTweetsTbl("select * from tweets where user_screen_name='eddieizzard'")
-	runSOQgt050r2()
+	runSOQgt100r2()
 	# Checking that tweets for twitter users from each followers_count scale are being collected properly
 	usersWithTweetsTbl = data.table(sqldf("select distinct on (user_id) t.user_screen_name,u.followers_count from tweets as t join twitter_users as u on t.user_screen_name = u.user_screen_name"))
 	usersWithTweetsTbl[order(followers_count), plot(log10(followers_count))]
