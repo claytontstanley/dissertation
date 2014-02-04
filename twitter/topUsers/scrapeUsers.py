@@ -216,7 +216,7 @@ def getAllTweetsDefault(userQuery):
     return getForTopUsers(alreadyCollectedFun=userAlreadyCollected, getForUserFun=getAllTweets, getRemainingHitsFun=getRemainingHitsUserTimeline, hitsAlwaysGreaterThan=30, userQuery=userQuery)
 
 def makeUserQuery(val, col):
-    return 'select user_screen_name from twitter_users where %s > %d order by followers_count asc limit 1000' % (col, val)
+    return 'select user_screen_name from twitter_users where %s > %d order by %s asc limit 1000' % (col, val, col)
 
 def makeUserQueryFollowers(val):
     return makeUserQuery(val, 'followers_count')

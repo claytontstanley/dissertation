@@ -563,8 +563,11 @@ curWS <- function() {
 	tweetsTbl = getTweetsTbl("select * from tweets where user_screen_name='eddieizzard'")
 	runSOQgt100r2()
 	# Checking that tweets for twitter users from each followers_count scale are being collected properly
-	usersWithTweetsTbl = data.table(sqldf("select distinct on (user_id) t.user_screen_name,u.followers_count from tweets as t join twitter_users as u on t.user_screen_name = u.user_screen_name"))
+	usersWithTweetsTbl = data.table(sqldf("select distinct on (user_id) t.user_screen_name,u.followers_count,u.statuses_count from tweets as t join twitter_users as u on t.user_screen_name = u.user_screen_name"))
+	usersWithTweetsTbl
 	usersWithTweetsTbl[order(followers_count), plot(log10(followers_count))]
+	usersWithTweetsTbl[order(statuses_count)][statuses_count > 5000 & statuses_count < 10000]
+	usersWithTweetsTbl[order(statuses_count)][, hist(statuses_count)]
 	usersWithTweetsTbl[order(followers_count),][followers_count > 10000000]
 	tweetsTbl
 	#hashtagsTbl = getHashtagsTbl(tweetsTbl, from='text')
