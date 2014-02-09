@@ -418,8 +418,9 @@ visModelVsPredTbl <- function(modelVsPredTbl) {
 
 tableModelVsPredTbl <- function(modelVsPredTbl) {
 	# Summary table of optimal d values and sample variance
-	modelVsPredTbl[topHashtag & hashtagUsedP & maxNP][, list(mean=mean(d), median=median(d), totN=mean(totN), NCell=mean(NCell), acc=mean(NCell/totN), sd=sd(d),
-								 meanCI=CI(d), sdCI=sqrt(CIVar(d)), sdCI1=sqrt(CIVar2(d))), by=list(datasetName, DVName)]
+	modelVsPredTbl[topHashtag & hashtagUsedP & maxNP][, list(mean=mean(d), median=median(d), totN=mean(totN), NCell=mean(NCell), acc=mean(NCell/totN),
+								 #sdCI=sqrt(CIVar(d)), sdCI1=sqrt(CIVar2(d)), meanCI=CI(d))
+								 sd=sd(d)), by=list(datasetName, DVName)]
 }
 
 modelVsPredOutFile <- function(name) {
