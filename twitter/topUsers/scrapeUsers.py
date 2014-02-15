@@ -236,6 +236,9 @@ def getAllTweetsFor100kUsers():
 def getAllTweetsFor10kUsers():
     return getAllTweetsDefault(makeUserQueryFollowers(10000))
 
+def getAllTweetsFor5kUsers():
+    return getAllTweetsDefault(makeUserQueryFollowers(5000))
+
 def getAllTweetsFor1kUsers():
     return getAllTweetsDefault(makeUserQueryFollowers(1000))
 
@@ -258,11 +261,12 @@ def getAllTweetsForS5e4Users():
     return getAllTweetsDefault(makeUserQueryTweets(50000))
 
 def getAllTweetsForTopUsersByFollowers():
-    getAllTweetsFor10MUsers()
-    getAllTweetsFor1MUsers()
-    getAllTweetsFor100kUsers()
-    getAllTweetsFor10kUsers()
-    getAllTweetsFor1kUsers()
+    #getAllTweetsFor10MUsers()
+    #getAllTweetsFor1MUsers()
+    #getAllTweetsFor100kUsers()
+    #getAllTweetsFor10kUsers()
+    #getAllTweetsFor1kUsers()
+    getAllTweetsFor5kUsers()
 
 def getAllTweetsForTopUsersByTweets():
     getAllTweetsForS1e2Users()
@@ -281,8 +285,8 @@ def generateTopUsers100k():
 
 # Current run selections
 #generateTopUsers100k()
-#getAllTweetsForTopUsersByFollowers()
+getAllTweetsForTopUsersByFollowers()
 #getAllTweetsForTopUsersByTweets()
 #getUserInfoForTopUsers()
 #storeCurTagSynonyms()
-backupTables()
+#backupTables()

@@ -124,8 +124,6 @@ sqlScratch <- function() {
 	data.table(sqldf("select retweeted, count(*) from tweets group by retweeted"))[, min(count) / (max(count) + min(count))]
 	sqldf("select * from tweets where 1=1 and user_screen_name='katyperry' limit 10")
 	foo = data.table(sqldf("select * from twitter_users"))
-	foo[order(followers_count), plot(followers_count)]
-	foo[order(statuses_count), hist(log10(statuses_count))]
 	twitter_users = myReadCSV(str_c(PATH, "/dissertationData/tables/twitter_users.csv"))
 	topUsers = myReadCSV(str_c(PATH, "/dissertationData/tables/topUsers.csv"))
 	twitter_users[created_at=='2010-10-29 19:05:25',]
@@ -455,8 +453,16 @@ modConfig <- function(config, mods) {
 	newConfig
 }
 
+getQueryGeneralT <- function(val, from, filters) {
+	sprintf('select * from tweets as t where %s and user_screen_name in (select user_screen_name from twitter_users where %s > %d order by %s asc limit 100)', filters, from, val, from)
+}
+
 getQueryT <- function(val, filters='1=1') {
-	sprintf('select * from tweets as t where %s and user_screen_name in (select user_screen_name from twitter_users where followers_count > %d order by followers_count asc limit 100)', filters, val)
+	getQueryGeneralT(val, 'followers_count', filters)
+}
+
+getQueryTStatuses <- function(val, filters='1=1') {
+	getQueryGeneralT(val, 'statuses_count', filters)
 }
 
 getQuerySO <- function(val) {
@@ -484,6 +490,10 @@ getQueryTNoRT <- function(val, filters='1=1') {
 	getQueryT(val, filters=combineFilters("retweeted = 'False'", filters))
 }
 
+getQueryTStatusesNoRT <- function(val, filters='1=1') {
+	getQueryTStatuses(val, filters=combineFilters("retweeted = 'False'", filters))
+}
+
 makeTRun <- function(val, outFileName, config, ...) {
 	function() runPriorT(config$query(val), outFile=modelVsPredOutFile(outFileName), config=config, ...)
 }
@@ -496,16 +506,38 @@ makeTRunr2 <- function(val, outFileName, ...) {
 	makeTRun(val, outFileName, config=modConfig(defaultTConfig, list(query=function(val) getQueryTNoRT(val, ...))))
 }
 
-runT1M <- makeTRunr1(1000000, 'gt1M')
-runT1Mr2 <- makeTRunr2(1000000,'gt1Mr2')
-runT100k <- makeTRunr1(100000, 'gt100k', filters="user_screen_name != 'hermosa_brisa'") 	# hermosa_brisa causes segfault w/ data.table 1.8.10
-runT100kr2 <- makeTRunr2(100000, 'gt100kr2', filters="user_screen_name != 'hermosa_brisa'")
-runT10k <- makeTRunr1(10000, 'gt10k', filters="user_screen_name != 'so_pr'") 			# so_pr user causes segfault w/ data.table 1.8.10
-runT10kr2 <- makeTRunr2(10000,'gt10kr2', filters="user_screen_name != 'so_pr'")
-runT1k <- makeTRunr1(1000, 'gt1k')
-runT1kr2 <- makeTRunr2(1000, 'gt1kr2')
-runT10M <- makeTRunr1(10000000, 'gt10M', filters='t.id != 12466832063')				# tweet 12466832063  has a corrupt utf-8 encoded string
-runT10Mr2 <- makeTRunr2(10000000, 'gt10Mr2', filters='t.id != 12466832063')
+makeTRunr3 <- function(val, outFileName, ...) {
+	makeTRun(val, outFileName, config=modConfig(defaultTConfig, list(query=function(val) getQueryTStatuses(val, ...))))
+}
+
+makeTRunr4 <- function(val, outFileName, ...) {
+	makeTRun(val, outFileName, config=modConfig(defaultTConfig, list(query=function(val) getQueryTStatusesNoRT(val, ...))))
+}
+
+runTFollow1k <- makeTRunr1(1000, 'TFollowgt1k')
+runTFollow1kr2 <- makeTRunr2(1000, 'TFollowgt1kr2')
+#runTFollow5k <- makeTRunr1(5000, 'TFollowgt5k')
+#runTFollow5kr2 <- makeTRunr2(5000, 'TFollowgt5kr2')
+runTFollow10k <- makeTRunr1(10000, 'TFollowgt10k', filters="user_screen_name != 'so_pr'") 			# so_pr user causes segfault w/ data.table 1.8.10
+runTFollow10kr2 <- makeTRunr2(10000,'TFollowgt10kr2', filters="user_screen_name != 'so_pr'")
+runTFollow100k <- makeTRunr1(100000, 'TFollowgt100k', filters="user_screen_name != 'hermosa_brisa'") 		# hermosa_brisa causes segfault w/ data.table 1.8.10
+runTFollow100kr2 <- makeTRunr2(100000, 'TFollowgt100kr2', filters="user_screen_name != 'hermosa_brisa'")
+runTFollow1M <- makeTRunr1(1000000, 'TFollowgt1M')
+runTFollow1Mr2 <- makeTRunr2(1000000,'TFollowgt1Mr2')
+runTFollow10M <- makeTRunr1(10000000, 'TFollowgt10M', filters='t.id != 12466832063')				# tweet 12466832063  has a corrupt utf-8 encoded string
+runTFollow10Mr2 <- makeTRunr2(10000000, 'TFollowgt10Mr2', filters='t.id != 12466832063')
+runTTweets1e2 <- makeTRunr3(100, 'TTweetsgt1e2')
+runTTweets1e2r2 <- makeTRunr4(100, 'TTweetsgt1e2r2')
+runTTweets5e2 <- makeTRunr3(500, 'TTweetsgt5e2')
+runTTweets5e2r2 <- makeTRunr4(500, 'TTweetsgt5e2r2')
+runTTweets1e3 <- makeTRunr3(1000, 'TTweetsgt1e3')
+runTTweets1e3r2 <- makeTRunr4(1000, 'TTweetsgt1e3r2')
+runTTweets5e3 <- makeTRunr3(5000, 'TTweetsgt5e3')
+runTTweets5e3r2 <- makeTRunr4(5000, 'TTweetsgt5e3r2')
+runTTweets1e4 <- makeTRunr3(10000, 'TTweetsgt1e4')
+runTTweets1e4r2 <- makeTRunr4(10000, 'TTweetsgt1e4r2')
+runTTweets5e4 <- makeTRunr3(50000, 'TTweetsgt5e4')
+runTTweets5e4r2 <- makeTRunr4(50000, 'TTweetsgt5e4r2')
 
 makeSORun <- function(val, outFileName, config, ...) {
 	runFun = function() runPriorSO(config$query(val), outFile=modelVsPredOutFile(outFileName), config=config, ...)
@@ -563,12 +595,11 @@ curWS <- function() {
 	tweetsTbl = getTweetsTbl("select * from tweets limit 100000")
 	tweetsTbl = getTweetsTbl("select * from tweets where user_screen_name='eddieizzard'")
 	runSOQgt100r2()
-	# Checking that tweets for twitter users from each followers_count scale are being collected properly
+	# Checking that tweets for twitter users from each followers_count,statuses_count scale are being collected properly
 	usersWithTweetsTbl = data.table(sqldf("select distinct on (user_id) t.user_screen_name,u.followers_count,u.statuses_count from tweets as t join twitter_users as u on t.user_screen_name = u.user_screen_name"))
 	usersWithTweetsTbl
 	usersWithTweetsTbl[order(followers_count), plot(log10(followers_count))]
-	usersWithTweetsTbl[order(statuses_count)][statuses_count > 5000 & statuses_count < 10000]
-	usersWithTweetsTbl[order(statuses_count)][, hist(statuses_count)]
+	usersWithTweetsTbl[order(statuses_count), plot(log10(statuses_count))]
 	usersWithTweetsTbl[order(followers_count),][followers_count > 10000000]
 	tweetsTbl
 	#hashtagsTbl = getHashtagsTbl(tweetsTbl, from='text')
