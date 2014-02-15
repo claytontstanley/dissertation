@@ -289,4 +289,4 @@ def generateTopUsers100k():
 #getAllTweetsForTopUsersByTweets()
 #getUserInfoForTopUsers()
 #storeCurTagSynonyms()
-backupTables()
+#backupTables()
