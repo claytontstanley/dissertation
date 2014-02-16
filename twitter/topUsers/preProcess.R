@@ -525,7 +525,7 @@ makeTRunr4 <- function(val, outFileName, ...) {
 	makeTRun(val, outFileName, config=modConfig(defaultTConfig, list(query=function(val) getQueryTStatusesNoRT(val, ...))))
 }
 
-runTFollow1k <- makeTRunr1(1000, 'TFollowgt1k')
+#runTFollow1k <- makeTRunr1(1000, 'TFollowgt1k')
 #runTFollow1kr2 <- makeTRunr2(1000, 'TFollowgt1kr2')
 runTFollow5k <- makeTRunr1(5000, 'TFollowgt5k', filters="user_screen_name != 'g4scareers'")			# g4scareers causes segfault w/ data.table 1.8.10
 runTFollow5kr2 <- makeTRunr2(5000, 'TFollowgt5kr2', filters="user_screen_name != 'g4scareers'")
@@ -547,8 +547,8 @@ runTFollow5kr2 <- makeTRunr2(5000, 'TFollowgt5kr2', filters="user_screen_name !=
 #runTTweets5e3r2 <- makeTRunr4(5000, 'TTweetsgt5e3r2')
 #runTTweets1e4 <- makeTRunr3(10000, 'TTweetsgt1e4')
 #runTTweets1e4r2 <- makeTRunr4(10000, 'TTweetsgt1e4r2')
-runTTweets5e4 <- makeTRunr3(50000, 'TTweetsgt5e4')
-#runTTweets5e4r2 <- makeTRunr4(50000, 'TTweetsgt5e4r2')
+runTTweets5e4 <- makeTRunr3(50000, 'TTweetsgt5e4', filters="user_screen_name != 'stanhjerleid'")
+runTTweets5e4r2 <- makeTRunr4(50000, 'TTweetsgt5e4r2', filters="user_screen_name != 'stanhjerleid'")
 
 makeSORun <- function(val, outFileName, config, ...) {
 	runFun = function() runPriorSO(config$query(val), outFile=modelVsPredOutFile(outFileName), config=config, ...)
