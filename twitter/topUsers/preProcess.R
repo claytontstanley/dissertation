@@ -267,8 +267,8 @@ computeActsByUser <- function(hashtagsTbl, ds) {
 	myLog('computing activations across table')
 	res = partialRes[, list(N=.N,
 				act=log(sum(partialAct)),
-				actOL=if(d[1]>=1) NaN else log(.N/(1-d))-d*log(dt),
-				actOL2=if(d[1]>=1) NaN else log(.N/(1-d))-d*log(max(dtP))), keyby=list(user_screen_name, dt, hashtag, d)]
+				actOL=if (d[1]>=1) NaN else log(.N/(1-d))-d*log(dt),
+				actOL2=if (d[1]>=1) NaN else log(.N/(1-d))-d*log(max(dtP))), keyby=list(user_screen_name, dt, hashtag, d)]
 	with(res, stopifnot(!is.infinite(act)))
 	with(res, stopifnot(!is.infinite(actOL2)))
 	res
