@@ -232,26 +232,21 @@ compareHashtagTbls <- function() {
 	hashtagTblText[hashtagTblTokenText]
 }
 
-computeActs <- function(hashtags, dt, cTime, d) {
+computeActs <- function(hashtags, dtP, cTime, d) {
 	debugPrint(hashtags)
-	debugPrint(dt)
 	debugPrint(d)
-	#cTime = dt[length(dt)]
 	debugPrint(cTime)
-	dt = cTime - dt
-	debugPrint(dt)
-	indeces = dt>0
+	dtP = cTime - dtP
+	indeces = dtP>0
 	hashtagsSub = hashtags[indeces] 
 	debugPrint(hashtagsSub)
 	cTimeSub = cTime[indeces]
 	cTimeSubRep = rep(cTimeSub, times=length(d))
-	dtSub = dt[indeces]
-	dtSubRep = rep(dtSub, times=length(d))
-	dRep = rep(d, each=length(dtSub))
+	dtPSub = dtP[indeces]
+	dtPSubRep = rep(dtPSub, times=length(d))
+	dRep = rep(d, each=length(dtPSub))
 	hashtagsSubRep = rep(hashtagsSub)
-	debugPrint(dtSubRep)
-	debugPrint(dRep)
-	list(hashtag=hashtagsSubRep, partialAct=dtSubRep^(-dRep), dt=cTimeSubRep, d=dRep)
+	list(hashtag=hashtagsSubRep, partialAct=dtPSubRep^(-dRep), dt=cTimeSubRep, d=dRep, dtP=dtPSubRep)
 }
 
 computeActsForUser <- function(hashtag, dt, ds, user_screen_name) {
@@ -259,8 +254,8 @@ computeActsForUser <- function(hashtag, dt, ds, user_screen_name) {
 	retIndeces = which(!duplicated(dt))[-1]
 	stopifnot(length(retIndeces) > 0)
 	partialRes = data.table(i=retIndeces)
-	partialRes = partialRes[, list(hashtag=hashtag[1:i], dt=dt[1:i], cTime=dt[i]), by=i]
-	partialRes = with(partialRes, as.data.table(computeActs(hashtag, dt, cTime, d=ds)))
+	partialRes = partialRes[, list(hashtag=hashtag[1:i], dtP=dt[1:i], cTime=dt[i]), by=i]
+	partialRes = with(partialRes, as.data.table(computeActs(hashtag, dtP, cTime, d=ds)))
 	partialRes
 }
 
@@ -270,8 +265,12 @@ computeActsByUser <- function(hashtagsTbl, ds) {
 	myLog('setting key for partial table')
 	setkeyv(partialRes, c('user_screen_name','dt','hashtag','d'))
 	myLog('computing activations across table')
-	res = partialRes[, list(N=.N, act=log(sum(partialAct)), actOL=if(d[1]>=1) NaN else log(.N/(1-d))-d*log(dt)), keyby=list(user_screen_name, dt, hashtag, d)]
+	res = partialRes[, list(N=.N,
+				act=log(sum(partialAct)),
+				actOL=if(d[1]>=1) NaN else log(.N/(1-d))-d*log(dt),
+				actOL2=if(d[1]>=1) NaN else log(.N/(1-d))-d*log(max(dtP))), keyby=list(user_screen_name, dt, hashtag, d)]
 	with(res, stopifnot(!is.infinite(act)))
+	with(res, stopifnot(!is.infinite(actOL2)))
 	res
 }
 
@@ -311,6 +310,7 @@ addMetrics <- function(hashtagsTbl, modelHashtagsTbl) {
 	}
 	addDVCols(act, topHashtagPost, topHashtagAct)
 	addDVCols(actOL, topHashtagPostOL, topHashtagActOL)
+	addDVCols(actOL2, topHashtagPostOL2, topHashtagActOL2)
 	stopifnot(key(modelHashtagsTbl) == (c('user_screen_name', 'dt', 'hashtag', 'd')))
 	stopifnot(key(hashtagsTbl) == (c('user_screen_name', 'dt', 'hashtag')))
 	modelHashtagsTbl[, hashtagUsedP := F]
@@ -358,7 +358,9 @@ getModelVsPredTbl <- function(modelHashtagsTbl, hashtagsTbl) {
 	modelVsPredTbl = rbind(modelVsPredForDV(modelHashtagsTbl, 'topHashtagPost'), 
 			       modelVsPredForDV(modelHashtagsTbl, 'topHashtagAct'),
 			       modelVsPredForDV(modelHashtagsTbl, 'topHashtagPostOL'),
-			       modelVsPredForDV(modelHashtagsTbl, 'topHashtagActOL'))
+			       modelVsPredForDV(modelHashtagsTbl, 'topHashtagActOL'),
+			       modelVsPredForDV(modelHashtagsTbl, 'topHashtagPostOL2'),
+			       modelVsPredForDV(modelHashtagsTbl, 'topHashtagActOL2'))
 	modelVsPredTbl[, maxNP := NCell==max(NCell), by=list(user_screen_name, topHashtag, hashtagUsedP, DVName)]
 	# TODO: Doesn't using the maxNP closest to the center of all of the maxNP's create an artifact for low N when all ds are MaxNP's?
 	modelVsPredTbl[maxNP==T, maxNP := onlyFirstT(abs(d-mean(d)) == min(abs(d-mean(d)))), by=list(user_screen_name, topHashtag, hashtagUsedP, DVName)]

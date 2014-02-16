@@ -5,7 +5,7 @@ setLogLevel(0)
 
 test_that("testPriorActivations", {
 	  sortExpectedTbl <- function(tbl) {
-		  cols = c('user_screen_name', 'dt', 'hashtag', 'd', 'N', 'act', 'actOL')
+		  cols = c('user_screen_name', 'dt', 'hashtag', 'd', 'N', 'act', 'actOL', 'actOL2')
 		  setcolorder(tbl, cols) 
 		  setkeyv(tbl, cols) 
 		  tbl
@@ -13,20 +13,23 @@ test_that("testPriorActivations", {
 	  testHashtagsTbl = data.table(user_screen_name=c(1,1,1,1), dt=c(0,2,3,4), hashtag=c('a', 'b', 'a', 'b'))
 	  expectedActTbl = sortExpectedTbl(data.table(dt=c(2,3,3,4,4), hashtag=c('a','a','b','a','b'), d=c(.5,.5,.5,.5,.5),
 						      user_screen_name=c(1,1,1,1,1), N=c(1,1,1,2,1), act=c(log(2^(-.5)), log(3^(-.5)), log(1), log(4^(-.5)+1), log(2^(-.5))),
-						      actOL=c(log(1/.5)-.5*log(2), log(1/.5)-.5*log(3), log(1/.5)-.5*log(3), log(2/.5)-.5*log(4), log(1/.5)-.5*log(4))))
+						      actOL=c(log(1/.5)-.5*log(2), log(1/.5)-.5*log(3), log(1/.5)-.5*log(3), log(2/.5)-.5*log(4), log(1/.5)-.5*log(4)),
+						      actOL2=c(log(1/.5)-.5*log(2), log(1/.5)-.5*log(3), log(1/.5)-.5*log(1), log(2/.5)-.5*log(4), log(1/.5)-.5*log(2))))
 	  actTbl = computeActsByUser(testHashtagsTbl, d=.5)
 	  expect_that(actTbl, is_equivalent_to(expectedActTbl))
 
 	  testHashtagsTbl = data.table(user_screen_name=c(1,1,2,2), dt=c(0,2,0,3), hashtag=c('a','b','b','b'))
 	  expectedActTbl = sortExpectedTbl(data.table(dt=c(2,3), hashtag=c('a','b'), d=c(.5, .5), user_screen_name=c(1,2), N=c(1,1), act=c(log(2^(-.5)), log(3^(-.5))),
-						      actOL=c(log(1/.5)-.5*log(2), log(1/.5)-.5*log(3))))
+						      actOL=c(log(1/.5)-.5*log(2), log(1/.5)-.5*log(3)),
+						      actOL2=c(log(1/.5)-.5*log(2), log(1/.5)-.5*log(3))))
 	  actTbl = computeActsByUser(testHashtagsTbl, d=.5)
 	  expect_that(actTbl, is_equivalent_to(expectedActTbl))
 
 	  testHashtagsTbl = data.table(user_screen_name=c(1,1), dt=c(0,2), hashtag=c('a','b'))
 	  expectedActTbl = sortExpectedTbl(data.table(dt=c(2,2,2,2), hashtag=c('a','a','a','a'), d=c(.2,.3,.4,.5),
 						      user_screen_name=c(1,1,1,1), N=c(1,1,1,1), act=c(log(2^(-.2)), log(2^(-.3)), log(2^(-.4)), log(2^(-.5))),
-						      actOL=sapply(c(.2,.3,.4,.5), function(d) log(1/(1-d))-d*log(2))))
+						      actOL=sapply(c(.2,.3,.4,.5), function(d) log(1/(1-d))-d*log(2)),
+						      actOL2=sapply(c(.2,.3,.4,.5), function(d) log(1/(1-d))-d*log(2))))
 	  actTbl = computeActsByUser(testHashtagsTbl, d=c(.2,.3,.4,.5))
 	  expect_that(actTbl, is_equivalent_to(expectedActTbl))
 
@@ -36,7 +39,9 @@ test_that("testPriorActivations", {
 						      act=c(log(2^(-.5)), log(3^(-.5)), log(1^(-.5)),
 							    log(2^(-.4)), log(3^(-.4)), log(1^(-.4))),
 						      actOL=c(log(1/.5)-.5*log(2), log(1/.5)-.5*log(3), log(1/.5)-.5*log(3),
-							      log(1/(1-.4))-.4*log(2), log(1/(1-.4))-.4*log(3), log(1/(1-.4))-.4*log(3))))
+							      log(1/(1-.4))-.4*log(2), log(1/(1-.4))-.4*log(3), log(1/(1-.4))-.4*log(3)),
+						      actOL2=c(log(1/.5)-.5*log(2), log(1/.5)-.5*log(3), log(1/.5)-.5*log(1),
+							       log(1/(1-.4))-.4*log(2), log(1/(1-.4))-.4*log(3), log(1/(1-.4))-.4*log(1))))
 	  actTbl = computeActsByUser(testHashtagsTbl, d=c(.5,.4))
 	  expect_that(actTbl, is_equivalent_to(expectedActTbl))
 
