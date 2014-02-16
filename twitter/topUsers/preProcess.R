@@ -270,7 +270,7 @@ computeActsByUser <- function(hashtagsTbl, ds) {
 	myLog('setting key for partial table')
 	setkeyv(partialRes, c('user_screen_name','dt','hashtag','d'))
 	myLog('computing activations across table')
-	res = partialRes[, list(N=.N, act=log(sum(partialAct))), keyby=list(user_screen_name, dt, hashtag, d)]
+	res = partialRes[, list(N=.N, act=log(sum(partialAct)), actOL=if(d[1]>=1) NaN else log(.N/(1-d))-d*log(dt)), keyby=list(user_screen_name, dt, hashtag, d)]
 	with(res, stopifnot(!is.infinite(act)))
 	res
 }
@@ -300,8 +300,17 @@ addMetrics <- function(hashtagsTbl, modelHashtagsTbl) {
 	modelHashtagsTbl[tagCountTbl, tagCount := tagCountN]
 	modelHashtagsTbl[tagCountTbl[, list(tagCountUserN=sum(tagCountN)), keyby=user_screen_name], tagCountUser := tagCountUserN]
 	myLog('adding metrics for modelHashtagsTbl')
-	modelHashtagsTbl[order(act, decreasing=T), topHashtagPost := 1:length(act) <= tagCount[1], by=list(user_screen_name, dt, d)]
-	modelHashtagsTbl[order(act, decreasing=T), topHashtagAct := 1:length(act) <= tagCountUser[1], by=list(user_screen_name, d)]
+	addDVCols <- function(col, newDVPost, newDVAct) {
+		col = substitute(col)
+		newDVPost = substitute(newDVPost)
+		newDVAct = substitute(newDVAct)
+		expr = bquote(modelHashtagsTbl[order(.(col), decreasing=T), .(newDVPost) := 1:length(.(col)) <= tagCount[1], by=list(user_screen_name, dt, d)])
+		eval(expr)
+		expr = bquote(modelHashtagsTbl[order(.(col), decreasing=T), .(newDVAct) := 1:length(.(col)) <= tagCountUser[1], by=list(user_screen_name, d)])
+		eval(expr)
+	}
+	addDVCols(act, topHashtagPost, topHashtagAct)
+	addDVCols(actOL, topHashtagPostOL, topHashtagActOL)
 	stopifnot(key(modelHashtagsTbl) == (c('user_screen_name', 'dt', 'hashtag', 'd')))
 	stopifnot(key(hashtagsTbl) == (c('user_screen_name', 'dt', 'hashtag')))
 	modelHashtagsTbl[, hashtagUsedP := F]
@@ -347,7 +356,9 @@ modelVsPredForDV <- function(modelHashtagsTbl, DVName) {
 
 getModelVsPredTbl <- function(modelHashtagsTbl, hashtagsTbl) {
 	modelVsPredTbl = rbind(modelVsPredForDV(modelHashtagsTbl, 'topHashtagPost'), 
-			       modelVsPredForDV(modelHashtagsTbl, 'topHashtagAct'))
+			       modelVsPredForDV(modelHashtagsTbl, 'topHashtagAct'),
+			       modelVsPredForDV(modelHashtagsTbl, 'topHashtagPostOL'),
+			       modelVsPredForDV(modelHashtagsTbl, 'topHashtagActOL'))
 	modelVsPredTbl[, maxNP := NCell==max(NCell), by=list(user_screen_name, topHashtag, hashtagUsedP, DVName)]
 	# TODO: Doesn't using the maxNP closest to the center of all of the maxNP's create an artifact for low N when all ds are MaxNP's?
 	modelVsPredTbl[maxNP==T, maxNP := onlyFirstT(abs(d-mean(d)) == min(abs(d-mean(d)))), by=list(user_screen_name, topHashtag, hashtagUsedP, DVName)]
@@ -514,10 +525,10 @@ makeTRunr4 <- function(val, outFileName, ...) {
 	makeTRun(val, outFileName, config=modConfig(defaultTConfig, list(query=function(val) getQueryTStatusesNoRT(val, ...))))
 }
 
-#runTFollow1k <- makeTRunr1(1000, 'TFollowgt1k')
+runTFollow1k <- makeTRunr1(1000, 'TFollowgt1k')
 #runTFollow1kr2 <- makeTRunr2(1000, 'TFollowgt1kr2')
-runTFollow5k <- makeTRunr1(5000, 'TFollowgt5k')
-runTFollow5kr2 <- makeTRunr2(5000, 'TFollowgt5kr2')
+runTFollow5k <- makeTRunr1(5000, 'TFollowgt5k', filters="user_screen_name != 'g4scareers'")			# g4scareers causes segfault w/ data.table 1.8.10
+runTFollow5kr2 <- makeTRunr2(5000, 'TFollowgt5kr2', filters="user_screen_name != 'g4scareers'")
 #runTFollow10k <- makeTRunr1(10000, 'TFollowgt10k', filters="user_screen_name != 'so_pr'") 			# so_pr user causes segfault w/ data.table 1.8.10
 #runTFollow10kr2 <- makeTRunr2(10000,'TFollowgt10kr2', filters="user_screen_name != 'so_pr'")
 #runTFollow100k <- makeTRunr1(100000, 'TFollowgt100k', filters="user_screen_name != 'hermosa_brisa'") 		# hermosa_brisa causes segfault w/ data.table 1.8.10
@@ -536,7 +547,7 @@ runTFollow5kr2 <- makeTRunr2(5000, 'TFollowgt5kr2')
 #runTTweets5e3r2 <- makeTRunr4(5000, 'TTweetsgt5e3r2')
 #runTTweets1e4 <- makeTRunr3(10000, 'TTweetsgt1e4')
 #runTTweets1e4r2 <- makeTRunr4(10000, 'TTweetsgt1e4r2')
-#runTTweets5e4 <- makeTRunr3(50000, 'TTweetsgt5e4')
+runTTweets5e4 <- makeTRunr3(50000, 'TTweetsgt5e4')
 #runTTweets5e4r2 <- makeTRunr4(50000, 'TTweetsgt5e4r2')
 
 makeSORun <- function(val, outFileName, config, ...) {
@@ -588,6 +599,7 @@ buildTables <- function(outFileNames) {
 }
 
 curWS <- function() {
+	runTFollow1k()
 	test_dir(sprintf("%s/%s", PATH, 'tests'), reporter='summary')
 	tweetsTbl = getTweetsTbl("select * from tweets limit 100000")
 	tweetsTbl = getTweetsTbl("select * from tweets where user_screen_name='eddieizzard'")
