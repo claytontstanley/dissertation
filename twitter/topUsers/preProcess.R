@@ -491,7 +491,7 @@ getQuerySOQ <- function(val) {
 		 join Users on Users.Id = foo2.Owner_User_Id
 		 where N > %d
 		 order by N asc
-		 limit 100)
+		 limit 500)
 		 ", val)
 }
 
