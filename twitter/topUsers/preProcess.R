@@ -385,12 +385,14 @@ compareModelVsExtreme <-function(modelHashtagsTbl, extremesTbl) {
 	fooTbl
 }
 
-genAggModelVsPredTbl <- function(hashtagsTbl, ds=c(0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1.0,1.1,1.2,1.3,1.4,1.5,1.6,1.8,2,5,10,20), outFile='/tmp/modelVsPred.csv') {
+genAggModelVsPredTbl <- function(hashtagsTbl, ds=c(0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1.0,1.1,1.2,1.3,1.4,1.5,1.6,1.8,2,5,10,20), outFile='/tmp/modelVsPred.csv', config) {
+	modelHashtagsTbls = data.table()
 	genModelVsPredTbl <- function(hashtagsTbl, d, userScreenName) {
 		myLog(sprintf('generating model predictions for user %s', userScreenName))
 		modelHashtagsTbl = computeActsByUser(hashtagsTbl, d=d)
 		addMetrics(hashtagsTbl, modelHashtagsTbl)
 		modelVsPredTbl = getModelVsPredTbl(modelHashtagsTbl, hashtagsTbl)	
+		if (config$accumModelHashtagsTbl == T) modelHashtagsTbls <<- rbind(modelHashtagsTbls, modelHashtagsTbl)
 		rm(modelHashtagsTbl)
 		gc()
 		modelVsPredTbl
@@ -402,7 +404,7 @@ genAggModelVsPredTbl <- function(hashtagsTbl, ds=c(0,.1,.2,.3,.4,.5,.6,.7,.8,.9,
 	res[, cur_user_screen_name := NULL]
 	setkey(res, user_screen_name, DVName, d)
 	write.csv(res, row.names=F, file=outFile)
-	res
+	list(modelVsPredTbl=res, modelHashtagsTbl=modelHashtagsTbls)
 }
 
 visModelVsPredTbl <- function(modelVsPredTbl) {
@@ -454,13 +456,15 @@ runPrior <- function(query, config, getPostsFun, getHashtagsFun, ...) {
 	withProf({
 		postsTbl = getPostsFun(query)
 		hashtagsTbl = getHashtagsFun(postsTbl, config=config, ...)
-		modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl, ...)
-		modelVsPredTbl
+		res = genAggModelVsPredTbl(hashtagsTbl, config=config, ...)
+		modelVsPredTbl = res$modelVsPredTbl
+		modelHashtagsTbl = res$modelHashtagsTbl
+		list(modelVsPredTbl=modelVsPredTbl, modelHashtagsTbl=modelHashtagsTbl, hashtagsTbl=hashtagsTbl)
 	})
 }
 
-defaultTConfig = list(from='tokenText')
-defaultSOConfig = list(convertTagSynonymsP=F)
+defaultTConfig = list(from='tokenText', accumModelHashtagsTbl=F)
+defaultSOConfig = list(convertTagSynonymsP=F, accumModelHashtagsTbl=F)
 
 runPriorT <- function(query, config=defaultTConfig, ...) {
 	runPrior(query, config, getTweetsTbl, getHashtagsTbl, ...)
@@ -503,7 +507,7 @@ getQuerySOQ <- function(val) {
 		 join Users on Users.Id = foo2.Owner_User_Id
 		 where N > %d
 		 order by N asc
-		 limit 500)
+		 limit 100)
 		 ", val)
 }
 
@@ -661,14 +665,61 @@ compare2Runs <- function(modelVsPredTbl, runNums) {
 
 compareOptimalDs <- function(modelVsPredTbl) {
 	sumTbl = tableModelVsPredTbl(modelVsPredTbl)[, withCI(median), keyby=list(DVName, datasetGroup)]
-	print(ggplot(sumTbl, aes(x=factor(datasetGroup), y=meanVal, fill=DVName)) +
+	myLog(ggplot(sumTbl, aes(x=factor(datasetGroup), y=meanVal, fill=DVName)) +
 	      geom_bar(position=position_dodge(), stat='identity') +
 	      geom_errorbar(aes(ymin=minCI, ymax=maxCI), position=position_dodge(width=0.9), width=0.1, size=0.3))
 	sumTbl
 }
 
-analyzeModelVsPredTbl <- function(modelVsPredTbl) {
+# TODO: Find a library that implements this
+wrapQuotes <- function(charVect) {
+	paste(paste(c("'"), charVect, sep='', collapse="',"), "'", sep="", collapse="")
+}
+
+plotTemporal <- function(modelHashtagsTbl, hashtagsTbl) {
+	db = makeDB(do.call(function(x) sample(x, length(x)), list(unique(res$hashtagsTbl$hashtag))))
+	visHashtags(res$hashtagsTbl, db)
+	visCompare(res$hashtagsTbl, res$modelHashtagsTbl[topHashtagPost==T & d %in% c(0,20,.5,.8)], db)
+}
+
+analyzeTemporal <- function(modelVsPredTbl) {
 	modelVsPredTbl[, unique(datasetName)]
+	#screenTbl = modelVsPredTbl[datasetName=='SOQgt300r2'][, list(user_screen_name=wrapQuotes(sample(user_screen_name, 10))), by=list(datasetName, datasetType)]
+	#user_screen_names = screenTbl[, paste(user_screen_name, sep='', collapse=','), by=datasetType]
+	#user_screen_names = user_screen_names[, V1]
+	user_screen_names = c("'rickeysmiley','fashionista_com','laurenpope','mtvindia','officialrcti'")
+	res = runPriorT(sprintf("select * from tweets where user_screen_name in (%s)", user_screen_names), config=modConfig(defaultTConfig, list(accumModelHashtagsTbl=T)))
+	plotTemporal(res$modelHashtagsTbl, res$hashtagsTbl)
+	user_screen_names = c("'520957','238260','413225','807325','521180'")
+	res = runPriorSO(sprintf("select * from posts where post_type_id = 1 and owner_user_id in (%s)", user_screen_names), config=modConfig(defaultSOConfig, list(accumModelHashtagsTbl=T)))
+	plotTemporal(res$modelHashtagsTbl, res$hashtagsTbl)
+}
+
+analyzeModelVsPredTbl <- function(modelVsPredTbl) {
+	analyzeTemporal(modelVsPredTbl)
+	# Check that totN calculated makes sense. Result should be small.
+	modelVsPredTbl[topHashtag == T & d==0][, list(totN, sum(NCell)), by=list(user_screen_name,d,DVName, datasetName)][!is.na(totN)][,list(res=totN-V2)][, withCI(res)]
+	compare2DVs(modelVsPredTbl, c('topHashtagAct', 'topHashtagPost'))
+	compare2DVs(modelVsPredTbl, c('topHashtagPost', 'topHashtagPostOL2'))
+	modelVsPredTbl[, compare2DVs(.SD, c('topHashtagPost', 'topHashtagPostOL2')), by=list(datasetType, datasetGroup), .SDcols=colnames(modelVsPredTbl)]
+	modelVsPredTbl[DVName %in% c('topHashtagPost', 'topHashtagPostOL2'), compare2Runs(.SD, c(1,2)), by=list(datasetType, datasetGroup), .SDcols=colnames(modelVsPredTbl)]
+	compareOptimalDs(modelVsPredTbl[DVName %in% c('topHashtagPost', 'topHashtagPostOL2')])[, mean(meanVal), by=DVName]
+	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & datasetName=='TFollowgt10Mr2'])
+	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & datasetName=='TFollowgt1kr2'])
+	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & datasetName=='TTweetsgt5e4r2'])
+	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & datasetName=='TTweetsgt1e2r2'])
+	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & datasetName=='SOgt1kr2'])
+	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & datasetName=='SOgt100kr2'])
+	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & datasetName=='SOQgt050r2'])
+	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & datasetName=='SOQgt500r2'])
+	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostOL2' & datasetName=='SOQgt400r2' & d < 1])
+}
+
+curWS <- function() {
+	runTFollow1k()
+	test_dir(sprintf("%s/%s", PATH, 'tests'), reporter='summary')
+	tweetsTbl = getTweetsTbl("select * from tweets limit 100000")
+
 	compare2DVs(modelVsPredTbl, c('topHashtagAct', 'topHashtagPost'))
 	compare2DVs(modelVsPredTbl, c('topHashtagPost', 'topHashtagPostOL2'))
 	modelVsPredTbl[, compare2DVs(.SD, c('topHashtagPost', 'topHashtagPostOL2')), by=list(datasetType, datasetGroup), .SDcols=colnames(modelVsPredTbl)]
@@ -690,7 +741,7 @@ curWS <- function() {
 	test_dir(sprintf("%s/%s", PATH, 'tests'), reporter='summary')
 	tweetsTbl = getTweetsTbl("select * from tweets limit 100000")
 	tweetsTbl = getTweetsTbl("select * from tweets where user_screen_name='eddieizzard'")
-	runSOQgt100r2()
+	runSOQgt050r2()
 	# Checking that tweets for twitter users from each followers_count,statuses_count scale are being collected properly
 	usersWithTweetsTbl = data.table(sqldf("select distinct on (user_id) t.user_screen_name,u.followers_count,u.statuses_count from tweets as t join twitter_users as u on t.user_screen_name = u.user_screen_name"))
 	usersWithTweetsTbl
@@ -706,49 +757,12 @@ curWS <- function() {
 	tusersTbl = getTusersTbl()
 	tusersTbl
 	tusersTbl[order(rank, decreasing=T)][20000:30000][, plot(1:length(followers_count), followers_count)]
-	db = makeDB(do.call(function(x) sample(x, length(x)), list(unique(hashtagsTbl$hashtag))))
-	visHashtags(hashtagsTbl[user_screen_name=='chelseafc'], db)
-	visHashtags(modelHashtagsTbl[topHashtag==T,], db)
-	visCompare(hashtagsTbl[user_screen_name=='joelmchale'], modelHashtagsTbl[topHashtag==T & user_screen_name=='joelmchale',], db)
 
 	extremesTbl = summarizeExtremes(hashtagsTbl)
 	extremesTbl
-	Q
-
 	summarizeExtremes(hashtagsTbl[user_screen_name=='eddieizzard'])
-	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl[user_screen_name %in% unique(user_screen_name)[1:25]])
-	modelVsPredTblBig = modelVsPredTbl
-	modelVsPredTbl = genAggModelVsPredTbl(hashtagsTbl)
-	modelVsPredTbl
-	write.csv(modelVsPredTbl, sprintf('%s/tmp2.csv', PATH))
-	modelVsPredTbl = myReadCSV(modelVsPredOutFile('gt100k'))
-	modelVsPredTbl = myReadCSV(modelVsPredOutFile('gt1M'))
-	modelVsPredTbl = myReadCSV(modelVsPredOutFile('gt1Mr2'))
-	modelVsPredTbl = myReadCSV(modelVsPredOutFile('SOQgt050'))
+	
 	modelVsPredTbl = buildTables(file_path_sans_ext(list.files(path=modelVsPredDir())))
-
-
-	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost'])
-	modelVsPredTbl[topHashtag & hashtagUsedP & maxNP & DVName=='topHashtagPost']
-	tableModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost'])
-	tableModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostOL2'])
-	modelVsPredTbl[, user_screen_name, by=user_screen_name]
-	modelVsPredTbl[, list(f=unique(user_screen_name), !(unique(user_screen_name) %in% unique(modelVsPredTbl[hashtagUsedP==T,user_screen_name])))]
-	modelVsPredTbl[DVName=='topHashtagPost' & maxNP & topHashtag & hashtagUsedP][,hist(d)]
-	modelVsPredTbl[topHashtag == T][, list(totN, sum(NCell)), by=list(user_screen_name,d)]
-	# Check that totN calculated makes sense	
-	modelVsPredTbl[topHashtag == T][, list(totN, sum(NCell)), by=list(user_screen_name,d, DVName)][d==0][!is.na(totN)][,totN-V2]
-	setkey(modelVsPredTbl, user_screen_name)
-	modelVsPredTbl[topHashtag ==T & hashtagUsedP]
-	setkey(extremesTbl, user_screen_name)
-	setkey(modelVsPredTbl, user_screen_name, d)
-	modelVsPredTblBig[topHashtag & hashtagUsedP]
-	modelVsPredTblBig[topHashtag & hashtagUsedP][extremesTbl, allow.cartesian=T][d==0 | d==20]
-	tables()
-	foo2[foo1][, N-V1]
-	tables()
-	modelVsPredTblSmall[topHashtag==T & hashtagUsedP]
-	setkey(modelVsPredTbl, user_screen_name)
 
 	joinTbl = modelVsPredTblBig[topHashtag & hashtagUsedP][extremesTbl, allow.cartesian=T][maxNP==T]
 	joinTbl[, list(user_screen_name, best=N/totN, r=NRecency/totN, f=NFrequency/totN)][, list(user_screen_name, best-r, best-f)][, lapply(list(V2, V3), mean),]
