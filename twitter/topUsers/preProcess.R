@@ -719,27 +719,6 @@ curWS <- function() {
 	runTFollow1k()
 	test_dir(sprintf("%s/%s", PATH, 'tests'), reporter='summary')
 	tweetsTbl = getTweetsTbl("select * from tweets limit 100000")
-
-	compare2DVs(modelVsPredTbl, c('topHashtagAct', 'topHashtagPost'))
-	compare2DVs(modelVsPredTbl, c('topHashtagPost', 'topHashtagPostOL2'))
-	modelVsPredTbl[, compare2DVs(.SD, c('topHashtagPost', 'topHashtagPostOL2')), by=list(datasetType, datasetGroup), .SDcols=colnames(modelVsPredTbl)]
-	modelVsPredTbl[DVName %in% c('topHashtagPost', 'topHashtagPostOL2'), compare2Runs(.SD, c(1,2)), by=list(datasetType, datasetGroup), .SDcols=colnames(modelVsPredTbl)]
-	compareOptimalDs(modelVsPredTbl[DVName %in% c('topHashtagPost', 'topHashtagPostOL2')])[, mean(meanVal), by=DVName]
-	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & datasetName=='TFollowgt10Mr2'])
-	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & datasetName=='TFollowgt1kr2'])
-	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & datasetName=='TTweetsgt5e4r2'])
-	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & datasetName=='TTweetsgt1e2r2'])
-	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & datasetName=='SOgt1kr2'])
-	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & datasetName=='SOgt100kr2'])
-	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & datasetName=='SOQgt050r2'])
-	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & datasetName=='SOQgt400r2'])
-	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostOL2' & datasetName=='SOQgt400r2' & d < 1])
-}
-
-curWS <- function() {
-	runTFollow1k()
-	test_dir(sprintf("%s/%s", PATH, 'tests'), reporter='summary')
-	tweetsTbl = getTweetsTbl("select * from tweets limit 100000")
 	tweetsTbl = getTweetsTbl("select * from tweets where user_screen_name='eddieizzard'")
 	runSOQgt050r2()
 	# Checking that tweets for twitter users from each followers_count,statuses_count scale are being collected properly
