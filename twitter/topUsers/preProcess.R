@@ -728,8 +728,6 @@ curWS <- function() {
 	usersWithTweetsTbl[order(statuses_count), plot(log10(statuses_count))]
 	usersWithTweetsTbl[order(followers_count),][followers_count > 10000000]
 	tweetsTbl
-	#hashtagsTbl = getHashtagsTbl(tweetsTbl, from='text')
-	hashtagsTbl = getHashtagsTbl(tweetsTbl, from='tokenText')
 	hashtagsTbl
 	compareHashtagTbls()[N!=N.1]
 	getHashtagEntropy(hashtagsTbl)
