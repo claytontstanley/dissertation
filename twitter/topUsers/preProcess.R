@@ -1,3 +1,4 @@
+library(tools)
 library(RPostgreSQL)
 library(lavaan)
 library(Rmisc)
@@ -84,8 +85,8 @@ withKey <- function(tbl, conKey, thunk) {
 	thunk
 }
 
-myReadCSV <- function(file) {
-	data.table(read.csv(file, stringsAsFactors=F))
+myReadCSV <- function(file, ...) {
+	data.table(read.csv(file, stringsAsFactors=F, ...))
 }
 
 # Computing CIs around a variance statistic
@@ -405,37 +406,48 @@ genAggModelVsPredTbl <- function(hashtagsTbl, ds=c(0,.1,.2,.3,.4,.5,.6,.7,.8,.9,
 }
 
 visModelVsPredTbl <- function(modelVsPredTbl) {
-	myLog(ggplot(modelVsPredTbl[maxNP==T & topHashtag & hashtagUsedP], aes(totN, d)) +
-		   geom_point() +
-		   xlab('total number of hashtags for user'))
+	assign('p1', ggplot(modelVsPredTbl[maxNP==T & topHashtag & hashtagUsedP], aes(totN, d)) +
+	       geom_point() +
+	       xlab('total number of hashtags for user'))
 	modelVsPredTbl[topHashtag & hashtagUsedP, meanPC := mean(NCell/totN), by=user_screen_name]
 	modelVsPredTbl[topHashtag & hashtagUsedP, relPC := NCell/totN - mean(NCell/totN), by=user_screen_name]
 	modelVsPredTbl[topHashtag & hashtagUsedP, meanRelPC := mean(relPC), by=d]
+	assign('p2', ggplot(modelVsPredTbl[topHashtag & hashtagUsedP], aes(log(d),relPC)) +
+	       geom_point() +
+	       geom_line(aes(log(d), meanRelPC, group=user_screen_name[1])) +
+	       xlab('log(d)') +
+	       ylab('normalized mean for user'))
+	assign('p3', ggplot(modelVsPredTbl[topHashtag & hashtagUsedP & user_screen_name %in% sample(unique(user_screen_name), size=min(20, length(unique(user_screen_name))))],
+			    aes(log(d),NCell/totN, group=as.factor(user_screen_name))) + geom_line() +
+	       ylab('proportion correct'))
+	assign('p4', ggplot(modelVsPredTbl[topHashtag & hashtagUsedP & maxNP], aes(d)) +
+	       geom_histogram(aes(y = ..density..)) +
+	       geom_density())
 	dev.new()
-	myLog(ggplot(modelVsPredTbl[topHashtag & hashtagUsedP], aes(log(d),relPC)) +
-		   geom_point() +
-		   geom_line(aes(log(d), meanRelPC, group=user_screen_name[1])) +
-		   xlab('log(d)') +
-		   ylab('change in proportion correct from mean for user'))
+	myLog(p1)
 	dev.new()
-	myLog(ggplot(modelVsPredTbl[topHashtag & hashtagUsedP & user_screen_name %in% sample(unique(user_screen_name), size=min(20, length(unique(user_screen_name))))],
-			  aes(log(d),NCell/totN, group=as.factor(user_screen_name))) + geom_line() +
-		   ylab('proportion correct'))
+	myLog(p2)
 	dev.new()
-	myLog(ggplot(modelVsPredTbl[topHashtag & hashtagUsedP & maxNP], aes(d)) +
-		   geom_histogram(aes(y = ..density..)) +
-		   geom_density())
+	myLog(p3)
+	dev.new()
+	myLog(p4)
 }
 
 tableModelVsPredTbl <- function(modelVsPredTbl) {
 	# Summary table of optimal d values and sample variance
 	modelVsPredTbl[topHashtag & hashtagUsedP & maxNP][, list(mean=mean(d), median=median(d), totN=mean(totN), NCell=mean(NCell), acc=mean(NCell/totN),
+								 datasetName=datasetName[1],
+								 datasetGroup=datasetGroup[1],
 								 #sdCI=sqrt(CIVar(d)), sdCI1=sqrt(CIVar2(d)), meanCI=CI(d))
-								 sd=sd(d)), by=list(datasetName, DVName)]
+								 sd=sd(d)), by=list(datasetNameRoot, runNum, DVName)]
+}
+
+modelVsPredDir <- function() {
+	sprintf('%s/dissertationData/modelVsPred', PATH)
 }
 
 modelVsPredOutFile <- function(name) {
-	sprintf('%s/dissertationData/modelVsPred/%s.csv', PATH, name)
+	sprintf('%s/%s.csv', modelVsPredDir(), name)
 }
 
 runPrior <- function(query, config, getPostsFun, getHashtagsFun, ...) {
@@ -593,11 +605,84 @@ runSOQgt050r2 <- makeSORunr4(050, 'SOQgt050r2')
 
 buildTables <- function(outFileNames) {
 	buildTable <- function(outFileName) {
-		tbl = myReadCSV(modelVsPredOutFile(outFileName))
+		colClasses = c('character', 'logical', 'logical', 'numeric', 'integer', 'character', 'logical', 'integer')
+		tbl = myReadCSV(modelVsPredOutFile(outFileName), colClasses=colClasses)
 		tbl[, datasetName := outFileName]
 		tbl
 	}
-	rbindlist(lapply(outFileNames, buildTable))
+	addRunNum <- function(modelVsPredTbl) {
+		modelVsPredTbl[, runNum := 1]
+		modelVsPredTbl[grepl('r[0-9]$', datasetName), runNum := as.numeric(substr(datasetName, nchar(datasetName), nchar(datasetName)))]
+	}
+	addDatasetNameRoot <- function(modelVsPredTbl) {
+		modelVsPredTbl[, datasetNameRoot := datasetName]
+		modelVsPredTbl[grepl('r[0-9]$', datasetName), datasetNameRoot := substr(datasetName, 1, nchar(datasetName)-2)] 
+	}
+	addDatasetType <- function(modelVsPredTbl) {
+		modelVsPredTbl[, datasetType := 'unknown']
+		modelVsPredTbl[grepl('^SO', datasetName), datasetType := 'stackoverflow']
+		modelVsPredTbl[grepl('^T', datasetName), datasetType := 'twitter']
+	}
+	addDatasetGroup <- function(modelVsPredTbl) {
+		modelVsPredTbl[, datasetGroup := 'unknown']
+		modelVsPredTbl[grepl('^SOQ', datasetName), datasetGroup := 'topQuestions']
+		modelVsPredTbl[grepl('^SOg', datasetName), datasetGroup := 'topReputation']
+		modelVsPredTbl[grepl('^TT', datasetName), datasetGroup := 'topTweets']
+		modelVsPredTbl[grepl('^TF', datasetName), datasetGroup := 'topFollowers']
+	}
+	modelVsPredTbl = rbindlist(lapply(outFileNames, buildTable))
+	addRunNum(modelVsPredTbl)
+	addDatasetNameRoot(modelVsPredTbl)
+	addDatasetType(modelVsPredTbl)
+	modelVsPredTbl[datasetType != 'unknown']
+}
+
+withCI <- function(dat) {
+	res = CI(dat)
+	list(N=length(dat), meanVal=res[2], minCI=res[1], maxCI=res[3])
+}
+
+genComparisonTbl <- function(resTbl) {
+	resTbl[!is.na(diff), withCI(diff), by=list(direction, DVName)]
+}
+
+compare2DVs <- function(modelVsPredTbl, DVs) {
+	sumTbl = tableModelVsPredTbl(modelVsPredTbl[DVName %in% DVs,])
+	setkey(sumTbl, datasetName, DVName)
+	sumTbl[, list(diff=acc[2]-acc[1], direction=paste(DVName[2], '-', DVName[1])), by=datasetName][, DVName := ''][, genComparisonTbl(.SD)]
+}
+
+compare2Runs <- function(modelVsPredTbl, runNums) {
+	modelVsPredTbl
+	sumTbl = tableModelVsPredTbl(modelVsPredTbl[runNum %in% runNums])
+	setkey(sumTbl, datasetNameRoot, DVName, runNum)
+	sumTbl[, list(diff=acc[2]-acc[1], direction=paste(runNums[2], '-', runNums[1])), by=list(datasetNameRoot, DVName)][, genComparisonTbl(.SD)]
+}
+
+compareOptimalDs <- function(modelVsPredTbl) {
+	sumTbl = tableModelVsPredTbl(modelVsPredTbl)[, withCI(median), keyby=list(DVName, datasetGroup)]
+	print(ggplot(sumTbl, aes(x=factor(datasetGroup), y=meanVal, fill=DVName)) +
+	      geom_bar(position=position_dodge(), stat='identity') +
+	      geom_errorbar(aes(ymin=minCI, ymax=maxCI), position=position_dodge(width=0.9), width=0.1, size=0.3))
+	sumTbl
+}
+
+analyzeModelVsPredTbl <- function(modelVsPredTbl) {
+	modelVsPredTbl[, unique(datasetName)]
+	compare2DVs(modelVsPredTbl, c('topHashtagAct', 'topHashtagPost'))
+	compare2DVs(modelVsPredTbl, c('topHashtagPost', 'topHashtagPostOL2'))
+	modelVsPredTbl[, compare2DVs(.SD, c('topHashtagPost', 'topHashtagPostOL2')), by=list(datasetType, datasetGroup), .SDcols=colnames(modelVsPredTbl)]
+	modelVsPredTbl[DVName %in% c('topHashtagPost', 'topHashtagPostOL2'), compare2Runs(.SD, c(1,2)), by=list(datasetType, datasetGroup), .SDcols=colnames(modelVsPredTbl)]
+	compareOptimalDs(modelVsPredTbl[DVName %in% c('topHashtagPost', 'topHashtagPostOL2')])[, mean(meanVal), by=DVName]
+	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & datasetName=='TFollowgt10Mr2'])
+	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & datasetName=='TFollowgt1kr2'])
+	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & datasetName=='TTweetsgt5e4r2'])
+	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & datasetName=='TTweetsgt1e2r2'])
+	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & datasetName=='SOgt1kr2'])
+	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & datasetName=='SOgt100kr2'])
+	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & datasetName=='SOQgt050r2'])
+	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & datasetName=='SOQgt400r2'])
+	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostOL2' & datasetName=='SOQgt400r2' & d < 1])
 }
 
 curWS <- function() {
@@ -640,21 +725,13 @@ curWS <- function() {
 	modelVsPredTbl = myReadCSV(modelVsPredOutFile('gt1M'))
 	modelVsPredTbl = myReadCSV(modelVsPredOutFile('gt1Mr2'))
 	modelVsPredTbl = myReadCSV(modelVsPredOutFile('SOQgt050'))
-	modelVsPredTbl = buildTables(c('gt100k', 'gt1M', 'gt1Mr2', 'gt10M'))
-	modelVsPredTbl = buildTables(c('gt1k', 'gt1kr2', 'gt10k', 'gt10kr2', 'gt100k', 'gt100kr2', 'gt1M', 'gt1Mr2', 'gt10M', 'gt10Mr2', 'SOgt100k', 'SOgt10k', 'SOgt1k'))
-	modelVsPredTbl = buildTables(c(paste(rep(paste('SOQgt', c('050', '100', '200', '300', '400', '500'), sep=""), each=2), c('', 'r2'), sep=''),
-				       paste(rep(paste('SOgt', c('500', '1k', '5k', '10k', '50k', '100k'), sep=""), each=2), c('', 'r2'), sep='')))
-	modelVsPredTbl = buildTables(c('gt1kr2', 'gt10kr2', 'gt100kr2', 'gt1Mr2', 'gt10Mr2',
-				       'SOgt500', 'SOgt1k', 'SOgt5k', 'SOgt10k', 'SOgt50k', 'SOgt100k',
-				       'SOQgt050', 'SOQgt100', 'SOQgt200', 'SOQgt300', 'SOQgt400', 'SOQgt500'))
-	modelVsPredTbl
-	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagRank'][user_screen_name %in% sample(unique(user_screen_name), size=10)], hashtagsTbl)
-	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & !(user_screen_name %in% c('cokguzelhareket', 'pmoindia')),], hashtagsTbl)
-	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & !(user_screen_name %in% lowUsers)], hashtagsTbl)
+	modelVsPredTbl = buildTables(file_path_sans_ext(list.files(path=modelVsPredDir())))
+
+
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost'])
-	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & datasetName=='SOQgt500'])
 	modelVsPredTbl[topHashtag & hashtagUsedP & maxNP & DVName=='topHashtagPost']
 	tableModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost'])
+	tableModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostOL2'])
 	modelVsPredTbl[, user_screen_name, by=user_screen_name]
 	modelVsPredTbl[, list(f=unique(user_screen_name), !(unique(user_screen_name) %in% unique(modelVsPredTbl[hashtagUsedP==T,user_screen_name])))]
 	modelVsPredTbl[DVName=='topHashtagPost' & maxNP & topHashtag & hashtagUsedP][,hist(d)]
