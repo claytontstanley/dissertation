@@ -638,6 +638,7 @@ buildTables <- function(outFileNames) {
 	addRunNum(modelVsPredTbl)
 	addDatasetNameRoot(modelVsPredTbl)
 	addDatasetType(modelVsPredTbl)
+	addDatasetGroup(modelVsPredTbl)
 	modelVsPredTbl[datasetType != 'unknown']
 }
 
@@ -696,6 +697,7 @@ analyzeTemporal <- function(modelVsPredTbl) {
 }
 
 analyzeModelVsPredTbl <- function(modelVsPredTbl) {
+	modelVsPredTbl
 	analyzeTemporal(modelVsPredTbl)
 	# Check that totN calculated makes sense. Result should be small.
 	modelVsPredTbl[topHashtag == T & d==0][, list(totN, sum(NCell)), by=list(user_screen_name,d,DVName, datasetName)][!is.na(totN)][,list(res=totN-V2)][, withCI(res)]
