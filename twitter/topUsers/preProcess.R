@@ -372,7 +372,6 @@ getModelVsPredTbl <- function(modelHashtagsTbl, hashtagsTbl) {
 
 compareModelVsExtreme <-function(modelHashtagsTbl, extremesTbl) {
 	modelHashtagsTbl[d==20][topHashtag==T]
-	tables()
 	setkey(extremesTbl, user_screen_name, dt, hashtag)
 	extremesTbl
 	modelHashtagsTbl
@@ -719,6 +718,8 @@ analyzeModelVsPredTbl <- function(modelVsPredTbl) {
 
 curWS <- function() {
 	runTFollow1k()
+	.ls.objects(order.by='Size')
+	tables()
 	test_dir(sprintf("%s/%s", PATH, 'tests'), reporter='summary')
 	tweetsTbl = getTweetsTbl("select * from tweets limit 100000")
 	tweetsTbl = getTweetsTbl("select * from tweets where user_screen_name='eddieizzard'")
