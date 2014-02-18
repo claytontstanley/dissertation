@@ -425,13 +425,13 @@ visModelVsPredTbl <- function(modelVsPredTbl) {
 	       geom_histogram(aes(y = ..density..)) +
 	       geom_density())
 	dev.new()
-	myLog(p1)
+	myPlotPrint(p1)
 	dev.new()
-	myLog(p2)
+	myPlotPrint(p2)
 	dev.new()
-	myLog(p3)
+	myPlotPrint(p3)
 	dev.new()
-	myLog(p4)
+	myPlotPrint(p4)
 }
 
 tableModelVsPredTbl <- function(modelVsPredTbl) {
@@ -671,9 +671,9 @@ compare2Runs <- function(modelVsPredTbl, runNums) {
 plotBarSumTbl <- function(sumTbl, fillCol) {
 	fillCol = substitute(fillCol)
 	dev.new()
-	expr = bquote(myLog(ggplot(sumTbl, aes(x=factor(datasetGroup), y=meanVal, fill=.(fillCol))) +
-			    geom_bar(position=position_dodge(), stat='identity') +
-			    geom_errorbar(aes(ymin=minCI, ymax=maxCI), position=position_dodge(width=0.9), width=0.1, size=0.3)))
+	expr = bquote(myPlotPrint(ggplot(sumTbl, aes(x=factor(datasetGroup), y=meanVal, fill=.(fillCol))) +
+				  geom_bar(position=position_dodge(), stat='identity') +
+				  geom_errorbar(aes(ymin=minCI, ymax=maxCI), position=position_dodge(width=0.9), width=0.1, size=0.3)))
 	eval(expr)
 	sumTbl
 }
