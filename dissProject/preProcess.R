@@ -192,7 +192,7 @@ getPostsTbl <- function(sqlStr) {
 	postsTbl
 }
 
-getHashtagsTbl <- function(tweetsTbl, config, ...) {
+getHashtagsTbl <- function(tweetsTbl, config) {
 	from = config$from
 	tokenizedTbl = getTokenizedTbl(tweetsTbl, from=from, regex='\\S+')
 	htOfTokenizedTbl = tokenizedTbl[grepl('^#', chunk),]
@@ -202,7 +202,7 @@ getHashtagsTbl <- function(tweetsTbl, config, ...) {
 	hashtagsTbl
 }
 
-getTagsTbl <- function(postsTbl, config, ...) {
+getTagsTbl <- function(postsTbl, config) {
 	tokenizedTbl = getTokenizedTbl(postsTbl, from='tagsNoHtml', regex='(?<=<)[^>]+(?=>)')
 	if (config$convertTagSynonymsP) {
 		withKey(tokenizedTbl, chunk,
@@ -455,26 +455,33 @@ modelVsPredOutFile <- function(name) {
 	sprintf('%s/%s.csv', modelVsPredDir(), name)
 }
 
-runPrior <- function(query, config, getPostsFun, getHashtagsFun, ...) {
+runPrior <- function(config) {
 	withProf({
-		postsTbl = getPostsFun(query)
-		hashtagsTbl = getHashtagsFun(postsTbl, config=config, ...)
-		res = genAggModelVsPredTbl(hashtagsTbl, config=config, ...)
+		postsTbl = config$getPostsFun(config$query)
+		hashtagsTbl = config$getHashtagsFun(postsTbl, config=config)
+		res = genAggModelVsPredTbl(hashtagsTbl, config=config)
 		modelVsPredTbl = res$modelVsPredTbl
 		modelHashtagsTbl = res$modelHashtagsTbl
 		list(modelVsPredTbl=modelVsPredTbl, modelHashtagsTbl=modelHashtagsTbl, hashtagsTbl=hashtagsTbl)
 	})
 }
 
-defaultTConfig = list(from='tokenText', accumModelHashtagsTbl=F)
-defaultSOConfig = list(convertTagSynonymsP=F, accumModelHashtagsTbl=F)
+defaultTConfig = list(from='tokenText',
+		      accumModelHashtagsTbl=F,
+		      getPostsFun=getTweetsTbl,
+		      getHashtagsFun=getHashtagsTbl)
 
-runPriorT <- function(query, config=defaultTConfig, ...) {
-	runPrior(query, config, getTweetsTbl, getHashtagsTbl, ...)
+defaultSOConfig = list(convertTagSynonymsP=F,
+		       accumModelHashtagsTbl=F,
+		       getPostsFun=getPostsTbl,
+		       getHashtagsFun=getTagsTbl)
+
+runPriorT <- function(config=defaultTConfig) {
+	runPrior(config)
 }
 
-runPriorSO <- function(query, config=defaultSOConfig, ...) {
-	runPrior(query, config, getPostsTbl, getTagsTbl, ...)
+runPriorSO <- function(config=defaultSOConfig) {
+	runPrior(config)
 }
 
 modConfig <- function(config, mods) {
@@ -526,8 +533,8 @@ getQueryTStatusesNoRT <- function(val, filters='1=1') {
 	getQueryTStatuses(val, filters=combineFilters("retweeted = 'False'", filters))
 }
 
-makeTRun <- function(val, outFileName, config, ...) {
-	function() runPriorT(config$query(val), outFile=modelVsPredOutFile(outFileName), config=config, ...)
+makeTRun <- function(val, outFileName, config) {
+	function() runPriorT(outFile=modelVsPredOutFile(outFileName), config=modConfig(config, query=config$query(val)))
 }
 
 makeTRunr1 <- function(val, outFileName, ...) {
@@ -571,8 +578,8 @@ runTTweets1e4r2 <- makeTRunr4(10000, 'TTweetsgt1e4r2')
 runTTweets5e4 <- makeTRunr3(50000, 'TTweetsgt5e4', filters="user_screen_name != 'stanhjerleid'")
 runTTweets5e4r2 <- makeTRunr4(50000, 'TTweetsgt5e4r2', filters="user_screen_name != 'stanhjerleid'")
 
-makeSORun <- function(val, outFileName, config, ...) {
-	runFun = function() runPriorSO(config$query(val), outFile=modelVsPredOutFile(outFileName), config=config, ...)
+makeSORun <- function(val, outFileName, config) {
+	runFun = function() runPriorSO(outFile=modelVsPredOutFile(outFileName), config=modConfig(config, query=config$query(val)))
 	runFun
 }
 
@@ -716,11 +723,14 @@ analyzeTemporal <- function(modelVsPredTbl) {
 	#user_screen_names = screenTbl[, paste(user_screen_name, sep='', collapse=','), by=datasetType]
 	#user_screen_names = user_screen_names[, V1]
 	user_screen_names = c("'rickeysmiley','fashionista_com','laurenpope','mtvindia','officialrcti'")
-	runTbls = runPriorT(sprintf("select * from tweets where user_screen_name in (%s)", user_screen_names), config=modConfig(defaultTConfig, list(accumModelHashtagsTbl=T)))
+	user_screen_names = c("'fashionista_com'")
+	runTbls = runPriorT(config=modConfig(defaultTConfig, list(accumModelHashtagsTbl=T,
+								  query=sprintf("select * from tweets where user_screen_name in (%s)", user_screen_names))))
 	plotTemporal(runTbls$modelHashtagsTbl, runTbls$hashtagsTbl)
 	user_screen_names = c("'520957','238260','413225','807325','521180'")
 	user_screen_names = c("'520957'")
-	runTbls = runPriorSO(sprintf("select * from posts where post_type_id = 1 and owner_user_id in (%s)", user_screen_names), config=modConfig(defaultSOConfig, list(accumModelHashtagsTbl=T)))
+	runTbls = runPriorSO(config=modConfig(defaultSOConfig, list(accumModelHashtagsTbl=T,
+								    query=sprintf("select * from posts where post_type_id = 1 and owner_user_id in (%s)", user_screen_names))))
 	plotTemporal(runTbls$modelHashtagsTbl, runTbls$hashtagsTbl)
 }
 
