@@ -672,11 +672,12 @@ compare2Runs <- function(modelVsPredTbl, runNums) {
 	sumTbl[, list(diff=acc[2]-acc[1], direction=paste(runNums[2], '-', runNums[1])), by=list(datasetNameRoot, DVName, user_screen_name)][, genComparisonTbl(.SD)]
 }
 
-plotBarSumTbl <- function(sumTbl, fillCol) {
+plotBarSumTbl <- function(sumTbl, fillCol, figName) {
 	fillCol = substitute(fillCol)
 	expr = bquote(myPlotPrint(ggplot(sumTbl, aes(x=factor(datasetGroup), y=meanVal, fill=.(fillCol))) +
 				  geom_bar(position=position_dodge(), stat='identity') +
-				  geom_errorbar(aes(ymin=minCI, ymax=maxCI), position=position_dodge(width=0.9), width=0.1, size=0.3)))
+				  geom_errorbar(aes(ymin=minCI, ymax=maxCI), position=position_dodge(width=0.9), width=0.1, size=0.3),
+				  figName))
 	eval(expr)
 	sumTbl
 }
@@ -685,15 +686,15 @@ compareMeanDV <- function(modelVsPredTbl, DV) {
 	DV = substitute(DV)
 	expr = bquote(tableModelVsPredTbl(modelVsPredTbl)[, withCI(.(DV)), keyby=list(DVName, datasetGroup)])
 	sumTbl = eval(expr)
-	plotBarSumTbl(sumTbl, DVName)
+	plotBarSumTbl(sumTbl, DVName, sprintf('compareMeanDV-%s', deparse(DV)))
 }
 
 plotDVDiffs <- function(sumTbl) {
-	plotBarSumTbl(sumTbl, direction)
+	plotBarSumTbl(sumTbl, direction, sprintf('compareDVDiffs'))
 }
 
 plotRunDiffs <- function(sumTbl) {
-	plotBarSumTbl(sumTbl, DVName)
+	plotBarSumTbl(sumTbl, DVName, sprintf('compareRunDiffs'))
 }
 
 compareOptimalDs <- function(modelVsPredTbl) compareMeanDV(modelVsPredTbl, median)
