@@ -61,9 +61,13 @@ myLog <- function(str, forLogLevel=1) {
 	if (logLevel >= forLogLevel) print(str)
 }
 
-myPlotPrint <- function(fig) {
+savePlotsP = T
+
+myPlotPrint <- function(fig, name) {
 	dev.new()
 	myLog(fig)
+	if (savePlotsP) ggsave(filename=sprintf('%s/figures/%s.pdf', PATH, name), plot=fig)
+	fig
 }
 
 # ref: http://stackoverflow.com/questions/5060076/convert-html-character-entity-encoding-in-r
@@ -280,13 +284,13 @@ computeActsByUser <- function(hashtagsTbl, ds) {
 	res
 }
 
-visHashtags <- function(hashtagsTbl, db) {
+visHashtags <- function(hashtagsTbl) {
 	plots = hashtagsTbl[, list(resPlots=list(ggplot(.SD, aes(x=hashtag, y=dt)) + geom_point())), by=user_screen_name]
-	plots[, myPlotPrint(resPlots), by=user_screen_name]
+	plots[, list(myPlotPrint(resPlots[[1]], sprintf('HTByTime-%s', .BY[1]))), by=user_screen_name]
 	plots
 }
 
-visCompare <- function(hashtagsTbl, modelHashtagsTbl, db) {
+visCompare <- function(hashtagsTbl, modelHashtagsTbl) {
 	expect_that(sort(unique(hashtagsTbl$user_screen_name)), is_equivalent_to(sort(unique(modelHashtagsTbl$user_screen_name))))
 	plotBuildFun <- function(modelHashtagsTbl) {
 		list(resPlots=list(ggplot(hashtagsTbl, aes(x=hashtag, y=dt)) +
@@ -294,7 +298,7 @@ visCompare <- function(hashtagsTbl, modelHashtagsTbl, db) {
 				   geom_point(data=modelHashtagsTbl, aes(x=hashtag, y=dt), colour="red", size=1)))
 	}
 	plots = modelHashtagsTbl[, plotBuildFun(.SD), by=list(user_screen_name, d)]
-	plots[, myPlotPrint(resPlots), by=list(user_screen_name, d)]
+	plots[, list(myPlotPrint(resPlots[[1]], sprintf('HTMByTime-%s-%s', .BY[1], .BY[2]))), by=list(user_screen_name, d)]
 	plots
 }
 
@@ -700,9 +704,8 @@ wrapQuotes <- function(charVect) {
 }
 
 plotTemporal <- function(modelHashtagsTbl, hashtagsTbl) {
-	db = makeDB(do.call(function(x) sample(x, length(x)), list(unique(hashtagsTbl$hashtag))))
-	visHashtags(hashtagsTbl, db)
-	visCompare(hashtagsTbl, modelHashtagsTbl[topHashtagPost==T & d %in% c(0,20,.8)], db)
+	visHashtags(hashtagsTbl)
+	visCompare(hashtagsTbl, modelHashtagsTbl[topHashtagPost==T & d %in% c(0,20,.8)])
 }
 
 analyzeTemporal <- function(modelVsPredTbl) {
