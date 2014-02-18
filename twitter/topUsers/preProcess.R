@@ -437,10 +437,10 @@ visModelVsPredTbl <- function(modelVsPredTbl) {
 tableModelVsPredTbl <- function(modelVsPredTbl) {
 	# Summary table of optimal d values and sample variance
 	modelVsPredTbl[predUsedBest == T][, list(mean=mean(d), median=median(d), totN=mean(totN), NCell=mean(NCell), acc=mean(NCell/totN),
-					    datasetName=datasetName[1],
-					    datasetGroup=datasetGroup[1],
-					    #sdCI=sqrt(CIVar(d)), sdCI1=sqrt(CIVar2(d)), meanCI=CI(d))
-					    sd=sd(d)), by=list(datasetNameRoot, runNum, DVName)]
+						 datasetName=datasetName[1],
+						 datasetGroup=datasetGroup[1],
+						 #sdCI=sqrt(CIVar(d)), sdCI1=sqrt(CIVar2(d)), meanCI=CI(d))
+						 sd=sd(d)), by=list(datasetNameRoot, runNum, DVName)]
 }
 
 modelVsPredDir <- function() {
@@ -507,7 +507,7 @@ getQuerySOQ <- function(val) {
 		 where N > %d
 		 order by N asc
 		 limit 100)
-		 ", val)
+		", val)
 }
 
 combineFilters <- function(f1, f2) {
@@ -702,9 +702,9 @@ wrapQuotes <- function(charVect) {
 }
 
 plotTemporal <- function(modelHashtagsTbl, hashtagsTbl) {
-	db = makeDB(do.call(function(x) sample(x, length(x)), list(unique(res$hashtagsTbl$hashtag))))
-	visHashtags(res$hashtagsTbl, db)
-	visCompare(res$hashtagsTbl, res$modelHashtagsTbl[topHashtagPost==T & d %in% c(0,20,.5,.8)], db)
+	db = makeDB(do.call(function(x) sample(x, length(x)), list(unique(hashtagsTbl$hashtag))))
+	visHashtags(hashtagsTbl, db)
+	visCompare(hashtagsTbl, modelHashtagsTbl[topHashtagPost==T & d %in% c(0,20,.5,.8)], db)
 }
 
 analyzeTemporal <- function(modelVsPredTbl) {
@@ -713,11 +713,11 @@ analyzeTemporal <- function(modelVsPredTbl) {
 	#user_screen_names = screenTbl[, paste(user_screen_name, sep='', collapse=','), by=datasetType]
 	#user_screen_names = user_screen_names[, V1]
 	user_screen_names = c("'rickeysmiley','fashionista_com','laurenpope','mtvindia','officialrcti'")
-	res = runPriorT(sprintf("select * from tweets where user_screen_name in (%s)", user_screen_names), config=modConfig(defaultTConfig, list(accumModelHashtagsTbl=T)))
-	plotTemporal(res$modelHashtagsTbl, res$hashtagsTbl)
+	runTbls = runPriorT(sprintf("select * from tweets where user_screen_name in (%s)", user_screen_names), config=modConfig(defaultTConfig, list(accumModelHashtagsTbl=T)))
+	plotTemporal(runTbls$modelHashtagsTbl, runTbls$hashtagsTbl)
 	user_screen_names = c("'520957','238260','413225','807325','521180'")
-	res = runPriorSO(sprintf("select * from posts where post_type_id = 1 and owner_user_id in (%s)", user_screen_names), config=modConfig(defaultSOConfig, list(accumModelHashtagsTbl=T)))
-	plotTemporal(res$modelHashtagsTbl, res$hashtagsTbl)
+	runTbls = runPriorSO(sprintf("select * from posts where post_type_id = 1 and owner_user_id in (%s)", user_screen_names), config=modConfig(defaultSOConfig, list(accumModelHashtagsTbl=T)))
+	plotTemporal(runTbls$modelHashtagsTbl, runTbls$hashtagsTbl)
 }
 
 analyzeModelVsPredTbl <- function(modelVsPredTbl) {
@@ -769,7 +769,7 @@ curWS <- function() {
 	extremesTbl = summarizeExtremes(hashtagsTbl)
 	extremesTbl
 	summarizeExtremes(hashtagsTbl[user_screen_name=='eddieizzard'])
-	
+
 	modelVsPredTbl = buildTables(file_path_sans_ext(list.files(path=modelVsPredDir())))
 
 	joinTbl = modelVsPredTblBig[topHashtag & hashtagUsedP][extremesTbl, allow.cartesian=T][maxNP==T]
