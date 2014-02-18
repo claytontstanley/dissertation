@@ -168,8 +168,10 @@ getDiffTimeSinceFirst <- function(ts) {
 	as.numeric(difftime(ts, ts[1], units='secs'))
 }
 
-getTweetsTbl <- function(sqlStr="select * from tweets limit 10000") {
+getTweetsTbl <- function(sqlStr="select * from tweets limit 10000", config) {
 	tweetsTbl = data.table(sqldf(sqlStr))
+	stopifnot(sort(unique(tweetsTbl$retweeted)) == c('False', 'True'))
+	if (!config$includeRetweetsP) tweetsTbl = tweetsTbl[retweeted == 'False']
 	addTokenText(tweetsTbl, from='text')
 	setkey(tweetsTbl, id)
 	tweetsTbl[, dt := getDiffTimeSinceFirst(created_at), by=user_screen_name]
@@ -182,7 +184,7 @@ getTagSynonymsTbl <- function(sqlStr='select * from tag_synonyms') {
 	tagSynonymsTbl
 }
 
-getPostsTbl <- function(sqlStr) {
+getPostsTbl <- function(sqlStr, config) {
 	postsTbl = data.table(sqldf(sqlStr))
 	setkey(postsTbl, id)
 	stopifnot(!duplicated(postsTbl$id))
@@ -457,7 +459,7 @@ modelVsPredOutFile <- function(name) {
 
 runPrior <- function(config) {
 	withProf({
-		postsTbl = config$getPostsFun(config$query)
+		postsTbl = config$getPostsFun(config$query, config=config)
 		hashtagsTbl = config$getHashtagsFun(postsTbl, config=config)
 		res = genAggModelVsPredTbl(hashtagsTbl, config=config)
 		modelVsPredTbl = res$modelVsPredTbl
@@ -469,9 +471,10 @@ runPrior <- function(config) {
 defaultTConfig = list(from='tokenText',
 		      accumModelHashtagsTbl=F,
 		      getPostsFun=getTweetsTbl,
-		      getHashtagsFun=getHashtagsTbl)
+		      getHashtagsFun=getHashtagsTbl,
+		      includeRetweetsP=F)
 
-defaultSOConfig = list(convertTagSynonymsP=F,
+defaultSOConfig = list(convertTagSynonymsP=T,
 		       accumModelHashtagsTbl=F,
 		       getPostsFun=getPostsTbl,
 		       getHashtagsFun=getTagsTbl)
@@ -521,16 +524,8 @@ getQuerySOQ <- function(val) {
 		", val)
 }
 
-combineFilters <- function(f1, f2) {
+combineFilters <- function(f1, f2='1=1') {
 	paste(f1, f2, sep=' and ')
-}
-
-getQueryTNoRT <- function(val, filters='1=1') {
-	getQueryT(val, filters=combineFilters("retweeted = 'False'", filters))
-}
-
-getQueryTStatusesNoRT <- function(val, filters='1=1') {
-	getQueryTStatuses(val, filters=combineFilters("retweeted = 'False'", filters))
 }
 
 makeTRun <- function(val, outFileName, config) {
@@ -538,19 +533,19 @@ makeTRun <- function(val, outFileName, config) {
 }
 
 makeTRunr1 <- function(val, outFileName, ...) {
-	makeTRun(val, outFileName, config=modConfig(defaultTConfig, list(query=function(val) getQueryT(val, ...))))
+	makeTRun(val, outFileName, config=modConfig(defaultTConfig, list(query=function(val) getQueryT(val, ...), includeRetweetsP=T)))
 }
 
 makeTRunr2 <- function(val, outFileName, ...) {
-	makeTRun(val, outFileName, config=modConfig(defaultTConfig, list(query=function(val) getQueryTNoRT(val, ...))))
+	makeTRun(val, outFileName, config=modConfig(defaultTConfig, list(query=function(val) getQueryT(val, ...), includeRetweetsP=F)))
 }
 
 makeTRunr3 <- function(val, outFileName, ...) {
-	makeTRun(val, outFileName, config=modConfig(defaultTConfig, list(query=function(val) getQueryTStatuses(val, ...))))
+	makeTRun(val, outFileName, config=modConfig(defaultTConfig, list(query=function(val) getQueryTStatuses(val, ...), includeRetweetsP=T)))
 }
 
 makeTRunr4 <- function(val, outFileName, ...) {
-	makeTRun(val, outFileName, config=modConfig(defaultTConfig, list(query=function(val) getQueryTStatusesNoRT(val, ...))))
+	makeTRun(val, outFileName, config=modConfig(defaultTConfig, list(query=function(val) getQueryTStatuses(val, ...), includeRetweetsP=F)))
 }
 
 runTFollow1k <- makeTRunr1(1000, 'TFollowgt1k')
