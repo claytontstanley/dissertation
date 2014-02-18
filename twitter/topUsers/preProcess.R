@@ -61,6 +61,11 @@ myLog <- function(str, forLogLevel=1) {
 	if (logLevel >= forLogLevel) print(str)
 }
 
+myPlotPrint <- function(fig) {
+	dev.new()
+	myLog(fig)
+}
+
 # ref: http://stackoverflow.com/questions/5060076/convert-html-character-entity-encoding-in-r
 html2txt <- function(str) {
 	xpathApply(htmlParse(str, asText=TRUE),
@@ -276,23 +281,21 @@ computeActsByUser <- function(hashtagsTbl, ds) {
 }
 
 visHashtags <- function(hashtagsTbl, db) {
-	hashtagsTbl[, {dev.new(); plot(dt, main=user_screen_name)}, by=user_screen_name]
-	hashtagsTbl[, {dev.new(); plot(getHashes(hashtag, db), dt, main=user_screen_name)}, by=user_screen_name]
+	plots = hashtagsTbl[, list(resPlots=list(ggplot(.SD, aes(x=hashtag, y=dt)) + geom_point())), by=user_screen_name]
+	plots[, myPlotPrint(resPlots), by=user_screen_name]
+	plots
 }
 
 visCompare <- function(hashtagsTbl, modelHashtagsTbl, db) {
 	expect_that(sort(unique(hashtagsTbl$user_screen_name)), is_equivalent_to(sort(unique(modelHashtagsTbl$user_screen_name))))
-	plotDFun <- function(hashtagsTbl, modelHashtagsTbl, userScreenName, d) {
-		dev.new()
-		with(hashtagsTbl, plot(getHashes(hashtag, db), dt, main=sprintf('%s, %f', userScreenName, d)))
-		with(modelHashtagsTbl, lines(getHashes(hashtag, db), dt, col='red', typ='p', pch=4, cex=.1))
+	plotBuildFun <- function(modelHashtagsTbl) {
+		list(resPlots=list(ggplot(hashtagsTbl, aes(x=hashtag, y=dt)) +
+				   geom_point() + 
+				   geom_point(data=modelHashtagsTbl, aes(x=hashtag, y=dt), colour="red", size=1)))
 	}
-	plotFun <- function(hashtagsTbl, modelHashtagsTbl, userScreenName) {
-		modelHashtagsTbl[, plotDFun(hashtagsTbl, .SD, userScreenName, d), by=d]
-
-	}
-	lapply(unique(hashtagsTbl$user_screen_name), function(usr) plotFun(hashtagsTbl[user_screen_name==usr], modelHashtagsTbl[user_screen_name==usr], usr))
-	return()
+	plots = modelHashtagsTbl[, plotBuildFun(.SD), by=list(user_screen_name, d)]
+	plots[, myPlotPrint(resPlots), by=list(user_screen_name, d)]
+	plots
 }
 
 addMetrics <- function(hashtagsTbl, modelHashtagsTbl) {
@@ -424,13 +427,9 @@ visModelVsPredTbl <- function(modelVsPredTbl) {
 	assign('p4', ggplot(modelVsPredTbl[predUsedBest == T], aes(d)) +
 	       geom_histogram(aes(y = ..density..)) +
 	       geom_density())
-	dev.new()
 	myPlotPrint(p1)
-	dev.new()
 	myPlotPrint(p2)
-	dev.new()
 	myPlotPrint(p3)
-	dev.new()
 	myPlotPrint(p4)
 }
 
@@ -670,7 +669,6 @@ compare2Runs <- function(modelVsPredTbl, runNums) {
 
 plotBarSumTbl <- function(sumTbl, fillCol) {
 	fillCol = substitute(fillCol)
-	dev.new()
 	expr = bquote(myPlotPrint(ggplot(sumTbl, aes(x=factor(datasetGroup), y=meanVal, fill=.(fillCol))) +
 				  geom_bar(position=position_dodge(), stat='identity') +
 				  geom_errorbar(aes(ymin=minCI, ymax=maxCI), position=position_dodge(width=0.9), width=0.1, size=0.3)))
@@ -704,7 +702,7 @@ wrapQuotes <- function(charVect) {
 plotTemporal <- function(modelHashtagsTbl, hashtagsTbl) {
 	db = makeDB(do.call(function(x) sample(x, length(x)), list(unique(hashtagsTbl$hashtag))))
 	visHashtags(hashtagsTbl, db)
-	visCompare(hashtagsTbl, modelHashtagsTbl[topHashtagPost==T & d %in% c(0,20,.5,.8)], db)
+	visCompare(hashtagsTbl, modelHashtagsTbl[topHashtagPost==T & d %in% c(0,20,.8)], db)
 }
 
 analyzeTemporal <- function(modelVsPredTbl) {
@@ -716,6 +714,7 @@ analyzeTemporal <- function(modelVsPredTbl) {
 	runTbls = runPriorT(sprintf("select * from tweets where user_screen_name in (%s)", user_screen_names), config=modConfig(defaultTConfig, list(accumModelHashtagsTbl=T)))
 	plotTemporal(runTbls$modelHashtagsTbl, runTbls$hashtagsTbl)
 	user_screen_names = c("'520957','238260','413225','807325','521180'")
+	user_screen_names = c("'520957'")
 	runTbls = runPriorSO(sprintf("select * from posts where post_type_id = 1 and owner_user_id in (%s)", user_screen_names), config=modConfig(defaultSOConfig, list(accumModelHashtagsTbl=T)))
 	plotTemporal(runTbls$modelHashtagsTbl, runTbls$hashtagsTbl)
 }
