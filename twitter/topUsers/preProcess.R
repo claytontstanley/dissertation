@@ -407,11 +407,11 @@ genAggModelVsPredTbl <- function(hashtagsTbl, ds=c(0,.1,.2,.3,.4,.5,.6,.7,.8,.9,
 }
 
 visModelVsPredTbl <- function(modelVsPredTbl) {
-	assign('p1', ggplot(modelVsPredTbl[maxNP==T & topHashtag & hashtagUsedP], aes(totN, d)) +
+	assign('p1', ggplot(modelVsPredTbl[predUsedBest == T], aes(totN, d)) +
 	       geom_point() +
 	       xlab('total number of hashtags for user'))
-	modelVsPredTbl[topHashtag & hashtagUsedP, meanPC := mean(NCell/totN), by=user_screen_name]
-	modelVsPredTbl[topHashtag & hashtagUsedP, relPC := NCell/totN - mean(NCell/totN), by=user_screen_name]
+	modelVsPredTbl[topHashtag & hashtagUsedP, meanPC := mean(acc), by=user_screen_name]
+	modelVsPredTbl[topHashtag & hashtagUsedP, relPC := acc - mean(acc), by=user_screen_name]
 	modelVsPredTbl[topHashtag & hashtagUsedP, meanRelPC := mean(relPC), by=d]
 	assign('p2', ggplot(modelVsPredTbl[topHashtag & hashtagUsedP], aes(log(d),relPC)) +
 	       geom_point() +
@@ -419,9 +419,9 @@ visModelVsPredTbl <- function(modelVsPredTbl) {
 	       xlab('log(d)') +
 	       ylab('normalized mean for user'))
 	assign('p3', ggplot(modelVsPredTbl[topHashtag & hashtagUsedP & user_screen_name %in% sample(unique(user_screen_name), size=min(20, length(unique(user_screen_name))))],
-			    aes(log(d),NCell/totN, group=as.factor(user_screen_name))) + geom_line() +
+			    aes(log(d),acc, group=as.factor(user_screen_name))) + geom_line() +
 	       ylab('proportion correct'))
-	assign('p4', ggplot(modelVsPredTbl[topHashtag & hashtagUsedP & maxNP], aes(d)) +
+	assign('p4', ggplot(modelVsPredTbl[predUsedBest == T], aes(d)) +
 	       geom_histogram(aes(y = ..density..)) +
 	       geom_density())
 	dev.new()
@@ -436,11 +436,11 @@ visModelVsPredTbl <- function(modelVsPredTbl) {
 
 tableModelVsPredTbl <- function(modelVsPredTbl) {
 	# Summary table of optimal d values and sample variance
-	modelVsPredTbl[topHashtag & hashtagUsedP & maxNP][, list(mean=mean(d), median=median(d), totN=mean(totN), NCell=mean(NCell), acc=mean(NCell/totN),
-								 datasetName=datasetName[1],
-								 datasetGroup=datasetGroup[1],
-								 #sdCI=sqrt(CIVar(d)), sdCI1=sqrt(CIVar2(d)), meanCI=CI(d))
-								 sd=sd(d)), by=list(datasetNameRoot, runNum, DVName)]
+	modelVsPredTbl[predUsedBest == T][, list(mean=mean(d), median=median(d), totN=mean(totN), NCell=mean(NCell), acc=mean(NCell/totN),
+					    datasetName=datasetName[1],
+					    datasetGroup=datasetGroup[1],
+					    #sdCI=sqrt(CIVar(d)), sdCI1=sqrt(CIVar2(d)), meanCI=CI(d))
+					    sd=sd(d)), by=list(datasetNameRoot, runNum, DVName)]
 }
 
 modelVsPredDir <- function() {
@@ -633,11 +633,17 @@ buildTables <- function(outFileNames) {
 		modelVsPredTbl[grepl('^TT', datasetName), datasetGroup := 'topTweets']
 		modelVsPredTbl[grepl('^TF', datasetName), datasetGroup := 'topFollowers']
 	}
+	addMiscellaneous <- function(modelVsPredTbl) {
+		modelVsPredTbl[, predUsedBest := F]
+		modelVsPredTbl[topHashtag & hashtagUsedP & maxNP, predUsedBest := T]
+		modelVsPredTbl[hashtagUsedP == T, acc := NCell/totN]
+	}
 	modelVsPredTbl = rbindlist(lapply(outFileNames, buildTable))
 	addRunNum(modelVsPredTbl)
 	addDatasetNameRoot(modelVsPredTbl)
 	addDatasetType(modelVsPredTbl)
 	addDatasetGroup(modelVsPredTbl)
+	addMiscellaneous(modelVsPredTbl)
 	modelVsPredTbl[datasetType != 'unknown']
 }
 
@@ -651,25 +657,29 @@ genComparisonTbl <- function(resTbl) {
 }
 
 compare2DVs <- function(modelVsPredTbl, DVs) {
-	sumTbl = tableModelVsPredTbl(modelVsPredTbl[DVName %in% DVs,])
-	setkey(sumTbl, datasetName, DVName)
-	sumTbl[, list(diff=acc[2]-acc[1], direction=paste(DVName[2], '-', DVName[1])), by=datasetName][, DVName := ''][, genComparisonTbl(.SD)]
+	sumTbl = modelVsPredTbl[predUsedBest == T][DVName %in% DVs,]
+	setkey(sumTbl, datasetName, user_screen_name, DVName)
+	sumTbl[, list(diff=acc[2]-acc[1], direction=paste(DVName[2], '-', DVName[1])), by=list(datasetName, user_screen_name)][, DVName := ''][, genComparisonTbl(.SD)]
 }
 
 compare2Runs <- function(modelVsPredTbl, runNums) {
-	modelVsPredTbl
-	sumTbl = tableModelVsPredTbl(modelVsPredTbl[runNum %in% runNums])
-	setkey(sumTbl, datasetNameRoot, DVName, runNum)
-	sumTbl[, list(diff=acc[2]-acc[1], direction=paste(runNums[2], '-', runNums[1])), by=list(datasetNameRoot, DVName)][, genComparisonTbl(.SD)]
+	sumTbl = modelVsPredTbl[predUsedBest == T][runNum %in% runNums]
+	setkey(sumTbl, datasetNameRoot, DVName, user_screen_name, runNum)
+	sumTbl[, list(diff=acc[2]-acc[1], direction=paste(runNums[2], '-', runNums[1])), by=list(datasetNameRoot, DVName, user_screen_name)][, genComparisonTbl(.SD)]
 }
 
-compareOptimalDs <- function(modelVsPredTbl) {
-	sumTbl = tableModelVsPredTbl(modelVsPredTbl)[, withCI(median), keyby=list(DVName, datasetGroup)]
+compareMeanDV <- function(modelVsPredTbl, DV) {
+	DV = substitute(DV)
+	expr = bquote(tableModelVsPredTbl(modelVsPredTbl)[, withCI(.(DV)), keyby=list(DVName, datasetGroup)])
+	sumTbl = eval(expr)
 	myLog(ggplot(sumTbl, aes(x=factor(datasetGroup), y=meanVal, fill=DVName)) +
 	      geom_bar(position=position_dodge(), stat='identity') +
 	      geom_errorbar(aes(ymin=minCI, ymax=maxCI), position=position_dodge(width=0.9), width=0.1, size=0.3))
 	sumTbl
 }
+
+compareOptimalDs <- function(modelVsPredTbl) compareMeanDV(modelVsPredTbl, median)
+compareOptimalAcc <- function(modelVsPredTbl) compareMeanDV(modelVsPredTbl, acc)
 
 # TODO: Find a library that implements this
 wrapQuotes <- function(charVect) {
@@ -700,11 +710,14 @@ analyzeModelVsPredTbl <- function(modelVsPredTbl) {
 	analyzeTemporal(modelVsPredTbl)
 	# Check that totN calculated makes sense. Result should be small.
 	modelVsPredTbl[topHashtag == T & d==0][, list(totN, sum(NCell)), by=list(user_screen_name,d,DVName, datasetName)][!is.na(totN)][,list(res=totN-V2)][, withCI(res)]
-	compare2DVs(modelVsPredTbl, c('topHashtagAct', 'topHashtagPost'))
-	compare2DVs(modelVsPredTbl, c('topHashtagPost', 'topHashtagPostOL2'))
-	rbind(modelVsPredTbl[, compare2DVs(.SD, c('topHashtagPost', 'topHashtagPostOL2')), by=list(datasetType, datasetGroup), .SDcols=colnames(modelVsPredTbl)],
+	# Check that the Ns for each dataset look right	
+	modelVsPredTbl[, list(N=.N, names=list(unique(datasetName))), by=list(datasetType, datasetGroup, runNum,datasetNameRoot)]
+	rbind(modelVsPredTbl[runNum==2, compare2DVs(.SD, c('topHashtagPost', 'topHashtagPostOL2')), by=list(datasetType, datasetGroup), .SDcols=colnames(modelVsPredTbl)],
+	      modelVsPredTbl[runNum==2, compare2DVs(.SD, c('topHashtagPost', 'topHashtagAct')), by=list(datasetType, datasetGroup), .SDcols=colnames(modelVsPredTbl)],
 	      modelVsPredTbl[DVName %in% c('topHashtagPost', 'topHashtagPostOL2'), compare2Runs(.SD, c(1,2)), by=list(datasetType, datasetGroup), .SDcols=colnames(modelVsPredTbl)])
-	compareOptimalDs(modelVsPredTbl[DVName %in% c('topHashtagPost', 'topHashtagPostOL2')])[, mean(meanVal), by=DVName]
+	compareOptimalDs(modelVsPredTbl[DVName %in% c('topHashtagPost', 'topHashtagPostOL2', 'topHashtagAct') & runNum == 2])
+	compareOptimalAcc(modelVsPredTbl[DVName %in% c('topHashtagPost', 'topHashtagPostOL2', 'topHashtagAct') & runNum == 2])
+
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & datasetName=='TFollowgt10Mr2'])
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & datasetName=='TFollowgt1kr2'])
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & datasetName=='TTweetsgt5e4r2'])
