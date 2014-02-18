@@ -672,6 +672,7 @@ compareMeanDV <- function(modelVsPredTbl, DV) {
 	DV = substitute(DV)
 	expr = bquote(tableModelVsPredTbl(modelVsPredTbl)[, withCI(.(DV)), keyby=list(DVName, datasetGroup)])
 	sumTbl = eval(expr)
+	dev.new()
 	myLog(ggplot(sumTbl, aes(x=factor(datasetGroup), y=meanVal, fill=DVName)) +
 	      geom_bar(position=position_dodge(), stat='identity') +
 	      geom_errorbar(aes(ymin=minCI, ymax=maxCI), position=position_dodge(width=0.9), width=0.1, size=0.3))
