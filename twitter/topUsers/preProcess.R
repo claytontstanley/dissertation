@@ -431,10 +431,11 @@ visModelVsPredTbl <- function(modelVsPredTbl) {
 	assign('p4', ggplot(modelVsPredTbl[predUsedBest == T], aes(d)) +
 	       geom_histogram(aes(y = ..density..)) +
 	       geom_density())
-	myPlotPrint(p1)
-	myPlotPrint(p2)
-	myPlotPrint(p3)
-	myPlotPrint(p4)
+	ext = sprintf('%s-%s', p1$data$datasetName[1], p1$data$DVName[1])
+	myPlotPrint(p1, sprintf('visDByN-%s', ext)) 
+	myPlotPrint(p2, sprintf('visNormMean-%s', ext)) 
+	myPlotPrint(p3, sprintf('visAcc-%s', ext)) 
+	myPlotPrint(p4, sprintf('visHistD-%s', ext)) 
 }
 
 tableModelVsPredTbl <- function(modelVsPredTbl) {
