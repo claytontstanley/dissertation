@@ -702,8 +702,8 @@ analyzeModelVsPredTbl <- function(modelVsPredTbl) {
 	modelVsPredTbl[topHashtag == T & d==0][, list(totN, sum(NCell)), by=list(user_screen_name,d,DVName, datasetName)][!is.na(totN)][,list(res=totN-V2)][, withCI(res)]
 	compare2DVs(modelVsPredTbl, c('topHashtagAct', 'topHashtagPost'))
 	compare2DVs(modelVsPredTbl, c('topHashtagPost', 'topHashtagPostOL2'))
-	modelVsPredTbl[, compare2DVs(.SD, c('topHashtagPost', 'topHashtagPostOL2')), by=list(datasetType, datasetGroup), .SDcols=colnames(modelVsPredTbl)]
-	modelVsPredTbl[DVName %in% c('topHashtagPost', 'topHashtagPostOL2'), compare2Runs(.SD, c(1,2)), by=list(datasetType, datasetGroup), .SDcols=colnames(modelVsPredTbl)]
+	rbind(modelVsPredTbl[, compare2DVs(.SD, c('topHashtagPost', 'topHashtagPostOL2')), by=list(datasetType, datasetGroup), .SDcols=colnames(modelVsPredTbl)],
+	      modelVsPredTbl[DVName %in% c('topHashtagPost', 'topHashtagPostOL2'), compare2Runs(.SD, c(1,2)), by=list(datasetType, datasetGroup), .SDcols=colnames(modelVsPredTbl)])
 	compareOptimalDs(modelVsPredTbl[DVName %in% c('topHashtagPost', 'topHashtagPostOL2')])[, mean(meanVal), by=DVName]
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & datasetName=='TFollowgt10Mr2'])
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & datasetName=='TFollowgt1kr2'])
@@ -713,7 +713,7 @@ analyzeModelVsPredTbl <- function(modelVsPredTbl) {
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & datasetName=='SOgt100kr2'])
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & datasetName=='SOQgt050r2'])
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & datasetName=='SOQgt500r2'])
-	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostOL2' & datasetName=='SOQgt400r2' & d < 1])
+	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostOL2' & datasetName=='SOQgt500r2' & d < 1])
 }
 
 curWS <- function() {
