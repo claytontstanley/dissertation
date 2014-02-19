@@ -738,9 +738,9 @@ wrapQuotes <- function(charVect) {
 	paste(paste(c("'"), charVect, sep='', collapse="',"), "'", sep="", collapse="")
 }
 
-plotTemporal <- function(modelHashtagsTbl, hashtagsTbl) {
-	bestDTbl = modelVsPredTbl[topHashtag & hashtagUsedP & maxNP & DVName=='topHashtagPost']
-	visCompare(hashtagsTbl, modelHashtagsTbl[topHashtagPost==T], bestDTbl)
+plotTemporal <- function(runTbls) {
+	bestDTbl = runTbls$modelVsPredTbl[topHashtag & hashtagUsedP & maxNP & DVName=='topHashtagPost']
+	visCompare(runTbls$hashtagsTbl, runTbls$modelHashtagsTbl[topHashtagPost==T], bestDTbl)
 }
 
 analyzeTemporal <- function(modelVsPredTbl) {
@@ -752,12 +752,12 @@ analyzeTemporal <- function(modelVsPredTbl) {
 	user_screen_names = c("'fashionista_com'")
 	runTbls = runPriorT(config=modConfig(defaultTConfig, list(accumModelHashtagsTbl=T,
 								  query=sprintf("select * from tweets where user_screen_name in (%s)", user_screen_names))))
-	plotTemporal(runTbls$modelHashtagsTbl, runTbls$hashtagsTbl)
+	plotTemporal(runTbls)
 	user_screen_names = c("'520957','238260','413225','807325','521180'")
 	user_screen_names = c("'520957'")
 	runTbls = runPriorSO(config=modConfig(defaultSOConfig, list(accumModelHashtagsTbl=T,
 								    query=sprintf("select * from posts where post_type_id = 1 and owner_user_id in (%s)", user_screen_names))))
-	plotTemporal(runTbls$modelHashtagsTbl, runTbls$hashtagsTbl)
+	plotTemporal(runTbls)
 }
 
 analyzeModelVsPredTbl <- function(modelVsPredTbl) {
