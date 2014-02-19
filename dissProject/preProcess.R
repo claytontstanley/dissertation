@@ -393,12 +393,12 @@ getModelVsPredTbl <- function(modelHashtagsTbl, hashtagsTbl) {
 }
 
 compareModelVsExtreme <-function(modelHashtagsTbl, extremesTbl) {
-	modelHashtagsTbl[d==20][topHashtag==T]
+	modelHashtagsTbl[d==max(d)][topHashtag==T]
 	setkey(extremesTbl, user_screen_name, dt, hashtag)
 	extremesTbl
 	modelHashtagsTbl
 	?data.table
-	fooTbl = extremesTbl[modelHashtagsTbl[d==20], allow.cartesian=T, nomatch=0][, list(tagCount, user_screen_name, dt, hashtag, hashtagChosenP, topHashtag, lapply(prevHashtags, function(x) x[1:4]))]
+	fooTbl = extremesTbl[modelHashtagsTbl[d==max(d)], allow.cartesian=T, nomatch=0][, list(tagCount, user_screen_name, dt, hashtag, hashtagChosenP, topHashtag, lapply(prevHashtags, function(x) x[1:4]))]
 	fooTbl
 	extremesTbl
 	fooTbl
