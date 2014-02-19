@@ -457,11 +457,11 @@ modelVsPredOutFile <- function(name) {
 	sprintf('%s/%s.csv', modelVsPredDir(), name)
 }
 
-runPrior <- function(config) {
+runPrior <- function(config, ...) {
 	withProf({
 		postsTbl = config$getPostsFun(config$query, config=config)
 		hashtagsTbl = config$getHashtagsFun(postsTbl, config=config)
-		res = genAggModelVsPredTbl(hashtagsTbl, config=config)
+		res = genAggModelVsPredTbl(hashtagsTbl, config=config, ...)
 		modelVsPredTbl = res$modelVsPredTbl
 		modelHashtagsTbl = res$modelHashtagsTbl
 		list(modelVsPredTbl=modelVsPredTbl, modelHashtagsTbl=modelHashtagsTbl, hashtagsTbl=hashtagsTbl)
@@ -479,12 +479,12 @@ defaultSOConfig = list(convertTagSynonymsP=T,
 		       getPostsFun=getPostsTbl,
 		       getHashtagsFun=getTagsTbl)
 
-runPriorT <- function(config=defaultTConfig) {
-	runPrior(config)
+runPriorT <- function(config=defaultTConfig, ...) {
+	runPrior(config, ...)
 }
 
-runPriorSO <- function(config=defaultSOConfig) {
-	runPrior(config)
+runPriorSO <- function(config=defaultSOConfig, ...) {
+	runPrior(config, ...)
 }
 
 modConfig <- function(config, mods) {
@@ -529,7 +529,7 @@ combineFilters <- function(f1, f2='1=1') {
 }
 
 makeTRun <- function(val, outFileName, config) {
-	function() runPriorT(outFile=modelVsPredOutFile(outFileName), config=modConfig(config, query=config$query(val)))
+	function() runPriorT(config=modConfig(config, list(query=config$query(val))), outFile=modelVsPredOutFile(outFileName))
 }
 
 makeTRunr1 <- function(val, outFileName, ...) {
@@ -574,7 +574,7 @@ runTTweets5e4 <- makeTRunr3(50000, 'TTweetsgt5e4', filters="user_screen_name != 
 runTTweets5e4r2 <- makeTRunr4(50000, 'TTweetsgt5e4r2', filters="user_screen_name != 'stanhjerleid'")
 
 makeSORun <- function(val, outFileName, config) {
-	runFun = function() runPriorSO(outFile=modelVsPredOutFile(outFileName), config=modConfig(config, query=config$query(val)))
+	runFun = function() runPriorSO(config=modConfig(config, list(query=config$query(val))), outFile=modelVsPredOutFile(outFileName))
 	runFun
 }
 
