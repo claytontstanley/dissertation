@@ -1,1 +1,1 @@
-- make sure that defaults for config files reflect r2 runs
+- remove a few more ...s by adding outFile to config object, and maybe ds as well
