@@ -70,22 +70,22 @@ test_that("testOnlyFirstT", {
 
 test_that("testModelVsPred", {
 	expectedTbl = myReadCSV(modelVsPredOutFile('testing1'))
-	resTbl = runPriorT("select * from tweets where user_screen_name = 'ap'", outFile='/tmp/modelVsPred.csv')
-	expect_equivalent(expectedTbl, resTbl)
+	resTbl = runPriorT(config=modConfig(defaultTConfig, list(query="select * from tweets where user_screen_name = 'ap'")), outFile='/tmp/modelVsPred.csv')
+	expect_equivalent(expectedTbl, resTbl$modelVsPredTbl)
 	expectedTbl = myReadCSV(modelVsPredOutFile('testing2'))
 	expectedTbl[, totN := as.integer(totN)]
-	resTbl = runPriorT("select * from tweets where user_screen_name = 'thebucktlist'", outFile='/tmp/modelVsPred.csv')
-	expect_equivalent(expectedTbl, resTbl)
+	resTbl = runPriorT(config=modConfig(defaultTConfig, list(query="select * from tweets where user_screen_name = 'thebucktlist'")), outFile='/tmp/modelVsPred.csv')
+	expect_equivalent(expectedTbl, resTbl$modelVsPredTbl)
 	expectedTbl = myReadCSV(modelVsPredOutFile('twitter_ru'))
-	resTbl = runPriorT("select * from tweets where user_screen_name = 'twitter_ru'", outFile='/tmp/modelVsPred.csv')
-	expect_equivalent(expectedTbl, resTbl)
+	resTbl = runPriorT(config=modConfig(defaultTConfig, list(query="select * from tweets where user_screen_name = 'twitter_ru'")), outFile='/tmp/modelVsPred.csv')
+	expect_equivalent(expectedTbl, resTbl$modelVsPredTbl)
 })
 
 test_that("testModelVsPredSO", {
 	  expectedTbl = myReadCSV(modelVsPredOutFile('testingSO1'))
 	  expectedTbl[, user_screen_name := as.character(user_screen_name)]
-	  resTbl = runPriorSO("select * from posts where post_type_id = 1 and owner_user_id = 20")
-	  expect_equivalent(expectedTbl, resTbl)
+	  resTbl = runPriorSO(config=modConfig(defaultSOConfig, list(query="select * from posts where post_type_id = 1 and owner_user_id = 20")))
+	  expect_equivalent(expectedTbl, resTbl$modelVsPredTbl)
 })
 
 test_that("testAggregation", {
