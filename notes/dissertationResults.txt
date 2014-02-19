@@ -3,4 +3,8 @@ Experiment 1: Prior Activation
 - Optimal d close to .5; a bit higher; for both datasets
 - Robust effect; independent of follower count, number of tweets, reputation, number of questions asked
 - High accuracy even when only prior is used; shows importance of prior
-- Effect of turning on OL, for both types of OL; prob less accurate
+- Effect of turning on OL:
+	for both types of OL; prob less accurate
+	d is also lower, closer to .5 (interesting since OL is the default in ACT-R)
+
+
