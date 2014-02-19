@@ -130,7 +130,7 @@ sqlScratch <- function() {
 	data.table(sqldf('select * from topusers order by rank'))
 	sqldf("select * from tweets where user_screen_name='jlo'")
 	data.table(sqldf('select * from (select user_screen_name,count(*) from tweets group by user_screen_name) as t join topUsers as u on t.user_screen_name = u.user_screen_name order by rank'))
-	data.table(sqldf("select retweeted, count(*) from tweets group by retweeted"))[, min(count) / (max(count) + min(count))]
+	data.table(sqldf("select retweeted, count(*) from tweets group by retweeted"))
 	sqldf("select * from tweets where 1=1 and user_screen_name='katyperry' limit 10")
 	foo = data.table(sqldf("select * from twitter_users"))
 	twitter_users = myReadCSV(str_c(PATH, "/dissertationData/tables/twitter_users.csv"))
