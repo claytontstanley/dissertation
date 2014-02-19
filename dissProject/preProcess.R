@@ -287,20 +287,28 @@ computeActsByUser <- function(hashtagsTbl, ds) {
 
 visHashtags <- function(hashtagsTbl) {
 	plots = hashtagsTbl[, list(resPlots=list(ggplot(.SD, aes(x=hashtag, y=dt)) + geom_point())), by=user_screen_name]
-	plots[, list(myPlotPrint(resPlots[[1]], sprintf('HTByTime-%s', .BY[1]))), by=user_screen_name]
 	plots
 }
 
-visCompare <- function(hashtagsTbl, modelHashtagsTbl) {
+visCompare <- function(hashtagsTbl, modelHashtagsTbl, bestDTbl) {
 	expect_that(sort(unique(hashtagsTbl$user_screen_name)), is_equivalent_to(sort(unique(modelHashtagsTbl$user_screen_name))))
-	plotBuildFun <- function(modelHashtagsTbl) {
-		list(resPlots=list(ggplot(hashtagsTbl, aes(x=hashtag, y=dt)) +
-				   geom_point() + 
+	plotBuildFun <- function(modelHashtagsTbl, userScreenName, d) {
+		list(resPlots=list(ggplot(hashtagsTbl[user_screen_name==userScreenName], aes(x=hashtag, y=dt)) +
+				   geom_point() +
+				   ggtitle(sprintf('d=%s', d)) + 
 				   geom_point(data=modelHashtagsTbl, aes(x=hashtag, y=dt), colour="red", size=1)))
 	}
-	plots = modelHashtagsTbl[, plotBuildFun(.SD), by=list(user_screen_name, d)]
-	plots[, list(myPlotPrint(resPlots[[1]], sprintf('HTMByTime-%s-%s', .BY[1], .BY[2]))), by=list(user_screen_name, d)]
-	plots
+	minMaxDs = modelHashtagsTbl[, c(min(d), max(d))]
+	allDsTbl = bestDTbl[, list(allDs=c(minMaxDs[1],d,minMaxDs[2])), by=list(user_screen_name, d)]
+	allDsTbl[, d := NULL]
+	setkey(modelHashtagsTbl, user_screen_name, d)
+	setkey(allDsTbl, user_screen_name, allDs)
+	subsetModelHashtagsTbl = modelHashtagsTbl[allDsTbl, nomatch=0]
+	modelPlots = subsetModelHashtagsTbl[, plotBuildFun(.SD, user_screen_name, d), by=list(user_screen_name, d)]
+	hashtagPlots = visHashtags(hashtagsTbl)
+	hashtagPlots[, resPlots := list(list(resPlots[[1]] + ggtitle('Observed'))), by=user_screen_name]
+	fullPlots = modelPlots[, list(resPlots=list(do.call(arrangeGrob, append(hashtagPlots[user_screen_name==user_screen_name, resPlots], resPlots)))), by=user_screen_name]
+	fullPlots[, list(resPlots=list(myPlotPrint(resPlots[[1]], sprintf('HTMByTime-%s', .BY[1])))), by=list(user_screen_name)]
 }
 
 addMetrics <- function(hashtagsTbl, modelHashtagsTbl) {
@@ -422,7 +430,7 @@ genAggModelVsPredTbl <- function(hashtagsTbl, ds=c(0,.1,.2,.3,.4,.5,.6,.7,.8,.9,
 visModelVsPredTbl <- function(modelVsPredTbl) {
 	assign('p1', ggplot(modelVsPredTbl[predUsedBest == T], aes(totN, d)) +
 	       geom_point() +
-	       xlab('total number of hashtags for user'))
+	       xlab('Total Number of Hashtags'))
 	modelVsPredTbl[topHashtag & hashtagUsedP, meanPC := mean(acc), by=user_screen_name]
 	modelVsPredTbl[topHashtag & hashtagUsedP, relPC := acc - mean(acc), by=user_screen_name]
 	modelVsPredTbl[topHashtag & hashtagUsedP, meanRelPC := mean(relPC), by=d]
@@ -430,18 +438,20 @@ visModelVsPredTbl <- function(modelVsPredTbl) {
 	       geom_point() +
 	       geom_line(aes(log(d), meanRelPC, group=user_screen_name[1])) +
 	       xlab('log(d)') +
-	       ylab('normalized mean for user'))
+	       ylab('Normalized Mean'))
 	assign('p3', ggplot(modelVsPredTbl[topHashtag & hashtagUsedP & user_screen_name %in% sample(unique(user_screen_name), size=min(20, length(unique(user_screen_name))))],
 			    aes(log(d),acc, group=as.factor(user_screen_name))) + geom_line() +
-	       ylab('proportion correct'))
+	       ylab('Accuracy'))
 	assign('p4', ggplot(modelVsPredTbl[predUsedBest == T], aes(d)) +
 	       geom_histogram(aes(y = ..density..)) +
-	       geom_density())
+	       geom_density() +
+	       ylab('Density'))
 	ext = sprintf('%s-%s', guardAllEqualP(p1$data$datasetName)[1], guardAllEqualP(p1$data$DVName)[1])
 	myPlotPrint(p1, sprintf('visDByN-%s', ext)) 
 	myPlotPrint(p2, sprintf('visNormMean-%s', ext)) 
 	myPlotPrint(p3, sprintf('visAcc-%s', ext)) 
 	myPlotPrint(p4, sprintf('visHistD-%s', ext)) 
+	return()
 }
 
 tableModelVsPredTbl <- function(modelVsPredTbl) {
@@ -729,8 +739,8 @@ wrapQuotes <- function(charVect) {
 }
 
 plotTemporal <- function(modelHashtagsTbl, hashtagsTbl) {
-	visHashtags(hashtagsTbl)
-	visCompare(hashtagsTbl, modelHashtagsTbl[topHashtagPost==T & d %in% c(0,20,.8)])
+	bestDTbl = modelVsPredTbl[topHashtag & hashtagUsedP & maxNP & DVName=='topHashtagPost']
+	visCompare(hashtagsTbl, modelHashtagsTbl[topHashtagPost==T], bestDTbl)
 }
 
 analyzeTemporal <- function(modelVsPredTbl) {
