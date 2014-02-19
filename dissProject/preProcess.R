@@ -662,14 +662,16 @@ withCI <- function(dat) {
 	list(N=length(dat), meanVal=res[2], minCI=res[1], maxCI=res[3])
 }
 
-genComparisonTbl <- function(resTbl) {
-	resTbl[!is.na(diff), withCI(diff), by=list(direction, DVName)]
+genComparisonTbl <- function(SD) {
+	resTbl = copy(SD)
+	resTbl[, DVDirection := sprintf('%s for %s', direction, DVName), by=list(direction, DVName)]
+	resTbl[!is.na(diff), withCI(diff), by=list(DVDirection, direction, DVName)]
 }
 
-compare2DVs <- function(modelVsPredTbl, DVs) {
+compare2DVs <- function(modelVsPredTbl, DVs, sortedOrder=c(1,2)) {
 	sumTbl = modelVsPredTbl[predUsedBest == T][DVName %in% DVs,]
 	setkey(sumTbl, datasetName, user_screen_name, DVName)
-	sumTbl[, list(diff=acc[2]-acc[1], direction=paste(DVName[2], '-', DVName[1])), by=list(datasetName, user_screen_name)][, DVName := ''][, genComparisonTbl(.SD)]
+	sumTbl[, list(diff=acc[sortedOrder[2]]-acc[sortedOrder[1]], direction=paste(DVName[sortedOrder[2]], '-', DVName[sortedOrder[1]])), by=list(datasetName, user_screen_name)][, DVName := ''][, genComparisonTbl(.SD)]
 }
 
 compare2Runs <- function(modelVsPredTbl, runNums) {
@@ -678,13 +680,27 @@ compare2Runs <- function(modelVsPredTbl, runNums) {
 	sumTbl[, list(diff=acc[2]-acc[1], direction=paste(runNums[2], '-', runNums[1])), by=list(datasetNameRoot, DVName, user_screen_name)][, genComparisonTbl(.SD)]
 }
 
-plotBarSumTbl <- function(sumTbl, fillCol, figName) {
+compareDBestVsMin <- function(modelVsPredTbl) {
+	sumTbl = modelVsPredTbl[topHashtag & hashtagUsedP & (maxNP | d == min(d))]
+	setkey(sumTbl, datasetName, user_screen_name, DVName, maxNP) 
+	sumTbl[, list(diff=acc[2]-acc[1], direction=paste('best d', '-', 'min d')), by=list(datasetName, user_screen_name, DVName)][, genComparisonTbl(.SD)]
+}
+
+compareDBestVsMax <- function(modelVsPredTbl) {
+	sumTbl = modelVsPredTbl[topHashtag & hashtagUsedP & (maxNP | d == max(d))]
+	setkey(sumTbl, datasetName, user_screen_name, DVName, maxNP) 
+	sumTbl[, list(diff=acc[2]-acc[1], direction=paste('best d', '-', 'max d')), by=list(datasetName, user_screen_name, DVName)][, genComparisonTbl(.SD)]
+}
+
+
+plotBarSumTbl <- function(sumTbl, fillCol, figName, extras=NULL) {
 	fillCol = substitute(fillCol)
-	expr = bquote(myPlotPrint(ggplot(sumTbl, aes(x=factor(datasetGroup), y=meanVal, fill=.(fillCol))) +
-				  geom_bar(position=position_dodge(), stat='identity') +
-				  geom_errorbar(aes(ymin=minCI, ymax=maxCI), position=position_dodge(width=0.9), width=0.1, size=0.3),
-				  figName))
-	eval(expr)
+	expr = bquote(ggplot(sumTbl, aes(x=factor(datasetGroup), y=meanVal, fill=.(fillCol))) +
+		      geom_bar(position=position_dodge(), stat='identity') +
+		      geom_errorbar(aes(ymin=minCI, ymax=maxCI), position=position_dodge(width=0.9), width=0.1, size=0.3))
+	plot = eval(expr)
+	lapply(extras, function(extra) plot <<- plot + extra)
+	myPlotPrint(plot, figName)
 	sumTbl
 }
 
@@ -696,11 +712,7 @@ compareMeanDV <- function(modelVsPredTbl, DV) {
 }
 
 plotDVDiffs <- function(sumTbl) {
-	plotBarSumTbl(sumTbl, direction, sprintf('compareDVDiffs'))
-}
-
-plotRunDiffs <- function(sumTbl) {
-	plotBarSumTbl(sumTbl, DVName, sprintf('compareRunDiffs'))
+	plotBarSumTbl(sumTbl, DVDirection, sprintf('compareDVDiffs'), extras=list(theme(legend.position='top', legend.direction='vertical'),coord_flip()))
 }
 
 compareOptimalDs <- function(modelVsPredTbl) compareMeanDV(modelVsPredTbl, median)
@@ -740,9 +752,11 @@ analyzeModelVsPredTbl <- function(modelVsPredTbl) {
 	modelVsPredTbl[topHashtag == T & d==0][, list(totN, sum(NCell)), by=list(user_screen_name,d,DVName, datasetName)][!is.na(totN)][,list(res=totN-V2)][, withCI(res)]
 	# Check that the Ns for each dataset look right	
 	modelVsPredTbl[, list(N=.N, names=list(unique(datasetName))), by=list(datasetType, datasetGroup, runNum,datasetNameRoot)]
-	plotDVDiffs(rbind(modelVsPredTbl[runNum==2, compare2DVs(.SD, c('topHashtagPost', 'topHashtagPostOL2')), by=list(datasetType, datasetGroup), .SDcols=colnames(modelVsPredTbl)],
-			  modelVsPredTbl[runNum==2, compare2DVs(.SD, c('topHashtagPost', 'topHashtagAct')), by=list(datasetType, datasetGroup), .SDcols=colnames(modelVsPredTbl)]))
-	plotRunDiffs(modelVsPredTbl[DVName %in% c('topHashtagPost', 'topHashtagPostOL2'), compare2Runs(.SD, c(1,2)), by=list(datasetType, datasetGroup), .SDcols=colnames(modelVsPredTbl)])
+	plotDVDiffs(rbind(modelVsPredTbl[runNum==2, compare2DVs(.SD, c('topHashtagPost', 'topHashtagPostOL2'), sortedOrder=c(2,1)), by=list(datasetType, datasetGroup), .SDcols=colnames(modelVsPredTbl)],
+			  modelVsPredTbl[runNum==2, compare2DVs(.SD, c('topHashtagPost', 'topHashtagAct')), by=list(datasetType, datasetGroup), .SDcols=colnames(modelVsPredTbl)],
+			  modelVsPredTbl[DVName %in% c('topHashtagPost', 'topHashtagPostOL2'), compare2Runs(.SD, c(1,2)), by=list(datasetType, datasetGroup), .SDcols=colnames(modelVsPredTbl)],
+			  modelVsPredTbl[runNum==2 & DVName %in% c('topHashtagPost'), compareDBestVsMin(.SD), by=list(datasetType, datasetGroup)],
+			  modelVsPredTbl[runNum==2 & DVName %in% c('topHashtagPost'), compareDBestVsMax(.SD), by=list(datasetType, datasetGroup)]))
 	compareOptimalDs(modelVsPredTbl[DVName %in% c('topHashtagPost', 'topHashtagPostOL2', 'topHashtagAct') & runNum == 2])
 	compareOptimalAcc(modelVsPredTbl[DVName %in% c('topHashtagPost', 'topHashtagPostOL2', 'topHashtagAct') & runNum == 2])
 
