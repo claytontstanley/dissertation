@@ -406,7 +406,9 @@ compareModelVsExtreme <-function(modelHashtagsTbl, extremesTbl) {
 	fooTbl
 }
 
-genAggModelVsPredTbl <- function(hashtagsTbl, ds=c(0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1.0,1.1,1.2,1.3,1.4,1.5,1.6,1.8,2,5,10,20), outFile='/tmp/modelVsPred.csv', config) {
+genAggModelVsPredTbl <- function(hashtagsTbl, config) {
+	outFile = config$modelVsPredOutFile
+	ds = config$ds
 	modelHashtagsTbls = data.table()
 	genModelVsPredTbl <- function(hashtagsTbl, d, userScreenName) {
 		myLog(sprintf('generating model predictions for user %s', userScreenName))
@@ -468,42 +470,50 @@ modelVsPredDir <- function() {
 	sprintf('%s/dissertationData/modelVsPred', PATH)
 }
 
-modelVsPredOutFile <- function(name) {
+getModelVsPredOutFile <- function(name) {
 	sprintf('%s/%s.csv', modelVsPredDir(), name)
 }
 
-runPrior <- function(config, ...) {
+runPrior <- function(config) {
+	stopifnot(!any(sapply(config,is.null)))
 	withProf({
 		postsTbl = config$getPostsFun(config$query, config=config)
 		hashtagsTbl = config$getHashtagsFun(postsTbl, config=config)
-		res = genAggModelVsPredTbl(hashtagsTbl, config=config, ...)
+		res = genAggModelVsPredTbl(hashtagsTbl, config=config)
 		modelVsPredTbl = res$modelVsPredTbl
 		modelHashtagsTbl = res$modelHashtagsTbl
 		list(modelVsPredTbl=modelVsPredTbl, modelHashtagsTbl=modelHashtagsTbl, hashtagsTbl=hashtagsTbl)
 	})
 }
 
-defaultTConfig = list(from='tokenText',
-		      accumModelHashtagsTbl=F,
-		      getPostsFun=getTweetsTbl,
-		      getHashtagsFun=getHashtagsTbl,
-		      includeRetweetsP=F)
+defaultBaseConfig = list(ds=c(0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1.0,1.1,1.2,1.3,1.4,1.5,1.6,1.8,2,5,10,20),
+			 modelVsPredOutFile='/tmp/modelVsPred.csv',
+			 query=NULL)
 
-defaultSOConfig = list(convertTagSynonymsP=T,
-		       accumModelHashtagsTbl=F,
-		       getPostsFun=getPostsTbl,
-		       getHashtagsFun=getTagsTbl)
+defaultTConfig = append(defaultBaseConfig,
+			list(from='tokenText',
+			     accumModelHashtagsTbl=F,
+			     getPostsFun=getTweetsTbl,
+			     getHashtagsFun=getHashtagsTbl,
+			     includeRetweetsP=F))
 
-runPriorT <- function(config=defaultTConfig, ...) {
-	runPrior(config, ...)
+defaultSOConfig = append(defaultBaseConfig,
+			 list(convertTagSynonymsP=T,
+			      accumModelHashtagsTbl=F,
+			      getPostsFun=getPostsTbl,
+			      getHashtagsFun=getTagsTbl))
+
+runPriorT <- function(config=defaultTConfig) {
+	runPrior(config)
 }
 
-runPriorSO <- function(config=defaultSOConfig, ...) {
-	runPrior(config, ...)
+runPriorSO <- function(config=defaultSOConfig) {
+	runPrior(config)
 }
 
 modConfig <- function(config, mods) {
 	newConfig = config
+	stopifnot(names(mods) %in% names(config))
 	for(modName in names(mods)) {
 		newConfig[[modName]] = mods[[modName]]
 	}
@@ -544,7 +554,7 @@ combineFilters <- function(f1, f2='1=1') {
 }
 
 makeTRun <- function(val, outFileName, config) {
-	function() runPriorT(config=modConfig(config, list(query=config$query(val))), outFile=modelVsPredOutFile(outFileName))
+	function() runPriorT(config=modConfig(config, list(query=config$query(val), modelVsPredOutFile=getModelVsPredOutFile(outFileName))))
 }
 
 makeTRunr1 <- function(val, outFileName, ...) {
@@ -589,7 +599,7 @@ runTTweets5e4 <- makeTRunr3(50000, 'TTweetsgt5e4', filters="user_screen_name != 
 runTTweets5e4r2 <- makeTRunr4(50000, 'TTweetsgt5e4r2', filters="user_screen_name != 'stanhjerleid'")
 
 makeSORun <- function(val, outFileName, config) {
-	runFun = function() runPriorSO(config=modConfig(config, list(query=config$query(val))), outFile=modelVsPredOutFile(outFileName))
+	runFun = function() runPriorSO(config=modConfig(config, list(query=config$query(val), modelVsPredOutFile=getModelVsPredOutFile(outFileName))))
 	runFun
 }
 
@@ -630,7 +640,7 @@ runSOQgt050r2 <- makeSORunr4(050, 'SOQgt050r2')
 buildTables <- function(outFileNames) {
 	buildTable <- function(outFileName) {
 		colClasses = c('character', 'logical', 'logical', 'numeric', 'integer', 'character', 'logical', 'integer')
-		tbl = myReadCSV(modelVsPredOutFile(outFileName), colClasses=colClasses)
+		tbl = myReadCSV(getModelVsPredOutFile(outFileName), colClasses=colClasses)
 		tbl[, datasetName := outFileName]
 		tbl
 	}

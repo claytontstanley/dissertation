@@ -70,14 +70,14 @@ test_that("testOnlyFirstT", {
 
 test_that("testModelVsPred", {
 	expectedTbl = myReadCSV(modelVsPredOutFile('testing1'))
-	resTbl = runPriorT(config=modConfig(defaultTConfig, list(query="select * from tweets where user_screen_name = 'ap'")), outFile='/tmp/modelVsPred.csv')
+	resTbl = runPriorT(config=modConfig(defaultTConfig, list(query="select * from tweets where user_screen_name = 'ap'")))
 	expect_equivalent(expectedTbl, resTbl$modelVsPredTbl)
 	expectedTbl = myReadCSV(modelVsPredOutFile('testing2'))
 	expectedTbl[, totN := as.integer(totN)]
-	resTbl = runPriorT(config=modConfig(defaultTConfig, list(query="select * from tweets where user_screen_name = 'thebucktlist'")), outFile='/tmp/modelVsPred.csv')
+	resTbl = runPriorT(config=modConfig(defaultTConfig, list(query="select * from tweets where user_screen_name = 'thebucktlist'")))
 	expect_equivalent(expectedTbl, resTbl$modelVsPredTbl)
 	expectedTbl = myReadCSV(modelVsPredOutFile('twitter_ru'))
-	resTbl = runPriorT(config=modConfig(defaultTConfig, list(query="select * from tweets where user_screen_name = 'twitter_ru'")), outFile='/tmp/modelVsPred.csv')
+	resTbl = runPriorT(config=modConfig(defaultTConfig, list(query="select * from tweets where user_screen_name = 'twitter_ru'")))
 	expect_equivalent(expectedTbl, resTbl$modelVsPredTbl)
 })
 
