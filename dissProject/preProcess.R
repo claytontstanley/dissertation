@@ -296,7 +296,7 @@ visCompare <- function(hashtagsTbl, modelHashtagsTbl, bestDTbl) {
 		list(resPlots=list(ggplot(hashtagsTbl[user_screen_name==userScreenName], aes(x=hashtag, y=dt)) +
 				   geom_point() +
 				   ggtitle(sprintf('d=%s', d)) + 
-				   geom_point(data=modelHashtagsTbl, aes(x=hashtag, y=dt), colour="red", size=1)))
+				   geom_point(data=modelHashtagsTbl, aes(x=hashtag, y=dt), colour="red", size=.7)))
 	}
 	minMaxDs = modelHashtagsTbl[, c(min(d), max(d))]
 	allDsTbl = bestDTbl[, list(allDs=c(minMaxDs[1],d,minMaxDs[2])), by=list(user_screen_name, d)]
@@ -307,7 +307,8 @@ visCompare <- function(hashtagsTbl, modelHashtagsTbl, bestDTbl) {
 	modelPlots = subsetModelHashtagsTbl[, plotBuildFun(.SD, user_screen_name, d), by=list(user_screen_name, d)]
 	hashtagPlots = visHashtags(hashtagsTbl)
 	hashtagPlots[, resPlots := list(list(resPlots[[1]] + ggtitle('Observed'))), by=user_screen_name]
-	fullPlots = modelPlots[, list(resPlots=list(do.call(arrangeGrob, append(hashtagPlots[user_screen_name==user_screen_name, resPlots], resPlots)))), by=user_screen_name]
+	setkey(hashtagPlots, user_screen_name)
+	fullPlots = modelPlots[, list(resPlots=list(do.call(arrangeGrob, append(hashtagPlots[user_screen_name]$resPlots, resPlots)))), by=user_screen_name]
 	fullPlots[, list(resPlots=list(myPlotPrint(resPlots[[1]], sprintf('HTMByTime-%s', .BY[1])))), by=list(user_screen_name)]
 }
 
@@ -754,7 +755,7 @@ analyzeTemporal <- function(modelVsPredTbl) {
 								  query=sprintf("select * from tweets where user_screen_name in (%s)", user_screen_names))))
 	plotTemporal(runTbls)
 	user_screen_names = c("'520957','238260','413225','807325','521180'")
-	user_screen_names = c("'520957'")
+	user_screen_names = c("'520957','238260'")
 	runTbls = runPriorSO(config=modConfig(defaultSOConfig, list(accumModelHashtagsTbl=T,
 								    query=sprintf("select * from posts where post_type_id = 1 and owner_user_id in (%s)", user_screen_names))))
 	plotTemporal(runTbls)
