@@ -723,6 +723,17 @@ compareMeanDV <- function(modelVsPredTbl, DV, extras=NULL) {
 	plotBarSumTbl(sumTbl, DVName, sprintf('compareMeanDV-%s', deparse(DV)), extras=append(list(theme(axis.title.x=element_blank())), extras))
 }
 
+plotDatasetDescriptives <- function(modelVsPredTbl) {
+	sumTbl = modelVsPredTbl[runNum==2 & predUsedBest == T & DVName == 'topHashtagPost'][, list(NUsers=.N, NHashtagObs=sum(totN)), by=list(datasetName,datasetType,datasetGroup)]
+	plotBarSumTbl(sumTbl[, withCI(NUsers), by=list(datasetGroup, datasetName)],
+		      datasetName, 'compareNumbers',
+		      extras=list(theme(axis.title.x=element_blank()), ylab('Number of Users')))
+	plotBarSumTbl(sumTbl[, withCI(NHashtagObs), by=list(datasetGroup, datasetName)],
+		      datasetName, 'compareHashtagObs',
+		      extras=list(theme(axis.title.x=element_blank()), ylab('Number of Hashtag Uses')))
+	sumTbl
+}
+
 plotDVDiffs <- function(sumTbl) {
 	plotBarSumTbl(sumTbl, DVDirection, sprintf('compareDVDiffs'), extras=list(theme(legend.position='top', legend.direction='vertical', axis.title.y=element_blank()),
 										  #labs(x=element_blank()),
@@ -762,12 +773,13 @@ analyzeTemporal <- function(modelVsPredTbl) {
 }
 
 analyzeModelVsPredTbl <- function(modelVsPredTbl) {
-	modelVsPredTbl
 	analyzeTemporal(modelVsPredTbl)
+	plotDatasetDescriptives(modelVsPredTbl)[, list(meanNUsers=mean(NUsers),totNUsers=sum(NUsers),meanNHO=mean(NHashtagObs),totNHO=sum(NHashtagObs)), by=list(datasetType)]
 	# Check that totN calculated makes sense. Result should be small.
 	modelVsPredTbl[topHashtag == T & d==0][, list(totN, sum(NCell)), by=list(user_screen_name,d,DVName, datasetName)][!is.na(totN)][,list(res=totN-V2)][, withCI(res)]
 	# Check that the Ns for each dataset look right	
 	modelVsPredTbl[, list(N=.N, names=list(unique(datasetName))), by=list(datasetType, datasetGroup, runNum,datasetNameRoot)]
+
 	plotDVDiffs(rbind(modelVsPredTbl[runNum==2, compare2DVs(.SD, c('topHashtagPost', 'topHashtagPostOL2'), sortedOrder=c(2,1)), by=list(datasetType, datasetGroup), .SDcols=colnames(modelVsPredTbl)],
 			  modelVsPredTbl[runNum==2, compare2DVs(.SD, c('topHashtagPost', 'topHashtagAct')), by=list(datasetType, datasetGroup), .SDcols=colnames(modelVsPredTbl)],
 			  modelVsPredTbl[DVName %in% c('topHashtagPost', 'topHashtagPostOL2'), compare2Runs(.SD, c(1,2)), by=list(datasetType, datasetGroup), .SDcols=colnames(modelVsPredTbl)],
