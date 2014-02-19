@@ -697,7 +697,8 @@ plotBarSumTbl <- function(sumTbl, fillCol, figName, extras=NULL) {
 	fillCol = substitute(fillCol)
 	expr = bquote(ggplot(sumTbl, aes(x=factor(datasetGroup), y=meanVal, fill=.(fillCol))) +
 		      geom_bar(position=position_dodge(), stat='identity') +
-		      geom_errorbar(aes(ymin=minCI, ymax=maxCI), position=position_dodge(width=0.9), width=0.1, size=0.3))
+		      geom_errorbar(aes(ymin=minCI, ymax=maxCI), position=position_dodge(width=0.9), width=0.1, size=0.3) + 
+		      scale_fill_grey())
 	plot = eval(expr)
 	lapply(extras, function(extra) plot <<- plot + extra)
 	myPlotPrint(plot, figName)
@@ -715,7 +716,7 @@ plotDVDiffs <- function(sumTbl) {
 	plotBarSumTbl(sumTbl, DVDirection, sprintf('compareDVDiffs'), extras=list(theme(legend.position='top', legend.direction='vertical', axis.title.y=element_blank()),
 										  #labs(x=element_blank()),
 										  labs(y='Mean Difference in Accuracy'),
-										  scale_fill_discrete(name='Difference Type'),
+										  guides(fill=guide_legend(title="Difference Type")),
 										  coord_flip()))
 }
 
