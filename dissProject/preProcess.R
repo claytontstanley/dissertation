@@ -664,7 +664,7 @@ withCI <- function(dat) {
 
 genComparisonTbl <- function(SD) {
 	resTbl = copy(SD)
-	resTbl[, DVDirection := sprintf('%s for %s', direction, DVName), by=list(direction, DVName)]
+	resTbl[, DVDirection := sprintf('%s%s', direction, if (DVName != '') sprintf(' for %s', DVName) else ''), by=list(direction, DVName)]
 	resTbl[!is.na(diff), withCI(diff), by=list(DVDirection, direction, DVName)]
 }
 
@@ -677,7 +677,7 @@ compare2DVs <- function(modelVsPredTbl, DVs, sortedOrder=c(1,2)) {
 compare2Runs <- function(modelVsPredTbl, runNums) {
 	sumTbl = modelVsPredTbl[predUsedBest == T][runNum %in% runNums]
 	setkey(sumTbl, datasetNameRoot, DVName, user_screen_name, runNum)
-	sumTbl[, list(diff=acc[2]-acc[1], direction=paste(runNums[2], '-', runNums[1])), by=list(datasetNameRoot, DVName, user_screen_name)][, genComparisonTbl(.SD)]
+	sumTbl[, list(diff=acc[2]-acc[1], direction=sprintf('run%d - run%d', runNums[2], runNums[1])), by=list(datasetNameRoot, DVName, user_screen_name)][, genComparisonTbl(.SD)]
 }
 
 compareDBestVsMin <- function(modelVsPredTbl) {
@@ -704,19 +704,23 @@ plotBarSumTbl <- function(sumTbl, fillCol, figName, extras=NULL) {
 	sumTbl
 }
 
-compareMeanDV <- function(modelVsPredTbl, DV) {
+compareMeanDV <- function(modelVsPredTbl, DV, extras=NULL) {
 	DV = substitute(DV)
 	expr = bquote(tableModelVsPredTbl(modelVsPredTbl)[, withCI(.(DV)), keyby=list(DVName, datasetGroup)])
 	sumTbl = eval(expr)
-	plotBarSumTbl(sumTbl, DVName, sprintf('compareMeanDV-%s', deparse(DV)))
+	plotBarSumTbl(sumTbl, DVName, sprintf('compareMeanDV-%s', deparse(DV)), extras=append(list(theme(axis.title.x=element_blank())), extras))
 }
 
 plotDVDiffs <- function(sumTbl) {
-	plotBarSumTbl(sumTbl, DVDirection, sprintf('compareDVDiffs'), extras=list(theme(legend.position='top', legend.direction='vertical'),coord_flip()))
+	plotBarSumTbl(sumTbl, DVDirection, sprintf('compareDVDiffs'), extras=list(theme(legend.position='top', legend.direction='vertical', axis.title.y=element_blank()),
+										  #labs(x=element_blank()),
+										  labs(y='Mean Difference in Accuracy'),
+										  scale_fill_discrete(name='Difference Type'),
+										  coord_flip()))
 }
 
-compareOptimalDs <- function(modelVsPredTbl) compareMeanDV(modelVsPredTbl, median)
-compareOptimalAcc <- function(modelVsPredTbl) compareMeanDV(modelVsPredTbl, acc)
+compareOptimalDs <- function(modelVsPredTbl) compareMeanDV(modelVsPredTbl, median, list(labs(y='Mean Optimal d')))
+compareOptimalAcc <- function(modelVsPredTbl) compareMeanDV(modelVsPredTbl, acc, list(labs(y='Mean Accuracy')))
 
 # TODO: Find a library that implements this
 wrapQuotes <- function(charVect) {
