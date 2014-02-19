@@ -130,7 +130,6 @@ sqlScratch <- function() {
 	data.table(sqldf('select * from topusers order by rank'))
 	sqldf("select * from tweets where user_screen_name='jlo'")
 	data.table(sqldf('select * from (select user_screen_name,count(*) from tweets group by user_screen_name) as t join topUsers as u on t.user_screen_name = u.user_screen_name order by rank'))
-	sqldf("select * from topUsers")[1:100,]
 	data.table(sqldf("select retweeted, count(*) from tweets group by retweeted"))[, min(count) / (max(count) + min(count))]
 	sqldf("select * from tweets where 1=1 and user_screen_name='katyperry' limit 10")
 	foo = data.table(sqldf("select * from twitter_users"))
@@ -358,6 +357,11 @@ onlyFirstT <- function(bool) {
 	ret
 }
 
+guardAllEqualP <- function(vect) {
+	stopifnot(length(unique(vect)) <= 1)
+	vect
+}
+
 modelVsPredForDV <- function(modelHashtagsTbl, DVName) {
 	tempTbl = modelHashtagsTbl[, list(NCell=.N, DVName=DVName), by=c('user_screen_name', DVName, 'hashtagUsedP', 'd')]
 	setnames(tempTbl, DVName, 'topHashtag')
@@ -433,7 +437,7 @@ visModelVsPredTbl <- function(modelVsPredTbl) {
 	assign('p4', ggplot(modelVsPredTbl[predUsedBest == T], aes(d)) +
 	       geom_histogram(aes(y = ..density..)) +
 	       geom_density())
-	ext = sprintf('%s-%s', p1$data$datasetName[1], p1$data$DVName[1])
+	ext = sprintf('%s-%s', guardAllEqualP(p1$data$datasetName)[1], guardAllEqualP(p1$data$DVName)[1])
 	myPlotPrint(p1, sprintf('visDByN-%s', ext)) 
 	myPlotPrint(p2, sprintf('visNormMean-%s', ext)) 
 	myPlotPrint(p3, sprintf('visAcc-%s', ext)) 
@@ -443,8 +447,8 @@ visModelVsPredTbl <- function(modelVsPredTbl) {
 tableModelVsPredTbl <- function(modelVsPredTbl) {
 	# Summary table of optimal d values and sample variance
 	modelVsPredTbl[predUsedBest == T][, list(mean=mean(d), median=median(d), totN=mean(totN), NCell=mean(NCell), acc=mean(NCell/totN),
-						 datasetName=datasetName[1],
-						 datasetGroup=datasetGroup[1],
+						 datasetName=guardAllEqualP(datasetName)[1],
+						 datasetGroup=guardAllEqualP(datasetGroup)[1],
 						 #sdCI=sqrt(CIVar(d)), sdCI1=sqrt(CIVar2(d)), meanCI=CI(d))
 						 sd=sd(d)), by=list(datasetNameRoot, runNum, DVName)]
 }
