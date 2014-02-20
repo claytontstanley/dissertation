@@ -81,7 +81,7 @@ html2txt <- function(str) {
 html2txt2 <- function(vect) {
 	inFile = tempfile(pattern='htmlIn-', tmpdir='/tmp', fileext='.csv')
 	outFile = tempfile(pattern='htmlOut-', tmpdir='/tmp', fileext='.csv')
-	write.csv(vect, file=inFile, row.names=F)
+	myWriteCSV(vect, file=inFile)
 	cmd = '/opt/local/bin/python'
 	args = sprintf('%s/bin/html2txt.py %s %s', PATH, inFile, outFile)
 	myLog(sprintf('running html2txt with in/out temp files: %s, %s', inFile, outFile))
@@ -110,6 +110,10 @@ withKey <- function(tbl, conKey, thunk) {
 
 myReadCSV <- function(file, ...) {
 	data.table(read.csv(file, stringsAsFactors=F, ...))
+}
+
+myWriteCSV <- function(data, file, ...) {
+	write.csv(data, file=file, row.names=F, ...)
 }
 
 # Computing CIs around a variance statistic
@@ -447,7 +451,7 @@ genAggModelVsPredTbl <- function(hashtagsTbl, config) {
 	res = users[, genModelVsPredTbl(hashtagsTbl[cur_user_screen_name], ds, cur_user_screen_name), by=cur_user_screen_name]
 	res[, cur_user_screen_name := NULL]
 	setkey(res, user_screen_name, DVName, d)
-	write.csv(res, row.names=F, file=outFile)
+	myWriteCSV(res, file=outFile)
 	list(modelVsPredTbl=res, modelHashtagsTbl=modelHashtagsTbls)
 }
 
@@ -849,13 +853,13 @@ genNcoocTblSO <- function(numPosts) {
 	NcoocTblTags = getNcoocTbl(tokenizedTblTitle, tokenizedTblTags)
 	NcoocTblBody = getNcoocTbl(tokenizedTblBody, tokenizedTblTags)
 	outFile = sprintf('%s/dissertationData/cooc/NcoocTblBody%s.csv', PATH, numPosts)
-	write.csv(NcoocTblBody, row.names=F, file=outFile) 
+	myWriteCSV(NcoocTblBody, file=outFile) 
 	outFile = sprintf('%s/dissertationData/cooc/NcoocTblTitle%s.csv', PATH, numPosts)
-	write.csv(NcoocTblTitle, row.names=F, file=outFile) 
+	myWriteCSV(NcoocTblTitle, file=outFile) 
 }
 
 curWS <- function() {
-	withProf(genNcoocTblSO(1000))
+	withProf(genNcoocTblSO(100))
 	test_dir(sprintf("%s/%s", PATH, 'tests'), reporter='summary')
 	runTFollow1k()
 	runSO1kr2()
