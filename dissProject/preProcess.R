@@ -210,10 +210,12 @@ getPostsTbl <- function(sqlStr, config) {
 	postsTbl
 }
 
+matchWhitespace = '\\S+'
+matchTag = '(?<=<)[^>]+(?=>)'
 
 getHashtagsTbl <- function(tweetsTbl, config) {
 	from = config$from
-	tokenizedTbl = getTokenizedTbl(tweetsTbl, from=from, regex='\\S+')
+	tokenizedTbl = getTokenizedTbl(tweetsTbl, from=from, regex=matchWhitespace)
 	htOfTokenizedTbl = tokenizedTbl[grepl('^#', chunk),]
 	stopifnot(c('id') == key(htOfTokenizedTbl))
 	hashtagsTbl = htOfTokenizedTbl[tweetsTbl, list(hashtag=chunk, pos=pos, created_at=created_at, dt=dt, user_id=user_id, user_screen_name=user_screen_name), nomatch=0]
@@ -222,7 +224,7 @@ getHashtagsTbl <- function(tweetsTbl, config) {
 }
 
 getTagsTbl <- function(postsTbl, config) {
-	tokenizedTbl = getTokenizedTbl(postsTbl, from='tagsNoHtml', regex='(?<=<)[^>]+(?=>)')
+	tokenizedTbl = getTokenizedTbl(postsTbl, from='tagsNoHtml', regex=matchTag)
 	if (config$convertTagSynonymsP) {
 		withKey(tokenizedTbl, chunk,
 			{tokenizedTbl[getTagSynonymsTbl(), chunk := target_tag_name]
@@ -840,10 +842,10 @@ genNcoocTblSO <- function(numPosts) {
 	postsTbl = getPostsTbl(sprintf('select id, owner_user_id, creation_date, title, body, tags from posts where post_type_id = 1 limit %d', numPosts), defaultSOConfig)
 	postsTbl[, tags := NULL][, bodyNoHtml := html2txt2(body)][, body := NULL]
 	addTokenText(postsTbl, from='title')
-	tokenizedTblTitle = getTokenizedTbl(postsTbl, from='tokenText', regex='\\S+')[, type := 'title']
+	tokenizedTblTitle = getTokenizedTbl(postsTbl, from='tokenText', regex=matchWhitespace)[, type := 'title']
 	addTokenText(postsTbl, from='bodyNoHtml')
-	tokenizedTblBody = getTokenizedTbl(postsTbl, from='tokenText', regex='\\S+')[, type := 'body']
-	tokenizedTblTags = getTokenizedTbl(postsTbl, from='tagsNoHtml', regex='(?<=<)[^>]+(?=>)')[, type := 'tag'][, pos := NaN]
+	tokenizedTblBody = getTokenizedTbl(postsTbl, from='tokenText', regex=matchWhitespace)[, type := 'body']
+	tokenizedTblTags = getTokenizedTbl(postsTbl, from='tagsNoHtml', regex=matchTag)[, type := 'tag'][, pos := NaN]
 	NcoocTblTags = getNcoocTbl(tokenizedTblTitle, tokenizedTblTags)
 	NcoocTblBody = getNcoocTbl(tokenizedTblBody, tokenizedTblTags)
 	outFile = sprintf('%s/dissertationData/cooc/NcoocTblBody%s.csv', PATH, numPosts)
@@ -853,7 +855,7 @@ genNcoocTblSO <- function(numPosts) {
 }
 
 curWS <- function() {
-	withProf(genNcoocTblSO(10000))
+	withProf(genNcoocTblSO(1000))
 	test_dir(sprintf("%s/%s", PATH, 'tests'), reporter='summary')
 	runTFollow1k()
 	runSO1kr2()
