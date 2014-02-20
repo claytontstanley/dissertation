@@ -852,7 +852,6 @@ genNcoocTblSO <- function(numPosts) {
 	write.csv(NcoocTblTitle, row.names=F, file=outFile) 
 }
 
-
 curWS <- function() {
 	withProf(genNcoocTblSO(10000))
 	test_dir(sprintf("%s/%s", PATH, 'tests'), reporter='summary')
