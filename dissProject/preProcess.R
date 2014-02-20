@@ -713,7 +713,6 @@ compareDBestVsMax <- function(modelVsPredTbl) {
 	sumTbl[, list(diff=acc[2]-acc[1], direction=paste('best d', '-', 'max d')), by=list(datasetName, user_screen_name, DVName)][, genComparisonTbl(.SD)]
 }
 
-
 plotBarSumTbl <- function(sumTbl, fillCol, figName, extras=NULL) {
 	fillCol = substitute(fillCol)
 	expr = bquote(ggplot(sumTbl, aes(x=factor(datasetGroup), y=meanVal, fill=.(fillCol))) +
