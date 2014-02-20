@@ -175,29 +175,35 @@ addTokenText <- function(tweetsTbl, from) {
 	myLog(paste(readLines(stderFile), sep='\n'))
 	tokenTextTbl = data.table(read.delim(tokenizedTweetsFile, sep='\t', quote="", header=F, stringsAsFactors=F))
 	tweetsTbl[, tokenText := tokenTextTbl[[1]]]
+	return()
 }
 
-fooFun <- function() {
-	postsTbl = getPostsTbl('select id, owner_user_id, creation_date, title, body, tags from posts where post_type_id = 1 limit 100000', defaultSOConfig) 
-	postsTbl[, tags := NULL]
-	addTokenText(postsTbl, from='title')
-	tokenizedTblTitle = getTokenizedTbl(postsTbl, from='tokenText', regex='\\S+')
-	tokenizedTblTitle[, type := 'title']
-	tokenizedTblTags = getTokenizedTbl(postsTbl, from='tagsNoHtml', regex='(?<=<)[^>]+(?=>)')
-	tokenizedTblTags[, type := 'tag']
-	tokenizedTblTags[, pos := NaN]
-	tokenizedTblTitle
-	tokenizedTblTags
-	setkey(tokenizedTblTitle, id)
+getNcoocTbl <- function(tokenizedTblChunks, tokenizedTblTags) {
+	setkey(tokenizedTblChunks, id)
 	setkey(tokenizedTblTags, id)
-	coOcTbl = tokenizedTblTitle[tokenizedTblTags, allow.cartesian=T][, list(id=id, chunk=chunk, tag=chunk.1)]
-	coOcTbl[, .N, by=list(chunk, tag)]
-	tokenizedTbl
-	tables()
-	?combn
-	?outer
-	expand.grid(c(1,2,3), c(1,2,3))
+	fun = function(tbl) tbl[, posFromTag := pos - pos.1][, list(id=id, chunk=chunk, tag=chunk.1, posFromTag=posFromTag)]
+	coocTbl = tokenizedTblChunks[tokenizedTblTags, allow.cartesian=T][, fun(copy(.SD))]
+	NcoocTbl = coocTblTitle[, .N, by=list(chunk, tag, posFromTag)]
+	NcoocTbl
 }
+
+genNcoocTblSO <- function(numPosts) {
+	postsTbl = getPostsTbl(sprintf('select id, owner_user_id, creation_date, title, body, tags from posts where post_type_id = 1 limit %d', numPosts), defaultSOConfig)
+	postsTbl[, tags := NULL][, bodyNoHtml := html2txt2(body)][, body := NULL]
+	addTokenText(postsTbl, from='title')
+	tokenizedTblTitle = getTokenizedTbl(postsTbl, from='tokenText', regex='\\S+')[, type := 'title']
+	addTokenText(postsTbl, from='bodyNoHtml')
+	tokenizedTblBody = getTokenizedTbl(postsTbl, from='tokenText', regex='\\S+')[, type := 'body']
+	tokenizedTblTags = getTokenizedTbl(postsTbl, from='tagsNoHtml', regex='(?<=<)[^>]+(?=>)')[, type := 'tag'][, pos := NaN]
+	NcoocTblTags = getNcoocTbl(tokenizedTblTitle, tokenizedTblTags)
+	NcoocTblBody = getNcoocTbl(tokenizedTblBody, tokenizedTblTags)
+	outFile = sprintf('%s/dissertationData/cooc/NcoocTblBody%s.csv', PATH, numPosts)
+	write.csv(NcoocTblBody, row.names=F, file=outFile) 
+	outFile = sprintf('%s/dissertationData/cooc/NcoocTblTitle%s.csv', PATH, numPosts)
+	write.csv(NcoocTblTitle, row.names=F, file=outFile) 
+}
+
+#genNcoocTblSO(10000)
 
 getDiffTimeSinceFirst <- function(ts) {
 	as.numeric(difftime(ts, ts[1], units='secs'))
@@ -853,7 +859,6 @@ curWS <- function() {
 	.ls.objects(order.by='Size')
 	lapply(split(lst, ceiling(seq_along(lst)/2)), print)
 	split(c(1,3,4,5,6),ceiling(seq_along(c(1,3,4,5,6))/2))
-	tables()
 	test_dir(sprintf("%s/%s", PATH, 'tests'), reporter='summary')
 	tweetsTbl = getTweetsTbl("select * from tweets limit 100000")
 	tweetsTbl = getTweetsTbl("select * from tweets where user_screen_name='eddieizzard'")

@@ -21,5 +21,4 @@ with open("%s" % (sys.argv[2]), 'wb') as f:
     writer = unicodecsv.writer(f, encoding='utf-8', quoting=unicodecsv.QUOTE_ALL)
     writer.writerows(res)
 
-
-print(1)
+exit()
