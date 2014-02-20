@@ -178,33 +178,6 @@ addTokenText <- function(tweetsTbl, from) {
 	return()
 }
 
-getNcoocTbl <- function(tokenizedTblChunks, tokenizedTblTags) {
-	setkey(tokenizedTblChunks, id)
-	setkey(tokenizedTblTags, id)
-	fun = function(tbl) tbl[, posFromTag := pos - pos.1][, list(id=id, chunk=chunk, tag=chunk.1, posFromTag=posFromTag)]
-	coocTbl = tokenizedTblChunks[tokenizedTblTags, allow.cartesian=T][, fun(copy(.SD))]
-	NcoocTbl = coocTblTitle[, .N, by=list(chunk, tag, posFromTag)]
-	NcoocTbl
-}
-
-genNcoocTblSO <- function(numPosts) {
-	postsTbl = getPostsTbl(sprintf('select id, owner_user_id, creation_date, title, body, tags from posts where post_type_id = 1 limit %d', numPosts), defaultSOConfig)
-	postsTbl[, tags := NULL][, bodyNoHtml := html2txt2(body)][, body := NULL]
-	addTokenText(postsTbl, from='title')
-	tokenizedTblTitle = getTokenizedTbl(postsTbl, from='tokenText', regex='\\S+')[, type := 'title']
-	addTokenText(postsTbl, from='bodyNoHtml')
-	tokenizedTblBody = getTokenizedTbl(postsTbl, from='tokenText', regex='\\S+')[, type := 'body']
-	tokenizedTblTags = getTokenizedTbl(postsTbl, from='tagsNoHtml', regex='(?<=<)[^>]+(?=>)')[, type := 'tag'][, pos := NaN]
-	NcoocTblTags = getNcoocTbl(tokenizedTblTitle, tokenizedTblTags)
-	NcoocTblBody = getNcoocTbl(tokenizedTblBody, tokenizedTblTags)
-	outFile = sprintf('%s/dissertationData/cooc/NcoocTblBody%s.csv', PATH, numPosts)
-	write.csv(NcoocTblBody, row.names=F, file=outFile) 
-	outFile = sprintf('%s/dissertationData/cooc/NcoocTblTitle%s.csv', PATH, numPosts)
-	write.csv(NcoocTblTitle, row.names=F, file=outFile) 
-}
-
-#genNcoocTblSO(10000)
-
 getDiffTimeSinceFirst <- function(ts) {
 	as.numeric(difftime(ts, ts[1], units='secs'))
 }
@@ -854,15 +827,40 @@ analyzeModelVsPredTbl <- function(modelVsPredTbl) {
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostOL2' & datasetName=='SOQgt500r2' & d < 1])
 }
 
+getNcoocTbl <- function(tokenizedTblChunks, tokenizedTblTags) {
+	setkey(tokenizedTblChunks, id)
+	setkey(tokenizedTblTags, id)
+	fun = function(tbl) tbl[, posFromTag := pos - pos.1][, list(id=id, chunk=chunk, tag=chunk.1, posFromTag=posFromTag)]
+	coocTbl = tokenizedTblChunks[tokenizedTblTags, allow.cartesian=T][, fun(copy(.SD))]
+	NcoocTbl = coocTblTitle[, .N, by=list(chunk, tag, posFromTag)]
+	NcoocTbl
+}
+
+genNcoocTblSO <- function(numPosts) {
+	postsTbl = getPostsTbl(sprintf('select id, owner_user_id, creation_date, title, body, tags from posts where post_type_id = 1 limit %d', numPosts), defaultSOConfig)
+	postsTbl[, tags := NULL][, bodyNoHtml := html2txt2(body)][, body := NULL]
+	addTokenText(postsTbl, from='title')
+	tokenizedTblTitle = getTokenizedTbl(postsTbl, from='tokenText', regex='\\S+')[, type := 'title']
+	addTokenText(postsTbl, from='bodyNoHtml')
+	tokenizedTblBody = getTokenizedTbl(postsTbl, from='tokenText', regex='\\S+')[, type := 'body']
+	tokenizedTblTags = getTokenizedTbl(postsTbl, from='tagsNoHtml', regex='(?<=<)[^>]+(?=>)')[, type := 'tag'][, pos := NaN]
+	NcoocTblTags = getNcoocTbl(tokenizedTblTitle, tokenizedTblTags)
+	NcoocTblBody = getNcoocTbl(tokenizedTblBody, tokenizedTblTags)
+	outFile = sprintf('%s/dissertationData/cooc/NcoocTblBody%s.csv', PATH, numPosts)
+	write.csv(NcoocTblBody, row.names=F, file=outFile) 
+	outFile = sprintf('%s/dissertationData/cooc/NcoocTblTitle%s.csv', PATH, numPosts)
+	write.csv(NcoocTblTitle, row.names=F, file=outFile) 
+}
+
+
 curWS <- function() {
-	runTFollow1k()
-	.ls.objects(order.by='Size')
-	lapply(split(lst, ceiling(seq_along(lst)/2)), print)
-	split(c(1,3,4,5,6),ceiling(seq_along(c(1,3,4,5,6))/2))
+	withProf(genNcoocTblSO(10000))
 	test_dir(sprintf("%s/%s", PATH, 'tests'), reporter='summary')
+	runTFollow1k()
+	runSO1kr2()
+	.ls.objects(order.by='Size')
 	tweetsTbl = getTweetsTbl("select * from tweets limit 100000")
 	tweetsTbl = getTweetsTbl("select * from tweets where user_screen_name='eddieizzard'")
-	runSO1kr2()
 	# Checking that tweets for twitter users from each followers_count,statuses_count scale are being collected properly
 	usersWithTweetsTbl = data.table(sqldf("select distinct on (user_id) t.user_screen_name,u.followers_count,u.statuses_count from tweets as t join twitter_users as u on t.user_screen_name = u.user_screen_name"))
 	usersWithTweetsTbl
