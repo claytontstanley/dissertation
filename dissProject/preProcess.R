@@ -70,11 +70,25 @@ myPlotPrint <- function(fig, name) {
 	fig
 }
 
+
 # ref: http://stackoverflow.com/questions/5060076/convert-html-character-entity-encoding-in-r
 html2txt <- function(str) {
 	xpathApply(htmlParse(str, asText=TRUE),
 		   "//body//text()", 
 		   xmlValue)[[1]] 
+}
+
+html2txt2 <- function(vect) {
+	inFile = tempfile(pattern='htmlIn-', tmpdir='/tmp', fileext='.csv')
+	outFile = tempfile(pattern='htmlOut-', tmpdir='/tmp', fileext='.csv')
+	write.csv(vect, file=inFile, row.names=F)
+	cmd = '/opt/local/bin/python'
+	args = sprintf('%s/bin/html2txt.py %s %s', PATH, inFile, outFile)
+	myLog(sprintf('running html2txt with in/out temp files: %s, %s', inFile, outFile))
+	cmdOut = system2(cmd, args=args)
+	res = myReadCSV(outFile, header=F)
+	stopifnot(res$V1 == vect)
+	res$V2
 }
 
 withProf <- function(thunk) {
@@ -163,6 +177,28 @@ addTokenText <- function(tweetsTbl, from) {
 	tweetsTbl[, tokenText := tokenTextTbl[[1]]]
 }
 
+fooFun <- function() {
+	postsTbl = getPostsTbl('select id, owner_user_id, creation_date, title, body, tags from posts where post_type_id = 1 limit 100000', defaultSOConfig) 
+	postsTbl[, tags := NULL]
+	addTokenText(postsTbl, from='title')
+	tokenizedTblTitle = getTokenizedTbl(postsTbl, from='tokenText', regex='\\S+')
+	tokenizedTblTitle[, type := 'title']
+	tokenizedTblTags = getTokenizedTbl(postsTbl, from='tagsNoHtml', regex='(?<=<)[^>]+(?=>)')
+	tokenizedTblTags[, type := 'tag']
+	tokenizedTblTags[, pos := NaN]
+	tokenizedTblTitle
+	tokenizedTblTags
+	setkey(tokenizedTblTitle, id)
+	setkey(tokenizedTblTags, id)
+	coOcTbl = tokenizedTblTitle[tokenizedTblTags, allow.cartesian=T][, list(id=id, chunk=chunk, tag=chunk.1)]
+	coOcTbl[, .N, by=list(chunk, tag)]
+	tokenizedTbl
+	tables()
+	?combn
+	?outer
+	expand.grid(c(1,2,3), c(1,2,3))
+}
+
 getDiffTimeSinceFirst <- function(ts) {
 	as.numeric(difftime(ts, ts[1], units='secs'))
 }
@@ -188,10 +224,13 @@ getPostsTbl <- function(sqlStr, config) {
 	setkey(postsTbl, id)
 	stopifnot(!duplicated(postsTbl$id))
 	# TODO: this is not vectorized b/c html2txt isn't vectorized
-	postsTbl[, tagsNoHtml := html2txt(tags), by=id]
+	# FIXME: Test this change
+	#postsTbl[, tagsNoHtml := html2txt(tags), by=id]
+	postsTbl[, tagsNoHtml := html2txt2(tags)]
 	postsTbl[, dt := getDiffTimeSinceFirst(creation_date), by=owner_user_id]
 	postsTbl
 }
+
 
 getHashtagsTbl <- function(tweetsTbl, config) {
 	from = config$from
@@ -812,8 +851,6 @@ analyzeModelVsPredTbl <- function(modelVsPredTbl) {
 curWS <- function() {
 	runTFollow1k()
 	.ls.objects(order.by='Size')
-	?seq_along
-	lst = c(1,2,4,5,6,7)
 	lapply(split(lst, ceiling(seq_along(lst)/2)), print)
 	split(c(1,3,4,5,6),ceiling(seq_along(c(1,3,4,5,6))/2))
 	tables()
