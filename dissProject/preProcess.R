@@ -178,6 +178,7 @@ addTokenText <- function(tweetsTbl, from) {
 	cmdOut = system2(cmd, args=args)
 	myLog(paste(readLines(stderFile), sep='\n'))
 	tokenTextTbl = data.table(read.delim(tokenizedTweetsFile, sep='\t', quote="", header=F, stringsAsFactors=F))
+	stopifnot(tokenTextTbl[[2]] == tweetsTbl[[from]])
 	tweetsTbl[, tokenText := tokenTextTbl[[1]]]
 	return()
 }
