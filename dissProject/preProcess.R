@@ -261,7 +261,7 @@ computeActs <- function(hashtags, dtP, cTime, d) {
 }
 
 computeActsForUser <- function(hashtag, dt, ds, user_screen_name) {
-	myLog(sprintf('computing partial activation for user %s', user_screen_name))
+	#myLog(sprintf('computing partial activation for user %s', user_screen_name))
 	retIndeces = which(!duplicated(dt))[-1]
 	stopifnot(length(retIndeces) > 0)
 	partialRes = data.table(i=retIndeces)
@@ -273,9 +273,9 @@ computeActsForUser <- function(hashtag, dt, ds, user_screen_name) {
 computeActsByUser <- function(hashtagsTbl, ds) {
 	partialRes = hashtagsTbl[, computeActsForUser(hashtag, dt, ds, user_screen_name), by=user_screen_name]
 	debugPrint(partialRes)
-	myLog('setting key for partial table')
+	#myLog('setting key for partial table')
 	setkeyv(partialRes, c('user_screen_name','dt','hashtag','d'))
-	myLog('computing activations across table')
+	#myLog('computing activations across table')
 	res = partialRes[, list(N=.N,
 				act=log(sum(partialAct)),
 				actOL=if (d[1]>=1) NaN else log(.N/(1-d))-d*log(dt),
@@ -410,9 +410,10 @@ genAggModelVsPredTbl <- function(hashtagsTbl, config) {
 	outFile = config$modelVsPredOutFile
 	ds = config$ds
 	modelHashtagsTbls = data.table()
-	genModelVsPredTbl <- function(hashtagsTbl, d, userScreenName) {
+	genModelVsPredTbl <- function(hashtagsTbl, ds, userScreenName) {
 		myLog(sprintf('generating model predictions for user %s', userScreenName))
-		modelHashtagsTbl = computeActsByUser(hashtagsTbl, d=d)
+		modelHashtagsTbl = rbindlist(lapply(ds, function(d) computeActsByUser(hashtagsTbl, d=d)))
+		setkey(modelHashtagsTbl, user_screen_name, dt, hashtag, d)
 		addMetrics(hashtagsTbl, modelHashtagsTbl)
 		modelVsPredTbl = getModelVsPredTbl(modelHashtagsTbl, hashtagsTbl)	
 		if (config$accumModelHashtagsTbl == T) modelHashtagsTbls <<- rbind(modelHashtagsTbls, modelHashtagsTbl)
@@ -811,11 +812,15 @@ analyzeModelVsPredTbl <- function(modelVsPredTbl) {
 curWS <- function() {
 	runTFollow1k()
 	.ls.objects(order.by='Size')
+	?seq_along
+	lst = c(1,2,4,5,6,7)
+	lapply(split(lst, ceiling(seq_along(lst)/2)), print)
+	split(c(1,3,4,5,6),ceiling(seq_along(c(1,3,4,5,6))/2))
 	tables()
 	test_dir(sprintf("%s/%s", PATH, 'tests'), reporter='summary')
 	tweetsTbl = getTweetsTbl("select * from tweets limit 100000")
 	tweetsTbl = getTweetsTbl("select * from tweets where user_screen_name='eddieizzard'")
-	runSOQgt050r2()
+	runSO1kr2()
 	# Checking that tweets for twitter users from each followers_count,statuses_count scale are being collected properly
 	usersWithTweetsTbl = data.table(sqldf("select distinct on (user_id) t.user_screen_name,u.followers_count,u.statuses_count from tweets as t join twitter_users as u on t.user_screen_name = u.user_screen_name"))
 	usersWithTweetsTbl
