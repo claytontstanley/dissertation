@@ -25,7 +25,13 @@ FILE = getNameOfThisFile()
 options(sqldf.RPostgreSQL.user = 'claytonstanley',
 	sqldf.RPostgreSQL.dbname = 'claytonstanley')
 options("scipen"=100, "digits"=4)
-con <- dbConnect(PostgreSQL(), host="localhost", user= "claytonstanley", dbname="claytonstanley")
+
+withDBConnect <- function(var, thunk) {
+	var = substitute(var)
+	eval(bquote(assign(.(deparse(var)), dbConnect(PostgreSQL(), host="localhost", user= "claytonstanley", dbname="claytonstanley"))))
+	on.exit(eval(bquote(dbDisconnect(.(var)))))
+	eval(substitute(thunk))
+}
 
 # Interface to retrieve chunkHash for chunk name
 getHashes <- function(vals, db) {
@@ -842,6 +848,7 @@ getNcoocTbl <- function(tokenizedTblChunks, tokenizedTblTags) {
 	fun = function(tbl) tbl[, posFromTag := pos - pos.1][, list(id=id, chunk=chunk, tag=chunk.1, posFromTag=posFromTag)]
 	coocTbl = tokenizedTblChunks[tokenizedTblTags, allow.cartesian=T][, fun(copy(.SD))]
 	NcoocTbl = coocTbl[, .N, by=list(chunk, tag, posFromTag)]
+	NcoocTbl[, NChunkTag := .N, by=list(chunk, tag)]
 	tables()
 	NcoocTbl
 }
@@ -871,7 +878,8 @@ genNcoocTblSO <- function(startId, endId, group_name='SOShuffledFull') {
 	myWriteCSV(NcoocTblTitle, file=outFile) 
 }
 
-runGenNcoocTblSO1thru50 <- function() genNcoocTblSO(1, 50)
+runGenNcoocTblSO1thru100 <- function() genNcoocTblSO(1, 100)
+runGenNcoocTblSO1thru1000 <- function() genNcoocTblSO(1, 1000)
 runGenNcoocTblSO1thru10000 <- function() genNcoocTblSO(1, 10000)
 runGenNcoocTblSO1thru100000 <- function() genNcoocTblSO(1, 100000)
 
@@ -882,12 +890,11 @@ addPostSubsets <- function() {
 	postIdsTbl[, group_name := 'SOShuffledFull']
 	setcolorder(postIdsTbl, c('post_id', 'id', 'group_name'))
 	setkey(postIdsTbl, group_name, id)
-	dbWriteTable(con, "post_subsets", postIdsTbl, append=T, row.names=0)
+	withDBConnect(dbCon, dbWriteTable(dbCon, "post_subsets", postIdsTbl, append=T, row.names=0))
 }
 
 curWS <- function() {
-	runGenNcoocTblSO1thru50()
-	runGenNcoocTblSO1thru10000()
+	runGenNcoocTblSO1thru100()
 	test_dir(sprintf("%s/%s", PATH, 'tests'), reporter='summary')
 	runTFollow1k()
 	runSO1kr2()
