@@ -25,6 +25,7 @@ FILE = getNameOfThisFile()
 options(sqldf.RPostgreSQL.user = 'claytonstanley',
 	sqldf.RPostgreSQL.dbname = 'claytonstanley')
 options("scipen"=100, "digits"=4)
+con <- dbConnect(PostgreSQL(), host="localhost", user= "claytonstanley", dbname="claytonstanley")
 
 # Interface to retrieve chunkHash for chunk name
 getHashes <- function(vals, db) {
@@ -725,7 +726,7 @@ compare2DVs <- function(modelVsPredTbl, DVs, sortedOrder=c(1,2)) {
 compare2Runs <- function(modelVsPredTbl, runNums) {
 	sumTbl = modelVsPredTbl[predUsedBest == T][runNum %in% runNums]
 	setkey(sumTbl, datasetNameRoot, DVName, user_screen_name, runNum)
-	sumTbl[, list(diff=acc[2]-acc[1], direction=sprintf('run%d - run%d', runNums[2], runNums[1])), by=list(datasetNameRoot, DVName, user_screen_name)][, genComparisonTbl(.SD)]
+	sumTbl[, list(diff=acc[2]-acc[1], direction=sprintf('run%s - run%s', runNums[2], runNums[1])), by=list(datasetNameRoot, DVName, user_screen_name)][, genComparisonTbl(.SD)]
 }
 
 compareDBestVsMin <- function(modelVsPredTbl) {
@@ -840,28 +841,53 @@ getNcoocTbl <- function(tokenizedTblChunks, tokenizedTblTags) {
 	setkey(tokenizedTblTags, id)
 	fun = function(tbl) tbl[, posFromTag := pos - pos.1][, list(id=id, chunk=chunk, tag=chunk.1, posFromTag=posFromTag)]
 	coocTbl = tokenizedTblChunks[tokenizedTblTags, allow.cartesian=T][, fun(copy(.SD))]
-	NcoocTbl = coocTblTitle[, .N, by=list(chunk, tag, posFromTag)]
+	NcoocTbl = coocTbl[, .N, by=list(chunk, tag, posFromTag)]
+	tables()
 	NcoocTbl
 }
 
-genNcoocTblSO <- function(numPosts) {
-	postsTbl = getPostsTbl(sprintf('select id, owner_user_id, creation_date, title, body, tags from posts where post_type_id = 1 limit %d', numPosts), defaultSOConfig)
+genNcoocTblSO <- function(startId, endId, group_name='SOShuffledFull') {
+	postsTbl = getPostsTbl(sprintf("select id, owner_user_id, creation_date, title, body, tags
+				       from posts
+				       where post_type_id = 1
+				       and id in (select post_id 
+						  from post_subsets
+						  where id >= %s
+						  and id <= %s
+						  and group_name = '%s')",
+				       startId, endId, group_name), defaultSOConfig)
+	stopifnot(nrow(postsTbl) == endId - startId + 1)
 	postsTbl[, tags := NULL][, bodyNoHtml := html2txt2(body)][, body := NULL]
 	addTokenText(postsTbl, from='title')
 	tokenizedTblTitle = getTokenizedTbl(postsTbl, from='tokenText', regex=matchWhitespace)[, type := 'title']
 	addTokenText(postsTbl, from='bodyNoHtml')
 	tokenizedTblBody = getTokenizedTbl(postsTbl, from='tokenText', regex=matchWhitespace)[, type := 'body']
 	tokenizedTblTags = getTokenizedTbl(postsTbl, from='tagsNoHtml', regex=matchTag)[, type := 'tag'][, pos := NaN]
-	NcoocTblTags = getNcoocTbl(tokenizedTblTitle, tokenizedTblTags)
+	NcoocTblTitle = getNcoocTbl(tokenizedTblTitle, tokenizedTblTags)
 	NcoocTblBody = getNcoocTbl(tokenizedTblBody, tokenizedTblTags)
-	outFile = sprintf('%s/dissertationData/cooc/NcoocTblBody%s.csv', PATH, numPosts)
+	outFile = sprintf('%s/dissertationData/cooc/NcoocTblBody-%s-thru-%s.csv', PATH, startId, endId)
 	myWriteCSV(NcoocTblBody, file=outFile) 
-	outFile = sprintf('%s/dissertationData/cooc/NcoocTblTitle%s.csv', PATH, numPosts)
+	outFile = sprintf('%s/dissertationData/cooc/NcoocTblTitle%s-thru-%s.csv', PATH, startId, endId)
 	myWriteCSV(NcoocTblTitle, file=outFile) 
 }
 
+runGenNcoocTblSO1thru50 <- function() genNcoocTblSO(1, 50)
+runGenNcoocTblSO1thru10000 <- function() genNcoocTblSO(1, 10000)
+runGenNcoocTblSO1thru100000 <- function() genNcoocTblSO(1, 100000)
+
+addPostSubsets <- function() {
+	postIdsTbl = data.table(sqldf('select id from posts where post_type_id = 1'))
+	postIdsTbl[, post_id := id][, id := NULL]
+	postIdsTbl[, id := sample(1:length(post_id), size=length(post_id))]
+	postIdsTbl[, group_name := 'SOShuffledFull']
+	setcolorder(postIdsTbl, c('post_id', 'id', 'group_name'))
+	setkey(postIdsTbl, group_name, id)
+	dbWriteTable(con, "post_subsets", postIdsTbl, append=T, row.names=0)
+}
+
 curWS <- function() {
-	withProf(genNcoocTblSO(100))
+	runGenNcoocTblSO1thru50()
+	runGenNcoocTblSO1thru10000()
 	test_dir(sprintf("%s/%s", PATH, 'tests'), reporter='summary')
 	runTFollow1k()
 	runSO1kr2()

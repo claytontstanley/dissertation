@@ -20,6 +20,14 @@ create table if not exists tweets (
 	primary key (id)
 	);
 
+drop table if exists post_subsets cascade;
+create table if not exists post_subsets (
+	post_id integer not null,
+	id integer not null,
+	group_name text not null,
+	primary key (post_id, group_name)
+	);
+
 create index user_screen_name_index_tweets on tweets (user_screen_name);
 create index user_id_index_tweets on tweets (user_id);
 
