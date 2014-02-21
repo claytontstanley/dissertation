@@ -870,6 +870,7 @@ genNcoocTblSO <- function(startId, endId, group_name='SOShuffledFull') {
 	addTokenText(postsTbl, from='bodyNoHtml')
 	tokenizedTblBody = getTokenizedTbl(postsTbl, from='tokenText', regex=matchWhitespace)[, type := 'body']
 	tokenizedTblTags = getTokenizedTbl(postsTbl, from='tagsNoHtml', regex=matchTag)[, type := 'tag'][, pos := NaN]
+	# FIXME: Add reduce function here, then use it how to do subset?
 	NcoocTblTitle = getNcoocTbl(tokenizedTblTitle, tokenizedTblTags)
 	NcoocTblBody = getNcoocTbl(tokenizedTblBody, tokenizedTblTags)
 	outFile = sprintf('%s/dissertationData/cooc/NcoocTblBody-%s-thru-%s.csv', PATH, startId, endId)
@@ -890,6 +891,7 @@ addPostSubsets <- function() {
 	postIdsTbl[, group_name := 'SOShuffledFull']
 	setcolorder(postIdsTbl, c('post_id', 'id', 'group_name'))
 	setkey(postIdsTbl, group_name, id)
+	sqldf('select count(*) from post_subsets')
 	withDBConnect(dbCon, dbWriteTable(dbCon, "post_subsets", postIdsTbl, append=T, row.names=0))
 }
 
