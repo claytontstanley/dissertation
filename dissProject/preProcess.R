@@ -3,6 +3,7 @@ library(RPostgreSQL)
 library(lavaan)
 library(Rmisc)
 library(ggplot2)
+require(gridExtra)
 library(memoise)
 library(microbenchmark)
 library(popbio)
@@ -178,7 +179,7 @@ addTokenText <- function(tweetsTbl, from) {
 	cmdOut = system2(cmd, args=args)
 	myLog(paste(readLines(stderFile), sep='\n'))
 	tokenTextTbl = data.table(read.delim(tokenizedTweetsFile, sep='\t', quote="", header=F, stringsAsFactors=F))
-	stopifnot(tokenTextTbl[[2]] == tweetsTbl[[from]])
+	stopifnot(tokenTextTbl[[2]] == stripDelimiters(tweetsTbl[[from]]))
 	tweetsTbl[, tokenText := tokenTextTbl[[1]]]
 	return()
 }
@@ -316,7 +317,7 @@ visHashtags <- function(hashtagsTbl) {
 }
 
 visCompare <- function(hashtagsTbl, modelHashtagsTbl, bestDTbl) {
-	expect_that(sort(unique(hashtagsTbl$user_screen_name)), is_equivalent_to(sort(unique(modelHashtagsTbl$user_screen_name))))
+	stopifnot(sort(unique(hashtagsTbl$user_screen_name)) == sort(unique(modelHashtagsTbl$user_screen_name)))
 	plotBuildFun <- function(modelHashtagsTbl, userScreenName, d) {
 		list(resPlots=list(ggplot(hashtagsTbl[user_screen_name==userScreenName], aes(x=hashtag, y=dt)) +
 				   geom_point() +
