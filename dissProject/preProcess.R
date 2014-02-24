@@ -842,13 +842,35 @@ analyzeModelVsPredTbl <- function(modelVsPredTbl) {
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostOL2' & datasetName=='SOQgt500r2' & d < 1])
 }
 
-getNcoocTbl <- function(tokenizedTblChunks, tokenizedTblTags) {
+getNcoocTbl <- function(tokenizedTblChunks, tokenizedTblTags, chunks=10000) {
 	setkey(tokenizedTblChunks, id)
 	setkey(tokenizedTblTags, id)
-	fun = function(tbl) tbl[, posFromTag := pos - pos.1][, list(id=id, chunk=chunk, tag=chunk.1, posFromTag=posFromTag)]
-	coocTbl = tokenizedTblChunks[tokenizedTblTags, allow.cartesian=T][, fun(copy(.SD))]
-	NcoocTbl = coocTbl[, .N, by=list(chunk, tag, posFromTag)]
-	NcoocTbl[, NChunkTag := .N, by=list(chunk, tag)]
+	getNcoocTblSubset <- function(subset) {
+		myLog('Getting Ncooc for subset')
+		tokenizedTblChunksSubset = tokenizedTblChunks[J(subset)]
+		tokenizedTblTagsSubset = tokenizedTblTags[J(subset)]
+		addPosFromTag = function(tbl) tbl[, posFromTag := pos - pos.1][, list(id=id, chunk=chunk, tag=chunk.1, posFromTag=posFromTag)]
+		coocTbl = tokenizedTblChunksSubset[tokenizedTblTagsSubset, allow.cartesian=T][, addPosFromTag(copy(.SD))]
+		NcoocTbl = coocTbl[, list(partialN=.N), by=list(chunk, tag, posFromTag)]
+		NcoocTbl[, posFromTag := as.character(posFromTag)]
+		setkey(NcoocTbl, chunk, tag, posFromTag)
+		rm(coocTbl)
+		NcoocTbl
+	}
+	mergeNcoocTbls <- function(tbl1, subset2) {
+		tbl2 = getNcoocTblSubset(subset2)
+		tbl1[tbl2[, partialN1 := partialN][, partialN := NULL], partialN := partialN + partialN1]
+		res = rbind(tbl1, tbl2[, partialN := partialN1][, partialN1 := NULL][!tbl1])
+		setkey(res, chunk, tag, posFromTag)
+		res
+	}
+	splitSequence <- function(d, n) {
+		split(d, ceiling(seq_along(d)/n))
+	}
+	ids = unique(tokenizedTblChunks$id)
+	groups = splitSequence(ids[2:length(ids)], chunks)
+	NcoocTbl = Reduce(mergeNcoocTbls, append(list(getNcoocTblSubset(ids[1])), groups))
+	NcoocTbl[, NChunkTag := sum(partialN), by=list(chunk, tag)]
 	tables()
 	NcoocTbl
 }
@@ -870,7 +892,6 @@ genNcoocTblSO <- function(startId, endId, group_name='SOShuffledFull') {
 	addTokenText(postsTbl, from='bodyNoHtml')
 	tokenizedTblBody = getTokenizedTbl(postsTbl, from='tokenText', regex=matchWhitespace)[, type := 'body']
 	tokenizedTblTags = getTokenizedTbl(postsTbl, from='tagsNoHtml', regex=matchTag)[, type := 'tag'][, pos := NaN]
-	# FIXME: Add reduce function here, then use it how to do subset?
 	NcoocTblTitle = getNcoocTbl(tokenizedTblTitle, tokenizedTblTags)
 	NcoocTblBody = getNcoocTbl(tokenizedTblBody, tokenizedTblTags)
 	outFile = sprintf('%s/dissertationData/cooc/NcoocTblBody-%s-thru-%s.csv', PATH, startId, endId)
@@ -896,7 +917,7 @@ addPostSubsets <- function() {
 }
 
 curWS <- function() {
-	runGenNcoocTblSO1thru100()
+	runGenNcoocTblSO1thru100000()
 	test_dir(sprintf("%s/%s", PATH, 'tests'), reporter='summary')
 	runTFollow1k()
 	runSO1kr2()
