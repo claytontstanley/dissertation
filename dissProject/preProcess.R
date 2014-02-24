@@ -28,9 +28,9 @@ options("scipen"=100, "digits"=4)
 
 withDBConnect <- function(var, thunk) {
 	var = substitute(var)
-	eval(bquote(assign(.(deparse(var)), dbConnect(PostgreSQL(), host="localhost", user= "claytonstanley", dbname="claytonstanley"))))
-	on.exit(eval(bquote(dbDisconnect(.(var)))))
-	eval(substitute(thunk))
+	eval(bquote(assign(.(deparse(var)), dbConnect(PostgreSQL(), host="localhost", user= "claytonstanley", dbname="claytonstanley"))), envir=parent.frame())
+	on.exit(eval(bquote(dbDisconnect(.(var))), envir=parent.frame()))
+	eval(substitute(thunk), envir=parent.frame())
 }
 
 # Interface to retrieve chunkHash for chunk name
@@ -211,13 +211,17 @@ getTagSynonymsTbl <- function(sqlStr='select * from tag_synonyms') {
 	tagSynonymsTbl
 }
 
-getPostsTbl <- function(sqlStr, config) {
-	postsTbl = data.table(sqldf(sqlStr))
+setupPostsTbl <- function(postsTbl, config) {
 	setkey(postsTbl, id)
 	stopifnot(!duplicated(postsTbl$id))
 	postsTbl[, tagsNoHtml := html2txt2(tags)]
 	postsTbl[, dt := getDiffTimeSinceFirst(creation_date), by=owner_user_id]
 	postsTbl
+}
+
+getPostsTbl <- function(sqlStr, config) {
+	postsTbl = data.table(sqldf(sqlStr))
+	setupPostsTbl(postsTbl, config)
 }
 
 matchWhitespace = '\\S+'
@@ -440,7 +444,7 @@ genAggModelVsPredTbl <- function(hashtagsTbl, config) {
 	outFile = config$modelVsPredOutFile
 	ds = config$ds
 	modelHashtagsTbls = data.table()
-	genModelVsPredTbl <- function(hashtagsTbl, ds, userScreenName) {
+	getModelVsPredTblFromHashtagsTbl <- function(hashtagsTbl, ds, userScreenName) {
 		myLog(sprintf('generating model predictions for user %s', userScreenName))
 		modelHashtagsTbl = rbindlist(lapply(ds, function(d) computeActsByUser(hashtagsTbl, d=d)))
 		setkey(modelHashtagsTbl, user_screen_name, dt, hashtag, d)
@@ -454,7 +458,7 @@ genAggModelVsPredTbl <- function(hashtagsTbl, config) {
 	singleHashtagUsers = hashtagsTbl[, list(uniqueDTs=length(unique(dt)) <= 1), by=user_screen_name][uniqueDTs==T]$user_screen_name
 	myLog(sprintf('not running users (%s) since they all have less than two dt hashtag observations', paste0(singleHashtagUsers, collapse=',')))
 	users = data.table(cur_user_screen_name=Filter(function(v) !(v %in% singleHashtagUsers), unique(hashtagsTbl$user_screen_name)))
-	res = users[, genModelVsPredTbl(hashtagsTbl[cur_user_screen_name], ds, cur_user_screen_name), by=cur_user_screen_name]
+	res = users[, getModelVsPredTblFromHashtagsTbl(hashtagsTbl[cur_user_screen_name], ds, cur_user_screen_name), by=cur_user_screen_name]
 	res[, cur_user_screen_name := NULL]
 	setkey(res, user_screen_name, DVName, d)
 	myWriteCSV(res, file=outFile)
@@ -714,7 +718,7 @@ withCI <- function(dat) {
 	list(N=length(dat), meanVal=res[2], minCI=res[1], maxCI=res[3])
 }
 
-genComparisonTbl <- function(SD) {
+getComparisonTbl <- function(SD) {
 	resTbl = copy(SD)
 	resTbl[, DVDirection := sprintf('%s%s', direction, if (DVName != '') sprintf(' for %s', DVName) else ''), by=list(direction, DVName)]
 	resTbl[!is.na(diff), withCI(diff), by=list(DVDirection, direction, DVName)]
@@ -723,25 +727,25 @@ genComparisonTbl <- function(SD) {
 compare2DVs <- function(modelVsPredTbl, DVs, sortedOrder=c(1,2)) {
 	sumTbl = modelVsPredTbl[predUsedBest == T][DVName %in% DVs,]
 	setkey(sumTbl, datasetName, user_screen_name, DVName)
-	sumTbl[, list(diff=acc[sortedOrder[2]]-acc[sortedOrder[1]], direction=paste(DVName[sortedOrder[2]], '-', DVName[sortedOrder[1]])), by=list(datasetName, user_screen_name)][, DVName := ''][, genComparisonTbl(.SD)]
+	sumTbl[, list(diff=acc[sortedOrder[2]]-acc[sortedOrder[1]], direction=paste(DVName[sortedOrder[2]], '-', DVName[sortedOrder[1]])), by=list(datasetName, user_screen_name)][, DVName := ''][, getComparisonTbl(.SD)]
 }
 
 compare2Runs <- function(modelVsPredTbl, runNums) {
 	sumTbl = modelVsPredTbl[predUsedBest == T][runNum %in% runNums]
 	setkey(sumTbl, datasetNameRoot, DVName, user_screen_name, runNum)
-	sumTbl[, list(diff=acc[2]-acc[1], direction=sprintf('run%s - run%s', runNums[2], runNums[1])), by=list(datasetNameRoot, DVName, user_screen_name)][, genComparisonTbl(.SD)]
+	sumTbl[, list(diff=acc[2]-acc[1], direction=sprintf('run%s - run%s', runNums[2], runNums[1])), by=list(datasetNameRoot, DVName, user_screen_name)][, getComparisonTbl(.SD)]
 }
 
 compareDBestVsMin <- function(modelVsPredTbl) {
 	sumTbl = modelVsPredTbl[topHashtag & hashtagUsedP & (maxNP | d == min(d))]
 	setkey(sumTbl, datasetName, user_screen_name, DVName, maxNP) 
-	sumTbl[, list(diff=acc[2]-acc[1], direction=paste('best d', '-', 'min d')), by=list(datasetName, user_screen_name, DVName)][, genComparisonTbl(.SD)]
+	sumTbl[, list(diff=acc[2]-acc[1], direction=paste('best d', '-', 'min d')), by=list(datasetName, user_screen_name, DVName)][, getComparisonTbl(.SD)]
 }
 
 compareDBestVsMax <- function(modelVsPredTbl) {
 	sumTbl = modelVsPredTbl[topHashtag & hashtagUsedP & (maxNP | d == max(d))]
 	setkey(sumTbl, datasetName, user_screen_name, DVName, maxNP) 
-	sumTbl[, list(diff=acc[2]-acc[1], direction=paste('best d', '-', 'max d')), by=list(datasetName, user_screen_name, DVName)][, genComparisonTbl(.SD)]
+	sumTbl[, list(diff=acc[2]-acc[1], direction=paste('best d', '-', 'max d')), by=list(datasetName, user_screen_name, DVName)][, getComparisonTbl(.SD)]
 }
 
 plotBarSumTbl <- function(sumTbl, fillCol, figName, extras=NULL) {
@@ -839,68 +843,83 @@ analyzeModelVsPredTbl <- function(modelVsPredTbl) {
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostOL2' & datasetName=='SOQgt500r2' & d < 1])
 }
 
-getNcoocTbl <- function(tokenizedTblChunks, tokenizedTblTags, chunks=10000) {
-	setkey(tokenizedTblChunks, id)
-	setkey(tokenizedTblTags, id)
-	getNcoocTblSubset <- function(subset) {
-		myLog('Getting Ncooc for subset')
-		tokenizedTblChunksSubset = tokenizedTblChunks[J(subset)]
-		tokenizedTblTagsSubset = tokenizedTblTags[J(subset)]
-		addPosFromTag = function(tbl) tbl[, posFromTag := pos - pos.1][, list(id=id, chunk=chunk, tag=chunk.1, posFromTag=posFromTag)]
-		coocTbl = tokenizedTblChunksSubset[tokenizedTblTagsSubset, allow.cartesian=T][, addPosFromTag(copy(.SD))]
-		NcoocTbl = coocTbl[, list(partialN=.N), by=list(chunk, tag, posFromTag)]
-		NcoocTbl[, posFromTag := as.character(posFromTag)]
-		setkey(NcoocTbl, chunk, tag, posFromTag)
-		rm(coocTbl)
-		NcoocTbl
-	}
-	mergeNcoocTbls <- function(tbl1, subset2) {
-		tbl2 = getNcoocTblSubset(subset2)
-		tbl1[tbl2[, partialN1 := partialN][, partialN := NULL], partialN := partialN + partialN1]
-		res = rbind(tbl1, tbl2[, partialN := partialN1][, partialN1 := NULL][!tbl1])
-		setkey(res, chunk, tag, posFromTag)
-		res
-	}
-	splitSequence <- function(d, n) {
-		split(d, ceiling(seq_along(d)/n))
-	}
-	ids = unique(tokenizedTblChunks$id)
-	groups = splitSequence(ids[2:length(ids)], chunks)
-	NcoocTbl = Reduce(mergeNcoocTbls, append(list(getNcoocTblSubset(ids[1])), groups))
-	NcoocTbl[, NChunkTag := sum(partialN), by=list(chunk, tag)]
-	tables()
+getNcoocTbl <- function(type, group_name, startId, endId) {
+	resTbl = data.table(sqldf(sprintf("select title_tbl.chunk as chunk, tag_tbl.chunk as tag, title_tbl.pos - tag_tbl.pos as pos_from_tag, count(tag_tbl.id) as partial_N from
+					  (select * from post_tokenized
+					   where group_name = '%s' 
+					   and start_id = %s 
+					   and end_id = %s 
+					   and type = 'tag') as tag_tbl
+					  join
+					  (select * from post_tokenized
+					   where group_name = '%s' 
+					   and start_id = %s 
+					   and end_id = %s 
+					   and type = '%s') as title_tbl
+					  on tag_tbl.id = title_tbl.id
+					  group by title_tbl.chunk, tag_tbl.chunk, pos_from_tag
+					  order by title_tbl.chunk, tag_tbl.chunk, pos_from_tag",
+					  group_name, startId, endId,
+					  group_name, startId, endId,
+					  type)))
+	resTbl[, pos_from_tag := NULL][, pos_from_tag := 'NaN'] # FIXME: Now that this has been regression tested against the prior R implementation, is this needed anymore?
+	NcoocTbl = resTbl[, list(posFromTag=pos_from_tag, partialN=partial_n, NChunkTag=sum(partial_n)), by=list(chunk, tag)]
+	setkey(NcoocTbl, chunk, tag, posFromTag)
 	NcoocTbl
 }
 
+genTokenizedTblSO <- function(startId, endId, group_name='SOShuffledFull') {
+	query = sprintf("select id, owner_user_id, creation_date, title, body, tags
+			from posts
+			where post_type_id = 1
+			and id in (select post_id 
+				   from post_subsets
+				   where id >= %s
+				   and id <= %s
+				   and group_name = '%s')",
+			startId, endId, group_name)
+	withDBConnect(dbCon,
+		      {dbRs = dbSendQuery(dbCon, query)
+		      sqldf(sprintf("delete from post_tokenized
+				    where group_name = '%s'
+				    and start_id = %s
+				    and end_id = %s",
+				    group_name, startId, endId))
+		      writePartialTbl <- function(tbl) {
+			      maxRowId = sqldf(sprintf("select max(row_id) from post_tokenized"))$max
+			      maxRowId = if (is.na(maxRowId)) 0 else maxRowId
+			      myLog(sprintf('Writing %s rows to post_tokenized table', nrow(tbl)))
+			      tbl[, group_name := group_name][, start_id := startId][, end_id := endId][, pos_as_char := as.character(pos)][, row_id := seq(maxRowId+1, length.out=length(id))]
+			      setcolorder(tbl, c('row_id', 'id', 'chunk', 'pos', 'pos_as_char', 'type', 'group_name', 'start_id', 'end_id'))
+			      withDBConnect(dbCon, dbWriteTable(dbCon, "post_tokenized", tbl, append=T, row.names=0))
+		      }
+		      while (T) {
+			      postsTbl = data.table(fetch(dbRs, n=10000))
+			      if (nrow(postsTbl) == 0) break
+			      setupPostsTbl(postsTbl, defaultSOConfig)
+			      #stopifnot(nrow(postsTbl) == endId-startId+1)
+			      postsTbl[, tags := NULL][, bodyNoHtml := html2txt2(body)][, body := NULL]
+			      addTokenText(postsTbl, from='title')
+			      tokenizedTblTitle = getTokenizedTbl(postsTbl, from='tokenText', regex=matchWhitespace)[, type := 'title']
+			      addTokenText(postsTbl, from='bodyNoHtml')
+			      tokenizedTblBody = getTokenizedTbl(postsTbl, from='tokenText', regex=matchWhitespace)[, type := 'body']
+			      tokenizedTblTags = getTokenizedTbl(postsTbl, from='tagsNoHtml', regex=matchTag)[, type := 'tag'][, pos := NaN]
+			      writePartialTbl(tokenizedTblTags)
+			      writePartialTbl(tokenizedTblTitle)
+			      writePartialTbl(tokenizedTblBody)
+		      }
+		      })
+	return()
+}
+
 genNcoocTblSO <- function(startId, endId, group_name='SOShuffledFull') {
-	postsTbl = getPostsTbl(sprintf("select id, owner_user_id, creation_date, title, body, tags
-				       from posts
-				       where post_type_id = 1
-				       and id in (select post_id 
-						  from post_subsets
-						  where id >= %s
-						  and id <= %s
-						  and group_name = '%s')",
-				       startId, endId, group_name), defaultSOConfig)
-	stopifnot(nrow(postsTbl) == endId - startId + 1)
-	postsTbl[, tags := NULL][, bodyNoHtml := html2txt2(body)][, body := NULL]
-	addTokenText(postsTbl, from='title')
-	tokenizedTblTitle = getTokenizedTbl(postsTbl, from='tokenText', regex=matchWhitespace)[, type := 'title']
-	addTokenText(postsTbl, from='bodyNoHtml')
-	tokenizedTblBody = getTokenizedTbl(postsTbl, from='tokenText', regex=matchWhitespace)[, type := 'body']
-	tokenizedTblTags = getTokenizedTbl(postsTbl, from='tagsNoHtml', regex=matchTag)[, type := 'tag'][, pos := NaN]
-	NcoocTblTitle = getNcoocTbl(tokenizedTblTitle, tokenizedTblTags)
-	NcoocTblBody = getNcoocTbl(tokenizedTblBody, tokenizedTblTags)
+	NcoocTblTitle = getNcoocTbl('title', group_name, startId, endId)
+	NcoocTblBody = getNcoocTbl('body', group_name, startId, endId)
 	outFile = sprintf('%s/dissertationData/cooc/NcoocTblBody-%s-thru-%s.csv', PATH, startId, endId)
 	myWriteCSV(NcoocTblBody, file=outFile) 
 	outFile = sprintf('%s/dissertationData/cooc/NcoocTblTitle%s-thru-%s.csv', PATH, startId, endId)
 	myWriteCSV(NcoocTblTitle, file=outFile) 
 }
-
-runGenNcoocTblSO1thru100 <- function() genNcoocTblSO(1, 100)
-runGenNcoocTblSO1thru1000 <- function() genNcoocTblSO(1, 1000)
-runGenNcoocTblSO1thru10000 <- function() genNcoocTblSO(1, 10000)
-runGenNcoocTblSO1thru100000 <- function() genNcoocTblSO(1, 100000)
 
 addPostSubsets <- function() {
 	postIdsTbl = data.table(sqldf('select id from posts where post_type_id = 1'))
@@ -913,16 +932,31 @@ addPostSubsets <- function() {
 	withDBConnect(dbCon, dbWriteTable(dbCon, "post_subsets", postIdsTbl, append=T, row.names=0))
 }
 
+runGenNcoocTblSO1thru100 <- function() genNcoocTblSO(1, 100)
+runGenNcoocTblSO1thru1000 <- function() genNcoocTblSO(1, 1000)
+runGenNcoocTblSO1thru10000 <- function() genNcoocTblSO(1, 10000)
+runGenNcoocTblSO1thru100000 <- function() genNcoocTblSO(1, 100000)
+runGenNcoocTblSO1thruEnd <- function() genNcoocTblSO(1, 6474687)
+
+runGenTokenizedTbl100 <- function() genTokenizedTblSO(1, 100)
+runGenTokenizedTbl1000 <- function() genTokenizedTblSO(1, 1000)
+runGenTokenizedTbl10000 <- function() genTokenizedTblSO(1, 10000)
+runGenTokenizedTbl100000 <- function() genTokenizedTblSO(1, 100000)
+runGenTokenizedTblAll <- function() genTokenizedTblSO(1, 6474687)
+
 curWS <- function() {
-	runGenNcoocTblSO1thru100000()
+	runGenTokenizedTbl100()
+	runGenNcoocTblSO1thru100()
 	test_dir(sprintf("%s/%s", PATH, 'tests'), reporter='summary')
+	sqldf('select count(*) from post_tokenized where end_id = 100000')
 	runTFollow1k()
 	runSO1kr2()
 	.ls.objects(order.by='Size')
 	tweetsTbl = getTweetsTbl("select * from tweets limit 100000")
 	tweetsTbl = getTweetsTbl("select * from tweets where user_screen_name='eddieizzard'")
 	# Checking that tweets for twitter users from each followers_count,statuses_count scale are being collected properly
-	usersWithTweetsTbl = data.table(sqldf("select distinct on (user_id) t.user_screen_name,u.followers_count,u.statuses_count from tweets as t join twitter_users as u on t.user_screen_name = u.user_screen_name"))
+	usersWithTweetsTbl = data.table(sqldf("select distinct on (user_id) t.user_screen_name,u.followers_count,u.statuses_count
+					      from tweets as t join twitter_users as u on t.user_screen_name = u.user_screen_name"))
 	usersWithTweetsTbl
 	usersWithTweetsTbl[order(followers_count), plot(log10(followers_count))]
 	usersWithTweetsTbl[order(statuses_count), plot(log10(statuses_count))]
