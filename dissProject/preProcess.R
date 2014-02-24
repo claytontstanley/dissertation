@@ -844,6 +844,7 @@ analyzeModelVsPredTbl <- function(modelVsPredTbl) {
 }
 
 getNcoocTbl <- function(type, group_name, startId, endId) {
+	myLog(sprintf('Getting Ncooc table for %s type and %s group_name', type, group_name))
 	resTbl = data.table(sqldf(sprintf("select title_tbl.chunk as chunk, tag_tbl.chunk as tag, title_tbl.pos - tag_tbl.pos as pos_from_tag, count(tag_tbl.id) as partial_N from
 					  (select * from post_tokenized
 					   where group_name = '%s' 
@@ -868,7 +869,7 @@ getNcoocTbl <- function(type, group_name, startId, endId) {
 	NcoocTbl
 }
 
-genTokenizedTblSO <- function(startId, endId, group_name='SOShuffledFull') {
+genTokenizedTblSO <- function(startId, endId, group_name) {
 	query = sprintf("select id, owner_user_id, creation_date, title, body, tags
 			from posts
 			where post_type_id = 1
@@ -912,7 +913,8 @@ genTokenizedTblSO <- function(startId, endId, group_name='SOShuffledFull') {
 	return()
 }
 
-genNcoocTblSO <- function(startId, endId, group_name='SOShuffledFull') {
+genNcoocTblSO <- function(startId, endId, group_name, regenTokenizedTblSOP=T) {
+	if (regenTokenizedTblSOP) genTokenizedTblSO(startId, endId, group_name)
 	NcoocTblTitle = getNcoocTbl('title', group_name, startId, endId)
 	NcoocTblBody = getNcoocTbl('body', group_name, startId, endId)
 	outFile = sprintf('%s/dissertationData/cooc/NcoocTblBody-%s-thru-%s.csv', PATH, startId, endId)
@@ -932,17 +934,11 @@ addPostSubsets <- function() {
 	withDBConnect(dbCon, dbWriteTable(dbCon, "post_subsets", postIdsTbl, append=T, row.names=0))
 }
 
-runGenNcoocTblSO1thru100 <- function() genNcoocTblSO(1, 100)
-runGenNcoocTblSO1thru1000 <- function() genNcoocTblSO(1, 1000)
-runGenNcoocTblSO1thru10000 <- function() genNcoocTblSO(1, 10000)
-runGenNcoocTblSO1thru100000 <- function() genNcoocTblSO(1, 100000)
-runGenNcoocTblSO1thruEnd <- function() genNcoocTblSO(1, 6474687)
-
-runGenTokenizedTbl100 <- function() genTokenizedTblSO(1, 100)
-runGenTokenizedTbl1000 <- function() genTokenizedTblSO(1, 1000)
-runGenTokenizedTbl10000 <- function() genTokenizedTblSO(1, 10000)
-runGenTokenizedTbl100000 <- function() genTokenizedTblSO(1, 100000)
-runGenTokenizedTblAll <- function() genTokenizedTblSO(1, 6474687)
+runGenNcoocTblSO1thru100 <- function() genNcoocTblSO(1, 100, 'SOShuffledFull')
+runGenNcoocTblSO1thru1000 <- function() genNcoocTblSO(1, 1000, 'SOShuffledFull')
+runGenNcoocTblSO1thru10000 <- function() genNcoocTblSO(1, 10000, 'SOShuffledFull')
+runGenNcoocTblSO1thru100000 <- function() genNcoocTblSO(1, 100000, 'SOShuffledFull')
+runGenNcoocTblSO1thruEnd <- function() genNcoocTblSO(1, 6474687, 'SOShuffledFull')
 
 curWS <- function() {
 	runGenTokenizedTbl100()
