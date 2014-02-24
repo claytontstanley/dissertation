@@ -215,9 +215,6 @@ getPostsTbl <- function(sqlStr, config) {
 	postsTbl = data.table(sqldf(sqlStr))
 	setkey(postsTbl, id)
 	stopifnot(!duplicated(postsTbl$id))
-	# TODO: this is not vectorized b/c html2txt isn't vectorized
-	# FIXME: Test this change
-	#postsTbl[, tagsNoHtml := html2txt(tags), by=id]
 	postsTbl[, tagsNoHtml := html2txt2(tags)]
 	postsTbl[, dt := getDiffTimeSinceFirst(creation_date), by=owner_user_id]
 	postsTbl
