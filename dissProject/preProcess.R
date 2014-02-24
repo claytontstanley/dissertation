@@ -938,7 +938,8 @@ runGenNcoocTblSO1thru100 <- function() genNcoocTblSO(1, 100, 'SOShuffledFull')
 runGenNcoocTblSO1thru1000 <- function() genNcoocTblSO(1, 1000, 'SOShuffledFull')
 runGenNcoocTblSO1thru10000 <- function() genNcoocTblSO(1, 10000, 'SOShuffledFull')
 runGenNcoocTblSO1thru100000 <- function() genNcoocTblSO(1, 100000, 'SOShuffledFull')
-runGenNcoocTblSO1thruEnd <- function() genNcoocTblSO(1, 6474687, 'SOShuffledFull')
+runGenNcoocTblSO1thru3000000 <- function() genNcoocTblSO(1, 3000000, 'SOShuffledFull')
+#runGenNcoocTblSO1thruEnd <- function() genNcoocTblSO(1, 6474687, 'SOShuffledFull')
 
 curWS <- function() {
 	runGenTokenizedTbl100()
