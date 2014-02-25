@@ -36,9 +36,7 @@ create table if not exists post_tokenized (
 	pos integer,
 	pos_as_char text not null,
 	type text not null,
-	group_name text not null,
-	start_id integer not null,
-	end_id integer not null,
+	full_subset_name text not null,
 	primary key (row_id)
 	);
 

@@ -843,33 +843,43 @@ analyzeModelVsPredTbl <- function(modelVsPredTbl) {
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostOL2' & datasetName=='SOQgt500r2' & d < 1])
 }
 
-getNcoocTbl <- function(type, group_name, startId, endId) {
-	myLog(sprintf('Getting Ncooc table for %s type and %s group_name', type, group_name))
+getNcoocTbl <- function(type, fullSubsetName) {
+	myLog(sprintf('Getting Ncooc table for %s type and %s subset_name', type, fullSubsetName))
 	resTbl = data.table(sqldf(sprintf("select title_tbl.chunk as chunk, tag_tbl.chunk as tag, title_tbl.pos - tag_tbl.pos as pos_from_tag, count(tag_tbl.id) as partial_N from
 					  (select * from post_tokenized
-					   where group_name = '%s' 
-					   and start_id = %s 
-					   and end_id = %s 
+					   where full_subset_name = '%s' 
 					   and type = 'tag') as tag_tbl
 					  join
 					  (select * from post_tokenized
-					   where group_name = '%s' 
-					   and start_id = %s 
-					   and end_id = %s 
+					   where full_subset_name = '%s' 
 					   and type = '%s') as title_tbl
 					  on tag_tbl.id = title_tbl.id
 					  group by title_tbl.chunk, tag_tbl.chunk, pos_from_tag
 					  order by title_tbl.chunk, tag_tbl.chunk, pos_from_tag",
-					  group_name, startId, endId,
-					  group_name, startId, endId,
-					  type)))
+					  fullSubsetName, fullSubsetName, type)))
 	resTbl[, pos_from_tag := NULL][, pos_from_tag := 'NaN'] # FIXME: Now that this has been regression tested against the prior R implementation, is this needed anymore?
 	NcoocTbl = resTbl[, list(posFromTag=pos_from_tag, partialN=partial_n, NChunkTag=sum(partial_n)), by=list(chunk, tag)]
 	setkey(NcoocTbl, chunk, tag, posFromTag)
 	NcoocTbl
 }
 
-genTokenizedTblSO <- function(startId, endId, group_name) {
+makeSubsetName <- function(subset, startId, endId) {
+	paste(subset, startId, endId, sep='-')
+}
+
+
+genNcoocTblSO <- function(subsetName, startId, endId, regenTokenizedTblSOP=T) {
+	if (regenTokenizedTblSOP) genTokenizedTblSO(subsetName, startId, endId)
+	fullSubsetName = makeSubsetName(subsetName, startId, endId)
+	NcoocTblTitle = getNcoocTbl('title', fullSubsetName) 
+	NcoocTblBody = getNcoocTbl('body', fullSubsetName) 
+	outFile = sprintf('%s/dissertationData/cooc/NcoocTblBody-%s.csv', PATH, fullSubsetName)
+	myWriteCSV(NcoocTblBody, file=outFile) 
+	outFile = sprintf('%s/dissertationData/cooc/NcoocTblTitle-%s.csv', PATH, fullSubsetName)
+	myWriteCSV(NcoocTblTitle, file=outFile)
+}
+
+genTokenizedTblSO <- function(subsetName, startId, endId) {
 	query = sprintf("select id, owner_user_id, creation_date, title, body, tags
 			from posts
 			where post_type_id = 1
@@ -878,20 +888,19 @@ genTokenizedTblSO <- function(startId, endId, group_name) {
 				   where id >= %s
 				   and id <= %s
 				   and group_name = '%s')",
-			startId, endId, group_name)
+			startId, endId, subsetName)
+	fullSubsetName = makeSubsetName(subsetName, startId, endId)
 	withDBConnect(dbCon,
 		      {dbRs = dbSendQuery(dbCon, query)
 		      sqldf(sprintf("delete from post_tokenized
-				    where group_name = '%s'
-				    and start_id = %s
-				    and end_id = %s",
-				    group_name, startId, endId))
+				    where full_subset_name = '%s'",
+				    fullSubsetName))
 		      writePartialTbl <- function(tbl) {
 			      maxRowId = sqldf(sprintf("select max(row_id) from post_tokenized"))$max
 			      maxRowId = if (is.na(maxRowId)) 0 else maxRowId
 			      myLog(sprintf('Writing %s rows to post_tokenized table', nrow(tbl)))
-			      tbl[, group_name := group_name][, start_id := startId][, end_id := endId][, pos_as_char := as.character(pos)][, row_id := seq(maxRowId+1, length.out=length(id))]
-			      setcolorder(tbl, c('row_id', 'id', 'chunk', 'pos', 'pos_as_char', 'type', 'group_name', 'start_id', 'end_id'))
+			      tbl[, full_subset_name := fullSubsetName][, pos_as_char := as.character(pos)][, row_id := seq(maxRowId+1, length.out=length(id))]
+			      setcolorder(tbl, c('row_id', 'id', 'chunk', 'pos', 'pos_as_char', 'type', 'full_subset_name'))
 			      withDBConnect(dbCon, dbWriteTable(dbCon, "post_tokenized", tbl, append=T, row.names=0))
 		      }
 		      while (T) {
@@ -913,16 +922,6 @@ genTokenizedTblSO <- function(startId, endId, group_name) {
 	return()
 }
 
-genNcoocTblSO <- function(startId, endId, group_name, regenTokenizedTblSOP=T) {
-	if (regenTokenizedTblSOP) genTokenizedTblSO(startId, endId, group_name)
-	NcoocTblTitle = getNcoocTbl('title', group_name, startId, endId)
-	NcoocTblBody = getNcoocTbl('body', group_name, startId, endId)
-	outFile = sprintf('%s/dissertationData/cooc/NcoocTblBody-%s-thru-%s.csv', PATH, startId, endId)
-	myWriteCSV(NcoocTblBody, file=outFile) 
-	outFile = sprintf('%s/dissertationData/cooc/NcoocTblTitle%s-thru-%s.csv', PATH, startId, endId)
-	myWriteCSV(NcoocTblTitle, file=outFile) 
-}
-
 addPostSubsets <- function() {
 	postIdsTbl = data.table(sqldf('select id from posts where post_type_id = 1'))
 	postIdsTbl[, post_id := id][, id := NULL]
@@ -934,18 +933,16 @@ addPostSubsets <- function() {
 	withDBConnect(dbCon, dbWriteTable(dbCon, "post_subsets", postIdsTbl, append=T, row.names=0))
 }
 
-runGenNcoocTblSO1thru100 <- function() genNcoocTblSO(1, 100, 'SOShuffledFull')
-runGenNcoocTblSO1thru1000 <- function() genNcoocTblSO(1, 1000, 'SOShuffledFull')
-runGenNcoocTblSO1thru10000 <- function() genNcoocTblSO(1, 10000, 'SOShuffledFull')
-runGenNcoocTblSO1thru100000 <- function() genNcoocTblSO(1, 100000, 'SOShuffledFull')
-runGenNcoocTblSO1thru3000000 <- function() genNcoocTblSO(1, 3000000, 'SOShuffledFull')
-#runGenNcoocTblSO1thruEnd <- function() genNcoocTblSO(1, 6474687, 'SOShuffledFull')
+runGenNcoocTblSO1thru100 <- function() genNcoocTblSO('SOShuffledFull', 1, 100)
+runGenNcoocTblSO1thru1000 <- function() genNcoocTblSO('SOShuffledFull', 1, 1000)
+runGenNcoocTblSO1thru10000 <- function() genNcoocTblSO('SOShuffledFull', 1, 10000)
+runGenNcoocTblSO1thru100000 <- function() genNcoocTblSO('SOShuffledFull', 1, 100000)
+runGenNcoocTblSO1thru3000000 <- function() genNcoocTblSO('SOShuffledFull', 1, 3000000)
+#runGenNcoocTblSO1thruEnd <- function() genNcoocTblSO('SOShuffledFull', 1, 6474687)
 
 curWS <- function() {
-	runGenTokenizedTbl100()
 	runGenNcoocTblSO1thru100()
 	test_dir(sprintf("%s/%s", PATH, 'tests'), reporter='summary')
-	sqldf('select count(*) from post_tokenized where end_id = 100000')
 	runTFollow1k()
 	runSO1kr2()
 	.ls.objects(order.by='Size')
