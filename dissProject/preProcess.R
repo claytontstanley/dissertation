@@ -952,6 +952,19 @@ runGenNcoocTblSO1thru3000000 <- function() genNcoocTblSO('SOShuffledFull', 1, 30
 
 curWS <- function() {
 	runGenNcoocTblSO1thru100()
+	data.table(sqldf("
+			 select title_tbl.chunk as chunk, tag_tbl.chunk as tag, title_tbl.pos - tag_tbl.pos as pos_from_tag, count(tag_tbl.id) as partial_N from
+			 (select * from post_tokenized
+			  where full_subset_name = 'SOShuffledFull-1-100' 
+			  and type = 'tag') as tag_tbl
+			 join
+			 (select * from post_tokenized
+			  where full_subset_name = 'SOShuffledFull-1-100' 
+			  and type = 'body') as title_tbl
+			 on tag_tbl.id = title_tbl.id
+			 group by title_tbl.chunk, tag_tbl.chunk, pos_from_tag
+			 order by title_tbl.chunk, tag_tbl.chunk, pos_from_tag"
+			 ))
 	test_dir(sprintf("%s/%s", PATH, 'tests'), reporter='summary')
 	runTFollow1k()
 	runSO1kr2()
@@ -960,7 +973,8 @@ curWS <- function() {
 	tweetsTbl = getTweetsTbl("select * from tweets where user_screen_name='eddieizzard'")
 	# Checking that tweets for twitter users from each followers_count,statuses_count scale are being collected properly
 	usersWithTweetsTbl = data.table(sqldf("select distinct on (user_id) t.user_screen_name,u.followers_count,u.statuses_count
-					      from tweets as t join twitter_users as u on t.user_screen_name = u.user_screen_name"))
+					      from tweets as t join twitter_users as u on t.user_screen_name = u.user_screen_name"
+					      ))
 	usersWithTweetsTbl
 	usersWithTweetsTbl[order(followers_count), plot(log10(followers_count))]
 	usersWithTweetsTbl[order(statuses_count), plot(log10(statuses_count))]
