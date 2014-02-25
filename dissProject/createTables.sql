@@ -40,6 +40,13 @@ create table if not exists post_tokenized (
 	primary key (row_id)
 	);
 
+drop table if exists post_filtered;
+create table if not exists post_filtered (
+	post_id integer not null,
+	reason text,
+	primary key (post_id)
+	);
+
 create index id_index_post_tokenized on post_tokenized (id);
 
 create index user_screen_name_index_tweets on tweets (user_screen_name);
@@ -79,5 +86,4 @@ create table if not exists tag_synonyms (
 	Approval_Date text not null,
 	primary key (id)
 	);
-
 

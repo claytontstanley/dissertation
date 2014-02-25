@@ -887,7 +887,8 @@ genTokenizedTblSO <- function(subsetName, startId, endId) {
 				   from post_subsets
 				   where id >= %s
 				   and id <= %s
-				   and group_name = '%s')",
+				   and group_name = '%s')
+			and id not in (select post_id from post_filtered)",
 			startId, endId, subsetName)
 	fullSubsetName = makeSubsetName(subsetName, startId, endId)
 	withDBConnect(dbCon,
@@ -920,6 +921,15 @@ genTokenizedTblSO <- function(subsetName, startId, endId) {
 		      }
 		      })
 	return()
+}
+
+addFilteredPosts <- function() {
+	browser()
+	ids = c('17801882')
+	reasons = c('java so')
+	filteredPostsTbl = data.table(id=ids, reason=reasons);
+	setcolorder (filteredPostsTbl, c('id', 'reason'))
+	withDBConnect(dbCon, dbWriteTable(dbCon, "post_filtered", filteredPostsTbl, append=T, row.names=0))
 }
 
 addPostSubsets <- function() {
