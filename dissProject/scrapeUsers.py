@@ -80,8 +80,7 @@ def generateTopUsers(scrapeFun=generateTopUsersTwitaholic, topUsersFile='top1000
 def storeCurTagSynonyms():
     storeTagSynonyms('synonyms-2014-01-30.csv')
 
-def backupTables():
-    tableNames = ['topUsers', 'twitter_users', 'tweets', 'users', 'posts', 'post_subsets', 'post_tokenized']
+def backupTables(tableNames=['topUsers', 'twitter_users', 'tweets', 'users', 'posts', 'post_subsets', 'post_tokenized', 'post_filtered', 'tag_synonyms']):
     for tableName in tableNames:
         file = "%s/dissertationData/tables/%s.csv" % (_dir, tableName)
         cmd = string.Template("copy ${tableName} to '${file}' delimiter ',' csv header").substitute(locals())
@@ -289,4 +288,5 @@ def generateTopUsers100k():
 #getAllTweetsForTopUsersByTweets()
 #getUserInfoForTopUsers()
 #storeCurTagSynonyms()
+#backupTables(tableNames=['tag_synonyms'])
 #backupTables()
