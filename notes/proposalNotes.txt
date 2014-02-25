@@ -1,0 +1,13 @@
+Word order take away for vector based model
+
+Sample twitter multiple times
+
+Statistically derive the bins
+
+Trever Cohen sigir 
+Ames publication
+
+Start with 1001 and go from tetr
+Look at the distribution
+
+Look at improvedtokeniZation
