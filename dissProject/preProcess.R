@@ -948,6 +948,8 @@ runGenNcoocTblSO1thru100000 <- function() genNcoocTblSO('SOShuffledFull', 1, 100
 runGenNcoocTblSO1thru3000000 <- function() genNcoocTblSO('SOShuffledFull', 1, 3000000)
 #runGenNcoocTblSO1thruEnd <- function() genNcoocTblSO('SOShuffledFull', 1, 6474687)
 
+runGenTokenizedTblSO <- function() genTokenizedTblSO()
+
 curWS <- function() {
 	addFilteredPosts()
 	genTokenizedTblSO(filters=sprintf('id in (%s)', makeIdsQuery('SOShuffledFull', 1, 10000)))
