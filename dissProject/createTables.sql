@@ -36,9 +36,10 @@ create table if not exists post_tokenized (
 	pos integer,
 	pos_as_char text not null,
 	type text not null,
-	full_subset_name text not null,
 	primary key (row_id)
 	);
+
+create index id_index_post_tokenized on post_tokenized (id);
 
 drop table if exists post_filtered;
 create table if not exists post_filtered (
@@ -47,7 +48,6 @@ create table if not exists post_filtered (
 	primary key (post_id)
 	);
 
-create index id_index_post_tokenized on post_tokenized (id);
 
 create index user_screen_name_index_tweets on tweets (user_screen_name);
 create index user_id_index_tweets on tweets (user_id);
