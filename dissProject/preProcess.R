@@ -887,13 +887,14 @@ genNcoocTblSO <- function(subsetName, startId, endId)  {
 	myWriteCSV(NcoocTblTitle, file=outFile)
 }
 
-genTokenizedTblSO <- function(filters='1=1') {
+genTokenizedTblSO <- function(filters='1=1', bundleSize=10000) {
 	query = sprintf("select id, owner_user_id, creation_date, title, body, tags
 			from posts
 			where post_type_id = 1
 			and id not in (select distinct id from post_tokenized)
 			and id not in (select post_id from post_filtered)
-			and %s", filters)
+			and %s
+			", filters)
 	withDBConnect(dbCon,
 		      {dbRs = dbSendQuery(dbCon, query)
 		      writePartialTbl <- function(tbl) {
@@ -905,7 +906,7 @@ genTokenizedTblSO <- function(filters='1=1') {
 			      withDBConnect(dbCon, dbWriteTable(dbCon, "post_tokenized", tbl, append=T, row.names=0))
 		      }
 		      while (T) {
-			      postsTbl = data.table(fetch(dbRs, n=10000))
+			      postsTbl = data.table(fetch(dbRs, n=bundleSize))
 			      if (nrow(postsTbl) == 0) break
 			      setupPostsTbl(postsTbl, defaultSOConfig)
 			      postsTbl[, tags := NULL][, bodyNoHtml := html2txt2(body)][, body := NULL]
@@ -949,6 +950,7 @@ runGenNcoocTblSO1thru3000000 <- function() genNcoocTblSO('SOShuffledFull', 1, 30
 #runGenNcoocTblSO1thruEnd <- function() genNcoocTblSO('SOShuffledFull', 1, 6474687)
 
 runGenTokenizedTblSO <- function() genTokenizedTblSO()
+runGenTokenizedTblSOSearch <- function() genTokenizedTblSO(bundleSize=2500)
 
 curWS <- function() {
 	addFilteredPosts()
