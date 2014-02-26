@@ -1,4 +1,5 @@
 import itertools
+import re
 import time
 import urllib2
 from bs4 import BeautifulSoup
@@ -30,6 +31,33 @@ def scrape_socialbakers(url):
         res.append(div.findAll('div')[0]['id'].split('-')[-1])
     print "grabbed %s results from url %s" % (len(res), url)
     return res
+
+def scrapeStatweestics():
+    url = 'http://statweestics.com/stats/hashtags/day'
+    soup = BeautifulSoup(urllib2.urlopen(url).read())
+    res = []
+    for hrefEl in soup.findAll('a', {'href': re.compile('^\/stats\/show')}):
+        res.append([hrefEl.contents[0].encode('utf-8')])
+    return res
+
+def write2csv(res, file):
+    with open(file, 'wb') as f:
+        writer = csv.writer(f, quoting=csv.QUOTE_ALL)
+        writer.writerows(res)
+
+def generateTopHashtagsStatweestics():
+    res = scrapeStatweestics()
+    return res
+
+_topHashtagsDir = "%s/dissertationData/topHashtags" % (_dir)
+
+def generateTopHashtagsCSV(scrapeFun=generateTopHashtagsStatweestics):
+    res = scrapeFun()
+    fileName = 'topHashtags'
+    file = "%s/%s-%s.csv" % (_topHashtagsDir, fileName, scrapeFun.__name__)
+    write2csv(res, file)
+
+generateTopHashtagsCSV()
 
 def generateTopUsersTwitaholic():
     res = []
@@ -114,11 +142,6 @@ def getTweets(screen_name, **kwargs):
 
 def isRetweet(tweet):
     return hasattr(tweet, 'retweeted_status')
-
-def write2csv(res, file):
-    with open(file, 'wb') as f:
-        writer = csv.writer(f, quoting=csv.QUOTE_ALL)
-        writer.writerows(res)
 
 def getInfoForUser(screenNames):
     users = _api.lookup_users(screen_names=screenNames)
