@@ -57,8 +57,6 @@ def generateTopHashtagsCSV(scrapeFun=generateTopHashtagsStatweestics):
     file = "%s/%s-%s.csv" % (_topHashtagsDir, fileName, scrapeFun.__name__)
     write2csv(res, file)
 
-generateTopHashtagsCSV()
-
 def generateTopUsersTwitaholic():
     res = []
     for i in range(10):
@@ -313,3 +311,4 @@ def generateTopUsers100k():
 #storeCurTagSynonyms()
 #backupTables(tableNames=['tag_synonyms'])
 #backupTables()
+#generateTopHashtagsCSV()
