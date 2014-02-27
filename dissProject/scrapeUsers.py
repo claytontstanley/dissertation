@@ -10,11 +10,63 @@ import string
 import pg
 from collections import OrderedDict
 import tweepy
+import sys
 
 # lint_ignore=E302,E501
 
 _dir = os.path.dirname(os.path.abspath(__file__))
 _cur = pg.connect(host="127.0.0.1")
+_topHashtagsDir = "%s/dissertationData/topHashtags" % (_dir)
+
+def getTweepyAPI():
+    consumer_key = "vKbz24SqytZnYO33FNkR7w"
+    consumer_secret = "jjobro8Chy9aKMzo8szYMz9tHftONLRkjNnrxk0"
+    access_key = "363361813-FKSdmwSbzuUzHWg326fTGJM7Bu2hTviqEetjMgu8"
+    access_secret = "VKgzDnTvDUWR1csliUR3BiMOI2oqO9NzocNKX1jPd4"
+    auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+    auth.set_access_token(access_key, access_secret)
+    return tweepy.API(auth)
+
+_api = getTweepyAPI()
+
+def isRetweet(tweet):
+    return hasattr(tweet, 'retweeted_status')
+
+def write2csv(res, file):
+    print "writing %s results to file: %s" % (len(res), file)
+    with open(file, 'wb') as f:
+        writer = csv.writer(f, quoting=csv.QUOTE_ALL)
+        writer.writerows(res)
+
+class CustomStreamListener(tweepy.StreamListener):
+    curTweets = []
+
+    def addTweet(self, tweet):
+        tweetObj = [tweet.id_str, tweet.user.id, tweet.user.screen_name.lower(), tweet.created_at, isRetweet(tweet), tweet.in_reply_to_status_id_str,
+                    tweet.lang, tweet.truncated, tweet.text.encode("utf-8")]
+        self.curTweets.append(tweetObj)
+        if len(self.curTweets) == 1000:
+            self.saveResults()
+            self.curTweets = []
+
+    def saveResults(self):
+        file = '/tmp/topHashtags.csv' % ()
+        write2csv(self.curTweets, file)
+        print "updating database with results in temp file"
+        _cur.query("copy top_hashtag_tweets (id, user_id, user_screen_name, created_at, retweeted, in_reply_to_status_id, lang, truncated,text) from '%s' delimiters ',' csv" % (file))
+
+    def on_status(self, status):
+        self.addTweet(status)
+
+    def on_error(self, status_code):
+        print >> sys.stderr, 'Encountered error with status code:', status_code
+        return True
+
+    def on_timeout(self):
+        print >> sys.stderr, 'Timeout...'
+        return True
+
+_sapi = tweepy.streaming.Stream(_api.auth, CustomStreamListener())
 
 def scrape_twitaholic(url):
     soup = BeautifulSoup(urllib2.urlopen(url).read())
@@ -40,22 +92,34 @@ def scrapeStatweestics():
         res.append([hrefEl.contents[0].encode('utf-8')])
     return res
 
-def write2csv(res, file):
-    with open(file, 'wb') as f:
-        writer = csv.writer(f, quoting=csv.QUOTE_ALL)
-        writer.writerows(res)
-
 def generateTopHashtagsStatweestics():
     res = scrapeStatweestics()
     return res
 
-_topHashtagsDir = "%s/dissertationData/topHashtags" % (_dir)
-
-def generateTopHashtagsCSV(scrapeFun=generateTopHashtagsStatweestics):
-    res = scrapeFun()
-    fileName = 'topHashtags'
-    file = "%s/%s-%s.csv" % (_topHashtagsDir, fileName, scrapeFun.__name__)
+def generateTopHashtagsCSV(scrapeFun, group):
+    res = []
+    for rank, item in enumerate(scrapeFun()):
+        res.append([item[0], rank, group])
+    file = "%s/%s.csv" % (_topHashtagsDir, group)
     write2csv(res, file)
+
+def storeTopHashtags(topHashtagsFile):
+    cmd = "copy top_hashtag_hashtags (hashtag, rank, hashtag_group) from '%s/%s.csv' delimiters ',' csv" % (_topHashtagsDir, topHashtagsFile)
+    _cur.query(cmd)
+
+def generateTopHashtags(scrapeFun=generateTopHashtagsStatweestics, group='initial'):
+    generateTopHashtagsCSV(scrapeFun, group)
+    storeTopHashtags(group)
+
+def getHashtagsFrom(group):
+    res = _cur.query("select * from top_hashtag_hashtags where hashtag_group = '%s'" % (group)).getresult()
+    res = [item[0] for item in res]
+    return res[0:400]
+
+def streamHashtags():
+    hashtagGroup = '%s-initial' % (time.strftime("%Y-%m-%d-%H:%M:%S"))
+    generateTopHashtags(group=hashtagGroup)
+    _sapi.filter(track=getHashtagsFrom('%s' % (hashtagGroup)))
 
 def generateTopUsersTwitaholic():
     res = []
@@ -112,17 +176,6 @@ def backupTables(tableNames=['topUsers', 'twitter_users', 'tweets', 'users', 'po
         cmd = string.Template("copy ${tableName} to '${file}' delimiter ',' csv header").substitute(locals())
         _cur.query(cmd)
 
-def getTweepyAPI():
-    consumer_key = "vKbz24SqytZnYO33FNkR7w"
-    consumer_secret = "jjobro8Chy9aKMzo8szYMz9tHftONLRkjNnrxk0"
-    access_key = "363361813-FKSdmwSbzuUzHWg326fTGJM7Bu2hTviqEetjMgu8"
-    access_secret = "VKgzDnTvDUWR1csliUR3BiMOI2oqO9NzocNKX1jPd4"
-    auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
-    auth.set_access_token(access_key, access_secret)
-    return tweepy.API(auth)
-
-_api = getTweepyAPI()
-
 def getRemainingHitsUserTimeline():
     stat = _api.rate_limit_status()
     return stat['resources']['statuses']['/statuses/user_timeline']['remaining']
@@ -138,15 +191,11 @@ def getTweets(screen_name, **kwargs):
     # selected by the count parameter).
     return _api.user_timeline(screen_name=screen_name, include_rts=True, **kwargs)
 
-def isRetweet(tweet):
-    return hasattr(tweet, 'retweeted_status')
-
 def getInfoForUser(screenNames):
     users = _api.lookup_users(screen_names=screenNames)
     res = [[user.id, user.created_at, user.description.encode('utf-8'), user.followers_count, user.friends_count,
             user.lang, user.location.encode('utf-8'), user.name.encode('utf-8'), user.screen_name.lower(), user.verified, user.statuses_count] for user in users]
     file = '/tmp/%s..%s_user.csv' % (screenNames[0], screenNames[-1])
-    print "writing %s results to file: %s" % (len(res), file)
     write2csv(res, file)
     print "updating database with results in temp file"
     _cur.query("copy twitter_users (id,created_at,description,followers_count,friends_count,lang,location,name,user_screen_name,verified,statuses_count) from '%s' delimiters ',' csv" % (file))
@@ -186,7 +235,6 @@ def getAllTweets(screenNames):
     outTweets = [[tweet.id_str, tweet.user.id, tweet.user.screen_name.lower(), tweet.created_at, isRetweet(tweet), tweet.in_reply_to_status_id_str,
                   tweet.lang, tweet.truncated, tweet.text.encode("utf-8")] for tweet in alltweets]
     file = '/tmp/%s_tweets.csv' % screen_name
-    print "writing %s results to file: %s" % (len(outTweets), file)
     write2csv(outTweets, file)
     print "updating database with results in temp file"
     _cur.query("copy tweets (id, user_id, user_screen_name, created_at, retweeted, in_reply_to_status_id, lang, truncated,text) from '%s' delimiters ',' csv" % (file))
@@ -311,4 +359,5 @@ def generateTopUsers100k():
 #storeCurTagSynonyms()
 #backupTables(tableNames=['tag_synonyms'])
 #backupTables()
-#generateTopHashtagsCSV()
+streamHashtags()
+#generateTopHashtags()

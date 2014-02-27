@@ -20,6 +20,28 @@ create table if not exists tweets (
 	primary key (id)
 	);
 
+drop table if exists top_hashtag_hashtags cascade;
+create table if not exists top_hashtag_hashtags (
+	hashtag text not null,
+	rank integer not null,
+	hashtag_group text not null,
+	primary key (hashtag, hashtag_group)
+	);
+
+drop table if exists top_hashtag_tweets cascade;
+create table if not exists top_hashtag_tweets (
+	id bigint not null,
+	user_id bigint not null,
+	user_screen_name varchar(255) not null,
+	created_at varchar(255) not null,
+	retweeted varchar(255) not null,
+	in_reply_to_status_id varchar(255) not null,
+	lang varchar(255) not null,
+	truncated varchar(255) not null,
+	text text not null,
+	primary key (id)
+	);
+
 drop table if exists post_subsets cascade;
 create table if not exists post_subsets (
 	post_id integer not null,
