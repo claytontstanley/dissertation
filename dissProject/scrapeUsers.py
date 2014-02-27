@@ -41,11 +41,16 @@ def write2csv(res, file):
 class CustomStreamListener(tweepy.StreamListener):
     curTweets = []
 
+    def __init__(self, group):
+        self.group = group
+        # http://stackoverflow.com/questions/576169/understanding-python-super-and-init-methods
+        super(self.__class__, self).__init__()
+
     def addTweet(self, tweet):
         tweetObj = [tweet.id_str, tweet.user.id, tweet.user.screen_name.lower(), tweet.created_at, isRetweet(tweet), tweet.in_reply_to_status_id_str,
-                    tweet.lang, tweet.truncated, tweet.text.encode("utf-8")]
+                    tweet.lang, tweet.truncated, tweet.text.encode("utf-8"), self.group]
         self.curTweets.append(tweetObj)
-        if len(self.curTweets) == 1000:
+        if len(self.curTweets) == 100:
             self.saveResults()
             self.curTweets = []
 
@@ -53,7 +58,7 @@ class CustomStreamListener(tweepy.StreamListener):
         file = '/tmp/topHashtags.csv' % ()
         write2csv(self.curTweets, file)
         print "updating database with results in temp file"
-        _cur.query("copy top_hashtag_tweets (id, user_id, user_screen_name, created_at, retweeted, in_reply_to_status_id, lang, truncated,text) from '%s' delimiters ',' csv" % (file))
+        _cur.query("copy top_hashtag_tweets (id, user_id, user_screen_name, created_at, retweeted, in_reply_to_status_id, lang, truncated, text, hashtag_group) from '%s' delimiters ',' csv" % (file))
 
     def on_status(self, status):
         self.addTweet(status)
@@ -65,8 +70,6 @@ class CustomStreamListener(tweepy.StreamListener):
     def on_timeout(self):
         print >> sys.stderr, 'Timeout...'
         return True
-
-_sapi = tweepy.streaming.Stream(_api.auth, CustomStreamListener())
 
 def scrapeStatweestics():
     url = 'http://statweestics.com/stats/hashtags/day'
@@ -103,7 +106,8 @@ def getHashtagsFrom(group):
 def streamHashtags():
     hashtagGroup = '%s-initial' % (time.strftime("%Y-%m-%d-%H:%M:%S"))
     generateTopHashtags(group=hashtagGroup)
-    _sapi.filter(track=getHashtagsFrom('%s' % (hashtagGroup)))
+    sapi = tweepy.streaming.Stream(_api.auth, CustomStreamListener(hashtagGroup))
+    sapi.filter(track=getHashtagsFrom('%s' % (hashtagGroup)))
 
 def scrape_socialbakers(url):
     soup = BeautifulSoup(urllib2.urlopen(url).read())

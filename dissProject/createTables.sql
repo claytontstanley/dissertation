@@ -39,6 +39,7 @@ create table if not exists top_hashtag_tweets (
 	lang varchar(255) not null,
 	truncated varchar(255) not null,
 	text text not null,
+	hashtag_group text not null,
 	primary key (id)
 	);
 
