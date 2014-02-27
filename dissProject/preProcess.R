@@ -924,8 +924,8 @@ genTokenizedTblSO <- function(filters='1=1', bundleSize=10000) {
 }
 
 addFilteredPosts <- function() {
-	ids = c('17801882', '9965709')
-	reasons = c('java so', 'java so')
+	ids = c('17801882', '9965709', '9204391')
+	reasons = c('java so', 'java so', 'java so')
 	filteredPostsTbl = data.table(id=ids, reason=reasons);
 	setcolorder (filteredPostsTbl, c('id', 'reason'))
 	withDBConnect(dbCon, dbWriteTable(dbCon, "post_filtered", filteredPostsTbl, append=T, row.names=0))

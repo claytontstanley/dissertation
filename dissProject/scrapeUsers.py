@@ -44,7 +44,7 @@ class CustomStreamListener(tweepy.StreamListener):
     def __init__(self, group):
         self.group = group
         # http://stackoverflow.com/questions/576169/understanding-python-super-and-init-methods
-        super(self.__class__, self).__init__()
+        super(CustomStreamListener, self).__init__()
 
     def addTweet(self, tweet):
         tweetObj = [tweet.id_str, tweet.user.id, tweet.user.screen_name.lower(), tweet.created_at, isRetweet(tweet), tweet.in_reply_to_status_id_str,
