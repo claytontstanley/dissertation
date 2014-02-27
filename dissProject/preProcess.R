@@ -953,7 +953,7 @@ runGenTokenizedTblSO <- function() genTokenizedTblSO()
 runGenTokenizedTblSOSearch <- function() genTokenizedTblSO(bundleSize=2500)
 
 curWS <- function() {
-	hashtagGroup = '2014-02-27 16:09:09 initial'
+	hashtagGroup = '2014-02-27 17:13:30 initial'
 	tweetsTbl = getTweetsTbl(sprintf("select * from top_hashtag_tweets where hashtag_group = '%s'", hashtagGroup), config=defaultTConfig)
 	tweetsTbl
 	tweetsTbl[, table(retweeted)]
@@ -962,7 +962,7 @@ curWS <- function() {
 	setkey(hashtagsTbl, hashtag)
 	setkey(popHashtagsTbl, hashtag)
 	popHashtagsTbl
-	hashtagsTbl[popHashtagsTbl, nomatch=0][,list(hashtag, .N), by=hashtag][order(N, decreasing = T)]
+	hashtagsTbl[popHashtagsTbl, nomatch=0][,list(hashtag, .N), by=hashtag][order(N, decreasing = T)][, N]
 	tweetsTbl[lang=='en']
 	addFilteredPosts()
 	genTokenizedTblSO(filters=sprintf('id in (%s)', makeIdsQuery('SOShuffledFull', 1, 10000)))
