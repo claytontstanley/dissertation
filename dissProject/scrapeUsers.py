@@ -38,6 +38,12 @@ def write2csv(res, file):
         writer = csv.writer(f, quoting=csv.QUOTE_ALL)
         writer.writerows(res)
 
+def myQuery(query):
+    print "running query: %s" % (query)
+    res = _cur.query(query)
+    print "finished running query"
+    return(res)
+
 class CustomStreamListener(tweepy.StreamListener):
     curTweets = []
 
@@ -57,8 +63,7 @@ class CustomStreamListener(tweepy.StreamListener):
     def saveResults(self):
         file = '/tmp/topHashtags.csv' % ()
         write2csv(self.curTweets, file)
-        print "updating database with results in temp file"
-        _cur.query("copy top_hashtag_tweets (id, user_id, user_screen_name, created_at, retweeted, in_reply_to_status_id, lang, truncated, text, hashtag_group) from '%s' delimiters ',' csv" % (file))
+        myQuery("copy top_hashtag_tweets (id, user_id, user_screen_name, created_at, retweeted, in_reply_to_status_id, lang, truncated, text, hashtag_group) from '%s' delimiters ',' csv" % (file))
 
     def on_status(self, status):
         self.addTweet(status)
@@ -92,16 +97,17 @@ def generateTopHashtagsCSV(scrapeFun, group):
 
 def storeTopHashtags(topHashtagsFile):
     cmd = "copy top_hashtag_hashtags (hashtag, rank, hashtag_group) from '%s/%s.csv' delimiters ',' csv" % (_topHashtagsDir, topHashtagsFile)
-    _cur.query(cmd)
+    myQuery(cmd)
 
 def generateTopHashtags(scrapeFun=generateTopHashtagsStatweestics, group='initial'):
     generateTopHashtagsCSV(scrapeFun, group)
     storeTopHashtags(group)
 
 def getHashtagsFrom(group):
-    res = _cur.query("select hashtag from top_hashtag_hashtags where hashtag_group = '%s'" % (group)).getresult()
+    res = myQuery("select hashtag from top_hashtag_hashtags where hashtag_group = '%s'" % (group)).getresult()
     res = [item[0] for item in res]
-    return res[0:400]
+    print res
+    return res[0:300]
 
 def streamHashtags():
     hashtagGroup = '%s-initial' % (time.strftime("%Y-%m-%d-%H:%M:%S"))
@@ -159,7 +165,7 @@ def storeTopUsers(topUsersFile):
     topUsersDir = _topUsersDir
     cmd = "copy topUsers (user_screen_name, rank) from '${topUsersDir}/${topUsersFile}' delimiters ',' csv"
     cmd = string.Template(cmd).substitute(locals())
-    _cur.query(cmd)
+    myQuery(cmd)
 
 def generateTopUsers(scrapeFun=generateTopUsersTwitaholic, topUsersFile='top1000Twitaholic.csv'):
     generateTopUsersCSV(scrapeFun=scrapeFun, topUsersFile=topUsersFile)
@@ -169,7 +175,7 @@ def storeTagSynonyms(synonymsFile):
     cmd = "copy tag_synonyms (%s) from '%s/dissertationData/tagSynonyms/%s' delimiters ',' csv header" % (
         "id, Source_Tag_Name, Target_Tag_Name, Creation_Date, Owner_User_Id, Auto_Rename_Count, Last_Auto_Rename, Score, Approved_By_User_Id, Approval_Date",
         _dir, synonymsFile)
-    _cur.query(cmd)
+    myQuery(cmd)
 
 def storeCurTagSynonyms():
     storeTagSynonyms('synonyms-2014-01-30.csv')
@@ -178,7 +184,7 @@ def backupTables(tableNames=['topUsers', 'twitter_users', 'tweets', 'users', 'po
     for tableName in tableNames:
         file = "%s/dissertationData/tables/%s.csv" % (_dir, tableName)
         cmd = string.Template("copy ${tableName} to '${file}' delimiter ',' csv header").substitute(locals())
-        _cur.query(cmd)
+        myQuery(cmd)
 
 def getRemainingHitsUserTimeline():
     stat = _api.rate_limit_status()
@@ -201,8 +207,7 @@ def getInfoForUser(screenNames):
             user.lang, user.location.encode('utf-8'), user.name.encode('utf-8'), user.screen_name.lower(), user.verified, user.statuses_count] for user in users]
     file = '/tmp/%s..%s_user.csv' % (screenNames[0], screenNames[-1])
     write2csv(res, file)
-    print "updating database with results in temp file"
-    _cur.query("copy twitter_users (id,created_at,description,followers_count,friends_count,lang,location,name,user_screen_name,verified,statuses_count) from '%s' delimiters ',' csv" % (file))
+    myQuery("copy twitter_users (id,created_at,description,followers_count,friends_count,lang,location,name,user_screen_name,verified,statuses_count) from '%s' delimiters ',' csv" % (file))
 
 def getAllTweets(screenNames):
     def getTweetsBetween(greaterThanID, lessThanID):
@@ -222,7 +227,7 @@ def getAllTweets(screenNames):
     alltweets = []
     lessThanID = getTweets(screen_name, count=1)[-1].id + 1
     cmd = string.Template("select id from tweets where user_screen_name = '${screen_name}' order by id desc").substitute(locals())
-    res = _cur.query(cmd).getresult()
+    res = myQuery(cmd).getresult()
     if len(res) == 0:
         newestGrabbed = 0
     else:
@@ -230,7 +235,7 @@ def getAllTweets(screenNames):
     res = getTweetsBetween(newestGrabbed, lessThanID)
     alltweets.extend(res)
     cmd = string.Template("select id from tweets where user_screen_name = '${screen_name}' order by id asc").substitute(locals())
-    res = _cur.query(cmd).getresult()
+    res = myQuery(cmd).getresult()
     if len(res) == 0:
         lessThanID = 0
     else:
@@ -240,15 +245,14 @@ def getAllTweets(screenNames):
                   tweet.lang, tweet.truncated, tweet.text.encode("utf-8")] for tweet in alltweets]
     file = '/tmp/%s_tweets.csv' % screen_name
     write2csv(outTweets, file)
-    print "updating database with results in temp file"
-    _cur.query("copy tweets (id, user_id, user_screen_name, created_at, retweeted, in_reply_to_status_id, lang, truncated,text) from '%s' delimiters ',' csv" % (file))
+    myQuery("copy tweets (id, user_id, user_screen_name, created_at, retweeted, in_reply_to_status_id, lang, truncated,text) from '%s' delimiters ',' csv" % (file))
 
 def userAlreadyCollected(user_screen_name):
-    res = _cur.query(string.Template("select * from tweets where user_screen_name='${user_screen_name}' limit 1").substitute(locals())).getresult()
+    res = myQuery(string.Template("select * from tweets where user_screen_name='${user_screen_name}' limit 1").substitute(locals())).getresult()
     return len(res) > 0
 
 def userInfoAlreadyCollected(user_screen_name):
-    res = _cur.query(string.Template("select * from twitter_users where user_screen_name='${user_screen_name}' limit 1").substitute(locals())).getresult()
+    res = myQuery(string.Template("select * from twitter_users where user_screen_name='${user_screen_name}' limit 1").substitute(locals())).getresult()
     return len(res) > 0
 
 # ref: http://stackoverflow.com/questions/434287/what-is-the-most-pythonic-way-to-iterate-over-a-list-in-chunks/434411#434411
@@ -256,7 +260,7 @@ def chunker(seq, size):
     return (seq[pos:pos + size] for pos in xrange(0, len(seq), size))
 
 def getForTopUsers(alreadyCollectedFun, getForUserFun, getRemainingHitsFun, hitsAlwaysGreaterThan, userQuery, groupFun=lambda x: chunker(x, 1)):
-    res = _cur.query(userQuery).getresult()
+    res = myQuery(userQuery).getresult()
     screenNames = [[user[0]] for user in res]
     screenNames = list(itertools.chain(*screenNames))
     print "getting tweets for %s users" % len(screenNames)
