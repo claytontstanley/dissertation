@@ -953,6 +953,17 @@ runGenTokenizedTblSO <- function() genTokenizedTblSO()
 runGenTokenizedTblSOSearch <- function() genTokenizedTblSO(bundleSize=2500)
 
 curWS <- function() {
+	hashtagGroup = '2014-02-27 16:09:09 initial'
+	tweetsTbl = getTweetsTbl(sprintf("select * from top_hashtag_tweets where hashtag_group = '%s'", hashtagGroup), config=defaultTConfig)
+	tweetsTbl
+	tweetsTbl[, table(retweeted)]
+	hashtagsTbl = getHashtagsTbl(tweetsTbl, defaultTConfig)
+	popHashtagsTbl = data.table(sqldf(sprintf("select hashtag from top_hashtag_hashtags where hashtag_group = '%s'", hashtagGroup)))
+	setkey(hashtagsTbl, hashtag)
+	setkey(popHashtagsTbl, hashtag)
+	popHashtagsTbl
+	hashtagsTbl[popHashtagsTbl, nomatch=0][,list(hashtag, .N), by=hashtag][order(N, decreasing = T)]
+	tweetsTbl[lang=='en']
 	addFilteredPosts()
 	genTokenizedTblSO(filters=sprintf('id in (%s)', makeIdsQuery('SOShuffledFull', 1, 10000)))
 	runGenNcoocTblSO1thru10000()

@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS topUsers cascade;
+--DROP TABLE IF EXISTS topUsers cascade;
 create table if not exists topUsers (
 	--user_id integer not null,
 	user_screen_name varchar(255) not null,
@@ -6,7 +6,7 @@ create table if not exists topUsers (
 	primary key (user_screen_name)
 	);
 
-drop table if exists tweets cascade;
+--drop table if exists tweets cascade;
 create table if not exists tweets (
 	id bigint not null,
 	user_id bigint not null,
@@ -20,7 +20,7 @@ create table if not exists tweets (
 	primary key (id)
 	);
 
-drop table if exists top_hashtag_hashtags cascade;
+--drop table if exists top_hashtag_hashtags cascade;
 create table if not exists top_hashtag_hashtags (
 	hashtag text not null,
 	rank integer not null,
@@ -28,7 +28,7 @@ create table if not exists top_hashtag_hashtags (
 	primary key (hashtag, hashtag_group)
 	);
 
-drop table if exists top_hashtag_tweets cascade;
+--drop table if exists top_hashtag_tweets cascade;
 create table if not exists top_hashtag_tweets (
 	id bigint not null,
 	user_id bigint not null,
@@ -43,13 +43,13 @@ create table if not exists top_hashtag_tweets (
 	primary key (id)
 	);
 
-drop table if exists temp_tweets_id cascade;
+--drop table if exists temp_tweets_id cascade;
 create table if not exists temp_tweets_id (
 	id bigint not null,
 	primary key (id)
 	);
 
-drop table if exists post_subsets cascade;
+--drop table if exists post_subsets cascade;
 create table if not exists post_subsets (
 	post_id integer not null,
 	id integer not null,
@@ -57,7 +57,7 @@ create table if not exists post_subsets (
 	primary key (post_id, group_name)
 	);
 
-drop table if exists post_tokenized;
+--drop table if exists post_tokenized;
 create table if not exists post_tokenized (
 	row_id serial,
 	id integer not null,
@@ -70,7 +70,7 @@ create table if not exists post_tokenized (
 
 create index id_index_post_tokenized on post_tokenized (id);
 
-drop table if exists post_filtered;
+--drop table if exists post_filtered;
 create table if not exists post_filtered (
 	post_id integer not null,
 	reason text,
@@ -81,7 +81,7 @@ create table if not exists post_filtered (
 create index user_screen_name_index_tweets on tweets (user_screen_name);
 create index user_id_index_tweets on tweets (user_id);
 
-drop table if exists twitter_users;
+--drop table if exists twitter_users;
 create table if not exists twitter_users (
 	id bigint not null,
 	created_at varchar(255) not null,
@@ -101,7 +101,7 @@ create table if not exists twitter_users (
 create index owner_user_id_index_posts on posts (owner_user_id);
 create index reputation_index_users on users (reputation);
 
-drop table if exists tag_synonyms;
+--drop table if exists tag_synonyms;
 create table if not exists tag_synonyms (
 	id int not null,
 	Source_Tag_Name text not null,

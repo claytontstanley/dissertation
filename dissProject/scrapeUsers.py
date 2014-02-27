@@ -1,5 +1,6 @@
 import itertools
 import re
+import random
 import time
 import urllib2
 from bs4 import BeautifulSoup
@@ -66,6 +67,7 @@ class CustomStreamListener(tweepy.StreamListener):
             self.curTweets = []
 
     def saveResults(self):
+        sys.stdout.write('\n')
         file = '/tmp/topHashtags.csv' % ()
         ids = [tweet[0] for tweet in self.curTweets]
         ids = list(OrderedDict.fromkeys(ids))
@@ -82,22 +84,46 @@ class CustomStreamListener(tweepy.StreamListener):
         myQuery("copy top_hashtag_tweets (id, user_id, user_screen_name, created_at, retweeted, in_reply_to_status_id, lang, truncated, text, hashtag_group) from '%s' delimiters ',' csv" % (file))
 
     def on_status(self, status):
+        sys.stdout.write('.')
+        sys.stdout.flush()
         self.addTweet(status)
 
     def on_error(self, status_code):
-        print >> sys.stderr, 'Encountered error with status code:', status_code
+        print >> sys.stderr, 'error: %s' % (repr(status_code))
         return True
 
     def on_timeout(self):
         print >> sys.stderr, 'Timeout...'
         return True
 
+def scrapeTrendsmap():
+    baseUrl = 'http://trendsmap.com'
+    url = baseUrl + '/local'
+    soup = BeautifulSoup(urllib2.urlopen(url).read())
+    #res = soup.findAll('div', {'class': 'location'})
+    res = soup.findAll('a', {'href': re.compile('^\/local\/us')})
+    cityUrls = [baseUrl + item['href'] for item in res]
+    allHashtags = []
+    for rank, url in enumerate(cityUrls):
+        print "working url %s, %s/%s" % (url, rank, len(cityUrls))
+        soup = BeautifulSoup(urllib2.urlopen(url).read())
+        res = soup.findAll('a', {'class': 'obscure-text', 'title': re.compile('^#')})
+        hashtags = [item['title'].encode('utf-8') for item in res]
+        allHashtags.extend(hashtags)
+    allHashtags = list(OrderedDict.fromkeys(allHashtags))
+    random.shuffle(allHashtags)
+    return allHashtags
+
+def generateTopHashtagsTrendsmap():
+    res = scrapeTrendsmap()
+    return res
+
 def scrapeStatweestics():
     url = 'http://statweestics.com/stats/hashtags/day'
     soup = BeautifulSoup(urllib2.urlopen(url).read())
     res = []
     for hrefEl in soup.findAll('a', {'href': re.compile('^\/stats\/show')}):
-        res.append([hrefEl.contents[0].encode('utf-8')])
+        res.append(hrefEl.contents[0].encode('utf-8'))
     return res
 
 def generateTopHashtagsStatweestics():
@@ -107,7 +133,7 @@ def generateTopHashtagsStatweestics():
 def generateTopHashtagsCSV(scrapeFun, group):
     res = []
     for rank, item in enumerate(scrapeFun()):
-        res.append([item[0], rank, group])
+        res.append([item, rank, group])
     file = "%s/%s.csv" % (_topHashtagsDir, group)
     write2csv(res, file)
 
@@ -115,20 +141,25 @@ def storeTopHashtags(topHashtagsFile):
     cmd = "copy top_hashtag_hashtags (hashtag, rank, hashtag_group) from '%s/%s.csv' delimiters ',' csv" % (_topHashtagsDir, topHashtagsFile)
     myQuery(cmd)
 
-def generateTopHashtags(scrapeFun=generateTopHashtagsStatweestics, group='initial'):
-    generateTopHashtagsCSV(scrapeFun, group)
-    storeTopHashtags(group)
+def generateTopHashtags(scrapeFun=generateTopHashtagsTrendsmap, groupID='trendsmap'):
+    hashtagGroup = '%s %s' % (time.strftime("%Y-%m-%d %H:%M:%S"), groupID)
+    generateTopHashtagsCSV(scrapeFun, hashtagGroup)
+    storeTopHashtags(hashtagGroup)
 
 def getHashtagsFrom(group):
     res = myQuery("select hashtag from top_hashtag_hashtags where hashtag_group = '%s'" % (group)).getresult()
     res = [item[0] for item in res]
-    return res[0:300]
+    res = [hashtag for hashtag in res if sys.getsizeof(hashtag) <= 60]
+    res = res[-400:]
+    return res
 
-def streamHashtags():
-    hashtagGroup = '%s-initial' % (time.strftime("%Y-%m-%d-%H:%M:%S"))
-    generateTopHashtags(group=hashtagGroup)
+def streamHashtags(hashtagGroup):
     sapi = tweepy.streaming.Stream(_api.auth, CustomStreamListener(hashtagGroup))
-    sapi.filter(track=getHashtagsFrom('%s' % (hashtagGroup)))
+    sapi.filter(languages=['en'], track=getHashtagsFrom('%s' % (hashtagGroup)))
+
+def streamHashtagsCurrent():
+    hashtagGroup = '2014-02-27 17:13:30 initial'
+    streamHashtags(hashtagGroup)
 
 def scrape_socialbakers(url):
     soup = BeautifulSoup(urllib2.urlopen(url).read())
@@ -381,5 +412,5 @@ def generateTopUsers100k():
 #storeCurTagSynonyms()
 #backupTables(tableNames=['tag_synonyms'])
 #backupTables()
-streamHashtags()
 #generateTopHashtags()
+#streamHashtagsCurrent()
