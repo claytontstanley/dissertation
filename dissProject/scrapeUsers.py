@@ -68,22 +68,6 @@ class CustomStreamListener(tweepy.StreamListener):
 
 _sapi = tweepy.streaming.Stream(_api.auth, CustomStreamListener())
 
-def scrape_twitaholic(url):
-    soup = BeautifulSoup(urllib2.urlopen(url).read())
-    res = []
-    for tr in soup.findAll('tr', {'style': 'border-top:1px solid black;'}):
-        temp = tr.find('td', {'class': 'statcol_name'})
-        res.append(temp.a['title'].split('(')[1][4:-1])
-    return res
-
-def scrape_socialbakers(url):
-    soup = BeautifulSoup(urllib2.urlopen(url).read())
-    res = []
-    for div in soup.findAll('div', {'id': 'snippet-bookmarkToggle-bookmarkToggle'}):
-        res.append(div.findAll('div')[0]['id'].split('-')[-1])
-    print "grabbed %s results from url %s" % (len(res), url)
-    return res
-
 def scrapeStatweestics():
     url = 'http://statweestics.com/stats/hashtags/day'
     soup = BeautifulSoup(urllib2.urlopen(url).read())
@@ -121,6 +105,22 @@ def streamHashtags():
     generateTopHashtags(group=hashtagGroup)
     _sapi.filter(track=getHashtagsFrom('%s' % (hashtagGroup)))
 
+def scrape_socialbakers(url):
+    soup = BeautifulSoup(urllib2.urlopen(url).read())
+    res = []
+    for div in soup.findAll('div', {'id': 'snippet-bookmarkToggle-bookmarkToggle'}):
+        res.append(div.findAll('div')[0]['id'].split('-')[-1])
+    print "grabbed %s results from url %s" % (len(res), url)
+    return res
+
+def scrape_twitaholic(url):
+    soup = BeautifulSoup(urllib2.urlopen(url).read())
+    res = []
+    for tr in soup.findAll('tr', {'style': 'border-top:1px solid black;'}):
+        temp = tr.find('td', {'class': 'statcol_name'})
+        res.append(temp.a['title'].split('(')[1][4:-1])
+    return res
+
 def generateTopUsersTwitaholic():
     res = []
     for i in range(10):
@@ -157,15 +157,15 @@ def storeTopUsers(topUsersFile):
     cmd = string.Template(cmd).substitute(locals())
     _cur.query(cmd)
 
+def generateTopUsers(scrapeFun=generateTopUsersTwitaholic, topUsersFile='top1000Twitaholic.csv'):
+    generateTopUsersCSV(scrapeFun=scrapeFun, topUsersFile=topUsersFile)
+    storeTopUsers(topUsersFile=topUsersFile)
+
 def storeTagSynonyms(synonymsFile):
     cmd = "copy tag_synonyms (%s) from '%s/dissertationData/tagSynonyms/%s' delimiters ',' csv header" % (
         "id, Source_Tag_Name, Target_Tag_Name, Creation_Date, Owner_User_Id, Auto_Rename_Count, Last_Auto_Rename, Score, Approved_By_User_Id, Approval_Date",
         _dir, synonymsFile)
     _cur.query(cmd)
-
-def generateTopUsers(scrapeFun=generateTopUsersTwitaholic, topUsersFile='top1000Twitaholic.csv'):
-    generateTopUsersCSV(scrapeFun=scrapeFun, topUsersFile=topUsersFile)
-    storeTopUsers(topUsersFile=topUsersFile)
 
 def storeCurTagSynonyms():
     storeTagSynonyms('synonyms-2014-01-30.csv')
