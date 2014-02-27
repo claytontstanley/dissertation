@@ -92,7 +92,7 @@ html2txt2 <- function(vect) {
 	myWriteCSV(vect, file=inFile)
 	cmd = '/opt/local/bin/python'
 	args = sprintf('%s/lib/html2txt.py %s %s', PATH, inFile, outFile)
-	myLog(sprintf('running html2txt with in/out temp files: %s, %s', inFile, outFile))
+	myLog(sprintf('running html2txt with in/out temp files: %s %s', inFile, outFile))
 	cmdOut = system2(cmd, args=args)
 	res = myReadCSV(outFile, header=F)
 	stopifnot(res$V1 == vect)
@@ -182,7 +182,7 @@ addTokenText <- function(tweetsTbl, from) {
 	writeLines(stripDelimiters(tweetsTbl[[from]]), rawTweetsFile, useBytes=T)
 	cmd = sprintf('%s/lib/ark-tweet-nlp-0.3.2/runTagger.sh', PATH)
 	args = sprintf('--no-confidence --just-tokenize --quiet %s > %s 2>%s', rawTweetsFile, tokenizedTweetsFile, stderFile)
-	myLog(sprintf('running tagger with in/out temp files: %s, %s', rawTweetsFile, tokenizedTweetsFile))
+	myLog(sprintf('running tagger with in/out temp files: %s %s', rawTweetsFile, tokenizedTweetsFile))
 	cmdOut = system2(cmd, args=args)
 	myLog(paste(readLines(stderFile), sep='\n'))
 	tokenTextTbl = data.table(read.delim(tokenizedTweetsFile, sep='\t', quote="", header=F, stringsAsFactors=F))
