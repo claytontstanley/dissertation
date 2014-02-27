@@ -43,6 +43,12 @@ create table if not exists top_hashtag_tweets (
 	primary key (id)
 	);
 
+drop table if exists temp_tweets_id cascade;
+create table if not exists temp_tweets_id (
+	id bigint not null,
+	primary key (id)
+	);
+
 drop table if exists post_subsets cascade;
 create table if not exists post_subsets (
 	post_id integer not null,

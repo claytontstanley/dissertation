@@ -44,6 +44,11 @@ def myQuery(query):
     print "finished running query"
     return(res)
 
+def getTweetObj(tweet):
+        tweetObj = [tweet.id_str, tweet.user.id, tweet.user.screen_name.lower(), tweet.created_at, isRetweet(tweet), tweet.in_reply_to_status_id_str,
+                    tweet.lang, tweet.truncated, tweet.text.encode("utf-8")]
+        return tweetObj
+
 class CustomStreamListener(tweepy.StreamListener):
     curTweets = []
 
@@ -53,16 +58,27 @@ class CustomStreamListener(tweepy.StreamListener):
         super(CustomStreamListener, self).__init__()
 
     def addTweet(self, tweet):
-        tweetObj = [tweet.id_str, tweet.user.id, tweet.user.screen_name.lower(), tweet.created_at, isRetweet(tweet), tweet.in_reply_to_status_id_str,
-                    tweet.lang, tweet.truncated, tweet.text.encode("utf-8"), self.group]
+        tweetObj = getTweetObj(tweet)
+        tweetObj.append(self.group)
         self.curTweets.append(tweetObj)
-        if len(self.curTweets) == 100:
+        if len(self.curTweets) == 1000:
             self.saveResults()
             self.curTweets = []
 
     def saveResults(self):
         file = '/tmp/topHashtags.csv' % ()
-        write2csv(self.curTweets, file)
+        ids = [tweet[0] for tweet in self.curTweets]
+        ids = list(OrderedDict.fromkeys(ids))
+        ids = [[id] for id in ids]
+        myQuery('truncate temp_tweets_id')
+        write2csv(ids, file)
+        myQuery("copy temp_tweets_id (id) from '%s' delimiters ',' csv" % (file))
+        newIds = myQuery("select id from temp_tweets_id as t where t.id not in (select id from top_hashtag_tweets)").getresult()
+        newIds = [id[0] for id in newIds]
+        newIds = [str(id) for id in newIds]
+        newTweets = [tweet for tweet in self.curTweets if tweet[0] in newIds]
+        newTweets = dict((tweet[0], tweet) for tweet in newTweets).values()
+        write2csv(newTweets, file)
         myQuery("copy top_hashtag_tweets (id, user_id, user_screen_name, created_at, retweeted, in_reply_to_status_id, lang, truncated, text, hashtag_group) from '%s' delimiters ',' csv" % (file))
 
     def on_status(self, status):
@@ -106,7 +122,6 @@ def generateTopHashtags(scrapeFun=generateTopHashtagsStatweestics, group='initia
 def getHashtagsFrom(group):
     res = myQuery("select hashtag from top_hashtag_hashtags where hashtag_group = '%s'" % (group)).getresult()
     res = [item[0] for item in res]
-    print res
     return res[0:300]
 
 def streamHashtags():
@@ -241,8 +256,7 @@ def getAllTweets(screenNames):
     else:
         lessThanID = int(res[0][0])
     alltweets.extend(getTweetsBetween(0, lessThanID))
-    outTweets = [[tweet.id_str, tweet.user.id, tweet.user.screen_name.lower(), tweet.created_at, isRetweet(tweet), tweet.in_reply_to_status_id_str,
-                  tweet.lang, tweet.truncated, tweet.text.encode("utf-8")] for tweet in alltweets]
+    outTweets = [getTweetObj(tweet) for tweet in alltweets]
     file = '/tmp/%s_tweets.csv' % screen_name
     write2csv(outTweets, file)
     myQuery("copy tweets (id, user_id, user_screen_name, created_at, retweeted, in_reply_to_status_id, lang, truncated,text) from '%s' delimiters ',' csv" % (file))
