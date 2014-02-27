@@ -96,7 +96,7 @@ def generateTopHashtags(scrapeFun=generateTopHashtagsStatweestics, group='initia
     storeTopHashtags(group)
 
 def getHashtagsFrom(group):
-    res = _cur.query("select * from top_hashtag_hashtags where hashtag_group = '%s'" % (group)).getresult()
+    res = _cur.query("select hashtag from top_hashtag_hashtags where hashtag_group = '%s'" % (group)).getresult()
     res = [item[0] for item in res]
     return res[0:400]
 
