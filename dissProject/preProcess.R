@@ -950,7 +950,6 @@ runGenNcoocTblSO1thru3000000 <- function() genNcoocTblSO('SOShuffledFull', 1, 30
 #runGenNcoocTblSO1thruEnd <- function() genNcoocTblSO('SOShuffledFull', 1, 6474687)
 
 runGenTokenizedTblSO <- function() genTokenizedTblSO()
-runGenTokenizedTblSOSearch <- function() genTokenizedTblSO(bundleSize=2500)
 
 curWS <- function() {
 	hashtagGroup = '2014-02-27 17:13:30 initial'
