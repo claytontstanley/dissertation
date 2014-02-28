@@ -110,7 +110,7 @@ def scrapeTrendsmap():
         res = soup.findAll('a', {'class': 'obscure-text', 'title': re.compile('^#')})
         hashtags = [item['title'].encode('utf-8') for item in res]
         allHashtags.extend(hashtags)
-        time.sleep(2)
+        time.sleep(2 + random.random())
     allHashtags = list(OrderedDict.fromkeys(allHashtags))
     random.shuffle(allHashtags)
     return allHashtags
