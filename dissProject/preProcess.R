@@ -965,7 +965,7 @@ curWS <- function() {
 	tweetsTbl[lang=='en']
 	addFilteredPosts()
 	genTokenizedTblSO(filters=sprintf('id in (%s)', makeIdsQuery('SOShuffledFull', 1, 10000)))
-	runGenNcoocTblSO1thru10000()
+	runGenNcoocTblSO1thru100()
 	test_dir(sprintf("%s/%s", PATH, 'tests'), reporter='summary')
 	runTFollow1k()
 	runSO1kr2()
