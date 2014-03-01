@@ -962,23 +962,23 @@ getSjiTbl <- function(subsetName, startId, endId) {
 	sjiTitleTbl[, type := 'title']
 	sjiBodyTbl[, type := 'body']
 	sjiTbl = rbind(sjiTitleTbl, sjiBodyTbl)
-	setkey(sjiTbl, list(chunk, tag, posFromTag, type))
+	setkey(sjiTbl, chunk, tag, posFromTag, type)
+	sjiTbl = sjiTbl[, list(partialN=sum(partialN), NChunkTag=sum(NChunkTag)), by=list(chunk, tag, posFromTag)]
 	addSjiAttrs(sjiTbl)
 	sjiTbl
 }
 
 addSjiAttrs <- function(sjiTbl) {
-	sjiTbl = sjiTbl[, list(partialN=sum(partialN), NChunkTag=sum(NChunkTag)), by=list(chunk, tag, posFromTag)]
 	sjiTbl[, chunkSums := sum(partialN), by=chunk]
 	sjiTbl[, tagSums := sum(partialN), by=tag]
 	sjiTbl[, sji := log(sum(partialN)) + log(partialN) - log(chunkSums) - log(tagSums)]
-	sjiTbl[, pTagGivenChunk := partialN/chunkSums, by=tag]
+	sjiTbl[, pTagGivenChunk := partialN/chunkSums]
 	sjiTbl[, HChunk := - sum(pTagGivenChunk * log(pTagGivenChunk)), by=chunk]
 	sjiTbl[, EChunk := 1 - HChunk/max(HChunk)]
 }
 
 computeAct <- function(context, sjiTbl) {
-	sjiTbl[J(context), {WChunk = EChunk/sum(EChunk); list(act=sum(WChunk * sji))}, keyby=tag]
+	sjiTbl[J(context), nomatch=0][,{WChunk = EChunk/sum(EChunk); list(act=sum(WChunk * sji))}, keyby=tag]
 }
 
 curWS <- function() {
