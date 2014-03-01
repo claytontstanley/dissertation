@@ -977,11 +977,9 @@ addSjiAttrs <- function(sjiTbl) {
 	sjiTbl[, EChunk := 1 - HChunk/max(HChunk)]
 }
 
-
 computeAct <- function(context, sjiTbl) {
 	sjiTbl[J(context), {WChunk = EChunk/sum(EChunk); list(act=sum(WChunk * sji))}, keyby=tag]
 }
-
 
 curWS <- function() {
 	hashtagGroup = '2014-02-27 17:13:30 initial'
