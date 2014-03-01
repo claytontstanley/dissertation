@@ -963,6 +963,11 @@ getSjiTbl <- function(subsetName, startId, endId) {
 	sjiBodyTbl[, type := 'body']
 	sjiTbl = rbind(sjiTitleTbl, sjiBodyTbl)
 	setkey(sjiTbl, list(chunk, tag, posFromTag, type))
+	addSjiAttrs(sjiTbl)
+	sjiTbl
+}
+
+addSjiAttrs <- function(sjiTbl) {
 	sjiTbl = sjiTbl[, list(partialN=sum(partialN), NChunkTag=sum(NChunkTag)), by=list(chunk, tag, posFromTag)]
 	sjiTbl[, chunkSums := sum(partialN), by=chunk]
 	sjiTbl[, tagSums := sum(partialN), by=tag]
@@ -970,8 +975,8 @@ getSjiTbl <- function(subsetName, startId, endId) {
 	sjiTbl[, pTagGivenChunk := partialN/chunkSums, by=tag]
 	sjiTbl[, HChunk := - sum(pTagGivenChunk * log(pTagGivenChunk)), by=chunk]
 	sjiTbl[, EChunk := 1 - HChunk/max(HChunk)]
-	sjiTbl
 }
+
 
 computeAct <- function(context, sjiTbl) {
 	sjiTbl[J(context), {WChunk = EChunk/sum(EChunk); list(act=sum(WChunk * sji))}, keyby=tag]
