@@ -983,7 +983,9 @@ curWS <- function() {
 	tweetsTbl = getTweetsTbl(sprintf("select * from top_hashtag_tweets where hashtag_group = '%s'", hashtagGroup), config=defaultTConfig)
 	sjiTbl = withProf(getSjiTbl('SOShuffledFull', 1, 100000))
 	computeAct(context, sjiTbl)[order(act)]
-	context = sjiTbl[tag=='.net'][order(partialN, decreasing = T)][1][, chunk]
+	computeAct('clojure', sjiTbl)[order(act)]
+	context = sjiTbl[tag=='.net'][order(sji, decreasing = T)]
+	context
 	key(sjiTbl)
 	sapply(sjiTbl, class)
 	tables()
