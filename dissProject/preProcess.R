@@ -978,7 +978,7 @@ addSjiAttrs <- function(sjiTbl) {
 }
 
 computeAct <- function(context, sjiTbl) {
-	sjiTbl[J(context), nomatch=0][,{WChunk = EChunk/sum(EChunk); list(act=sum(WChunk * sji))}, keyby=tag]
+	sjiTbl[J(context), nomatch=0][, {WChunk = EChunk/sum(EChunk); list(act=sum(WChunk * sji))}, keyby=tag]
 }
 
 curWS <- function() {
