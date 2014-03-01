@@ -159,8 +159,6 @@ sqlScratch <- function() {
 	data.table(sqldf("select retweeted, count(*) from tweets group by retweeted"))
 	sqldf("select * from tweets where 1=1 and user_screen_name='katyperry' limit 10")
 	foo = data.table(sqldf("select * from twitter_users"))
-	twitter_users = myReadCSV(str_c(PATH, "/dissertationData/tables/twitter_users.csv"))
-	topUsers = myReadCSV(str_c(PATH, "/dissertationData/tables/topUsers.csv"))
 	twitter_users[created_at=='2010-10-29 19:05:25',]
 }
 
@@ -503,6 +501,10 @@ tableModelVsPredTbl <- function(modelVsPredTbl) {
 
 modelVsPredDir <- function() {
 	sprintf('%s/dissertationData/modelVsPred', PATH)
+}
+
+coocDir <- function() {
+	sprintf('%s/dissertationData/cooc', PATH)
 }
 
 getModelVsPredOutFile <- function(name) {
@@ -881,9 +883,9 @@ genNcoocTblSO <- function(subsetName, startId, endId)  {
 	fullSubsetName = makeSubsetName(subsetName, startId, endId)
 	NcoocTblTitle = getNcoocTbl('title', idsQuery) 
 	NcoocTblBody = getNcoocTbl('body', idsQuery) 
-	outFile = sprintf('%s/dissertationData/cooc/NcoocTblBody-%s.csv', PATH, fullSubsetName)
+	outFile = sprintf('%s/NcoocTblBody-%s.csv', coocDir(), fullSubsetName)
 	myWriteCSV(NcoocTblBody, file=outFile) 
-	outFile = sprintf('%s/dissertationData/cooc/NcoocTblTitle-%s.csv', PATH, fullSubsetName)
+	outFile = sprintf('%s/NcoocTblTitle-%s.csv', coocDir(), fullSubsetName)
 	myWriteCSV(NcoocTblTitle, file=outFile)
 }
 
@@ -951,9 +953,39 @@ runGenNcoocTblSO1thru3000000 <- function() genNcoocTblSO('SOShuffledFull', 1, 30
 
 runGenTokenizedTblSO <- function() genTokenizedTblSO()
 
+getSjiTbl <- function(subsetName, startId, endId) {
+	fileName = sprintf('%s.csv', makeSubsetName(subsetName, startId, endId))
+	sjiTitleName = paste('NcoocTblTitle', fileName, sep='-')
+	sjiBodyName = paste('NcoocTblBody', fileName, sep='-')
+	sjiTitleTbl = myReadCSV(sprintf('%s/%s', coocDir(), sjiTitleName))
+	sjiBodyTbl = myReadCSV(sprintf('%s/%s', coocDir(), sjiBodyName))
+	sjiTitleTbl[, type := 'title']
+	sjiBodyTbl[, type := 'body']
+	sjiTbl = rbind(sjiTitleTbl, sjiBodyTbl)
+	setkey(sjiTbl, list(chunk, tag, posFromTag, type))
+	sjiTbl = sjiTbl[, list(partialN=sum(partialN), NChunkTag=sum(NChunkTag)), by=list(chunk, tag, posFromTag)]
+	sjiTbl[, chunkSums := sum(partialN), by=chunk]
+	sjiTbl[, tagSums := sum(partialN), by=tag]
+	sjiTbl[, sji := log(sum(partialN)) + log(partialN) - log(chunkSums) - log(tagSums)]
+	sjiTbl[, pTagGivenChunk := partialN/chunkSums, by=tag]
+	sjiTbl[, HChunk := - sum(pTagGivenChunk * log(pTagGivenChunk)), by=chunk]
+	sjiTbl[, EChunk := 1 - HChunk/max(HChunk)]
+	sjiTbl
+}
+
+computeAct <- function(context, sjiTbl) {
+	sjiTbl[J(context), {WChunk = EChunk/sum(EChunk); list(act=sum(WChunk * sji))}, keyby=tag]
+}
+
+
 curWS <- function() {
 	hashtagGroup = '2014-02-27 17:13:30 initial'
 	tweetsTbl = getTweetsTbl(sprintf("select * from top_hashtag_tweets where hashtag_group = '%s'", hashtagGroup), config=defaultTConfig)
+	sjiTbl = withProf(getSjiTbl('SOShuffledFull', 1, 100000))
+	computeAct(rep('ke', 1), sjiTbl)
+	key(sjiTbl)
+	sapply(sjiTbl, class)
+	tables()
 	tweetsTbl
 	tweetsTbl[, table(retweeted)]
 	hashtagsTbl = getHashtagsTbl(tweetsTbl, defaultTConfig)
