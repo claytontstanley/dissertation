@@ -982,7 +982,8 @@ curWS <- function() {
 	hashtagGroup = '2014-02-27 17:13:30 initial'
 	tweetsTbl = getTweetsTbl(sprintf("select * from top_hashtag_tweets where hashtag_group = '%s'", hashtagGroup), config=defaultTConfig)
 	sjiTbl = withProf(getSjiTbl('SOShuffledFull', 1, 100000))
-	computeAct(rep('ke', 1), sjiTbl)
+	computeAct(context, sjiTbl)[order(act)]
+	context = sjiTbl[tag=='.net'][order(partialN, decreasing = T)][1][, chunk]
 	key(sjiTbl)
 	sapply(sjiTbl, class)
 	tables()
