@@ -190,7 +190,10 @@ addTokenText <- function(tweetsTbl, from) {
 }
 
 getDiffTimeSinceFirst <- function(ts) {
-	as.numeric(difftime(ts, ts[1], units='secs'))
+	diffTime = as.numeric(difftime(ts, ts[1], units='secs'))
+	stopifnot(diffTime >= 0)
+	stopifnot(order(diffTime) == 1:length(diffTime))
+	diffTime
 }
 
 getTweetsTbl <- function(sqlStr="select * from tweets limit 10000", config) {
