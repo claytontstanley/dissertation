@@ -187,9 +187,8 @@ addTokenText <- function(tweetsTbl, from) {
 }
 
 getDiffTimeSinceFirst <- function(ts) {
-	diffTime = as.numeric(difftime(ts, ts[1], units='secs'))
+	diffTime = as.numeric(difftime(ts, min(ts), units='secs'))
 	stopifnot(diffTime >= 0)
-	stopifnot(order(diffTime) == 1:length(diffTime))
 	diffTime
 }
 
@@ -1026,6 +1025,7 @@ computeAct <- function(context, sjiTbl) {
 }
 
 curWS <- function() {
+	runTFollow1k()
 	userPTbl = withProf(getUserPTbl(defaultSOConfig))
 	BTbl = getPriorForUserAtTime(userPTbl, '4653', 1691899323, .5)
 	microbenchmark(getPriorForUserAtTime(userPTbl, '4653', 1691899323, .5), times=100)
