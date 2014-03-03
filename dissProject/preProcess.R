@@ -1001,7 +1001,6 @@ curWS <- function() {
 	lapply(userPTbl, class)
 	setkey(userPTbl, owner_user_id)
 	system.time(userPTbl[J(c(1))])
-	system.time(sqldf("select owner_user_id, creation_date, chunk from posts join post_tokenized on posts.id = post_tokenized.id where owner_user_id = 1 and post_type_id = 1 and type = 'tag'"))
 	hashtagGroup = '2014-02-27 17:13:30 initial'
 	tweetsTbl = getTweetsTbl(sprintf("select * from top_hashtag_tweets where hashtag_group = '%s'", hashtagGroup), config=defaultTConfig)
 	sjiTbl = withProf(getSjiTbl('SOShuffledFull', 1, 100000))
