@@ -82,10 +82,14 @@ test_that("testModelVsPred", {
 })
 
 test_that("testModelVsPredSO", {
-	  expectedTbl = myReadCSV(getModelVsPredOutFile('testingSO1'))
-	  expectedTbl[, user_screen_name := as.character(user_screen_name)]
+	  expectedModelVsPredTbl = myReadCSV(getModelVsPredOutFile('testingSO1'))
+	  expectedHashtagsTbl = myReadCSV(getHashtagsOutFile('testingSO1'))
+	  expectedModelVsPredTbl[, user_screen_name := as.character(user_screen_name)]
+	  expectedHashtagsTbl[, user_screen_name := as.character(user_screen_name)]
 	  resTbl = runPriorSO(config=modConfig(defaultSOConfig, list(query="select * from posts where post_type_id = 1 and owner_user_id = 20")))
-	  expect_equivalent(expectedTbl, resTbl$modelVsPredTbl)
+	  resTbl$hashtagsTbl[, created_at := as.character(created_at)]
+	  expect_equivalent(expectedModelVsPredTbl, resTbl$modelVsPredTbl)
+	  expect_equivalent(expectedHashtagsTbl, resTbl$hashtagsTbl)
 })
 
 test_that("testAggregation", {

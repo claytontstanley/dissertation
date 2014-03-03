@@ -152,10 +152,8 @@ sqlScratch <- function() {
 	sqldf('select count(*) from tweets')
 	sqldf('select count(*) from topUsers')
 	sqldf('select * from topUsers')
-	#data.table(sqldf('select t.user_screen_name,rank from tweets as t join topusers as u on t.user_screen_name = u.user_screen_name group by t.user_screen_name,u.rank order by rank'))
 	data.table(sqldf('select * from topusers order by rank'))
 	sqldf("select * from tweets where user_screen_name='jlo'")
-	data.table(sqldf('select * from (select user_screen_name,count(*) from tweets group by user_screen_name) as t join topUsers as u on t.user_screen_name = u.user_screen_name order by rank'))
 	data.table(sqldf("select retweeted, count(*) from tweets group by retweeted"))
 	sqldf("select * from tweets where 1=1 and user_screen_name='katyperry' limit 10")
 	foo = data.table(sqldf("select * from twitter_users"))
@@ -216,7 +214,7 @@ setupPostsTbl <- function(postsTbl, config) {
 	setkey(postsTbl, id)
 	stopifnot(!duplicated(postsTbl$id))
 	postsTbl[, tagsNoHtml := html2txt2(tags)]
-	postsTbl[, dt := getDiffTimeSinceFirst(creation_date), by=owner_user_id]
+	postsTbl[, dt := creation_epoch - min(creation_epoch), by=owner_user_id]
 	postsTbl
 }
 
@@ -238,13 +236,15 @@ getHashtagsTbl <- function(tweetsTbl, config) {
 	hashtagsTbl
 }
 
+convertTagSynonyms <- function(tokenizedTbl) {
+	withKey(tokenizedTbl, chunk,
+		{tokenizedTbl[getTagSynonymsTbl(), chunk := target_tag_name]
+		})
+}
+
 getTagsTbl <- function(postsTbl, config) {
 	tokenizedTbl = getTokenizedTbl(postsTbl, from='tagsNoHtml', regex=matchTag)
-	if (config$convertTagSynonymsP) {
-		withKey(tokenizedTbl, chunk,
-			{tokenizedTbl[getTagSynonymsTbl(), chunk := target_tag_name]
-			})
-	}
+	if (config$convertTagSynonymsP) convertTagSynonyms(tokenizedTbl)
 	tagsTbl = tokenizedTbl[postsTbl, list(hashtag=chunk, pos=pos, created_at=creation_date, dt=dt, user_id=owner_user_id, user_screen_name=as.character(owner_user_id)), nomatch=0]
 	setkey(tagsTbl, user_screen_name, dt, hashtag)
 	tagsTbl
@@ -506,12 +506,20 @@ modelVsPredDir <- function() {
 	sprintf('%s/dissertationData/modelVsPred', PATH)
 }
 
+hashtagsTblDir <- function() {
+	sprintf('%s/dissertationData/hashtagsTbl', PATH)
+}
+
 coocDir <- function() {
 	sprintf('%s/dissertationData/cooc', PATH)
 }
 
 getModelVsPredOutFile <- function(name) {
 	sprintf('%s/%s.csv', modelVsPredDir(), name)
+}
+
+getHashtagsOutFile <- function(name) {
+	sprintf('%s/%s.csv', hashtagsTblDir(), name)
 }
 
 runPrior <- function(config) {
@@ -561,7 +569,7 @@ modConfig <- function(config, mods) {
 }
 
 getQueryGeneralT <- function(val, from, filters) {
-	sprintf('select * from tweets as t where %s and user_screen_name in (select user_screen_name from twitter_users where %s > %d order by %s asc limit 100)', filters, from, val, from)
+	sprintf('select * from tweets where %s and user_screen_name in (select user_screen_name from twitter_users where %s > %d order by %s asc limit 100)', filters, from, val, from)
 }
 
 getQueryT <- function(val, filters='1=1') {
@@ -573,11 +581,12 @@ getQueryTStatuses <- function(val, filters='1=1') {
 }
 
 getQuerySO <- function(val) {
-	sprintf('select id, owner_user_id, creation_date, title, tags from posts where post_type_id = 1 and owner_user_id in (select id from users where reputation > %d order by reputation asc limit 500)', val)
+	sprintf('select id, owner_user_id, creation_date, creation_epoch, title, tags from posts
+		where post_type_id = 1 and owner_user_id in (select id from users where reputation > %d order by reputation asc limit 500)', val)
 }
 
 getQuerySOQ <- function(val) {
-	sprintf("select id, owner_user_id, creation_date, title, tags from posts where post_type_id = 1 and owner_user_id in 
+	sprintf("select id, owner_user_id, creation_date, creation_epoch, title, tags from posts where post_type_id = 1 and owner_user_id in 
 		(select Owner_User_Id from
 		 (select owner_user_id, Post_Type_Id, count(*) as N from Posts 
 		  where Post_Type_Id = 1
@@ -623,8 +632,8 @@ runTFollow100k <- makeTRunr1(100000, 'TFollowgt100k', filters="user_screen_name 
 runTFollow100kr2 <- makeTRunr2(100000, 'TFollowgt100kr2', filters="user_screen_name != 'hermosa_brisa'")
 runTFollow1M <- makeTRunr1(1000000, 'TFollowgt1M')
 runTFollow1Mr2 <- makeTRunr2(1000000,'TFollowgt1Mr2')
-runTFollow10M <- makeTRunr1(10000000, 'TFollowgt10M', filters='t.id != 12466832063')				# tweet 12466832063  has a corrupt utf-8 encoded string
-runTFollow10Mr2 <- makeTRunr2(10000000, 'TFollowgt10Mr2', filters='t.id != 12466832063')
+runTFollow10M <- makeTRunr1(10000000, 'TFollowgt10M', filters='tweets.id != 12466832063')				# tweet 12466832063  has a corrupt utf-8 encoded string
+runTFollow10Mr2 <- makeTRunr2(10000000, 'TFollowgt10Mr2', filters='tweets.id != 12466832063')
 runTTweets1e2 <- makeTRunr3(100, 'TTweetsgt1e2')
 runTTweets1e2r2 <- makeTRunr4(100, 'TTweetsgt1e2r2')
 runTTweets5e2 <- makeTRunr3(500, 'TTweetsgt5e2')
@@ -971,15 +980,21 @@ getSjiTbl <- function(subsetName, startId, endId) {
 	sjiTbl
 }
 
-getUserPTbl <- function() {
-	userPFrm = sqldf("select posts.id, owner_user_id, to_char(creation_date, 'YYYY-MM-DD HH24:MI:SS') as creation_date, chunk, type from posts
+getUserPTbl <- function(config) {
+	userPFrm = sqldf("select posts.id, owner_user_id, creation_epoch, chunk, type from posts
 			 join post_tokenized
 			 on posts.id = post_tokenized.id
 			 where type = 'tag'
 			 and post_type_id = 1
-			 and owner_user_id is not null"
+			 and owner_user_id is not null
+			 "
 			 )
 	userPTbl = as.data.table(userPFrm)
+	if (config$convertTagSynonymsP) convertTagSynonyms(userPTbl)
+	userPTbl[, user_screen_name := as.character(owner_user_id)]
+	userPTbl[, dt := creation_epoch - min(creation_epoch), by=owner_user_id]
+	userPTbl[, hashtag := chunk][, chunk := NULL]
+	setkey(userPTbl, user_screen_name, dt, hashtag)
 	userPTbl
 }
 
@@ -997,9 +1012,13 @@ computeAct <- function(context, sjiTbl) {
 }
 
 curWS <- function() {
-	userPTbl = withProf(getUserPTbl())
+	userPTbl = withProf(getUserPTbl(defaultSOConfig))
+	userPTbl
+	key(userPTbl)
+	tables()
 	lapply(userPTbl, class)
-	setkey(userPTbl, owner_user_id)
+	userPTbl[J(c('20'))]
+	sqldf('select * from posts where owner_user_id = 20 and post_type_id = 1')
 	system.time(userPTbl[J(c(1))])
 	hashtagGroup = '2014-02-27 17:13:30 initial'
 	tweetsTbl = getTweetsTbl(sprintf("select * from top_hashtag_tweets where hashtag_group = '%s'", hashtagGroup), config=defaultTConfig)

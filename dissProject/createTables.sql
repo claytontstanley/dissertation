@@ -118,3 +118,5 @@ create table if not exists tag_synonyms (
 	primary key (id)
 	);
 
+alter table posts add column dt_creation_date int;
+update posts set dt_creation_date = extract(epoch from creation_date);
