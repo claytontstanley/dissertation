@@ -1027,9 +1027,11 @@ computeAct <- function(context, sjiTbl) {
 
 curWS <- function() {
 	userPTbl = withProf(getUserPTbl(defaultSOConfig))
-	BTbl = getPriorForUserAtTime(userPTbl, '20', 1000, .5)
+	BTbl = getPriorForUserAtTime(userPTbl, '4653', 1691899323, .5)
+	microbenchmark(getPriorForUserAtTime(userPTbl, '4653', 1691899323, .5), times=100)
+	userPTbl[J('4653')]
 	BTbl
-	userPTbl[J('9')]
+	userPTbl[, list(N=length(unique(hashtag))), by=user_screen_name][order(N, decreasing = T)]
 	hashtagGroup = '2014-02-27 17:13:30 initial'
 	tweetsTbl = getTweetsTbl(sprintf("select * from top_hashtag_tweets where hashtag_group = '%s'", hashtagGroup), config=defaultTConfig)
 	sjiTbl = withProf(getSjiTbl('SOShuffledFull', 1, 100000))
