@@ -69,7 +69,7 @@ create table if not exists post_tokenized (
 	);
 
 create index id_index_post_tokenized on post_tokenized (id);
-create index type_index_post_tokenized on post_tokenized (type) where type = 'tag';
+create index type_index_post_tokenized on post_tokenized (type);
 
 --drop table if exists post_filtered;
 create table if not exists post_filtered (
