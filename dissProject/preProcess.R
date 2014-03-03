@@ -157,7 +157,6 @@ sqlScratch <- function() {
 	data.table(sqldf("select retweeted, count(*) from tweets group by retweeted"))
 	sqldf("select * from tweets where 1=1 and user_screen_name='katyperry' limit 10")
 	foo = data.table(sqldf("select * from twitter_users"))
-	twitter_users[created_at=='2010-10-29 19:05:25',]
 }
 
 getTokenizedTbl <- function(tweetsTbl, from, regex) {
