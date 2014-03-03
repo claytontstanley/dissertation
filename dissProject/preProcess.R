@@ -847,18 +847,18 @@ analyzeModelVsPredTbl <- function(modelVsPredTbl) {
 
 getNcoocTbl <- function(type, idsQuery) {
 	myLog(sprintf('Getting Ncooc table for type %s and idsQuery %s', type, idsQuery))
-	resTbl = data.table(sqldf(sprintf("select title_tbl.chunk as chunk, tag_tbl.chunk as tag, title_tbl.pos - tag_tbl.pos as pos_from_tag, count(tag_tbl.id) as partial_N from
-					  (select * from post_tokenized
-					   where id in (%s)
-					   and type = 'tag') as tag_tbl
-					  join
-					  (select * from post_tokenized
-					   where id in (%s)
-					   and type = '%s') as title_tbl
-					  on tag_tbl.id = title_tbl.id
-					  group by title_tbl.chunk, tag_tbl.chunk, pos_from_tag
-					  order by title_tbl.chunk, tag_tbl.chunk, pos_from_tag",
-					  idsQuery, idsQuery, type)))
+	resTbl = as.data.table(sqldf(sprintf("select title_tbl.chunk as chunk, tag_tbl.chunk as tag, title_tbl.pos - tag_tbl.pos as pos_from_tag, count(tag_tbl.id) as partial_N from
+					     (select * from post_tokenized
+					      where id in (%s)
+					      and type = 'tag') as tag_tbl
+					     join
+					     (select * from post_tokenized
+					      where id in (%s)
+					      and type = '%s') as title_tbl
+					     on tag_tbl.id = title_tbl.id
+					     group by title_tbl.chunk, tag_tbl.chunk, pos_from_tag
+					     order by title_tbl.chunk, tag_tbl.chunk, pos_from_tag",
+					     idsQuery, idsQuery, type)))
 	resTbl[, pos_from_tag := NULL][, pos_from_tag := 'NaN'] # FIXME: Now that this has been regression tested against the prior R implementation, is this needed anymore?
 	NcoocTbl = resTbl[, list(posFromTag=pos_from_tag, partialN=partial_n, NChunkTag=sum(partial_n)), by=list(chunk, tag)]
 	setkey(NcoocTbl, chunk, tag, posFromTag)
