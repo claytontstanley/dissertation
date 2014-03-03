@@ -116,6 +116,9 @@ test_that("testComputeAct", {
 			      context=c('a'))
 	testTestTblVsExpected(data.table(chunk=c('a'), tag=c('x'), sji=c(1), EChunk=c(1)),
 			      data.table(tag=c('x'), act=c(1)))
+	testTestTblVsExpected(data.table(chunk=c('a', 'b'), tag=c('x', 'x'), sji=c(1,2), EChunk=c(1,1)),
+			      data.table(tag=c('x'), act=c(5/4)),
+			      context=c('a','a','a','b'))
 })
 
 setLogLevel(priorLogLevel)
