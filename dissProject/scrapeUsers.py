@@ -51,10 +51,10 @@ def getTweetObj(tweet):
         return tweetObj
 
 class CustomStreamListener(tweepy.StreamListener):
-    curTweets = []
 
     def __init__(self, group):
         self.group = group
+        self.curTweets = []
         # http://stackoverflow.com/questions/576169/understanding-python-super-and-init-methods
         super(CustomStreamListener, self).__init__()
 
@@ -155,8 +155,14 @@ def getHashtagsFrom(group):
     return res
 
 def streamHashtags(hashtagGroup):
-    sapi = tweepy.streaming.Stream(_api.auth, CustomStreamListener(hashtagGroup))
-    sapi.filter(languages=['en'], track=getHashtagsFrom('%s' % (hashtagGroup)))
+    while True:
+        try:
+            sapi = tweepy.streaming.Stream(_api.auth, CustomStreamListener(hashtagGroup))
+            sapi.filter(languages=['en'], track=getHashtagsFrom('%s' % (hashtagGroup)))
+        except Exception as e:
+            print "couldn't do it for %s:" % (e)
+            time.sleep(1)
+            pass
 
 def streamHashtagsCurrent():
     hashtagGroup = '2014-02-27 17:13:30 initial'
@@ -413,6 +419,6 @@ def generateTopUsers100k():
 #getUserInfoForTopUsers()
 #storeCurTagSynonyms()
 #backupTables(tableNames=['tag_synonyms'])
-backupTables()
+#backupTables()
 #generateTopHashtags()
-#streamHashtagsCurrent()
+streamHashtagsCurrent()

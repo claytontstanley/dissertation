@@ -968,6 +968,18 @@ getSjiTbl <- function(subsetName, startId, endId) {
 	sjiTbl
 }
 
+getUserPTbl <- function() {
+	query = "select posts.id, owner_user_id, to_char(creation_date, 'YYYY-MM-DD HH24:MI:SS') as creation_date, chunk, type from posts
+	join post_tokenized
+	on posts.id = post_tokenized.id
+	where type = 'tag'
+	and post_type_id = 1
+	and owner_user_id is not null"
+	userPFrm = sqldf(query)
+	userPTbl = as.data.table(userPFrm)
+	userPTbl
+}
+
 addSjiAttrs <- function(sjiTbl) {
 	sjiTbl[, chunkSums := sum(partialN), by=chunk]
 	sjiTbl[, tagSums := sum(partialN), by=tag]
@@ -982,6 +994,10 @@ computeAct <- function(context, sjiTbl) {
 }
 
 curWS <- function() {
+	userPTbl = withProf(getUserPTbl())
+	lapply(userPTbl, class)
+	setkey(userPTbl, owner_user_id)
+	userPTbl[J(c(1))]
 	hashtagGroup = '2014-02-27 17:13:30 initial'
 	tweetsTbl = getTweetsTbl(sprintf("select * from top_hashtag_tweets where hashtag_group = '%s'", hashtagGroup), config=defaultTConfig)
 	sjiTbl = withProf(getSjiTbl('SOShuffledFull', 1, 100000))

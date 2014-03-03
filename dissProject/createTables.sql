@@ -69,6 +69,7 @@ create table if not exists post_tokenized (
 	);
 
 create index id_index_post_tokenized on post_tokenized (id);
+create index type_index_post_tokenized on post_tokenized (type) where type = 'tag';
 
 --drop table if exists post_filtered;
 create table if not exists post_filtered (
@@ -99,6 +100,7 @@ create table if not exists twitter_users (
 
 
 create index owner_user_id_index_posts on posts (owner_user_id);
+create index post_type_id_index_posts on posts (post_type_id);
 create index reputation_index_users on users (reputation);
 
 --drop table if exists tag_synonyms;
