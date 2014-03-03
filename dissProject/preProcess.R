@@ -278,6 +278,8 @@ compareHashtagTbls <- function() {
 }
 
 computeActs <- function(hashtags, dtP, cTime, d) {
+	stopifnot(length(dtP) == length(hashtags))
+	stopifnot(length(dtP) == length(cTime))
 	debugPrint(hashtags)
 	debugPrint(d)
 	debugPrint(cTime)
@@ -304,8 +306,7 @@ computeActsForUser <- function(hashtag, dt, ds, user_screen_name) {
 	partialRes
 }
 
-computeActsByUser <- function(hashtagsTbl, ds) {
-	partialRes = hashtagsTbl[, computeActsForUser(hashtag, dt, ds, user_screen_name), by=user_screen_name]
+getModelHashtagsTbl <- function(partialRes) {
 	debugPrint(partialRes)
 	#myLog('setting key for partial table')
 	setkeyv(partialRes, c('user_screen_name','dt','hashtag','d'))
@@ -318,6 +319,20 @@ computeActsByUser <- function(hashtagsTbl, ds) {
 	with(res, stopifnot(!is.infinite(actOL2)))
 	res
 }
+
+computeActsByUser <- function(hashtagsTbl, ds) {
+	partialRes = hashtagsTbl[, computeActsForUser(hashtag, dt, ds, user_screen_name), by=user_screen_name]
+	modelHashtagsTbl = getModelHashtagsTbl(partialRes)
+	modelHashtagsTbl
+}
+
+getPriorForUserAtTime <- function(userPTbl, userScreenName, cTime, d) {
+	curUserPTbl = userPTbl[J(userScreenName)][dt <= cTime][, cTime := cTime]
+	partialRes = curUserPTbl[, as.data.table(computeActs(hashtag, dt, cTime, d)), by=user_screen_name]
+	modelHashtagsTbl = getModelHashtagsTbl(partialRes)
+	modelHashtagsTbl
+}
+
 
 visHashtags <- function(hashtagsTbl) {
 	plots = hashtagsTbl[, list(resPlots=list(ggplot(.SD, aes(x=hashtag, y=dt)) + geom_point())), by=user_screen_name]
@@ -1012,13 +1027,9 @@ computeAct <- function(context, sjiTbl) {
 
 curWS <- function() {
 	userPTbl = withProf(getUserPTbl(defaultSOConfig))
-	userPTbl
-	key(userPTbl)
-	tables()
-	lapply(userPTbl, class)
-	userPTbl[J(c('20'))]
-	sqldf('select * from posts where owner_user_id = 20 and post_type_id = 1')
-	system.time(userPTbl[J(c(1))])
+	BTbl = getPriorForUserAtTime(userPTbl, '20', 1000, .5)
+	BTbl
+	userPTbl[J('9')]
 	hashtagGroup = '2014-02-27 17:13:30 initial'
 	tweetsTbl = getTweetsTbl(sprintf("select * from top_hashtag_tweets where hashtag_group = '%s'", hashtagGroup), config=defaultTConfig)
 	sjiTbl = withProf(getSjiTbl('SOShuffledFull', 1, 100000))
