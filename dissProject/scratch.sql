@@ -8,7 +8,6 @@ and (t.id is null or posts.id is null) and posts.id not in (select post_filtered
 
 select * from topUsers where username = ''; 
 select * from topUsers;
-
 select rank, t.user_screen_name, count(*) from tweets as t join topUsers as u on t.user_screen_name = u.user_screen_name group by t.user_screen_name, rank order by rank desc;
 select * from tweets where user_screen_name = 'JLo' limit 10;
 select count(*) from topUsers; 
