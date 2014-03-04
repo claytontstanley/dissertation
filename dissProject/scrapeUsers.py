@@ -75,7 +75,7 @@ class CustomStreamListener(tweepy.StreamListener):
         myQuery('truncate temp_tweets_id')
         write2csv(ids, file)
         myQuery("copy temp_tweets_id (id) from '%s' delimiters ',' csv" % (file))
-        newIds = myQuery("select id from temp_tweets_id as t where t.id not in (select id from top_hashtag_tweets)").getresult()
+        newIds = myQuery("select id from temp_tweets_id as t where t.id not in (select id from top_hashtag_tweets where top_hashtag_tweets.id >= (select min(id) from temp_tweets_id))").getresult()
         newIds = [id[0] for id in newIds]
         newIds = [str(id) for id in newIds]
         newTweets = [tweet for tweet in self.curTweets if tweet[0] in newIds]
@@ -419,6 +419,6 @@ def generateTopUsers100k():
 #getUserInfoForTopUsers()
 #storeCurTagSynonyms()
 #backupTables(tableNames=['tag_synonyms'])
-#backupTables()
+backupTables()
 #generateTopHashtags()
-streamHashtagsCurrent()
+#streamHashtagsCurrent()
