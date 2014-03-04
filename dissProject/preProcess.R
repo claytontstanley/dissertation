@@ -1025,10 +1025,9 @@ computeAct <- function(context, sjiTbl) {
 }
 
 curWS <- function() {
-	runTFollow1k()
 	userPTbl = withProf(getUserPTbl(defaultSOConfig))
-	BTbl = getPriorForUserAtTime(userPTbl, '4653', 1691899323, .5)
-	microbenchmark(getPriorForUserAtTime(userPTbl, '4653', 1691899323, .5), times=100)
+	BTbl = getPriorForUserAtTime(userPTbl, '4653', 1691899323, c(.5, .6))
+	microbenchmark(getPriorForUserAtTime(userPTbl, '4653', 1691899323, rep(.5,1)), times=100)
 	userPTbl[J('4653')]
 	BTbl
 	userPTbl[, list(N=length(unique(hashtag))), by=user_screen_name][order(N, decreasing = T)]
