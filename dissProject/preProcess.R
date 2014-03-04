@@ -1045,8 +1045,6 @@ curWS <- function() {
 	genTokenizedTblSO(filters=sprintf('id in (%s)', makeIdsQuery('SOShuffledFull', 1, 10000)))
 	runGenNcoocTblSO1thru100()
 	test_dir(sprintf("%s/%s", PATH, 'tests'), reporter='summary')
-	runTFollow1k()
-	runSO1kr2()
 	.ls.objects(order.by='Size')
 	# Checking that tweets for twitter users from each followers_count,statuses_count scale are being collected properly
 	usersWithTweetsTbl = data.table(sqldf("select distinct on (user_id) t.user_screen_name,u.followers_count,u.statuses_count
