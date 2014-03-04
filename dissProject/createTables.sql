@@ -120,3 +120,8 @@ create table if not exists tag_synonyms (
 
 alter table posts add column creation_epoch numeric;
 update posts set creation_epoch = extract(epoch from creation_date);
+
+alter table tweets add column created_at_epoch numeric; 
+update tweets set created_at_epoch = extract(epoch from to_timestamp(created_at, 'YYYY-MM-DD HH24:MI:SS')::timestamp without time zone); 
+
+
