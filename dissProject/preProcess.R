@@ -325,8 +325,9 @@ computeActsByUser <- function(hashtagsTbl, ds) {
 	modelHashtagsTbl
 }
 
-getPriorForUserAtTime <- function(userPTbl, userScreenName, cTime, d) {
-	curUserPTbl = userPTbl[J(userScreenName)][dt <= cTime][, cTime := cTime]
+getPriorForUserAtEpoch <- function(userPTbl, userScreenName, cEpoch, d) {
+	curUserPTbl = userPTbl[J(userScreenName)][creation_epoch <= cEpoch]
+	curUserPTbl[, cTime := cEpoch - min(creation_epoch)]
 	partialRes = curUserPTbl[, as.data.table(computeActs(hashtag, dt, cTime, d)), by=user_screen_name]
 	modelHashtagsTbl = getModelHashtagsTbl(partialRes)
 	modelHashtagsTbl
@@ -1026,8 +1027,10 @@ computeAct <- function(context, sjiTbl) {
 
 curWS <- function() {
 	userPTbl = withProf(getUserPTbl(defaultSOConfig))
-	BTbl = getPriorForUserAtTime(userPTbl, '4653', 1691899323, c(.5, .6))
-	microbenchmark(getPriorForUserAtTime(userPTbl, '4653', 1691899323, rep(.5,1)), times=100)
+	userPTbl
+	BTbl = getPriorForUserAtEpoch(userPTbl, '4653', 1390076773, c(.5, .6))
+	BTbl = getPriorForUserAtEpoch(userPTbl, '4653', 1220886841, c(.5, .6))
+	microbenchmark(getPriorForUserAtEpoch(userPTbl, '4653', 1390076773, rep(.5,1)), times=100)
 	userPTbl[J('4653')]
 	BTbl
 	userPTbl[, list(N=length(unique(hashtag))), by=user_screen_name][order(N, decreasing = T)]
