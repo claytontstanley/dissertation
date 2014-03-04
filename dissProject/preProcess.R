@@ -148,14 +148,8 @@ CIVar2 <- function(vals) {
 sqlScratch <- function() {
 	install.packages('~/src/datatable/pkg', repos=NULL, type='source')
 	install.packages('~/Desktop/data.table', repos=NULL, type='source')
-	sqldf("select * from tweets where user_screen_name = 'claytonstanley1'")
-	sqldf('select count(*) from tweets')
-	sqldf('select count(*) from topUsers')
 	sqldf('select * from topUsers')
 	data.table(sqldf('select * from topusers order by rank'))
-	sqldf("select * from tweets where user_screen_name='jlo'")
-	data.table(sqldf("select retweeted, count(*) from tweets group by retweeted"))
-	sqldf("select * from tweets where 1=1 and user_screen_name='katyperry' limit 10")
 	foo = data.table(sqldf("select * from twitter_users"))
 }
 
@@ -186,19 +180,13 @@ addTokenText <- function(tweetsTbl, from) {
 	return()
 }
 
-getDiffTimeSinceFirst <- function(ts) {
-	diffTime = as.numeric(difftime(ts, min(ts), units='secs'))
-	stopifnot(diffTime >= 0)
-	diffTime
-}
-
 getTweetsTbl <- function(sqlStr="select * from tweets limit 10000", config) {
 	tweetsTbl = data.table(sqldf(sqlStr))
 	stopifnot(sort(unique(tweetsTbl$retweeted)) == c('False', 'True'))
 	if (!config$includeRetweetsP) tweetsTbl = tweetsTbl[retweeted == 'False']
 	addTokenText(tweetsTbl, from='text')
 	setkey(tweetsTbl, id)
-	tweetsTbl[, dt := getDiffTimeSinceFirst(created_at), by=user_screen_name]
+	tweetsTbl[, dt := created_at_epoch - min(created_at_epoch), by=user_screen_name]
 	tweetsTbl
 }
 
@@ -1060,8 +1048,6 @@ curWS <- function() {
 	runTFollow1k()
 	runSO1kr2()
 	.ls.objects(order.by='Size')
-	tweetsTbl = getTweetsTbl("select * from tweets limit 100000")
-	tweetsTbl = getTweetsTbl("select * from tweets where user_screen_name='eddieizzard'")
 	# Checking that tweets for twitter users from each followers_count,statuses_count scale are being collected properly
 	usersWithTweetsTbl = data.table(sqldf("select distinct on (user_id) t.user_screen_name,u.followers_count,u.statuses_count
 					      from tweets as t join twitter_users as u on t.user_screen_name = u.user_screen_name"

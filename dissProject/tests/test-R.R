@@ -70,12 +70,16 @@ test_that("testOnlyFirstT", {
 
 test_that("testModelVsPred", {
 	expectedTbl = myReadCSV(getModelVsPredOutFile('testing1'))
+	expectedHashtagsTbl = myReadCSV(getHashtagsOutFile('testing1'))
 	resTbl = runPriorT(config=modConfig(defaultTConfig, list(query="select * from tweets where user_screen_name = 'ap'")))
 	expect_equivalent(expectedTbl, resTbl$modelVsPredTbl)
+	expect_equivalent(expectedHashtagsTbl, resTbl$hashtagsTbl)
 	expectedTbl = myReadCSV(getModelVsPredOutFile('testing2'))
 	expectedTbl[, totN := as.integer(totN)]
+	expectedHashtagsTbl = myReadCSV(getHashtagsOutFile('testing2'))
 	resTbl = runPriorT(config=modConfig(defaultTConfig, list(query="select * from tweets where user_screen_name = 'thebucktlist'")))
 	expect_equivalent(expectedTbl, resTbl$modelVsPredTbl)
+	expect_equivalent(expectedHashtagsTbl, resTbl$hashtagsTbl)
 	expectedTbl = myReadCSV(getModelVsPredOutFile('twitter_ru'))
 	resTbl = runPriorT(config=modConfig(defaultTConfig, list(query="select * from tweets where user_screen_name = 'twitter_ru'")))
 	expect_equivalent(expectedTbl, resTbl$modelVsPredTbl)
