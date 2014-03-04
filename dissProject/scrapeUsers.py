@@ -419,6 +419,6 @@ def generateTopUsers100k():
 #getUserInfoForTopUsers()
 #storeCurTagSynonyms()
 #backupTables(tableNames=['tag_synonyms'])
-backupTables()
+#backupTables()
 #generateTopHashtags()
-#streamHashtagsCurrent()
+streamHashtagsCurrent()
