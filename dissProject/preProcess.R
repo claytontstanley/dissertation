@@ -145,14 +145,6 @@ CIVar2 <- function(vals) {
 	with(res, c(upper=ci.upper, mean=est, lower=ci.lower))
 }
 
-sqlScratch <- function() {
-	install.packages('~/src/datatable/pkg', repos=NULL, type='source')
-	install.packages('~/Desktop/data.table', repos=NULL, type='source')
-	sqldf('select * from topUsers')
-	data.table(sqldf('select * from topusers order by rank'))
-	foo = data.table(sqldf("select * from twitter_users"))
-}
-
 getTokenizedTbl <- function(tweetsTbl, from, regex) {
 	matches = regmatches(tweetsTbl[[from]], gregexpr(regex, tweetsTbl[[from]], perl=T))
 	wideTbl = data.table(id=tweetsTbl$id, matches=matches)
