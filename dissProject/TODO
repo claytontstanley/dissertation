@@ -1,0 +1,3 @@
+- run all T and SO in prod; T will change; verify
+- update data.table and check regressions; use newer if all good
+- optimize hairy sql
