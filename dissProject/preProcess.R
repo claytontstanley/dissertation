@@ -455,7 +455,7 @@ genAggModelVsPredTbl <- function(hashtagsTbl, config) {
 	users = data.table(cur_user_screen_name=Filter(function(v) !(v %in% singleHashtagUsers), unique(hashtagsTbl$user_screen_name)))
 	res = users[, getModelVsPredTblFromHashtagsTbl(hashtagsTbl[cur_user_screen_name], ds, cur_user_screen_name), by=cur_user_screen_name]
 	res[, cur_user_screen_name := NULL]
-	setkey(res, user_screen_name, DVName, d)
+	setkey(res, user_screen_name, DVName, d, topHashtag, hashtagUsedP)
 	myWriteCSV(res, file=outFile)
 	list(modelVsPredTbl=res, modelHashtagsTbl=modelHashtagsTbls)
 }
