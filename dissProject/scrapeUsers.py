@@ -418,7 +418,7 @@ def generateTopUsers100k():
 #getAllTweetsForTopUsersByTweets()
 #getUserInfoForTopUsers()
 #storeCurTagSynonyms()
-backupTables(tableNames=['post_tokenized'])
+#backupTables(tableNames=['post_tokenized'])
 #backupTables()
 #generateTopHashtags()
 #streamHashtagsCurrent()
