@@ -668,9 +668,11 @@ getSummaryStats <- function() {
 	tPostsCntFromRunsTbl = rbindlist(lapply(runTQueries, getTPostsFromRunQuery))
 	SOUsersFromRunsTbl = rbindlist(lapply(runSOQueries, getSOUsersFromRunQuery))
 	SOPostsCntFromRunsTbl = rbindlist(lapply(runSOQueries, getSOPostsFromRunQuery))
-	usersFromRunsTbl = rbind(tUsersFromRunsTbl, SOUsersFrmRunsTbl)
+	usersFromRunsTbl = rbind(tUsersFromRunsTbl, SOUsersFromRunsTbl, use.names=F)
+	unique(usersFromRunsTbl)
 	postsCntFromRunsTbl = rbind(tPostsCntFromRunsTbl, SOPostsCntFromRunsTbl)
-	modelVsPredTbl[predUsedBest == T][runNum == 2][, list(acc=median(acc), d=median(d), N=.N), by=DVName]
+	postsCntFromRunsTbl[, sum(count), by=dataset]
+	modelVsPredTbl[predUsedBest == T][runNum == 2][, list(acc=median(acc), d=median(d), N=.N), by=list(DVName, datasetType)]
 	modelVsPredTbl[hashtagUsedP == T][topHashtag == T][DVName == 'topHashtagAct'][, sum(totN), by=datasetType]
 	modelVsPredTbl[, .N, by=d]
 }
