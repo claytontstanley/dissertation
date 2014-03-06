@@ -110,15 +110,6 @@ create table if not exists tag_synonyms (
 	Approval_Date text not null,
 	primary key (id)
 	);
-
-create table if not exists tokenized_types (
-	id serial not null,
-	type_name text,
-	primary key (id)
-	);
-
-insert into tokenized_types (type_name) values ('title'), ('body'), ('tag');
-
 alter table posts add column creation_epoch numeric;
 update posts set creation_epoch = extract(epoch from creation_date) where creation_epoch is null;
 
@@ -129,6 +120,35 @@ alter table post_tokenized add column tokenized_type_id integer;
 update post_tokenized set tokenized_type_id = (select id from tokenized_types where type_name = type) where type='body';
 update post_tokenized set tokenized_type_id = q.id from tokenized_types as q where q.type_name = post_tokenized.type and tokenized_type_id is null;
 alter table post_tokenized add constraint post_tokenized_tokenized_type_id_fk foreign key (tokenized_type_id) references tokenized_types (id);
+
+create table if not exists temp_post_tokenized (
+	row_id integer not null,
+	id integer not null,
+	chunk_id integer not null,
+	pos integer not null,
+	type_id integer not null,
+	primary key (row_id)
+	);
+
+alter table temp_post_tokenized add constraint temp_post_tokenized_row_id_fk foreign key (row_id) references post_tokenized (row_id);
+alter table temp_post_tokenized add constraint temp_post_tokenized_type_id_fk foreign key (type_id) references tokenized_types (id);
+alter table temp_post_tokenized add constraint temp_post_tokenized_chunk_id_fk foreign key (chunk_id) references tokenized_chunk_types (id);
+create index id_index_temp_post_tokenized on temp_post_tokenized (id);
+create index type_id_index_post_tokenized on temp_post_tokenized (type_id); 
+
+create table if not exists tokenized_types (
+	id serial not null,
+	type_name text,
+	primary key (id)
+	);
+insert into tokenized_types (type_name) values ('title'), ('body'), ('tag');
+
+create table if not exists tokenized_chunk_types (
+	id serial not null,
+	type_name text,
+	primary key (id)
+	);
+insert into tokenized_chunk_types (type_name) select distinct chunk from post_tokenized;
 
 alter table users add column num_questions integer;
 update users set num_questions = q.N from (select owner_user_id, count(*) as N from Posts where post_type_id = 1 group by owner_user_id) as q where q.owner_user_id = users.id;
