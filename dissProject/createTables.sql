@@ -20,6 +20,9 @@ create table if not exists tweets (
 	primary key (id)
 	);
 
+create index user_screen_name_index_tweets on tweets (user_screen_name);
+create index user_id_index_tweets on tweets (user_id);
+
 --drop table if exists top_hashtag_hashtags cascade;
 create table if not exists top_hashtag_hashtags (
 	hashtag text not null,
@@ -69,7 +72,7 @@ create table if not exists post_tokenized (
 	);
 
 create index id_index_post_tokenized on post_tokenized (id);
-create index type_index_post_tokenized on post_tokenized (type);
+create index type_index_post_tokenized on post_tokenized (type) where type = 'tag';
 
 --drop table if exists post_filtered;
 create table if not exists post_filtered (
@@ -77,10 +80,6 @@ create table if not exists post_filtered (
 	reason text,
 	primary key (post_id)
 	);
-
-
-create index user_screen_name_index_tweets on tweets (user_screen_name);
-create index user_id_index_tweets on tweets (user_id);
 
 --drop table if exists twitter_users;
 create table if not exists twitter_users (
@@ -98,11 +97,6 @@ create table if not exists twitter_users (
 	primary key (id)
 	);
 
-
-create index owner_user_id_index_posts on posts (owner_user_id);
-create index post_type_id_index_posts on posts (post_type_id);
-create index reputation_index_users on users (reputation);
-
 --drop table if exists tag_synonyms;
 create table if not exists tag_synonyms (
 	id int not null,
@@ -118,10 +112,29 @@ create table if not exists tag_synonyms (
 	primary key (id)
 	);
 
+create table if not exists tokenized_types (
+	id serial not null,
+	type_name text,
+	primary key (id)
+	);
+
+insert into tokenized_types (type_name) values ('title'), ('body'), ('tag');
+
 alter table posts add column creation_epoch numeric;
 update posts set creation_epoch = extract(epoch from creation_date) where creation_epoch is null;
 
 alter table tweets add column created_at_epoch numeric; 
 update tweets set created_at_epoch = extract(epoch from to_timestamp(created_at, 'YYYY-MM-DD HH24:MI:SS')::timestamp without time zone) where created_at_epoch is null; 
 
+alter table post_tokenized add column tokenized_type_id integer;
+update post_tokenized set tokenized_type_id = (select id from tokenized_types where type_name = type) where type='body';
+update post_tokenized set tokenized_type_id = q.id from tokenized_types as q where q.type_name = post_tokenized.type and tokenized_type_id is null;
+alter table post_tokenized add constraint post_tokenized_tokenized_type_id_fk foreign key (tokenized_type_id) references tokenized_types (id);
 
+alter table users add column num_questions integer;
+update users set num_questions = q.N from (select owner_user_id, count(*) as N from Posts where post_type_id = 1 group by owner_user_id) as q where q.owner_user_id = users.id;
+
+create index owner_user_id_index_posts on posts (owner_user_id);
+create index post_type_id_index_posts on posts (post_type_id);
+create index reputation_index_users on users (reputation);
+create index num_questions_index_users on users (num_questions);

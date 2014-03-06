@@ -562,8 +562,13 @@ modConfig <- function(config, mods) {
 	newConfig
 }
 
+getQueryUsersSubset <- function(val, from) {
+	sprintf('select user_screen_name from twitter_users where %s > %d order by %s asc limit 100', from, val, from)
+}
+
+
 getQueryGeneralT <- function(val, from, filters) {
-	sprintf('select * from tweets where %s and user_screen_name in (select user_screen_name from twitter_users where %s > %d order by %s asc limit 100)', filters, from, val, from)
+	sprintf('select * from tweets where %s and user_screen_name in (%s)', filters, getQueryUsersSubset(val, from))
 }
 
 getQueryT <- function(val, filters='1=1') {
@@ -580,16 +585,8 @@ getQuerySO <- function(val) {
 }
 
 getQuerySOQ <- function(val) {
-	sprintf("select id, owner_user_id, creation_date, creation_epoch, title, tags from posts where post_type_id = 1 and owner_user_id in 
-		(select Owner_User_Id from
-		 (select owner_user_id, Post_Type_Id, count(*) as N from Posts 
-		  where Post_Type_Id = 1
-		  group by Owner_User_Id,Post_Type_Id) as foo2
-		 join Users on Users.Id = foo2.Owner_User_Id
-		 where N > %d
-		 order by N asc
-		 limit 100)
-		", val)
+	sprintf("select id, owner_user_id, creation_date, creation_epoch, title, tags from posts
+		where post_type_id = 1 and owner_user_id in (select id from users where num_questions > %d order by num_questions asc limit 100)", val)
 }
 
 combineFilters <- function(f1, f2='1=1') {
@@ -600,46 +597,109 @@ makeTRun <- function(val, outFileName, config) {
 	function() runPriorT(config=modConfig(config, list(query=config$query(val), modelVsPredOutFile=getModelVsPredOutFile(outFileName))))
 }
 
-makeTRunr1 <- function(val, outFileName, ...) {
-	makeTRun(val, outFileName, config=modConfig(defaultTConfig, list(query=function(val) getQueryT(val, ...), includeRetweetsP=T)))
+makeTRunr1 <- function(val, outFileName, query) {
+	makeTRun(val, outFileName, config=modConfig(defaultTConfig, list(query=query, includeRetweetsP=T)))
 }
 
-makeTRunr2 <- function(val, outFileName, ...) {
-	makeTRun(val, outFileName, config=modConfig(defaultTConfig, list(query=function(val) getQueryT(val, ...), includeRetweetsP=F)))
+makeTRunr2 <- function(val, outFileName, query) {
+	makeTRun(val, outFileName, config=modConfig(defaultTConfig, list(query=query, includeRetweetsP=F)))
 }
 
-makeTRunr3 <- function(val, outFileName, ...) {
-	makeTRun(val, outFileName, config=modConfig(defaultTConfig, list(query=function(val) getQueryTStatuses(val, ...), includeRetweetsP=T)))
+queryRunTFollow1k = getQueryT
+queryRunTFollow5k = function(val) getQueryT(val, filters="user_screen_name != 'g4scareers'")
+queryRunTFollow10k = function(val) getQueryT(val, filters="user_screen_name != 'so_pr'")
+queryRunTFollow100k = function(val) getQueryT(val, filters="user_screen_name != 'hermosa_brisa'")
+queryRunTFollow1M = getQueryT
+queryRunTFollow10M = function(val) getQueryT(val, filters='tweets.id != 12466832063')
+
+queryRunTTweets1e2 = getQueryTStatuses
+queryRunTTweets5e2 = getQueryTStatuses
+queryRunTTweets1e3 = getQueryTStatuses
+queryRunTTweets5e3 = getQueryTStatuses
+queryRunTTweets1e4 = getQueryTStatuses
+queryRunTTweets5e4 = function(val) getQueryTStatuses(val, filters="user_screen_name != 'stanhjerleid'")
+
+runTQueries = list(queryRunTFollow1k(1000),
+		   queryRunTFollow5k(5000),
+		   queryRunTFollow10k(10000),
+		   queryRunTFollow100k(100000),
+		   queryRunTFollow1M(1000000),
+		   queryRunTFollow10M(10000000),
+		   queryRunTTweets1e2(100),
+		   queryRunTTweets5e2(500),
+		   queryRunTTweets1e3(1000),
+		   queryRunTTweets5e3(5000),
+		   queryRunTTweets1e4(10000),
+		   queryRunTTweets5e4(50000))
+
+runSOQueries = list(getQuerySO(100000),
+		    getQuerySO(50000),
+		    getQuerySO(10000),
+		    getQuerySO(5000),
+		    getQuerySO(1000),
+		    getQuerySO(500),
+		    getQuerySOQ(500),
+		    getQuerySOQ(400),
+		    getQuerySOQ(300),
+		    getQuerySOQ(200),
+		    getQuerySOQ(100),
+		    getQuerySOQ(050)
+		    )
+
+
+getTUsersFromRunQuery <- function(runQuery) {
+	as.data.table(sqldf(sprintf("select distinct user_screen_name from (%s) as foo", runQuery)))[, dataset := 'twitter']
 }
 
-makeTRunr4 <- function(val, outFileName, ...) {
-	makeTRun(val, outFileName, config=modConfig(defaultTConfig, list(query=function(val) getQueryTStatuses(val, ...), includeRetweetsP=F)))
+getTPostsFromRunQuery <- function(runQuery) {
+	as.data.table(sqldf(sprintf('select count(*) from (%s) as foo', runQuery)))[, dataset := 'twitter']
 }
 
-runTFollow1k <- makeTRunr1(1000, 'TFollowgt1k')
-runTFollow1kr2 <- makeTRunr2(1000, 'TFollowgt1kr2')
-runTFollow5k <- makeTRunr1(5000, 'TFollowgt5k', filters="user_screen_name != 'g4scareers'")			# g4scareers causes segfault w/ data.table 1.8.10
-runTFollow5kr2 <- makeTRunr2(5000, 'TFollowgt5kr2', filters="user_screen_name != 'g4scareers'")
-runTFollow10k <- makeTRunr1(10000, 'TFollowgt10k', filters="user_screen_name != 'so_pr'") 			# so_pr user causes segfault w/ data.table 1.8.10
-runTFollow10kr2 <- makeTRunr2(10000,'TFollowgt10kr2', filters="user_screen_name != 'so_pr'")
-runTFollow100k <- makeTRunr1(100000, 'TFollowgt100k', filters="user_screen_name != 'hermosa_brisa'") 		# hermosa_brisa causes segfault w/ data.table 1.8.10
-runTFollow100kr2 <- makeTRunr2(100000, 'TFollowgt100kr2', filters="user_screen_name != 'hermosa_brisa'")
-runTFollow1M <- makeTRunr1(1000000, 'TFollowgt1M')
-runTFollow1Mr2 <- makeTRunr2(1000000,'TFollowgt1Mr2')
-runTFollow10M <- makeTRunr1(10000000, 'TFollowgt10M', filters='tweets.id != 12466832063')				# tweet 12466832063  has a corrupt utf-8 encoded string
-runTFollow10Mr2 <- makeTRunr2(10000000, 'TFollowgt10Mr2', filters='tweets.id != 12466832063')
-runTTweets1e2 <- makeTRunr3(100, 'TTweetsgt1e2')
-runTTweets1e2r2 <- makeTRunr4(100, 'TTweetsgt1e2r2')
-runTTweets5e2 <- makeTRunr3(500, 'TTweetsgt5e2')
-runTTweets5e2r2 <- makeTRunr4(500, 'TTweetsgt5e2r2')
-runTTweets1e3 <- makeTRunr3(1000, 'TTweetsgt1e3')
-runTTweets1e3r2 <- makeTRunr4(1000, 'TTweetsgt1e3r2')
-runTTweets5e3 <- makeTRunr3(5000, 'TTweetsgt5e3')
-runTTweets5e3r2 <- makeTRunr4(5000, 'TTweetsgt5e3r2')
-runTTweets1e4 <- makeTRunr3(10000, 'TTweetsgt1e4')
-runTTweets1e4r2 <- makeTRunr4(10000, 'TTweetsgt1e4r2')
-runTTweets5e4 <- makeTRunr3(50000, 'TTweetsgt5e4', filters="user_screen_name != 'stanhjerleid'")
-runTTweets5e4r2 <- makeTRunr4(50000, 'TTweetsgt5e4r2', filters="user_screen_name != 'stanhjerleid'")
+getSOUsersFromRunQuery <- function(runQuery) {
+	as.data.table(sqldf(sprintf("select distinct owner_user_id from (%s) as foo", runQuery)))[, dataset := 'stackoverflow']
+}
+
+getSOPostsFromRunQuery <- function(runQuery) {
+	as.data.table(sqldf(sprintf('select count(*) from (%s) as foo', runQuery)))[, dataset := 'stackoverflow']
+}
+
+getSummaryStats <- function() {
+	tUsersFromRunsTbl = rbindlist(lapply(runTQueries, getTUsersFromRunQuery))
+	tPostsCntFromRunsTbl = rbindlist(lapply(runTQueries, getTPostsFromRunQuery))
+	SOUsersFromRunsTbl = rbindlist(lapply(runSOQueries, getSOUsersFromRunQuery))
+	SOPostsCntFromRunsTbl = rbindlist(lapply(runSOQueries, getSOPostsFromRunQuery))
+	usersFromRunsTbl = rbind(tUsersFromRunsTbl, SOUsersFrmRunsTbl)
+	postsCntFromRunsTbl = rbind(tPostsCntFromRunsTbl, SOPostsCntFromRunsTbl)
+	modelVsPredTbl[predUsedBest == T][runNum == 2][, list(acc=median(acc), d=median(d), N=.N), by=DVName]
+	modelVsPredTbl[hashtagUsedP == T][topHashtag == T][DVName == 'topHashtagAct'][, sum(totN), by=datasetType]
+	modelVsPredTbl[, .N, by=d]
+}
+
+
+runTFollow1k <- makeTRunr1(1000, 'TFollowgt1k', queryRunTFollow1k)
+runTFollow1kr2 <- makeTRunr2(1000, 'TFollowgt1kr2', queryRunTFollow1k)
+runTFollow5k <- makeTRunr1(5000, 'TFollowgt5k', queryRunTFollow5k) 
+runTFollow5kr2 <- makeTRunr2(5000, 'TFollowgt5kr2', queryRunTFollow5k) 
+runTFollow10k <- makeTRunr1(10000, 'TFollowgt10k', queryRunTFollow10k) 
+runTFollow10kr2 <- makeTRunr2(10000,'TFollowgt10kr2', queryRunTFollow10k) 
+runTFollow100k <- makeTRunr1(100000, 'TFollowgt100k', queryRunTFollow100k)
+runTFollow100kr2 <- makeTRunr2(100000, 'TFollowgt100kr2', queryRunTFollow100k) 
+runTFollow1M <- makeTRunr1(1000000, 'TFollowgt1M', queryRunTFollow1M)
+runTFollow1Mr2 <- makeTRunr2(1000000,'TFollowgt1Mr2', queryRunTFollow1M)
+runTFollow10M <- makeTRunr1(10000000, 'TFollowgt10M', queryRunTFollow10M) 
+runTFollow10Mr2 <- makeTRunr2(10000000, 'TFollowgt10Mr2', queryRunTFollow10M) 
+runTTweets1e2 <- makeTRunr1(100, 'TTweetsgt1e2', queryRunTTweets1e2)
+runTTweets1e2r2 <- makeTRunr2(100, 'TTweetsgt1e2r2', queryRunTTweets1e2)
+runTTweets5e2 <- makeTRunr1(500, 'TTweetsgt5e2', queryRunTTweets5e2)
+runTTweets5e2r2 <- makeTRunr2(500, 'TTweetsgt5e2r2', queryRunTTweets5e2)
+runTTweets1e3 <- makeTRunr1(1000, 'TTweetsgt1e3', queryRunTTweets1e3)
+runTTweets1e3r2 <- makeTRunr2(1000, 'TTweetsgt1e3r2', queryRunTTweets1e3)
+runTTweets5e3 <- makeTRunr1(5000, 'TTweetsgt5e3', queryRunTTweets5e3)
+runTTweets5e3r2 <- makeTRunr2(5000, 'TTweetsgt5e3r2', queryRunTTweets5e3)
+runTTweets1e4 <- makeTRunr1(10000, 'TTweetsgt1e4', queryRunTTweets1e4)
+runTTweets1e4r2 <- makeTRunr2(10000, 'TTweetsgt1e4r2', queryRunTTweets1e4)
+runTTweets5e4 <- makeTRunr1(50000, 'TTweetsgt5e4', queryRunTTweets5e4)
+runTTweets5e4r2 <- makeTRunr2(50000, 'TTweetsgt5e4r2', queryRunTTweets5e4)
 
 makeSORun <- function(val, outFileName, config) {
 	runFun = function() runPriorSO(config=modConfig(config, list(query=config$query(val), modelVsPredOutFile=getModelVsPredOutFile(outFileName))))
@@ -832,11 +892,12 @@ analyzeModelVsPredTbl <- function(modelVsPredTbl) {
 	# Check that the Ns for each dataset look right	
 	modelVsPredTbl[, list(N=.N, names=list(unique(datasetName))), by=list(datasetType, datasetGroup, runNum,datasetNameRoot)]
 
-	plotDVDiffs(rbind(modelVsPredTbl[runNum==2, compare2DVs(.SD, c('topHashtagPost', 'topHashtagPostOL2'), sortedOrder=c(2,1)), by=list(datasetType, datasetGroup), .SDcols=colnames(modelVsPredTbl)],
-			  modelVsPredTbl[runNum==2, compare2DVs(.SD, c('topHashtagPost', 'topHashtagAct')), by=list(datasetType, datasetGroup), .SDcols=colnames(modelVsPredTbl)],
-			  modelVsPredTbl[DVName %in% c('topHashtagPost', 'topHashtagPostOL2'), compare2Runs(.SD, c(1,2)), by=list(datasetType, datasetGroup), .SDcols=colnames(modelVsPredTbl)],
-			  modelVsPredTbl[runNum==2 & DVName %in% c('topHashtagPost'), compareDBestVsMin(.SD), by=list(datasetType, datasetGroup)],
-			  modelVsPredTbl[runNum==2 & DVName %in% c('topHashtagPost'), compareDBestVsMax(.SD), by=list(datasetType, datasetGroup)]))
+	dvDiffsTbl = plotDVDiffs(rbind(modelVsPredTbl[runNum==2, compare2DVs(.SD, c('topHashtagPost', 'topHashtagPostOL2'), sortedOrder=c(2,1)), by=list(datasetType, datasetGroup), .SDcols=colnames(modelVsPredTbl)],
+				       modelVsPredTbl[runNum==2, compare2DVs(.SD, c('topHashtagPost', 'topHashtagAct')), by=list(datasetType, datasetGroup), .SDcols=colnames(modelVsPredTbl)],
+				       modelVsPredTbl[DVName %in% c('topHashtagPost', 'topHashtagPostOL2'), compare2Runs(.SD, c(1,2)), by=list(datasetType, datasetGroup), .SDcols=colnames(modelVsPredTbl)],
+				       modelVsPredTbl[runNum==2 & DVName %in% c('topHashtagPost'), compareDBestVsMin(.SD), by=list(datasetType, datasetGroup)],
+				       modelVsPredTbl[runNum==2 & DVName %in% c('topHashtagPost'), compareDBestVsMax(.SD), by=list(datasetType, datasetGroup)]))
+	dvDiffsTbl[, mean(meanVal), by=direction]
 	compareOptimalDs(modelVsPredTbl[DVName %in% c('topHashtagPost', 'topHashtagPostOL2', 'topHashtagAct') & runNum == 2])
 	compareOptimalAcc(modelVsPredTbl[DVName %in% c('topHashtagPost', 'topHashtagPostOL2', 'topHashtagAct') & runNum == 2])
 

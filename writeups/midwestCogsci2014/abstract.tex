@@ -1,0 +1,41 @@
+\documentclass[english]{article}
+\usepackage{graphicx}
+\usepackage[T1]{fontenc}
+\usepackage{babel}
+\usepackage[group-separator={,}]{siunitx}
+
+
+\title{Abstract Submission for Fourth Annual Midwestern Cognitive Science Conference}
+
+\author{Clayton Stanley (clayton.stanley@rice.edu) \\
+  Department of Psychology, 6100 Main Street \\
+  Houston, TX 77005 USA 
+  \and Michael D. Byrne (byrne@rice.edu) \\
+  Departments of Psychology and Computer Science, 6100 Main Street \\
+  Houston, TX 77005 USA \\
+}
+
+\begin{document}
+
+\maketitle
+
+%TC:break Abstract
+\begin{abstract}
+  This research explores and further validates ACT-R's base-level learning architectural component on two large-scale real-world datasets.
+  We framed the process where an author chooses tags and hashtags on StackOverflow posts and Twitter tweets as a declarative memory retrieval problem.
+  Over \num{265000} posts and 2.4 million tweets from \num{3900} total authors were collected. 
+  ACT-R's base-level learning equation and the simplified version of that equation (which assumes equally-spaced retrievals for each chunk) were used to predict each author's chosen hashtags, given their previous hashtag use.
+  The model performance space was explored from over 70 million total declarative memory retrievals, at 22 different levels of the decay rate parameter, and 48 different subsets of the two datasets.
+  The results show that for these datasets, the optimal value for the decay rate parameter for the simplified form of the equation is 0.4, slightly less than but close to the standard 0.5 value. 
+  However, the results also suggest that a higher (0.7) value is optimal when the standard form of the equation is used.
+  Further, the standard form can be implemented in a computationally efficient manner (20 ms per retrieval), and using the standard equation significantly improves model accuracy within subjects by 5\%.
+  Taken together, this research suggests that it may be advantageous to set the standard form of the base-level learning equation as the default in ACT-R,
+  and also increase the default value for the decay rate parameter to 0.7.
+  The results also highlight the importance of customizing model retrieval predictions based on each user's prior history, as model accuracy is still significant when a retrieval is based purely on history (i.e., no context).
+\end{abstract}
+%TC:break _main_
+
+
+\end{document}
+
+
