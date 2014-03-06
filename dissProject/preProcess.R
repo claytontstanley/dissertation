@@ -972,8 +972,8 @@ genTokenizedTblSO <- function(filters='1=1', bundleSize=10000) {
 			      maxRowId = sqldf(sprintf("select max(row_id) from post_tokenized"))$max
 			      maxRowId = if (is.na(maxRowId)) 0 else maxRowId
 			      myLog(sprintf('Writing %s rows to post_tokenized table', nrow(tbl)))
-			      tbl[, pos_as_char := as.character(pos)][, row_id := seq(maxRowId+1, length.out=length(id))]
-			      setcolorder(tbl, c('row_id', 'id', 'chunk', 'pos', 'pos_as_char', 'type'))
+			      tbl[, row_id := seq(maxRowId+1, length.out=length(id))]
+			      setcolorder(tbl, c('row_id', 'id', 'chunk', 'pos', 'type'))
 			      withDBConnect(dbCon, dbWriteTable(dbCon, "post_tokenized", tbl, append=T, row.names=0))
 		      }
 		      while (T) {
