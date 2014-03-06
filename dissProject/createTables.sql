@@ -66,7 +66,6 @@ create table if not exists post_tokenized (
 	id integer not null,
 	chunk text not null,
 	pos integer,
-	pos_as_char text not null,
 	type text not null,
 	primary key (row_id)
 	);
