@@ -60,6 +60,9 @@ create table if not exists post_subsets (
 	primary key (post_id, group_name)
 	);
 
+create index id_index_post_subsets on post_subsets (id);
+create index group_name_index_post_subsets on post_subsets (group_name);
+
 --drop table if exists post_tokenized;
 create table if not exists post_tokenized (
 	row_id serial,
@@ -123,18 +126,27 @@ alter table post_tokenized add constraint post_tokenized_tokenized_type_id_fk fo
 
 create table if not exists temp_post_tokenized (
 	row_id integer not null,
-	id integer not null,
 	chunk_id integer not null,
-	pos integer not null,
-	type_id integer not null,
+	post_id integer not null,
+	pos integer,
+	post_type_id integer not null,
 	primary key (row_id)
 	);
 
-alter table temp_post_tokenized add constraint temp_post_tokenized_row_id_fk foreign key (row_id) references post_tokenized (row_id);
-alter table temp_post_tokenized add constraint temp_post_tokenized_type_id_fk foreign key (type_id) references tokenized_types (id);
-alter table temp_post_tokenized add constraint temp_post_tokenized_chunk_id_fk foreign key (chunk_id) references tokenized_chunk_types (id);
-create index id_index_temp_post_tokenized on temp_post_tokenized (id);
-create index type_id_index_post_tokenized on temp_post_tokenized (type_id); 
+create index chunk_id_index_temp_post_tokenized on temp_post_tokenized (chunk_id);
+create index post_id_index_temp_post_tokenized on temp_post_tokenized (post_id);
+create index post_type_id_index_temp_post_tokenized on temp_post_tokenized (post_type_id); 
+
+create table if not exists temp_cooc (
+	id serial,
+	tag_chunk_id integer not null,
+	context_chunk_id integer not null,
+	pos_from_tag integer,
+	partial_N integer not null
+	);
+
+create index tag_chunk_id_index_temp_cooc on temp_cooc(tag_chunk_id);
+create index context_chunk_id_index_temp_cooc on temp_cooc(context_chunk_id);
 
 create table if not exists tokenized_types (
 	id serial not null,
@@ -148,8 +160,27 @@ create table if not exists tokenized_chunk_types (
 	type_name text unique,
 	primary key (id)
 	);
-truncate table tokenized_chunk_types;
 insert into tokenized_chunk_types (type_name) select distinct chunk from post_tokenized where char_length(chunk) <= 500;
+
+create type chunk_table_type as ("row_id" int, "chunk_id" int, "post_id" int, "pos" int, "post_type_id" int);
+
+create or replace function make_chunk_table(int, int, text)
+returns setof chunk_table_type as
+$$
+select tokenized.row_id as row_id, chunk_types.id as chunk_id, tokenized.id as post_id, tokenized.pos as pos, types.id as post_type_id
+from post_tokenized as tokenized
+join tokenized_chunk_types as chunk_types
+on tokenized.chunk = chunk_types.type_name
+join tokenized_types as types
+on tokenized.type = types.type_name
+join post_subsets as subsets
+on tokenized.id = subsets.post_id
+where subsets.id >= $1
+and subsets.id <= $2
+and subsets.group_name = $3
+;
+$$
+language sql immutable;
 
 alter table users add column num_questions integer;
 update users set num_questions = q.N from (select owner_user_id, count(*) as N from Posts where post_type_id = 1 group by owner_user_id) as q where q.owner_user_id = users.id;

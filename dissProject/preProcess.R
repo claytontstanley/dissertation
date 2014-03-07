@@ -121,6 +121,7 @@ myReadCSV <- function(file, ...) {
 }
 
 myWriteCSV <- function(data, file, ...) {
+	myLog(sprintf('Writing results to "%s"', file))
 	write.csv(data, file=file, row.names=F, ...)
 }
 
@@ -914,20 +915,27 @@ analyzeModelVsPredTbl <- function(modelVsPredTbl) {
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostOL2' & datasetName=='SOQgt500r2' & d < 1])
 }
 
-getNcoocTbl <- function(type, idsQuery) {
-	myLog(sprintf('Getting Ncooc table for type %s and idsQuery %s', type, idsQuery))
-	resTbl = as.data.table(sqldf(sprintf("select title_tbl.chunk as chunk, tag_tbl.chunk as tag, title_tbl.pos - tag_tbl.pos as pos_from_tag, count(tag_tbl.id) as partial_N from
-					     (select * from post_tokenized
-					      where id in (%s)
-					      and type = 'tag') as tag_tbl
-					     join
-					     (select * from post_tokenized
-					      where id in (%s)
-					      and type = '%s') as title_tbl
-					     on tag_tbl.id = title_tbl.id
-					     group by title_tbl.chunk, tag_tbl.chunk, pos_from_tag
-					     order by title_tbl.chunk, tag_tbl.chunk, pos_from_tag",
-					     idsQuery, idsQuery, type)))
+getNcoocTbl <- function(type, chunkTableQuery) {
+	myLog(sprintf('Getting Ncooc table for type %s', type))
+	sqldf('truncate table temp_cooc')
+	sqldf(sprintf("insert into temp_cooc (tag_chunk_id, context_chunk_id, pos_from_tag, partial_N)
+		      select L.chunk_id as tag_chunk_id, R.chunk_id as context_chunk_id, L.pos - R.pos as pos_from_tag, count(L.post_id) as partial_N
+		      from temp_post_tokenized as L
+		      join temp_post_tokenized as R
+		      on L.post_id = R.post_id
+		      where L.post_type_id = (select tokenized_types.id from tokenized_types where tokenized_types.type_name = 'tag')
+		      and R.post_type_id = (select tokenized_types.id from tokenized_types where tokenized_types.type_name = '%s')
+		      group by L.chunk_id, R.chunk_id, pos_from_tag
+		      order by L.chunk_id, R.chunk_id, pos_from_tag",
+		      type))
+	resTbl = as.data.table(sqldf('select t.type_name as tag, c.type_name as chunk, pos_from_tag, partial_N
+				     from temp_cooc
+				     join tokenized_chunk_types as t
+				     on t.id = temp_cooc.tag_chunk_id
+				     join tokenized_chunk_types as c
+				     on c.id = temp_cooc.context_chunk_id
+				     order by tag, chunk, pos_from_tag'
+				     ))
 	resTbl[, pos_from_tag := NULL][, pos_from_tag := 'NaN'] # FIXME: Now that this has been regression tested against the prior R implementation, is this needed anymore?
 	NcoocTbl = resTbl[, list(posFromTag=pos_from_tag, partialN=partial_n, NChunkTag=sum(partial_n)), by=list(chunk, tag)]
 	setkey(NcoocTbl, chunk, tag, posFromTag)
@@ -938,24 +946,22 @@ makeSubsetName <- function(subset, startId, endId) {
 	paste(subset, startId, endId, sep='-')
 }
 
-makeIdsQuery <- function(subsetName, startId, endId) {
-	sprintf("select post_id 
-		from post_subsets
-		where id >= %s
-		and id <= %s
-		and group_name = '%s'",
-		startId, endId, subsetName)
+makeChunkTableQuery <- function(subsetName, startId, endId) {
+	sprintf("select * from make_chunk_table(%s, %s, '%s')", startId, endId, subsetName)
 }
 
 genNcoocTblSO <- function(subsetName, startId, endId)  {
-	idsQuery = makeIdsQuery(subsetName, startId, endId)
+	chunkTableQuery = makeChunkTableQuery(subsetName, startId, endId)
 	fullSubsetName = makeSubsetName(subsetName, startId, endId)
-	NcoocTblTitle = getNcoocTbl('title', idsQuery) 
-	NcoocTblBody = getNcoocTbl('body', idsQuery) 
-	outFile = sprintf('%s/NcoocTblBody-%s.csv', coocDir(), fullSubsetName)
-	myWriteCSV(NcoocTblBody, file=outFile) 
+	myLog(sprintf("generating temp_post_tokenized table with query %s", chunkTableQuery))
+	sqldf('truncate table temp_post_tokenized')
+	sqldf(sprintf("insert into temp_post_tokenized %s", chunkTableQuery))
+	NcoocTblTitle = getNcoocTbl('title', chunkTableQuery) 
+	NcoocTblBody = getNcoocTbl('body', chunkTableQuery) 
 	outFile = sprintf('%s/NcoocTblTitle-%s.csv', coocDir(), fullSubsetName)
 	myWriteCSV(NcoocTblTitle, file=outFile)
+	outFile = sprintf('%s/NcoocTblBody-%s.csv', coocDir(), fullSubsetName)
+	myWriteCSV(NcoocTblBody, file=outFile) 
 }
 
 genTokenizedTblSO <- function(filters='1=1', bundleSize=10000) {
@@ -1069,6 +1075,9 @@ computeAct <- function(context, sjiTbl) {
 }
 
 curWS <- function() {
+	runGenNcoocTblSO1thru3000000()
+	runGenNcoocTblSO1thru100()
+	fooTbl = myReadCSV('~/src/dissertation/firstSOProject/analysis/model/title-chunks-subset-4.csv')
 	userPTbl = withProf(getUserPTbl(defaultSOConfig))
 	userPTbl
 	BTbl = getPriorForUserAtEpoch(userPTbl, '4653', 1390076773, c(.5, .6))
@@ -1097,8 +1106,6 @@ curWS <- function() {
 	hashtagsTbl[popHashtagsTbl, nomatch=0][,list(hashtag, .N), by=hashtag][order(N, decreasing = T)][, N]
 	tweetsTbl[lang=='en']
 	addFilteredPosts()
-	genTokenizedTblSO(filters=sprintf('id in (%s)', makeIdsQuery('SOShuffledFull', 1, 10000)))
-	runGenNcoocTblSO1thru100()
 	test_dir(sprintf("%s/%s", PATH, 'tests'), reporter='summary')
 	.ls.objects(order.by='Size')
 	# Checking that tweets for twitter users from each followers_count,statuses_count scale are being collected properly
