@@ -673,7 +673,7 @@ getSummaryStats <- function() {
 	unique(usersFromRunsTbl)
 	postsCntFromRunsTbl = rbind(tPostsCntFromRunsTbl, SOPostsCntFromRunsTbl)
 	postsCntFromRunsTbl[, sum(count), by=dataset]
-	modelVsPredTbl[predUsedBest == T][runNum == 2][, list(acc=median(acc), d=median(d), N=.N), by=list(DVName, datasetType)]
+	modelVsPredTbl[predUsedBest == T][runNum == 2][, list(acc=mean(acc), d=median(d), N=.N), by=list(DVName, datasetType)][DVName %in% c('topHashtagPost', 'topHashtagPostOL2')][, mean(acc), by=DVName]
 	modelVsPredTbl[hashtagUsedP == T][topHashtag == T][DVName == 'topHashtagAct'][, sum(totN), by=datasetType]
 	modelVsPredTbl[, .N, by=d]
 }
