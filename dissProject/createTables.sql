@@ -138,17 +138,18 @@ create index type_id_index_post_tokenized on temp_post_tokenized (type_id);
 
 create table if not exists tokenized_types (
 	id serial not null,
-	type_name text,
+	type_name text unique,
 	primary key (id)
 	);
 insert into tokenized_types (type_name) values ('title'), ('body'), ('tag');
 
 create table if not exists tokenized_chunk_types (
 	id serial not null,
-	type_name text,
+	type_name text unique,
 	primary key (id)
 	);
-insert into tokenized_chunk_types (type_name) select distinct chunk from post_tokenized;
+truncate table tokenized_chunk_types;
+insert into tokenized_chunk_types (type_name) select distinct chunk from post_tokenized where char_length(chunk) <= 500;
 
 alter table users add column num_questions integer;
 update users set num_questions = q.N from (select owner_user_id, count(*) as N from Posts where post_type_id = 1 group by owner_user_id) as q where q.owner_user_id = users.id;
