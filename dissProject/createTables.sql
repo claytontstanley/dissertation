@@ -119,11 +119,6 @@ update posts set creation_epoch = extract(epoch from creation_date) where creati
 alter table tweets add column created_at_epoch numeric; 
 update tweets set created_at_epoch = extract(epoch from to_timestamp(created_at, 'YYYY-MM-DD HH24:MI:SS')::timestamp without time zone) where created_at_epoch is null; 
 
-alter table post_tokenized add column tokenized_type_id integer;
-update post_tokenized set tokenized_type_id = (select id from tokenized_types where type_name = type) where type='body';
-update post_tokenized set tokenized_type_id = q.id from tokenized_types as q where q.type_name = post_tokenized.type and tokenized_type_id is null;
-alter table post_tokenized add constraint post_tokenized_tokenized_type_id_fk foreign key (tokenized_type_id) references tokenized_types (id);
-
 create table if not exists temp_post_tokenized (
 	row_id integer not null,
 	chunk_id integer not null,
