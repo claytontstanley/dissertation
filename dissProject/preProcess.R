@@ -1076,7 +1076,7 @@ computeAct <- function(context, sjiTbl) {
 
 curWS <- function() {
 	runGenNcoocTblSO1thru3000000()
-	runGenNcoocTblSO1thru100()
+	runGenNcoocTblSO1thru10000()
 	fooTbl = myReadCSV('~/src/dissertation/firstSOProject/analysis/model/title-chunks-subset-4.csv')
 	userPTbl = withProf(getUserPTbl(defaultSOConfig))
 	userPTbl
