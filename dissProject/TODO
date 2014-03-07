@@ -1,10 +1,5 @@
-- reload post_tokenized
-- add chunk_type insert
-- try out new query method on small dataset
-- if all good, clean up createTables with alter table stuff on tokenized table
-- optimize hairy sql
+- run 3M cooc table 
 
-- make sure current prod regressinos are good
-- if good, then sync over new stuff; will check Twitter config file code change
+- run 48 subsets again to verify
 
 - update data.table and check regressions; use newer if all good
