@@ -936,6 +936,7 @@ getNcoocTbl <- function(type, chunkTableQuery) {
 				     on c.id = temp_cooc.context_chunk_id
 				     order by tag, chunk, pos_from_tag'
 				     ))
+	sqldf('truncate table temp_cooc')
 	resTbl[, pos_from_tag := NULL][, pos_from_tag := 'NaN'] # FIXME: Now that this has been regression tested against the prior R implementation, is this needed anymore?
 	NcoocTbl = resTbl[, list(posFromTag=pos_from_tag, partialN=partial_n, NChunkTag=sum(partial_n)), by=list(chunk, tag)]
 	setkey(NcoocTbl, chunk, tag, posFromTag)
@@ -962,6 +963,8 @@ genNcoocTblSO <- function(subsetName, startId, endId)  {
 	myWriteCSV(NcoocTblTitle, file=outFile)
 	outFile = sprintf('%s/NcoocTblBody-%s.csv', coocDir(), fullSubsetName)
 	myWriteCSV(NcoocTblBody, file=outFile) 
+	sqldf('truncate table temp_post_tokenized')
+	return()
 }
 
 genTokenizedTblSO <- function(filters='1=1', bundleSize=10000) {
