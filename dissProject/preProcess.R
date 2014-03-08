@@ -173,9 +173,9 @@ addTokenText <- function(tweetsTbl, from) {
 	return()
 }
 
-getTweetsTbl <- function(sqlStr="select * from tweets limit 10000", config) {
+getTweetsTbl <- function(sqlStr=sprintf("select %s from tweets limit 10000", defaultTCols), config) {
 	tweetsTbl = data.table(sqldf(sqlStr))
-	stopifnot(sort(unique(tweetsTbl$retweeted)) == c('False', 'True'))
+	stopifnot(unique(tweetsTbl$retweeted) %in% c('False', 'True'))
 	if (!config$includeRetweetsP) tweetsTbl = tweetsTbl[retweeted == 'False']
 	addTokenText(tweetsTbl, from='text')
 	setkey(tweetsTbl, id)
@@ -563,13 +563,14 @@ modConfig <- function(config, mods) {
 	newConfig
 }
 
+defaultTCols = "id::text, user_id, user_screen_name, created_at, retweeted, in_reply_to_status_id, lang, truncated, text, created_at_epoch"
+
 getQueryUsersSubset <- function(val, from) {
 	sprintf('select user_screen_name from twitter_users where %s > %d order by %s asc limit 100', from, val, from)
 }
 
-
 getQueryGeneralT <- function(val, from, filters) {
-	sprintf('select * from tweets where %s and user_screen_name in (%s)', filters, getQueryUsersSubset(val, from))
+	sprintf('select %s from tweets where %s and user_screen_name in (%s)', defaultTCols, filters, getQueryUsersSubset(val, from))
 }
 
 getQueryT <- function(val, filters='1=1') {
@@ -878,7 +879,7 @@ analyzeTemporal <- function(modelVsPredTbl) {
 	user_screen_names = c("'rickeysmiley','fashionista_com','laurenpope','mtvindia','officialrcti'")
 	user_screen_names = c("'fashionista_com'")
 	runTbls = runPriorT(config=modConfig(defaultTConfig, list(accumModelHashtagsTbl=T,
-								  query=sprintf("select * from tweets where user_screen_name in (%s)", user_screen_names))))
+								  query=sprintf("select %s from tweets where user_screen_name in (%s)", defaultTCols, user_screen_names))))
 	plotTemporal(runTbls)
 	user_screen_names = c("'520957','238260','413225','807325','521180'")
 	user_screen_names = c("'520957','238260'")
@@ -1090,7 +1091,6 @@ curWS <- function() {
 	BTbl
 	userPTbl[, list(N=length(unique(hashtag))), by=user_screen_name][order(N, decreasing = T)]
 	hashtagGroup = '2014-02-27 17:13:30 initial'
-	tweetsTbl = getTweetsTbl(sprintf("select * from top_hashtag_tweets where hashtag_group = '%s'", hashtagGroup), config=defaultTConfig)
 	sjiTbl = withProf(getSjiTbl('SOShuffledFull', 1, 100000))
 	computeAct(context, sjiTbl)[order(act)]
 	computeAct('clojure', sjiTbl)[order(act)]
@@ -1101,7 +1101,6 @@ curWS <- function() {
 	tables()
 	tweetsTbl
 	tweetsTbl[, table(retweeted)]
-	hashtagsTbl = getHashtagsTbl(tweetsTbl, defaultTConfig)
 	popHashtagsTbl = data.table(sqldf(sprintf("select hashtag from top_hashtag_hashtags where hashtag_group = '%s'", hashtagGroup)))
 	setkey(hashtagsTbl, hashtag)
 	setkey(popHashtagsTbl, hashtag)
