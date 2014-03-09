@@ -117,7 +117,7 @@ withKey <- function(tbl, conKey, thunk) {
 }
 
 myReadCSV <- function(file, ...) {
-	data.table(read.csv(file, stringsAsFactors=F, ...))
+	setDT(read.csv(file, stringsAsFactors=F, ...))
 }
 
 myWriteCSV <- function(data, file, ...) {
@@ -1036,8 +1036,9 @@ getSjiTbl <- function(subsetName, startId, endId) {
 	fileName = sprintf('%s.csv', makeSubsetName(subsetName, startId, endId))
 	sjiTitleName = paste('NcoocTblTitle', fileName, sep='-')
 	sjiBodyName = paste('NcoocTblBody', fileName, sep='-')
-	sjiTitleTbl = myReadCSV(sprintf('%s/%s', coocDir(), sjiTitleName))
-	sjiBodyTbl = myReadCSV(sprintf('%s/%s', coocDir(), sjiBodyName))
+	sjiColClasses = c('character', 'character', 'character', 'integer', 'integer')	
+	sjiTitleTbl = myReadCSV(sprintf('%s/%s', coocDir(), sjiTitleName), colClasses=sjiColClasses)
+	sjiBodyTbl = myReadCSV(sprintf('%s/%s', coocDir(), sjiBodyName), colClasses=sjiColClasses)
 	sjiTitleTbl[, type := 'title']
 	sjiBodyTbl[, type := 'body']
 	sjiTbl = rbind(sjiTitleTbl, sjiBodyTbl)
