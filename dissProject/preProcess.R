@@ -117,6 +117,7 @@ withKey <- function(tbl, conKey, thunk) {
 }
 
 myReadCSV <- function(file, ...) {
+	myLog(sprintf('Reading results from file "%s"', file))
 	setDT(read.csv(file, stringsAsFactors=F, ...))
 }
 
@@ -938,7 +939,6 @@ getNcoocTbl <- function(type, chunkTableQuery) {
 				     order by tag, chunk, pos_from_tag'
 				     ))
 	sqldf('truncate table temp_cooc')
-	resTbl[, pos_from_tag := NULL][, pos_from_tag := 'NaN'] # FIXME: Now that this has been regression tested against the prior R implementation, is this needed anymore?
 	NcoocTbl = resTbl[, list(posFromTag=pos_from_tag, partialN=partial_n, NChunkTag=sum(partial_n)), by=list(chunk, tag)]
 	setkey(NcoocTbl, chunk, tag, posFromTag)
 	NcoocTbl
