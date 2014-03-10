@@ -979,11 +979,8 @@ genTokenizedTblSO <- function(filters='1=1', bundleSize=10000) {
 	withDBConnect(dbCon,
 		      {dbRs = dbSendQuery(dbCon, query)
 		      writePartialTbl <- function(tbl) {
-			      maxRowId = sqldf(sprintf("select max(row_id) from post_tokenized"))$max
-			      maxRowId = if (is.na(maxRowId)) 0 else maxRowId
 			      myLog(sprintf('Writing %s rows to post_tokenized table', nrow(tbl)))
-			      tbl[, row_id := seq(maxRowId+1, length.out=length(id))]
-			      setcolorder(tbl, c('row_id', 'id', 'chunk', 'pos', 'type'))
+			      setcolorder(tbl, c('id', 'chunk', 'pos', 'type'))
 			      withDBConnect(dbCon, dbWriteTable(dbCon, "post_tokenized", tbl, append=T, row.names=0))
 		      }
 		      while (T) {
@@ -1081,7 +1078,7 @@ computeAct <- function(context, sjiTbl) {
 
 curWS <- function() {
 	runGenNcoocTblSO1thru3000000()
-	runGenNcoocTblSO1thru100()
+	runGenNcoocTblSO1thru1000()
 	fooTbl = myReadCSV('~/src/dissertation/firstSOProject/analysis/model/title-chunks-subset-4.csv')
 	userPTbl = withProf(getUserPTbl(defaultSOConfig))
 	userPTbl

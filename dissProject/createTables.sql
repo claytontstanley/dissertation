@@ -64,13 +64,11 @@ create index id_index_post_subsets on post_subsets (id);
 create index group_name_index_post_subsets on post_subsets (group_name);
 
 --drop table if exists post_tokenized;
-create table if not exists post_tokenized (
-	row_id serial,
+create table post_tokenized (
 	id integer not null,
 	chunk text not null,
 	pos integer,
-	type text not null,
-	primary key (row_id)
+	type text not null
 	);
 
 create index id_index_post_tokenized on post_tokenized (id);
@@ -119,21 +117,18 @@ update posts set creation_epoch = extract(epoch from creation_date) where creati
 alter table tweets add column created_at_epoch numeric; 
 update tweets set created_at_epoch = extract(epoch from to_timestamp(created_at, 'YYYY-MM-DD HH24:MI:SS')::timestamp without time zone) where created_at_epoch is null; 
 
-create table if not exists temp_post_tokenized (
-	row_id integer not null,
+create table temp_post_tokenized (
 	chunk_id integer not null,
 	post_id integer not null,
 	pos integer,
-	post_type_id integer not null,
-	primary key (row_id)
+	post_type_id integer not null
 	);
 
 create index chunk_id_index_temp_post_tokenized on temp_post_tokenized (chunk_id);
 create index post_id_index_temp_post_tokenized on temp_post_tokenized (post_id);
 create index post_type_id_index_temp_post_tokenized on temp_post_tokenized (post_type_id); 
 
-create table if not exists temp_cooc (
-	id serial,
+create table temp_cooc (
 	tag_chunk_id integer not null,
 	context_chunk_id integer not null,
 	pos_from_tag integer,
@@ -157,12 +152,12 @@ create table if not exists tokenized_chunk_types (
 	);
 insert into tokenized_chunk_types (type_name) select distinct chunk from post_tokenized where char_length(chunk) <= 500;
 
-create type chunk_table_type as ("row_id" int, "chunk_id" int, "post_id" int, "pos" int, "post_type_id" int);
+create type chunk_table_type as ("chunk_id" int, "post_id" int, "pos" int, "post_type_id" int);
 
 create or replace function make_chunk_table(int, int, text)
 returns setof chunk_table_type as
 $$
-select tokenized.row_id as row_id, chunk_types.id as chunk_id, tokenized.id as post_id, tokenized.pos as pos, types.id as post_type_id
+select chunk_types.id as chunk_id, tokenized.id as post_id, tokenized.pos as pos, types.id as post_type_id
 from post_tokenized as tokenized
 join tokenized_chunk_types as chunk_types
 on tokenized.chunk = chunk_types.type_name
