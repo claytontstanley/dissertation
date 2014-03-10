@@ -1,4 +1,0 @@
-- run 3M cooc table 
-
-- update data.table and check regressions; use newer if all good
-- run 48 subsets again to verify
