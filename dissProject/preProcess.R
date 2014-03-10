@@ -1025,7 +1025,6 @@ runGenNcoocTblSO1thru1000 <- function() genNcoocTblSO('SOShuffledFull', 1, 1000)
 runGenNcoocTblSO1thru10000 <- function() genNcoocTblSO('SOShuffledFull', 1, 10000)
 runGenNcoocTblSO1thru100000 <- function() genNcoocTblSO('SOShuffledFull', 1, 100000)
 runGenNcoocTblSO1thru3000000 <- function() genNcoocTblSO('SOShuffledFull', 1, 3000000)
-#runGenNcoocTblSO1thruEnd <- function() genNcoocTblSO('SOShuffledFull', 1, 6474687)
 
 runGenTokenizedTblSO <- function() genTokenizedTblSO()
 
