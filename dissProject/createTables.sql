@@ -46,6 +46,9 @@ create table if not exists top_hashtag_tweets (
 	primary key (id)
 	);
 
+alter table top_hashtag_tweets add column created_at_epoch numeric; 
+update top_hashtag_tweets set created_at_epoch = extract(epoch from to_timestamp(created_at, 'YYYY-MM-DD HH24:MI:SS')::timestamp without time zone) where created_at_epoch is null; 
+
 --drop table if exists temp_tweets_id cascade;
 create table if not exists temp_tweets_id (
 	id bigint not null,
@@ -73,6 +76,18 @@ create table post_tokenized (
 
 create index id_index_post_tokenized on post_tokenized (id);
 create index type_index_post_tokenized on post_tokenized (type) where type = 'tag';
+
+create table top_hashtag_tokenized (
+	id bigint not null,
+	chunk text not null,
+	pos integer not null,
+	type text not null,
+	hashtag_group text not null
+);
+
+create index hashtag_group_index_top_hashtag_tokenized on top_hashtag_tokenized (hashtag_group);
+create index id_index_top_hashtag_tokenized on top_hashtag_tokenized (id);
+create index type_index_top_hashtag_tokenized on top_hashtag_tokenized (type) where type = 'tag';
 
 --drop table if exists post_filtered;
 create table if not exists post_filtered (

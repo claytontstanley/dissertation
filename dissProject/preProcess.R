@@ -126,6 +126,10 @@ myWriteCSV <- function(data, file, ...) {
 	write.csv(data, file=file, row.names=F, ...)
 }
 
+sqldt <- function(...) {
+	setDT(sqldf(...))
+}
+
 # Computing CIs around a variance statistic
 
 CIVar <- function(vals) {
@@ -174,18 +178,23 @@ addTokenText <- function(tweetsTbl, from) {
 	return()
 }
 
-getTweetsTbl <- function(sqlStr=sprintf("select %s from tweets limit 10000", defaultTCols), config) {
-	tweetsTbl = data.table(sqldf(sqlStr))
-	stopifnot(unique(tweetsTbl$retweeted) %in% c('False', 'True'))
-	if (!config$includeRetweetsP) tweetsTbl = tweetsTbl[retweeted == 'False']
+setupTweetsTbl <- function(tweetsTbl, config) {
 	addTokenText(tweetsTbl, from='text')
 	setkey(tweetsTbl, id)
 	tweetsTbl[, dt := created_at_epoch - min(created_at_epoch), by=user_screen_name]
 	tweetsTbl
 }
 
+getTweetsTbl <- function(sqlStr=sprintf("select %s from tweets limit 10000", defaultTCols), config) {
+	allowedRetweetedVals = if (config$includeRetweetsP) c('True', 'False') else c('False')
+	tweetsTbl = sqldt(sqlStr)[retweeted %in% allowedRetweetedVals]
+	stopifnot(unique(tweetsTbl$retweeted) %in% allowedRetweetedVals)
+	setupTweetsTbl(tweetsTbl, config)
+	tweetsTbl
+}
+
 getTagSynonymsTbl <- function(sqlStr='select * from tag_synonyms') {
-	tagSynonymsTbl = data.table(sqldf(sqlStr))
+	tagSynonymsTbl = sqldt(sqlStr)
 	setkey(tagSynonymsTbl, source_tag_name)
 	tagSynonymsTbl
 }
@@ -199,17 +208,19 @@ setupPostsTbl <- function(postsTbl, config) {
 }
 
 getPostsTbl <- function(sqlStr, config) {
-	postsTbl = data.table(sqldf(sqlStr))
+	postsTbl = sqldt(sqlStr)
 	setupPostsTbl(postsTbl, config)
+	postsTbl
 }
 
 matchWhitespace = '\\S+'
+matchHashtag = '^#'
 matchTag = '(?<=<)[^>]+(?=>)'
 
 getHashtagsTbl <- function(tweetsTbl, config) {
 	from = config$from
 	tokenizedTbl = getTokenizedTbl(tweetsTbl, from=from, regex=matchWhitespace)
-	htOfTokenizedTbl = tokenizedTbl[grepl('^#', chunk),]
+	htOfTokenizedTbl = tokenizedTbl[grepl(matchHashtag, chunk),]
 	stopifnot(c('id') == key(htOfTokenizedTbl))
 	hashtagsTbl = htOfTokenizedTbl[tweetsTbl, list(hashtag=chunk, pos=pos, created_at=created_at, dt=dt, user_id=user_id, user_screen_name=user_screen_name), nomatch=0]
 	setkey(hashtagsTbl, user_screen_name, dt, hashtag)
@@ -231,14 +242,14 @@ getTagsTbl <- function(postsTbl, config) {
 }
 
 getTusersTbl <- function() {
-	tusersTbl = data.table(sqldf('select * from twitter_users'))
+	tusersTbl = sqldt('select * from twitter_users')
 	tusersTbl[, rank := order(followers_count, decreasing=T)]
 	setkey(tusersTbl, id)
 	tusersTbl
 }
 
 getSOusersTbl <- function() {
-	sousersTbl = data.table(sqldf('select * from users limit 1000'))
+	sousersTbl = sqldt('select * from users limit 1000')
 	sousersTbl
 }
 
@@ -651,19 +662,19 @@ runSOQueries = list(getQuerySO(100000),
 
 
 getTUsersFromRunQuery <- function(runQuery) {
-	as.data.table(sqldf(sprintf("select distinct user_screen_name from (%s) as foo", runQuery)))[, dataset := 'twitter']
+	sqldt(sprintf("select distinct user_screen_name from (%s) as foo", runQuery))[, dataset := 'twitter']
 }
 
 getTPostsFromRunQuery <- function(runQuery) {
-	as.data.table(sqldf(sprintf('select count(*) from (%s) as foo', runQuery)))[, dataset := 'twitter']
+	sqldt(sprintf('select count(*) from (%s) as foo', runQuery))[, dataset := 'twitter']
 }
 
 getSOUsersFromRunQuery <- function(runQuery) {
-	as.data.table(sqldf(sprintf("select distinct owner_user_id from (%s) as foo", runQuery)))[, dataset := 'stackoverflow']
+	sqldt(sprintf("select distinct owner_user_id from (%s) as foo", runQuery))[, dataset := 'stackoverflow']
 }
 
 getSOPostsFromRunQuery <- function(runQuery) {
-	as.data.table(sqldf(sprintf('select count(*) from (%s) as foo', runQuery)))[, dataset := 'stackoverflow']
+	sqldt(sprintf('select count(*) from (%s) as foo', runQuery))[, dataset := 'stackoverflow']
 }
 
 getSummaryStats <- function() {
@@ -919,8 +930,8 @@ analyzeModelVsPredTbl <- function(modelVsPredTbl) {
 
 getNcoocTbl <- function(type, chunkTableQuery) {
 	myLog(sprintf('Getting Ncooc table for type %s', type))
-	sqldf('truncate table temp_cooc')
-	sqldf(sprintf("insert into temp_cooc (tag_chunk_id, context_chunk_id, pos_from_tag, partial_N)
+	sqldt('truncate table temp_cooc')
+	sqldt(sprintf("insert into temp_cooc (tag_chunk_id, context_chunk_id, pos_from_tag, partial_N)
 		      select L.chunk_id as tag_chunk_id, R.chunk_id as context_chunk_id, L.pos - R.pos as pos_from_tag, count(L.post_id) as partial_N
 		      from temp_post_tokenized as L
 		      join temp_post_tokenized as R
@@ -930,15 +941,15 @@ getNcoocTbl <- function(type, chunkTableQuery) {
 		      group by L.chunk_id, R.chunk_id, pos_from_tag
 		      order by L.chunk_id, R.chunk_id, pos_from_tag",
 		      type))
-	resTbl = as.data.table(sqldf('select t.type_name as tag, c.type_name as chunk, pos_from_tag, partial_N
-				     from temp_cooc
-				     join tokenized_chunk_types as t
-				     on t.id = temp_cooc.tag_chunk_id
-				     join tokenized_chunk_types as c
-				     on c.id = temp_cooc.context_chunk_id
-				     order by tag, chunk, pos_from_tag'
-				     ))
-	sqldf('truncate table temp_cooc')
+	resTbl = sqldt('select t.type_name as tag, c.type_name as chunk, pos_from_tag, partial_N
+		       from temp_cooc
+		       join tokenized_chunk_types as t
+		       on t.id = temp_cooc.tag_chunk_id
+		       join tokenized_chunk_types as c
+		       on c.id = temp_cooc.context_chunk_id
+		       order by tag, chunk, pos_from_tag'
+		       )
+	sqldt('truncate table temp_cooc')
 	NcoocTbl = resTbl[, list(posFromTag=pos_from_tag, partialN=partial_n, NChunkTag=sum(partial_n)), by=list(chunk, tag)]
 	setkey(NcoocTbl, chunk, tag, posFromTag)
 	NcoocTbl
@@ -956,16 +967,21 @@ genNcoocTblSO <- function(subsetName, startId, endId)  {
 	chunkTableQuery = makeChunkTableQuery(subsetName, startId, endId)
 	fullSubsetName = makeSubsetName(subsetName, startId, endId)
 	myLog(sprintf("generating temp_post_tokenized table with query %s", chunkTableQuery))
-	sqldf('truncate table temp_post_tokenized')
-	sqldf(sprintf("insert into temp_post_tokenized %s", chunkTableQuery))
+	sqldt('truncate table temp_post_tokenized')
+	sqldt(sprintf("insert into temp_post_tokenized %s", chunkTableQuery))
 	NcoocTblTitle = getNcoocTbl('title', chunkTableQuery) 
 	NcoocTblBody = getNcoocTbl('body', chunkTableQuery) 
 	outFile = sprintf('%s/NcoocTblTitle-%s.csv', coocDir(), fullSubsetName)
 	myWriteCSV(NcoocTblTitle, file=outFile)
 	outFile = sprintf('%s/NcoocTblBody-%s.csv', coocDir(), fullSubsetName)
 	myWriteCSV(NcoocTblBody, file=outFile) 
-	sqldf('truncate table temp_post_tokenized')
+	sqldt('truncate table temp_post_tokenized')
 	return()
+}
+
+writeDTbl <- function(tbl, tblName) {
+	myLog(sprintf('Writing %s rows to %s table', nrow(tbl), tblName))
+	withDBConnect(dbCon, dbWriteTable(dbCon, tblName, tbl, append=T, row.names=0))
 }
 
 genTokenizedTblSO <- function(filters='1=1', bundleSize=10000) {
@@ -979,9 +995,8 @@ genTokenizedTblSO <- function(filters='1=1', bundleSize=10000) {
 	withDBConnect(dbCon,
 		      {dbRs = dbSendQuery(dbCon, query)
 		      writePartialTbl <- function(tbl) {
-			      myLog(sprintf('Writing %s rows to post_tokenized table', nrow(tbl)))
 			      setcolorder(tbl, c('id', 'chunk', 'pos', 'type'))
-			      withDBConnect(dbCon, dbWriteTable(dbCon, "post_tokenized", tbl, append=T, row.names=0))
+			      writeDTbl(tbl, 'post_tokenized')
 		      }
 		      while (T) {
 			      postsTbl = data.table(fetch(dbRs, n=bundleSize))
@@ -1001,6 +1016,31 @@ genTokenizedTblSO <- function(filters='1=1', bundleSize=10000) {
 	return()
 }
 
+genTokenizedTblTwitter <- function(hashtagGroup, bundleSize=10000) {
+	query = sprintf("select %s from top_hashtag_tweets 
+			where hashtag_group = '%s'
+			and id not in (select distinct id from top_hashtag_tokenized where hashtag_group = '%s')
+			",
+			defaultTCols, hashtagGroup, hashtagGroup)
+	withDBConnect(dbCon,
+		      {dbRs = dbSendQuery(dbCon, query)
+		      writePartialTbl <- function(tbl) {
+			      setcolorder(tbl, c('id', 'chunk', 'pos', 'type', 'hashtag_group'))
+			      writeDTbl(tbl, 'top_hashtag_tokenized')
+		      }
+		      while (T) {
+			      tweetsTbl = data.table(fetch(dbRs, n=bundleSize))
+			      if (nrow(tweetsTbl) == 0) break
+			      setupTweetsTbl(tweetsTbl, defaultTConfig)
+			      tokenizedTbl = getTokenizedTbl(tweetsTbl, from='tokenText', regex=matchWhitespace)[, type := 'tweet']
+			      tokenizedTbl[grepl(pattern=matchHashtag, x=chunk), type := 'hashtag']
+			      tokenizedTbl[, hashtag_group := hashtagGroup]
+			      writePartialTbl(tokenizedTbl)
+		      }
+		      })
+	return()
+}
+
 addFilteredPosts <- function() {
 	ids = c('17801882', '9965709', '9204391', '15837898', '18893489', '20156201', '3245809')
 	reasons = c('java so', 'java so', 'java so', 'java so', 'java so', 'java so', 'nonprintable U+FFFF')
@@ -1010,13 +1050,13 @@ addFilteredPosts <- function() {
 }
 
 addPostSubsets <- function() {
-	postIdsTbl = data.table(sqldf('select id from posts where post_type_id = 1'))
+	postIdsTbl = sqldt('select id from posts where post_type_id = 1')
 	postIdsTbl[, post_id := id][, id := NULL]
 	postIdsTbl[, id := sample(1:length(post_id), size=length(post_id))]
 	postIdsTbl[, group_name := 'SOShuffledFull']
 	setcolorder(postIdsTbl, c('post_id', 'id', 'group_name'))
 	setkey(postIdsTbl, group_name, id)
-	sqldf('select count(*) from post_subsets')
+	sqldt('select count(*) from post_subsets')
 	withDBConnect(dbCon, dbWriteTable(dbCon, "post_subsets", postIdsTbl, append=T, row.names=0))
 }
 
@@ -1027,6 +1067,7 @@ runGenNcoocTblSO1thru100000 <- function() genNcoocTblSO('SOShuffledFull', 1, 100
 runGenNcoocTblSO1thru3000000 <- function() genNcoocTblSO('SOShuffledFull', 1, 3000000)
 
 runGenTokenizedTblSO <- function() genTokenizedTblSO()
+runGenTokenizedTblTwitter <- function() genTokenizedTblTwitter('2014-02-27 17:13:30 initial')
 
 getSjiTbl <- function(subsetName, startId, endId) {
 	fileName = sprintf('%s.csv', makeSubsetName(subsetName, startId, endId))
@@ -1045,7 +1086,7 @@ getSjiTbl <- function(subsetName, startId, endId) {
 }
 
 getUserPTbl <- function(config) {
-	userPFrm = sqldf("select posts.id, owner_user_id, creation_epoch, chunk, type from posts
+	userPTbl = sqldt("select posts.id, owner_user_id, creation_epoch, chunk, type from posts
 			 join post_tokenized
 			 on posts.id = post_tokenized.id
 			 where type = 'tag'
@@ -1053,7 +1094,6 @@ getUserPTbl <- function(config) {
 			 and owner_user_id is not null
 			 "
 			 )
-	userPTbl = as.data.table(userPFrm)
 	if (config$convertTagSynonymsP) convertTagSynonyms(userPTbl)
 	userPTbl[, user_screen_name := as.character(owner_user_id)]
 	userPTbl[, dt := creation_epoch - min(creation_epoch), by=owner_user_id]
@@ -1098,7 +1138,6 @@ curWS <- function() {
 	tables()
 	tweetsTbl
 	tweetsTbl[, table(retweeted)]
-	popHashtagsTbl = data.table(sqldf(sprintf("select hashtag from top_hashtag_hashtags where hashtag_group = '%s'", hashtagGroup)))
 	setkey(hashtagsTbl, hashtag)
 	setkey(popHashtagsTbl, hashtag)
 	popHashtagsTbl
@@ -1108,9 +1147,9 @@ curWS <- function() {
 	test_dir(sprintf("%s/%s", PATH, 'tests'), reporter='summary')
 	.ls.objects(order.by='Size')
 	# Checking that tweets for twitter users from each followers_count,statuses_count scale are being collected properly
-	usersWithTweetsTbl = data.table(sqldf("select distinct on (user_id) t.user_screen_name,u.followers_count,u.statuses_count
-					      from tweets as t join twitter_users as u on t.user_screen_name = u.user_screen_name"
-					      ))
+	usersWithTweetsTbl = sqldt("select distinct on (user_id) t.user_screen_name,u.followers_count,u.statuses_count
+				   from tweets as t join twitter_users as u on t.user_screen_name = u.user_screen_name"
+				   )
 	usersWithTweetsTbl
 	usersWithTweetsTbl[order(followers_count), plot(log10(followers_count))]
 	usersWithTweetsTbl[order(statuses_count), plot(log10(statuses_count))]
