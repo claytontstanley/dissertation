@@ -1055,7 +1055,24 @@ addPostSubsets <- function() {
 	postIdsTbl[, group_name := 'SOShuffledFull']
 	setcolorder(postIdsTbl, c('post_id', 'id', 'group_name'))
 	setkey(postIdsTbl, group_name, id)
-	withDBConnect(dbCon, dbWriteTable(dbCon, "post_subsets", postIdsTbl, append=T, row.names=0))
+	writeDTbl(postIdsTbl, "post_subsets")
+}
+
+addTweetSubsets <- function() {
+	tweetsIdGpTbl = sqldt('select id::text, hashtag_group
+			      from top_hashtag_tweets
+			      where hashtag_group not in (select distinct group_name from top_hashtag_subsets)'
+			      )
+	partialWriteTable <- function(tbl, hashtag_group) {
+		tbl[, post_id := id][, id := NULL]
+		tbl[, id := sample(1:length(post_id), size=length(post_id))]
+		tbl[, group_name := hashtag_group]
+		setcolorder(tbl, c('post_id', 'id', 'group_name'))
+		setkey(tbl, group_name, id)
+		writeDTbl(tbl, "top_hashtag_subsets")
+		return()
+	}
+	tweetsIdGpTbl[, partialWriteTable(copy(.SD), hashtag_group), by=hashtag_group]
 }
 
 runGenNcoocTblSO1thru100 <- function() genNcoocTblSO('SOShuffledFull', 1, 100)

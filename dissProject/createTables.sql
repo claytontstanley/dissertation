@@ -66,6 +66,16 @@ create table if not exists post_subsets (
 create index id_index_post_subsets on post_subsets (id);
 create index group_name_index_post_subsets on post_subsets (group_name);
 
+create table top_hashtag_subsets (
+	post_id bigint not null,
+	id integer not null,
+	group_name text not null,
+	primary key (post_id, group_name)
+        );
+
+create index id_index_top_hashtag_subsets on top_hashtag_subsets (id);
+create index group_name_index_top_hashtag_subsets on top_hashtag_subsets (group_name);
+
 --drop table if exists post_tokenized;
 create table post_tokenized (
 	id integer not null,
