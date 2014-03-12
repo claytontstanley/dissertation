@@ -979,7 +979,7 @@ genNcoocTblSO <- function(subsetName, startId, endId)  {
 	return()
 }
 
-writeDTbl <- function(tbl, tblName) {
+appendDTbl <- function(tbl, tblName) {
 	myLog(sprintf('Writing %s rows to %s table', nrow(tbl), tblName))
 	withDBConnect(dbCon, dbWriteTable(dbCon, tblName, tbl, append=T, row.names=0))
 }
