@@ -996,7 +996,7 @@ genTokenizedTblSO <- function(filters='1=1', bundleSize=10000) {
 		      {dbRs = dbSendQuery(dbCon, query)
 		      writePartialTbl <- function(tbl) {
 			      setcolorder(tbl, c('id', 'chunk', 'pos', 'type'))
-			      writeDTbl(tbl, 'post_tokenized')
+			      appendDTbl(tbl, 'post_tokenized')
 		      }
 		      while (T) {
 			      postsTbl = data.table(fetch(dbRs, n=bundleSize))
@@ -1026,7 +1026,7 @@ genTokenizedTblTwitter <- function(hashtagGroup, bundleSize=10000) {
 		      {dbRs = dbSendQuery(dbCon, query)
 		      writePartialTbl <- function(tbl) {
 			      setcolorder(tbl, c('id', 'chunk', 'pos', 'type'))
-			      writeDTbl(tbl, 'top_hashtag_tokenized')
+			      appendDTbl(tbl, 'top_hashtag_tokenized')
 		      }
 		      while (T) {
 			      tweetsTbl = data.table(fetch(dbRs, n=bundleSize))
@@ -1045,7 +1045,7 @@ addFilteredPosts <- function() {
 	reasons = c('java so', 'java so', 'java so', 'java so', 'java so', 'java so', 'nonprintable U+FFFF')
 	filteredPostsTbl = data.table(post_id=ids, reason=reasons);
 	setcolorder (filteredPostsTbl, c('post_id', 'reason'))
-	writeDTbl(filteredPostsTbl, 'post_filtered')
+	appendDTbl(filteredPostsTbl, 'post_filtered')
 }
 
 addPostSubsets <- function() {
@@ -1055,7 +1055,7 @@ addPostSubsets <- function() {
 	postIdsTbl[, group_name := 'SOShuffledFull']
 	setcolorder(postIdsTbl, c('post_id', 'id', 'group_name'))
 	setkey(postIdsTbl, group_name, id)
-	writeDTbl(postIdsTbl, "post_subsets")
+	appendDTbl(postIdsTbl, "post_subsets")
 }
 
 addTweetSubsets <- function() {
@@ -1069,7 +1069,7 @@ addTweetSubsets <- function() {
 		tbl[, group_name := hashtag_group]
 		setcolorder(tbl, c('post_id', 'id', 'group_name'))
 		setkey(tbl, group_name, id)
-		writeDTbl(tbl, "top_hashtag_subsets")
+		appendDTbl(tbl, "top_hashtag_subsets")
 		return()
 	}
 	tweetsIdGpTbl[, partialWriteTable(copy(.SD), hashtag_group), by=hashtag_group]
