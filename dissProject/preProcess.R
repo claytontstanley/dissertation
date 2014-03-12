@@ -1045,7 +1045,7 @@ addFilteredPosts <- function() {
 	reasons = c('java so', 'java so', 'java so', 'java so', 'java so', 'java so', 'nonprintable U+FFFF')
 	filteredPostsTbl = data.table(post_id=ids, reason=reasons);
 	setcolorder (filteredPostsTbl, c('post_id', 'reason'))
-	withDBConnect(dbCon, dbWriteTable(dbCon, "post_filtered", filteredPostsTbl, append=T, row.names=0))
+	writeDTbl(filteredPostsTbl, 'post_filtered')
 }
 
 addPostSubsets <- function() {
