@@ -81,11 +81,9 @@ create table top_hashtag_tokenized (
 	id bigint not null,
 	chunk text not null,
 	pos integer not null,
-	type text not null,
-	hashtag_group text not null
+	type text not null
 );
 
-create index hashtag_group_index_top_hashtag_tokenized on top_hashtag_tokenized (hashtag_group);
 create index id_index_top_hashtag_tokenized on top_hashtag_tokenized (id);
 create index type_index_top_hashtag_tokenized on top_hashtag_tokenized (type) where type = 'tag';
 

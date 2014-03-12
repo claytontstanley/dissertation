@@ -1019,13 +1019,13 @@ genTokenizedTblSO <- function(filters='1=1', bundleSize=10000) {
 genTokenizedTblTwitter <- function(hashtagGroup, bundleSize=10000) {
 	query = sprintf("select %s from top_hashtag_tweets 
 			where hashtag_group = '%s'
-			and id not in (select distinct id from top_hashtag_tokenized where hashtag_group = '%s')
+			and id not in (select distinct id from top_hashtag_tokenized)
 			",
 			defaultTCols, hashtagGroup, hashtagGroup)
 	withDBConnect(dbCon,
 		      {dbRs = dbSendQuery(dbCon, query)
 		      writePartialTbl <- function(tbl) {
-			      setcolorder(tbl, c('id', 'chunk', 'pos', 'type', 'hashtag_group'))
+			      setcolorder(tbl, c('id', 'chunk', 'pos', 'type'))
 			      writeDTbl(tbl, 'top_hashtag_tokenized')
 		      }
 		      while (T) {
@@ -1034,7 +1034,6 @@ genTokenizedTblTwitter <- function(hashtagGroup, bundleSize=10000) {
 			      setupTweetsTbl(tweetsTbl, defaultTConfig)
 			      tokenizedTbl = getTokenizedTbl(tweetsTbl, from='tokenText', regex=matchWhitespace)[, type := 'tweet']
 			      tokenizedTbl[grepl(pattern=matchHashtag, x=chunk), type := 'hashtag']
-			      tokenizedTbl[, hashtag_group := hashtagGroup]
 			      writePartialTbl(tokenizedTbl)
 		      }
 		      })
