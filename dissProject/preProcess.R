@@ -930,8 +930,8 @@ analyzeModelVsPredTbl <- function(modelVsPredTbl) {
 
 getNcoocTbl <- function(type, chunkTableQuery) {
 	myLog(sprintf('Getting Ncooc table for type %s', type))
-	sqldt('truncate table temp_cooc')
-	sqldt(sprintf("insert into temp_cooc (tag_chunk_id, context_chunk_id, pos_from_tag, partial_N)
+	sqldf('truncate table temp_cooc')
+	sqldf(sprintf("insert into temp_cooc (tag_chunk_id, context_chunk_id, pos_from_tag, partial_N)
 		      select L.chunk_id as tag_chunk_id, R.chunk_id as context_chunk_id, L.pos - R.pos as pos_from_tag, count(L.post_id) as partial_N
 		      from temp_post_tokenized as L
 		      join temp_post_tokenized as R
@@ -949,7 +949,7 @@ getNcoocTbl <- function(type, chunkTableQuery) {
 		       on c.id = temp_cooc.context_chunk_id
 		       order by tag, chunk, pos_from_tag'
 		       )
-	sqldt('truncate table temp_cooc')
+	sqldf('truncate table temp_cooc')
 	NcoocTbl = resTbl[, list(posFromTag=pos_from_tag, partialN=partial_n, NChunkTag=sum(partial_n)), by=list(chunk, tag)]
 	setkey(NcoocTbl, chunk, tag, posFromTag)
 	NcoocTbl
@@ -967,15 +967,15 @@ genNcoocTblSO <- function(subsetName, startId, endId)  {
 	chunkTableQuery = makeChunkTableQuery(subsetName, startId, endId)
 	fullSubsetName = makeSubsetName(subsetName, startId, endId)
 	myLog(sprintf("generating temp_post_tokenized table with query %s", chunkTableQuery))
-	sqldt('truncate table temp_post_tokenized')
-	sqldt(sprintf("insert into temp_post_tokenized %s", chunkTableQuery))
+	sqldf('truncate table temp_post_tokenized')
+	sqldf(sprintf("insert into temp_post_tokenized %s", chunkTableQuery))
 	NcoocTblTitle = getNcoocTbl('title', chunkTableQuery) 
 	NcoocTblBody = getNcoocTbl('body', chunkTableQuery) 
 	outFile = sprintf('%s/NcoocTblTitle-%s.csv', coocDir(), fullSubsetName)
 	myWriteCSV(NcoocTblTitle, file=outFile)
 	outFile = sprintf('%s/NcoocTblBody-%s.csv', coocDir(), fullSubsetName)
 	myWriteCSV(NcoocTblBody, file=outFile) 
-	sqldt('truncate table temp_post_tokenized')
+	sqldf('truncate table temp_post_tokenized')
 	return()
 }
 
@@ -1056,7 +1056,6 @@ addPostSubsets <- function() {
 	postIdsTbl[, group_name := 'SOShuffledFull']
 	setcolorder(postIdsTbl, c('post_id', 'id', 'group_name'))
 	setkey(postIdsTbl, group_name, id)
-	sqldt('select count(*) from post_subsets')
 	withDBConnect(dbCon, dbWriteTable(dbCon, "post_subsets", postIdsTbl, append=T, row.names=0))
 }
 
