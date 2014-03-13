@@ -550,13 +550,22 @@ defaultTConfig = append(defaultBaseConfig,
 			     accumModelHashtagsTbl=F,
 			     getPostsFun=getTweetsTbl,
 			     getHashtagsFun=getHashtagsTbl,
+			     makeChunkTblFun='make_chunk_table_Twitter',
+			     tokenizedChunkTypeTbl = 'top_hashtag_tokenized_chunk_types',
+			     tokenizedTypeTypeTbl = 'top_hashtag_tokenized_type_types',
+			     tagTypeName = 'hashtag',
 			     includeRetweetsP=F))
 
 defaultSOConfig = append(defaultBaseConfig,
 			 list(convertTagSynonymsP=T,
 			      accumModelHashtagsTbl=F,
 			      getPostsFun=getPostsTbl,
-			      getHashtagsFun=getTagsTbl))
+			      getHashtagsFun=getTagsTbl,
+			      tokenizedChunkTypeTbl = 'post_tokenized_chunk_types',
+			      tokenizedTypeTypeTbl = 'post_tokenized_type_types',
+			      tagTypeName = 'tag',
+			      makeChunkTblFun='make_chunk_table_SO'
+			      ))
 
 runPriorT <- function(config=defaultTConfig) {
 	runPrior(config)
@@ -928,7 +937,7 @@ analyzeModelVsPredTbl <- function(modelVsPredTbl) {
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostOL2' & datasetName=='SOQgt500r2' & d < 1])
 }
 
-getNcoocTbl <- function(type, chunkTableQuery) {
+getNcoocTbl <- function(type, chunkTableQuery, config) {
 	myLog(sprintf('Getting Ncooc table for type %s', type))
 	sqldf('truncate table temp_cooc')
 	sqldf(sprintf("insert into temp_cooc (tag_chunk_id, context_chunk_id, pos_from_tag, partial_N)
@@ -936,19 +945,21 @@ getNcoocTbl <- function(type, chunkTableQuery) {
 		      from temp_post_tokenized as L
 		      join temp_post_tokenized as R
 		      on L.post_id = R.post_id
-		      where L.post_type_id = (select post_tokenized_type_types.id from post_tokenized_type_types where post_tokenized_type_types.type_name = 'tag')
-		      and R.post_type_id = (select post_tokenized_type_types.id from post_tokenized_type_types where post_tokenized_type_types.type_name = '%s')
+		      where L.post_type_id = (select tt.id from %s as tt where tt.type_name = '%s')
+		      and R.post_type_id = (select tt.id from %s as tt where tt.type_name = '%s')
 		      group by L.chunk_id, R.chunk_id, pos_from_tag
 		      order by L.chunk_id, R.chunk_id, pos_from_tag",
-		      type))
-	resTbl = sqldt('select t.type_name as tag, c.type_name as chunk, pos_from_tag, partial_N
-		       from temp_cooc
-		       join post_tokenized_chunk_types as t
-		       on t.id = temp_cooc.tag_chunk_id
-		       join post_tokenized_chunk_types as c
-		       on c.id = temp_cooc.context_chunk_id
-		       order by tag, chunk, pos_from_tag'
-		       )
+		      config$tokenizedTypeTypeTbl, config$tagTypeName,
+		      config$tokenizedTypeTypeTbl, type))
+	resTbl = sqldt(sprintf('select t.type_name as tag, c.type_name as chunk, pos_from_tag, partial_N
+			       from temp_cooc
+			       join %s as t
+			       on t.id = temp_cooc.tag_chunk_id
+			       join %s as c
+			       on c.id = temp_cooc.context_chunk_id
+			       order by tag, chunk, pos_from_tag',
+			       config$tokenizedChunkTypeTbl, config$tokenizedChunkTypeTbl
+			       ))
 	sqldf('truncate table temp_cooc')
 	NcoocTbl = resTbl[, list(posFromTag=pos_from_tag, partialN=partial_n, NChunkTag=sum(partial_n)), by=list(chunk, tag)]
 	setkey(NcoocTbl, chunk, tag, posFromTag)
@@ -959,24 +970,40 @@ makeSubsetName <- function(subset, startId, endId) {
 	paste(subset, startId, endId, sep='-')
 }
 
-makeChunkTableQuery <- function(subsetName, startId, endId) {
-	sprintf("select * from make_chunk_table(%s, %s, '%s')", startId, endId, subsetName)
+makeChunkTableQuery <- function(subsetName, startId, endId, config) {
+	sprintf("select * from %s(%s, %s, '%s')", config$makeChunkTblFun, startId, endId, subsetName)
 }
 
-genNcoocTblSO <- function(subsetName, startId, endId)  {
-	chunkTableQuery = makeChunkTableQuery(subsetName, startId, endId)
+genNcoocTblSO <- function(subsetName, startId, endId) {
+	config = defaultSOConfig
 	fullSubsetName = makeSubsetName(subsetName, startId, endId)
-	myLog(sprintf("generating temp_post_tokenized table with query %s", chunkTableQuery))
-	sqldf('truncate table temp_post_tokenized')
-	sqldf(sprintf("insert into temp_post_tokenized %s", chunkTableQuery))
-	NcoocTblTitle = getNcoocTbl('title', chunkTableQuery) 
-	NcoocTblBody = getNcoocTbl('body', chunkTableQuery) 
+	chunkTableQuery = makeChunkTableQuery(subsetName, startId, endId, config)
+	genTempPostTokenizedTbl(chunkTableQuery)
+	NcoocTblTitle = getNcoocTbl('title', chunkTableQuery, config) 
+	NcoocTblBody = getNcoocTbl('body', chunkTableQuery, config) 
 	outFile = sprintf('%s/NcoocTblTitle-%s.csv', coocDir(), fullSubsetName)
 	myWriteCSV(NcoocTblTitle, file=outFile)
 	outFile = sprintf('%s/NcoocTblBody-%s.csv', coocDir(), fullSubsetName)
 	myWriteCSV(NcoocTblBody, file=outFile) 
 	sqldf('truncate table temp_post_tokenized')
-	return()
+
+}
+
+genNcoocTblTwitter <- function(subsetName, startId, endId) {
+	config = defaultTConfig
+	fullSubsetName = makeSubsetName(subsetName, startId, endId)
+	chunkTableQuery = makeChunkTableQuery(subsetName, startId, endId, config)
+	genTempPostTokenizedTbl(chunkTableQuery)
+	NcoocTblTweet = getNcoocTbl('tweet', chunkTableQuery, config) 
+	outFile = sprintf('%s/NcoocTblTweet-%s.csv', coocDir(), fullSubsetName)
+	myWriteCSV(NcoocTblTweet, file=outFile)
+	sqldf('truncate table temp_post_tokenized')
+}
+
+genTempPostTokenizedTbl <- function(chunkTableQuery) {
+	myLog(sprintf("generating temp_post_tokenized table with query %s", chunkTableQuery))
+	sqldf('truncate table temp_post_tokenized')
+	sqldf(sprintf("insert into temp_post_tokenized %s", chunkTableQuery))
 }
 
 appendDTbl <- function(tbl, tblName) {
@@ -1081,6 +1108,8 @@ runGenNcoocTblSO1thru10000 <- function() genNcoocTblSO('SOShuffledFull', 1, 1000
 runGenNcoocTblSO1thru100000 <- function() genNcoocTblSO('SOShuffledFull', 1, 100000)
 runGenNcoocTblSO1thru3000000 <- function() genNcoocTblSO('SOShuffledFull', 1, 3000000)
 
+runGenNcoocTblT11thru100 <- function() genNcoocTblTwitter('2014-02-27 17:13:30 initial', 1, 100)
+
 runGenTokenizedTblSO <- function() genTokenizedTblSO()
 runGenTokenizedTblTwitter <- function() genTokenizedTblTwitter('2014-02-27 17:13:30 initial')
 
@@ -1131,8 +1160,9 @@ computeAct <- function(context, sjiTbl) {
 }
 
 curWS <- function() {
+	runGenNcoocTblT11thru100()
 	runGenNcoocTblSO1thru3000000()
-	runGenNcoocTblSO1thru1000()
+	runGenNcoocTblSO1thru100()
 	fooTbl = myReadCSV('~/src/dissertation/firstSOProject/analysis/model/title-chunks-subset-4.csv')
 	userPTbl = withProf(getUserPTbl(defaultSOConfig))
 	userPTbl

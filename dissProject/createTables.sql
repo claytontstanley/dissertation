@@ -142,7 +142,7 @@ update tweets set created_at_epoch = extract(epoch from to_timestamp(created_at,
 
 create table temp_post_tokenized (
 	chunk_id integer not null,
-	post_id integer not null,
+	post_id bigint not null,
 	pos integer,
 	post_type_id integer not null
 	);
@@ -168,6 +168,13 @@ create table if not exists post_tokenized_type_types (
 	);
 insert into post_tokenized_type_types (type_name) values ('title'), ('body'), ('tag');
 
+create table if not exists top_hashtag_tokenized_type_types (
+	id serial not null,
+	type_name text unique,
+	primary key (id)
+	);
+insert into top_hashtag_tokenized_type_types (type_name) values ('tweet'), ('hashtag');
+
 create table if not exists post_tokenized_chunk_types (
 	id serial not null,
 	type_name text unique,
@@ -175,18 +182,43 @@ create table if not exists post_tokenized_chunk_types (
 	);
 insert into post_tokenized_chunk_types (type_name) select distinct chunk from post_tokenized where char_length(chunk) <= 500;
 
-create type chunk_table_type as ("chunk_id" int, "post_id" int, "pos" int, "post_type_id" int);
+create table if not exists top_hashtag_tokenized_chunk_types (
+	id serial not null,
+	type_name text unique,
+	primary key (id)
+	);
+insert into top_hashtag_tokenized_chunk_types (type_name) select distinct chunk from top_hashtag_tokenized;
 
-create or replace function make_chunk_table(int, int, text)
+create type chunk_table_type as ("chunk_id" int, "post_id" bigint, "pos" int, "post_type_id" int);
+
+create or replace function make_chunk_table_SO(int, int, text)
 returns setof chunk_table_type as
 $$
-select chunk_types.id as chunk_id, tokenized.id as post_id, tokenized.pos as pos, types.id as post_type_id
+select chunk_types.id as chunk_id, tokenized.id::bigint as post_id, tokenized.pos as pos, types.id as post_type_id
 from post_tokenized as tokenized
 join post_tokenized_chunk_types as chunk_types
 on tokenized.chunk = chunk_types.type_name
 join post_tokenized_type_types as types
 on tokenized.type = types.type_name
 join post_subsets as subsets
+on tokenized.id = subsets.post_id
+where subsets.id >= $1
+and subsets.id <= $2
+and subsets.group_name = $3
+;
+$$
+language sql immutable;
+
+create or replace function make_chunk_table_Twitter(int, int, text)
+returns setof chunk_table_type as
+$$
+select chunk_types.id as chunk_id, tokenized.id as post_id, tokenized.pos as pos, types.id as post_type_id
+from top_hashtag_tokenized as tokenized
+join top_hashtag_tokenized_chunk_types as chunk_types
+on tokenized.chunk = chunk_types.type_name
+join top_hashtag_tokenized_type_types as types
+on tokenized.type = types.type_name
+join top_hashtag_subsets as subsets
 on tokenized.id = subsets.post_id
 where subsets.id >= $1
 and subsets.id <= $2
