@@ -1086,9 +1086,10 @@ addPostSubsets <- function() {
 }
 
 addTweetSubsets <- function() {
-	tweetsIdGpTbl = sqldt('select id::text, hashtag_group
+	tweetsIdGpTbl = sqldt("select id::text, hashtag_group
 			      from top_hashtag_tweets
-			      where hashtag_group not in (select distinct group_name from top_hashtag_subsets)'
+			      where hashtag_group not in (select distinct group_name from top_hashtag_subsets)
+			      and retweeted = 'False'"
 			      )
 	partialWriteTable <- function(tbl, hashtag_group) {
 		tbl[, post_id := id][, id := NULL]
@@ -1112,6 +1113,8 @@ runGenNcoocTblT11thru100 <- function() genNcoocTblTwitter('2014-02-27 17:13:30 i
 runGenNcoocTblT11thru1000 <- function() genNcoocTblTwitter('2014-02-27 17:13:30 initial', 1, 1000)
 runGenNcoocTblT11thru10000 <- function() genNcoocTblTwitter('2014-02-27 17:13:30 initial', 1, 10000)
 runGenNcoocTblT11thru100000 <- function() genNcoocTblTwitter('2014-02-27 17:13:30 initial', 1, 100000)
+runGenNcoocTblT11thru1000000 <- function() genNcoocTblTwitter('2014-02-27 17:13:30 initial', 1, 1000000)
+runGenNcoocTblT11thru3000000 <- function() genNcoocTblTwitter('2014-02-27 17:13:30 initial', 1, 3000000)
 
 runGenTokenizedTblSO <- function() genTokenizedTblSO()
 runGenTokenizedTblTwitter <- function() genTokenizedTblTwitter('2014-02-27 17:13:30 initial')
@@ -1185,7 +1188,6 @@ curWS <- function() {
 	sapply(sjiTbl, class)
 	tables()
 	tweetsTbl
-	tweetsTbl[, table(retweeted)]
 	setkey(hashtagsTbl, hashtag)
 	setkey(popHashtagsTbl, hashtag)
 	popHashtagsTbl
