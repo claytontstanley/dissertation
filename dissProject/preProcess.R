@@ -1109,6 +1109,9 @@ runGenNcoocTblSO1thru100000 <- function() genNcoocTblSO('SOShuffledFull', 1, 100
 runGenNcoocTblSO1thru3000000 <- function() genNcoocTblSO('SOShuffledFull', 1, 3000000)
 
 runGenNcoocTblT11thru100 <- function() genNcoocTblTwitter('2014-02-27 17:13:30 initial', 1, 100)
+runGenNcoocTblT11thru1000 <- function() genNcoocTblTwitter('2014-02-27 17:13:30 initial', 1, 1000)
+runGenNcoocTblT11thru10000 <- function() genNcoocTblTwitter('2014-02-27 17:13:30 initial', 1, 10000)
+runGenNcoocTblT11thru100000 <- function() genNcoocTblTwitter('2014-02-27 17:13:30 initial', 1, 100000)
 
 runGenTokenizedTblSO <- function() genTokenizedTblSO()
 runGenTokenizedTblTwitter <- function() genTokenizedTblTwitter('2014-02-27 17:13:30 initial')
@@ -1160,7 +1163,7 @@ computeAct <- function(context, sjiTbl) {
 }
 
 curWS <- function() {
-	runGenNcoocTblT11thru100()
+	runGenNcoocTblT11thru10000()
 	runGenNcoocTblSO1thru3000000()
 	runGenNcoocTblSO1thru100()
 	fooTbl = myReadCSV('~/src/dissertation/firstSOProject/analysis/model/title-chunks-subset-4.csv')
