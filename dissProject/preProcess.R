@@ -936,16 +936,16 @@ getNcoocTbl <- function(type, chunkTableQuery) {
 		      from temp_post_tokenized as L
 		      join temp_post_tokenized as R
 		      on L.post_id = R.post_id
-		      where L.post_type_id = (select tokenized_types.id from tokenized_types where tokenized_types.type_name = 'tag')
-		      and R.post_type_id = (select tokenized_types.id from tokenized_types where tokenized_types.type_name = '%s')
+		      where L.post_type_id = (select post_tokenized_type_types.id from post_tokenized_type_types where post_tokenized_type_types.type_name = 'tag')
+		      and R.post_type_id = (select post_tokenized_type_types.id from post_tokenized_type_types where post_tokenized_type_types.type_name = '%s')
 		      group by L.chunk_id, R.chunk_id, pos_from_tag
 		      order by L.chunk_id, R.chunk_id, pos_from_tag",
 		      type))
 	resTbl = sqldt('select t.type_name as tag, c.type_name as chunk, pos_from_tag, partial_N
 		       from temp_cooc
-		       join tokenized_chunk_types as t
+		       join post_tokenized_chunk_types as t
 		       on t.id = temp_cooc.tag_chunk_id
-		       join tokenized_chunk_types as c
+		       join post_tokenized_chunk_types as c
 		       on c.id = temp_cooc.context_chunk_id
 		       order by tag, chunk, pos_from_tag'
 		       )

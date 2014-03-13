@@ -8,9 +8,13 @@ run%:
 createSOSmall:
 	(cd /Volumes/SuperSupernova/stackExchange/ && rm stackOverflowSmall/* && cd stackOverflow2014 && find *.xml -print -exec bash -ic "(head '{}' && tail '{}') > ../stackOverflowSmall/{}" \;)
 
-runAll: unit
-	make -s getSjis | parallel -P 1 --progress make {}
-	make -s getPriors | parallel -P 4 --progress make {}
+parrunPriors: NP = 4
+parrunSjis: NP = 1
+
+parrun%:
+	make -s get$* | parallel -P ${NP} --progress make {}
+
+runAll: unit parrunSjis parrunPriors
 
 getPriors:
 	grep '^run.* <- make' preProcess.R | awk '{print $$1}'

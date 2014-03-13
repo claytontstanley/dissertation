@@ -161,19 +161,19 @@ create table temp_cooc (
 create index tag_chunk_id_index_temp_cooc on temp_cooc(tag_chunk_id);
 create index context_chunk_id_index_temp_cooc on temp_cooc(context_chunk_id);
 
-create table if not exists tokenized_types (
+create table if not exists post_tokenized_type_types (
 	id serial not null,
 	type_name text unique,
 	primary key (id)
 	);
-insert into tokenized_types (type_name) values ('title'), ('body'), ('tag');
+insert into post_tokenized_type_types (type_name) values ('title'), ('body'), ('tag');
 
-create table if not exists tokenized_chunk_types (
+create table if not exists post_tokenized_chunk_types (
 	id serial not null,
 	type_name text unique,
 	primary key (id)
 	);
-insert into tokenized_chunk_types (type_name) select distinct chunk from post_tokenized where char_length(chunk) <= 500;
+insert into post_tokenized_chunk_types (type_name) select distinct chunk from post_tokenized where char_length(chunk) <= 500;
 
 create type chunk_table_type as ("chunk_id" int, "post_id" int, "pos" int, "post_type_id" int);
 
@@ -182,9 +182,9 @@ returns setof chunk_table_type as
 $$
 select chunk_types.id as chunk_id, tokenized.id as post_id, tokenized.pos as pos, types.id as post_type_id
 from post_tokenized as tokenized
-join tokenized_chunk_types as chunk_types
+join post_tokenized_chunk_types as chunk_types
 on tokenized.chunk = chunk_types.type_name
-join tokenized_types as types
+join post_tokenized_type_types as types
 on tokenized.type = types.type_name
 join post_subsets as subsets
 on tokenized.id = subsets.post_id
