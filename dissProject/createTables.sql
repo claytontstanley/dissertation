@@ -140,16 +140,16 @@ update posts set creation_epoch = extract(epoch from creation_date) where creati
 alter table tweets add column created_at_epoch numeric; 
 update tweets set created_at_epoch = extract(epoch from to_timestamp(created_at, 'YYYY-MM-DD HH24:MI:SS')::timestamp without time zone) where created_at_epoch is null; 
 
-create table temp_post_tokenized (
+create table temp_tokenized (
 	chunk_id integer not null,
 	post_id bigint not null,
 	pos integer,
 	post_type_id integer not null
 	);
 
-create index chunk_id_index_temp_post_tokenized on temp_post_tokenized (chunk_id);
-create index post_id_index_temp_post_tokenized on temp_post_tokenized (post_id);
-create index post_type_id_index_temp_post_tokenized on temp_post_tokenized (post_type_id); 
+create index chunk_id_index_temp_tokenized on temp_tokenized (chunk_id);
+create index post_id_index_temp_tokenized on temp_tokenized (post_id);
+create index post_type_id_index_temp_tokenized on temp_tokenized (post_type_id); 
 
 create table temp_cooc (
 	tag_chunk_id integer not null,

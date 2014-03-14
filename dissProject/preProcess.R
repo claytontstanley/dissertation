@@ -942,8 +942,8 @@ getNcoocTbl <- function(type, chunkTableQuery, config) {
 	sqldf('truncate table temp_cooc')
 	sqldf(sprintf("insert into temp_cooc (tag_chunk_id, context_chunk_id, pos_from_tag, partial_N)
 		      select L.chunk_id as tag_chunk_id, R.chunk_id as context_chunk_id, L.pos - R.pos as pos_from_tag, count(L.post_id) as partial_N
-		      from temp_post_tokenized as L
-		      join temp_post_tokenized as R
+		      from temp_tokenized as L
+		      join temp_tokenized as R
 		      on L.post_id = R.post_id
 		      where L.post_type_id = (select tt.id from %s as tt where tt.type_name = '%s')
 		      and R.post_type_id = (select tt.id from %s as tt where tt.type_name = '%s')
@@ -985,7 +985,7 @@ genNcoocTblSO <- function(subsetName, startId, endId) {
 	myWriteCSV(NcoocTblTitle, file=outFile)
 	outFile = sprintf('%s/NcoocTblBody-%s.csv', coocDir(), fullSubsetName)
 	myWriteCSV(NcoocTblBody, file=outFile) 
-	sqldf('truncate table temp_post_tokenized')
+	sqldf('truncate table temp_tokenized')
 
 }
 
@@ -997,13 +997,13 @@ genNcoocTblTwitter <- function(subsetName, startId, endId) {
 	NcoocTblTweet = getNcoocTbl('tweet', chunkTableQuery, config) 
 	outFile = sprintf('%s/NcoocTblTweet-%s.csv', coocDir(), fullSubsetName)
 	myWriteCSV(NcoocTblTweet, file=outFile)
-	sqldf('truncate table temp_post_tokenized')
+	sqldf('truncate table temp_tokenized')
 }
 
 genTempPostTokenizedTbl <- function(chunkTableQuery) {
-	myLog(sprintf("generating temp_post_tokenized table with query %s", chunkTableQuery))
-	sqldf('truncate table temp_post_tokenized')
-	sqldf(sprintf("insert into temp_post_tokenized %s", chunkTableQuery))
+	myLog(sprintf("generating temp_tokenized table with query %s", chunkTableQuery))
+	sqldf('truncate table temp_tokenized')
+	sqldf(sprintf("insert into temp_tokenized %s", chunkTableQuery))
 }
 
 appendDTbl <- function(tbl, tblName) {
