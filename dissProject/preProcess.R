@@ -1246,7 +1246,7 @@ curWS <- function() {
 	runGenNcoocTblSO1thru3000000()
 	runGenNcoocTblSO1thru100()
 	withProf(genAndSaveCurWorkspace())
-	myLoadImage()
+	withProf(myLoadImage())
 	priorTblGlobT[, .N, by=hashtag][order(N, decreasing=T)]
 	BTbl = getPriorForUserAtEpoch(priorTblUserSO, '4653', 1390076773, c(.5, .6))
 	BTbl = getPriorForUserAtEpoch(priorTblUserSO, '4653', 1220886841, c(.5, .6))
