@@ -323,9 +323,9 @@ computeActsByUser <- function(hashtagsTbl, ds) {
 }
 
 getPriorAtEpoch <- function(priorTbl, cEpoch, d) {
-	curUserPTbl = priorTbl[creation_epoch <= cEpoch]
-	curUserPTbl[, cTime := cEpoch - min(creation_epoch)]
-	partialRes = curUserPTbl[, as.data.table(computeActs(hashtag, dt, cTime, d)), by=user_screen_name]
+	curUserPriorTbl = priorTbl[creation_epoch <= cEpoch]
+	curUserPriorTbl[, cTime := cEpoch - min(creation_epoch)]
+	partialRes = curUserPriorTbl[, as.data.table(computeActs(hashtag, dt, cTime, d)), by=user_screen_name]
 	modelHashtagsTbl = getModelHashtagsTbl(partialRes)
 	modelHashtagsTbl
 }
@@ -1162,7 +1162,7 @@ getSjiTblT <- function(config, startId, endId) {
 }
 
 
-getPTblUser <- function(config) {
+getPriorTblUserSO <- function(config) {
 	priorTblUser = sqldt("select posts.id, owner_user_id, owner_user_id::text as user_screen_name, creation_epoch, chunk, type from posts
 			 join post_tokenized
 			 on posts.id = post_tokenized.id
@@ -1178,8 +1178,8 @@ getPTblUser <- function(config) {
 	priorTblUser
 }
 
-getPTblGlobT <- function(config) {
-	globPTbl = sqldt(sprintf("select created_at_epoch as creation_epoch, chunk as hashtag from top_hashtag_tokenized as token
+getPriorTblGlobT <- function(config) {
+	globPriorTbl = sqldt(sprintf("select created_at_epoch as creation_epoch, chunk as hashtag from top_hashtag_tokenized as token
 				 join top_hashtag_tweets as tweets
 				 on tweets.id = token.id 
 				 where type = 'hashtag'
@@ -1188,10 +1188,10 @@ getPTblGlobT <- function(config) {
 				 and tweets.id in (select post_id from top_hashtag_subsets where group_name = '%s')
 				 ", config$topHashtagsSubsetName, config$topHashtagsSubsetName
 				 ))
-	globPTbl[, user_screen_name := 'allUsers']
-	addDtToTbl(globPTbl)
-	setkey(globPTbl, user_screen_name, dt, hashtag)
-	globPTbl
+	globPriorTbl[, user_screen_name := 'allUsers']
+	addDtToTbl(globPriorTbl)
+	setkey(globPriorTbl, user_screen_name, dt, hashtag)
+	globPriorTbl
 }
 
 
@@ -1211,44 +1211,40 @@ computeAct <- function(context, sjiTbl) {
 wsFile = '/Volumes/SSDSupernova/RWorkspace/workspace.RData'
 
 mySaveImage <- function() {
-	save(list=c('sjiTblT', 'priorTblGlobT', 'sjiTbl'), file=wsFile, compress=F)
+	eval(quote(save(list=c('sjiTblT', 'priorTblGlobT', 'sjiTblSO', 'priorTblUserSO'), file=wsFile, compress=F)),
+	     envir=parent.frame())
 }
 
 myLoadImage <- function() {
-	eval(quote(load(file=wsFile)), envir=parent.frame())
+	eval(quote(load(file=wsFile)),
+	     envir=parent.frame())
+}
+
+genAndSaveCurWorkspace <- function() {
+	priorTblGlobT = getPriorTblGlobT(defaultTConfig)
+	priorTblUserSO = getPriorTblUserSO(defaultSOConfig)
+	sjiTblSO = getSjiTblSO('SOShuffledFull', 1, 100000)
+	sjiTblT = getSjiTblT(defaultTConfig, 1, 100000)
+	mySaveImage()
 }
 
 curWS <- function() {
 	runGenNcoocTblT11thru10000()
 	runGenNcoocTblSO1thru3000000()
 	runGenNcoocTblSO1thru100()
-	priorTblGlobT = getPTblGlobT(defaultTConfig)
-	priorTblGlobT
+	withProf(genAndSaveCurWorkspace())
+	myLoadImage()
 	priorTblGlobT[, .N, by=hashtag][order(N, decreasing=T)]
-	priorTblUser = withProf(getPTblUser(defaultSOConfig))
-	BTbl = getPriorForUserAtEpoch(priorTblUser, '4653', 1390076773, c(.5, .6))
-	BTbl = getPriorForUserAtEpoch(priorTblUser, '4653', 1220886841, c(.5, .6))
+	BTbl = getPriorForUserAtEpoch(priorTblUserSO, '4653', 1390076773, c(.5, .6))
+	BTbl = getPriorForUserAtEpoch(priorTblUserSO, '4653', 1220886841, c(.5, .6))
 	BTbl = withProf(getPriorForAllUsersAtEpoch(priorTblGlobT, 1394059415, c(.5)))
 	BTbl[order(act, decreasing=T)]
-	sjiTblSO = withProf(getSjiTblSO('SOShuffledFull', 1, 100000))
-	sjiTblT = withProf(getSjiTblT(defaultTConfig, 1, 100000))
 	sjiTblT
 	tables()
-	myLoadImage()
-	mySaveImage()
-	key(sjiTblT)
 	computeAct(context, sjiTblSO)[order(act)]
 	computeAct('clojure', sjiTblSO)[order(act)]
-	computeAct('music', sjiTblT)[order(act)]
-	context
-	tables()
-	tweetsTbl
-	setkey(hashtagsTbl, hashtag)
-	setkey(popHashtagsTbl, hashtag)
-	popHashtagsTbl
-	hashtagsTbl[popHashtagsTbl, nomatch=0][,list(hashtag, .N), by=hashtag][order(N, decreasing = T)][, N]
-	tweetsTbl[lang=='en']
-	addFilteredPosts()
+	computeAct('music', sjiTblT)[order(act, decreasing=T)]
+	
 	test_dir(sprintf("%s/%s", PATH, 'tests'), reporter='summary')
 	.ls.objects(order.by='Size')
 	# Checking that tweets for twitter users from each followers_count,statuses_count scale are being collected properly
