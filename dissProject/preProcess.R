@@ -1227,7 +1227,6 @@ curWS <- function() {
 	BTbl = getPriorForUserAtEpoch(userPTbl, '4653', 1390076773, c(.5, .6))
 	BTbl = getPriorForUserAtEpoch(userPTbl, '4653', 1220886841, c(.5, .6))
 	BTbl = withProf(getPriorForAllUsersAtEpoch(pTblGlobT, 1394069415, c(.5)))
-	BTbl
 	microbenchmark(getPriorForUserAtEpoch(userPTbl, '4653', 1390076773, rep(.5,1)), times=100)
 	userPTbl[J('4653')]
 	BTbl
