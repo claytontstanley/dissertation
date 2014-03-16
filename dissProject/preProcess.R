@@ -1243,7 +1243,8 @@ curWS <- function() {
 	tables()
 	computeAct(context, sjiTblSO)[order(act)]
 	computeAct('clojure', sjiTblSO)[order(act)]
-	computeAct('music', sjiTblT)[order(act, decreasing=T)]
+	computeAct('radio', sjiTblT)[order(act, decreasing=T)]
+	sjiTblT[tag == '#soundcloud'][order(partialN, decreasing=T)][1:30]
 	
 	test_dir(sprintf("%s/%s", PATH, 'tests'), reporter='summary')
 	.ls.objects(order.by='Size')
