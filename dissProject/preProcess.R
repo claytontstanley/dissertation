@@ -532,6 +532,8 @@ coocDir <- function() {
 	sprintf('%s/dissertationData/cooc', PATH)
 }
 
+getPriorDir <- function() sprintf('%s/dissertationData/prior', PATH)
+
 getModelVsPredOutFile <- function(name) {
 	sprintf('%s/%s.csv', modelVsPredDir(), name)
 }
@@ -565,7 +567,7 @@ defaultTConfig = append(defaultBaseConfig,
 			     tokenizedChunkTypeTbl = 'top_hashtag_tokenized_chunk_types',
 			     tokenizedTypeTypeTbl = 'top_hashtag_tokenized_type_types',
 			     tagTypeName = 'hashtag',
-			     topHashtagsSubsetName = '2014-02-27 17:13:30 initial',
+			     topHashtagsGroupName = '2014-02-27 17:13:30 initial',
 			     includeRetweetsP=F))
 
 defaultSOConfig = append(defaultBaseConfig,
@@ -576,6 +578,7 @@ defaultSOConfig = append(defaultBaseConfig,
 			      tokenizedChunkTypeTbl = 'post_tokenized_chunk_types',
 			      tokenizedTypeTypeTbl = 'post_tokenized_type_types',
 			      tagTypeName = 'tag',
+			      postsGroupName = 'SOShuffledFull',
 			      makeChunkTblFun='make_chunk_table_SO'
 			      ))
 
@@ -1133,8 +1136,8 @@ runGenNcoocTblT11thru3000000 <- function() genNcoocTblTwitter('2014-02-27 17:13:
 runGenTokenizedTblSO <- function() genTokenizedTblSO()
 runGenTokenizedTblTwitter <- function() genTokenizedTblTwitter('2014-02-27 17:13:30 initial')
 
-getSjiTblSO <- function(subsetName, startId, endId) {
-	fileName = sprintf('%s.csv', makeSubsetName(subsetName, startId, endId))
+getSjiTblSO <- function(config, startId, endId) {
+	fileName = sprintf('%s.csv', makeSubsetName(config$postsGroupName, startId, endId))
 	sjiTitleName = paste('NcoocTblTitle', fileName, sep='-')
 	sjiBodyName = paste('NcoocTblBody', fileName, sep='-')
 	sjiColClasses = c('character', 'character', 'character', 'integer', 'integer')	
@@ -1150,7 +1153,7 @@ getSjiTblSO <- function(subsetName, startId, endId) {
 }
 
 getSjiTblT <- function(config, startId, endId) {
-	fileName = sprintf('%s.csv', makeSubsetName(config$topHashtagsSubsetName, startId, endId))
+	fileName = sprintf('%s.csv', makeSubsetName(config$topHashtagsGroupName, startId, endId))
 	sjiTblName = sprintf('NcoocTblTweet-%s', fileName)
 	sjiColClasses = c('character', 'character', 'character', 'integer', 'integer')	
 	sjiTbl = myReadCSV(sprintf('%s/%s', coocDir(), sjiTblName), colClasses=sjiColClasses)
@@ -1162,15 +1165,19 @@ getSjiTblT <- function(config, startId, endId) {
 }
 
 
-getPriorTblUserSO <- function(config) {
-	priorTblUser = sqldt("select posts.id, owner_user_id, owner_user_id::text as user_screen_name, creation_epoch, chunk, type from posts
-			 join post_tokenized
-			 on posts.id = post_tokenized.id
-			 where type = 'tag'
-			 and post_type_id = 1
-			 and owner_user_id is not null
-			 "
-			 )
+getPriorTblUserSO <- function(config, startId, endId) {
+	priorTblUser = sqldt(sprintf("select posts.id, owner_user_id, owner_user_id::text as user_screen_name, creation_epoch, chunk, type from posts
+				     join post_tokenized
+				     on posts.id = post_tokenized.id
+				     where type = 'tag'
+				     and post_type_id = 1
+				     and owner_user_id is not null
+				     and posts.id in (select post_id from post_subsets
+						      where group_name = '%s'
+						      and id >= %s
+						      and id <= %s)
+				     ", config$postsGroupName, startId, endId
+				     ))
 	if (config$convertTagSynonymsP) convertTagSynonyms(priorTblUser)
 	addDtToTbl(priorTblUser)
 	priorTblUser[, hashtag := chunk][, chunk := NULL]
@@ -1178,15 +1185,19 @@ getPriorTblUserSO <- function(config) {
 	priorTblUser
 }
 
-getPriorTblGlobT <- function(config) {
+getPriorTblGlobT <- function(config, startId, endId) {
 	globPriorTbl = sqldt(sprintf("select created_at_epoch as creation_epoch, chunk as hashtag from top_hashtag_tokenized as token
 				 join top_hashtag_tweets as tweets
 				 on tweets.id = token.id 
 				 where type = 'hashtag'
 				 and user_screen_name is not null
 				 and chunk in (select hashtag from top_hashtag_hashtags where hashtag_group = '%s')
-				 and tweets.id in (select post_id from top_hashtag_subsets where group_name = '%s')
-				 ", config$topHashtagsSubsetName, config$topHashtagsSubsetName
+				 and tweets.id in (select post_id from top_hashtag_subsets
+						   where group_name = '%s'
+						   and id >= %s
+						   and id <= %s)
+				 ", config$topHashtagsGroupName,
+				 config$topHashtagsGroupName, startId, endId
 				 ))
 	globPriorTbl[, user_screen_name := 'allUsers']
 	addDtToTbl(globPriorTbl)
@@ -1221,9 +1232,10 @@ myLoadImage <- function() {
 }
 
 genAndSaveCurWorkspace <- function() {
-	priorTblGlobT = getPriorTblGlobT(defaultTConfig)
-	priorTblUserSO = getPriorTblUserSO(defaultSOConfig)
-	sjiTblSO = getSjiTblSO('SOShuffledFull', 1, 100000)
+	priorTblGlobT = getPriorTblGlobT(defaultTConfig, 1, 1000000)
+	priorTblUserSO = getPriorTblUserSO(defaultSOConfig, 1, 100000)
+	expect_equivalent(priorTblUserSO, priorTblUserSO2)
+	sjiTblSO = getSjiTblSO(defaultSOConfig, 1, 100000)
 	sjiTblT = getSjiTblT(defaultTConfig, 1, 1000000)
 	mySaveImage()
 }

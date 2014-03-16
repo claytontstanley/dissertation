@@ -130,4 +130,14 @@ test_that("testComputeAct", {
 			      context=c('a','a','a','b'))
 })
 
+test_that('testGetPriorTbl', {
+	  priorTblGlobT = getPriorTblGlobT(defaultTConfig, 1, 1000)
+	  priorTblUserSO = getPriorTblUserSO(defaultSOConfig, 1, 100)
+	  priorTblGlobTExp = myReadCSV(sprintf('%s/priorTblGlobT-1-1000.csv', getPriorDir()))
+	  expect_equivalent(priorTblGlobT, priorTblGlobTExp)
+	  priorTblUserSOExp = myReadCSV(sprintf('%s/priorTblUserSO-1-100.csv', getPriorDir()))
+	  priorTblUserSOExp[, user_screen_name := as.character(user_screen_name)]
+	  expect_equivalent(priorTblUserSO, priorTblUserSOExp)
+})
+
 setLogLevel(priorLogLevel)
