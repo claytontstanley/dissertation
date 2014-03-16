@@ -322,20 +322,20 @@ computeActsByUser <- function(hashtagsTbl, ds) {
 	modelHashtagsTbl
 }
 
-getPriorAtEpoch <- function(pTbl, cEpoch, d) {
-	curUserPTbl = pTbl[creation_epoch <= cEpoch]
+getPriorAtEpoch <- function(priorTbl, cEpoch, d) {
+	curUserPTbl = priorTbl[creation_epoch <= cEpoch]
 	curUserPTbl[, cTime := cEpoch - min(creation_epoch)]
 	partialRes = curUserPTbl[, as.data.table(computeActs(hashtag, dt, cTime, d)), by=user_screen_name]
 	modelHashtagsTbl = getModelHashtagsTbl(partialRes)
 	modelHashtagsTbl
 }
 
-getPriorForUserAtEpoch <- function(userPTbl, userScreenName, cEpoch, d) {
-	getPriorAtEpoch(userPTbl[J(userScreenName)], cEpoch, d)
+getPriorForUserAtEpoch <- function(priorTblUser, userScreenName, cEpoch, d) {
+	getPriorAtEpoch(priorTblUser[J(userScreenName)], cEpoch, d)
 }
 
-getPriorForAllUsersAtEpoch <- function(userPTbl, cEpoch, d) {
-	getPriorForUserAtEpoch(userPTbl, 'allUsers', cEpoch, d)
+getPriorForAllUsersAtEpoch <- function(priorTblUser, cEpoch, d) {
+	getPriorForUserAtEpoch(priorTblUser, 'allUsers', cEpoch, d)
 }
 
 visHashtags <- function(hashtagsTbl) {
@@ -1133,7 +1133,7 @@ runGenNcoocTblT11thru3000000 <- function() genNcoocTblTwitter('2014-02-27 17:13:
 runGenTokenizedTblSO <- function() genTokenizedTblSO()
 runGenTokenizedTblTwitter <- function() genTokenizedTblTwitter('2014-02-27 17:13:30 initial')
 
-getSjiTbl <- function(subsetName, startId, endId) {
+getSjiTblSO <- function(subsetName, startId, endId) {
 	fileName = sprintf('%s.csv', makeSubsetName(subsetName, startId, endId))
 	sjiTitleName = paste('NcoocTblTitle', fileName, sep='-')
 	sjiBodyName = paste('NcoocTblBody', fileName, sep='-')
@@ -1154,14 +1154,16 @@ getSjiTblT <- function(config, startId, endId) {
 	sjiTblName = sprintf('NcoocTblTweet-%s', fileName)
 	sjiColClasses = c('character', 'character', 'character', 'integer', 'integer')	
 	sjiTbl = myReadCSV(sprintf('%s/%s', coocDir(), sjiTblName), colClasses=sjiColClasses)
-	sjiTbl = sjiTbl[, list(partialN=sum(partialN)), by=list(chunk, tag)]
+	sjiTbl
+	sjiTbl = sjiTbl[, list(posFromTag=NaN, partialN=sum(partialN)), by=list(chunk, tag)]
+	setkey(sjiTbl, chunk, tag, posFromTag)
 	addSjiAttrs(sjiTbl)
 	sjiTbl
 }
 
 
-getUserPTbl <- function(config) {
-	userPTbl = sqldt("select posts.id, owner_user_id, owner_user_id::text as user_screen_name, creation_epoch, chunk, type from posts
+getPTblUser <- function(config) {
+	priorTblUser = sqldt("select posts.id, owner_user_id, owner_user_id::text as user_screen_name, creation_epoch, chunk, type from posts
 			 join post_tokenized
 			 on posts.id = post_tokenized.id
 			 where type = 'tag'
@@ -1169,11 +1171,11 @@ getUserPTbl <- function(config) {
 			 and owner_user_id is not null
 			 "
 			 )
-	if (config$convertTagSynonymsP) convertTagSynonyms(userPTbl)
-	addDtToTbl(userPTbl)
-	userPTbl[, hashtag := chunk][, chunk := NULL]
-	setkey(userPTbl, user_screen_name, dt, hashtag)
-	userPTbl
+	if (config$convertTagSynonymsP) convertTagSynonyms(priorTblUser)
+	addDtToTbl(priorTblUser)
+	priorTblUser[, hashtag := chunk][, chunk := NULL]
+	setkey(priorTblUser, user_screen_name, dt, hashtag)
+	priorTblUser
 }
 
 getPTblGlobT <- function(config) {
@@ -1209,7 +1211,7 @@ computeAct <- function(context, sjiTbl) {
 wsFile = '/Volumes/SSDSupernova/RWorkspace/workspace.RData'
 
 mySaveImage <- function() {
-	save(list=c('sjiTblT', 'pTblGlobT'), file=wsFile, compress=F)
+	save(list=c('sjiTblT', 'priorTblGlobT', 'sjiTbl'), file=wsFile, compress=F)
 }
 
 myLoadImage <- function() {
@@ -1220,29 +1222,25 @@ curWS <- function() {
 	runGenNcoocTblT11thru10000()
 	runGenNcoocTblSO1thru3000000()
 	runGenNcoocTblSO1thru100()
-	pTblGlobT = getPTblGlobT(defaultTConfig)
-	pTblGlobT[, .N, by=hashtag][order(N, decreasing=T)]
-	userPTbl = withProf(getUserPTbl(defaultSOConfig))
-	userPTbl
-	BTbl = getPriorForUserAtEpoch(userPTbl, '4653', 1390076773, c(.5, .6))
-	BTbl = getPriorForUserAtEpoch(userPTbl, '4653', 1220886841, c(.5, .6))
-	BTbl = withProf(getPriorForAllUsersAtEpoch(pTblGlobT, 1394069415, c(.5)))
-	microbenchmark(getPriorForUserAtEpoch(userPTbl, '4653', 1390076773, rep(.5,1)), times=100)
-	userPTbl[J('4653')]
-	BTbl
-	userPTbl[, list(N=length(unique(hashtag))), by=user_screen_name][order(N, decreasing = T)]
-	sjiTbl = withProf(getSjiTbl('SOShuffledFull', 1, 100000))
+	priorTblGlobT = getPTblGlobT(defaultTConfig)
+	priorTblGlobT
+	priorTblGlobT[, .N, by=hashtag][order(N, decreasing=T)]
+	priorTblUser = withProf(getPTblUser(defaultSOConfig))
+	BTbl = getPriorForUserAtEpoch(priorTblUser, '4653', 1390076773, c(.5, .6))
+	BTbl = getPriorForUserAtEpoch(priorTblUser, '4653', 1220886841, c(.5, .6))
+	BTbl = withProf(getPriorForAllUsersAtEpoch(priorTblGlobT, 1394059415, c(.5)))
+	BTbl[order(act, decreasing=T)]
+	sjiTblSO = withProf(getSjiTblSO('SOShuffledFull', 1, 100000))
 	sjiTblT = withProf(getSjiTblT(defaultTConfig, 1, 100000))
 	sjiTblT
 	tables()
 	myLoadImage()
 	mySaveImage()
-	computeAct(context, sjiTbl)[order(act)]
-	computeAct('clojure', sjiTbl)[order(act)]
-	context = sjiTbl[tag=='.net'][order(sji, decreasing = T)]
+	key(sjiTblT)
+	computeAct(context, sjiTblSO)[order(act)]
+	computeAct('clojure', sjiTblSO)[order(act)]
+	computeAct('music', sjiTblT)[order(act)]
 	context
-	key(sjiTbl)
-	sapply(sjiTbl, class)
 	tables()
 	tweetsTbl
 	setkey(hashtagsTbl, hashtag)
