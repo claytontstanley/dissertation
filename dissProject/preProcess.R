@@ -528,7 +528,7 @@ hashtagsTblDir <- function() {
 	sprintf('%s/dissertationData/hashtagsTbl', PATH)
 }
 
-coocDir <- function() {
+getCoocDir <- function() {
 	sprintf('%s/dissertationData/cooc', PATH)
 }
 
@@ -998,9 +998,9 @@ genNcoocTblSO <- function(subsetName, startId, endId) {
 	genTempPostTokenizedTbl(chunkTableQuery)
 	NcoocTblTitle = getNcoocTbl('title', chunkTableQuery, config) 
 	NcoocTblBody = getNcoocTbl('body', chunkTableQuery, config) 
-	outFile = sprintf('%s/NcoocTblTitle-%s.csv', coocDir(), fullSubsetName)
+	outFile = sprintf('%s/NcoocTblTitle-%s.csv', getCoocDir(), fullSubsetName)
 	myWriteCSV(NcoocTblTitle, file=outFile)
-	outFile = sprintf('%s/NcoocTblBody-%s.csv', coocDir(), fullSubsetName)
+	outFile = sprintf('%s/NcoocTblBody-%s.csv', getCoocDir(), fullSubsetName)
 	myWriteCSV(NcoocTblBody, file=outFile) 
 	sqldf('truncate table temp_tokenized')
 
@@ -1012,7 +1012,7 @@ genNcoocTblTwitter <- function(subsetName, startId, endId) {
 	chunkTableQuery = makeChunkTableQuery(subsetName, startId, endId, config)
 	genTempPostTokenizedTbl(chunkTableQuery)
 	NcoocTblTweet = getNcoocTbl('tweet', chunkTableQuery, config) 
-	outFile = sprintf('%s/NcoocTblTweet-%s.csv', coocDir(), fullSubsetName)
+	outFile = sprintf('%s/NcoocTblTweet-%s.csv', getCoocDir(), fullSubsetName)
 	myWriteCSV(NcoocTblTweet, file=outFile)
 	sqldf('truncate table temp_tokenized')
 }
@@ -1141,8 +1141,8 @@ getSjiTblSO <- function(config, startId, endId) {
 	sjiTitleName = paste('NcoocTblTitle', fileName, sep='-')
 	sjiBodyName = paste('NcoocTblBody', fileName, sep='-')
 	sjiColClasses = c('character', 'character', 'character', 'integer', 'integer')	
-	sjiTitleTbl = myReadCSV(sprintf('%s/%s', coocDir(), sjiTitleName), colClasses=sjiColClasses)
-	sjiBodyTbl = myReadCSV(sprintf('%s/%s', coocDir(), sjiBodyName), colClasses=sjiColClasses)
+	sjiTitleTbl = myReadCSV(sprintf('%s/%s', getCoocDir(), sjiTitleName), colClasses=sjiColClasses)
+	sjiBodyTbl = myReadCSV(sprintf('%s/%s', getCoocDir(), sjiBodyName), colClasses=sjiColClasses)
 	sjiTitleTbl[, type := 'title']
 	sjiBodyTbl[, type := 'body']
 	sjiTbl = rbind(sjiTitleTbl, sjiBodyTbl)
@@ -1156,7 +1156,7 @@ getSjiTblT <- function(config, startId, endId) {
 	fileName = sprintf('%s.csv', makeSubsetName(config$topHashtagsGroupName, startId, endId))
 	sjiTblName = sprintf('NcoocTblTweet-%s', fileName)
 	sjiColClasses = c('character', 'character', 'character', 'integer', 'integer')	
-	sjiTbl = myReadCSV(sprintf('%s/%s', coocDir(), sjiTblName), colClasses=sjiColClasses)
+	sjiTbl = myReadCSV(sprintf('%s/%s', getCoocDir(), sjiTblName), colClasses=sjiColClasses)
 	sjiTbl
 	sjiTbl = sjiTbl[, list(posFromTag=NaN, partialN=sum(partialN)), by=list(chunk, tag)]
 	setkey(sjiTbl, chunk, tag, posFromTag)
