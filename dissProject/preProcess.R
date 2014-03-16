@@ -1232,11 +1232,12 @@ myLoadImage <- function() {
 }
 
 genAndSaveCurWorkspace <- function() {
-	priorTblGlobT = getPriorTblGlobT(defaultTConfig, 1, 1000000)
-	priorTblUserSO = getPriorTblUserSO(defaultSOConfig, 1, 100000)
-	expect_equivalent(priorTblUserSO, priorTblUserSO2)
-	sjiTblSO = getSjiTblSO(defaultSOConfig, 1, 100000)
-	sjiTblT = getSjiTblT(defaultTConfig, 1, 1000000)
+	maxIdSO = 100000
+	maxIdT = 1000000
+	priorTblGlobT = getPriorTblGlobT(defaultTConfig, 1, maxIdT)
+	priorTblUserSO = getPriorTblUserSO(defaultSOConfig, 1, maxIdSO)
+	sjiTblT = getSjiTblT(defaultTConfig, 1, maxIdT)
+	sjiTblSO = getSjiTblSO(defaultSOConfig, 1, maxIdSO)
 	mySaveImage()
 }
 
