@@ -1224,7 +1224,7 @@ genAndSaveCurWorkspace <- function() {
 	priorTblGlobT = getPriorTblGlobT(defaultTConfig)
 	priorTblUserSO = getPriorTblUserSO(defaultSOConfig)
 	sjiTblSO = getSjiTblSO('SOShuffledFull', 1, 100000)
-	sjiTblT = getSjiTblT(defaultTConfig, 1, 100000)
+	sjiTblT = getSjiTblT(defaultTConfig, 1, 1000000)
 	mySaveImage()
 }
 
