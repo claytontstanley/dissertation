@@ -91,7 +91,7 @@ test_that("testModelVsPredSO", {
 	  expectedHashtagsTbl = myReadCSV(getHashtagsOutFile('testingSO1'))
 	  expectedModelVsPredTbl[, user_screen_name := as.character(user_screen_name)]
 	  expectedHashtagsTbl[, user_screen_name := as.character(user_screen_name)]
-	  resTbl = runPriorSO(config=modConfig(defaultSOConfig, list(query="select * from posts where post_type_id = 1 and owner_user_id = 20")))
+	  resTbl = runPriorSO(config=modConfig(defaultSOConfig, list(query=sprintf("select %s from posts where post_type_id = 1 and owner_user_id = 20", defaultSOCols))))
 	  resTbl$hashtagsTbl[, created_at := as.character(created_at)]
 	  expect_equivalent(expectedModelVsPredTbl, resTbl$modelVsPredTbl)
 	  expect_equivalent(expectedHashtagsTbl, resTbl$hashtagsTbl)

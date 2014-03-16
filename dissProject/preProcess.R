@@ -178,10 +178,14 @@ addTokenText <- function(tweetsTbl, from) {
 	return()
 }
 
+addDtToTbl <- function(tbl) {
+	tbl[, dt := creation_epoch - min(creation_epoch), by=user_screen_name]
+}
+
 setupTweetsTbl <- function(tweetsTbl, config) {
 	addTokenText(tweetsTbl, from='text')
 	setkey(tweetsTbl, id)
-	tweetsTbl[, dt := created_at_epoch - min(created_at_epoch), by=user_screen_name]
+	addDtToTbl(tweetsTbl)
 	tweetsTbl
 }
 
@@ -203,7 +207,7 @@ setupPostsTbl <- function(postsTbl, config) {
 	setkey(postsTbl, id)
 	stopifnot(!duplicated(postsTbl$id))
 	postsTbl[, tagsNoHtml := html2txt2(tags)]
-	postsTbl[, dt := creation_epoch - min(creation_epoch), by=owner_user_id]
+	addDtToTbl(postsTbl)
 	postsTbl
 }
 
@@ -318,14 +322,21 @@ computeActsByUser <- function(hashtagsTbl, ds) {
 	modelHashtagsTbl
 }
 
-getPriorForUserAtEpoch <- function(userPTbl, userScreenName, cEpoch, d) {
-	curUserPTbl = userPTbl[J(userScreenName)][creation_epoch <= cEpoch]
+getPriorAtEpoch <- function(pTbl, cEpoch, d) {
+	curUserPTbl = pTbl[creation_epoch <= cEpoch]
 	curUserPTbl[, cTime := cEpoch - min(creation_epoch)]
 	partialRes = curUserPTbl[, as.data.table(computeActs(hashtag, dt, cTime, d)), by=user_screen_name]
 	modelHashtagsTbl = getModelHashtagsTbl(partialRes)
 	modelHashtagsTbl
 }
 
+getPriorForUserAtEpoch <- function(userPTbl, userScreenName, cEpoch, d) {
+	getPriorAtEpoch(userPTbl[J(userScreenName)], cEpoch, d)
+}
+
+getPriorForAllUsersAtEpoch <- function(userPTbl, cEpoch, d) {
+	getPriorForUserAtEpoch(userPTbl, 'allUsers', cEpoch, d)
+}
 
 visHashtags <- function(hashtagsTbl) {
 	plots = hashtagsTbl[, list(resPlots=list(ggplot(.SD, aes(x=hashtag, y=dt)) + geom_point())), by=user_screen_name]
@@ -554,6 +565,7 @@ defaultTConfig = append(defaultBaseConfig,
 			     tokenizedChunkTypeTbl = 'top_hashtag_tokenized_chunk_types',
 			     tokenizedTypeTypeTbl = 'top_hashtag_tokenized_type_types',
 			     tagTypeName = 'hashtag',
+			     topHashtagsSubsetName = '2014-02-27 17:13:30 initial',
 			     includeRetweetsP=F))
 
 defaultSOConfig = append(defaultBaseConfig,
@@ -584,7 +596,7 @@ modConfig <- function(config, mods) {
 	newConfig
 }
 
-defaultTCols = "id::text, user_id, user_screen_name, created_at, retweeted, in_reply_to_status_id, lang, truncated, text, created_at_epoch"
+defaultTCols = "id::text, user_id, user_screen_name, created_at, retweeted, in_reply_to_status_id, lang, truncated, text, created_at_epoch as creation_epoch"
 
 getQueryUsersSubset <- function(val, from) {
 	sprintf('select user_screen_name from twitter_users where %s > %d order by %s asc limit 100', from, val, from)
@@ -602,14 +614,16 @@ getQueryTStatuses <- function(val, filters='1=1') {
 	getQueryGeneralT(val, 'statuses_count', filters)
 }
 
+defaultSOCols = 'id, owner_user_id, owner_user_id::text as user_screen_name, creation_date, creation_epoch, title, tags'
+
 getQuerySO <- function(val) {
-	sprintf('select id, owner_user_id, creation_date, creation_epoch, title, tags from posts
-		where post_type_id = 1 and owner_user_id in (select id from users where reputation > %d order by reputation asc limit 500)', val)
+	sprintf('select %s from posts
+		where post_type_id = 1 and owner_user_id in (select id from users where reputation > %d order by reputation asc limit 500)', defaultSOCols, val)
 }
 
 getQuerySOQ <- function(val) {
-	sprintf("select id, owner_user_id, creation_date, creation_epoch, title, tags from posts
-		where post_type_id = 1 and owner_user_id in (select id from users where num_questions > %d order by num_questions asc limit 100)", val)
+	sprintf("select %s from posts
+		where post_type_id = 1 and owner_user_id in (select id from users where num_questions > %d order by num_questions asc limit 100)", defaultSOCols, val)
 }
 
 combineFilters <- function(f1, f2='1=1') {
@@ -905,7 +919,7 @@ analyzeTemporal <- function(modelVsPredTbl) {
 	user_screen_names = c("'520957','238260','413225','807325','521180'")
 	user_screen_names = c("'520957','238260'")
 	runTbls = runPriorSO(config=modConfig(defaultSOConfig, list(accumModelHashtagsTbl=T,
-								    query=sprintf("select * from posts where post_type_id = 1 and owner_user_id in (%s)", user_screen_names))))
+								    query=sprintf("select %s from posts where post_type_id = 1 and owner_user_id in (%s)", defaultSOCols, user_screen_names))))
 	plotTemporal(runTbls)
 }
 
@@ -1135,8 +1149,19 @@ getSjiTbl <- function(subsetName, startId, endId) {
 	sjiTbl
 }
 
+getSjiTblT <- function(config, startId, endId) {
+	fileName = sprintf('%s.csv', makeSubsetName(config$topHashtagsSubsetName, startId, endId))
+	sjiTblName = sprintf('NcoocTblTweet-%s', fileName)
+	sjiColClasses = c('character', 'character', 'character', 'integer', 'integer')	
+	sjiTbl = myReadCSV(sprintf('%s/%s', coocDir(), sjiTblName), colClasses=sjiColClasses)
+	sjiTbl = sjiTbl[, list(partialN=sum(partialN)), by=list(chunk, tag)]
+	addSjiAttrs(sjiTbl)
+	sjiTbl
+}
+
+
 getUserPTbl <- function(config) {
-	userPTbl = sqldt("select posts.id, owner_user_id, creation_epoch, chunk, type from posts
+	userPTbl = sqldt("select posts.id, owner_user_id, owner_user_id::text as user_screen_name, creation_epoch, chunk, type from posts
 			 join post_tokenized
 			 on posts.id = post_tokenized.id
 			 where type = 'tag'
@@ -1145,12 +1170,28 @@ getUserPTbl <- function(config) {
 			 "
 			 )
 	if (config$convertTagSynonymsP) convertTagSynonyms(userPTbl)
-	userPTbl[, user_screen_name := as.character(owner_user_id)]
-	userPTbl[, dt := creation_epoch - min(creation_epoch), by=owner_user_id]
+	addDtToTbl(userPTbl)
 	userPTbl[, hashtag := chunk][, chunk := NULL]
 	setkey(userPTbl, user_screen_name, dt, hashtag)
 	userPTbl
 }
+
+getPTblGlobT <- function(config) {
+	globPTbl = sqldt(sprintf("select created_at_epoch as creation_epoch, chunk as hashtag from top_hashtag_tokenized as token
+				 join top_hashtag_tweets as tweets
+				 on tweets.id = token.id 
+				 where type = 'hashtag'
+				 and user_screen_name is not null
+				 and chunk in (select hashtag from top_hashtag_hashtags where hashtag_group = '%s')
+				 and tweets.id in (select post_id from top_hashtag_subsets where group_name = '%s')
+				 ", config$topHashtagsSubsetName, config$topHashtagsSubsetName
+				 ))
+	globPTbl[, user_screen_name := 'allUsers']
+	addDtToTbl(globPTbl)
+	setkey(globPTbl, user_screen_name, dt, hashtag)
+	globPTbl
+}
+
 
 addSjiAttrs <- function(sjiTbl) {
 	sjiTbl[, chunkSums := sum(partialN), by=chunk]
@@ -1165,21 +1206,38 @@ computeAct <- function(context, sjiTbl) {
 	sjiTbl[J(context), nomatch=0][, {WChunk = EChunk/sum(EChunk); list(act=sum(WChunk * sji))}, keyby=tag]
 }
 
+wsFile = '/Volumes/SSDSupernova/RWorkspace/workspace.RData'
+
+mySaveImage <- function() {
+	save(list=c('sjiTblT', 'pTblGlobT'), file=wsFile, compress=F)
+}
+
+myLoadImage <- function() {
+	eval(quote(load(file=wsFile)), envir=parent.frame())
+}
+
 curWS <- function() {
 	runGenNcoocTblT11thru10000()
 	runGenNcoocTblSO1thru3000000()
 	runGenNcoocTblSO1thru100()
-	fooTbl = myReadCSV('~/src/dissertation/firstSOProject/analysis/model/title-chunks-subset-4.csv')
+	pTblGlobT = getPTblGlobT(defaultTConfig)
+	pTblGlobT[, .N, by=hashtag][order(N, decreasing=T)]
 	userPTbl = withProf(getUserPTbl(defaultSOConfig))
 	userPTbl
 	BTbl = getPriorForUserAtEpoch(userPTbl, '4653', 1390076773, c(.5, .6))
 	BTbl = getPriorForUserAtEpoch(userPTbl, '4653', 1220886841, c(.5, .6))
+	BTbl = withProf(getPriorForAllUsersAtEpoch(pTblGlobT, 1394069415, c(.5)))
+	BTbl
 	microbenchmark(getPriorForUserAtEpoch(userPTbl, '4653', 1390076773, rep(.5,1)), times=100)
 	userPTbl[J('4653')]
 	BTbl
 	userPTbl[, list(N=length(unique(hashtag))), by=user_screen_name][order(N, decreasing = T)]
-	hashtagGroup = '2014-02-27 17:13:30 initial'
 	sjiTbl = withProf(getSjiTbl('SOShuffledFull', 1, 100000))
+	sjiTblT = withProf(getSjiTblT(defaultTConfig, 1, 100000))
+	sjiTblT
+	tables()
+	myLoadImage()
+	mySaveImage()
 	computeAct(context, sjiTbl)[order(act)]
 	computeAct('clojure', sjiTbl)[order(act)]
 	context = sjiTbl[tag=='.net'][order(sji, decreasing = T)]
