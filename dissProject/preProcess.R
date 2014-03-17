@@ -1348,7 +1348,6 @@ curWS <- function() {
 	BTbl[order(act, decreasing=T)]
 	BTbl
 	sjiTblT
-	tables()
 	computeActSji(context, sjiTblSO)[order(act)]
 	computeActSji(rep('clojure', 50), sjiTblSO)[order(act)]
 	computeActSji('radio', sjiTblT)[order(act, decreasing=T)]
