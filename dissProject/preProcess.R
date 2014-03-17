@@ -190,7 +190,7 @@ setupTweetsTbl <- function(tweetsTbl, config) {
 }
 
 getTweetsTbl <- function(sqlStr=sprintf("select %s from tweets limit 10000", defaultTCols), config) {
-	allowedRetweetedVals = if (config$includeRetweetsP) c('True', 'False') else c('False')
+	allowedRetweetedVals = if (getConfig(config, "includeRetweetsP")) c('True', 'False') else c('False')
 	tweetsTbl = sqldt(sqlStr)[retweeted %in% allowedRetweetedVals]
 	stopifnot(unique(tweetsTbl$retweeted) %in% allowedRetweetedVals)
 	setupTweetsTbl(tweetsTbl, config)
@@ -222,7 +222,7 @@ matchHashtag = '^#'
 matchTag = '(?<=<)[^>]+(?=>)'
 
 getHashtagsTbl <- function(tweetsTbl, config) {
-	from = config$from
+	from = getConfig(config, "from")
 	tokenizedTbl = getTokenizedTbl(tweetsTbl, from=from, regex=matchWhitespace)
 	htOfTokenizedTbl = tokenizedTbl[grepl(matchHashtag, chunk),]
 	stopifnot(c('id') == key(htOfTokenizedTbl))
@@ -239,7 +239,7 @@ convertTagSynonyms <- function(tokenizedTbl) {
 
 getTagsTbl <- function(postsTbl, config) {
 	tokenizedTbl = getTokenizedTbl(postsTbl, from='tagsNoHtml', regex=matchTag)
-	if (config$convertTagSynonymsP) convertTagSynonyms(tokenizedTbl)
+	if (getConfig(config, "convertTagSynonymsP")) convertTagSynonyms(tokenizedTbl)
 	tagsTbl = tokenizedTbl[postsTbl, list(hashtag=chunk, pos=pos, created_at=creation_date, dt=dt, user_id=owner_user_id, user_screen_name=as.character(owner_user_id)), nomatch=0]
 	setkey(tagsTbl, user_screen_name, dt, hashtag)
 	tagsTbl
@@ -460,8 +460,8 @@ compareModelVsExtreme <-function(modelHashtagsTbl, extremesTbl) {
 }
 
 genAggModelVsPredTbl <- function(hashtagsTbl, config) {
-	outFile = config$modelVsPredOutFile
-	ds = config$ds
+	outFile = getConfig(config, "modelVsPredOutFile")
+	ds = getConfig(config, "ds")
 	modelHashtagsTbls = data.table()
 	getModelVsPredTblFromHashtagsTbl <- function(hashtagsTbl, ds, userScreenName) {
 		myLog(sprintf('generating model predictions for user %s', userScreenName))
@@ -469,7 +469,7 @@ genAggModelVsPredTbl <- function(hashtagsTbl, config) {
 		setkey(modelHashtagsTbl, user_screen_name, dt, hashtag, d)
 		addMetrics(hashtagsTbl, modelHashtagsTbl)
 		modelVsPredTbl = getModelVsPredTbl(modelHashtagsTbl, hashtagsTbl)	
-		if (config$accumModelHashtagsTbl == T) modelHashtagsTbls <<- rbind(modelHashtagsTbls, modelHashtagsTbl)
+		if (getConfig(config, "accumModelHashtagsTbl") == T) modelHashtagsTbls <<- rbind(modelHashtagsTbls, modelHashtagsTbl)
 		rm(modelHashtagsTbl)
 		gc()
 		modelVsPredTbl
@@ -545,8 +545,8 @@ getHashtagsOutFile <- function(name) {
 runPrior <- function(config) {
 	stopifnot(!any(sapply(config,is.null)))
 	withProf({
-		postsTbl = config$getPostsFun(config$query, config=config)
-		hashtagsTbl = config$getHashtagsFun(postsTbl, config=config)
+		postsTbl = getConfig(config, "getPostsFun")(getConfig(config, "query"), config=config)
+		hashtagsTbl = getConfig(config, "getHashtagsFun")(postsTbl, config=config)
 		res = genAggModelVsPredTbl(hashtagsTbl, config=config)
 		modelVsPredTbl = res$modelVsPredTbl
 		modelHashtagsTbl = res$modelHashtagsTbl
@@ -647,7 +647,7 @@ combineFilters <- function(f1, f2='1=1') {
 }
 
 makeTRun <- function(val, outFileName, config) {
-	function() runPriorT(config=modConfig(config, list(query=config$query(val), modelVsPredOutFile=getModelVsPredOutFile(outFileName))))
+	function() runPriorT(config=modConfig(config, list(query=getConfig(config, "query")(val), modelVsPredOutFile=getModelVsPredOutFile(outFileName))))
 }
 
 makeTRunr1 <- function(val, outFileName, query) {
@@ -757,7 +757,7 @@ runTTweets5e4 <- makeTRunr1(50000, 'TTweetsgt5e4', queryRunTTweets5e4)
 runTTweets5e4r2 <- makeTRunr2(50000, 'TTweetsgt5e4r2', queryRunTTweets5e4)
 
 makeSORun <- function(val, outFileName, config) {
-	runFun = function() runPriorSO(config=modConfig(config, list(query=config$query(val), modelVsPredOutFile=getModelVsPredOutFile(outFileName))))
+	runFun = function() runPriorSO(config=modConfig(config, list(query=getConfig(config, "query")(val), modelVsPredOutFile=getModelVsPredOutFile(outFileName))))
 	runFun
 }
 
@@ -979,8 +979,8 @@ getNcoocTbl <- function(type, chunkTableQuery, config) {
 		      and R.post_type_id = (select tt.id from %s as tt where tt.type_name = '%s')
 		      group by L.chunk_id, R.chunk_id, pos_from_tag
 		      order by L.chunk_id, R.chunk_id, pos_from_tag",
-		      config$tokenizedTypeTypeTbl, config$tagTypeName,
-		      config$tokenizedTypeTypeTbl, type))
+		      getConfig(config, "tokenizedTypeTypeTbl"), getConfig(config, "tagTypeName"),
+		      getConfig(config, "tokenizedTypeTypeTbl"), type))
 	resTbl = sqldt(sprintf('select t.type_name as tag, c.type_name as chunk, pos_from_tag, partial_N
 			       from temp_cooc
 			       join %s as t
@@ -988,7 +988,7 @@ getNcoocTbl <- function(type, chunkTableQuery, config) {
 			       join %s as c
 			       on c.id = temp_cooc.context_chunk_id
 			       order by tag, chunk, pos_from_tag',
-			       config$tokenizedChunkTypeTbl, config$tokenizedChunkTypeTbl
+			       getConfig(config, "tokenizedChunkTypeTbl"), getConfig(config, "tokenizedChunkTypeTbl")
 			       ))
 	sqldf('truncate table temp_cooc')
 	NcoocTbl = resTbl[, list(posFromTag=pos_from_tag, partialN=partial_n, NChunkTag=sum(partial_n)), by=list(chunk, tag)]
@@ -1001,7 +1001,7 @@ makeSubsetName <- function(subset, startId, endId) {
 }
 
 makeChunkTableQuery <- function(subsetName, startId, endId, config) {
-	sprintf("select * from %s(%s, %s, '%s')", config$makeChunkTblFun, startId, endId, subsetName)
+	sprintf("select * from %s(%s, %s, '%s')", getConfig(config, "makeChunkTblFun"), startId, endId, subsetName)
 }
 
 genNcoocTblSO <- function(subsetName, startId, endId) {
@@ -1150,7 +1150,7 @@ runGenTokenizedTblSO <- function() genTokenizedTblSO()
 runGenTokenizedTblTwitter <- function() genTokenizedTblTwitter('2014-02-27 17:13:30 initial')
 
 getSjiTblSO <- function(config, startId, endId) {
-	fileName = sprintf('%s.csv', makeSubsetName(config$postsGroupName, startId, endId))
+	fileName = sprintf('%s.csv', makeSubsetName(getConfig(config, "postsGroupName"), startId, endId))
 	sjiTitleName = paste('NcoocTblTitle', fileName, sep='-')
 	sjiBodyName = paste('NcoocTblBody', fileName, sep='-')
 	sjiColClasses = c('character', 'character', 'character', 'integer', 'integer')	
@@ -1166,11 +1166,11 @@ getSjiTblSO <- function(config, startId, endId) {
 }
 
 getSjiTblT <- function(config, startId, endId) {
-	fileName = sprintf('%s.csv', makeSubsetName(config$groupName, startId, endId))
+	fileName = sprintf('%s.csv', makeSubsetName(getConfig(config, "groupName"), startId, endId))
 	sjiTblName = sprintf('NcoocTblTweet-%s', fileName)
 	sjiColClasses = c('character', 'character', 'character', 'integer', 'integer')	
 	sjiTbl = myReadCSV(sprintf('%s/%s', getCoocDir(), sjiTblName), colClasses=sjiColClasses)
-	topHashtagsTbl = sqldt(sprintf("select hashtag from top_hashtag_hashtags where hashtag_group = '%s'", config$groupName))
+	topHashtagsTbl = sqldt(sprintf("select hashtag from top_hashtag_hashtags where hashtag_group = '%s'", getConfig(config, "groupName")))
 	sjiTbl = sjiTbl[tag %in% topHashtagsTbl[, hashtag]]
 	sjiTbl = sjiTbl[, list(posFromTag=NaN, partialN=sum(partialN)), by=list(chunk, tag)]
 	setkey(sjiTbl, chunk, tag, posFromTag)
@@ -1190,9 +1190,9 @@ getPriorTblUserSO <- function(config, startId, endId) {
 						      where group_name = '%s'
 						      and id >= %s
 						      and id <= %s)
-				     ", config$postsGroupName, startId, endId
+				     ", getConfig(config, "postsGroupName"), startId, endId
 				     ))
-	if (config$convertTagSynonymsP) convertTagSynonyms(priorTblUser)
+	if (getConfig(config, "convertTagSynonymsP")) convertTagSynonyms(priorTblUser)
 	addDtToTbl(priorTblUser)
 	priorTblUser[, hashtag := chunk][, chunk := NULL]
 	setkey(priorTblUser, user_screen_name, dt, hashtag)
@@ -1210,8 +1210,8 @@ getPriorTblGlobT <- function(config, startId, endId) {
 						   where group_name = '%s'
 						   and id >= %s
 						   and id <= %s)
-				 ", config$groupName,
-				 config$groupName, startId, endId
+				 ", getConfig(config, "groupName"),
+				 getConfig(config, "groupName"), startId, endId
 				 ))
 	globPriorTbl[, user_screen_name := 'allUsers']
 	addDtToTbl(globPriorTbl)
@@ -1258,8 +1258,8 @@ genAndSaveCurWorkspace <- function() {
 
 getPostResTbl <- function(tokenTbl, config) {
 	guardAllEqualP(tokenTbl$creation_epoch)
-	contextTbl = tokenTbl[type != config$tagTypeName]
-	tagTbl = tokenTbl[type == config$tagTypeName]
+	contextTbl = tokenTbl[type != getConfig(config, "tagTypeName")]
+	tagTbl = tokenTbl[type == getConfig(config, "tagTypeName")]
 	setkey(tagTbl, chunk)
 	priorTbl = getPriorForAllUsersAtEpoch(priorTblGlobT, tokenTbl$creation_epoch[1], c(.5))
 	setkey(priorTbl, hashtag)
@@ -1268,7 +1268,7 @@ getPostResTbl <- function(tokenTbl, config) {
 		sjiTblWide = dcast.data.table(sjiTbl, tag ~ type, value.var='act')
 	} else {
 		sjiTblWide = copy(sjiTbl)
-		lapply(config$postTypeNames, function(x) sjiTblWide[[x]] <<- double(0))
+		lapply(getConfig(config, "postTypeNames"), function(x) sjiTblWide[[x]] <<- double(0))
 		sjiTblWide[, act := NULL][, type := NULL]
 	}
 	setkey(sjiTblWide, tag)
@@ -1286,7 +1286,7 @@ getTokenizedFromSubset <- function(minId, maxId, config) {
 							  where id >= %s
 							  and id <= %s
 							  and group_name = '%s')",
-			       config$tokenizedTbl, config$postsTbl, config$subsetsTbl, minId, maxId, config$groupName 
+			       getConfig(config, "tokenizedTbl"), getConfig(config, "postsTbl"), getConfig(config, "subsetsTbl"), minId, maxId, getConfig(config, "groupName") 
 			       ))
 	resTbl
 }
