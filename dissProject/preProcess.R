@@ -1169,7 +1169,7 @@ runGenTokenizedTblSO <- function() genTokenizedTblSO()
 runGenTokenizedTblTwitter <- function() genTokenizedTblTwitter('2014-02-27 17:13:30 initial')
 
 getSjiTblSO <- function(config, startId, endId) {
-	fileName = sprintf('%s.csv', makeSubsetName(getConfig(config, "postsGroupName"), startId, endId))
+	fileName = sprintf('%s.csv', makeSubsetName(getConfig(config, "groupName"), startId, endId))
 	sjiTitleName = paste('NcoocTblTitle', fileName, sep='-')
 	sjiBodyName = paste('NcoocTblBody', fileName, sep='-')
 	sjiColClasses = c('character', 'character', 'character', 'integer', 'integer')	
@@ -1209,7 +1209,7 @@ getPriorTblUserSO <- function(config, startId, endId) {
 						      where group_name = '%s'
 						      and id >= %s
 						      and id <= %s)
-				     ", getConfig(config, "postsGroupName"), startId, endId
+				     ", getConfig(config, "groupName"), startId, endId
 				     ))
 	if (getConfig(config, "convertTagSynonymsP")) convertTagSynonyms(priorTblUser)
 	addDtToTbl(priorTblUser)
@@ -1287,6 +1287,9 @@ getPostResTbl <- function(tokenTbl, config) {
 	setkey(tagTbl, chunk)
 	priorTbl = getPriorForUserAtEpoch(get(getConfig(config, 'priorTbl')), tokenTbl$user_screen_name[1], tokenTbl$creation_epoch[1], c(.5))
 	setkey(priorTbl, hashtag)
+	tempTagTbl = tagTbl[, list(hashtag=chunk)]
+	setkey(tempTagTbl, hashtag)
+	priorTbl = merge(priorTbl, tempTagTbl, all=T)
 	sjiTbl = contextTbl[, computeActSji(chunk, get(getConfig(config, 'sjiTbl'))), by=type]
 	if (nrow(sjiTbl) > 0) {
 		sjiTblWide = dcast.data.table(sjiTbl, tag ~ type, value.var='act')
@@ -1296,7 +1299,6 @@ getPostResTbl <- function(tokenTbl, config) {
 		sjiTblWide[, act := NULL][, type := NULL]
 	}
 	setkey(sjiTblWide, tag)
-	priorTbl = merge(priorTbl, tagTbl[, list(hashtag=chunk)], all=T)
 	postResTbl = sjiTblWide[priorTbl]
 	postResTbl[, hashtagUsedP := F]
 	postResTbl[tagTbl, hashtagUsedP := T]
@@ -1332,7 +1334,6 @@ curWS <- function() {
 	postResTbl = withProf(tokenTblT[, getPostResTbl(.SD, defaultTConfig), by=id])
 	postResTbl = withProf(tokenTblSO[, getPostResTbl(.SD, defaultSOConfig), by=id])
 	postResTbl
-	key(tbl1)
 	getPostResTbl(fooTbl[, post_id[1]], defaultTConfig)
 	runGenNcoocTblT11thru10000()
 	runGenNcoocTblSO1thru3000000()
