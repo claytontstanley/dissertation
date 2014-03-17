@@ -570,6 +570,7 @@ defaultTConfig = append(defaultBaseConfig,
 			     postsTbl = 'top_hashtag_tweets',
 			     subsetsTbl = 'top_hashtag_subsets',
 			     tagTypeName = 'hashtag',
+			     postTypeNames = 'tweet',
 			     groupName = '2014-02-27 17:13:30 initial',
 			     includeRetweetsP=F))
 
@@ -584,6 +585,7 @@ defaultSOConfig = append(defaultBaseConfig,
 			      subsetsTbl = 'post_subsets',
 			      postsTbl = 'posts',
 			      tagTypeName = 'tag',
+			      postTypeNames = c('title', 'body'),
 			      postsGroupName = 'SOShuffledFull',
 			      makeChunkTblFun='make_chunk_table_SO'
 			      ))
@@ -1253,13 +1255,19 @@ getPostResTbl <- function(tokenTbl, config) {
 	guardAllEqualP(tokenTbl$creation_epoch)
 	contextTbl = tokenTbl[type != config$tagTypeName]
 	tagTbl = tokenTbl[type == config$tagTypeName]
-	sjiTbl = contextTbl[, computeActSji(chunk, sjiTblT), by=type]
-	priorTbl = getPriorForAllUsersAtEpoch(priorTblGlobT, tokenTbl$creation_epoch[1], c(.5))
-	sjiTblWide = dcast.data.table(sjiTbl, tag ~ type, value.var='act')
-	setkey(sjiTblWide, tag)
-	setkey(priorTbl, hashtag)
 	setkey(tagTbl, chunk)
-	postResTbl = priorTbl[sjiTblWide]
+	priorTbl = getPriorForAllUsersAtEpoch(priorTblGlobT, tokenTbl$creation_epoch[1], c(.5))
+	setkey(priorTbl, hashtag)
+	sjiTbl = contextTbl[, computeActSji(chunk, sjiTblT), by=type]
+	if (nrow(sjiTbl) > 0) {
+		sjiTblWide = dcast.data.table(sjiTbl, tag ~ type, value.var='act')
+	} else {
+		sjiTblWide = copy(sjiTbl)
+		lapply(config$postTypeNames, function(x) sjiTblWide[[x]] <<- numeric(0))
+		sjiTblWide[, act := NULL][, type := NULL]
+	}
+	setkey(sjiTblWide, tag)
+	postResTbl = sjiTblWide[priorTbl]
 	postResTbl[, hashtagUsedP := F]
 	postResTbl[tagTbl, hashtagUsedP := T]
 	postResTbl
@@ -1280,7 +1288,8 @@ getTokenizedFromSubset <- function(minId, maxId, config) {
 
 
 curWS <- function() {
-	tokenTbl = getTokenizedFromSubset(3000001, 3000050, defaultTConfig)
+	tokenTbl = getTokenizedFromSubset(3000001, 3000200, defaultTConfig)
+	tokenTbl
 	postResTbl = withProf(tokenTbl[, getPostResTbl(.SD, defaultTConfig), by=id])
 	postResTbl
 	tokenTbl
