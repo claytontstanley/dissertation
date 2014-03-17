@@ -307,6 +307,8 @@ computeActPriorForUser <- function(hashtag, dt, ds, user_screen_name) {
 	partialRes
 }
 
+
+
 getModelHashtagsTbl <- function(partialRes) {
 	debugPrint(partialRes)
 	#myLog('setting key for partial table')
@@ -314,8 +316,8 @@ getModelHashtagsTbl <- function(partialRes) {
 	#myLog('computing activations across table')
 	res = partialRes[, list(N=.N,
 				act=log(sum(partialAct)),
-				actOL=if (d[1]>=1) NaN else log(.N/(1-d))-d*log(dt),
-				actOL2=if (d[1]>=1) NaN else log(.N/(1-d))-d*log(max(dtP))), keyby=list(user_screen_name, dt, hashtag, d)]
+				actOL=if (is.na(d[1])) numeric(0) else if (d[1]>=1) NaN else log(.N/(1-d))-d*log(dt),
+				actOL2=if (is.na(d[1])) numeric(0) else if (d[1]>=1) NaN else log(.N/(1-d))-d*log(max(dtP))), keyby=list(user_screen_name, dt, hashtag, d)]
 	with(res, myStopifnot(!is.infinite(act)))
 	with(res, myStopifnot(!is.infinite(actOL2)))
 	res
@@ -329,14 +331,19 @@ computeActPriorByUser <- function(hashtagsTbl, ds) {
 
 getPriorAtEpoch <- function(priorTbl, cEpoch, d) {
 	curUserPriorTbl = priorTbl[creation_epoch <= cEpoch]
-	curUserPriorTbl[, cTime := cEpoch - min(creation_epoch)]
+	curUserPriorTbl
+	if (nrow(curUserPriorTbl) > 0) {
+		curUserPriorTbl[, cTime := cEpoch - min(creation_epoch)]
+	} else {
+		curUserPriorTbl[, cTime := numeric(0)]
+	}
 	partialRes = curUserPriorTbl[, computeActPrior(hashtag, dt, cTime, d), by=user_screen_name]
 	modelHashtagsTbl = getModelHashtagsTbl(partialRes)
 	modelHashtagsTbl
 }
 
 getPriorForUserAtEpoch <- function(priorTblUser, userScreenName, cEpoch, d) {
-	getPriorAtEpoch(priorTblUser[J(userScreenName)], cEpoch, d)
+	getPriorAtEpoch(priorTblUser[J(userScreenName), nomatch=0], cEpoch, d)
 }
 
 getPriorForAllUsersAtEpoch <- function(priorTblUser, cEpoch, d) {
@@ -577,6 +584,9 @@ defaultTConfig = append(defaultBaseConfig,
 			     tagTypeName = 'hashtag',
 			     postTypeNames = 'tweet',
 			     groupName = '2014-02-27 17:13:30 initial',
+			     priorTbl = 'priorTblGlobT',
+			     sjiTbl = 'sjiTblT',
+			     userScreenNameCol = 'user_screen_name',
 			     includeRetweetsP=F))
 
 defaultSOConfig = append(defaultBaseConfig,
@@ -592,6 +602,9 @@ defaultSOConfig = append(defaultBaseConfig,
 			      tagTypeName = 'tag',
 			      postTypeNames = c('title', 'body'),
 			      groupName = 'SOShuffledFull',
+			      priorTbl = 'priorTblUserSO',
+			      sjiTbl = 'sjiTblSO',
+			      userScreenNameCol = 'owner_user_id::text as user_screen_name',
 			      makeChunkTblFun='make_chunk_table_SO'
 			      ))
 
@@ -636,7 +649,7 @@ getQueryTStatuses <- function(val, filters='1=1') {
 	getQueryGeneralT(val, 'statuses_count', filters)
 }
 
-defaultSOCols = 'id, owner_user_id, owner_user_id::text as user_screen_name, creation_date, creation_epoch, title, tags'
+defaultSOCols = sprintf('id, owner_user_id, %s, creation_date, creation_epoch, title, tags', getConfig(defaultSOConfig, 'userScreenNameCol'))
 
 getQuerySO <- function(val) {
 	sprintf('select %s from posts
@@ -1236,7 +1249,9 @@ addSjiAttrs <- function(sjiTbl) {
 }
 
 computeActSji <- function(context, sjiTbl) {
-	sjiTbl[J(context), nomatch=0][, {WChunk = EChunk/sum(EChunk); list(act=sum(WChunk * sji))}, keyby=tag]
+	myLog(sprintf("computing sji act for context with length %s", length(context)))
+	resTbl = sjiTbl[J(context), nomatch=0]
+	resTbl = resTbl[, {WChunk = EChunk/sum(EChunk); list(act=sum(WChunk * sji))}, keyby=tag]
 }
 
 wsFile = '/Volumes/SSDSupernova/RWorkspace/workspace.RData'
@@ -1252,24 +1267,27 @@ myLoadImage <- function() {
 }
 
 genAndSaveCurWorkspace <- function() {
-	maxIdSO = 100000
+	maxIdSOSji = 100000
+	maxIdSOPrior = 10000000
 	maxIdTSji = 1000000
 	maxIdTPrior = 100000
 	priorTblGlobT = getPriorTblGlobT(defaultTConfig, 1, maxIdTPrior)
-	priorTblUserSO = getPriorTblUserSO(defaultSOConfig, 1, maxIdSO)
+	priorTblUserSO = getPriorTblUserSO(defaultSOConfig, 1, maxIdSOPrior)
 	sjiTblT = getSjiTblT(defaultTConfig, 1, maxIdTSji)
-	sjiTblSO = getSjiTblSO(defaultSOConfig, 1, maxIdSO)
+	sjiTblSO = getSjiTblSO(defaultSOConfig, 1, maxIdSOSji)
 	mySaveImage()
 }
 
 getPostResTbl <- function(tokenTbl, config) {
 	guardAllEqualP(tokenTbl$creation_epoch)
+	guardAllEqualP(tokenTbl$user_screen_name)
 	contextTbl = tokenTbl[type != getConfig(config, "tagTypeName")]
+	contextTbl
 	tagTbl = tokenTbl[type == getConfig(config, "tagTypeName")]
 	setkey(tagTbl, chunk)
-	priorTbl = getPriorForAllUsersAtEpoch(priorTblGlobT, tokenTbl$creation_epoch[1], c(.5))
+	priorTbl = getPriorForUserAtEpoch(get(getConfig(config, 'priorTbl')), tokenTbl$user_screen_name[1], tokenTbl$creation_epoch[1], c(.5))
 	setkey(priorTbl, hashtag)
-	sjiTbl = contextTbl[, computeActSji(chunk, sjiTblT), by=type]
+	sjiTbl = contextTbl[, computeActSji(chunk, get(getConfig(config, 'sjiTbl'))), by=type]
 	if (nrow(sjiTbl) > 0) {
 		sjiTblWide = dcast.data.table(sjiTbl, tag ~ type, value.var='act')
 	} else {
@@ -1278,6 +1296,7 @@ getPostResTbl <- function(tokenTbl, config) {
 		sjiTblWide[, act := NULL][, type := NULL]
 	}
 	setkey(sjiTblWide, tag)
+	priorTbl = merge(priorTbl, tagTbl[, list(hashtag=chunk)], all=T)
 	postResTbl = sjiTblWide[priorTbl]
 	postResTbl[, hashtagUsedP := F]
 	postResTbl[tagTbl, hashtagUsedP := T]
@@ -1285,27 +1304,35 @@ getPostResTbl <- function(tokenTbl, config) {
 }
 
 getTokenizedFromSubset <- function(minId, maxId, config) {
-	resTbl = sqldt(sprintf("select tokenized_tbl.id::text, creation_epoch, chunk, pos, type from %s as tokenized_tbl
+	resTbl = sqldt(sprintf("select tokenized_tbl.id::text, %s, creation_epoch, chunk, pos, type from %s as tokenized_tbl
 			       join %s as posts_tbl
 			       on tokenized_tbl.id = posts_tbl.id 
 			       where tokenized_tbl.id in (select post_id from %s 
 							  where id >= %s
 							  and id <= %s
 							  and group_name = '%s')",
+			       getConfig(config, 'userScreenNameCol'),
 			       getConfig(config, "tokenizedTbl"), getConfig(config, "postsTbl"), getConfig(config, "subsetsTbl"), minId, maxId, getConfig(config, "groupName") 
 			       ))
 	resTbl
 }
 
+getTokenizedFromSubsetT <- function(minId, maxId, config) {
+	getTokenizedFromSubset(minId, maxId, config)[, user_screen_name := 'allUsers']
+}
+
+getTokenizedFromSubsetSO <- getTokenizedFromSubset
+
 
 curWS <- function() {
-	tokenTbl = getTokenizedFromSubset(3000001, 3000020, defaultTConfig)
-	tokenTbl = getTokenizedFromSubset(3000001, 3000020, defaultSOConfig)
-	setLogLevel(2)
-	tokenTbl
-	postResTbl = withProf(tokenTbl[, getPostResTbl(.SD, defaultTConfig), by=id])
+	tokenTblT = getTokenizedFromSubsetT(3000001, 3000020, defaultTConfig)
+	tokenTblSO = getTokenizedFromSubsetSO(3000001, 3000020, defaultSOConfig)
+	tokenTblSO
+	tokenTblT
+	postResTbl = withProf(tokenTblT[, getPostResTbl(.SD, defaultTConfig), by=id])
+	postResTbl = withProf(tokenTblSO[, getPostResTbl(.SD, defaultSOConfig), by=id])
 	postResTbl
-	tokenTbl
+	key(tbl1)
 	getPostResTbl(fooTbl[, post_id[1]], defaultTConfig)
 	runGenNcoocTblT11thru10000()
 	runGenNcoocTblSO1thru3000000()
@@ -1322,7 +1349,7 @@ curWS <- function() {
 	sjiTblT
 	tables()
 	computeActSji(context, sjiTblSO)[order(act)]
-	computeActSji('clojure', sjiTblSO)[order(act)]
+	computeActSji(rep('clojure', 50), sjiTblSO)[order(act)]
 	computeActSji('radio', sjiTblT)[order(act, decreasing=T)]
 	sjiTblT[tag == '#soundcloud'][order(partialN, decreasing=T)][1:30]
 	
