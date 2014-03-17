@@ -1240,10 +1240,11 @@ myLoadImage <- function() {
 
 genAndSaveCurWorkspace <- function() {
 	maxIdSO = 100000
-	maxIdT = 1000000
-	priorTblGlobT = getPriorTblGlobT(defaultTConfig, 1, maxIdT)
+	maxIdTSji = 1000000
+	maxIdTPrior = 100000
+	priorTblGlobT = getPriorTblGlobT(defaultTConfig, 1, maxIdTPrior)
 	priorTblUserSO = getPriorTblUserSO(defaultSOConfig, 1, maxIdSO)
-	sjiTblT = getSjiTblT(defaultTConfig, 1, maxIdT)
+	sjiTblT = getSjiTblT(defaultTConfig, 1, maxIdTSji)
 	sjiTblSO = getSjiTblSO(defaultSOConfig, 1, maxIdSO)
 	mySaveImage()
 }
@@ -1279,8 +1280,9 @@ getTokenizedFromSubset <- function(minId, maxId, config) {
 
 
 curWS <- function() {
-	tokenTbl = getTokenizedFromSubset(3000001, 3000001, defaultTConfig)
-	tokenTbl[, getPostResTbl(.SD, defaultTConfig), by=id]
+	tokenTbl = getTokenizedFromSubset(3000001, 3000050, defaultTConfig)
+	postResTbl = withProf(tokenTbl[, getPostResTbl(.SD, defaultTConfig), by=id])
+	postResTbl
 	tokenTbl
 	getPostResTbl(fooTbl[, post_id[1]], defaultTConfig)
 	runGenNcoocTblT11thru10000()
