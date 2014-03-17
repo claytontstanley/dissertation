@@ -37,7 +37,7 @@ withDBConnect <- function(var, thunk) {
 getHashes <- function(vals, db) {
 	ret = db[match(vals, names(db))]
 	ret = ret[!is.na(ret)]
-	#stopifnot(length(ret) > 0)
+	#myStopifnot(length(ret) > 0)
 	debugPrint(str_c(length(vals), "->", length(ret)))
 	return(ret)
 }
@@ -69,6 +69,11 @@ myLog <- function(str, forLogLevel=1) {
 	if (logLevel >= forLogLevel) print(str)
 }
 
+myStopifnot <- function(...) {
+	debugPrint(substitute(...))
+	stopifnot(...)
+}
+
 savePlotsP = T
 
 myPlotPrint <- function(fig, name) {
@@ -95,7 +100,7 @@ html2txt2 <- function(vect) {
 	myLog(sprintf('running html2txt with in/out temp files: %s %s', inFile, outFile))
 	cmdOut = system2(cmd, args=args)
 	res = myReadCSV(outFile, header=F)
-	stopifnot(res$V1 == vect)
+	myStopifnot(res$V1 == vect)
 	res$V2
 }
 
@@ -173,7 +178,7 @@ addTokenText <- function(tweetsTbl, from) {
 	cmdOut = system2(cmd, args=args)
 	myLog(paste(readLines(stderFile), sep='\n'))
 	tokenTextTbl = data.table(read.delim(tokenizedTweetsFile, sep='\t', quote="", header=F, stringsAsFactors=F))
-	stopifnot(tokenTextTbl[[2]] == stripDelimiters(tweetsTbl[[from]]))
+	myStopifnot(tokenTextTbl[[2]] == stripDelimiters(tweetsTbl[[from]]))
 	tweetsTbl[, tokenText := tokenTextTbl[[1]]]
 	return()
 }
@@ -192,7 +197,7 @@ setupTweetsTbl <- function(tweetsTbl, config) {
 getTweetsTbl <- function(sqlStr=sprintf("select %s from tweets limit 10000", defaultTCols), config) {
 	allowedRetweetedVals = if (getConfig(config, "includeRetweetsP")) c('True', 'False') else c('False')
 	tweetsTbl = sqldt(sqlStr)[retweeted %in% allowedRetweetedVals]
-	stopifnot(unique(tweetsTbl$retweeted) %in% allowedRetweetedVals)
+	myStopifnot(unique(tweetsTbl$retweeted) %in% allowedRetweetedVals)
 	setupTweetsTbl(tweetsTbl, config)
 	tweetsTbl
 }
@@ -205,7 +210,7 @@ getTagSynonymsTbl <- function(sqlStr='select * from tag_synonyms') {
 
 setupPostsTbl <- function(postsTbl, config) {
 	setkey(postsTbl, id)
-	stopifnot(!duplicated(postsTbl$id))
+	myStopifnot(!duplicated(postsTbl$id))
 	postsTbl[, tagsNoHtml := html2txt2(tags)]
 	addDtToTbl(postsTbl)
 	postsTbl
@@ -225,7 +230,7 @@ getHashtagsTbl <- function(tweetsTbl, config) {
 	from = getConfig(config, "from")
 	tokenizedTbl = getTokenizedTbl(tweetsTbl, from=from, regex=matchWhitespace)
 	htOfTokenizedTbl = tokenizedTbl[grepl(matchHashtag, chunk),]
-	stopifnot(c('id') == key(htOfTokenizedTbl))
+	myStopifnot(c('id') == key(htOfTokenizedTbl))
 	hashtagsTbl = htOfTokenizedTbl[tweetsTbl, list(hashtag=chunk, pos=pos, created_at=created_at, dt=dt, user_id=user_id, user_screen_name=user_screen_name), nomatch=0]
 	setkey(hashtagsTbl, user_screen_name, dt, hashtag)
 	hashtagsTbl
@@ -274,8 +279,8 @@ compareHashtagTbls <- function() {
 }
 
 computeActPrior <- function(hashtags, dtP, cTime, d) {
-	stopifnot(length(dtP) == length(hashtags))
-	stopifnot(length(dtP) == length(cTime))
+	myStopifnot(length(dtP) == length(hashtags))
+	myStopifnot(length(dtP) == length(cTime))
 	debugPrint(hashtags)
 	debugPrint(d)
 	debugPrint(cTime)
@@ -295,7 +300,7 @@ computeActPrior <- function(hashtags, dtP, cTime, d) {
 computeActPriorForUser <- function(hashtag, dt, ds, user_screen_name) {
 	#myLog(sprintf('computing partial activation for user %s', user_screen_name))
 	retIndeces = which(!duplicated(dt))[-1]
-	stopifnot(length(retIndeces) > 0)
+	myStopifnot(length(retIndeces) > 0)
 	partialRes = data.table(i=retIndeces)
 	partialRes = partialRes[, list(hashtag=hashtag[1:i], dtP=dt[1:i], cTime=dt[i]), by=i]
 	partialRes = with(partialRes, as.data.table(computeActPrior(hashtag, dtP, cTime, d=ds)))
@@ -311,8 +316,8 @@ getModelHashtagsTbl <- function(partialRes) {
 				act=log(sum(partialAct)),
 				actOL=if (d[1]>=1) NaN else log(.N/(1-d))-d*log(dt),
 				actOL2=if (d[1]>=1) NaN else log(.N/(1-d))-d*log(max(dtP))), keyby=list(user_screen_name, dt, hashtag, d)]
-	with(res, stopifnot(!is.infinite(act)))
-	with(res, stopifnot(!is.infinite(actOL2)))
+	with(res, myStopifnot(!is.infinite(act)))
+	with(res, myStopifnot(!is.infinite(actOL2)))
 	res
 }
 
@@ -344,7 +349,7 @@ visHashtags <- function(hashtagsTbl) {
 }
 
 visCompare <- function(hashtagsTbl, modelHashtagsTbl, bestDTbl) {
-	stopifnot(sort(unique(hashtagsTbl$user_screen_name)) == sort(unique(modelHashtagsTbl$user_screen_name)))
+	myStopifnot(sort(unique(hashtagsTbl$user_screen_name)) == sort(unique(modelHashtagsTbl$user_screen_name)))
 	plotBuildFun <- function(modelHashtagsTbl, userScreenName, d) {
 		list(resPlots=list(ggplot(hashtagsTbl[user_screen_name==userScreenName], aes(x=hashtag, y=dt)) +
 				   geom_point() +
@@ -382,8 +387,8 @@ addMetrics <- function(hashtagsTbl, modelHashtagsTbl) {
 	addDVCols(act, topHashtagPost, topHashtagAct)
 	addDVCols(actOL, topHashtagPostOL, topHashtagActOL)
 	addDVCols(actOL2, topHashtagPostOL2, topHashtagActOL2)
-	stopifnot(key(modelHashtagsTbl) == (c('user_screen_name', 'dt', 'hashtag', 'd')))
-	stopifnot(key(hashtagsTbl) == (c('user_screen_name', 'dt', 'hashtag')))
+	myStopifnot(key(modelHashtagsTbl) == (c('user_screen_name', 'dt', 'hashtag', 'd')))
+	myStopifnot(key(hashtagsTbl) == (c('user_screen_name', 'dt', 'hashtag')))
 	modelHashtagsTbl[, hashtagUsedP := F]
 	modelHashtagsTbl[hashtagsTbl, hashtagUsedP := T]
 	#wideTbl = hashtagsTbl[, list(usedHashtags=list(hashtag)), by=list(user_screen_name, dt)]
@@ -413,14 +418,14 @@ summarizeExtremes <- function(hashtagsTbl) {
 }
 
 onlyFirstT <- function(bool) {
-	stopifnot(any(bool == T))
+	myStopifnot(any(bool == T))
 	ret = rep(F, length(bool))
 	ret[which(bool)[1]] = T
 	ret
 }
 
 guardAllEqualP <- function(vect) {
-	stopifnot(length(unique(vect)) <= 1)
+	myStopifnot(length(unique(vect)) <= 1)
 	vect
 }
 
@@ -543,7 +548,7 @@ getHashtagsOutFile <- function(name) {
 }
 
 runPrior <- function(config) {
-	stopifnot(!any(sapply(config,is.null)))
+	myStopifnot(!any(sapply(config,is.null)))
 	withProf({
 		postsTbl = getConfig(config, "getPostsFun")(getConfig(config, "query"), config=config)
 		hashtagsTbl = getConfig(config, "getHashtagsFun")(postsTbl, config=config)
@@ -586,7 +591,7 @@ defaultSOConfig = append(defaultBaseConfig,
 			      postsTbl = 'posts',
 			      tagTypeName = 'tag',
 			      postTypeNames = c('title', 'body'),
-			      postsGroupName = 'SOShuffledFull',
+			      groupName = 'SOShuffledFull',
 			      makeChunkTblFun='make_chunk_table_SO'
 			      ))
 
@@ -600,7 +605,7 @@ runPriorSO <- function(config=defaultSOConfig) {
 
 modConfig <- function(config, mods) {
 	newConfig = config
-	stopifnot(names(mods) %in% names(config))
+	myStopifnot(names(mods) %in% names(config))
 	for(modName in names(mods)) {
 		newConfig[[modName]] = mods[[modName]]
 	}
@@ -608,7 +613,8 @@ modConfig <- function(config, mods) {
 }
 
 getConfig <- function(config, slot) {
-	stopifnot(slot %in% names(config))
+	debugPrint(sprintf('Getting slot %s in config %s', slot, deparse(substitute(config))))
+	myStopifnot(slot %in% names(config))
 	config[[slot]]
 }
 
@@ -1294,6 +1300,8 @@ getTokenizedFromSubset <- function(minId, maxId, config) {
 
 curWS <- function() {
 	tokenTbl = getTokenizedFromSubset(3000001, 3000020, defaultTConfig)
+	tokenTbl = getTokenizedFromSubset(3000001, 3000020, defaultSOConfig)
+	setLogLevel(2)
 	tokenTbl
 	postResTbl = withProf(tokenTbl[, getPostResTbl(.SD, defaultTConfig), by=id])
 	postResTbl
