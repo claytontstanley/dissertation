@@ -325,7 +325,7 @@ computeActsByUser <- function(hashtagsTbl, ds) {
 getPriorAtEpoch <- function(priorTbl, cEpoch, d) {
 	curUserPriorTbl = priorTbl[creation_epoch <= cEpoch]
 	curUserPriorTbl[, cTime := cEpoch - min(creation_epoch)]
-	partialRes = curUserPriorTbl[, as.data.table(computeActs(hashtag, dt, cTime, d)), by=user_screen_name]
+	partialRes = curUserPriorTbl[, computeActs(hashtag, dt, cTime, d), by=user_screen_name]
 	modelHashtagsTbl = getModelHashtagsTbl(partialRes)
 	modelHashtagsTbl
 }
@@ -1247,11 +1247,13 @@ curWS <- function() {
 	runGenNcoocTblSO1thru100()
 	withProf(genAndSaveCurWorkspace())
 	withProf(myLoadImage())
-	priorTblGlobT[, .N, by=hashtag][order(N, decreasing=T)]
+	priorTblGlobT[, .N, by=hashtag][, list(hashtag, p=N/sum(N))][order(p, decreasing=T)][1:50][, plot(1:length(p), p)]
+	priorTblUserSO[, .N, by=hashtag][, list(hashtag, p=N/sum(N))][order(p, decreasing=T)][1:50][, plot(1:length(p), p)]
 	BTbl = getPriorForUserAtEpoch(priorTblUserSO, '4653', 1390076773, c(.5, .6))
 	BTbl = getPriorForUserAtEpoch(priorTblUserSO, '4653', 1220886841, c(.5, .6))
-	BTbl = withProf(getPriorForAllUsersAtEpoch(priorTblGlobT, 1394059415, c(.5)))
+	BTbl = withProf(getPriorForAllUsersAtEpoch(priorTblGlobT, 99999999999, c(.5)))
 	BTbl[order(act, decreasing=T)]
+	BTbl
 	sjiTblT
 	tables()
 	computeAct(context, sjiTblSO)[order(act)]

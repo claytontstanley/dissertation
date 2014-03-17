@@ -165,7 +165,8 @@ def streamHashtags(hashtagGroup):
             pass
 
 def streamHashtagsCurrent():
-    hashtagGroup = '2014-02-27 17:13:30 initial'
+    #hashtagGroup = '2014-02-27 17:13:30 initial'
+    hashtagGroup = '2014-03-17 11:28:15 trendsmap'
     streamHashtags(hashtagGroup)
 
 def scrape_socialbakers(url):
@@ -422,4 +423,4 @@ def generateTopUsers100k():
 #backupTables(tableNames=['post_filtered'])
 #backupTables()
 #generateTopHashtags()
-#streamHashtagsCurrent()
+streamHashtagsCurrent()
