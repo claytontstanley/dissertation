@@ -1263,7 +1263,7 @@ getPostResTbl <- function(tokenTbl, config) {
 		sjiTblWide = dcast.data.table(sjiTbl, tag ~ type, value.var='act')
 	} else {
 		sjiTblWide = copy(sjiTbl)
-		lapply(config$postTypeNames, function(x) sjiTblWide[[x]] <<- numeric(0))
+		lapply(config$postTypeNames, function(x) sjiTblWide[[x]] <<- double(0))
 		sjiTblWide[, act := NULL][, type := NULL]
 	}
 	setkey(sjiTblWide, tag)
@@ -1288,7 +1288,7 @@ getTokenizedFromSubset <- function(minId, maxId, config) {
 
 
 curWS <- function() {
-	tokenTbl = getTokenizedFromSubset(3000001, 3000200, defaultTConfig)
+	tokenTbl = getTokenizedFromSubset(3000001, 3000020, defaultTConfig)
 	tokenTbl
 	postResTbl = withProf(tokenTbl[, getPostResTbl(.SD, defaultTConfig), by=id])
 	postResTbl
