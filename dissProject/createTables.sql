@@ -46,8 +46,8 @@ create table if not exists top_hashtag_tweets (
 	primary key (id)
 	);
 
-alter table top_hashtag_tweets add column created_at_epoch numeric; 
-update top_hashtag_tweets set created_at_epoch = extract(epoch from to_timestamp(created_at, 'YYYY-MM-DD HH24:MI:SS')::timestamp without time zone) where created_at_epoch is null; 
+alter table top_hashtag_tweets add column creation_epoch numeric; 
+update top_hashtag_tweets set creation_epoch = extract(epoch from to_timestamp(created_at, 'YYYY-MM-DD HH24:MI:SS')::timestamp without time zone) where creation_epoch is null; 
 
 --drop table if exists temp_tweets_id cascade;
 create table if not exists temp_tweets_id (
@@ -137,8 +137,8 @@ create table if not exists tag_synonyms (
 alter table posts add column creation_epoch numeric;
 update posts set creation_epoch = extract(epoch from creation_date) where creation_epoch is null;
 
-alter table tweets add column created_at_epoch numeric; 
-update tweets set created_at_epoch = extract(epoch from to_timestamp(created_at, 'YYYY-MM-DD HH24:MI:SS')::timestamp without time zone) where created_at_epoch is null; 
+alter table tweets add column creation_epoch numeric; 
+update tweets set creation_epoch = extract(epoch from to_timestamp(created_at, 'YYYY-MM-DD HH24:MI:SS')::timestamp without time zone) where creation_epoch is null; 
 
 create table temp_tokenized (
 	chunk_id integer not null,

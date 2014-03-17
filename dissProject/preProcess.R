@@ -618,7 +618,7 @@ getConfig <- function(config, slot) {
 	config[[slot]]
 }
 
-defaultTCols = "id::text, user_id, user_screen_name, created_at, retweeted, in_reply_to_status_id, lang, truncated, text, created_at_epoch as creation_epoch"
+defaultTCols = "id::text, user_id, user_screen_name, created_at, retweeted, in_reply_to_status_id, lang, truncated, text, creation_epoch"
 
 getQueryUsersSubset <- function(val, from) {
 	sprintf('select user_screen_name from twitter_users where %s > %d order by %s asc limit 100', from, val, from)
@@ -1206,7 +1206,7 @@ getPriorTblUserSO <- function(config, startId, endId) {
 }
 
 getPriorTblGlobT <- function(config, startId, endId) {
-	globPriorTbl = sqldt(sprintf("select created_at_epoch as creation_epoch, chunk as hashtag from top_hashtag_tokenized as token
+	globPriorTbl = sqldt(sprintf("select creation_epoch, chunk as hashtag from top_hashtag_tokenized as token
 				 join top_hashtag_tweets as tweets
 				 on tweets.id = token.id 
 				 where type = 'hashtag'
@@ -1285,7 +1285,7 @@ getPostResTbl <- function(tokenTbl, config) {
 }
 
 getTokenizedFromSubset <- function(minId, maxId, config) {
-	resTbl = sqldt(sprintf("select tokenized_tbl.id::text, created_at_epoch as creation_epoch, chunk, pos, type from %s as tokenized_tbl
+	resTbl = sqldt(sprintf("select tokenized_tbl.id::text, creation_epoch, chunk, pos, type from %s as tokenized_tbl
 			       join %s as posts_tbl
 			       on tokenized_tbl.id = posts_tbl.id 
 			       where tokenized_tbl.id in (select post_id from %s 
