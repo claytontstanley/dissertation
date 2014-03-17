@@ -566,8 +566,11 @@ defaultTConfig = append(defaultBaseConfig,
 			     makeChunkTblFun='make_chunk_table_Twitter',
 			     tokenizedChunkTypeTbl = 'top_hashtag_tokenized_chunk_types',
 			     tokenizedTypeTypeTbl = 'top_hashtag_tokenized_type_types',
+			     tokenizedTbl = 'top_hashtag_tokenized',
+			     postsTbl = 'top_hashtag_tweets',
+			     subsetsTbl = 'top_hashtag_subsets',
 			     tagTypeName = 'hashtag',
-			     topHashtagsGroupName = '2014-02-27 17:13:30 initial',
+			     groupName = '2014-02-27 17:13:30 initial',
 			     includeRetweetsP=F))
 
 defaultSOConfig = append(defaultBaseConfig,
@@ -577,6 +580,9 @@ defaultSOConfig = append(defaultBaseConfig,
 			      getHashtagsFun=getTagsTbl,
 			      tokenizedChunkTypeTbl = 'post_tokenized_chunk_types',
 			      tokenizedTypeTypeTbl = 'post_tokenized_type_types',
+			      tokenizedTbl = 'post_tokenized',
+			      subsetsTbl = 'post_subsets',
+			      postsTbl = 'posts',
 			      tagTypeName = 'tag',
 			      postsGroupName = 'SOShuffledFull',
 			      makeChunkTblFun='make_chunk_table_SO'
@@ -1153,11 +1159,12 @@ getSjiTblSO <- function(config, startId, endId) {
 }
 
 getSjiTblT <- function(config, startId, endId) {
-	fileName = sprintf('%s.csv', makeSubsetName(config$topHashtagsGroupName, startId, endId))
+	fileName = sprintf('%s.csv', makeSubsetName(config$groupName, startId, endId))
 	sjiTblName = sprintf('NcoocTblTweet-%s', fileName)
 	sjiColClasses = c('character', 'character', 'character', 'integer', 'integer')	
 	sjiTbl = myReadCSV(sprintf('%s/%s', getCoocDir(), sjiTblName), colClasses=sjiColClasses)
-	sjiTbl
+	topHashtagsTbl = sqldt(sprintf("select hashtag from top_hashtag_hashtags where hashtag_group = '%s'", config$groupName))
+	sjiTbl = sjiTbl[tag %in% topHashtagsTbl[, hashtag]]
 	sjiTbl = sjiTbl[, list(posFromTag=NaN, partialN=sum(partialN)), by=list(chunk, tag)]
 	setkey(sjiTbl, chunk, tag, posFromTag)
 	addSjiAttrs(sjiTbl)
@@ -1196,8 +1203,8 @@ getPriorTblGlobT <- function(config, startId, endId) {
 						   where group_name = '%s'
 						   and id >= %s
 						   and id <= %s)
-				 ", config$topHashtagsGroupName,
-				 config$topHashtagsGroupName, startId, endId
+				 ", config$groupName,
+				 config$groupName, startId, endId
 				 ))
 	globPriorTbl[, user_screen_name := 'allUsers']
 	addDtToTbl(globPriorTbl)
@@ -1241,7 +1248,41 @@ genAndSaveCurWorkspace <- function() {
 	mySaveImage()
 }
 
+getPostResTbl <- function(tokenTbl, config) {
+	guardAllEqualP(tokenTbl$creation_epoch)
+	contextTbl = tokenTbl[type != config$tagTypeName]
+	tagTbl = tokenTbl[type == config$tagTypeName]
+	sjiTbl = contextTbl[, computeActSji(chunk, sjiTblT), by=type]
+	priorTbl = getPriorForAllUsersAtEpoch(priorTblGlobT, tokenTbl$creation_epoch[1], c(.5))
+	sjiTblWide = dcast.data.table(sjiTbl, tag ~ type, value.var='act')
+	setkey(sjiTblWide, tag)
+	setkey(priorTbl, hashtag)
+	setkey(tagTbl, chunk)
+	postResTbl = priorTbl[sjiTblWide]
+	postResTbl[, hashtagUsedP := F]
+	postResTbl[tagTbl, hashtagUsedP := T]
+	postResTbl
+}
+
+getTokenizedFromSubset <- function(minId, maxId, config) {
+	resTbl = sqldt(sprintf("select tokenized_tbl.id::text, created_at_epoch as creation_epoch, chunk, pos, type from %s as tokenized_tbl
+			       join %s as posts_tbl
+			       on tokenized_tbl.id = posts_tbl.id 
+			       where tokenized_tbl.id in (select post_id from %s 
+							  where id >= %s
+							  and id <= %s
+							  and group_name = '%s')",
+			       config$tokenizedTbl, config$postsTbl, config$subsetsTbl, minId, maxId, config$groupName 
+			       ))
+	resTbl
+}
+
+
 curWS <- function() {
+	tokenTbl = getTokenizedFromSubset(3000001, 3000001, defaultTConfig)
+	tokenTbl[, getPostResTbl(.SD, defaultTConfig), by=id]
+	tokenTbl
+	getPostResTbl(fooTbl[, post_id[1]], defaultTConfig)
 	runGenNcoocTblT11thru10000()
 	runGenNcoocTblSO1thru3000000()
 	runGenNcoocTblSO1thru100()
