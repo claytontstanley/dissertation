@@ -15,7 +15,8 @@ parrunTSjis: NP = 1
 parrun%:
 	make -s get$* | parallel -P ${NP} --progress make {}
 
-runAll: unit parrunSjis parrunPriors parrunTSjis
+runAll: unit parrunPriors parrunSjis parrunTSjis
+	exit 0
 
 getPriors:
 	grep '^run.* <- make' preProcess.R | awk '{print $$1}'
