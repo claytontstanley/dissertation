@@ -273,7 +273,7 @@ compareHashtagTbls <- function() {
 	hashtagTblText[hashtagTblTokenText]
 }
 
-computeActs <- function(hashtags, dtP, cTime, d) {
+computeActPrior <- function(hashtags, dtP, cTime, d) {
 	stopifnot(length(dtP) == length(hashtags))
 	stopifnot(length(dtP) == length(cTime))
 	debugPrint(hashtags)
@@ -292,13 +292,13 @@ computeActs <- function(hashtags, dtP, cTime, d) {
 	list(hashtag=hashtagsSubRep, partialAct=dtPSubRep^(-dRep), dt=cTimeSubRep, d=dRep, dtP=dtPSubRep)
 }
 
-computeActsForUser <- function(hashtag, dt, ds, user_screen_name) {
+computeActPriorForUser <- function(hashtag, dt, ds, user_screen_name) {
 	#myLog(sprintf('computing partial activation for user %s', user_screen_name))
 	retIndeces = which(!duplicated(dt))[-1]
 	stopifnot(length(retIndeces) > 0)
 	partialRes = data.table(i=retIndeces)
 	partialRes = partialRes[, list(hashtag=hashtag[1:i], dtP=dt[1:i], cTime=dt[i]), by=i]
-	partialRes = with(partialRes, as.data.table(computeActs(hashtag, dtP, cTime, d=ds)))
+	partialRes = with(partialRes, as.data.table(computeActPrior(hashtag, dtP, cTime, d=ds)))
 	partialRes
 }
 
@@ -316,8 +316,8 @@ getModelHashtagsTbl <- function(partialRes) {
 	res
 }
 
-computeActsByUser <- function(hashtagsTbl, ds) {
-	partialRes = hashtagsTbl[, computeActsForUser(hashtag, dt, ds, user_screen_name), by=user_screen_name]
+computeActPriorByUser <- function(hashtagsTbl, ds) {
+	partialRes = hashtagsTbl[, computeActPriorForUser(hashtag, dt, ds, user_screen_name), by=user_screen_name]
 	modelHashtagsTbl = getModelHashtagsTbl(partialRes)
 	modelHashtagsTbl
 }
@@ -325,7 +325,7 @@ computeActsByUser <- function(hashtagsTbl, ds) {
 getPriorAtEpoch <- function(priorTbl, cEpoch, d) {
 	curUserPriorTbl = priorTbl[creation_epoch <= cEpoch]
 	curUserPriorTbl[, cTime := cEpoch - min(creation_epoch)]
-	partialRes = curUserPriorTbl[, computeActs(hashtag, dt, cTime, d), by=user_screen_name]
+	partialRes = curUserPriorTbl[, computeActPrior(hashtag, dt, cTime, d), by=user_screen_name]
 	modelHashtagsTbl = getModelHashtagsTbl(partialRes)
 	modelHashtagsTbl
 }
@@ -465,7 +465,7 @@ genAggModelVsPredTbl <- function(hashtagsTbl, config) {
 	modelHashtagsTbls = data.table()
 	getModelVsPredTblFromHashtagsTbl <- function(hashtagsTbl, ds, userScreenName) {
 		myLog(sprintf('generating model predictions for user %s', userScreenName))
-		modelHashtagsTbl = rbindlist(lapply(ds, function(d) computeActsByUser(hashtagsTbl, d=d)))
+		modelHashtagsTbl = rbindlist(lapply(ds, function(d) computeActPriorByUser(hashtagsTbl, d=d)))
 		setkey(modelHashtagsTbl, user_screen_name, dt, hashtag, d)
 		addMetrics(hashtagsTbl, modelHashtagsTbl)
 		modelVsPredTbl = getModelVsPredTbl(modelHashtagsTbl, hashtagsTbl)	
@@ -1215,7 +1215,7 @@ addSjiAttrs <- function(sjiTbl) {
 	sjiTbl[, EChunk := 1 - HChunk/max(HChunk)]
 }
 
-computeAct <- function(context, sjiTbl) {
+computeActSji <- function(context, sjiTbl) {
 	sjiTbl[J(context), nomatch=0][, {WChunk = EChunk/sum(EChunk); list(act=sum(WChunk * sji))}, keyby=tag]
 }
 
@@ -1256,9 +1256,9 @@ curWS <- function() {
 	BTbl
 	sjiTblT
 	tables()
-	computeAct(context, sjiTblSO)[order(act)]
-	computeAct('clojure', sjiTblSO)[order(act)]
-	computeAct('radio', sjiTblT)[order(act, decreasing=T)]
+	computeActSji(context, sjiTblSO)[order(act)]
+	computeActSji('clojure', sjiTblSO)[order(act)]
+	computeActSji('radio', sjiTblT)[order(act, decreasing=T)]
 	sjiTblT[tag == '#soundcloud'][order(partialN, decreasing=T)][1:30]
 	
 	test_dir(sprintf("%s/%s", PATH, 'tests'), reporter='summary')
