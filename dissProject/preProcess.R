@@ -607,6 +607,11 @@ modConfig <- function(config, mods) {
 	newConfig
 }
 
+getConfig <- function(config, slot) {
+	stopifnot(slot %in% names(config))
+	config[[slot]]
+}
+
 defaultTCols = "id::text, user_id, user_screen_name, created_at, retweeted, in_reply_to_status_id, lang, truncated, text, created_at_epoch as creation_epoch"
 
 getQueryUsersSubset <- function(val, from) {
