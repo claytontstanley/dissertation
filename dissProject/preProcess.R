@@ -1356,7 +1356,7 @@ updateBestFitCol <- function(postResTbl, coeffsTbl) {
 	}
 }
 
-getPPV = function(dFrame) {
+getPPVTbl = function(dFrame) {
 	pred = with(dFrame, prediction(bestFit, hashtagUsedP))
 	perf = performance(pred, "tpr", "fpr")
 	fp = unlist(perf@x.values)*sum(!dFrame$hashtagUsedP)
@@ -1379,7 +1379,7 @@ analyzePostResTbl <- function(postResTbl, predictors) {
 	coeffsTbl = data.table(coeff=coeffs, name=names(coeffs))
 	updateBestFitCol(validPostResTbl, coeffsTbl)
 	validPostResTbl
-	ppvTbl = getPPV(validPostResTbl)
+	ppvTbl = getPPVTbl(validPostResTbl)
 	ppvTbl[, plot(x,y)]
 	print(summary(myLogit))
 	print(ClassLog(myLogit, validPostResTbl$hashtagUsedP))
