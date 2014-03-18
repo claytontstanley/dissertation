@@ -19,6 +19,10 @@ library(Matrix)
 library(utils)
 library(testthat)
 library(ROCR)
+library(popbio)
+library(QuantPsyc)
+
+
 PATH = getPathToThisFile()
 FILE = getNameOfThisFile()
 
@@ -1322,6 +1326,18 @@ getTokenizedFromSubsetT <- function(minId, maxId, config) {
 
 getTokenizedFromSubsetSO <- getTokenizedFromSubset
 
+analyzePostResTbl <- function(postResTbl, predictors) {
+	predictors = c(predictors, 'act')
+	postResTbl
+	model = reformulate(termlabels = predictors, response = 'hashtagUsedP')
+	model
+	naRows = postResTbl[, predictors, with=F][, rowSums(is.na(as.matrix(.SD))) > 0]
+	validPostResTbl = postResTbl[!naRows]
+	myLogit = glm(model, data=validPostResTbl, family=binomial(link="logit"))
+	print(summary(myLogit))
+	print(ClassLog(myLogit, validPostResTbl$hashtagUsedP))
+	myLogit
+}
 
 curWS <- function() {
 	priorTblUserSO
@@ -1331,9 +1347,14 @@ curWS <- function() {
 	tokenTblSO
 	tokenTblT
 	tables()
-	postResTbl = withProf(tokenTblT[, getPostResTbl(.SD, defaultTConfig), by=id])
-	postResTbl = withProf(tokenTblSO[, getPostResTbl(.SD, defaultSOConfig), by=id])
-	postResTbl
+	predictors = c('title', 'body')
+	?formula
+	postResTblT = withProf(tokenTblT[, getPostResTbl(.SD, defaultTConfig), by=id])
+	postResTblSO = withProf(tokenTblSO[, getPostResTbl(.SD, defaultSOConfig), by=id])
+	myLogit = analyzePostResTbl(postResTblT, c('tweet'))
+	myLogit = analyzePostResTbl(postResTblSO, c('title', 'body'))
+	myLogit
+
 	getPostResTbl(fooTbl[, post_id[1]], defaultTConfig)
 	runGenNcoocTblT11thru10000()
 	runGenNcoocTblSO1thru3000000()
