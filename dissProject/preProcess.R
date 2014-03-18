@@ -1349,6 +1349,8 @@ handleNas <- function(postResTbl, predictors) {
 analyzePostResTbl <- function(postResTbl, predictors) {
 	predictors = c(predictors, 'act')
 	validPostResTbl = handleNas(postResTbl, predictors)
+	postResTbl
+	validPostResTbl
 	model = reformulate(termlabels = predictors, response = 'hashtagUsedP')
 	myLogit = glm(model, data=validPostResTbl, family=binomial(link="logit"))
 	print(summary(myLogit))
