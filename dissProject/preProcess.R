@@ -1326,9 +1326,7 @@ getTokenizedFromSubsetT <- function(minId, maxId, config) {
 
 getTokenizedFromSubsetSO <- getTokenizedFromSubset
 
-
-
-handleNas <- function(validPostResTbl, predictors) {
+handleNAs <- function(validPostResTbl, predictors) {
 	#validPostResTbl = copy(postResTbl)
 	#validPostResTbl[is.na(postResTbl)] = -4
 	#validPostResTbl = lapply(postResTbl, function(col) if !is.numeric(col) col[is.na(col)] = mean(col, na.rm=T))
@@ -1372,7 +1370,7 @@ getPPVTbl = function(tbl) {
 analyzePostResTbl <- function(postResTbl, predictors) {
 	predictors = c(predictors, 'act')
 	validPostResTbl = copy(postResTbl)
-	handleNas(validPostResTbl, predictors)
+	handleNAs(validPostResTbl, predictors)
 	model = reformulate(termlabels = predictors, response = 'hashtagUsedP')
 	myLogit = glm(model, data=validPostResTbl, family=binomial(link="logit"))
 	coeffs = summary(myLogit)$coefficients[,"Estimate"]
