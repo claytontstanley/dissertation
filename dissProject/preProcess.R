@@ -1328,29 +1328,59 @@ getTokenizedFromSubsetSO <- getTokenizedFromSubset
 
 
 
-handleNas <- function(postResTbl, predictors) {
+handleNas <- function(validPostResTbl, predictors) {
 	#validPostResTbl = copy(postResTbl)
 	#validPostResTbl[is.na(postResTbl)] = -4
 	#validPostResTbl = lapply(postResTbl, function(col) if !is.numeric(col) col[is.na(col)] = mean(col, na.rm=T))
-	validPostResTbl = copy(postResTbl)
 	for (col in predictors) {
 		oldVal = validPostResTbl[[col]]
 		meanVal = mean(oldVal, na.rm=T)
 		linds = is.na(oldVal)
 		myLog(sprintf('Imputing mean of %s for %s of %s values in column name %s', meanVal, sum(linds), length(linds), col))
 		oldVal[linds] = meanVal 
-		validPostResTbl[[col]] = oldVal
+		eval(bquote(validPostResTbl[, .(col) := oldVal]))
 	}
 	validPostResTbl
 	#naRows = postResTbl[, predictors, with=F][, rowSums(is.na(as.matrix(.SD))) > 0]
 	#validPostResTbl = postResTbl[!naRows]
 }
 
+updateBestFitCol <- function(postResTbl, coeffsTbl) {
+	predictors = coeffsTbl[name != '(Intercept)', name]
+	postResTbl[, bestFit := coeffsTbl[name == '(Intercept)', coeff]]
+	for (predictor in predictors) {
+		sym = as.symbol(predictor)
+		e = bquote(postResTbl[, bestFit := bestFit + .(sym) * .(coeffsTbl[name == predictor, coeff])])
+		myLog(e)
+		eval(e)
+	}
+}
+
+getPPV = function(dFrame) {
+	pred = with(dFrame, prediction(bestFit, hashtagUsedP))
+	perf = performance(pred, "tpr", "fpr")
+	fp = unlist(perf@x.values)*sum(!dFrame$hashtagUsedP)
+	tp = unlist(perf@y.values)*sum(dFrame$hashtagUsedP)
+	cutoff = min(which((tp+fp) > (sum(dFrame$hashtagUsedP) * 2)))
+	indeces = sort(sample(cutoff, min(cutoff, 2000), prob=1/(1+1:cutoff)))
+	x = tp[indeces]+fp[indeces]
+	x = x/sum(dFrame$hashtagUsedP)
+	y = tp[indeces]/(tp[indeces]+fp[indeces])
+	data.table(x=x, y=y)
+}
+
 analyzePostResTbl <- function(postResTbl, predictors) {
 	predictors = c(predictors, 'act')
-	validPostResTbl = handleNas(postResTbl, predictors)
+	validPostResTbl = copy(postResTbl)
+	handleNas(validPostResTbl, predictors)
 	model = reformulate(termlabels = predictors, response = 'hashtagUsedP')
 	myLogit = glm(model, data=validPostResTbl, family=binomial(link="logit"))
+	coeffs = summary(myLogit)$coefficients[,"Estimate"]
+	coeffsTbl = data.table(coeff=coeffs, name=names(coeffs))
+	updateBestFitCol(validPostResTbl, coeffsTbl)
+	validPostResTbl
+	ppvTbl = getPPV(validPostResTbl)
+	ppvTbl[, plot(x,y)]
 	print(summary(myLogit))
 	print(ClassLog(myLogit, validPostResTbl$hashtagUsedP))
 	myLogit
