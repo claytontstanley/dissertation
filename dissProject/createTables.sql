@@ -17,9 +17,11 @@ create table if not exists tweets (
 	lang varchar(255) not null,
 	truncated varchar(255) not null,
 	text text not null,
+	creation_epoch numeric,
 	primary key (id)
 	);
 
+update tweets set creation_epoch = extract(epoch from to_timestamp(created_at, 'YYYY-MM-DD HH24:MI:SS')::timestamp without time zone) where creation_epoch is null; 
 create index user_screen_name_index_tweets on tweets (user_screen_name);
 create index user_id_index_tweets on tweets (user_id);
 
@@ -43,10 +45,10 @@ create table if not exists top_hashtag_tweets (
 	truncated varchar(255) not null,
 	text text not null,
 	hashtag_group text not null,
+	creation_epoch numeric,
 	primary key (id)
 	);
 
-alter table top_hashtag_tweets add column creation_epoch numeric; 
 update top_hashtag_tweets set creation_epoch = extract(epoch from to_timestamp(created_at, 'YYYY-MM-DD HH24:MI:SS')::timestamp without time zone) where creation_epoch is null; 
 
 --drop table if exists temp_tweets_id cascade;
@@ -134,11 +136,9 @@ create table if not exists tag_synonyms (
 	Approval_Date text not null,
 	primary key (id)
 	);
+
 alter table posts add column creation_epoch numeric;
 update posts set creation_epoch = extract(epoch from creation_date) where creation_epoch is null;
-
-alter table tweets add column creation_epoch numeric; 
-update tweets set creation_epoch = extract(epoch from to_timestamp(created_at, 'YYYY-MM-DD HH24:MI:SS')::timestamp without time zone) where creation_epoch is null; 
 
 create table temp_tokenized (
 	chunk_id integer not null,
