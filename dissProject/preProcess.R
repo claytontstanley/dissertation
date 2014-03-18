@@ -245,7 +245,7 @@ convertTagSynonyms <- function(tokenizedTbl) {
 getTagsTbl <- function(postsTbl, config) {
 	tokenizedTbl = getTokenizedTbl(postsTbl, from='tagsNoHtml', regex=matchTag)
 	if (getConfig(config, "convertTagSynonymsP")) convertTagSynonyms(tokenizedTbl)
-	tagsTbl = tokenizedTbl[postsTbl, list(hashtag=chunk, pos=pos, created_at=creation_date, dt=dt, user_id=owner_user_id, user_screen_name=as.character(owner_user_id)), nomatch=0]
+	tagsTbl = tokenizedTbl[postsTbl, list(hashtag=chunk, pos=pos, created_at=creation_date, dt=dt, user_id=owner_user_id, user_screen_name=user_screen_name), nomatch=0]
 	setkey(tagsTbl, user_screen_name, dt, hashtag)
 	tagsTbl
 }
@@ -952,7 +952,7 @@ analyzeTemporal <- function(modelVsPredTbl) {
 	user_screen_names = c("'520957','238260','413225','807325','521180'")
 	user_screen_names = c("'520957','238260'")
 	runTbls = runPriorSO(config=modConfig(defaultSOConfig, list(accumModelHashtagsTbl=T,
-								    query=sprintf("select %s from posts where post_type_id = 1 and owner_user_id in (%s)", defaultSOCols, user_screen_names))))
+								    query=sprintf("select %s from posts where post_type_id = 1 and user_screen_name in (%s)", defaultSOCols, user_screen_names))))
 	plotTemporal(runTbls)
 }
 
@@ -1197,7 +1197,7 @@ getSjiTblT <- function(config, startId, endId) {
 
 
 getPriorTblUserSO <- function(config, startId, endId) {
-	priorTblUser = sqldt(sprintf("select posts.id, owner_user_id, user_screen_name, creation_epoch, chunk, type from posts
+	priorTblUser = sqldt(sprintf("select posts.id, user_screen_name, creation_epoch, chunk, type from posts
 				     join post_tokenized
 				     on posts.id = post_tokenized.id
 				     where type = 'tag'
@@ -1324,6 +1324,7 @@ getTokenizedFromSubsetSO <- getTokenizedFromSubset
 
 
 curWS <- function() {
+	priorTblUserSO
 	sqldf('select hashtag_group, retweeted, count(text) from top_hashtag_tweets group by hashtag_group, retweeted order by hashtag_group, retweeted')
 	tokenTblT = getTokenizedFromSubsetT(3000001, 3000020, defaultTConfig)
 	tokenTblSO = getTokenizedFromSubsetSO(3000001, 3000020, defaultSOConfig)
@@ -1355,10 +1356,9 @@ curWS <- function() {
 	test_dir(sprintf("%s/%s", PATH, 'tests'), reporter='summary')
 	.ls.objects(order.by='Size')
 	# Checking that tweets for twitter users from each followers_count,statuses_count scale are being collected properly
-	usersWithTweetsTbl = sqldt("select distinct on (user_id) t.user_screen_name,u.followers_count,u.statuses_count
+	usersWithTweetsTbl = sqldt("select distinct on (t.user_screen_name) t.user_screen_name,u.followers_count,u.statuses_count
 				   from tweets as t join twitter_users as u on t.user_screen_name = u.user_screen_name"
 				   )
-	usersWithTweetsTbl
 	usersWithTweetsTbl[order(followers_count), plot(log10(followers_count))]
 	usersWithTweetsTbl[order(statuses_count), plot(log10(statuses_count))]
 	usersWithTweetsTbl[order(followers_count),][followers_count > 10000000]

@@ -233,6 +233,7 @@ alter table users add column num_questions integer;
 update users set num_questions = q.N from (select owner_user_id, count(*) as N from Posts where post_type_id = 1 group by owner_user_id) as q where q.owner_user_id = users.id;
 
 create index owner_user_id_index_posts on posts (owner_user_id);
+create index user_screen_name_index_posts on posts (user_screen_name);
 create index post_type_id_index_posts on posts (post_type_id);
 create index reputation_index_users on users (reputation);
 create index num_questions_index_users on users (num_questions);
