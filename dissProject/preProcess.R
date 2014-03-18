@@ -586,7 +586,6 @@ defaultTConfig = append(defaultBaseConfig,
 			     groupName = '2014-02-27 17:13:30 initial',
 			     priorTbl = 'priorTblGlobT',
 			     sjiTbl = 'sjiTblT',
-			     userScreenNameCol = 'user_screen_name',
 			     includeRetweetsP=F))
 
 defaultSOConfig = append(defaultBaseConfig,
@@ -604,7 +603,6 @@ defaultSOConfig = append(defaultBaseConfig,
 			      groupName = 'SOShuffledFull',
 			      priorTbl = 'priorTblUserSO',
 			      sjiTbl = 'sjiTblSO',
-			      userScreenNameCol = 'owner_user_id::text as user_screen_name',
 			      makeChunkTblFun='make_chunk_table_SO'
 			      ))
 
@@ -649,7 +647,7 @@ getQueryTStatuses <- function(val, filters='1=1') {
 	getQueryGeneralT(val, 'statuses_count', filters)
 }
 
-defaultSOCols = sprintf('id, owner_user_id, %s, creation_date, creation_epoch, title, tags', getConfig(defaultSOConfig, 'userScreenNameCol'))
+defaultSOCols = sprintf('id, owner_user_id, user_screen_name, creation_date, creation_epoch, title, tags')
 
 getQuerySO <- function(val) {
 	sprintf('select %s from posts
@@ -1199,7 +1197,7 @@ getSjiTblT <- function(config, startId, endId) {
 
 
 getPriorTblUserSO <- function(config, startId, endId) {
-	priorTblUser = sqldt(sprintf("select posts.id, owner_user_id, owner_user_id::text as user_screen_name, creation_epoch, chunk, type from posts
+	priorTblUser = sqldt(sprintf("select posts.id, owner_user_id, user_screen_name, creation_epoch, chunk, type from posts
 				     join post_tokenized
 				     on posts.id = post_tokenized.id
 				     where type = 'tag'
@@ -1267,10 +1265,10 @@ myLoadImage <- function() {
 }
 
 genAndSaveCurWorkspace <- function() {
-	maxIdSOSji = 100000
-	maxIdSOPrior = 10000000
-	maxIdTSji = 1000000
-	maxIdTPrior = 100000
+	maxIdSOSji = 1e5
+	maxIdSOPrior = 1e7 
+	maxIdTSji = 1e6 
+	maxIdTPrior = 1e5 
 	priorTblGlobT = getPriorTblGlobT(defaultTConfig, 1, maxIdTPrior)
 	priorTblUserSO = getPriorTblUserSO(defaultSOConfig, 1, maxIdSOPrior)
 	sjiTblT = getSjiTblT(defaultTConfig, 1, maxIdTSji)
@@ -1306,14 +1304,13 @@ getPostResTbl <- function(tokenTbl, config) {
 }
 
 getTokenizedFromSubset <- function(minId, maxId, config) {
-	resTbl = sqldt(sprintf("select tokenized_tbl.id::text, %s, creation_epoch, chunk, pos, type from %s as tokenized_tbl
+	resTbl = sqldt(sprintf("select tokenized_tbl.id::text, user_screen_name, creation_epoch, chunk, pos, type from %s as tokenized_tbl
 			       join %s as posts_tbl
 			       on tokenized_tbl.id = posts_tbl.id 
 			       where tokenized_tbl.id in (select post_id from %s 
 							  where id >= %s
 							  and id <= %s
 							  and group_name = '%s')",
-			       getConfig(config, 'userScreenNameCol'),
 			       getConfig(config, "tokenizedTbl"), getConfig(config, "postsTbl"), getConfig(config, "subsetsTbl"), minId, maxId, getConfig(config, "groupName") 
 			       ))
 	resTbl
@@ -1327,10 +1324,12 @@ getTokenizedFromSubsetSO <- getTokenizedFromSubset
 
 
 curWS <- function() {
+	sqldf('select hashtag_group, retweeted, count(text) from top_hashtag_tweets group by hashtag_group, retweeted order by hashtag_group, retweeted')
 	tokenTblT = getTokenizedFromSubsetT(3000001, 3000020, defaultTConfig)
 	tokenTblSO = getTokenizedFromSubsetSO(3000001, 3000020, defaultSOConfig)
 	tokenTblSO
 	tokenTblT
+	tables()
 	postResTbl = withProf(tokenTblT[, getPostResTbl(.SD, defaultTConfig), by=id])
 	postResTbl = withProf(tokenTblSO[, getPostResTbl(.SD, defaultSOConfig), by=id])
 	postResTbl

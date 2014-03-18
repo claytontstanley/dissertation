@@ -139,6 +139,8 @@ create table if not exists tag_synonyms (
 
 alter table posts add column creation_epoch numeric;
 update posts set creation_epoch = extract(epoch from creation_date) where creation_epoch is null;
+alter table posts add column user_screen_name text;
+update posts set user_screen_name = owner_user_id::text where user_screen_name is null;
 
 create table temp_tokenized (
 	chunk_id integer not null,
