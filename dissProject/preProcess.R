@@ -1252,7 +1252,7 @@ addSjiAttrs <- function(sjiTbl) {
 
 computeActSji <- function(context, sjiTbl) {
 	myLog(sprintf("computing sji act for context with length %s", length(context)))
-	resTbl = sjiTbl[J(context), nomatch=0]
+	resTbl = sjiTbl[J(unique(context)), nomatch=0]
 	resTbl = resTbl[, {WChunk = EChunk/sum(EChunk); list(act=sum(WChunk * sji))}, keyby=tag]
 }
 
@@ -1291,7 +1291,7 @@ getPostResTbl <- function(tokenTbl, config) {
 	setkey(priorTbl, hashtag)
 	tempTagTbl = tagTbl[, list(hashtag=chunk)]
 	setkey(tempTagTbl, hashtag)
-	priorTbl = merge(priorTbl, tempTagTbl, all=T)
+	priorTbl = merge(priorTbl, unique(tempTagTbl), all=T)
 	sjiTbl = contextTbl[, computeActSji(chunk, get(getConfig(config, 'sjiTbl'))), by=type]
 	if (nrow(sjiTbl) > 0) {
 		sjiTblWide = dcast.data.table(sjiTbl, tag ~ type, value.var='act')
@@ -1326,13 +1326,30 @@ getTokenizedFromSubsetT <- function(minId, maxId, config) {
 
 getTokenizedFromSubsetSO <- getTokenizedFromSubset
 
+
+
+handleNas <- function(postResTbl, predictors) {
+	#validPostResTbl = copy(postResTbl)
+	#validPostResTbl[is.na(postResTbl)] = -4
+	#validPostResTbl = lapply(postResTbl, function(col) if !is.numeric(col) col[is.na(col)] = mean(col, na.rm=T))
+	validPostResTbl = copy(postResTbl)
+	for (col in predictors) {
+		oldVal = validPostResTbl[[col]]
+		meanVal = mean(oldVal, na.rm=T)
+		linds = is.na(oldVal)
+		myLog(sprintf('imputing mean of %s for %s of %s values in column name %s', meanVal, sum(linds), length(linds), col))
+		oldVal[linds] = meanVal 
+		validPostResTbl[[col]] = oldVal
+	}
+	validPostResTbl
+	#naRows = postResTbl[, predictors, with=F][, rowSums(is.na(as.matrix(.SD))) > 0]
+	#validPostResTbl = postResTbl[!naRows]
+}
+
 analyzePostResTbl <- function(postResTbl, predictors) {
 	predictors = c(predictors, 'act')
-	postResTbl
+	validPostResTbl = handleNas(postResTbl, predictors)
 	model = reformulate(termlabels = predictors, response = 'hashtagUsedP')
-	model
-	naRows = postResTbl[, predictors, with=F][, rowSums(is.na(as.matrix(.SD))) > 0]
-	validPostResTbl = postResTbl[!naRows]
 	myLogit = glm(model, data=validPostResTbl, family=binomial(link="logit"))
 	print(summary(myLogit))
 	print(ClassLog(myLogit, validPostResTbl$hashtagUsedP))
@@ -1342,8 +1359,8 @@ analyzePostResTbl <- function(postResTbl, predictors) {
 curWS <- function() {
 	priorTblUserSO
 	sqldf('select hashtag_group, retweeted, count(text) from top_hashtag_tweets group by hashtag_group, retweeted order by hashtag_group, retweeted')
-	tokenTblT = getTokenizedFromSubsetT(3000001, 3000020, defaultTConfig)
-	tokenTblSO = getTokenizedFromSubsetSO(3000001, 3000020, defaultSOConfig)
+	tokenTblT = getTokenizedFromSubsetT(3000001, 3000100, defaultTConfig)
+	tokenTblSO = getTokenizedFromSubsetSO(3000001, 3000100, defaultSOConfig)
 	tokenTblSO
 	tokenTblT
 	tables()
@@ -1351,6 +1368,8 @@ curWS <- function() {
 	?formula
 	postResTblT = withProf(tokenTblT[, getPostResTbl(.SD, defaultTConfig), by=id])
 	postResTblSO = withProf(tokenTblSO[, getPostResTbl(.SD, defaultSOConfig), by=id])
+	postResTblSO
+	postResTblSO[hashtagUsedP==T][, act, by=id][, .N, by=act]
 	myLogit = analyzePostResTbl(postResTblT, c('tweet'))
 	myLogit = analyzePostResTbl(postResTblSO, c('title', 'body'))
 	myLogit
