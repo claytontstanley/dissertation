@@ -1337,7 +1337,7 @@ handleNas <- function(postResTbl, predictors) {
 		oldVal = validPostResTbl[[col]]
 		meanVal = mean(oldVal, na.rm=T)
 		linds = is.na(oldVal)
-		myLog(sprintf('imputing mean of %s for %s of %s values in column name %s', meanVal, sum(linds), length(linds), col))
+		myLog(sprintf('Imputing mean of %s for %s of %s values in column name %s', meanVal, sum(linds), length(linds), col))
 		oldVal[linds] = meanVal 
 		validPostResTbl[[col]] = oldVal
 	}
