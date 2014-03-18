@@ -1356,15 +1356,15 @@ updateBestFitCol <- function(postResTbl, coeffsTbl) {
 	}
 }
 
-getPPVTbl = function(dFrame) {
-	pred = with(dFrame, prediction(bestFit, hashtagUsedP))
+getPPVTbl = function(tbl) {
+	pred = with(tbl, prediction(bestFit, hashtagUsedP))
 	perf = performance(pred, "tpr", "fpr")
-	fp = unlist(perf@x.values)*sum(!dFrame$hashtagUsedP)
-	tp = unlist(perf@y.values)*sum(dFrame$hashtagUsedP)
-	cutoff = min(which((tp+fp) > (sum(dFrame$hashtagUsedP) * 2)))
+	fp = unlist(perf@x.values)*sum(!tbl$hashtagUsedP)
+	tp = unlist(perf@y.values)*sum(tbl$hashtagUsedP)
+	cutoff = min(which((tp+fp) > (sum(tbl$hashtagUsedP) * 2)))
 	indeces = sort(sample(cutoff, min(cutoff, 2000), prob=1/(1+1:cutoff)))
 	x = tp[indeces]+fp[indeces]
-	x = x/sum(dFrame$hashtagUsedP)
+	x = x/sum(tbl$hashtagUsedP)
 	y = tp[indeces]/(tp[indeces]+fp[indeces])
 	data.table(x=x, y=y)
 }
