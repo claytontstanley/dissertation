@@ -169,6 +169,7 @@ create table if not exists post_tokenized_type_types (
 	primary key (id)
 	);
 insert into post_tokenized_type_types (type_name) values ('title'), ('body'), ('tag');
+vacuum analyze post_tokenized_type_types;
 
 create table if not exists top_hashtag_tokenized_type_types (
 	id serial not null,
@@ -176,6 +177,7 @@ create table if not exists top_hashtag_tokenized_type_types (
 	primary key (id)
 	);
 insert into top_hashtag_tokenized_type_types (type_name) values ('tweet'), ('hashtag');
+vacuum analyze top_hahtag_tokenized_type_types;
 
 create table if not exists post_tokenized_chunk_types (
 	id serial not null,
@@ -183,6 +185,7 @@ create table if not exists post_tokenized_chunk_types (
 	primary key (id)
 	);
 insert into post_tokenized_chunk_types (type_name) select distinct chunk from post_tokenized where char_length(chunk) <= 500;
+vacuum analyze post_tokenized_chunk_types;
 
 create table if not exists top_hashtag_tokenized_chunk_types (
 	id serial not null,
@@ -190,6 +193,7 @@ create table if not exists top_hashtag_tokenized_chunk_types (
 	primary key (id)
 	);
 insert into top_hashtag_tokenized_chunk_types (type_name) select distinct chunk from top_hashtag_tokenized;
+vacuum analyze top_hashtag_tokenized_chunk_types;
 
 create type chunk_table_type as ("chunk_id" int, "post_id" bigint, "pos" int, "post_type_id" int);
 

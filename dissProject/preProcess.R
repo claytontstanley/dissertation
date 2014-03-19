@@ -1002,6 +1002,7 @@ getNcoocTbl <- function(type, chunkTableQuery, config) {
 		      order by L.chunk_id, R.chunk_id, pos_from_tag",
 		      getConfig(config, "tokenizedTypeTypeTbl"), getConfig(config, "tagTypeName"),
 		      getConfig(config, "tokenizedTypeTypeTbl"), type))
+	sqldf('vacuum analyze temp_cooc')
 	resTbl = sqldt(sprintf('select t.type_name as tag, c.type_name as chunk, pos_from_tag, partial_N
 			       from temp_cooc
 			       join %s as t
@@ -1055,6 +1056,7 @@ genTempPostTokenizedTbl <- function(chunkTableQuery) {
 	myLog(sprintf("generating temp_tokenized table with query %s", chunkTableQuery))
 	sqldf('truncate table temp_tokenized')
 	sqldf(sprintf("insert into temp_tokenized %s", chunkTableQuery))
+	sqldf('vacuum analyze temp_tokenized')
 }
 
 appendDTbl <- function(tbl, tblName) {
