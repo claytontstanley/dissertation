@@ -927,8 +927,9 @@ plotDVDiffs <- function(sumTbl) {
 	plotBarSumTbl(sumTbl, DVDirection, sprintf('compareDVDiffs'), extras=list(theme(legend.position='top', legend.direction='vertical', axis.title.y=element_blank()),
 										  #labs(x=element_blank()),
 										  labs(y='Mean Difference in Accuracy'),
-										  guides(fill=guide_legend(title="Difference Type")),
-										  coord_flip()))
+										  guides(fill=guide_legend(title="Difference Type", reverse=T)),
+										  coord_flip()
+										  ))
 }
 
 compareOptimalDs <- function(modelVsPredTbl) compareMeanDV(modelVsPredTbl, median, list(labs(y='Mean Optimal d')))
