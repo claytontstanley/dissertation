@@ -377,6 +377,7 @@ visCompare <- function(hashtagsTbl, modelHashtagsTbl, bestDTbl) {
 	hashtagPlots = visHashtags(hashtagsTbl)
 	hashtagPlots[, resPlots := list(list(resPlots[[1]] + ggtitle('Observed'))), by=user_screen_name]
 	setkey(hashtagPlots, user_screen_name)
+	hashtagPlots[, list(resPlots=list(myPlotPrint(resPlots[[1]], sprintf('HTByTime-%s', .BY[1])))), by=list(user_screen_name)]
 	fullPlots = modelPlots[, list(resPlots=list(do.call(arrangeGrob, append(hashtagPlots[user_screen_name]$resPlots, resPlots)))), by=user_screen_name]
 	fullPlots[, list(resPlots=list(myPlotPrint(resPlots[[1]], sprintf('HTMByTime-%s', .BY[1])))), by=list(user_screen_name)]
 }
@@ -501,7 +502,7 @@ genAggModelVsPredTbl <- function(hashtagsTbl, config) {
 }
 
 visModelVsPredTbl <- function(modelVsPredTbl) {
-	assign('p1', ggplot(modelVsPredTbl[predUsedBest == T], aes(totN, d)) +
+	assign('p1', ggplot(modelVsPredTbl[predUsedBest == T & d <= 2], aes(totN, d)) +
 	       geom_point() +
 	       xlab('Total Number of Hashtags'))
 	modelVsPredTbl[topHashtag & hashtagUsedP, meanPC := mean(acc), by=user_screen_name]
@@ -515,7 +516,7 @@ visModelVsPredTbl <- function(modelVsPredTbl) {
 	assign('p3', ggplot(modelVsPredTbl[topHashtag & hashtagUsedP & user_screen_name %in% sample(unique(user_screen_name), size=min(20, length(unique(user_screen_name))))],
 			    aes(log(d),acc, group=as.factor(user_screen_name))) + geom_line() +
 	       ylab('Accuracy'))
-	assign('p4', ggplot(modelVsPredTbl[predUsedBest == T], aes(d)) +
+	assign('p4', ggplot(modelVsPredTbl[predUsedBest == T & d <= 2], aes(d)) +
 	       geom_histogram(aes(y = ..density..)) +
 	       geom_density() +
 	       ylab('Density'))
@@ -977,13 +978,14 @@ analyzeModelVsPredTbl <- function(modelVsPredTbl) {
 	compareOptimalDs(modelVsPredTbl[DVName %in% c('topHashtagPost', 'topHashtagPostOL2', 'topHashtagAct') & runNum == 2])
 	compareOptimalAcc(modelVsPredTbl[DVName %in% c('topHashtagPost', 'topHashtagPostOL2', 'topHashtagAct') & runNum == 2])
 
-	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & datasetName=='TFollowgt10Mr2'])
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & datasetName=='TFollowgt1kr2'])
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & datasetName=='TTweetsgt5e4r2'])
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & datasetName=='TTweetsgt1e2r2'])
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & datasetName=='SOgt1kr2'])
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & datasetName=='SOgt100kr2'])
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & datasetName=='SOQgt050r2'])
+	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & datasetName=='TFollowgt10Mr2'])
+	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostOL2' & datasetName=='TFollowgt10Mr2' & d < 1])
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & datasetName=='SOQgt500r2'])
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostOL2' & datasetName=='SOQgt500r2' & d < 1])
 }
