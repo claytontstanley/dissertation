@@ -1257,8 +1257,7 @@ addSjiAttrs <- function(sjiTbl) {
 
 computeActSji <- function(context, sjiTbl) {
 	myLog(sprintf("computing sji act for context with length %s", length(context)))
-	#resTbl = sjiTbl[J(unique(context)), nomatch=0]
-	resTbl = sjiTbl[J(context), nomatch=0]
+	resTbl = sjiTbl[J(context), nomatch=0, allow.cartesian=T]
 	resTbl = resTbl[, {WChunk = EChunk/sum(EChunk); list(act=sum(WChunk * sji))}, keyby=tag]
 }
 

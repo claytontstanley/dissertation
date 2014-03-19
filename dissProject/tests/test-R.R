@@ -128,6 +128,9 @@ test_that("testComputeAct", {
 	testTestTblVsExpected(data.table(chunk=c('a', 'b'), tag=c('x', 'x'), sji=c(1,2), EChunk=c(1,1)),
 			      data.table(tag=c('x'), act=c(5/4)),
 			      context=c('a','a','a','b'))
+	testTestTblVsExpected(data.table(chunk=c('a','a'), tag=c('x','y'), sji=c(1,2), EChunk=c(1,1)),
+			      data.table(tag=c('x','y'), act=c(1,2)),
+			      context=c('a','a','a','a'))
 })
 
 test_that('testGetPriorTbl', {
