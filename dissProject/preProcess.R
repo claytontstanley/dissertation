@@ -908,6 +908,7 @@ compareDBestVsMax <- function(modelVsPredTbl) {
 
 plotBarSumTbl <- function(sumTbl, fillCol, figName, extras=NULL) {
 	fillCol = substitute(fillCol)
+	renameColDatasetGroup(sumTbl)
 	expr = bquote(ggplot(sumTbl, aes(x=factor(datasetGroup), y=meanVal, fill=.(fillCol))) +
 		      geom_bar(width=0.7, position=position_dodge(), stat='identity') +
 		      geom_errorbar(aes(ymin=minCI, ymax=maxCI), position=position_dodge(width=0.7), width=0.1, size=0.3) + 
@@ -922,7 +923,11 @@ compareMeanDV <- function(modelVsPredTbl, DV, extras=NULL) {
 	DV = substitute(DV)
 	expr = bquote(tableModelVsPredTbl(modelVsPredTbl)[, withCI(.(DV)), keyby=list(DVName, datasetGroup)])
 	sumTbl = eval(expr)
-	plotBarSumTbl(sumTbl, DVName, sprintf('compareMeanDV-%s', deparse(DV)), extras=append(list(theme(axis.title.x=element_blank())), extras))
+	renameColDVName(sumTbl)
+	plotBarSumTbl(sumTbl, DVName, sprintf('compareMeanDV-%s', deparse(DV)), extras=append(list(theme(legend.position='top', legend.direction='vertical', axis.title.y=element_blank()),
+												   guides(fill=guide_legend(reverse=T)),
+												   coord_flip()
+												   ), extras))
 }
 
 plotDatasetDescriptives <- function(modelVsPredTbl) {
@@ -962,8 +967,19 @@ renameDVDirection <- function(tbl) {
 	tbl
 }
 
+renameColDVName <- function(tbl) {
+	setkey(tbl, DVName)
+	mapTbl = data.table(DVName=c('topHashtagAct', 'topHashtagPost', 'topHashtagPostOL2'),
+			    newName=c('Standard Model Relaxed Across Posts',
+				      'Standard Model',
+				      'Optimized Learning Model'))
+	setkey(mapTbl, DVName)
+	tbl[mapTbl, DVName := newName]
+	tbl
+}
+
+
 plotDVDiffs <- function(sumTbl) {
-	renameColDatasetGroup(sumTbl)
 	renameDVDirection(sumTbl)
 	plotBarSumTbl(sumTbl, DVDirection, sprintf('compareDVDiffs'), extras=list(theme(legend.position='top', legend.direction='vertical', axis.title.y=element_blank()),
 										  #labs(x=element_blank()),
@@ -973,7 +989,7 @@ plotDVDiffs <- function(sumTbl) {
 										  ))
 }
 
-compareOptimalDs <- function(modelVsPredTbl) compareMeanDV(modelVsPredTbl, median, list(labs(y='Mean Optimal d')))
+compareOptimalDs <- function(modelVsPredTbl) compareMeanDV(modelVsPredTbl, median, list(labs(y='Mean Optimal Decay Rate Parameter (d)')))
 compareOptimalAcc <- function(modelVsPredTbl) compareMeanDV(modelVsPredTbl, acc, list(labs(y='Mean Accuracy')))
 
 # TODO: Find a library that implements this
