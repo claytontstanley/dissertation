@@ -607,6 +607,7 @@ defaultTConfig = append(defaultBaseConfig,
 			     tagTypeName = 'hashtag',
 			     postTypeNames = 'tweet',
 			     groupName = '2014-02-27 17:13:30 initial',
+			     allGroupNames = c('2014-02-27 17:13:30 initial', '2014-03-17 11:28:15 trendsmap'),
 			     priorTbl = 'priorTblGlobT',
 			     sjiTbl = 'sjiTblT',
 			     includeRetweetsP=F))
@@ -1221,10 +1222,16 @@ addTweetSubsets <- function() {
 		appendDTbl(tbl, "top_hashtag_subsets")
 		return()
 	}
-	tweetsIdGpTbl[, partialWriteTable(copy(.SD), hashtag_group), by=hashtag_group]
+	if (nrow(tweetsIdGpTbl) > 0) {
+		tweetsIdGpTbl[, partialWriteTable(copy(.SD), hashtag_group), by=hashtag_group]
+	}
 }
 
 runAddTweetSubsets <- addTweetSubsets
+runUpdateTwitterWithNewGroup <- function() {
+	runAddTweetSubsets()
+	runGenTokenizedTblTwitter()
+}
 
 runGenNcoocTblSO1thru100 <- function() genNcoocTblSO('SOShuffledFull', 1, 100)
 runGenNcoocTblSO1thru1000 <- function() genNcoocTblSO('SOShuffledFull', 1, 1000)
@@ -1240,7 +1247,11 @@ runGenNcoocTblT11thru1000000 <- function() genNcoocTblTwitter('2014-02-27 17:13:
 runGenNcoocTblT11thru3000000 <- function() genNcoocTblTwitter('2014-02-27 17:13:30 initial', 1, 3000000)
 
 runGenTokenizedTblSO <- function() genTokenizedTblSO()
-runGenTokenizedTblTwitter <- function() genTokenizedTblTwitter('2014-02-27 17:13:30 initial')
+runGenTokenizedTblTwitter <- function() {
+	for (groupName in getConfig(defaultTConfig, 'allGroupNames')) {
+		genTokenizedTblTwitter(groupName)
+	}
+}
 
 getSjiTblSO <- function(config, startId, endId) {
 	fileName = sprintf('%s.csv', makeSubsetName(getConfig(config, "groupName"), startId, endId))
