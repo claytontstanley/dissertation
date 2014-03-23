@@ -355,7 +355,10 @@ getPriorForAllUsersAtEpoch <- function(priorTblUser, cEpoch, d) {
 }
 
 visHashtags <- function(hashtagsTbl) {
-	plots = hashtagsTbl[, list(resPlots=list(ggplot(.SD, aes(x=hashtag, y=dt)) + geom_point())), by=user_screen_name]
+	plots = hashtagsTbl[, list(resPlots=list(ggplot(.SD, aes(x=hashtag, y=dt)) +
+						 geom_point() +
+						 defaultGGPlotOpts + 
+						 theme(axis.text.x = element_blank()))), by=user_screen_name]
 	plots
 }
 
@@ -365,7 +368,10 @@ visCompare <- function(hashtagsTbl, modelHashtagsTbl, bestDTbl) {
 		list(resPlots=list(ggplot(hashtagsTbl[user_screen_name==userScreenName], aes(x=hashtag, y=dt)) +
 				   geom_point() +
 				   ggtitle(sprintf('d=%s', d)) + 
-				   geom_point(data=modelHashtagsTbl, aes(x=hashtag, y=dt), colour="red", size=.7)))
+				   geom_point(data=modelHashtagsTbl, aes(x=hashtag, y=dt), colour="red", size=.7) +
+				   defaultGGPlotOpts + 
+				   theme(axis.text.x = element_blank())
+				   ))
 	}
 	minMaxDs = modelHashtagsTbl[, c(min(d), max(d))]
 	allDsTbl = bestDTbl[, list(allDs=c(minMaxDs[1],d,minMaxDs[2])), by=list(user_screen_name, d)]
@@ -504,6 +510,7 @@ genAggModelVsPredTbl <- function(hashtagsTbl, config) {
 visModelVsPredTbl <- function(modelVsPredTbl) {
 	assign('p1', ggplot(modelVsPredTbl[predUsedBest == T & d <= 2], aes(totN, d)) +
 	       geom_point() +
+	       defaultGGPlotOpts + 
 	       xlab('Total Number of Hashtags'))
 	modelVsPredTbl[topHashtag & hashtagUsedP, meanPC := mean(acc), by=user_screen_name]
 	modelVsPredTbl[topHashtag & hashtagUsedP, relPC := acc - mean(acc), by=user_screen_name]
@@ -511,14 +518,18 @@ visModelVsPredTbl <- function(modelVsPredTbl) {
 	assign('p2', ggplot(modelVsPredTbl[topHashtag & hashtagUsedP], aes(log(d),relPC)) +
 	       geom_point() +
 	       geom_line(aes(log(d), meanRelPC, group=user_screen_name[1])) +
+	       defaultGGPlotOpts + 
 	       xlab('log(d)') +
 	       ylab('Normalized Mean'))
 	assign('p3', ggplot(modelVsPredTbl[topHashtag & hashtagUsedP & user_screen_name %in% sample(unique(user_screen_name), size=min(20, length(unique(user_screen_name))))],
-			    aes(log(d),acc, group=as.factor(user_screen_name))) + geom_line() +
+			    aes(log(d),acc, group=as.factor(user_screen_name))) +
+	       geom_line() +
+	       defaultGGPlotOpts + 
 	       ylab('Accuracy'))
 	assign('p4', ggplot(modelVsPredTbl[predUsedBest == T & d <= 2], aes(d)) +
 	       geom_histogram(aes(y = ..density..)) +
 	       geom_density() +
+	       defaultGGPlotOpts + 
 	       ylab('Density'))
 	ext = sprintf('%s-%s', guardAllEqualP(p1$data$datasetName)[1], guardAllEqualP(p1$data$DVName)[1])
 	myPlotPrint(p1, sprintf('visDByN-%s', ext)) 
@@ -610,6 +621,8 @@ defaultSOConfig = append(defaultBaseConfig,
 			      sjiTbl = 'sjiTblSO',
 			      makeChunkTblFun='make_chunk_table_SO'
 			      ))
+
+defaultGGPlotOptions <- theme_bw() + theme_classic()
 
 runPriorT <- function(config=defaultTConfig) {
 	runPrior(config)
@@ -896,9 +909,9 @@ compareDBestVsMax <- function(modelVsPredTbl) {
 plotBarSumTbl <- function(sumTbl, fillCol, figName, extras=NULL) {
 	fillCol = substitute(fillCol)
 	expr = bquote(ggplot(sumTbl, aes(x=factor(datasetGroup), y=meanVal, fill=.(fillCol))) +
-		      geom_bar(position=position_dodge(), stat='identity') +
-		      geom_errorbar(aes(ymin=minCI, ymax=maxCI), position=position_dodge(width=0.9), width=0.1, size=0.3) + 
-		      scale_fill_grey())
+		      geom_bar(width=0.7, position=position_dodge(), stat='identity') +
+		      geom_errorbar(aes(ymin=minCI, ymax=maxCI), position=position_dodge(width=0.7), width=0.1, size=0.3) + 
+		      defaultGGPlotOpts)
 	plot = eval(expr)
 	lapply(extras, function(extra) plot <<- plot + extra)
 	myPlotPrint(plot, figName)
@@ -916,14 +929,42 @@ plotDatasetDescriptives <- function(modelVsPredTbl) {
 	sumTbl = modelVsPredTbl[runNum==2 & predUsedBest == T & DVName == 'topHashtagPost'][, list(NUsers=.N, NHashtagObs=sum(totN)), by=list(datasetName,datasetType,datasetGroup)]
 	plotBarSumTbl(sumTbl[, withCI(NUsers), by=list(datasetGroup, datasetName)],
 		      datasetName, 'compareNumbers',
-		      extras=list(theme(axis.title.x=element_blank()), ylab('Number of Users')))
+		      extras=list(theme(axis.title.x=element_blank()),
+				  scale_fill_discrete(guide = "none"),
+				  ylab('Number of Users')))
 	plotBarSumTbl(sumTbl[, withCI(NHashtagObs), by=list(datasetGroup, datasetName)],
 		      datasetName, 'compareHashtagObs',
-		      extras=list(theme(axis.title.x=element_blank()), ylab('Number of Hashtag Uses')))
+		      extras=list(theme(axis.title.x=element_blank()),
+				  scale_fill_discrete(guide = "none"),
+				  ylab('Number of Hashtag Uses')))
 	sumTbl
 }
 
+renameColDatasetGroup <- function(tbl) {
+	setkey(tbl, datasetGroup)
+	mapTbl = data.table(datasetGroup = c('topReputation', 'topQuestions', 'topFollowers', 'topTweets'),
+			    newName = c('SO Top Reputation', 'SO Top Questions', 'Twitter Top Followers', 'Twitter Top Tweets'))
+	setkey(mapTbl, datasetGroup)
+	tbl[mapTbl, datasetGroup := newName]
+	tbl
+}
+
+renameDVDirection <- function(tbl) {
+	setkey(tbl, DVDirection)
+	mapTbl = data.table(DVDirection=c('topHashtagPost - topHashtagPostOL2', 'topHashtagPost - topHashtagAct',
+					  'best d - min d for topHashtagPost', 'best d - max d for topHashtagPost',
+					  'best d - min d for topHashtagPostOL2', 'best d - max d for topHashtagPostOL2'),
+			    newName=c('Standard - Optimized Learning', 'Standard - Standard Relaxed Across Posts', 
+				      'Best Fit - All Frequency for Standard Model', 'Best Fit - All Recency for Standard Model',
+				      'Best Fit - All Frequency for Optimized Learning Model', 'Best Fit - All Recency for Optimized Learning Model'))
+	setkey(mapTbl, DVDirection)
+	tbl[mapTbl, DVDirection := newName]
+	tbl
+}
+
 plotDVDiffs <- function(sumTbl) {
+	renameColDatasetGroup(sumTbl)
+	renameDVDirection(sumTbl)
 	plotBarSumTbl(sumTbl, DVDirection, sprintf('compareDVDiffs'), extras=list(theme(legend.position='top', legend.direction='vertical', axis.title.y=element_blank()),
 										  #labs(x=element_blank()),
 										  labs(y='Mean Difference in Accuracy'),
@@ -972,8 +1013,8 @@ analyzeModelVsPredTbl <- function(modelVsPredTbl) {
 
 	dvDiffsTbl = plotDVDiffs(rbind(modelVsPredTbl[runNum==2, compare2DVs(.SD, c('topHashtagPost', 'topHashtagPostOL2'), sortedOrder=c(2,1)), by=list(datasetType, datasetGroup), .SDcols=colnames(modelVsPredTbl)],
 				       modelVsPredTbl[runNum==2, compare2DVs(.SD, c('topHashtagPost', 'topHashtagAct')), by=list(datasetType, datasetGroup), .SDcols=colnames(modelVsPredTbl)],
-				       modelVsPredTbl[DVName %in% c('topHashtagPost', 'topHashtagPostOL2'), compare2Runs(.SD, c(1,2)), by=list(datasetType, datasetGroup), .SDcols=colnames(modelVsPredTbl)],
-				       modelVsPredTbl[runNum==2 & DVName %in% c('topHashtagPost'), compareDBestVsMin(.SD), by=list(datasetType, datasetGroup)],
+				       #modelVsPredTbl[DVName %in% c('topHashtagPost', 'topHashtagPostOL2'), compare2Runs(.SD, c(1,2)), by=list(datasetType, datasetGroup), .SDcols=colnames(modelVsPredTbl)],
+				       modelVsPredTbl[runNum==2 & DVName %in% c('topHashtagPost', 'topHashtagPostOL2'), compareDBestVsMin(.SD), by=list(datasetType, datasetGroup)],
 				       modelVsPredTbl[runNum==2 & DVName %in% c('topHashtagPost'), compareDBestVsMax(.SD), by=list(datasetType, datasetGroup)]))
 	dvDiffsTbl[, mean(meanVal), by=direction]
 	compareOptimalDs(modelVsPredTbl[DVName %in% c('topHashtagPost', 'topHashtagPostOL2', 'topHashtagAct') & runNum == 2])
