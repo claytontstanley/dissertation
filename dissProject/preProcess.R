@@ -358,6 +358,8 @@ visHashtags <- function(hashtagsTbl) {
 	plots = hashtagsTbl[, list(resPlots=list(ggplot(.SD, aes(x=hashtag, y=dt)) +
 						 geom_point() +
 						 defaultGGPlotOpts + 
+						 ylab('Time Since First Post (s)') +
+						 xlab('Hashtag') + 
 						 theme(axis.text.x = element_blank()))), by=user_screen_name]
 	plots
 }
@@ -370,6 +372,8 @@ visCompare <- function(hashtagsTbl, modelHashtagsTbl, bestDTbl) {
 				   ggtitle(sprintf('d=%s', d)) + 
 				   geom_point(data=modelHashtagsTbl, aes(x=hashtag, y=dt), colour="red", size=.7) +
 				   defaultGGPlotOpts + 
+				   ylab('Time Since First Post (s)') +
+				   xlab('Hashtag') + 
 				   theme(axis.text.x = element_blank())
 				   ))
 	}
@@ -526,10 +530,13 @@ visModelVsPredTbl <- function(modelVsPredTbl) {
 	       geom_line() +
 	       defaultGGPlotOpts + 
 	       ylab('Accuracy'))
+	modelVsPredTbl[d <= .4]
+	modelVsPredTbl[predUsedBest == T & d <= .4]
 	assign('p4', ggplot(modelVsPredTbl[predUsedBest == T & d <= 2], aes(d)) +
-	       geom_histogram(aes(y = ..density..)) +
+	       geom_histogram(breaks=defaultBaseConfig$ds[defaultBaseConfig$ds <= min(2, max(modelVsPredTbl[,d+.1]))], aes(y = ..density..)) +
 	       geom_density() +
 	       defaultGGPlotOpts + 
+	       xlab('Best Fit Decay Rate Parameter (d) by Subject') +
 	       ylab('Density'))
 	ext = sprintf('%s-%s', guardAllEqualP(p1$data$datasetName)[1], guardAllEqualP(p1$data$DVName)[1])
 	myPlotPrint(p1, sprintf('visDByN-%s', ext)) 
@@ -925,7 +932,7 @@ compareMeanDV <- function(modelVsPredTbl, DV, extras=NULL) {
 	sumTbl = eval(expr)
 	renameColDVName(sumTbl)
 	plotBarSumTbl(sumTbl, DVName, sprintf('compareMeanDV-%s', deparse(DV)), extras=append(list(theme(legend.position='top', legend.direction='vertical', axis.title.y=element_blank()),
-												   guides(fill=guide_legend(reverse=T)),
+												   guides(fill=guide_legend(title='Model Name', reverse=T)),
 												   coord_flip()
 												   ), extras))
 }
@@ -941,7 +948,7 @@ plotDatasetDescriptives <- function(modelVsPredTbl) {
 		      datasetName, 'compareHashtagObs',
 		      extras=list(theme(axis.title.x=element_blank()),
 				  scale_fill_discrete(guide = "none"),
-				  ylab('Number of Hashtag Uses')))
+				  ylab('Number of Hashtag Occurrences')))
 	sumTbl
 }
 
@@ -984,7 +991,7 @@ plotDVDiffs <- function(sumTbl) {
 	plotBarSumTbl(sumTbl, DVDirection, sprintf('compareDVDiffs'), extras=list(theme(legend.position='top', legend.direction='vertical', axis.title.y=element_blank()),
 										  #labs(x=element_blank()),
 										  labs(y='Mean Difference in Accuracy'),
-										  guides(fill=guide_legend(title="Difference Type", reverse=T)),
+										  guides(fill=guide_legend(title="Model Comparison", reverse=T)),
 										  coord_flip()
 										  ))
 }
@@ -1042,9 +1049,10 @@ analyzeModelVsPredTbl <- function(modelVsPredTbl) {
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & datasetName=='SOgt1kr2'])
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & datasetName=='SOgt100kr2'])
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & datasetName=='SOQgt050r2'])
+	
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & datasetName=='TFollowgt10Mr2'])
-	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostOL2' & datasetName=='TFollowgt10Mr2' & d < 1])
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & datasetName=='SOQgt500r2'])
+	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostOL2' & datasetName=='TFollowgt10Mr2' & d < 1])
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostOL2' & datasetName=='SOQgt500r2' & d < 1])
 }
 
