@@ -1224,6 +1224,8 @@ addTweetSubsets <- function() {
 	tweetsIdGpTbl[, partialWriteTable(copy(.SD), hashtag_group), by=hashtag_group]
 }
 
+runAddTweetSubsets <- addTweetSubsets
+
 runGenNcoocTblSO1thru100 <- function() genNcoocTblSO('SOShuffledFull', 1, 100)
 runGenNcoocTblSO1thru1000 <- function() genNcoocTblSO('SOShuffledFull', 1, 1000)
 runGenNcoocTblSO1thru10000 <- function() genNcoocTblSO('SOShuffledFull', 1, 10000)
