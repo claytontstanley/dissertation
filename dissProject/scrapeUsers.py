@@ -414,13 +414,22 @@ def getUserInfoForTopUsers():
 def generateTopUsers100k():
     generateTopUsers(scrapeFun=lambda: generateTopUsersSocialBakers(numUsers=100000), topUsersFile='top100000SocialBakers.csv')
 
+def backupTopHashtags():
+    backupTables(tableNames=['top_hashtag_subsets',
+                             'top_hashtag_tokenized',
+                             'top_hashtag_tokenized_chunk_types',
+                             'top_hashtag_tweets',
+                             'top_hashtag_hashtags',
+                             'top_hashtag_tokenized_type_types'])
+
+
 # Current run selections
 #generateTopUsers100k()
 #getAllTweetsForTopUsersByFollowers()
 #getAllTweetsForTopUsersByTweets()
 #getUserInfoForTopUsers()
 #storeCurTagSynonyms()
-backupTables(tableNames=['posts'])
+backupTopHashtags()
 #backupTables()
 #generateTopHashtags()
 #streamHashtagsCurrent()
