@@ -148,7 +148,7 @@ def generateTopHashtags(scrapeFun=generateTopHashtagsTrendsmap, groupID='trendsm
     storeTopHashtags(hashtagGroup)
 
 def getHashtagsFrom(group):
-    res = myQuery("select hashtag from top_hashtag_hashtags where hashtag_group = '%s'" % (group)).getresult()
+    res = myQuery("select hashtag from top_hashtag_hashtags where hashtag_group = '%s' order by rank asc" % (group)).getresult()
     res = [item[0] for item in res]
     res = [hashtag for hashtag in res if sys.getsizeof(hashtag) <= 60]
     res = res[-400:]
@@ -166,7 +166,8 @@ def streamHashtags(hashtagGroup):
 
 def streamHashtagsCurrent():
     #hashtagGroup = '2014-02-27 17:13:30 initial'
-    hashtagGroup = '2014-03-17 11:28:15 trendsmap'
+    #hashtagGroup = '2014-03-17 11:28:15 trendsmap'
+    hashtagGroup = '2014-03-24 13:06:19 trendsmap'
     streamHashtags(hashtagGroup)
 
 def scrape_socialbakers(url):
@@ -429,7 +430,7 @@ def backupTopHashtags():
 #getAllTweetsForTopUsersByTweets()
 #getUserInfoForTopUsers()
 #storeCurTagSynonyms()
-backupTopHashtags()
+#backupTopHashtags()
 #backupTables()
 #generateTopHashtags()
-#streamHashtagsCurrent()
+streamHashtagsCurrent()
