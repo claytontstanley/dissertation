@@ -27,3 +27,7 @@ getSjis:
 getTSjis:
 	egrep '^runGenNcoocTblT.*10+ <-' preProcess.R | awk '{print $$1}'
 
+getTSjisAll:
+	egrep '^runGenNcoocTblT.* <-' preProcess.R | awk '{print $$1}'
+
+

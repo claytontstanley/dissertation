@@ -388,7 +388,7 @@ visCompare <- function(hashtagsTbl, modelHashtagsTbl, bestDTbl) {
 	hashtagPlots[, resPlots := list(list(resPlots[[1]] + ggtitle('Observed'))), by=user_screen_name]
 	setkey(hashtagPlots, user_screen_name)
 	hashtagPlots[, list(resPlots=list(myPlotPrint(resPlots[[1]], sprintf('HTByTime-%s', .BY[1])))), by=list(user_screen_name)]
-	fullPlots = modelPlots[, list(resPlots=list(do.call(arrangeGrob, append(hashtagPlots[user_screen_name]$resPlots, resPlots)))), by=user_screen_name]
+	fullPlots = modelPlots[, list(resPlots=list(do.call(arrangeGrob, c(hashtagPlots[user_screen_name]$resPlots, resPlots)))), by=user_screen_name]
 	fullPlots[, list(resPlots=list(myPlotPrint(resPlots[[1]], sprintf('HTMByTime-%s', .BY[1])))), by=list(user_screen_name)]
 }
 
@@ -593,26 +593,26 @@ defaultBaseConfig = list(ds=c(0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1.0,1.1,1.2,1.3,1.4,1
 			 modelVsPredOutFile='/tmp/modelVsPred.csv',
 			 query=NULL)
 
-defaultTConfig = append(defaultBaseConfig,
-			list(from='tokenText',
-			     accumModelHashtagsTbl=F,
-			     getPostsFun=getTweetsTbl,
-			     getHashtagsFun=getHashtagsTbl,
-			     makeChunkTblFun='make_chunk_table_Twitter',
-			     tokenizedChunkTypeTbl = 'top_hashtag_tokenized_chunk_types',
-			     tokenizedTypeTypeTbl = 'top_hashtag_tokenized_type_types',
-			     tokenizedTbl = 'top_hashtag_tokenized',
-			     postsTbl = 'top_hashtag_tweets',
-			     subsetsTbl = 'top_hashtag_subsets',
-			     tagTypeName = 'hashtag',
-			     postTypeNames = 'tweet',
-			     groupName = '2014-02-27 17:13:30 initial',
-			     allGroupNames = c('2014-02-27 17:13:30 initial', '2014-03-17 11:28:15 trendsmap'),
-			     priorTbl = 'priorTblGlobT',
-			     sjiTbl = 'sjiTblT',
-			     includeRetweetsP=F))
+defaultTConfig = c(defaultBaseConfig,
+		   list(from='tokenText',
+			accumModelHashtagsTbl=F,
+			getPostsFun=getTweetsTbl,
+			getHashtagsFun=getHashtagsTbl,
+			makeChunkTblFun='make_chunk_table_Twitter',
+			tokenizedChunkTypeTbl = 'top_hashtag_tokenized_chunk_types',
+			tokenizedTypeTypeTbl = 'top_hashtag_tokenized_type_types',
+			tokenizedTbl = 'top_hashtag_tokenized',
+			postsTbl = 'top_hashtag_tweets',
+			subsetsTbl = 'top_hashtag_subsets',
+			tagTypeName = 'hashtag',
+			postTypeNames = 'tweet',
+			groupName = '2014-02-27 17:13:30 initial',
+			allGroupNames = c('2014-02-27 17:13:30 initial', '2014-03-17 11:28:15 trendsmap'),
+			priorTbl = 'priorTblGlobT',
+			sjiTbl = 'sjiTblT',
+			includeRetweetsP=F))
 
-defaultSOConfig = append(defaultBaseConfig,
+defaultSOConfig = c(defaultBaseConfig,
 			 list(convertTagSynonymsP=T,
 			      accumModelHashtagsTbl=F,
 			      getPostsFun=getPostsTbl,
@@ -630,7 +630,7 @@ defaultSOConfig = append(defaultBaseConfig,
 			      makeChunkTblFun='make_chunk_table_SO'
 			      ))
 
-defaultGGPlotOptions <- theme_bw() + theme_classic()
+defaultGGPlotOpts <- theme_bw() + theme_classic()
 
 runPriorT <- function(config=defaultTConfig) {
 	runPrior(config)
@@ -932,10 +932,10 @@ compareMeanDV <- function(modelVsPredTbl, DV, extras=NULL) {
 	expr = bquote(tableModelVsPredTbl(modelVsPredTbl)[, withCI(.(DV)), keyby=list(DVName, datasetGroup)])
 	sumTbl = eval(expr)
 	renameColDVName(sumTbl)
-	plotBarSumTbl(sumTbl, DVName, sprintf('compareMeanDV-%s', deparse(DV)), extras=append(list(theme(legend.position='top', legend.direction='vertical', axis.title.y=element_blank()),
-												   guides(fill=guide_legend(title='Model Name', reverse=T)),
-												   coord_flip()
-												   ), extras))
+	plotBarSumTbl(sumTbl, DVName, sprintf('compareMeanDV-%s', deparse(DV)), extras=c(list(theme(legend.position='top', legend.direction='vertical', axis.title.y=element_blank()),
+											      guides(fill=guide_legend(title='Model Name', reverse=T)),
+											      coord_flip()
+											      ), extras))
 }
 
 plotDatasetDescriptives <- function(modelVsPredTbl) {
@@ -1121,6 +1121,12 @@ genNcoocTblTwitter <- function(subsetName, startId, endId) {
 	sqldf('truncate table temp_tokenized')
 }
 
+genAllNcoocTblTwitter <- function(startId, endId) {
+	for (groupName in getConfig(defaultTConfig, 'allGroupNames')) {
+		genNcoocTblTwitter(groupName, startId, endId)
+	}
+}
+
 genTempPostTokenizedTbl <- function(chunkTableQuery) {
 	myLog(sprintf("generating temp_tokenized table with query %s", chunkTableQuery))
 	sqldf('truncate table temp_tokenized')
@@ -1239,12 +1245,12 @@ runGenNcoocTblSO1thru10000 <- function() genNcoocTblSO('SOShuffledFull', 1, 1000
 runGenNcoocTblSO1thru100000 <- function() genNcoocTblSO('SOShuffledFull', 1, 100000)
 runGenNcoocTblSO1thru3000000 <- function() genNcoocTblSO('SOShuffledFull', 1, 3000000)
 
-runGenNcoocTblT11thru100 <- function() genNcoocTblTwitter('2014-02-27 17:13:30 initial', 1, 100)
-runGenNcoocTblT11thru1000 <- function() genNcoocTblTwitter('2014-02-27 17:13:30 initial', 1, 1000)
-runGenNcoocTblT11thru10000 <- function() genNcoocTblTwitter('2014-02-27 17:13:30 initial', 1, 10000)
-runGenNcoocTblT11thru100000 <- function() genNcoocTblTwitter('2014-02-27 17:13:30 initial', 1, 100000)
-runGenNcoocTblT11thru1000000 <- function() genNcoocTblTwitter('2014-02-27 17:13:30 initial', 1, 1000000)
-runGenNcoocTblT11thru3000000 <- function() genNcoocTblTwitter('2014-02-27 17:13:30 initial', 1, 3000000)
+runGenNcoocTblT11thru100 <- function() genAllNcoocTblTwitter(1, 100)
+runGenNcoocTblT11thru1000 <- function() genAllNcoocTblTwitter(1, 1000)
+runGenNcoocTblT11thru10000 <- function() genAllNcoocTblTwitter(1, 10000)
+runGenNcoocTblT11thru100000 <- function() genAllNcoocTblTwitter(1, 100000)
+runGenNcoocTblT11thru1000000 <- function() genAllNcoocTblTwitter(1, 1000000)
+runGenNcoocTblT11thru3000000 <- function() genAllNcoocTblTwitter(1, 3000000)
 
 runGenTokenizedTblSO <- function() genTokenizedTblSO()
 runGenTokenizedTblTwitter <- function() {
