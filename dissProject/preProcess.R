@@ -21,6 +21,7 @@ library(testthat)
 library(ROCR)
 library(popbio)
 library(QuantPsyc)
+library(dplyr)
 
 
 PATH = getPathToThisFile()
@@ -1000,9 +1001,8 @@ plotDVDiffs <- function(sumTbl) {
 compareOptimalDs <- function(modelVsPredTbl) compareMeanDV(modelVsPredTbl, median, list(labs(y='Mean Optimal Decay Rate Parameter (d)')))
 compareOptimalAcc <- function(modelVsPredTbl) compareMeanDV(modelVsPredTbl, acc, list(labs(y='Mean Accuracy')))
 
-# TODO: Find a library that implements this
 wrapQuotes <- function(charVect) {
-	paste(paste(c("'"), charVect, sep='', collapse="',"), "'", sep="", collapse="")
+	withDBConnect(db, as.character(escape(charVect, parens=F, con=db)))
 }
 
 plotTemporal <- function(runTbls) {
@@ -1015,13 +1015,13 @@ analyzeTemporal <- function(modelVsPredTbl) {
 	#screenTbl = modelVsPredTbl[datasetName=='SOQgt300r2'][, list(user_screen_name=wrapQuotes(sample(user_screen_name, 10))), by=list(datasetName, datasetType)]
 	#user_screen_names = screenTbl[, paste(user_screen_name, sep='', collapse=','), by=datasetType]
 	#user_screen_names = user_screen_names[, V1]
-	user_screen_names = c("'rickeysmiley','fashionista_com','laurenpope','mtvindia','officialrcti'")
-	user_screen_names = c("'fashionista_com'")
+	user_screen_names = wrapQuotes(c('rickeysmiley','fashionista_com','laurenpope','mtvindia','officialrcti'))
+	user_screen_names = wrapQuotes(c('fashionista_com'))
 	runTbls = runPriorT(config=modConfig(defaultTConfig, list(accumModelHashtagsTbl=T,
 								  query=sprintf("select %s from tweets where user_screen_name in (%s)", defaultTCols, user_screen_names))))
 	plotTemporal(runTbls)
-	user_screen_names = c("'520957','238260','413225','807325','521180'")
-	user_screen_names = c("'520957','238260'")
+	user_screen_names = wrapQuotes(c('520957','238260','413225','807325','521180'))
+	user_screen_names = wrapQuotes(c('520957','238260'))
 	runTbls = runPriorSO(config=modConfig(defaultSOConfig, list(accumModelHashtagsTbl=T,
 								    query=sprintf("select %s from posts where post_type_id = 1 and user_screen_name in (%s)", defaultSOCols, user_screen_names))))
 	plotTemporal(runTbls)
