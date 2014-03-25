@@ -1013,8 +1013,7 @@ plotTemporal <- function(runTbls) {
 analyzeTemporal <- function(modelVsPredTbl) {
 	modelVsPredTbl[, unique(datasetName)]
 	#screenTbl = modelVsPredTbl[datasetName=='SOQgt300r2'][, list(user_screen_name=wrapQuotes(sample(user_screen_name, 10))), by=list(datasetName, datasetType)]
-	#user_screen_names = screenTbl[, paste(user_screen_name, sep='', collapse=','), by=datasetType]
-	#user_screen_names = user_screen_names[, V1]
+	#user_screen_names = screenTbl[, user_screen_name]
 	user_screen_names = wrapQuotes(c('rickeysmiley','fashionista_com','laurenpope','mtvindia','officialrcti'))
 	user_screen_names = wrapQuotes(c('fashionista_com'))
 	runTbls = runPriorT(config=modConfig(defaultTConfig, list(accumModelHashtagsTbl=T,
