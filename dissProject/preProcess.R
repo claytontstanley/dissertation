@@ -236,7 +236,7 @@ getHashtagsTbl <- function(tweetsTbl, config) {
 	tokenizedTbl = getTokenizedTbl(tweetsTbl, from=from, regex=matchWhitespace)
 	htOfTokenizedTbl = tokenizedTbl[grepl(matchHashtag, chunk),]
 	myStopifnot(c('id') == key(htOfTokenizedTbl))
-	hashtagsTbl = htOfTokenizedTbl[tweetsTbl, list(hashtag=chunk, pos=pos, created_at=created_at, dt=dt, user_id=user_id, user_screen_name=user_screen_name), nomatch=0]
+	hashtagsTbl = htOfTokenizedTbl[tweetsTbl, nomatch=0][, list(id=id, hashtag=chunk, pos=pos, created_at=created_at, dt=dt, user_id=user_id, user_screen_name=user_screen_name)]
 	setkey(hashtagsTbl, user_screen_name, dt, hashtag)
 	hashtagsTbl
 }
@@ -250,7 +250,7 @@ convertTagSynonyms <- function(tokenizedTbl) {
 getTagsTbl <- function(postsTbl, config) {
 	tokenizedTbl = getTokenizedTbl(postsTbl, from='tagsNoHtml', regex=matchTag)
 	if (getConfig(config, "convertTagSynonymsP")) convertTagSynonyms(tokenizedTbl)
-	tagsTbl = tokenizedTbl[postsTbl, list(hashtag=chunk, pos=pos, created_at=creation_date, dt=dt, user_id=owner_user_id, user_screen_name=user_screen_name), nomatch=0]
+	tagsTbl = tokenizedTbl[postsTbl, nomatch=0][, list(id=id, hashtag=chunk, pos=pos, created_at=creation_date, dt=dt, user_id=owner_user_id, user_screen_name=user_screen_name)]
 	setkey(tagsTbl, user_screen_name, dt, hashtag)
 	tagsTbl
 }
@@ -393,9 +393,10 @@ visCompare <- function(hashtagsTbl, modelHashtagsTbl, bestDTbl) {
 	fullPlots[, list(resPlots=list(myPlotPrint(resPlots[[1]], sprintf('HTMByTime-%s', .BY[1])))), by=list(user_screen_name)]
 }
 
+
 addMetrics <- function(hashtagsTbl, modelHashtagsTbl) {
 	tagCountTbl = hashtagsTbl[, list(tagCountN=.N), by=list(user_screen_name, dt)]
-	modelHashtagsTbl[tagCountTbl, tagCount := tagCountN]
+	modelHashtagsTbl[tagCountTbl, tagCount := tagCountN, nomatch=0]
 	modelHashtagsTbl[tagCountTbl[, list(tagCountUserN=sum(tagCountN)), keyby=user_screen_name], tagCountUser := tagCountUserN]
 	myLog('adding metrics for modelHashtagsTbl')
 	addDVCols <- function(col, newDVPost, newDVAct) {
@@ -1268,8 +1269,9 @@ getSjiTblSO <- function(config, startId, endId) {
 	sjiTitleTbl[, type := 'title']
 	sjiBodyTbl[, type := 'body']
 	sjiTbl = rbind(sjiTitleTbl, sjiBodyTbl)
-	setkey(sjiTbl, chunk, tag, posFromTag, type)
-	sjiTbl = sjiTbl[, list(partialN=sum(partialN), NChunkTag=sum(NChunkTag)), by=list(chunk, tag, posFromTag)]
+	sjiTbl[, hashtag := tag][, tag := NULL]
+	setkey(sjiTbl, chunk, hashtag, posFromTag, type)
+	sjiTbl = sjiTbl[, list(partialN=sum(partialN), NChunkTag=sum(NChunkTag)), by=list(chunk, hashtag, posFromTag)]
 	addSjiAttrs(sjiTbl)
 	sjiTbl
 }
@@ -1282,7 +1284,8 @@ getSjiTblT <- function(config, startId, endId) {
 	topHashtagsTbl = sqldt(sprintf("select hashtag from top_hashtag_hashtags where hashtag_group = '%s'", getConfig(config, "groupName")))
 	sjiTbl = sjiTbl[tag %in% topHashtagsTbl[, hashtag]]
 	sjiTbl = sjiTbl[, list(posFromTag=NaN, partialN=sum(partialN)), by=list(chunk, tag)]
-	setkey(sjiTbl, chunk, tag, posFromTag)
+	sjiTbl[, hashtag := tag][, tag := NULL]
+	setkey(sjiTbl, chunk, hashtag, posFromTag)
 	addSjiAttrs(sjiTbl)
 	sjiTbl
 }
@@ -1331,7 +1334,7 @@ getPriorTblGlobT <- function(config, startId, endId) {
 
 addSjiAttrs <- function(sjiTbl) {
 	sjiTbl[, chunkSums := sum(partialN), by=chunk]
-	sjiTbl[, tagSums := sum(partialN), by=tag]
+	sjiTbl[, tagSums := sum(partialN), by=hashtag]
 	sjiTbl[, sji := log(sum(partialN)) + log(partialN) - log(chunkSums) - log(tagSums)]
 	sjiTbl[, pTagGivenChunk := partialN/chunkSums]
 	sjiTbl[, HChunk := - sum(pTagGivenChunk * log(pTagGivenChunk)), by=chunk]
@@ -1341,7 +1344,7 @@ addSjiAttrs <- function(sjiTbl) {
 computeActSji <- function(context, sjiTbl) {
 	myLog(sprintf("computing sji act for context with length %s", length(context)))
 	resTbl = sjiTbl[J(context), nomatch=0, allow.cartesian=T]
-	resTbl = resTbl[, {WChunk = EChunk/sum(EChunk); list(act=sum(WChunk * sji))}, keyby=tag]
+	resTbl = resTbl[, {WChunk = EChunk/sum(EChunk); list(act=sum(WChunk * sji))}, keyby=hashtag]
 }
 
 wsFile = '/Volumes/SSDSupernova/RWorkspace/workspace.RData'
@@ -1356,21 +1359,35 @@ myLoadImage <- function() {
 	     envir=parent.frame())
 }
 
+getCurWorkspace <- function(maxIdSOSji, maxIdSOPrior, maxIdTSji, maxIdTPrior) {
+	priorTblGlobT <<- getPriorTblGlobT(defaultTConfig, 1, maxIdTPrior)
+	priorTblUserSO <<- getPriorTblUserSO(defaultSOConfig, 1, maxIdSOPrior)
+	sjiTblT <<- getSjiTblT(defaultTConfig, 1, maxIdTSji)
+	sjiTblSO <<- getSjiTblSO(defaultSOConfig, 1, maxIdSOSji)
+	return()
+}
+
 genAndSaveCurWorkspace <- function() {
 	maxIdSOSji = 1e5
 	maxIdSOPrior = 1e7 
 	maxIdTSji = 1e6 
 	maxIdTPrior = 1e5 
-	priorTblGlobT = getPriorTblGlobT(defaultTConfig, 1, maxIdTPrior)
-	priorTblUserSO = getPriorTblUserSO(defaultSOConfig, 1, maxIdSOPrior)
-	sjiTblT = getSjiTblT(defaultTConfig, 1, maxIdTSji)
-	sjiTblSO = getSjiTblSO(defaultSOConfig, 1, maxIdSOSji)
+	getCurWorkspace(maxIdSOSji, maxIdSOPrior, maxIdTSji, maxIdTPrior)
 	mySaveImage()
 }
 
+fillNAWithOthers <- function(tbl, col) {
+	col = as.symbol(col)
+	eval(bquote(tbl[!is.na(.(col)), guardAllEqualP(.(col))]))
+	val = eval(bquote(tbl[!is.na(.(col)), .(col)[1]]))
+	eval(bquote(tbl[is.na(.(col)), .(col) := val]))
+	tbl
+}
+
 getPostResTbl <- function(tokenTbl, config) {
-	guardAllEqualP(tokenTbl$creation_epoch)
-	guardAllEqualP(tokenTbl$user_screen_name)
+	guardAllEqualP(tokenTbl[, creation_epoch])
+	guardAllEqualP(tokenTbl[, user_screen_name])
+	guardAllEqualP(tokenTbl[, dt])
 	contextTbl = tokenTbl[type != getConfig(config, "tagTypeName")]
 	contextTbl
 	tagTbl = tokenTbl[type == getConfig(config, "tagTypeName")]
@@ -1380,18 +1397,20 @@ getPostResTbl <- function(tokenTbl, config) {
 	tempTagTbl = tagTbl[, list(hashtag=chunk)]
 	setkey(tempTagTbl, hashtag)
 	priorTbl = merge(priorTbl, unique(tempTagTbl), all=T)
+	lapply(c('user_screen_name', 'dt', 'd'), function(x) fillNAWithOthers(priorTbl, x))
 	sjiTbl = contextTbl[, computeActSji(chunk, get(getConfig(config, 'sjiTbl'))), by=type]
 	if (nrow(sjiTbl) > 0) {
-		sjiTblWide = dcast.data.table(sjiTbl, tag ~ type, value.var='act')
+		sjiTblWide = dcast.data.table(sjiTbl, hashtag ~ type, value.var='act')
 	} else {
 		sjiTblWide = copy(sjiTbl)
 		lapply(getConfig(config, "postTypeNames"), function(x) sjiTblWide[[x]] <<- double(0))
 		sjiTblWide[, act := NULL][, type := NULL]
 	}
-	setkey(sjiTblWide, tag)
+	setkey(sjiTblWide, hashtag)
 	postResTbl = sjiTblWide[priorTbl]
 	postResTbl[, hashtagUsedP := F]
 	postResTbl[tagTbl, hashtagUsedP := T]
+	postResTbl[, dt := tokenTbl[, dt[1]]]
 	postResTbl
 }
 
@@ -1409,7 +1428,9 @@ getTokenizedFromSubset <- function(minId, maxId, config) {
 }
 
 getTokenizedFromSubsetT <- function(minId, maxId, config) {
-	getTokenizedFromSubset(minId, maxId, config)[, user_screen_name := 'allUsers']
+	resTbl = getTokenizedFromSubset(minId, maxId, config)[, user_screen_name := 'allUsers']
+	addDtToTbl(resTbl)
+	resTbl
 }
 
 getTokenizedFromSubsetSO <- getTokenizedFromSubset
@@ -1455,9 +1476,9 @@ getPPVTbl = function(tbl) {
 	data.table(x=x, y=y)
 }
 
-analyzePostResTbl <- function(postResTbl, predictors) {
+analyzePostResTbl <- function(validPostResTbl, predictors) {
 	predictors = c(predictors, 'act')
-	validPostResTbl = copy(postResTbl)
+	#validPostResTbl = copy(postResTbl)
 	handleNAs(validPostResTbl, predictors)
 	model = reformulate(termlabels = predictors, response = 'hashtagUsedP')
 	myLogit = glm(model, data=validPostResTbl, family=binomial(link="logit"))
@@ -1474,20 +1495,30 @@ analyzePostResTbl <- function(postResTbl, predictors) {
 
 curWS <- function() {
 	priorTblUserSO
+	priorTblGlobT
 	sqldf('select hashtag_group, retweeted, count(text) from top_hashtag_tweets group by hashtag_group, retweeted order by hashtag_group, retweeted')
+	resTbl = runPriorT(config=modConfig(defaultTConfig, list(query=sprintf("select %s from tweets where user_screen_name = 'ap'", defaultTCols))))
+	getCurWorkspace(100, 1000, 100, 1000)
+
 	tokenTblT = getTokenizedFromSubsetT(3000001, 3000100, defaultTConfig)
-	tokenTblSO = getTokenizedFromSubsetSO(3000001, 3000100, defaultSOConfig)
-	tokenTblSO
 	tokenTblT
-	tables()
+	tokenTblSO = getTokenizedFromSubsetSO(3000001, 3000100, defaultSOConfig)
 	predictors = c('title', 'body')
-	?formula
+	tokenTblT
 	postResTblT = withProf(tokenTblT[, getPostResTbl(.SD, defaultTConfig), by=id])
 	postResTblSO = withProf(tokenTblSO[, getPostResTbl(.SD, defaultSOConfig), by=id])
-	postResTblSO
-	postResTblSO[hashtagUsedP==T][, act, by=id][, .N, by=act]
 	myLogit = analyzePostResTbl(postResTblT, c('tweet'))
 	myLogit = analyzePostResTbl(postResTblSO, c('title', 'body'))
+	setkey(postResTblT, user_screen_name, dt, hashtag, d)
+	hashtagsTblT = tokenTblT[type=='hashtag']
+	hashtagsTblT[, hashtag := chunk][, chunk := NULL]
+	setkey(hashtagsTblT, user_screen_name, dt, hashtag)
+	addMetrics(hashtagsTblT, postResTblT)
+	postResTblT
+	postResTblSO
+	postResTblT
+	postResTblT
+	postResTblSO[hashtagUsedP==T][, act, by=id][, .N, by=act]
 	myLogit
 
 	getPostResTbl(fooTbl[, post_id[1]], defaultTConfig)
