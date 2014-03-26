@@ -1503,11 +1503,13 @@ getHashtagsTblFromSubsetTbl <- function(tokenTbl) {
 
 fooFunT <- function() {
 	tokenTblT = getTokenizedFromSubsetT(3000001, 3000100, defaultTConfig)
-	tokenTblT
 	postResTblT = tokenTblT[, getPostResTbl(.SD, defaultTConfig), by=id]
 	myLogit = analyzePostResTbl(postResTblT, getConfig(defaultTConfig, 'postTypeNames'))
 	hashtagsTblT = getHashtagsTblFromSubsetTbl(tokenTblT)
 	addMetrics(hashtagsTblT, postResTblT)
+	modelVsPredTbl = getModelVsPredTbl(postResTblT, hashtagsTblT)	
+	modelVsPredTbl
+	# Pattern this after runPrior output file, etc.
 	postResTblT
 }
 
