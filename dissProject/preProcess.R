@@ -1477,6 +1477,7 @@ getPPVTbl = function(tbl) {
 }
 
 analyzePostResTbl <- function(validPostResTbl, predictors) {
+	setkey(validPostResTbl, user_screen_name, dt, hashtag, d)
 	predictors = c(predictors, 'act')
 	#validPostResTbl = copy(postResTbl)
 	handleNAs(validPostResTbl, predictors)
@@ -1493,28 +1494,41 @@ analyzePostResTbl <- function(validPostResTbl, predictors) {
 	myLogit
 }
 
+getHashtagsTblFromSubsetTbl <- function(tokenTbl) {
+	hashtagsTbl = tokenTbl[type=='hashtag']
+	hashtagsTbl[, hashtag := chunk][, chunk := NULL]
+	setkey(hashtagsTbl, user_screen_name, dt, hashtag)
+	hashtagsTbl
+}
+
+fooFunT <- function() {
+	tokenTblT = getTokenizedFromSubsetT(3000001, 3000100, defaultTConfig)
+	tokenTblT
+	postResTblT = tokenTblT[, getPostResTbl(.SD, defaultTConfig), by=id]
+	myLogit = analyzePostResTbl(postResTblT, getConfig(defaultTConfig, 'postTypeNames'))
+	hashtagsTblT = getHashtagsTblFromSubsetTbl(tokenTblT)
+	addMetrics(hashtagsTblT, postResTblT)
+	postResTblT
+}
+
+fooFunSO <- function() {
+	# FIXME: Shouldn't need this function; everything should work with above with different config
+	tokenTblSO = getTokenizedFromSubsetSO(3000001, 3000100, defaultSOConfig)
+	postResTblSO = withProf(tokenTblSO[, getPostResTbl(.SD, defaultSOConfig), by=id])
+	myLogit = analyzePostResTbl(postResTblSO, c('title', 'body'))
+}
+
 curWS <- function() {
+	getCurWorkspace(100, 1000, 100, 1000)
+	fooFunT()
 	priorTblUserSO
 	priorTblGlobT
 	sqldf('select hashtag_group, retweeted, count(text) from top_hashtag_tweets group by hashtag_group, retweeted order by hashtag_group, retweeted')
 	resTbl = runPriorT(config=modConfig(defaultTConfig, list(query=sprintf("select %s from tweets where user_screen_name = 'ap'", defaultTCols))))
-	getCurWorkspace(100, 1000, 100, 1000)
 
-	tokenTblT = getTokenizedFromSubsetT(3000001, 3000100, defaultTConfig)
 	tokenTblT
-	tokenTblSO = getTokenizedFromSubsetSO(3000001, 3000100, defaultSOConfig)
 	predictors = c('title', 'body')
 	tokenTblT
-	postResTblT = withProf(tokenTblT[, getPostResTbl(.SD, defaultTConfig), by=id])
-	postResTblSO = withProf(tokenTblSO[, getPostResTbl(.SD, defaultSOConfig), by=id])
-	myLogit = analyzePostResTbl(postResTblT, c('tweet'))
-	myLogit = analyzePostResTbl(postResTblSO, c('title', 'body'))
-	setkey(postResTblT, user_screen_name, dt, hashtag, d)
-	hashtagsTblT = tokenTblT[type=='hashtag']
-	hashtagsTblT[, hashtag := chunk][, chunk := NULL]
-	setkey(hashtagsTblT, user_screen_name, dt, hashtag)
-	addMetrics(hashtagsTblT, postResTblT)
-	postResTblT
 	postResTblSO
 	postResTblT
 	postResTblT
