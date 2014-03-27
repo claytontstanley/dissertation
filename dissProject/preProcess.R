@@ -1541,7 +1541,6 @@ curWS <- function() {
 	getCurWorkspace(100, 1000000, 100, 1000)
 	runContext(modConfig(defaultTConfig, list(modelVsPredOutFile=getModelVsPredOutFile('testingTC'))))
 	runContext(modConfig(defaultSOConfig, list(modelVsPredOutFile=getModelVsPredOutFile('testingSOC'))))
-	runContext(defaultSOConfig)
 	priorTblUserSO
 	priorTblGlobT
 	sqldf('select hashtag_group, retweeted, count(text) from top_hashtag_tweets group by hashtag_group, retweeted order by hashtag_group, retweeted')
