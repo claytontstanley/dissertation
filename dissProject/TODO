@@ -1,4 +1,3 @@
-- rename chunk to context for sji
 - wrap up truncate and recreate chunk_type call into an R call
 - add new groupName, and generate new sjis
 
