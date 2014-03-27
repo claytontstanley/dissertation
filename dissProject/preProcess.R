@@ -351,10 +351,6 @@ getPriorForUserAtEpoch <- function(priorTblUser, userScreenName, cEpoch, d) {
 	getPriorAtEpoch(priorTblUser[J(userScreenName), nomatch=0], cEpoch, d)
 }
 
-getPriorForAllUsersAtEpoch <- function(priorTblUser, cEpoch, d) {
-	getPriorForUserAtEpoch(priorTblUser, 'allUsers', cEpoch, d)
-}
-
 visHashtags <- function(hashtagsTbl) {
 	plots = hashtagsTbl[, list(resPlots=list(ggplot(.SD, aes(x=hashtag, y=dt)) +
 						 geom_point() +
@@ -396,6 +392,8 @@ visCompare <- function(hashtagsTbl, modelHashtagsTbl, bestDTbl) {
 
 addMetrics <- function(hashtagsTbl, modelHashtagsTbl) {
 	tagCountTbl = hashtagsTbl[, list(tagCountN=.N), by=list(user_screen_name, dt)]
+	tagCountTbl
+	modelHashtagsTbl
 	modelHashtagsTbl[tagCountTbl, tagCount := tagCountN, nomatch=0]
 	modelHashtagsTbl[tagCountTbl[, list(tagCountUserN=sum(tagCountN)), keyby=user_screen_name], tagCountUser := tagCountUserN]
 	myLog('adding metrics for modelHashtagsTbl')
@@ -488,6 +486,11 @@ compareModelVsExtreme <-function(modelHashtagsTbl, extremesTbl) {
 	fooTbl
 }
 
+writeModelVsPredTbl <- function(modelVsPredTbl, outFile) {
+	setkey(modelVsPredTbl, user_screen_name, DVName, d, topHashtag, hashtagUsedP)
+	myWriteCSV(modelVsPredTbl, file=outFile)
+}
+
 genAggModelVsPredTbl <- function(hashtagsTbl, config) {
 	outFile = getConfig(config, "modelVsPredOutFile")
 	ds = getConfig(config, "ds")
@@ -508,8 +511,7 @@ genAggModelVsPredTbl <- function(hashtagsTbl, config) {
 	users = data.table(cur_user_screen_name=Filter(function(v) !(v %in% singleHashtagUsers), unique(hashtagsTbl$user_screen_name)))
 	res = users[, getModelVsPredTblFromHashtagsTbl(hashtagsTbl[cur_user_screen_name], ds, cur_user_screen_name), by=cur_user_screen_name]
 	res[, cur_user_screen_name := NULL]
-	setkey(res, user_screen_name, DVName, d, topHashtag, hashtagUsedP)
-	myWriteCSV(res, file=outFile)
+	writeModelVsPredTbl(res, outFile)
 	list(modelVsPredTbl=res, modelHashtagsTbl=modelHashtagsTbls)
 }
 
@@ -612,6 +614,7 @@ defaultTConfig = c(defaultBaseConfig,
 			allGroupNames = c('2014-02-27 17:13:30 initial', '2014-03-17 11:28:15 trendsmap'),
 			priorTbl = 'priorTblGlobT',
 			sjiTbl = 'sjiTblT',
+			getTokenizedFromSubsetFun=getTokenizedFromSubsetT,
 			includeRetweetsP=F))
 
 defaultSOConfig = c(defaultBaseConfig,
@@ -629,6 +632,7 @@ defaultSOConfig = c(defaultBaseConfig,
 			      groupName = 'SOShuffledFull',
 			      priorTbl = 'priorTblUserSO',
 			      sjiTbl = 'sjiTblSO',
+			      getTokenizedFromSubsetFun=getTokenizedFromSubsetSO,
 			      makeChunkTblFun='make_chunk_table_SO'
 			      ))
 
@@ -1385,18 +1389,22 @@ fillNAWithOthers <- function(tbl, col) {
 }
 
 getPostResTbl <- function(tokenTbl, config) {
+	tokenTbl
 	guardAllEqualP(tokenTbl[, creation_epoch])
 	guardAllEqualP(tokenTbl[, user_screen_name])
+	guardAllEqualP(tokenTbl[, user_screen_name_prior])
 	guardAllEqualP(tokenTbl[, dt])
 	contextTbl = tokenTbl[type != getConfig(config, "tagTypeName")]
 	contextTbl
 	tagTbl = tokenTbl[type == getConfig(config, "tagTypeName")]
 	setkey(tagTbl, chunk)
-	priorTbl = getPriorForUserAtEpoch(get(getConfig(config, 'priorTbl')), tokenTbl$user_screen_name[1], tokenTbl$creation_epoch[1], c(.5))
+	priorTbl = getPriorForUserAtEpoch(get(getConfig(config, 'priorTbl')), tokenTbl$user_screen_name_prior[1], tokenTbl$creation_epoch[1], c(.5))
+	priorTbl
 	setkey(priorTbl, hashtag)
 	tempTagTbl = tagTbl[, list(hashtag=chunk)]
 	setkey(tempTagTbl, hashtag)
 	priorTbl = merge(priorTbl, unique(tempTagTbl), all=T)
+	priorTbl[, user_screen_name := tokenTbl$user_screen_name[1]]
 	lapply(c('user_screen_name', 'dt', 'd'), function(x) fillNAWithOthers(priorTbl, x))
 	sjiTbl = contextTbl[, computeActSji(chunk, get(getConfig(config, 'sjiTbl'))), by=type]
 	if (nrow(sjiTbl) > 0) {
@@ -1429,11 +1437,17 @@ getTokenizedFromSubset <- function(minId, maxId, config) {
 
 getTokenizedFromSubsetT <- function(minId, maxId, config) {
 	resTbl = getTokenizedFromSubset(minId, maxId, config)[, user_screen_name := 'allUsers']
+	resTbl[, user_screen_name_prior := 'allUsers'][, user_screen_name := 'allUsers']
 	addDtToTbl(resTbl)
 	resTbl
 }
 
-getTokenizedFromSubsetSO <- getTokenizedFromSubset
+getTokenizedFromSubsetSO <- function(minId, maxId, config) {
+	resTbl = getTokenizedFromSubset(minId, maxId, config)
+	resTbl[, user_screen_name_prior := user_screen_name][, user_screen_name := 'allUsers']
+	addDtToTbl(resTbl)
+	resTbl
+}
 
 handleNAs <- function(validPostResTbl, predictors) {
 	#validPostResTbl = copy(postResTbl)
@@ -1480,6 +1494,9 @@ analyzePostResTbl <- function(validPostResTbl, predictors) {
 	setkey(validPostResTbl, user_screen_name, dt, hashtag, d)
 	predictors = c(predictors, 'act')
 	#validPostResTbl = copy(postResTbl)
+	#browser()
+	predictors
+	validPostResTbl
 	handleNAs(validPostResTbl, predictors)
 	model = reformulate(termlabels = predictors, response = 'hashtagUsedP')
 	myLogit = glm(model, data=validPostResTbl, family=binomial(link="logit"))
@@ -1494,35 +1511,44 @@ analyzePostResTbl <- function(validPostResTbl, predictors) {
 	myLogit
 }
 
-getHashtagsTblFromSubsetTbl <- function(tokenTbl) {
-	hashtagsTbl = tokenTbl[type=='hashtag']
+getHashtagsTblFromSubsetTbl <- function(tokenTbl, config) {
+	hashtagsTbl = tokenTbl[type==getConfig(config, 'tagTypeName')]
 	hashtagsTbl[, hashtag := chunk][, chunk := NULL]
 	setkey(hashtagsTbl, user_screen_name, dt, hashtag)
 	hashtagsTbl
 }
 
-fooFunT <- function() {
-	tokenTblT = getTokenizedFromSubsetT(3000001, 3000100, defaultTConfig)
-	postResTblT = tokenTblT[, getPostResTbl(.SD, defaultTConfig), by=id]
-	myLogit = analyzePostResTbl(postResTblT, getConfig(defaultTConfig, 'postTypeNames'))
-	hashtagsTblT = getHashtagsTblFromSubsetTbl(tokenTblT)
-	addMetrics(hashtagsTblT, postResTblT)
-	modelVsPredTbl = getModelVsPredTbl(postResTblT, hashtagsTblT)	
-	modelVsPredTbl
-	# Pattern this after runPrior output file, etc.
-	postResTblT
+getFullPostResTbl <- function(tokenTbl, config) {
+	postResTbl = tokenTbl[, getPostResTbl(.SD, config), by=id]
+	postResTbl[, d := .5]
+	postResTbl
 }
 
-fooFunSO <- function() {
-	# FIXME: Shouldn't need this function; everything should work with above with different config
-	tokenTblSO = getTokenizedFromSubsetSO(3000001, 3000100, defaultSOConfig)
-	postResTblSO = withProf(tokenTblSO[, getPostResTbl(.SD, defaultSOConfig), by=id])
-	myLogit = analyzePostResTbl(postResTblSO, c('title', 'body'))
+
+runContext <- function(config) {
+	tokenTbl = getConfig(config, 'getTokenizedFromSubsetFun')(3000001, 3000100, config)
+	tokenTbl[, unique(user_screen_name)]
+	key(tokenTbl)
+	postResTbl = getFullPostResTbl(tokenTbl, config)
+	key(postResTbl)
+	postResTbl
+	myLogit = analyzePostResTbl(postResTbl, getConfig(config, 'postTypeNames'))
+	hashtagsTbl = getHashtagsTblFromSubsetTbl(tokenTbl, config)
+	hashtagsTbl
+	postResTbl
+	addMetrics(hashtagsTbl, postResTbl)
+	modelVsPredTbl = getModelVsPredTbl(postResTbl, hashtagsTbl)	
+	outFile = getConfig(config, "modelVsPredOutFile")
+	writeModelVsPredTbl(modelVsPredTbl, outFile)
+	list(modelVsPredTbl=modelVsPredTbl, modelHashtagsTbl=postResTbl, hashtagsTbl=hashtagsTbl)
 }
 
 curWS <- function() {
-	getCurWorkspace(100, 1000, 100, 1000)
-	fooFunT()
+	getCurWorkspace(100, 1000000, 100, 1000)
+	getModelVsPredOutFile('testingTC')
+	runContext(modConfig(defaultTConfig, list(modelVsPredOutFile=getModelVsPredOutFile('testingTC'))))
+	runContext(modConfig(defaultSOConfig, list(modelVsPredOutFile=getModelVsPredOutFile('testingSOC'))))
+	runContext(defaultSOConfig)
 	priorTblUserSO
 	priorTblGlobT
 	sqldf('select hashtag_group, retweeted, count(text) from top_hashtag_tweets group by hashtag_group, retweeted order by hashtag_group, retweeted')
@@ -1547,7 +1573,6 @@ curWS <- function() {
 	priorTblUserSO[, .N, by=hashtag][, list(hashtag, p=N/sum(N))][order(p, decreasing=T)][1:50][, plot(1:length(p), p)]
 	BTbl = getPriorForUserAtEpoch(priorTblUserSO, '4653', 1390076773, c(.5, .6))
 	BTbl = getPriorForUserAtEpoch(priorTblUserSO, '4653', 1220886841, c(.5, .6))
-	BTbl = withProf(getPriorForAllUsersAtEpoch(priorTblGlobT, 99999999999, c(.5)))
 	BTbl[order(act, decreasing=T)]
 	BTbl
 	sjiTblT
