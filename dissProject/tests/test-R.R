@@ -103,32 +103,33 @@ test_that("testAggregation", {
 })
 
 test_that("testAddSjiAttrs", {
-	sjiTestTbl = data.table(chunk=c('a','a','b','b'), hashtag=c('x','y','x','y'), partialN=c(1,2,3,4))
-	expectedTbl = copy(sjiTestTbl)[, chunkSums := c(3,3,7,7)][, tagSums := c(4,6,4,6)][, sji := log( 10 * partialN / (chunkSums * tagSums))]
-	expectedTbl[, pTagGivenChunk := c(1/3, 2/3, 3/7, 4/7)][, HChunk := - sum(pTagGivenChunk * log(pTagGivenChunk)), by=chunk][, EChunk := 1 - HChunk/max(HChunk)]
+	sjiTestTbl = data.table(context=c('a','a','b','b'), hashtag=c('x','y','x','y'), partialN=c(1,2,3,4))
+	expectedTbl = copy(sjiTestTbl)[, contextSums := c(3,3,7,7)][, tagSums := c(4,6,4,6)][, sji := log( 10 * partialN / (contextSums * tagSums))]
+	expectedTbl[, pTagGivenChunk := c(1/3, 2/3, 3/7, 4/7)][, HContext := - sum(pTagGivenChunk * log(pTagGivenChunk)), by=context][, EContext := 1 - HContext/max(HContext)]
 	addSjiAttrs(sjiTestTbl)
 	expect_equivalent(expectedTbl, sjiTestTbl)
 })
 
 test_that("testComputeAct", {
 	testTestTblVsExpected <- function(sjiTestTbl, expectedTbl, context=c('a', 'b')) {
-		setkey(sjiTestTbl, chunk, hashtag)
+		setkey(sjiTestTbl, context, hashtag)
 		resTbl = computeActSji(context, sjiTestTbl)
+		print(resTbl)
 		expect_equivalent(expectedTbl, resTbl)
 	}
-	testTestTblVsExpected(data.table(chunk=c('a','a','b','b'), hashtag=c('x','y','x','y'), sji=c(1,2,3,4), EChunk=c(1,1,1,1)),
+	testTestTblVsExpected(data.table(context=c('a','a','b','b'), hashtag=c('x','y','x','y'), sji=c(1,2,3,4), EContext=c(1,1,1,1)),
 			      data.table(hashtag=c('x','y'), act=c(4/2,6/2)))
-	testTestTblVsExpected(data.table(chunk=c('a','b','b'), hashtag=c('x','x','y'), sji=c(1,2,3), EChunk=c(1,1,1)),
+	testTestTblVsExpected(data.table(context=c('a','b','b'), hashtag=c('x','x','y'), sji=c(1,2,3), EContext=c(1,1,1)),
 			      data.table(hashtag=c('x','y'), act=c(3/2, 3)))
-	testTestTblVsExpected(data.table(chunk=c('a','b'), hashtag=c('x','y'), sji=c(1,2), EChunk=c(1,1)),
+	testTestTblVsExpected(data.table(context=c('a','b'), hashtag=c('x','y'), sji=c(1,2), EContext=c(1,1)),
 			      data.table(hashtag=c('x'), act=c(1)),
 			      context=c('a'))
-	testTestTblVsExpected(data.table(chunk=c('a'), hashtag=c('x'), sji=c(1), EChunk=c(1)),
+	testTestTblVsExpected(data.table(context=c('a'), hashtag=c('x'), sji=c(1), EContext=c(1)),
 			      data.table(hashtag=c('x'), act=c(1)))
-	testTestTblVsExpected(data.table(chunk=c('a', 'b'), hashtag=c('x', 'x'), sji=c(1,2), EChunk=c(1,1)),
+	testTestTblVsExpected(data.table(context=c('a', 'b'), hashtag=c('x', 'x'), sji=c(1,2), EContext=c(1,1)),
 			      data.table(hashtag=c('x'), act=c(5/4)),
 			      context=c('a','a','a','b'))
-	testTestTblVsExpected(data.table(chunk=c('a','a'), hashtag=c('x','y'), sji=c(1,2), EChunk=c(1,1)),
+	testTestTblVsExpected(data.table(context=c('a','a'), hashtag=c('x','y'), sji=c(1,2), EContext=c(1,1)),
 			      data.table(hashtag=c('x','y'), act=c(1,2)),
 			      context=c('a','a','a','a'))
 })

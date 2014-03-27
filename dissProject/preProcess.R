@@ -611,7 +611,9 @@ defaultTConfig = c(defaultBaseConfig,
 			tagTypeName = 'hashtag',
 			postTypeNames = 'tweet',
 			groupName = '2014-02-27 17:13:30 initial',
-			allGroupNames = c('2014-02-27 17:13:30 initial', '2014-03-17 11:28:15 trendsmap'),
+			allGroupNames = c('2014-02-27 17:13:30 initial',
+					  '2014-03-17 11:28:15 trendsmap',
+					  '2014-03-24 13:06:19 trendsmap'),
 			priorTbl = 'priorTblGlobT',
 			sjiTbl = 'sjiTblT',
 			getTokenizedFromSubsetFun='getTokenizedFromSubsetT',
@@ -1274,8 +1276,9 @@ getSjiTblSO <- function(config, startId, endId) {
 	sjiBodyTbl[, type := 'body']
 	sjiTbl = rbind(sjiTitleTbl, sjiBodyTbl)
 	sjiTbl[, hashtag := tag][, tag := NULL]
-	setkey(sjiTbl, chunk, hashtag, posFromTag, type)
-	sjiTbl = sjiTbl[, list(partialN=sum(partialN), NChunkTag=sum(NChunkTag)), by=list(chunk, hashtag, posFromTag)]
+	sjiTbl[, context := chunk][, chunk := NULL]
+	setkey(sjiTbl, context, hashtag, posFromTag, type)
+	sjiTbl = sjiTbl[, list(partialN=sum(partialN), NChunkTag=sum(NChunkTag)), by=list(context, hashtag, posFromTag)]
 	addSjiAttrs(sjiTbl)
 	sjiTbl
 }
@@ -1285,11 +1288,12 @@ getSjiTblT <- function(config, startId, endId) {
 	sjiTblName = sprintf('NcoocTblTweet-%s', fileName)
 	sjiColClasses = c('character', 'character', 'character', 'integer', 'integer')	
 	sjiTbl = myReadCSV(sprintf('%s/%s', getCoocDir(), sjiTblName), colClasses=sjiColClasses)
-	topHashtagsTbl = sqldt(sprintf("select hashtag from top_hashtag_hashtags where hashtag_group = '%s'", getConfig(config, "groupName")))
-	sjiTbl = sjiTbl[tag %in% topHashtagsTbl[, hashtag]]
-	sjiTbl = sjiTbl[, list(posFromTag=NaN, partialN=sum(partialN)), by=list(chunk, tag)]
+	sjiTbl[, context := chunk][, chunk := NULL]
 	sjiTbl[, hashtag := tag][, tag := NULL]
-	setkey(sjiTbl, chunk, hashtag, posFromTag)
+	topHashtagsTbl = sqldt(sprintf("select hashtag from top_hashtag_hashtags where hashtag_group = '%s'", getConfig(config, "groupName")))
+	sjiTbl = sjiTbl[hashtag %in% topHashtagsTbl[, hashtag]]
+	sjiTbl = sjiTbl[, list(posFromTag=NaN, partialN=sum(partialN)), by=list(context, hashtag)]
+	setkey(sjiTbl, context, hashtag, posFromTag)
 	addSjiAttrs(sjiTbl)
 	sjiTbl
 }
@@ -1337,18 +1341,19 @@ getPriorTblGlobT <- function(config, startId, endId) {
 
 
 addSjiAttrs <- function(sjiTbl) {
-	sjiTbl[, chunkSums := sum(partialN), by=chunk]
-	sjiTbl[, tagSums := sum(partialN), by=hashtag]
-	sjiTbl[, sji := log(sum(partialN)) + log(partialN) - log(chunkSums) - log(tagSums)]
-	sjiTbl[, pTagGivenChunk := partialN/chunkSums]
-	sjiTbl[, HChunk := - sum(pTagGivenChunk * log(pTagGivenChunk)), by=chunk]
-	sjiTbl[, EChunk := 1 - HChunk/max(HChunk)]
+	sjiTbl[, contextSums := sum(partialN), by=context]
+	sjiTbl[, hashtagSums := sum(partialN), by=hashtag]
+	sjiTbl[, sji := log(sum(partialN)) + log(partialN) - log(contextSums) - log(hashtagSums)]
+	sjiTbl[, pHashtagGivenContext := partialN/contextSums]
+	sjiTbl[, HContext := - sum(pHashtagGivenContext * log(pHashtagGivenContext)), by=context]
+	sjiTbl[, EContext := 1 - HContext/max(HContext)]
 }
 
-computeActSji <- function(context, sjiTbl) {
+computeActSji <- function(contextVect, sjiTbl) {
 	myLog(sprintf("computing sji act for context with length %s", length(context)))
-	resTbl = sjiTbl[J(context), nomatch=0, allow.cartesian=T]
-	resTbl = resTbl[, {WChunk = EChunk/sum(EChunk); list(act=sum(WChunk * sji))}, keyby=hashtag]
+	resTbl = sjiTbl[J(contextVect), nomatch=0, allow.cartesian=T]
+	resTbl = resTbl[, {WContext = EContext/sum(EContext); list(act=sum(WContext * sji))}, keyby=hashtag]
+	resTbl
 }
 
 wsFile = '/Volumes/SSDSupernova/RWorkspace/workspace.RData'
@@ -1545,7 +1550,9 @@ runContext <- function(config) {
 }
 
 curWS <- function() {
-	runGenNcoocTblSO1thru100()
+	getSjiTblSO(defaultSOConfig, 1, 100)
+	sjiTblSO
+	sjiTblT
 	getCurWorkspace(100, 1000000, 100, 1000)
 	runContext(modConfig(defaultTConfig, list(modelVsPredOutFile=getModelVsPredOutFile('testingTC'))))
 	runContext(modConfig(defaultSOConfig, list(modelVsPredOutFile=getModelVsPredOutFile('testingSOC'))))
@@ -1555,9 +1562,6 @@ curWS <- function() {
 	sqldf('select hashtag_group, retweeted, count(text) from top_hashtag_tweets group by hashtag_group, retweeted order by hashtag_group, retweeted')
 	resTbl = runPriorT(config=modConfig(defaultTConfig, list(query=sprintf("select %s from tweets where user_screen_name = 'ap'", defaultTCols))))
 
-	tokenTblT
-	predictors = c('title', 'body')
-	tokenTblT
 	postResTblSO
 	postResTblT
 	postResTblT
