@@ -1387,14 +1387,6 @@ genAndSaveCurWorkspace <- function() {
 	mySaveImage()
 }
 
-fillNAWithOthers <- function(tbl, col) {
-	col = as.symbol(col)
-	eval(bquote(tbl[!is.na(.(col)), guardAllEqualP(.(col))]))
-	val = eval(bquote(tbl[!is.na(.(col)), .(col)[1]]))
-	eval(bquote(tbl[is.na(.(col)), .(col) := val]))
-	tbl
-}
-
 getPostResTbl <- function(tokenTbl, config) {
 	tokenTbl
 	dStd = getConfig(config, 'dStd')
@@ -1404,16 +1396,16 @@ getPostResTbl <- function(tokenTbl, config) {
 	guardAllEqualP(tokenTbl[, dt])
 	stopifnot(length(dStd) == 1)
 	contextTbl = tokenTbl[type != getConfig(config, "tagTypeName")]
-	contextTbl
 	tagTbl = tokenTbl[type == getConfig(config, "tagTypeName")]
 	setkey(tagTbl, chunk)
 	priorTbl = getPriorForUserAtEpoch(get(getConfig(config, 'priorTbl')), tokenTbl$user_screen_name_prior[1], tokenTbl$creation_epoch[1], dStd)
-	priorTbl
 	setkey(priorTbl, hashtag)
 	tempTagTbl = tagTbl[, list(hashtag=chunk)]
 	setkey(tempTagTbl, hashtag)
 	priorTbl = merge(priorTbl, unique(tempTagTbl), all=T)
-	lapply(c('user_screen_name', 'dt', 'd'), function(x) fillNAWithOthers(priorTbl, x))
+	priorTbl[, user_screen_name := tokenTbl$user_screen_name[1]]
+	priorTbl[, dt := tokenTbl[, dt[1]]]
+	priorTbl[, d := dStd]
 	sjiTbl = contextTbl[, computeActSji(chunk, get(getConfig(config, 'sjiTbl'))), by=type]
 	if (nrow(sjiTbl) > 0) {
 		sjiTblWide = dcast.data.table(sjiTbl, hashtag ~ type, value.var='act')
@@ -1426,9 +1418,6 @@ getPostResTbl <- function(tokenTbl, config) {
 	postResTbl = sjiTblWide[priorTbl]
 	postResTbl[, hashtagUsedP := F]
 	postResTbl[tagTbl, hashtagUsedP := T]
-	postResTbl[, dt := tokenTbl[, dt[1]]]
-	postResTbl[, user_screen_name := tokenTbl$user_screen_name[1]]
-	postResTbl[, d := dStd]
 	postResTbl
 }
 
