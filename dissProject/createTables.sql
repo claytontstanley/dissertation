@@ -193,12 +193,20 @@ create table if not exists top_hashtag_tokenized_chunk_types (
 	primary key (id)
 	);
 
+create or replace function fill_top_hashtag_tokenized_chunk_types()
+returns void as
+$$
+truncate table top_hashtag_tokenized_chunk_types;
 insert into top_hashtag_tokenized_chunk_types (type_name)
 select distinct chunk
 from top_hashtag_tokenized as t
 where t.chunk not in (select type_name from top_hashtag_tokenized_chunk_types);
-
 vacuum analyze top_hashtag_tokenized_chunk_types;
+;
+$$
+language sql immutable;
+
+fill_top_hashtag_tokenized_chunk_types()
 
 create type chunk_table_type as ("chunk_id" int, "post_id" bigint, "pos" int, "post_type_id" int);
 

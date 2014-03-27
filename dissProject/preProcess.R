@@ -594,6 +594,7 @@ runPrior <- function(config) {
 }
 
 defaultBaseConfig = list(ds=c(0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1.0,1.1,1.2,1.3,1.4,1.5,1.6,1.8,2,5,10,20),
+			 dStd=0.5,
 			 modelVsPredOutFile='/tmp/modelVsPred.csv',
 			 query=NULL)
 
@@ -1243,6 +1244,7 @@ runAddTweetSubsets <- addTweetSubsets
 runUpdateTwitterWithNewGroup <- function() {
 	runAddTweetSubsets()
 	runGenTokenizedTblTwitter()
+	sqldf('select * from fill_top_hashtag_tokenized_chunk_types()')
 }
 
 runGenNcoocTblSO1thru100 <- function() genNcoocTblSO('SOShuffledFull', 1, 100)
@@ -1350,7 +1352,7 @@ addSjiAttrs <- function(sjiTbl) {
 }
 
 computeActSji <- function(contextVect, sjiTbl) {
-	myLog(sprintf("computing sji act for context with length %s", length(context)))
+	myLog(sprintf("computing sji act for context with length %s", length(contextVect)))
 	resTbl = sjiTbl[J(contextVect), nomatch=0, allow.cartesian=T]
 	resTbl = resTbl[, {WContext = EContext/sum(EContext); list(act=sum(WContext * sji))}, keyby=hashtag]
 	resTbl
@@ -1395,22 +1397,22 @@ fillNAWithOthers <- function(tbl, col) {
 
 getPostResTbl <- function(tokenTbl, config) {
 	tokenTbl
+	dStd = getConfig(config, 'dStd')
 	guardAllEqualP(tokenTbl[, creation_epoch])
 	guardAllEqualP(tokenTbl[, user_screen_name])
 	guardAllEqualP(tokenTbl[, user_screen_name_prior])
 	guardAllEqualP(tokenTbl[, dt])
+	stopifnot(length(dStd) == 1)
 	contextTbl = tokenTbl[type != getConfig(config, "tagTypeName")]
 	contextTbl
 	tagTbl = tokenTbl[type == getConfig(config, "tagTypeName")]
 	setkey(tagTbl, chunk)
-	# .5 FIXME!
-	priorTbl = getPriorForUserAtEpoch(get(getConfig(config, 'priorTbl')), tokenTbl$user_screen_name_prior[1], tokenTbl$creation_epoch[1], c(.5))
+	priorTbl = getPriorForUserAtEpoch(get(getConfig(config, 'priorTbl')), tokenTbl$user_screen_name_prior[1], tokenTbl$creation_epoch[1], dStd)
 	priorTbl
 	setkey(priorTbl, hashtag)
 	tempTagTbl = tagTbl[, list(hashtag=chunk)]
 	setkey(tempTagTbl, hashtag)
 	priorTbl = merge(priorTbl, unique(tempTagTbl), all=T)
-	priorTbl[, user_screen_name := tokenTbl$user_screen_name[1]]
 	lapply(c('user_screen_name', 'dt', 'd'), function(x) fillNAWithOthers(priorTbl, x))
 	sjiTbl = contextTbl[, computeActSji(chunk, get(getConfig(config, 'sjiTbl'))), by=type]
 	if (nrow(sjiTbl) > 0) {
@@ -1425,6 +1427,8 @@ getPostResTbl <- function(tokenTbl, config) {
 	postResTbl[, hashtagUsedP := F]
 	postResTbl[tagTbl, hashtagUsedP := T]
 	postResTbl[, dt := tokenTbl[, dt[1]]]
+	postResTbl[, user_screen_name := tokenTbl$user_screen_name[1]]
+	postResTbl[, d := dStd]
 	postResTbl
 }
 
@@ -1500,7 +1504,6 @@ analyzePostResTbl <- function(validPostResTbl, predictors) {
 	setkey(validPostResTbl, user_screen_name, dt, hashtag, d)
 	predictors = c(predictors, 'act')
 	#validPostResTbl = copy(postResTbl)
-	#browser()
 	predictors
 	validPostResTbl
 	handleNAs(validPostResTbl, predictors)
@@ -1526,21 +1529,14 @@ getHashtagsTblFromSubsetTbl <- function(tokenTbl, config) {
 
 getFullPostResTbl <- function(tokenTbl, config) {
 	postResTbl = tokenTbl[, getPostResTbl(.SD, config), by=id]
-	postResTbl[, d := .5] # FIXME!
 	postResTbl
 }
 
-
 runContext <- function(config) {
 	tokenTbl = get(getConfig(config, 'getTokenizedFromSubsetFun'))(3000001, 3000100, config)
-	tokenTbl[, unique(user_screen_name)]
-	key(tokenTbl)
 	postResTbl = getFullPostResTbl(tokenTbl, config)
-	key(postResTbl)
-	postResTbl
 	myLogit = analyzePostResTbl(postResTbl, getConfig(config, 'postTypeNames'))
 	hashtagsTbl = getHashtagsTblFromSubsetTbl(tokenTbl, config)
-	hashtagsTbl
 	postResTbl
 	addMetrics(hashtagsTbl, postResTbl)
 	modelVsPredTbl = getModelVsPredTbl(postResTbl, hashtagsTbl)	
