@@ -1398,6 +1398,7 @@ getPostResTbl <- function(tokenTbl, config) {
 	contextTbl
 	tagTbl = tokenTbl[type == getConfig(config, "tagTypeName")]
 	setkey(tagTbl, chunk)
+	# .5 FIXME!
 	priorTbl = getPriorForUserAtEpoch(get(getConfig(config, 'priorTbl')), tokenTbl$user_screen_name_prior[1], tokenTbl$creation_epoch[1], c(.5))
 	priorTbl
 	setkey(priorTbl, hashtag)
