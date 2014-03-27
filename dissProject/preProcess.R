@@ -1546,7 +1546,6 @@ runContext <- function(config) {
 
 curWS <- function() {
 	getCurWorkspace(100, 1000000, 100, 1000)
-	getModelVsPredOutFile('testingTC')
 	runContext(modConfig(defaultTConfig, list(modelVsPredOutFile=getModelVsPredOutFile('testingTC'))))
 	runContext(modConfig(defaultSOConfig, list(modelVsPredOutFile=getModelVsPredOutFile('testingSOC'))))
 	runContext(defaultSOConfig)
