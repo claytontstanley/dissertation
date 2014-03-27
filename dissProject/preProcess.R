@@ -614,7 +614,7 @@ defaultTConfig = c(defaultBaseConfig,
 			allGroupNames = c('2014-02-27 17:13:30 initial', '2014-03-17 11:28:15 trendsmap'),
 			priorTbl = 'priorTblGlobT',
 			sjiTbl = 'sjiTblT',
-			getTokenizedFromSubsetFun=getTokenizedFromSubsetT,
+			getTokenizedFromSubsetFun='getTokenizedFromSubsetT',
 			includeRetweetsP=F))
 
 defaultSOConfig = c(defaultBaseConfig,
@@ -632,7 +632,7 @@ defaultSOConfig = c(defaultBaseConfig,
 			      groupName = 'SOShuffledFull',
 			      priorTbl = 'priorTblUserSO',
 			      sjiTbl = 'sjiTblSO',
-			      getTokenizedFromSubsetFun=getTokenizedFromSubsetSO,
+			      getTokenizedFromSubsetFun='getTokenizedFromSubsetSO',
 			      makeChunkTblFun='make_chunk_table_SO'
 			      ))
 
@@ -1527,7 +1527,7 @@ getFullPostResTbl <- function(tokenTbl, config) {
 
 
 runContext <- function(config) {
-	tokenTbl = getConfig(config, 'getTokenizedFromSubsetFun')(3000001, 3000100, config)
+	tokenTbl = get(getConfig(config, 'getTokenizedFromSubsetFun'))(3000001, 3000100, config)
 	tokenTbl[, unique(user_screen_name)]
 	key(tokenTbl)
 	postResTbl = getFullPostResTbl(tokenTbl, config)
@@ -1545,6 +1545,7 @@ runContext <- function(config) {
 }
 
 curWS <- function() {
+	runGenNcoocTblSO1thru100()
 	getCurWorkspace(100, 1000000, 100, 1000)
 	runContext(modConfig(defaultTConfig, list(modelVsPredOutFile=getModelVsPredOutFile('testingTC'))))
 	runContext(modConfig(defaultSOConfig, list(modelVsPredOutFile=getModelVsPredOutFile('testingSOC'))))
@@ -1564,9 +1565,6 @@ curWS <- function() {
 	myLogit
 
 	getPostResTbl(fooTbl[, post_id[1]], defaultTConfig)
-	runGenNcoocTblT11thru10000()
-	runGenNcoocTblSO1thru3000000()
-	runGenNcoocTblSO1thru100()
 	withProf(genAndSaveCurWorkspace())
 	withProf(myLoadImage())
 	priorTblGlobT[, .N, by=hashtag][, list(hashtag, p=N/sum(N))][order(p, decreasing=T)][1:50][, plot(1:length(p), p)]
