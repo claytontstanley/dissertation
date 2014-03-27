@@ -1520,7 +1520,7 @@ getHashtagsTblFromSubsetTbl <- function(tokenTbl, config) {
 
 getFullPostResTbl <- function(tokenTbl, config) {
 	postResTbl = tokenTbl[, getPostResTbl(.SD, config), by=id]
-	postResTbl[, d := .5]
+	postResTbl[, d := .5] # FIXME!
 	postResTbl
 }
 
