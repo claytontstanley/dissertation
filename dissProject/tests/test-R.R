@@ -114,7 +114,6 @@ test_that("testComputeAct", {
 	testTestTblVsExpected <- function(sjiTestTbl, expectedTbl, context=c('a', 'b')) {
 		setkey(sjiTestTbl, context, hashtag)
 		resTbl = computeActSji(context, sjiTestTbl)
-		print(resTbl)
 		expect_equivalent(expectedTbl, resTbl)
 	}
 	testTestTblVsExpected(data.table(context=c('a','a','b','b'), hashtag=c('x','y','x','y'), sji=c(1,2,3,4), EContext=c(1,1,1,1)),
