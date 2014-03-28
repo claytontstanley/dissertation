@@ -205,7 +205,7 @@ where t.chunk not in (select type_name from top_hashtag_tokenized_chunk_types);
 $$
 language sql;
 
-fill_top_hashtag_tokenized_chunk_types()
+select * from fill_top_hashtag_tokenized_chunk_types();
 vacuum analyze top_hashtag_tokenized_chunk_types;
 
 create type chunk_table_type as ("chunk_id" int, "post_id" bigint, "pos" int, "post_type_id" int);
