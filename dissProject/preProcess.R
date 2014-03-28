@@ -1255,8 +1255,8 @@ runUpdateTwitterWithNewGroup <- function() {
 	runGenTokenizedTblTwitter()
 	sqldf('select * from fill_top_hashtag_tokenized_chunk_types()')
 	sqldf('vacuum analyze top_hashtag_tokenized_chunk_types')
-	runPythonFun('backupTopHashtags()')
 	runMakeTarget('parrunTSjisAll')
+	runPythonFun('backupTopHashtags()')
 }
 
 runGenNcoocTblSO1thru100 <- function() genNcoocTblSO('SOShuffledFull', 1, 100)
