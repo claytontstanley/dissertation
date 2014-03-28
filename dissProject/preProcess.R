@@ -1245,6 +1245,10 @@ runPythonFun <- function(call) {
 	system2('python', args=c(sprintf('%s/%s', PATH, file), sprintf("'%s'", call)))
 }
 
+runMakeTarget <- function(call) {
+	system2(sprintf('make'), args=c('-C', PATH, call))
+}
+
 runAddTweetSubsets <- addTweetSubsets
 runUpdateTwitterWithNewGroup <- function() {
 	runAddTweetSubsets()
@@ -1252,6 +1256,8 @@ runUpdateTwitterWithNewGroup <- function() {
 	sqldf('select * from fill_top_hashtag_tokenized_chunk_types()')
 	sqldf('vacuum analyze top_hashtag_tokenized_chunk_types')
 	runPythonFun('backupTopHashtags()')
+	runMakeTarget('parrunTSjisAll')
+	runMakeTarget('getContext')
 }
 
 runGenNcoocTblSO1thru100 <- function() genNcoocTblSO('SOShuffledFull', 1, 100)
