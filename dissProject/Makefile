@@ -11,6 +11,7 @@ createSOSmall:
 parrunPriors: NP = 4
 parrunSjis: NP = 1
 parrunTSjis: NP = 1
+parrunTSjisAll: NP = 1
 parrunContext: NP = 1
 
 parrun%:
