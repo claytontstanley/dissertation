@@ -1240,12 +1240,18 @@ addTweetSubsets <- function() {
 	}
 }
 
+runPythonFun <- function(call) {
+	file = 'scrapeUsers.py'
+	system2('python', args=c(sprintf('%s/%s', PATH, file), sprintf("'%s'", call)))
+}
+
 runAddTweetSubsets <- addTweetSubsets
 runUpdateTwitterWithNewGroup <- function() {
 	runAddTweetSubsets()
 	runGenTokenizedTblTwitter()
 	sqldf('select * from fill_top_hashtag_tokenized_chunk_types()')
 	sqldf('vacuum analyze top_hashtag_tokenized_chunk_types')
+	runPythonFun('backupTopHashtags()')
 }
 
 runGenNcoocTblSO1thru100 <- function() genNcoocTblSO('SOShuffledFull', 1, 100)

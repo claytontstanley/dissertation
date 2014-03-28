@@ -423,14 +423,18 @@ def backupTopHashtags():
                              'top_hashtag_tokenized_type_types',
                              'top_hashtag_tweets'])
 
-
 # Current run selections
 #generateTopUsers100k()
 #getAllTweetsForTopUsersByFollowers()
 #getAllTweetsForTopUsersByTweets()
 #getUserInfoForTopUsers()
 #storeCurTagSynonyms()
-backupTopHashtags()
+#backupTopHashtags()
 #backupTables()
 #generateTopHashtags()
 #streamHashtagsCurrent()
+
+if __name__ == "__main__":
+    command = " ".join(sys.argv[1:])
+    print('running command %s') % (command)
+    eval(command)
