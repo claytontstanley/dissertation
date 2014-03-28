@@ -1534,15 +1534,14 @@ runContext <- function(config) {
 	list(modelVsPredTbl=modelVsPredTbl, modelHashtagsTbl=postResTbl, hashtagsTbl=hashtagsTbl)
 }
 
-curWS <- function() {
-	getSjiTblSO(defaultSOConfig, 1, 100)
-	sjiTblSO
-	sjiTblT
+runContextTest <- function() {
 	getCurWorkspace(100, 1000000, 100, 1000)
 	runContext(modConfig(defaultTConfig, list(modelVsPredOutFile=getModelVsPredOutFile('testingTC'))))
 	runContext(modConfig(defaultSOConfig, list(modelVsPredOutFile=getModelVsPredOutFile('testingSOC'))))
-	priorTblUserSO
-	priorTblGlobT
+}
+
+
+curWS <- function() {
 	sqldf('select hashtag_group, retweeted, count(text) from top_hashtag_tweets group by hashtag_group, retweeted order by hashtag_group, retweeted')
 	resTbl = runPriorT(config=modConfig(defaultTConfig, list(query=sprintf("select %s from tweets where user_screen_name = 'ap'", defaultTCols))))
 
