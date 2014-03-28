@@ -319,11 +319,11 @@ getModelHashtagsTbl <- function(partialRes) {
 	setkeyv(partialRes, c('user_screen_name','dt','hashtag','d'))
 	#myLog('computing activations across table')
 	res = partialRes[, list(N=.N,
-				act=log(sum(partialAct)),
-				actOL=if (is.na(d[1])) numeric(0) else if (d[1]>=1) NaN else log(.N/(1-d))-d*log(dt),
-				actOL2=if (is.na(d[1])) numeric(0) else if (d[1]>=1) NaN else log(.N/(1-d))-d*log(max(dtP))), keyby=list(user_screen_name, dt, hashtag, d)]
-	with(res, myStopifnot(!is.infinite(act)))
-	with(res, myStopifnot(!is.infinite(actOL2)))
+				actPriorStd=log(sum(partialAct)),
+				actPriorOL=if (is.na(d[1])) numeric(0) else if (d[1]>=1) NaN else log(.N/(1-d))-d*log(dt),
+				actPriorOL2=if (is.na(d[1])) numeric(0) else if (d[1]>=1) NaN else log(.N/(1-d))-d*log(max(dtP))), keyby=list(user_screen_name, dt, hashtag, d)]
+	with(res, myStopifnot(!is.infinite(actPriorStd)))
+	with(res, myStopifnot(!is.infinite(actPriorOL2)))
 	res
 }
 
@@ -405,9 +405,9 @@ addMetrics <- function(hashtagsTbl, modelHashtagsTbl) {
 		expr = bquote(modelHashtagsTbl[order(.(col), decreasing=T), .(newDVAct) := 1:length(.(col)) <= tagCountUser[1], by=list(user_screen_name, d)])
 		eval(expr)
 	}
-	addDVCols(act, topHashtagPost, topHashtagAcross)
-	addDVCols(actOL, topHashtagPostOL, topHashtagAcrossOL)
-	addDVCols(actOL2, topHashtagPostOL2, topHashtagAcrossOL2)
+	addDVCols(actPriorStd, topHashtagPostPriorStd, topHashtagAcrossPriorStd)
+	addDVCols(actPriorOL, topHashtagPostPriorOL, topHashtagAcrossPriorOL)
+	addDVCols(actPriorOL2, topHashtagPostPriorOL2, topHashtagAcrossPriorOL2)
 	myStopifnot(key(modelHashtagsTbl) == (c('user_screen_name', 'dt', 'hashtag', 'd')))
 	myStopifnot(key(hashtagsTbl) == (c('user_screen_name', 'dt', 'hashtag')))
 	modelHashtagsTbl[, hashtagUsedP := F]
@@ -457,12 +457,12 @@ modelVsPredForDV <- function(modelHashtagsTbl, DVName) {
 }
 
 getModelVsPredTbl <- function(modelHashtagsTbl, hashtagsTbl) {
-	modelVsPredTbl = rbind(modelVsPredForDV(modelHashtagsTbl, 'topHashtagPost'), 
-			       modelVsPredForDV(modelHashtagsTbl, 'topHashtagAcross'),
-			       modelVsPredForDV(modelHashtagsTbl, 'topHashtagPostOL'),
-			       modelVsPredForDV(modelHashtagsTbl, 'topHashtagAcrossOL'),
-			       modelVsPredForDV(modelHashtagsTbl, 'topHashtagPostOL2'),
-			       modelVsPredForDV(modelHashtagsTbl, 'topHashtagAcrossOL2'))
+	modelVsPredTbl = rbind(modelVsPredForDV(modelHashtagsTbl, 'topHashtagPostPriorStd'), 
+			       modelVsPredForDV(modelHashtagsTbl, 'topHashtagAcrossPriorStd'),
+			       modelVsPredForDV(modelHashtagsTbl, 'topHashtagPostPriorOL'),
+			       modelVsPredForDV(modelHashtagsTbl, 'topHashtagAcrossPriorOL'),
+			       modelVsPredForDV(modelHashtagsTbl, 'topHashtagPostPriorOL2'),
+			       modelVsPredForDV(modelHashtagsTbl, 'topHashtagAcrossPriorOL2'))
 	modelVsPredTbl[, maxNP := NCell==max(NCell), by=list(user_screen_name, topHashtag, hashtagUsedP, DVName)]
 	# TODO: Doesn't using the maxNP closest to the center of all of the maxNP's create an artifact for low N when all ds are MaxNP's?
 	modelVsPredTbl[maxNP==T, maxNP := onlyFirstT(abs(d-mean(d)) == min(abs(d-mean(d)))), by=list(user_screen_name, topHashtag, hashtagUsedP, DVName)]
@@ -776,8 +776,8 @@ getSummaryStats <- function() {
 	unique(usersFromRunsTbl)
 	postsCntFromRunsTbl = rbind(tPostsCntFromRunsTbl, SOPostsCntFromRunsTbl)
 	postsCntFromRunsTbl[, sum(count), by=dataset]
-	modelVsPredTbl[predUsedBest == T][runNum == 2][, list(acc=mean(acc), d=median(d), N=.N), by=list(DVName, datasetType)][DVName %in% c('topHashtagPost', 'topHashtagPostOL2')][, mean(acc), by=DVName]
-	modelVsPredTbl[hashtagUsedP == T][topHashtag == T][DVName == 'topHashtagAcross'][, sum(totN), by=datasetType]
+	modelVsPredTbl[predUsedBest == T][runNum == 2][, list(acc=mean(acc), d=median(d), N=.N), by=list(DVName, datasetType)][DVName %in% c('topHashtagPostPriorStd', 'topHashtagPostPriorOL2')][, mean(acc), by=DVName]
+	modelVsPredTbl[hashtagUsedP == T][topHashtag == T][DVName == 'topHashtagAcrossPriorStd'][, sum(totN), by=datasetType]
 	modelVsPredTbl[, .N, by=d]
 }
 
@@ -947,7 +947,7 @@ compareMeanDV <- function(modelVsPredTbl, DV, extras=NULL) {
 }
 
 plotDatasetDescriptives <- function(modelVsPredTbl) {
-	sumTbl = modelVsPredTbl[runNum==2 & predUsedBest == T & DVName == 'topHashtagPost'][, list(NUsers=.N, NHashtagObs=sum(totN)), by=list(datasetName,datasetType,datasetGroup)]
+	sumTbl = modelVsPredTbl[runNum==2 & predUsedBest == T & DVName == 'topHashtagPostPriorStd'][, list(NUsers=.N, NHashtagObs=sum(totN)), by=list(datasetName,datasetType,datasetGroup)]
 	plotBarSumTbl(sumTbl[, withCI(NUsers), by=list(datasetGroup, datasetName)],
 		      datasetName, 'compareNumbers',
 		      extras=list(theme(axis.title.x=element_blank()),
@@ -972,9 +972,9 @@ renameColDatasetGroup <- function(tbl) {
 
 renameDVDirection <- function(tbl) {
 	setkey(tbl, DVDirection)
-	mapTbl = data.table(DVDirection=c('topHashtagPost - topHashtagPostOL2', 'topHashtagPost - topHashtagAcross',
-					  'best d - min d for topHashtagPost', 'best d - max d for topHashtagPost',
-					  'best d - min d for topHashtagPostOL2', 'best d - max d for topHashtagPostOL2'),
+	mapTbl = data.table(DVDirection=c('topHashtagPostPriorStd - topHashtagPostPriorOL2', 'topHashtagPostPriorStd - topHashtagAcrossPriorStd',
+					  'best d - min d for topHashtagPostPriorStd', 'best d - max d for topHashtagPostPriorStd',
+					  'best d - min d for topHashtagPostPriorOL2', 'best d - max d for topHashtagPostPriorOL2'),
 			    newName=c('Standard - Optimized Learning', 'Standard - Standard Relaxed Across Posts', 
 				      'Best Fit - All Frequency for Standard Model', 'Best Fit - All Recency for Standard Model',
 				      'Best Fit - All Frequency for Optimized Learning Model', 'Best Fit - All Recency for Optimized Learning Model'))
@@ -985,7 +985,7 @@ renameDVDirection <- function(tbl) {
 
 renameColDVName <- function(tbl) {
 	setkey(tbl, DVName)
-	mapTbl = data.table(DVName=c('topHashtagAcross', 'topHashtagPost', 'topHashtagPostOL2'),
+	mapTbl = data.table(DVName=c('topHashtagAcrossPriorStd', 'topHashtagPostPriorStd', 'topHashtagPostPriorOL2'),
 			    newName=c('Standard Model Relaxed Across Posts',
 				      'Standard Model',
 				      'Optimized Learning Model'))
@@ -1013,8 +1013,8 @@ wrapQuotes <- function(charVect) {
 }
 
 plotTemporal <- function(runTbls) {
-	bestDTbl = runTbls$modelVsPredTbl[topHashtag & hashtagUsedP & maxNP & DVName=='topHashtagPost']
-	visCompare(runTbls$hashtagsTbl, runTbls$modelHashtagsTbl[topHashtagPost==T], bestDTbl)
+	bestDTbl = runTbls$modelVsPredTbl[topHashtag & hashtagUsedP & maxNP & DVName=='topHashtagPostPriorStd']
+	visCompare(runTbls$hashtagsTbl, runTbls$modelHashtagsTbl[topHashtagPostPriorStd==T], bestDTbl)
 }
 
 analyzeTemporal <- function(modelVsPredTbl) {
@@ -1041,26 +1041,26 @@ analyzeModelVsPredTbl <- function(modelVsPredTbl) {
 	# Check that the Ns for each dataset look right	
 	modelVsPredTbl[, list(N=.N, names=list(unique(datasetName))), by=list(datasetType, datasetGroup, runNum,datasetNameRoot)]
 
-	dvDiffsTbl = plotDVDiffs(rbind(modelVsPredTbl[runNum==2, compare2DVs(.SD, c('topHashtagPost', 'topHashtagPostOL2'), sortedOrder=c(2,1)), by=list(datasetType, datasetGroup), .SDcols=colnames(modelVsPredTbl)],
-				       modelVsPredTbl[runNum==2, compare2DVs(.SD, c('topHashtagPost', 'topHashtagAcross')), by=list(datasetType, datasetGroup), .SDcols=colnames(modelVsPredTbl)],
-				       #modelVsPredTbl[DVName %in% c('topHashtagPost', 'topHashtagPostOL2'), compare2Runs(.SD, c(1,2)), by=list(datasetType, datasetGroup), .SDcols=colnames(modelVsPredTbl)],
-				       modelVsPredTbl[runNum==2 & DVName %in% c('topHashtagPost', 'topHashtagPostOL2'), compareDBestVsMin(.SD), by=list(datasetType, datasetGroup)],
-				       modelVsPredTbl[runNum==2 & DVName %in% c('topHashtagPost'), compareDBestVsMax(.SD), by=list(datasetType, datasetGroup)]))
+	dvDiffsTbl = plotDVDiffs(rbind(modelVsPredTbl[runNum==2, compare2DVs(.SD, c('topHashtagPostPriorStd', 'topHashtagPostPriorOL2'), sortedOrder=c(2,1)), by=list(datasetType, datasetGroup), .SDcols=colnames(modelVsPredTbl)],
+				       modelVsPredTbl[runNum==2, compare2DVs(.SD, c('topHashtagPostPriorStd', 'topHashtagAcrossPriorStd')), by=list(datasetType, datasetGroup), .SDcols=colnames(modelVsPredTbl)],
+				       #modelVsPredTbl[DVName %in% c('topHashtagPostPriorStd', 'topHashtagPostPriorOL2'), compare2Runs(.SD, c(1,2)), by=list(datasetType, datasetGroup), .SDcols=colnames(modelVsPredTbl)],
+				       modelVsPredTbl[runNum==2 & DVName %in% c('topHashtagPostPriorStd', 'topHashtagPostPriorOL2'), compareDBestVsMin(.SD), by=list(datasetType, datasetGroup)],
+				       modelVsPredTbl[runNum==2 & DVName %in% c('topHashtagPostPriorStd'), compareDBestVsMax(.SD), by=list(datasetType, datasetGroup)]))
 	dvDiffsTbl[, mean(meanVal), by=direction]
-	compareOptimalDs(modelVsPredTbl[DVName %in% c('topHashtagPost', 'topHashtagPostOL2', 'topHashtagAcross') & runNum == 2])
-	compareOptimalAcc(modelVsPredTbl[DVName %in% c('topHashtagPost', 'topHashtagPostOL2', 'topHashtagAcross') & runNum == 2])
+	compareOptimalDs(modelVsPredTbl[DVName %in% c('topHashtagPostPriorStd', 'topHashtagPostPriorOL2', 'topHashtagAcrossPriorStd') & runNum == 2])
+	compareOptimalAcc(modelVsPredTbl[DVName %in% c('topHashtagPostPriorStd', 'topHashtagPostPriorOL2', 'topHashtagAcrossPriorStd') & runNum == 2])
 
-	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & datasetName=='TFollowgt1kr2'])
-	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & datasetName=='TTweetsgt5e4r2'])
-	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & datasetName=='TTweetsgt1e2r2'])
-	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & datasetName=='SOgt1kr2'])
-	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & datasetName=='SOgt100kr2'])
-	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & datasetName=='SOQgt050r2'])
+	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostPriorStd' & datasetName=='TFollowgt1kr2'])
+	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostPriorStd' & datasetName=='TTweetsgt5e4r2'])
+	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostPriorStd' & datasetName=='TTweetsgt1e2r2'])
+	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostPriorStd' & datasetName=='SOgt1kr2'])
+	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostPriorStd' & datasetName=='SOgt100kr2'])
+	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostPriorStd' & datasetName=='SOQgt050r2'])
 	
-	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & datasetName=='TFollowgt10Mr2'])
-	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPost' & datasetName=='SOQgt500r2'])
-	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostOL2' & datasetName=='TFollowgt10Mr2' & d < 1])
-	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostOL2' & datasetName=='SOQgt500r2' & d < 1])
+	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostPriorStd' & datasetName=='TFollowgt10Mr2'])
+	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostPriorStd' & datasetName=='SOQgt500r2'])
+	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostPriorOL2' & datasetName=='TFollowgt10Mr2' & d < 1])
+	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostPriorOL2' & datasetName=='SOQgt500r2' & d < 1])
 }
 
 getNcoocTbl <- function(type, chunkTableQuery, config) {
@@ -1478,17 +1478,17 @@ handleNAs <- function(validPostResTbl, predictors) {
 
 updateBestFitCol <- function(postResTbl, coeffsTbl) {
 	predictors = coeffsTbl[name != '(Intercept)', name]
-	postResTbl[, bestFit := coeffsTbl[name == '(Intercept)', coeff]]
+	postResTbl[, actBestFit := coeffsTbl[name == '(Intercept)', coeff]]
 	for (predictor in predictors) {
 		sym = as.symbol(predictor)
-		e = bquote(postResTbl[, bestFit := bestFit + .(sym) * .(coeffsTbl[name == predictor, coeff])])
+		e = bquote(postResTbl[, actBestFit := actBestFit + .(sym) * .(coeffsTbl[name == predictor, coeff])])
 		myLog(e)
 		eval(e)
 	}
 }
 
 getPPVTbl = function(tbl) {
-	pred = with(tbl, prediction(bestFit, hashtagUsedP))
+	pred = with(tbl, prediction(actBestFit, hashtagUsedP))
 	perf = performance(pred, "tpr", "fpr")
 	fp = unlist(perf@x.values)*sum(!tbl$hashtagUsedP)
 	tp = unlist(perf@y.values)*sum(tbl$hashtagUsedP)
@@ -1502,7 +1502,7 @@ getPPVTbl = function(tbl) {
 
 analyzePostResTbl <- function(validPostResTbl, predictors) {
 	setkey(validPostResTbl, user_screen_name, dt, hashtag, d)
-	predictors = c(predictors, 'act')
+	predictors = c(predictors, 'actPriorStd')
 	#validPostResTbl = copy(postResTbl)
 	predictors
 	validPostResTbl
@@ -1560,7 +1560,6 @@ curWS <- function() {
 	postResTblSO
 	postResTblT
 	postResTblT
-	postResTblSO[hashtagUsedP==T][, act, by=id][, .N, by=act]
 	myLogit
 
 	getPostResTbl(fooTbl[, post_id[1]], defaultTConfig)
@@ -1570,12 +1569,8 @@ curWS <- function() {
 	priorTblUserSO[, .N, by=hashtag][, list(hashtag, p=N/sum(N))][order(p, decreasing=T)][1:50][, plot(1:length(p), p)]
 	BTbl = getPriorForUserAtEpoch(priorTblUserSO, '4653', 1390076773, c(.5, .6))
 	BTbl = getPriorForUserAtEpoch(priorTblUserSO, '4653', 1220886841, c(.5, .6))
-	BTbl[order(act, decreasing=T)]
 	BTbl
 	sjiTblT
-	computeActSji(context, sjiTblSO)[order(act)]
-	computeActSji(rep('clojure', 50), sjiTblSO)[order(act)]
-	computeActSji('radio', sjiTblT)[order(act, decreasing=T)]
 	sjiTblT[tag == '#soundcloud'][order(partialN, decreasing=T)][1:30]
 	
 	test_dir(sprintf("%s/%s", PATH, 'tests'), reporter='summary')
