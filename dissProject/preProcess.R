@@ -2,15 +2,11 @@ library(tools)
 library(RPostgreSQL)
 library(lavaan)
 library(Rmisc)
-library(ggplot2)
 require(gridExtra)
 library(memoise)
 library(microbenchmark)
 library(popbio)
 library(stringr)
-library(sqldf)
-library(data.table)
-library(reshape2)
 library(assertthat)
 library(tm)
 library(tau)
@@ -22,7 +18,10 @@ library(ROCR)
 library(popbio)
 library(QuantPsyc)
 library(dplyr)
-
+library(ggplot2)
+library(sqldf)
+library(data.table)
+library(reshape2)
 
 PATH = getPathToThisFile()
 FILE = getNameOfThisFile()
@@ -1556,7 +1555,7 @@ runContextTest <- function() {
 curWS <- function() {
 	sqldf('select hashtag_group, retweeted, count(text) from top_hashtag_tweets group by hashtag_group, retweeted order by hashtag_group, retweeted')
 	resTbl = runPriorT(config=modConfig(defaultTConfig, list(query=sprintf("select %s from tweets where user_screen_name = 'ap'", defaultTCols))))
-
+	sessionInfo()
 	postResTblSO
 	postResTblT
 	postResTblT
