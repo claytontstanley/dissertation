@@ -11,11 +11,12 @@ createSOSmall:
 parrunPriors: NP = 4
 parrunSjis: NP = 1
 parrunTSjis: NP = 1
+parrunContext: NP = 1
 
 parrun%:
 	make -s get$* | parallel -P ${NP} --progress make {}
 
-runAll: unit parrunPriors parrunSjis parrunTSjis
+runAll: unit parrunPriors parrunSjis parrunTSjis parrunContext
 	exit 0
 
 getPriors:
@@ -30,6 +31,8 @@ getTSjis:
 getTSjisAll:
 	egrep '^runGenNcoocTblT.* <-' preProcess.R | awk '{print $$1}'
 
+getContext:
+	echo "runContextTest"
 
 checkPostgresTimes:
 	sudo tail -n 10000 /opt/local/var/db/postgresql93/defaultdb/system.log | egrep '(statement:|duration:)'
