@@ -388,8 +388,13 @@ visCompare <- function(hashtagsTbl, modelHashtagsTbl, bestDTbl) {
 	fullPlots[, list(resPlots=list(myPlotPrint(resPlots[[1]], sprintf('HTMByTime-%s', .BY[1])))), by=list(user_screen_name)]
 }
 
+topHashtagDVFromActDV <- function(actDV) {
+	c(gsub(pattern='^act', replacement='topHashtagPost', x=actDV),
+	  gsub(pattern='^act', replacement='topHashtagAcross', x=actDV))
+}
 
-addMetrics <- function(hashtagsTbl, modelHashtagsTbl) {
+addMetrics <- function(hashtagsTbl, modelHashtagsTbl, config) {
+	actDVs = getConfig(config, 'actDVs')
 	tagCountTbl = hashtagsTbl[, list(tagCountN=.N), by=list(user_screen_name, dt)]
 	tagCountTbl
 	modelHashtagsTbl
@@ -397,17 +402,17 @@ addMetrics <- function(hashtagsTbl, modelHashtagsTbl) {
 	modelHashtagsTbl[tagCountTbl[, list(tagCountUserN=sum(tagCountN)), keyby=user_screen_name], tagCountUser := tagCountUserN]
 	myLog('adding metrics for modelHashtagsTbl')
 	addDVCols <- function(col, newDVPost, newDVAct) {
-		col = substitute(col)
-		newDVPost = substitute(newDVPost)
-		newDVAct = substitute(newDVAct)
+		col = as.symbol(col)
+		newDVPost = as.symbol(newDVPost)
+		newDVAct = as.symbol(newDVAct)
 		expr = bquote(modelHashtagsTbl[order(.(col), decreasing=T), .(newDVPost) := 1:length(.(col)) <= tagCount[1], by=list(user_screen_name, dt, d)])
 		eval(expr)
 		expr = bquote(modelHashtagsTbl[order(.(col), decreasing=T), .(newDVAct) := 1:length(.(col)) <= tagCountUser[1], by=list(user_screen_name, d)])
 		eval(expr)
 	}
-	addDVCols(actPriorStd, topHashtagPostPriorStd, topHashtagAcrossPriorStd)
-	addDVCols(actPriorOL, topHashtagPostPriorOL, topHashtagAcrossPriorOL)
-	addDVCols(actPriorOL2, topHashtagPostPriorOL2, topHashtagAcrossPriorOL2)
+	for (actDV in actDVs) {
+		do.call(addDVCols, as.list(c(actDV, topHashtagDVFromActDV(actDV))))
+	}
 	myStopifnot(key(modelHashtagsTbl) == (c('user_screen_name', 'dt', 'hashtag', 'd')))
 	myStopifnot(key(hashtagsTbl) == (c('user_screen_name', 'dt', 'hashtag')))
 	modelHashtagsTbl[, hashtagUsedP := F]
@@ -456,13 +461,14 @@ modelVsPredForDV <- function(modelHashtagsTbl, DVName) {
 	tempTbl
 }
 
-getModelVsPredTbl <- function(modelHashtagsTbl, hashtagsTbl) {
-	modelVsPredTbl = rbind(modelVsPredForDV(modelHashtagsTbl, 'topHashtagPostPriorStd'), 
-			       modelVsPredForDV(modelHashtagsTbl, 'topHashtagAcrossPriorStd'),
-			       modelVsPredForDV(modelHashtagsTbl, 'topHashtagPostPriorOL'),
-			       modelVsPredForDV(modelHashtagsTbl, 'topHashtagAcrossPriorOL'),
-			       modelVsPredForDV(modelHashtagsTbl, 'topHashtagPostPriorOL2'),
-			       modelVsPredForDV(modelHashtagsTbl, 'topHashtagAcrossPriorOL2'))
+modelVsPredForDVs <- function(modelHashtagsTbl, dvs) {
+	dvTbl = data.table(dv=dvs)
+	resTbl = dvTbl[, modelVsPredForDV(modelHashtagsTbl, dv), by=dv][, dv := NULL]
+}
+
+getModelVsPredTbl <- function(modelHashtagsTbl, hashtagsTbl, config) {
+	dvs = c(sapply(getConfig(config, 'actDVs'), topHashtagDVFromActDV))
+	modelVsPredTbl = modelVsPredForDVs(modelHashtagsTbl, dvs)
 	modelVsPredTbl[, maxNP := NCell==max(NCell), by=list(user_screen_name, topHashtag, hashtagUsedP, DVName)]
 	# TODO: Doesn't using the maxNP closest to the center of all of the maxNP's create an artifact for low N when all ds are MaxNP's?
 	modelVsPredTbl[maxNP==T, maxNP := onlyFirstT(abs(d-mean(d)) == min(abs(d-mean(d)))), by=list(user_screen_name, topHashtag, hashtagUsedP, DVName)]
@@ -498,8 +504,8 @@ genAggModelVsPredTbl <- function(hashtagsTbl, config) {
 		myLog(sprintf('generating model predictions for user %s', userScreenName))
 		modelHashtagsTbl = rbindlist(lapply(ds, function(d) computeActPriorByUser(hashtagsTbl, d=d)))
 		setkey(modelHashtagsTbl, user_screen_name, dt, hashtag, d)
-		addMetrics(hashtagsTbl, modelHashtagsTbl)
-		modelVsPredTbl = getModelVsPredTbl(modelHashtagsTbl, hashtagsTbl)	
+		addMetrics(hashtagsTbl, modelHashtagsTbl, config)
+		modelVsPredTbl = getModelVsPredTbl(modelHashtagsTbl, hashtagsTbl, config)	
 		if (getConfig(config, "accumModelHashtagsTbl") == T) modelHashtagsTbls <<- rbind(modelHashtagsTbls, modelHashtagsTbl)
 		rm(modelHashtagsTbl)
 		gc()
@@ -595,6 +601,7 @@ runPrior <- function(config) {
 defaultBaseConfig = list(ds=c(0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1.0,1.1,1.2,1.3,1.4,1.5,1.6,1.8,2,5,10,20),
 			 dStd=0.5,
 			 modelVsPredOutFile='/tmp/modelVsPred.csv',
+			 actDVs = c('actPriorStd', 'actPriorOL', 'actPriorOL2'),
 			 query=NULL)
 
 defaultTConfig = c(defaultBaseConfig,
@@ -1538,8 +1545,8 @@ runContext <- function(config) {
 	myLogit = analyzePostResTbl(postResTbl, getConfig(config, 'postTypeNames'))
 	hashtagsTbl = getHashtagsTblFromSubsetTbl(tokenTbl, config)
 	postResTbl
-	addMetrics(hashtagsTbl, postResTbl)
-	modelVsPredTbl = getModelVsPredTbl(postResTbl, hashtagsTbl)	
+	addMetrics(hashtagsTbl, postResTbl, config)
+	modelVsPredTbl = getModelVsPredTbl(postResTbl, hashtagsTbl, config)	
 	outFile = getConfig(config, "modelVsPredOutFile")
 	writeModelVsPredTbl(modelVsPredTbl, outFile)
 	list(modelVsPredTbl=modelVsPredTbl, modelHashtagsTbl=postResTbl, hashtagsTbl=hashtagsTbl)
@@ -1547,9 +1554,10 @@ runContext <- function(config) {
 
 runContextTest <- function() {
 	getCurWorkspace(100, 1000000, 100, 1000)
-	resTbls = runContext(modConfig(defaultTConfig, list(modelVsPredOutFile=getModelVsPredOutFile('testingTC'))))
+	actDVs = c('actBestFit', 'actPriorStd')
+	resTbls = runContext(modConfig(defaultTConfig, list(modelVsPredOutFile=getModelVsPredOutFile('testingTC'), actDVs=actDVs)))
 	resTbls
-	runContext(modConfig(defaultSOConfig, list(modelVsPredOutFile=getModelVsPredOutFile('testingSOC'))))
+	runContext(modConfig(defaultSOConfig, list(modelVsPredOutFile=getModelVsPredOutFile('testingSOC'), actDVs=actDVs)))
 }
 
 
