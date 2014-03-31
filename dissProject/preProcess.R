@@ -1574,7 +1574,6 @@ curWS <- function() {
 	myLogit
 
 	getPostResTbl(fooTbl[, post_id[1]], defaultTConfig)
-	withProf(genAndSaveCurWorkspace())
 	withProf(myLoadImage())
 	priorTblGlobT[, .N, by=hashtag][, list(hashtag, p=N/sum(N))][order(p, decreasing=T)][1:50][, plot(1:length(p), p)]
 	priorTblUserSO[, .N, by=hashtag][, list(hashtag, p=N/sum(N))][order(p, decreasing=T)][1:50][, plot(1:length(p), p)]
