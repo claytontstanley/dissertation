@@ -1398,8 +1398,8 @@ getCurWorkspace <- function(maxIdSOSji, maxIdSOPrior, maxIdTSji, maxIdTPrior) {
 
 genAndSaveCurWorkspace <- function() {
 	maxIdSOSji = 1e5
-	maxIdSOPrior = 1e7 
-	maxIdTSji = 1e6 
+	maxIdSOPrior = 100e6
+	maxIdTSji = 3e6 
 	maxIdTPrior = 1e5 
 	getCurWorkspace(maxIdSOSji, maxIdSOPrior, maxIdTSji, maxIdTPrior)
 	mySaveImage()
@@ -1552,12 +1552,15 @@ runContext <- function(config) {
 	list(modelVsPredTbl=modelVsPredTbl, modelHashtagsTbl=postResTbl, hashtagsTbl=hashtagsTbl)
 }
 
-runContextTest <- function() {
-	getCurWorkspace(100, 1000000, 100, 1000)
+runContextTest <- function(regen=T) {
+	if (regen) {
+		getCurWorkspace(1e5, 100e6, 3e6, 1e5)
+	}
 	actDVs = c('actBestFit', 'actPriorStd')
+	tables()
 	resTbls = runContext(modConfig(defaultTConfig, list(modelVsPredOutFile=getModelVsPredOutFile('testingTC'), actDVs=actDVs)))
 	resTbls
-	runContext(modConfig(defaultSOConfig, list(modelVsPredOutFile=getModelVsPredOutFile('testingSOC'), actDVs=actDVs)))
+	resTbls = runContext(modConfig(defaultSOConfig, list(modelVsPredOutFile=getModelVsPredOutFile('testingSOC'), actDVs=actDVs)))
 }
 
 
