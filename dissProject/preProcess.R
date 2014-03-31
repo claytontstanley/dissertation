@@ -1565,6 +1565,7 @@ runContextTest <- function(regen=T) {
 
 
 curWS <- function() {
+	runContextTest(regen=F)
 	sqldf('select hashtag_group, retweeted, count(text) from top_hashtag_tweets group by hashtag_group, retweeted order by hashtag_group, retweeted')
 	resTbl = runPriorT(config=modConfig(defaultTConfig, list(query=sprintf("select %s from tweets where user_screen_name = 'ap'", defaultTCols))))
 	sessionInfo()
