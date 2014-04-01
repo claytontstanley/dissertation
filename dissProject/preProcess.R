@@ -622,7 +622,7 @@ defaultTConfig = c(defaultBaseConfig,
 					  '2014-03-17 11:28:15 trendsmap',
 					  '2014-03-24 13:06:19 trendsmap'),
 			priorTbl = 'priorTblGlobT',
-			sjiTbl = 'sjiTblT',
+			sjiTbl = 'sjiTblTOrderless',
 			getTokenizedFromSubsetFun='getTokenizedFromSubsetT',
 			includeRetweetsP=F))
 
@@ -1312,12 +1312,23 @@ getSjiTblT <- function(config, startId, endId) {
 	sjiTbl[, hashtag := tag][, tag := NULL]
 	topHashtagsTbl = sqldt(sprintf("select hashtag from top_hashtag_hashtags where hashtag_group = '%s'", getConfig(config, "groupName")))
 	sjiTbl = sjiTbl[hashtag %in% topHashtagsTbl[, hashtag]]
+	sjiTbl
+}
+
+getSjiTblTOrderless <- function(config, startId, endId) {
+	sjiTbl = getSjiTblT(config, startId, endId)
 	sjiTbl = sjiTbl[, list(posFromTag=NaN, partialN=sum(partialN)), by=list(context, hashtag)]
 	setkey(sjiTbl, context, hashtag, posFromTag)
 	addSjiAttrs(sjiTbl)
 	sjiTbl
 }
 
+getSjiTblTOrder <- function(config, startId, endId) {
+	sjiTbl = getSjiTblT(config, startId, endId)
+	sjiTbl = sjiTbl[, list(partialN), by=list(context, hashtag, posFromTag)]
+	setkey(sjiTbl, context, hashtag, posFromTag)
+	sjiTbl
+}
 
 getPriorTblUserSO <- function(config, startId, endId) {
 	priorTblUser = sqldt(sprintf("select posts.id, user_screen_name, creation_epoch, chunk, type from posts
@@ -1379,7 +1390,7 @@ computeActSji <- function(contextVect, sjiTbl) {
 wsFile = '/Volumes/SSDSupernova/RWorkspace/workspace.RData'
 
 mySaveImage <- function() {
-	eval(quote(save(list=c('sjiTblT', 'priorTblGlobT', 'sjiTblSO', 'priorTblUserSO'), file=wsFile, compress=F)),
+	eval(quote(save(list=c('sjiTblTOrderless', 'sjiTblTOrder', 'priorTblGlobT', 'sjiTblSO', 'priorTblUserSO'), file=wsFile, compress=F)),
 	     envir=parent.frame())
 }
 
@@ -1391,7 +1402,8 @@ myLoadImage <- function() {
 getCurWorkspace <- function(maxIdSOSji, maxIdSOPrior, maxIdTSji, maxIdTPrior) {
 	priorTblGlobT <<- getPriorTblGlobT(defaultTConfig, 1, maxIdTPrior)
 	priorTblUserSO <<- getPriorTblUserSO(defaultSOConfig, 1, maxIdSOPrior)
-	sjiTblT <<- getSjiTblT(defaultTConfig, 1, maxIdTSji)
+	sjiTblTOrderless <<- getSjiTblTOrderless(defaultTConfig, 1, maxIdTSji)
+	sjiTblTOrder <<- getSjiTblTOrder(defaultTConfig, 1, maxIdTSji)
 	sjiTblSO <<- getSjiTblSO(defaultSOConfig, 1, maxIdSOSji)
 	return()
 }
@@ -1564,6 +1576,17 @@ runContextTest <- function(regen=T) {
 	
 }
 
+# Environment vectors is a data.table, keyed on context,pos.
+
+makeEnvironmentTbl <- function(sjiTbl) {
+}
+
+makeMemoryMatrix <- function(sjiTbl) {
+}
+
+getMemoryVect <- function(context, pos) {
+	permEnvTbl[J(context, pos), rowsums(vect)]
+}
 
 curWS <- function() {
 	runContextTest(regen=F)
@@ -1582,8 +1605,6 @@ curWS <- function() {
 	BTbl = getPriorForUserAtEpoch(priorTblUserSO, '4653', 1390076773, c(.5, .6))
 	BTbl = getPriorForUserAtEpoch(priorTblUserSO, '4653', 1220886841, c(.5, .6))
 	BTbl
-	sjiTblT
-	sjiTblT[tag == '#soundcloud'][order(partialN, decreasing=T)][1:30]
 	
 	test_dir(sprintf("%s/%s", PATH, 'tests'), reporter='summary')
 	.ls.objects(order.by='Size')
