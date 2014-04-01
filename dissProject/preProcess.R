@@ -1576,7 +1576,7 @@ runContextTest <- function(regen=T) {
 	
 }
 
-# Environment vectors is a data.table, keyed on context,pos.
+# Environment vectors is a data.table, keyed on context,posFromTag
 
 makeEnvironmentTbl <- function(sjiTbl) {
 }
@@ -1586,6 +1586,11 @@ makeMemoryMatrix <- function(sjiTbl) {
 
 getMemoryVect <- function(context, pos) {
 	permEnvTbl[J(context, pos), rowsums(vect)]
+}
+
+computePermAct <- function(context, pos) {
+	# Correlate memory vector with memory matrix, order by rank,
+	# and return hashtag,activation data.table
 }
 
 curWS <- function() {
