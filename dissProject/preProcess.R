@@ -1569,7 +1569,6 @@ runContextTest <- function(regen=T) {
 		getCurWorkspace(1e5, 100e6, 3e6, 1e5)
 	}
 	actDVs = c('actBestFit', 'actPriorStd')
-	tables()
 	resTbls = runContext(modConfig(defaultTConfig, list(modelVsPredOutFile=getModelVsPredOutFile('testingTC'), actDVs=actDVs)))
 	resTbls
 	resTbls = runContext(modConfig(defaultSOConfig, list(modelVsPredOutFile=getModelVsPredOutFile('testingSOC'), actDVs=actDVs)))
@@ -1579,21 +1578,45 @@ runContextTest <- function(regen=T) {
 # Environment vectors is a data.table, keyed on context,posFromTag
 
 makeEnvironmentTbl <- function(sjiTbl) {
+	permEnvTbl = with(sjiTbl, data.table(chunk=unique(context), type='context', ind=1:length(unique(context))))
+	permEnvTbl[, ind := 1]
+	permEnvTbl[, val := 1]
+	setkey(permEnvTbl, chunk)
+	permEnvTbl
 }
 
-makeMemoryMatrix <- function(sjiTbl) {
-}
-
-getMemoryVect <- function(context, pos) {
-	permEnvTbl[J(context, pos), rowsums(vect)]
+makeMemMat <- function(sjiTbl, permEnvTbl) {
+	memTbl = permEnvTbl[sjiTbl]
+	memTbl[, posFromTag := as.numeric(posFromTag)]
+	memTbl[, rotInd := ((ind-1 + posFromTag) %% 1000) + 1]
+	memTbl = memTbl[, list(sumPartialN=sum(partialN)), by=list(rotInd, val, hashtag)]
+	memTbl = memTbl[, list(totVal=sum(val*sumPartialN)), by=list(rotInd, hashtag)]
+	db = makeDB(memTbl[, unique(hashtag)])
+	memMat = with(memTbl, sparseMatrix(i=rotInd, j=getHashes(hashtag, db), x=totVal, dims=c(1000, length(db))))
+	colnames(memMat) = getVals(1:ncol(memMat), db) 
+	memMat
 }
 
 computePermAct <- function(context, pos) {
-	# Correlate memory vector with memory matrix, order by rank,
-	# and return hashtag,activation data.table
+	fooTbl = data.table(context=context, posFromTag=pos, hashtag='context', partialN=1, key='context')
+	fooMat = makeMemMat(fooTbl, permEnvTbl)
+	fooVect = rowSums(fooMat)
+	corVect = cor(as.matrix(permMemMat), fooVect)
+	resTbl = data.table(hashtag=rownames(corVect), act=as.vector(corVect))
+	resTbl
 }
 
 curWS <- function() {
+	permEnvTbl = makeEnvironmentTbl(sjiTblTOrder)
+	permMemMat = makeMemMat(sjiTblTOrder, permEnvTbl)
+	sjiTblTOrder
+	key(sjiTblTOrder)
+	context = c('a', 'it', 'i')
+	pos = c(1, 3, 1)
+	withProf(for (i in 1:100) computePermAct(context, pos))
+	computePermAct(context, pos)
+	sjiTblTOrder
+	tables()
 	runContextTest(regen=F)
 	sqldf('select hashtag_group, retweeted, count(text) from top_hashtag_tweets group by hashtag_group, retweeted order by hashtag_group, retweeted')
 	resTbl = runPriorT(config=modConfig(defaultTConfig, list(query=sprintf("select %s from tweets where user_screen_name = 'ap'", defaultTCols))))
@@ -1601,7 +1624,6 @@ curWS <- function() {
 	postResTblSO
 	postResTblT
 	postResTblT
-	myLogit
 
 	getPostResTbl(fooTbl[, post_id[1]], defaultTConfig)
 	withProf(myLoadImage())
