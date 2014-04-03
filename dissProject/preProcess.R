@@ -1630,7 +1630,7 @@ makeMemMat <- function(sjiTbl, permEnvTbl, config) {
 	memMat
 }
 
-computePermAct <- function(context, pos, config) {
+computePermAct <- function(context, pos, permEnvTbl, permMemMat, config) {
 	contextTbl = data.table(context=context, posFromTag=pos, hashtag='context', partialN=1, key='context')
 	contextMemMat = makeMemMat(contextTbl, permEnvTbl, config)
 	contextMemVect = rowSums(contextMemMat) 
@@ -1647,7 +1647,7 @@ curWS <- function() {
 	key(sjiTblTOrder)
 	context = c('a', 'it', 'i')
 	pos = c(1, 3, 1)
-	withProf(for (i in 1:100) computePermAct(context, pos))
+	withProf(for (i in 1:100) computePermAct(context, pos, permEnvTbl, permMemMat, defaultBaseConfig))
 	computePermAct(context, pos)
 	sjiTblTOrder
 	tables()
