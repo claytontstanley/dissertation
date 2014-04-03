@@ -602,6 +602,7 @@ defaultBaseConfig = list(ds=c(0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1.0,1.1,1.2,1.3,1.4,1
 			 dStd=0.5,
 			 modelVsPredOutFile='/tmp/modelVsPred.csv',
 			 actDVs = c('actPriorStd', 'actPriorOL', 'actPriorOL2'),
+			 permNRows = 2048,
 			 query=NULL)
 
 defaultTConfig = c(defaultBaseConfig,
@@ -1577,30 +1578,30 @@ runContextTest <- function(regen=T) {
 
 # Environment vectors is a data.table, keyed on context,posFromTag
 
-createSampleInd <- function(tbl, num) {
+createSampleInd <- function(tbl, num, config) {
 	indName = as.symbol(paste0('ind', num))
-	expr = bquote(.(indName) := sample(1:2048, size=nrow(tbl), replace=T))
+	expr = bquote(.(indName) := sample(1:getConfig(config, 'permNRows'), size=nrow(tbl), replace=T))
 	tbl[, eval(expr)]
 }
 
-makeEnvironmentSubsetTbl <- function(tbl) {
+makeEnvironmentSubsetTbl <- function(tbl, config) {
 	myLog(sprintf('Attempting to create vectors for %s chunks', nrow(tbl)))
-	createSampleInd(tbl, 1)
-	createSampleInd(tbl, 2)
-	createSampleInd(tbl, 3)
-	createSampleInd(tbl, 4)
+	createSampleInd(tbl, 1, config)
+	createSampleInd(tbl, 2, config)
+	createSampleInd(tbl, 3, config)
+	createSampleInd(tbl, 4, config)
 	tbl[, uniq := (ind1 != ind2 & ind1 != ind3 & ind1 != ind4 & ind2 != ind3 & ind2 != ind4 & ind3 != ind4)]
 	redoTbl = tbl[uniq == F]
 	if (nrow(redoTbl) == 0) {
 		tbl
 	} else {
-		rbind(tbl[uniq == T], makeEnvironmentSubsetTbl(redoTbl[, list(chunk = chunk)]))
+		rbind(tbl[uniq == T], makeEnvironmentSubsetTbl(redoTbl[, list(chunk = chunk)], config))
 	}
 }
 
-makeEnvironmentTbl <- function(sjiTbl) {
+makeEnvironmentTbl <- function(sjiTbl, config) {
 	permEnvTbl = with(sjiTbl, data.table(chunk=unique(context)))
-	permEnvTbl = makeEnvironmentSubsetTbl(permEnvTbl)
+	permEnvTbl = makeEnvironmentSubsetTbl(permEnvTbl, config)
 	permEnvTbl[, uniq := NULL]
 	permEnvTbl = melt(permEnvTbl,
 			  id=c('chunk'),
@@ -1615,22 +1616,23 @@ makeEnvironmentTbl <- function(sjiTbl) {
 	permEnvTbl
 }
 
-makeMemMat <- function(sjiTbl, permEnvTbl) {
+makeMemMat <- function(sjiTbl, permEnvTbl, config) {
 	memTbl = permEnvTbl[sjiTbl, allow.cartesian=T]
 	memTbl[, posFromTag := as.numeric(posFromTag)]
-	memTbl[, rotInd := ((ind-1 + posFromTag) %% 1000) + 1]
+	NRows = getConfig(config, 'permNRows')
+	memTbl[, rotInd := ((ind-1 + posFromTag) %% NRows) + 1]
 	memTbl = memTbl[, list(sumPartialN=sum(partialN)), by=list(rotInd, val, hashtag)]
 	memTbl = memTbl[, list(totVal=sum(val*sumPartialN)), by=list(rotInd, hashtag)]
 	db = makeDB(memTbl[, unique(hashtag)])
-	memMat = with(memTbl, sparseMatrix(i=rotInd, j=getHashes(hashtag, db), x=totVal, dims=c(1000, length(db))))
+	memMat = with(memTbl, sparseMatrix(i=rotInd, j=getHashes(hashtag, db), x=totVal, dims=c(NRows, length(db))))
 	memMat = as.matrix(memMat)
 	colnames(memMat) = getVals(1:ncol(memMat), db) 
 	memMat
 }
 
-computePermAct <- function(context, pos) {
+computePermAct <- function(context, pos, config) {
 	contextTbl = data.table(context=context, posFromTag=pos, hashtag='context', partialN=1, key='context')
-	contextMemMat = makeMemMat(contextTbl, permEnvTbl)
+	contextMemMat = makeMemMat(contextTbl, permEnvTbl, config)
 	contextMemVect = rowSums(contextMemMat) 
 	contextCorVect = cor(permMemMat, contextMemVect)
 	resTbl = data.table(hashtag=rownames(contextCorVect), act=as.vector(contextCorVect))
@@ -1638,8 +1640,9 @@ computePermAct <- function(context, pos) {
 }
 
 curWS <- function() {
-	permEnvTbl = makeEnvironmentTbl(sjiTblTOrder)
-	permMemMat = makeMemMat(sjiTblTOrder, permEnvTbl)
+	permEnvTbl = makeEnvironmentTbl(sjiTblTOrder, defaultBaseConfig)
+	permMemMat = makeMemMat(sjiTblTOrder, permEnvTbl, defaultBaseConfig)
+	permEnvTbl
 	sjiTblTOrder
 	key(sjiTblTOrder)
 	context = c('a', 'it', 'i')
@@ -1657,7 +1660,6 @@ curWS <- function() {
 	postResTblT
 	postResTblT
 
-	getPostResTbl(fooTbl[, post_id[1]], defaultTConfig)
 	withProf(myLoadImage())
 	priorTblGlobT[, .N, by=hashtag][, list(hashtag, p=N/sum(N))][order(p, decreasing=T)][1:50][, plot(1:length(p), p)]
 	priorTblUserSO[, .N, by=hashtag][, list(hashtag, p=N/sum(N))][order(p, decreasing=T)][1:50][, plot(1:length(p), p)]

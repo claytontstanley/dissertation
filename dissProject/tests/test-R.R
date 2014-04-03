@@ -143,4 +143,28 @@ test_that('testGetPriorTbl', {
 	  expect_equivalent(priorTblUserSO, priorTblUserSOExp)
 })
 
+test_that('testMakeMemMat', {
+	config = modConfig(defaultBaseConfig, list(permNRows=5))
+	testMemMat <- function(testSjiTbl, testPermEnvTbl, resTbl) {
+		testMemMat = makeMemMat(testSjiTbl, testPermEnvTbl, config) 
+		expect_equivalent(testMemMat, as.matrix(data.table(resTbl)))
+	}
+	testSjiTbl = data.table(context=c('!'), hashtag=c('b'), posFromTag=0, partialN=1, key='context')
+	testPermEnvTbl = data.table(chunk=c('!', '!', '!', '!'), val=c(1,1,-1,-1), ind=c(1,2,3,4), key='chunk')
+	testMemMat(testSjiTbl, testPermEnvTbl, data.table(b=c(1,1,-1,-1,0)))
+	testSjiTbl = data.table(context=c('!'), hashtag=c('b'), posFromTag=0, partialN=4, key='context')
+	testPermEnvTbl = data.table(chunk=c('!', '!', '!', '!'), val=c(1,1,-1,-1), ind=c(1,2,3,4), key='chunk')
+	testMemMat(testSjiTbl, testPermEnvTbl, data.table(b=c(4,4,-4,-4,0)))
+	testSjiTbl = data.table(context=c('!'), hashtag=c('b'), posFromTag=1, partialN=1, key='context')
+	testPermEnvTbl = data.table(chunk=c('!', '!', '!', '!'), val=c(1,1,-1,-1), ind=c(1,2,3,4), key='chunk')
+	testMemMat(testSjiTbl, testPermEnvTbl, data.table(b=c(0,1,1,-1,-1)))
+	testSjiTbl = data.table(context=c('!'), hashtag=c('b'), posFromTag=-1, partialN=1, key='context')
+	testPermEnvTbl = data.table(chunk=c('!', '!', '!', '!'), val=c(1,1,-1,-1), ind=c(1,2,3,4), key='chunk')
+	testMemMat(testSjiTbl, testPermEnvTbl, data.table(b=c(1,-1,-1,0,1)))
+	testSjiTbl = data.table(context=c('!','#'), hashtag=c('b', 'c'), posFromTag=c(0,0), partialN=1, key='context')
+	testPermEnvTbl = data.table(chunk=c('!', '!', '#', '#'), val=c(1,1,-1,-1), ind=c(1,2,3,4), key='chunk')
+	testMemMat(testSjiTbl, testPermEnvTbl, data.table(b=c(1,1,0,0,0), c=c(0,0,-1,-1,0)))
+})
+
+
 setLogLevel(priorLogLevel)
