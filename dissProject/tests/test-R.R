@@ -166,5 +166,33 @@ test_that('testMakeMemMat', {
 	testMemMat(testSjiTbl, testPermEnvTbl, data.table(b=c(1,1,0,0,0), c=c(0,0,-1,-1,0)))
 })
 
+test_that('testComputePermAct', {
+	  testConfig = modConfig(defaultBaseConfig, list(permNRows=5))
+	  testComputePermAct <- function(testContext, testPos, testEnvTbl, testMemMat, testConfig, expectedTbl) {
+		  resTbl = computePermAct(testContext, testPos, testEnvTbl, testMemMat, testConfig) 
+		  expect_equivalent(resTbl, expectedTbl) 
+	  }
+	  testEnvTbl = data.table(chunk=c('!','!','!','!'), val=c(1,1,-1,-1), ind=c(1,2,3,4), key='chunk')
+	  testSjiTbl = data.table(context=c('!'), hashtag=c('a'), posFromTag=0, partialN=1, key='context')
+	  testMemMat = makeMemMat(testSjiTbl, testEnvTbl, testConfig)
+	  testComputePermAct('!', 0, testEnvTbl, testMemMat, testConfig, data.table(hashtag='a', act=cor(c(1,1,-1,-1), c(1,1,-1,-1))))
+	  testComputePermAct('!', 1, testEnvTbl, testMemMat, testConfig, data.table(hashtag='a', act=cor(c(1,1,-1,-1,0), c(0,1,1,-1,-1))))
+	  testComputePermAct('!', 2, testEnvTbl, testMemMat, testConfig, data.table(hashtag='a', act=cor(c(1,1,-1,-1,0), c(-1,0,1,1,-1))))
+	  testComputePermAct('!', -1, testEnvTbl, testMemMat, testConfig, data.table(hashtag='a', act=cor(c(1,1,-1,-1,0), c(0,1,1,-1,-1))))
+	  testEnvTbl = data.table(chunk=c('!','#'), val=c(1,-1), ind=c(1,2), key='chunk')
+	  testSjiTbl = data.table(context=c('!','#'), hashtag=c('a','a'), posFromTag=c(0,0), partialN=c(1,1), key='context')
+	  testMemMat = makeMemMat(testSjiTbl, testEnvTbl, testConfig)
+	  testComputePermAct('!', 0, testEnvTbl, testMemMat, testConfig, data.table(hashtag='a', act=cor(c(1,-1,0,0,0), c(1,0,0,0,0))))
+	  testComputePermAct(c('!', '#', '!'), 0, testEnvTbl, testMemMat, testConfig, data.table(hashtag='a', act=cor(c(1,-1,0,0,0), c(2,-1,0,0,0))))
+	  testComputePermAct('#', -1, testEnvTbl, testMemMat, testConfig, data.table(hashtag='a', act=cor(c(1,-1,0,0,0), c(-1,0,0,0,0))))
+	  testEnvTbl = data.table(chunk=c('!','#','!'), val=c(1,-1,-1), ind=c(1,2,3), key='chunk')
+	  testSjiTbl = data.table(context=c('!','#','#'), hashtag=c('a','a','b'), posFromTag=c(1,0,1), partialN=c(2,1,1), key='context')
+	  testMemMat = makeMemMat(testSjiTbl, testEnvTbl, testConfig)
+	  # Have fun figuring these out a few months from now
+	  testComputePermAct('#', 0, testEnvTbl, testMemMat, testConfig, data.table(hashtag=c('a','b'), act=c(cor(c(0,1,0,-2,0), c(0,-1,0,0,0)),
+													      cor(c(0,0,-1,0,0), c(0,-1,0,0,0)))))
+	  testComputePermAct('#', 1, testEnvTbl, testMemMat, testConfig, data.table(hashtag=c('a','b'), act=c(cor(c(0,1,0,-2,0), c(0,0,-1,0,0)),
+													      cor(c(0,0,-1,0,0), c(0,0,-1,0,0)))))
+})
 
 setLogLevel(priorLogLevel)

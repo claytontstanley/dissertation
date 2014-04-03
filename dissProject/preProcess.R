@@ -1648,7 +1648,7 @@ curWS <- function() {
 	context = c('a', 'it', 'i')
 	pos = c(1, 3, 1)
 	withProf(for (i in 1:100) computePermAct(context, pos, permEnvTbl, permMemMat, defaultBaseConfig))
-	computePermAct(context, pos)
+	computePermAct(context, pos, permEnvTbl, permMemMat, defaultBaseConfig)
 	sjiTblTOrder
 	tables()
 	.ls.objects(order.by="Size")
