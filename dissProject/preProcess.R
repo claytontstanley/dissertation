@@ -1577,32 +1577,63 @@ runContextTest <- function(regen=T) {
 
 # Environment vectors is a data.table, keyed on context,posFromTag
 
+createSampleInd <- function(tbl, num) {
+	indName = as.symbol(paste0('ind', num))
+	expr = bquote(.(indName) := sample(1:2048, size=nrow(tbl), replace=T))
+	tbl[, eval(expr)]
+}
+
+makeEnvironmentSubsetTbl <- function(tbl) {
+	myLog(sprintf('Attempting to create vectors for %s chunks', nrow(tbl)))
+	createSampleInd(tbl, 1)
+	createSampleInd(tbl, 2)
+	createSampleInd(tbl, 3)
+	createSampleInd(tbl, 4)
+	tbl[, uniq := (ind1 != ind2 & ind1 != ind3 & ind1 != ind4 & ind2 != ind3 & ind2 != ind4 & ind3 != ind4)]
+	redoTbl = tbl[uniq == F]
+	if (nrow(redoTbl) == 0) {
+		tbl
+	} else {
+		rbind(tbl[uniq == T], makeEnvironmentSubsetTbl(redoTbl[, list(chunk = chunk)]))
+	}
+}
+
 makeEnvironmentTbl <- function(sjiTbl) {
-	permEnvTbl = with(sjiTbl, data.table(chunk=unique(context), type='context', ind=1:length(unique(context))))
-	permEnvTbl[, ind := 1]
-	permEnvTbl[, val := 1]
+	permEnvTbl = with(sjiTbl, data.table(chunk=unique(context)))
+	permEnvTbl = makeEnvironmentSubsetTbl(permEnvTbl)
+	permEnvTbl[, uniq := NULL]
+	permEnvTbl = melt(permEnvTbl,
+			  id=c('chunk'),
+			  measure=c('ind1', 'ind2', 'ind3', 'ind4'),
+			  variable.name='val',
+			  value.name='ind')
+	setkey(permEnvTbl, val)
+	valTbl = data.table(name=c('ind1', 'ind2', 'ind3', 'ind4'), valAsNum=c(1,1,-1,-1), key='name')
+	permEnvTbl[valTbl, valAsNum := valAsNum]
+	permEnvTbl[, val := valAsNum][, valAsNum := NULL]
 	setkey(permEnvTbl, chunk)
 	permEnvTbl
 }
 
 makeMemMat <- function(sjiTbl, permEnvTbl) {
-	memTbl = permEnvTbl[sjiTbl]
+	memTbl = permEnvTbl[sjiTbl, allow.cartesian=T]
 	memTbl[, posFromTag := as.numeric(posFromTag)]
 	memTbl[, rotInd := ((ind-1 + posFromTag) %% 1000) + 1]
 	memTbl = memTbl[, list(sumPartialN=sum(partialN)), by=list(rotInd, val, hashtag)]
 	memTbl = memTbl[, list(totVal=sum(val*sumPartialN)), by=list(rotInd, hashtag)]
 	db = makeDB(memTbl[, unique(hashtag)])
 	memMat = with(memTbl, sparseMatrix(i=rotInd, j=getHashes(hashtag, db), x=totVal, dims=c(1000, length(db))))
+	memMat = as.matrix(memMat)
 	colnames(memMat) = getVals(1:ncol(memMat), db) 
 	memMat
 }
 
 computePermAct <- function(context, pos) {
-	fooTbl = data.table(context=context, posFromTag=pos, hashtag='context', partialN=1, key='context')
-	fooMat = makeMemMat(fooTbl, permEnvTbl)
-	fooVect = rowSums(fooMat)
-	corVect = cor(as.matrix(permMemMat), fooVect)
-	resTbl = data.table(hashtag=rownames(corVect), act=as.vector(corVect))
+	contextTbl = data.table(context=context, posFromTag=pos, hashtag='context', partialN=1, key='context')
+	contextMemMat = makeMemMat(contextTbl, permEnvTbl)
+	contextMemVect = rowSums(contextMemMat) 
+	contextCorVect = cor(permMemMat, contextMemVect)
+	resTbl = data.table(hashtag=rownames(contextCorVect), act=as.vector(contextCorVect))
 	resTbl
 }
 
@@ -1617,6 +1648,7 @@ curWS <- function() {
 	computePermAct(context, pos)
 	sjiTblTOrder
 	tables()
+	.ls.objects(order.by="Size")
 	runContextTest(regen=F)
 	sqldf('select hashtag_group, retweeted, count(text) from top_hashtag_tweets group by hashtag_group, retweeted order by hashtag_group, retweeted')
 	resTbl = runPriorT(config=modConfig(defaultTConfig, list(query=sprintf("select %s from tweets where user_screen_name = 'ap'", defaultTCols))))
