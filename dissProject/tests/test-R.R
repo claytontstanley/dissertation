@@ -169,7 +169,7 @@ test_that('testMakeMemMat', {
 test_that('testComputePermAct', {
 	  testConfig = modConfig(defaultBaseConfig, list(permNRows=5))
 	  testComputePermAct <- function(testContext, testPos, testEnvTbl, testMemMat, testConfig, expectedTbl) {
-		  resTbl = computePermAct(testContext, testPos, testEnvTbl, testMemMat, testConfig) 
+		  resTbl = computePermActOrder(testContext, testPos, testEnvTbl, testMemMat, testConfig) 
 		  expect_equivalent(resTbl, expectedTbl) 
 	  }
 	  testEnvTbl = data.table(chunk=c('!','!','!','!'), val=c(1,1,-1,-1), ind=c(1,2,3,4), key='chunk')

@@ -1290,7 +1290,7 @@ getSjiTblSO <- function(config, startId, endId) {
 	fileName = sprintf('%s.csv', makeSubsetName(getConfig(config, "groupName"), startId, endId))
 	sjiTitleName = paste('NcoocTblTitle', fileName, sep='-')
 	sjiBodyName = paste('NcoocTblBody', fileName, sep='-')
-	sjiColClasses = c('character', 'character', 'character', 'integer', 'integer')	
+	sjiColClasses = c('character', 'character', 'integer', 'integer', 'integer')	
 	sjiTitleTbl = myReadCSV(sprintf('%s/%s', getCoocDir(), sjiTitleName), colClasses=sjiColClasses)
 	sjiBodyTbl = myReadCSV(sprintf('%s/%s', getCoocDir(), sjiBodyName), colClasses=sjiColClasses)
 	sjiTitleTbl[, type := 'title']
@@ -1298,6 +1298,7 @@ getSjiTblSO <- function(config, startId, endId) {
 	sjiTbl = rbind(sjiTitleTbl, sjiBodyTbl)
 	sjiTbl[, hashtag := tag][, tag := NULL]
 	sjiTbl[, context := chunk][, chunk := NULL]
+	sjiTbl[, posFromTag := 0]
 	setkey(sjiTbl, context, hashtag, posFromTag, type)
 	sjiTbl = sjiTbl[, list(partialN=sum(partialN), NChunkTag=sum(NChunkTag)), by=list(context, hashtag, posFromTag)]
 	addSjiAttrs(sjiTbl)
@@ -1307,7 +1308,7 @@ getSjiTblSO <- function(config, startId, endId) {
 getSjiTblT <- function(config, startId, endId) {
 	fileName = sprintf('%s.csv', makeSubsetName(getConfig(config, "groupName"), startId, endId))
 	sjiTblName = sprintf('NcoocTblTweet-%s', fileName)
-	sjiColClasses = c('character', 'character', 'character', 'integer', 'integer')	
+	sjiColClasses = c('character', 'character', 'integer', 'integer', 'integer')	
 	sjiTbl = myReadCSV(sprintf('%s/%s', getCoocDir(), sjiTblName), colClasses=sjiColClasses)
 	sjiTbl[, context := chunk][, chunk := NULL]
 	sjiTbl[, hashtag := tag][, tag := NULL]
@@ -1318,7 +1319,7 @@ getSjiTblT <- function(config, startId, endId) {
 
 getSjiTblTOrderless <- function(config, startId, endId) {
 	sjiTbl = getSjiTblT(config, startId, endId)
-	sjiTbl = sjiTbl[, list(posFromTag=NaN, partialN=sum(partialN)), by=list(context, hashtag)]
+	sjiTbl = sjiTbl[, list(posFromTag=0, partialN=sum(partialN)), by=list(context, hashtag)]
 	setkey(sjiTbl, context, hashtag, posFromTag)
 	addSjiAttrs(sjiTbl)
 	sjiTbl
@@ -1618,7 +1619,6 @@ makeEnvironmentTbl <- function(sjiTbl, config) {
 
 makeMemMat <- function(sjiTbl, permEnvTbl, config) {
 	memTbl = permEnvTbl[sjiTbl, allow.cartesian=T]
-	memTbl[, posFromTag := as.numeric(posFromTag)]
 	NRows = getConfig(config, 'permNRows')
 	memTbl[, rotInd := ((ind-1 + posFromTag) %% NRows) + 1]
 	memTbl = memTbl[, list(sumPartialN=sum(partialN)), by=list(rotInd, val, hashtag)]
@@ -1639,17 +1639,26 @@ computePermAct <- function(context, pos, permEnvTbl, permMemMat, config) {
 	resTbl
 }
 
+computePermActOrder <- function(context, pos, permEnvTbl, permMemMat, config) {
+	computePermAct(context, pos, permEnvTbl, permMemMat, config)
+}
+
+computePermActOrderless <- function(context, permEnvTbl, permMemMat, config) {
+	computePermAct(context, rep(0, length(context)), permEnvTbl, permMemMat, config)
+}
+
 curWS <- function() {
-	permEnvTbl = makeEnvironmentTbl(sjiTblTOrder, defaultBaseConfig)
-	permMemMat = makeMemMat(sjiTblTOrder, permEnvTbl, defaultBaseConfig)
-	permEnvTbl
-	sjiTblTOrder
+	permEnvTbl = makeEnvironmentTbl(sjiTblTOrderless, defaultBaseConfig)
+	permMemMatOrder = makeMemMat(sjiTblTOrder, permEnvTbl, defaultBaseConfig)
+	permMemMatOrderless = makeMemMat(sjiTblTOrderless, permEnvTbl, defaultBaseConfig)
+	dim(permMemMatOrderless)
+	permMemMatOrderless
+	key(sjiTblTOrderless)
 	key(sjiTblTOrder)
 	context = c('a', 'it', 'i')
 	pos = c(1, 3, 1)
-	withProf(for (i in 1:100) computePermAct(context, pos, permEnvTbl, permMemMat, defaultBaseConfig))
-	computePermAct(context, pos, permEnvTbl, permMemMat, defaultBaseConfig)
-	sjiTblTOrder
+	computePermActOrder(context, pos, permEnvTbl, permMemMat, defaultBaseConfig)
+	sjiTblTOrderless
 	tables()
 	.ls.objects(order.by="Size")
 	runContextTest(regen=F)
