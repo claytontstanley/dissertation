@@ -3,6 +3,8 @@
 /plots
 /RProf.out
 /pictures
-/LogReg.csv
+/LogReg*.csv
 /*-subset-1*
 /*-subset-4*
+/contextWeights.csv
+/userIdForPostId.csv
