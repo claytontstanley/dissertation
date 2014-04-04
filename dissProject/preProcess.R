@@ -176,7 +176,7 @@ addTokenText <- function(tweetsTbl, from) {
 	tokenizedTweetsFile = tempfile(pattern='tokenizedTweets-', tmpdir='/tmp', fileext='.txt')
 	stderFile = tempfile(pattern='stderr-', tmpdir='/tmp', fileext='.txt')
 	writeLines(stripDelimiters(tweetsTbl[[from]]), rawTweetsFile, useBytes=T)
-	cmd = sprintf('%s/lib/ark-tweet-nlp-0.3.2/runTagger.sh', PATH)
+	cmd = sprintf('%s/dissertationData/lib/ark-tweet-nlp-0.3.2/runTagger.sh', PATH)
 	args = sprintf('--no-confidence --just-tokenize --quiet %s > %s 2>%s', rawTweetsFile, tokenizedTweetsFile, stderFile)
 	myLog(sprintf('running tagger with in/out temp files: %s %s', rawTweetsFile, tokenizedTweetsFile))
 	cmdOut = system2(cmd, args=args)
