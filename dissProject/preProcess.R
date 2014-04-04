@@ -1583,13 +1583,22 @@ createSampleInd <- function(tbl, num, config) {
 	tbl[, eval(expr)]
 }
 
+allColUniqExpr <- function(colNames, resColName) {
+	makeExpr = function(x) sprintf('%s != %s', x[1], x[2])
+	expr = apply(combn(colNames, 2), 2, makeExpr)
+	expr = paste(expr, sep='', collapse=' & ')
+	expr = sprintf('%s := %s', resColName, expr)
+	expr = parse(text=expr)
+	expr
+}
+
 makeEnvironmentSubsetTbl <- function(tbl, config) {
 	myLog(sprintf('Attempting to create vectors for %s chunks', nrow(tbl)))
 	createSampleInd(tbl, 1, config)
 	createSampleInd(tbl, 2, config)
 	createSampleInd(tbl, 3, config)
 	createSampleInd(tbl, 4, config)
-	tbl[, uniq := (ind1 != ind2 & ind1 != ind3 & ind1 != ind4 & ind2 != ind3 & ind2 != ind4 & ind3 != ind4)]
+	tbl[, eval(allColUniqExpr(c('ind1', 'ind2', 'ind3', 'ind4'), 'uniq'))]
 	redoTbl = tbl[uniq == F]
 	if (nrow(redoTbl) == 0) {
 		tbl
