@@ -1577,8 +1577,6 @@ runContextTest <- function(regen=T) {
 	
 }
 
-# Environment vectors is a data.table, keyed on context,posFromTag
-
 createSampleInd <- function(tbl, num, config) {
 	indName = as.symbol(paste0('ind', num))
 	expr = bquote(.(indName) := sample(1:getConfig(config, 'permNRows'), size=nrow(tbl), replace=T))
