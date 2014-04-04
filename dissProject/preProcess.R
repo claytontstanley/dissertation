@@ -87,14 +87,6 @@ myPlotPrint <- function(fig, name) {
 	fig
 }
 
-
-# ref: http://stackoverflow.com/questions/5060076/convert-html-character-entity-encoding-in-r
-html2txt <- function(str) {
-	xpathApply(htmlParse(str, asText=TRUE),
-		   "//body//text()", 
-		   xmlValue)[[1]] 
-}
-
 html2txt2 <- function(vect) {
 	inFile = tempfile(pattern='htmlIn-', tmpdir='/tmp', fileext='.csv')
 	outFile = tempfile(pattern='htmlOut-', tmpdir='/tmp', fileext='.csv')
