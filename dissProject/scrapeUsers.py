@@ -167,7 +167,8 @@ def streamHashtags(hashtagGroup):
 def streamHashtagsCurrent():
     #hashtagGroup = '2014-02-27 17:13:30 initial'
     #hashtagGroup = '2014-03-17 11:28:15 trendsmap'
-    hashtagGroup = '2014-03-24 13:06:19 trendsmap'
+    #hashtagGroup = '2014-03-24 13:06:19 trendsmap'
+    hashtagGroup = '2014-04-04 15:03:59 trendsmap'
     streamHashtags(hashtagGroup)
 
 def scrape_socialbakers(url):

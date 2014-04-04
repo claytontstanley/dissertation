@@ -1647,6 +1647,10 @@ computePermActOrderless <- function(context, permEnvTbl, permMemMat, config) {
 }
 
 curWS <- function() {
+	sjiTblTOrderless
+	priorTblGlobT[, N:=.N, by=hashtag][, N := N/nrow(.SD)]
+	priorTblGlobT[, N:=NULL]
+	priorTblGlobT[order(N, decreasing=T)]
 	permEnvTbl = makeEnvironmentTbl(sjiTblTOrderless, defaultBaseConfig)
 	permMemMatOrder = makeMemMat(sjiTblTOrder, permEnvTbl, defaultBaseConfig)
 	permMemMatOrderless = makeMemMat(sjiTblTOrderless, permEnvTbl, defaultBaseConfig)
