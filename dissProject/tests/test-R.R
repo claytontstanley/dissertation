@@ -144,7 +144,7 @@ test_that('testGetPriorTbl', {
 })
 
 test_that('testMakeMemMat', {
-	config = modConfig(defaultBaseConfig, list(permNRows=5))
+	config = list(permNRows=5)
 	testMemMat <- function(testSjiTbl, testPermEnvTbl, resTbl) {
 		testMemMat = makeMemMat(testSjiTbl, testPermEnvTbl, config) 
 		expect_equivalent(testMemMat, as.matrix(data.table(resTbl)))
@@ -167,7 +167,7 @@ test_that('testMakeMemMat', {
 })
 
 test_that('testComputePermAct', {
-	  testConfig = modConfig(defaultBaseConfig, list(permNRows=5))
+	  testConfig = list(permNRows=5)
 	  testComputePermAct <- function(testContext, testPos, testEnvTbl, testMemMat, testConfig, expectedTbl) {
 		  resTbl = computePermActOrder(testContext, testPos, testEnvTbl, testMemMat, testConfig) 
 		  expect_equivalent(resTbl, expectedTbl) 
@@ -188,7 +188,6 @@ test_that('testComputePermAct', {
 	  testEnvTbl = data.table(chunk=c('!','#','!'), val=c(1,-1,-1), ind=c(1,2,3), key='chunk')
 	  testSjiTbl = data.table(context=c('!','#','#'), hashtag=c('a','a','b'), posFromTag=c(1,0,1), partialN=c(2,1,1), key='context')
 	  testMemMat = makeMemMat(testSjiTbl, testEnvTbl, testConfig)
-	  # Have fun figuring these out a few months from now
 	  testComputePermAct('#', 0, testEnvTbl, testMemMat, testConfig, data.table(hashtag=c('a','b'), act=c(cor(c(0,1,0,-2,0), c(0,-1,0,0,0)),
 													      cor(c(0,0,-1,0,0), c(0,-1,0,0,0)))))
 	  testComputePermAct('#', 1, testEnvTbl, testMemMat, testConfig, data.table(hashtag=c('a','b'), act=c(cor(c(0,1,0,-2,0), c(0,0,-1,0,0)),
