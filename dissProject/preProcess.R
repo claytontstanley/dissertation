@@ -617,9 +617,6 @@ defaultTConfig = c(defaultBaseConfig,
 			priorTbl = 'priorTblGlobT',
 			sjiTbl = 'sjiTblTOrderless',
 			getTokenizedFromSubsetFun='getTokenizedFromSubsetT',
-			permEnvTbl='permEnvTblT',
-			permMemMatOrder='permMemMatTOrder',
-			permMemMatOrderless='permMemMatTOrderless',
 			includeRetweetsP=F))
 
 defaultSOConfig = c(defaultBaseConfig,
@@ -648,10 +645,16 @@ defaultTPermConfig = c(defaultTConfig, defaultPermConfig,
 		       list(contextIVNames=c('tweetOrder', 'tweetOrderless')))
 
 defaultSOPermConfig = c(defaultSOConfig, defaultPermConfig,
-			list(contextIVNames=c('titleOrder', 'titleOrderless', 'bodyOrder', 'bodyOrderless')))
+			list(contextIVNames=c('titleOrder', 'titleOrderless', 'bodyOrder', 'bodyOrderless'),
+			     permEnvTbl='permEnvTblSO',
+			     permMemMatOrder='permMemMatSOOrder',
+			     permMemMatOrderless='permMemMatSOOrderless'))
 
 defaultTSjiConfig = c(defaultTConfig, defaultSjiConfig,
-		      list(contextIVNames=c('tweet')))
+		      list(contextIVNames=c('tweet'),
+			   permEnvTbl='permEnvTblT',
+			   permMemMatOrder='permMemMatTOrder',
+			   permMemMatOrderless='permMemMatTOrderless'))
 
 defaultSOSjiConfig = c(defaultSOConfig, defaultSjiConfig,
 		       list(contextIVNames=c('title', 'body')))
@@ -1592,11 +1595,10 @@ runContextTest <- function(regen=T) {
 	}
 	actDVs = c('actBestFit', 'actPriorStd')
 	resTbls = runContext(modConfig(defaultTSjiConfig, list(modelVsPredOutFile=getModelVsPredOutFile('testingTC'), actDVs=actDVs)))
-	resTbls
 	resTbls = runContext(modConfig(defaultSOSjiConfig, list(modelVsPredOutFile=getModelVsPredOutFile('testingSOC'), actDVs=actDVs)))
-	resTbls
 	resTbls = withProf(runContext(modConfig(defaultTPermConfig, list(modelVsPredOutFile=getModelVsPredOutFile('testingTCPerm'), actDVs=actDVs))))
-	
+	resTbls = runContext(modConfig(defaultSOPermConfig, list(modelVsPredOutFile=getModelVsPredOutFile('testingSOCPerm'), actDVs=actDVs)))
+	resTbls
 }
 
 createSampleInd <- function(tbl, num, config) {
@@ -1704,6 +1706,9 @@ curWS <- function() {
 	permEnvTblT = makeEnvironmentTbl(sjiTblTOrderless, defaultBaseConfig)
 	permMemMatTOrder = makeMemMat(sjiTblTOrder, permEnvTblT, defaultBaseConfig)
 	permMemMatTOrderless = makeMemMat(sjiTblTOrderless, permEnvTblT, defaultBaseConfig)
+	permEnvTblSO = makeEnvironmentTbl(sjiTblSOOrderless, defaultBaseConfig)
+	permMemMatTOrder = makeMemMat(sjiTblSOOrder, permEnvTblSO, defaultBaseConfig)
+	permMemMatTOrderless = makeMemMat(sjiTblSOOrderless, permEnvTblSO, defaultBaseConfig)
 	permMemMatTOrderless
 	key(sjiTblTOrderless)
 	key(sjiTblTOrder)
