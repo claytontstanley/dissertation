@@ -1450,7 +1450,7 @@ getPostResTbl <- function(tokenTbl, config) {
 	guardAllEqualP(tokenTbl[, user_screen_name])
 	guardAllEqualP(tokenTbl[, user_screen_name_prior])
 	guardAllEqualP(tokenTbl[, dt])
-	stopifnot(length(dStd) == 1)
+	myStopifnot(length(dStd) == 1)
 	contextTbl = tokenTbl[type != getConfig(config, "tagTypeName")]
 	tagTbl = tokenTbl[type == getConfig(config, "tagTypeName")]
 	setkey(tagTbl, chunk)
@@ -1735,7 +1735,6 @@ curWS <- function() {
 	BTbl = getPriorForUserAtEpoch(priorTblUserSO, '4653', 1390076773, c(.5, .6))
 	BTbl = getPriorForUserAtEpoch(priorTblUserSO, '4653', 1220886841, c(.5, .6))
 	BTbl
-	
 	test_dir(sprintf("%s/%s", PATH, 'tests'), reporter='summary')
 	.ls.objects(order.by='Size')
 	# Checking that tweets for twitter users from each followers_count,statuses_count scale are being collected properly
