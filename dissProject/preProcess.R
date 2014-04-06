@@ -326,6 +326,7 @@ computeActPriorByUser <- function(hashtagsTbl, ds) {
 }
 
 getPriorAtEpoch <- function(priorTbl, cEpoch, d) {
+	myLog(sprintf('computing prior at epoch %s', cEpoch))
 	curUserPriorTbl = priorTbl[creation_epoch <= cEpoch]
 	curUserPriorTbl
 	if (nrow(curUserPriorTbl) > 0) {
@@ -609,7 +610,6 @@ defaultTConfig = c(defaultBaseConfig,
 			postsTbl = 'top_hashtag_tweets',
 			subsetsTbl = 'top_hashtag_subsets',
 			tagTypeName = 'hashtag',
-			postTypeNames = 'tweet',
 			groupName = '2014-02-27 17:13:30 initial',
 			allGroupNames = c('2014-02-27 17:13:30 initial',
 					  '2014-03-17 11:28:15 trendsmap',
@@ -617,6 +617,9 @@ defaultTConfig = c(defaultBaseConfig,
 			priorTbl = 'priorTblGlobT',
 			sjiTbl = 'sjiTblTOrderless',
 			getTokenizedFromSubsetFun='getTokenizedFromSubsetT',
+			permEnvTbl='permEnvTblT',
+			permMemMatOrder='permMemMatTOrder',
+			permMemMatOrderless='permMemMatTOrderless',
 			includeRetweetsP=F))
 
 defaultSOConfig = c(defaultBaseConfig,
@@ -630,13 +633,28 @@ defaultSOConfig = c(defaultBaseConfig,
 			      subsetsTbl = 'post_subsets',
 			      postsTbl = 'posts',
 			      tagTypeName = 'tag',
-			      postTypeNames = c('title', 'body'),
 			      groupName = 'SOShuffledFull',
 			      priorTbl = 'priorTblUserSO',
 			      sjiTbl = 'sjiTblSO',
 			      getTokenizedFromSubsetFun='getTokenizedFromSubsetSO',
 			      makeChunkTblFun='make_chunk_table_SO'
 			      ))
+
+defaultPermConfig = list(computeActFromContextTbl = 'computeActPermFromContextTbl')
+
+defaultSjiConfig = list(computeActFromContextTbl = 'computeActSjiFromContextTbl')
+
+defaultTPermConfig = c(defaultTConfig, defaultPermConfig,
+		       list(contextIVNames=c('tweetOrder', 'tweetOrderless')))
+
+defaultSOPermConfig = c(defaultSOConfig, defaultPermConfig,
+			list(contextIVNames=c('titleOrder', 'titleOrderless', 'bodyOrder', 'bodyOrderless')))
+
+defaultTSjiConfig = c(defaultTConfig, defaultSjiConfig,
+		      list(contextIVNames=c('tweet')))
+
+defaultSOSjiConfig = c(defaultSOConfig, defaultSjiConfig,
+		       list(contextIVNames=c('title', 'body')))
 
 defaultGGPlotOpts <- theme_bw() + theme_classic()
 
@@ -1374,7 +1392,7 @@ addSjiAttrs <- function(sjiTbl) {
 	sjiTbl[, EContext := 1 - HContext/max(HContext)]
 }
 
-computeActSji <- function(contextVect, sjiTbl) {
+computeActSji <- function(contextVect, sjiTbl, config) {
 	myLog(sprintf("computing sji act for context with length %s", length(contextVect)))
 	resTbl = sjiTbl[J(contextVect), nomatch=0, allow.cartesian=T]
 	resTbl = resTbl[, {WContext = EContext/sum(EContext); list(act=sum(WContext * sji))}, keyby=hashtag]
@@ -1411,6 +1429,16 @@ genAndSaveCurWorkspace <- function() {
 	mySaveImage()
 }
 
+computeActSjiFromContextTbl <- function(contextTbl, config) {
+	contextTbl[, computeActSji(chunk, getConfig(config, 'sjiTbl'), config), by=type]
+}
+
+computeActPermFromContextTbl <- function(contextTbl, config) {
+	contextTbl = rbind(copy(contextTbl)[,type:=paste0(type,'Order')][,fun:='computeActPermOrder'],
+			   copy(contextTbl)[,type:=paste0(type,'Orderless')][,fun:='computeActPermOrderless'])
+	contextTbl[, get(fun[1])(chunk, pos, config), by=type]
+}
+
 getPostResTbl <- function(tokenTbl, config) {
 	tokenTbl
 	dStd = getConfig(config, 'dStd')
@@ -1430,12 +1458,12 @@ getPostResTbl <- function(tokenTbl, config) {
 	priorTbl[, user_screen_name := tokenTbl$user_screen_name[1]]
 	priorTbl[, dt := tokenTbl[, dt[1]]]
 	priorTbl[, d := dStd]
-	sjiTbl = contextTbl[, computeActSji(chunk, get(getConfig(config, 'sjiTbl'))), by=type]
+	sjiTbl = get(getConfig(config, 'computeActFromContextTbl'))(contextTbl, config)
 	if (nrow(sjiTbl) > 0) {
 		sjiTblWide = dcast.data.table(sjiTbl, hashtag ~ type, value.var='act')
 	} else {
 		sjiTblWide = copy(sjiTbl)
-		lapply(getConfig(config, "postTypeNames"), function(x) sjiTblWide[[x]] <<- double(0))
+		lapply(getConfig(config, "contextIVNames"), function(x) sjiTblWide[[x]] <<- double(0))
 		sjiTblWide[, act := NULL][, type := NULL]
 	}
 	setkey(sjiTblWide, hashtag)
@@ -1548,7 +1576,7 @@ getFullPostResTbl <- function(tokenTbl, config) {
 runContext <- function(config) {
 	tokenTbl = get(getConfig(config, 'getTokenizedFromSubsetFun'))(3000001, 3000200, config)
 	postResTbl = getFullPostResTbl(tokenTbl, config)
-	myLogit = analyzePostResTbl(postResTbl, getConfig(config, 'postTypeNames'))
+	myLogit = analyzePostResTbl(postResTbl, getConfig(config, 'contextIVNames'))
 	hashtagsTbl = getHashtagsTblFromSubsetTbl(tokenTbl, config)
 	postResTbl
 	addMetrics(hashtagsTbl, postResTbl, config)
@@ -1563,9 +1591,11 @@ runContextTest <- function(regen=T) {
 		getCurWorkspace(1e5, 100e6, 3e6, 1e5)
 	}
 	actDVs = c('actBestFit', 'actPriorStd')
-	resTbls = runContext(modConfig(defaultTConfig, list(modelVsPredOutFile=getModelVsPredOutFile('testingTC'), actDVs=actDVs)))
+	resTbls = runContext(modConfig(defaultTSjiConfig, list(modelVsPredOutFile=getModelVsPredOutFile('testingTC'), actDVs=actDVs)))
 	resTbls
-	resTbls = runContext(modConfig(defaultSOConfig, list(modelVsPredOutFile=getModelVsPredOutFile('testingSOC'), actDVs=actDVs)))
+	resTbls = runContext(modConfig(defaultSOSjiConfig, list(modelVsPredOutFile=getModelVsPredOutFile('testingSOC'), actDVs=actDVs)))
+	resTbls
+	resTbls = withProf(runContext(modConfig(defaultTPermConfig, list(modelVsPredOutFile=getModelVsPredOutFile('testingTCPerm'), actDVs=actDVs))))
 	
 }
 
@@ -1617,33 +1647,53 @@ makeEnvironmentTbl <- function(sjiTbl, config) {
 }
 
 makeMemMat <- function(sjiTbl, permEnvTbl, config) {
-	memTbl = permEnvTbl[sjiTbl, allow.cartesian=T]
+	memTbl = permEnvTbl[sjiTbl, allow.cartesian=T, nomatch=0]
+	memTbl
 	NRows = getConfig(config, 'permNRows')
+	NRows
 	memTbl[, rotInd := ((ind-1 + posFromTag) %% NRows) + 1]
 	memTbl = memTbl[, list(sumPartialN=sum(partialN)), by=list(rotInd, val, hashtag)]
 	memTbl = memTbl[, list(totVal=sum(val*sumPartialN)), by=list(rotInd, hashtag)]
 	db = makeDB(memTbl[, unique(hashtag)])
+	db
 	memMat = with(memTbl, sparseMatrix(i=rotInd, j=getHashes(hashtag, db), x=totVal, dims=c(NRows, length(db))))
 	memMat = as.matrix(memMat)
-	colnames(memMat) = getVals(1:ncol(memMat), db) 
+	colnames(memMat) = getVals(seq(1, length=ncol(memMat)), db)
+	dim(memMat)
 	memMat
 }
 
-computePermAct <- function(context, pos, permEnvTbl, permMemMat, config) {
+computeActPerm <- function(context, pos, permEnvTbl, permMemMat, config) {
+	myLog(sprintf("computing perm act for context with length %s", length(context)))
+	permEnvTbl
+	permMemMat
 	contextTbl = data.table(context=context, posFromTag=pos, hashtag='context', partialN=1, key='context')
+	contextTbl
 	contextMemMat = makeMemMat(contextTbl, permEnvTbl, config)
 	contextMemVect = rowSums(contextMemMat) 
-	contextCorVect = cor(permMemMat, contextMemVect)
+	if (sd(contextMemVect) == 0) {
+		contextCorVect = matrix(data=0, nrow=dim(permMemMat)[2], ncol=1, dimnames=list(colnames(permMemMat)))
+	} else {
+		contextCorVect = cor(permMemMat, contextMemVect)
+	}
 	resTbl = data.table(hashtag=rownames(contextCorVect), act=as.vector(contextCorVect))
 	resTbl
 }
 
-computePermActOrder <- function(context, pos, permEnvTbl, permMemMat, config) {
-	computePermAct(context, pos, permEnvTbl, permMemMat, config)
+computeActPermOrder <- function(context, pos, config) {
+	computeActPerm(context,
+		       pos,
+		       permEnvTbl = get(getConfig(config, 'permEnvTbl'), envir=parent.frame()),
+		       permMemMat = get(getConfig(config, 'permMemMatOrder'), envir=parent.frame()),
+		       config)
 }
 
-computePermActOrderless <- function(context, permEnvTbl, permMemMat, config) {
-	computePermAct(context, rep(0, length(context)), permEnvTbl, permMemMat, config)
+computeActPermOrderless <- function(context, pos, config) {
+	computeActPerm(context,
+		       rep(0, length(context)),
+		       permEnvTbl = get(getConfig(config, 'permEnvTbl'), envir=parent.frame()),
+		       permMemMat = get(getConfig(config, 'permMemMatOrderless'), envir=parent.frame()),
+		       config)
 }
 
 curWS <- function() {
@@ -1651,16 +1701,16 @@ curWS <- function() {
 	priorTblGlobT[, N:=.N, by=hashtag][, N := N/nrow(.SD)]
 	priorTblGlobT[, N:=NULL]
 	priorTblGlobT[order(N, decreasing=T)]
-	permEnvTbl = makeEnvironmentTbl(sjiTblTOrderless, defaultBaseConfig)
-	permMemMatOrder = makeMemMat(sjiTblTOrder, permEnvTbl, defaultBaseConfig)
-	permMemMatOrderless = makeMemMat(sjiTblTOrderless, permEnvTbl, defaultBaseConfig)
-	dim(permMemMatOrderless)
-	permMemMatOrderless
+	permEnvTblT = makeEnvironmentTbl(sjiTblTOrderless, defaultBaseConfig)
+	permMemMatTOrder = makeMemMat(sjiTblTOrder, permEnvTblT, defaultBaseConfig)
+	permMemMatTOrderless = makeMemMat(sjiTblTOrderless, permEnvTblT, defaultBaseConfig)
+	permMemMatTOrderless
 	key(sjiTblTOrderless)
 	key(sjiTblTOrder)
 	context = c('a', 'it', 'i')
 	pos = c(1, 3, 1)
-	computePermActOrder(context, pos, permEnvTbl, permMemMat, defaultBaseConfig)
+	setLogLevel(2)
+	computeActPermOrder(context, pos, defaultTConfig)
 	sjiTblTOrderless
 	tables()
 	.ls.objects(order.by="Size")

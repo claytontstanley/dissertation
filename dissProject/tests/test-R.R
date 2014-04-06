@@ -167,10 +167,10 @@ test_that('testMakeMemMat', {
 })
 
 test_that('testComputePermAct', {
-	  testConfig = list(permNRows=5)
+	  testConfig = list(permNRows=5, permEnvTbl='testEnvTbl', permMemMatOrder='testMemMat', permMemMat='')
 	  testComputePermAct <- function(testContext, testPos, testEnvTbl, testMemMat, testConfig, expectedTbl) {
-		  resTbl = computePermActOrder(testContext, testPos, testEnvTbl, testMemMat, testConfig) 
-		  expect_equivalent(resTbl, expectedTbl) 
+		  resTbl = computeActPermOrder(testContext, testPos, testConfig)
+		  expect_equivalent(resTbl, expectedTbl)
 	  }
 	  testEnvTbl = data.table(chunk=c('!','!','!','!'), val=c(1,1,-1,-1), ind=c(1,2,3,4), key='chunk')
 	  testSjiTbl = data.table(context=c('!'), hashtag=c('a'), posFromTag=0, partialN=1, key='context')
