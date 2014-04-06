@@ -1703,6 +1703,7 @@ curWS <- function() {
 	priorTblGlobT[, N:=.N, by=hashtag][, N := N/nrow(.SD)]
 	priorTblGlobT[, N:=NULL]
 	priorTblGlobT[order(N, decreasing=T)]
+	#FIXME: Get SO to work
 	permEnvTblT = makeEnvironmentTbl(sjiTblTOrderless, defaultBaseConfig)
 	permMemMatTOrder = makeMemMat(sjiTblTOrder, permEnvTblT, defaultBaseConfig)
 	permMemMatTOrderless = makeMemMat(sjiTblTOrderless, permEnvTblT, defaultBaseConfig)
