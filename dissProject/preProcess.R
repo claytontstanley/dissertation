@@ -680,6 +680,7 @@ modConfig <- function(config, mods) {
 
 getConfig <- function(config, slot) {
 	debugPrint(sprintf('Getting slot %s in config %s', slot, deparse(substitute(config))))
+	myStopifnot(!duplicated(names(config)))
 	myStopifnot(slot %in% names(config))
 	config[[slot]]
 }
