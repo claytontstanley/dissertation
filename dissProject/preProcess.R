@@ -653,7 +653,6 @@ defaultTPermConfig = modConfig(c(defaultTConfig, defaultPermConfig,
 
 defaultSOPermConfig = modConfig(c(defaultSOConfig, defaultPermConfig,
 				  list(contextPredNames=c('titleOrderless', 'bodyOrderless'),
-				       actDVs=c('actBestFit', 'actPriorStd', 'titleOrderless', 'bodyOrderless'),
 				       permEnvTbl='permEnvTblSO',
 				       permMemMatOrder='',
 				       permMemMatOrderless='permMemMatSOOrderless',
