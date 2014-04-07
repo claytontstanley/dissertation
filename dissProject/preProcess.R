@@ -1707,14 +1707,11 @@ curWS <- function() {
 	priorTblGlobT[, N:=.N, by=hashtag][, N := N/nrow(.SD)]
 	priorTblGlobT[, N:=NULL]
 	priorTblGlobT[order(N, decreasing=T)]
-	#FIXME: Get SO to work
 	permMemMatSOOrderless
-	key(sjiTblTOrderless)
-	key(sjiTblTOrder)
 	context = c('a', 'it', 'i')
 	pos = c(1, 3, 1)
-	setLogLevel(2)
-	computeActPermOrder(context, pos, defaultTConfig)
+	setLogLevel(1)
+	withProf(computeActPermOrderless(context, pos, defaultSOPermConfig))
 	sjiTblTOrderless
 	.ls.objects(order.by="Size")
 	runContextTest()
