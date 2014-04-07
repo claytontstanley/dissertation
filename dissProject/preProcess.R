@@ -1607,6 +1607,8 @@ runContext <- function(config) {
 runContextTest <- function(regen=F) {
 	if (regen) {
 		getCurWorkspace(1e5, 100e6, 3e6, 1e5)
+	} else {
+		myLoadImage()
 	}
 	actDVs = c('actBestFit', 'actPriorStd')
 	tables()
