@@ -1,9 +1,6 @@
 [submodule "submodules/python-boilerpipe"]
 	path = submodules/python-boilerpipe
 	url = ssh://chil/srv/git/python-boilerpipe 
-[submodule "submodules/lisp-dev"]
-	path = submodules/lisp-dev
-	url = ssh://chil/srv/git/lisp-dev
 [submodule "submodules/dissertationData"]
 	path = submodules/dissertationData
 	url = ssh://raid@cstanley.no-ip.biz/srv/git/dissertationData
