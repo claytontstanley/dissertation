@@ -1443,7 +1443,7 @@ genAndSaveCurWorkspace <- function() {
 }
 
 computeActSjiFromContextTbl <- function(contextTbl, config) {
-	contextTbl[, computeActSji(chunk, getConfig(config, 'sjiTbl'), config), by=type]
+	contextTbl[, computeActSji(chunk, get(getConfig(config, 'sjiTbl')), config), by=type]
 }
 
 computeActPermTFromContextTbl <- function(contextTbl, config) {
