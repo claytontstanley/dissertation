@@ -577,6 +577,22 @@ runPrior <- function(config) {
 	})
 }
 
+modConfig <- function(config, mods) {
+	newConfig = config
+	myStopifnot(names(mods) %in% names(config))
+	for(modName in names(mods)) {
+		newConfig[[modName]] = mods[[modName]]
+	}
+	newConfig
+}
+
+getConfig <- function(config, slot) {
+	debugPrint(sprintf('Getting slot %s in config %s', slot, deparse(substitute(config))))
+	myStopifnot(!duplicated(names(config)))
+	myStopifnot(slot %in% names(config))
+	config[[slot]]
+}
+
 defaultBaseConfig = list(ds=c(0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1.0,1.1,1.2,1.3,1.4,1.5,1.6,1.8,2,5,10,20),
 			 dStd=0.5,
 			 modelVsPredOutFile='/tmp/modelVsPred.csv',
@@ -627,25 +643,30 @@ defaultPermConfig = list()
 
 defaultSjiConfig = list(computeActFromContextTbl = 'computeActSjiFromContextTbl')
 
-defaultTPermConfig = c(defaultTConfig, defaultPermConfig,
-		       list(contextIVNames=c('tweetOrder', 'tweetOrderless'),
-			    permEnvTbl='permEnvTblT',
-			    permMemMatOrder='permMemMatTOrder',
-			    permMemMatOrderless='permMemMatTOrderless',
-			    computeActFromContextTbl = 'computeActPermTFromContextTbl'))
+defaultTPermConfig = modConfig(c(defaultTConfig, defaultPermConfig,
+				 list(contextPredNames=c('tweetOrder', 'tweetOrderless'),
+				      permEnvTbl='permEnvTblT',
+				      permMemMatOrder='permMemMatTOrder',
+				      permMemMatOrderless='permMemMatTOrderless',
+				      computeActFromContextTbl = 'computeActPermTFromContextTbl')),
+			       list(actDVs=c('actBestFit', 'actPriorStd', 'tweetOrder', 'tweetOrderless')))
 
-defaultSOPermConfig = c(defaultSOConfig, defaultPermConfig,
-			list(contextIVNames=c('titleOrderless', 'bodyOrderless'),
-			     permEnvTbl='permEnvTblSO',
-			     permMemMatOrder='',
-			     permMemMatOrderless='permMemMatSOOrderless',
-			     computeActFromContextTbl = 'computeActPermSOFromContextTbl'))
+defaultSOPermConfig = modConfig(c(defaultSOConfig, defaultPermConfig,
+				  list(contextPredNames=c('titleOrderless', 'bodyOrderless'),
+				       actDVs=c('actBestFit', 'actPriorStd', 'titleOrderless', 'bodyOrderless'),
+				       permEnvTbl='permEnvTblSO',
+				       permMemMatOrder='',
+				       permMemMatOrderless='permMemMatSOOrderless',
+				       computeActFromContextTbl = 'computeActPermSOFromContextTbl')),
+				list(actDVs=c('actBestFit', 'actPriorStd', 'titleOrderless', 'bodyOrderless')))
 
-defaultTSjiConfig = c(defaultTConfig, defaultSjiConfig,
-		      list(contextIVNames=c('tweet')))
+defaultTSjiConfig = modConfig(c(defaultTConfig, defaultSjiConfig,
+				list(contextPredNames=c('tweet'))),
+			      list(actDVs=c('actBestFit', 'actPriorStd')))
 
-defaultSOSjiConfig = c(defaultSOConfig, defaultSjiConfig,
-		       list(contextIVNames=c('title', 'body')))
+defaultSOSjiConfig = modConfig(c(defaultSOConfig, defaultSjiConfig,
+				 list(contextPredNames=c('title', 'body'))),
+			       list(actDVs=c('actBestFit', 'actPriorStd')))
 
 defaultGGPlotOpts <- theme_bw() + theme_classic()
 
@@ -657,21 +678,7 @@ runPriorSO <- function(config=defaultSOConfig) {
 	runPrior(config)
 }
 
-modConfig <- function(config, mods) {
-	newConfig = config
-	myStopifnot(names(mods) %in% names(config))
-	for(modName in names(mods)) {
-		newConfig[[modName]] = mods[[modName]]
-	}
-	newConfig
-}
 
-getConfig <- function(config, slot) {
-	debugPrint(sprintf('Getting slot %s in config %s', slot, deparse(substitute(config))))
-	myStopifnot(!duplicated(names(config)))
-	myStopifnot(slot %in% names(config))
-	config[[slot]]
-}
 
 defaultTCols = "id::text, user_id, user_screen_name, created_at, retweeted, in_reply_to_status_id, lang, truncated, text, creation_epoch"
 
@@ -1467,7 +1474,7 @@ getPostResTbl <- function(tokenTbl, config) {
 		sjiTblWide = dcast.data.table(sjiTbl, hashtag ~ type, value.var='act')
 	} else {
 		sjiTblWide = copy(sjiTbl)
-		lapply(getConfig(config, "contextIVNames"), function(x) sjiTblWide[[x]] <<- double(0))
+		lapply(getConfig(config, "contextPredNames"), function(x) sjiTblWide[[x]] <<- double(0))
 		sjiTblWide[, act := NULL][, type := NULL]
 	}
 	setkey(sjiTblWide, hashtag)
@@ -1580,7 +1587,7 @@ getFullPostResTbl <- function(tokenTbl, config) {
 runContext <- function(config) {
 	tokenTbl = get(getConfig(config, 'getTokenizedFromSubsetFun'))(3000001, 3000200, config)
 	postResTbl = getFullPostResTbl(tokenTbl, config)
-	myLogit = analyzePostResTbl(postResTbl, getConfig(config, 'contextIVNames'))
+	myLogit = analyzePostResTbl(postResTbl, getConfig(config, 'contextPredNames'))
 	hashtagsTbl = getHashtagsTblFromSubsetTbl(tokenTbl, config)
 	postResTbl
 	addMetrics(hashtagsTbl, postResTbl, config)
@@ -1596,12 +1603,11 @@ runContextTest <- function(regen=F) {
 	} else {
 		eval(quote(myLoadImage()), envir=parent.frame())
 	}
-	actDVs = c('actBestFit', 'actPriorStd')
 	tables()
-	resTbls = runContext(modConfig(defaultTSjiConfig, list(modelVsPredOutFile=getModelVsPredOutFile('testingTC'), actDVs=actDVs)))
-	resTbls = runContext(modConfig(defaultSOSjiConfig, list(modelVsPredOutFile=getModelVsPredOutFile('testingSOC'), actDVs=actDVs)))
-	resTbls = runContext(modConfig(defaultTPermConfig, list(modelVsPredOutFile=getModelVsPredOutFile('testingTCPerm'), actDVs=actDVs)))
-	resTbls = runContext(modConfig(defaultSOPermConfig, list(modelVsPredOutFile=getModelVsPredOutFile('testingSOCPerm'), actDVs=actDVs)))
+	resTbls = runContext(modConfig(defaultTSjiConfig, list(modelVsPredOutFile=getModelVsPredOutFile('testingTC'))))
+	resTbls = runContext(modConfig(defaultSOSjiConfig, list(modelVsPredOutFile=getModelVsPredOutFile('testingSOC'))))
+	resTbls = runContext(modConfig(defaultTPermConfig, list(modelVsPredOutFile=getModelVsPredOutFile('testingTCPerm'))))
+	resTbls = runContext(modConfig(defaultSOPermConfig, list(modelVsPredOutFile=getModelVsPredOutFile('testingSOCPerm'))))
 	resTbls
 }
 
