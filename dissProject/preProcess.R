@@ -1592,7 +1592,7 @@ getFullPostResTbl <- function(tokenTbl, config) {
 }
 
 runContext <- function(config) {
-	tokenTbl = get(getConfig(config, 'getTokenizedFromSubsetFun'))(3000001, 3000020, config)
+	tokenTbl = get(getConfig(config, 'getTokenizedFromSubsetFun'))(3000001, 3000200, config)
 	postResTbl = getFullPostResTbl(tokenTbl, config)
 	myLogit = analyzePostResTbl(postResTbl, getConfig(config, 'contextIVNames'))
 	hashtagsTbl = getHashtagsTblFromSubsetTbl(tokenTbl, config)
