@@ -677,8 +677,6 @@ runPriorSO <- function(config=defaultSOConfig) {
 	runPrior(config)
 }
 
-
-
 defaultTCols = "id::text, user_id, user_screen_name, created_at, retweeted, in_reply_to_status_id, lang, truncated, text, creation_epoch"
 
 getQueryUsersSubset <- function(val, from) {
