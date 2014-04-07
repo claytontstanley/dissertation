@@ -27,13 +27,14 @@ library(reshape2)
 PATH = getPathToThisFile()
 FILE = getNameOfThisFile()
 
-options(sqldf.RPostgreSQL.user = Sys.getenv("USER"),
-	sqldf.RPostgreSQL.dbname = Sys.getenv("USER"))
+USER = Sys.getenv("USER")
+options(sqldf.RPostgreSQL.user = USER,
+	sqldf.RPostgreSQL.dbname = USER)
 options("scipen"=100, "digits"=4)
 
 withDBConnect <- function(var, thunk) {
 	var = substitute(var)
-	eval(bquote(assign(.(deparse(var)), dbConnect(PostgreSQL(), host="localhost", user= "claytonstanley", dbname="claytonstanley"))), envir=parent.frame())
+	eval(bquote(assign(.(deparse(var)), dbConnect(PostgreSQL(), host="localhost", user=USER, dbname=USER))), envir=parent.frame())
 	on.exit(eval(bquote(dbDisconnect(.(var))), envir=parent.frame()))
 	eval(substitute(thunk), envir=parent.frame())
 }
