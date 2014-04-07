@@ -27,8 +27,8 @@ library(reshape2)
 PATH = getPathToThisFile()
 FILE = getNameOfThisFile()
 
-options(sqldf.RPostgreSQL.user = 'claytonstanley',
-	sqldf.RPostgreSQL.dbname = 'claytonstanley')
+options(sqldf.RPostgreSQL.user = Sys.getenv("USER"),
+	sqldf.RPostgreSQL.dbname = Sys.getenv("USER"))
 options("scipen"=100, "digits"=4)
 
 withDBConnect <- function(var, thunk) {
