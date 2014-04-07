@@ -1718,16 +1718,17 @@ computeActPerm <- function(context, pos, permEnvTbl, permMemMat, config) {
 computeActPermOrder <- function(context, pos, config) {
 	computeActPerm(context,
 		       pos,
-		       permEnvTbl = myGetGlobal(getConfig(config, 'permEnvTbl')),
-		       permMemMat = myGetGlobal(getConfig(config, 'permMemMatOrder')),
+		       # Cannot get from global environment or test 'testComputePermAct' will fail
+		       permEnvTbl = get(getConfig(config, 'permEnvTbl'), envir=parent.frame()),
+		       permMemMat = get(getConfig(config, 'permMemMatOrder'), envir=parent.frame()),
 		       config)
 }
 
 computeActPermOrderless <- function(context, pos, config) {
 	computeActPerm(context,
 		       rep(0, length(context)),
-		       permEnvTbl = myGetGlobal(getConfig(config, 'permEnvTbl')),
-		       permMemMat = myGetGlobal(getConfig(config, 'permMemMatOrderless')),
+		       permEnvTbl = get(getConfig(config, 'permEnvTbl'), envir=parent.frame()),
+		       permMemMat = get(getConfig(config, 'permMemMatOrderless'), envir=parent.frame()),
 		       config)
 }
 
