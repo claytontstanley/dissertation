@@ -22,6 +22,7 @@ library(ggplot2)
 library(sqldf)
 library(data.table)
 library(reshape2)
+library(Hmisc)
 
 PATH = getPathToThisFile()
 FILE = getNameOfThisFile()
@@ -382,8 +383,9 @@ visCompare <- function(hashtagsTbl, modelHashtagsTbl, bestDTbl) {
 }
 
 topHashtagDVFromActDV <- function(actDV) {
-	c(gsub(pattern='^act', replacement='topHashtagPost', x=actDV),
-	  gsub(pattern='^act', replacement='topHashtagAcross', x=actDV))
+	myStopifnot(grepl(pattern='^act', x=actDV))
+	res = c(gsub(pattern='^act', replacement='topHashtagPost', x=actDV),
+		gsub(pattern='^act', replacement='topHashtagAcross', x=actDV))
 }
 
 addMetrics <- function(hashtagsTbl, modelHashtagsTbl, config) {
@@ -404,6 +406,7 @@ addMetrics <- function(hashtagsTbl, modelHashtagsTbl, config) {
 		eval(expr)
 	}
 	for (actDV in actDVs) {
+		actDV
 		do.call(addDVCols, as.list(c(actDV, topHashtagDVFromActDV(actDV))))
 	}
 	myStopifnot(key(modelHashtagsTbl) == (c('user_screen_name', 'dt', 'hashtag', 'd')))
@@ -644,28 +647,28 @@ defaultPermConfig = list()
 defaultSjiConfig = list(computeActFromContextTbl = 'computeActSjiFromContextTbl')
 
 defaultTPermConfig = modConfig(c(defaultTConfig, defaultPermConfig,
-				 list(contextPredNames=c('tweetOrder', 'tweetOrderless'),
+				 list(contextPredNames=c('actPriorStd', 'actTweetOrder', 'actTweetOrderless'),
 				      permEnvTbl='permEnvTblT',
 				      permMemMatOrder='permMemMatTOrder',
 				      permMemMatOrderless='permMemMatTOrderless',
 				      computeActFromContextTbl = 'computeActPermTFromContextTbl')),
-			       list(actDVs=c('actBestFit', 'actPriorStd', 'tweetOrder', 'tweetOrderless')))
+			       list(actDVs=c('actBestFit', 'actPriorStd', 'actTweetOrder', 'actTweetOrderless')))
 
 defaultSOPermConfig = modConfig(c(defaultSOConfig, defaultPermConfig,
-				  list(contextPredNames=c('titleOrderless', 'bodyOrderless'),
+				  list(contextPredNames=c('actPriorStd', 'actTitleOrderless', 'actBodyOrderless'),
 				       permEnvTbl='permEnvTblSO',
 				       permMemMatOrder='',
 				       permMemMatOrderless='permMemMatSOOrderless',
 				       computeActFromContextTbl = 'computeActPermSOFromContextTbl')),
-				list(actDVs=c('actBestFit', 'actPriorStd', 'titleOrderless', 'bodyOrderless')))
+				list(actDVs=c('actBestFit', 'actPriorStd', 'actTitleOrderless', 'actBodyOrderless')))
 
 defaultTSjiConfig = modConfig(c(defaultTConfig, defaultSjiConfig,
-				list(contextPredNames=c('tweet'))),
-			      list(actDVs=c('actBestFit', 'actPriorStd')))
+				list(contextPredNames=c('actPriorStd', 'actTweet'))),
+			      list(actDVs=c('actBestFit', 'actPriorStd', 'actTweet')))
 
 defaultSOSjiConfig = modConfig(c(defaultSOConfig, defaultSjiConfig,
-				 list(contextPredNames=c('title', 'body'))),
-			       list(actDVs=c('actBestFit', 'actPriorStd')))
+				 list(contextPredNames=c('actPriorStd', 'actTitle', 'actBody'))),
+			       list(actDVs=c('actBestFit', 'actPriorStd', 'actTitle', 'actBody')))
 
 defaultGGPlotOpts <- theme_bw() + theme_classic()
 
@@ -1433,17 +1436,18 @@ genAndSaveCurWorkspace <- function() {
 }
 
 computeActSjiFromContextTbl <- function(contextTbl, config) {
+	contextTbl = copy(contextTbl)[, type := paste0('act', capitalize(type))]
 	contextTbl[, computeActSji(chunk, get(getConfig(config, 'sjiTbl')), config), by=type]
 }
 
 computeActPermTFromContextTbl <- function(contextTbl, config) {
-	contextTbl = rbind(copy(contextTbl)[,type:=paste0(type,'Order')][,fun:='computeActPermOrder'],
-			   copy(contextTbl)[,type:=paste0(type,'Orderless')][,fun:='computeActPermOrderless'])
+	contextTbl = rbind(copy(contextTbl)[,type:=paste0('act', capitalize(type),'Order')][,fun:='computeActPermOrder'],
+			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'Orderless')][,fun:='computeActPermOrderless'])
 	contextTbl[, get(fun[1])(chunk, pos, config), by=type]
 }
 
 computeActPermSOFromContextTbl <- function(contextTbl, config) {
-	contextTbl = copy(contextTbl)[,type:=paste0(type,'Orderless')][,fun:='computeActPermOrderless']
+	contextTbl = copy(contextTbl)[,type:=paste0('act', capitalize(type),'Orderless')][,fun:='computeActPermOrderless']
 	contextTbl[, get(fun[1])(chunk, pos, config), by=type]
 }
 
@@ -1551,7 +1555,6 @@ getPPVTbl = function(tbl) {
 
 analyzePostResTbl <- function(validPostResTbl, predictors) {
 	setkey(validPostResTbl, user_screen_name, dt, hashtag, d)
-	predictors = c(predictors, 'actPriorStd')
 	#validPostResTbl = copy(postResTbl)
 	predictors
 	validPostResTbl
@@ -1588,6 +1591,7 @@ runContext <- function(config) {
 	hashtagsTbl = getHashtagsTblFromSubsetTbl(tokenTbl, config)
 	postResTbl
 	addMetrics(hashtagsTbl, postResTbl, config)
+	hashtagsTbl
 	modelVsPredTbl = getModelVsPredTbl(postResTbl, hashtagsTbl, config)	
 	outFile = getConfig(config, "modelVsPredOutFile")
 	writeModelVsPredTbl(modelVsPredTbl, outFile)
