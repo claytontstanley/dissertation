@@ -4,6 +4,3 @@
 [submodule "submodules/dissertationData"]
 	path = submodules/dissertationData
 	url = ssh://raid@cstanley.no-ip.biz/srv/git/dissertationData
-[submodule "submodules/so2db"]
-	path = submodules/so2db
-	url = raid@raid:/srv/git/so2db
