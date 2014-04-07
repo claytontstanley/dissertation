@@ -33,7 +33,7 @@ getTSjisAll:
 	egrep '^runGenNcoocTblT.* <-' preProcess.R | awk '{print $$1}'
 
 getContext:
-	echo "runContextTest"
+	echo "runContext200"
 
 checkPostgresTimes:
 	sudo tail -n 10000 /opt/local/var/db/postgresql93/defaultdb/system.log | egrep '(statement:|duration:)'

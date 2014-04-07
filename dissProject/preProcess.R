@@ -74,6 +74,10 @@ myLog <- function(str, forLogLevel=1) {
 	if (logLevel >= forLogLevel) print(str)
 }
 
+myGetGlobal <- function(...) {
+	get(..., envir=globalenv())
+}
+
 myStopifnot <- function(...) {
 	debugPrint(substitute(...))
 	stopifnot(...)
@@ -647,7 +651,7 @@ defaultPermConfig = list()
 defaultSjiConfig = list(computeActFromContextTbl = 'computeActSjiFromContextTbl')
 
 defaultTPermConfig = modConfig(c(defaultTConfig, defaultPermConfig,
-				 list(contextPredNames=c('actPriorStd', 'actTweetOrder', 'actTweetOrderless'),
+				 list(allPredNames=c('actPriorStd', 'actTweetOrder', 'actTweetOrderless'),
 				      permEnvTbl='permEnvTblT',
 				      permMemMatOrder='permMemMatTOrder',
 				      permMemMatOrderless='permMemMatTOrderless',
@@ -655,7 +659,7 @@ defaultTPermConfig = modConfig(c(defaultTConfig, defaultPermConfig,
 			       list(actDVs=c('actBestFit', 'actPriorStd', 'actTweetOrder', 'actTweetOrderless')))
 
 defaultSOPermConfig = modConfig(c(defaultSOConfig, defaultPermConfig,
-				  list(contextPredNames=c('actPriorStd', 'actTitleOrderless', 'actBodyOrderless'),
+				  list(allPredNames=c('actPriorStd', 'actTitleOrderless', 'actBodyOrderless'),
 				       permEnvTbl='permEnvTblSO',
 				       permMemMatOrder='',
 				       permMemMatOrderless='permMemMatSOOrderless',
@@ -663,11 +667,11 @@ defaultSOPermConfig = modConfig(c(defaultSOConfig, defaultPermConfig,
 				list(actDVs=c('actBestFit', 'actPriorStd', 'actTitleOrderless', 'actBodyOrderless')))
 
 defaultTSjiConfig = modConfig(c(defaultTConfig, defaultSjiConfig,
-				list(contextPredNames=c('actPriorStd', 'actTweet'))),
+				list(allPredNames=c('actPriorStd', 'actTweet'))),
 			      list(actDVs=c('actBestFit', 'actPriorStd', 'actTweet')))
 
 defaultSOSjiConfig = modConfig(c(defaultSOConfig, defaultSjiConfig,
-				 list(contextPredNames=c('actPriorStd', 'actTitle', 'actBody'))),
+				 list(allPredNames=c('actPriorStd', 'actTitle', 'actBody'))),
 			       list(actDVs=c('actBestFit', 'actPriorStd', 'actTitle', 'actBody')))
 
 defaultGGPlotOpts <- theme_bw() + theme_classic()
@@ -1404,12 +1408,12 @@ mySaveImage <- function() {
 	eval(quote(save(list=c('sjiTblTOrderless', 'sjiTblTOrder', 'priorTblGlobT', 'sjiTblSOOrderless', 'priorTblUserSO',
 			       'permEnvTblT', 'permEnvTblSO', 'permMemMatTOrder', 'permMemMatTOrderless',
 			       'permMemMatSOOrderless'), file=wsFile, compress=F)),
-	     envir=parent.frame())
+	     envir=globalenv())
 }
 
 myLoadImage <- function() {
 	eval(quote(load(file=wsFile)),
-	     envir=parent.frame())
+	     envir=globalenv())
 }
 
 getCurWorkspace <- function(maxIdSOSji, maxIdSOPrior, maxIdTSji, maxIdTPrior) {
@@ -1451,6 +1455,12 @@ computeActPermSOFromContextTbl <- function(contextTbl, config) {
 	contextTbl[, get(fun[1])(chunk, pos, config), by=type]
 }
 
+getContextPredNames <- function(config) {
+	res = getConfig(config, 'allPredNames')
+	res = res[!grepl(pattern='Prior', x=res)]
+	res
+}
+
 getPostResTbl <- function(tokenTbl, config) {
 	tokenTbl
 	dStd = getConfig(config, 'dStd')
@@ -1475,10 +1485,11 @@ getPostResTbl <- function(tokenTbl, config) {
 		sjiTblWide = dcast.data.table(sjiTbl, hashtag ~ type, value.var='act')
 	} else {
 		sjiTblWide = copy(sjiTbl)
-		lapply(getConfig(config, "contextPredNames"), function(x) sjiTblWide[[x]] <<- double(0))
+		lapply(getContextPredNames(config), function(x) sjiTblWide[[x]] <<- double(0))
 		sjiTblWide[, act := NULL][, type := NULL]
 	}
 	setkey(sjiTblWide, hashtag)
+	sjiTblWide
 	postResTbl = sjiTblWide[priorTbl]
 	postResTbl[, hashtagUsedP := F]
 	postResTbl[tagTbl, hashtagUsedP := T]
@@ -1584,10 +1595,12 @@ getFullPostResTbl <- function(tokenTbl, config) {
 	postResTbl
 }
 
-runContext <- function(config) {
-	tokenTbl = get(getConfig(config, 'getTokenizedFromSubsetFun'))(3000001, 3000200, config)
+runContext <- function(config, numSamples) {
+	startId = 3000001
+	endId = startId + numSamples - 1
+	tokenTbl = get(getConfig(config, 'getTokenizedFromSubsetFun'))(startId, endId, config)
 	postResTbl = getFullPostResTbl(tokenTbl, config)
-	myLogit = analyzePostResTbl(postResTbl, getConfig(config, 'contextPredNames'))
+	myLogit = analyzePostResTbl(postResTbl, getConfig(config, 'allPredNames'))
 	hashtagsTbl = getHashtagsTblFromSubsetTbl(tokenTbl, config)
 	postResTbl
 	addMetrics(hashtagsTbl, postResTbl, config)
@@ -1598,19 +1611,27 @@ runContext <- function(config) {
 	list(modelVsPredTbl=modelVsPredTbl, modelHashtagsTbl=postResTbl, hashtagsTbl=hashtagsTbl)
 }
 
-runContextTest <- function(regen=F) {
-	if (regen) {
-		getCurWorkspace(1e5, 100e6, 3e6, 1e5)
+getCurWorkspaceBy <- function(regen) {
+	if (regen == 'useAlreadyLoaded') return()
+	if (regen == T) {
+		eval(quote(getCurWorkspace(1e5, 100e6, 3e6, 1e5)), envir=globalenv())
 	} else {
-		eval(quote(myLoadImage()), envir=parent.frame())
+		eval(quote(myLoadImage()), envir=globalenv())
 	}
-	tables()
-	resTbls = runContext(modConfig(defaultTSjiConfig, list(modelVsPredOutFile=getModelVsPredOutFile('testingTC'))))
-	resTbls = runContext(modConfig(defaultSOSjiConfig, list(modelVsPredOutFile=getModelVsPredOutFile('testingSOC'))))
-	resTbls = runContext(modConfig(defaultTPermConfig, list(modelVsPredOutFile=getModelVsPredOutFile('testingTCPerm'))))
-	resTbls = runContext(modConfig(defaultSOPermConfig, list(modelVsPredOutFile=getModelVsPredOutFile('testingSOCPerm'))))
+}
+
+runContextWithConfig <- function(regen, numSamples) {
+	getCurWorkspaceBy(regen)
+	addNumSamples = function(str) sprintf('%s-%s', str, numSamples)
+	resTbls = runContext(modConfig(defaultTSjiConfig, list(modelVsPredOutFile=getModelVsPredOutFile(addNumSamples('testingTC')))), numSamples)
+	resTbls = runContext(modConfig(defaultSOSjiConfig, list(modelVsPredOutFile=getModelVsPredOutFile(addNumSamples('testingSOC')))), numSamples)
+	resTbls = runContext(modConfig(defaultTPermConfig, list(modelVsPredOutFile=getModelVsPredOutFile(addNumSamples('testingTCPerm')))), numSamples)
+	resTbls = runContext(modConfig(defaultSOPermConfig, list(modelVsPredOutFile=getModelVsPredOutFile(addNumSamples('testingSOCPerm')))), numSamples)
 	resTbls
 }
+
+runContext200 <- function() runContextWithConfig(regen=F, 200)
+runContext20 <- function(regen=F) runContextWithConfig(regen=regen, 20)
 
 createSampleInd <- function(tbl, num, config) {
 	indName = as.symbol(paste0('ind', num))
@@ -1696,20 +1717,21 @@ computeActPerm <- function(context, pos, permEnvTbl, permMemMat, config) {
 computeActPermOrder <- function(context, pos, config) {
 	computeActPerm(context,
 		       pos,
-		       permEnvTbl = get(getConfig(config, 'permEnvTbl'), envir=parent.frame()),
-		       permMemMat = get(getConfig(config, 'permMemMatOrder'), envir=parent.frame()),
+		       permEnvTbl = myGetGlobal(getConfig(config, 'permEnvTbl')),
+		       permMemMat = myGetGlobal(getConfig(config, 'permMemMatOrder')),
 		       config)
 }
 
 computeActPermOrderless <- function(context, pos, config) {
 	computeActPerm(context,
 		       rep(0, length(context)),
-		       permEnvTbl = get(getConfig(config, 'permEnvTbl'), envir=parent.frame()),
-		       permMemMat = get(getConfig(config, 'permMemMatOrderless'), envir=parent.frame()),
+		       permEnvTbl = myGetGlobal(getConfig(config, 'permEnvTbl')),
+		       permMemMat = myGetGlobal(getConfig(config, 'permMemMatOrderless')),
 		       config)
 }
 
 curWS <- function() {
+	runContext20(regen='useAlreadyLoaded')
 	sjiTblTOrderless
 	priorTblGlobT[, N:=.N, by=hashtag][, N := N/nrow(.SD)]
 	priorTblGlobT[, N:=NULL]
@@ -1721,14 +1743,11 @@ curWS <- function() {
 	withProf(computeActPermOrderless(context, pos, defaultSOPermConfig))
 	sjiTblTOrderless
 	.ls.objects(order.by="Size")
-	runContextTest()
 	sqldf('select hashtag_group, retweeted, count(text) from top_hashtag_tweets group by hashtag_group, retweeted order by hashtag_group, retweeted')
-	resTbl = runPriorT(config=modConfig(defaultTConfig, list(query=sprintf("select %s from tweets where user_screen_name = 'ap'", defaultTCols))))
 	sessionInfo()
 	postResTblSO
 	postResTblT
 	postResTblT
-
 	withProf(myLoadImage())
 	priorTblGlobT[, .N, by=hashtag][, list(hashtag, p=N/sum(N))][order(p, decreasing=T)][1:50][, plot(1:length(p), p)]
 	priorTblUserSO[, .N, by=hashtag][, list(hashtag, p=N/sum(N))][order(p, decreasing=T)][1:50][, plot(1:length(p), p)]
@@ -1744,23 +1763,6 @@ curWS <- function() {
 	usersWithTweetsTbl[order(followers_count), plot(log10(followers_count))]
 	usersWithTweetsTbl[order(statuses_count), plot(log10(statuses_count))]
 	usersWithTweetsTbl[order(followers_count),][followers_count > 10000000]
-	tweetsTbl
-	hashtagsTbl
-	compareHashtagTbls()[N!=N.1]
-	getHashtagEntropy(hashtagsTbl)
-	tusersTbl = getTusersTbl()
-	tusersTbl
-	tusersTbl[order(rank, decreasing=T)][20000:30000][, plot(1:length(followers_count), followers_count)]
-
-	extremesTbl = summarizeExtremes(hashtagsTbl)
-	extremesTbl
-	summarizeExtremes(hashtagsTbl[user_screen_name=='eddieizzard'])
-
-	modelVsPredTbl = buildTables(file_path_sans_ext(list.files(path=modelVsPredDir())))
-
-	joinTbl = modelVsPredTblBig[topHashtag & hashtagUsedP][extremesTbl, allow.cartesian=T][maxNP==T]
-	joinTbl[, list(user_screen_name, best=N/totN, r=NRecency/totN, f=NFrequency/totN)][, list(user_screen_name, best-r, best-f)][, lapply(list(V2, V3), mean),]
-	joinTbl[, list(user_screen_name, best=N/totN, r=NRecency/totN, f=NFrequency/totN)][, list(user_screen_name, best-r, best-f)][, hist(V2)]
 }
 
 #curWS()
