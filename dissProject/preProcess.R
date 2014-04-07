@@ -1604,7 +1604,7 @@ runContext <- function(config) {
 	list(modelVsPredTbl=modelVsPredTbl, modelHashtagsTbl=postResTbl, hashtagsTbl=hashtagsTbl)
 }
 
-runContextTest <- function(regen=T) {
+runContextTest <- function(regen=F) {
 	if (regen) {
 		getCurWorkspace(1e5, 100e6, 3e6, 1e5)
 	}
@@ -1715,6 +1715,8 @@ computeActPermOrderless <- function(context, pos, config) {
 }
 
 curWS <- function() {
+	fooTbl = data.table(a=c(1,2,3), b=c(1,1,2), key='a')
+	fooTbl
 	sjiTblTOrderless
 	priorTblGlobT[, N:=.N, by=hashtag][, N := N/nrow(.SD)]
 	priorTblGlobT[, N:=NULL]
@@ -1729,7 +1731,7 @@ curWS <- function() {
 	computeActPermOrder(context, pos, defaultTConfig)
 	sjiTblTOrderless
 	.ls.objects(order.by="Size")
-	runContextTest(regen=F)
+	runContextTest()
 	sqldf('select hashtag_group, retweeted, count(text) from top_hashtag_tweets group by hashtag_group, retweeted order by hashtag_group, retweeted')
 	resTbl = runPriorT(config=modConfig(defaultTConfig, list(query=sprintf("select %s from tweets where user_screen_name = 'ap'", defaultTCols))))
 	sessionInfo()
