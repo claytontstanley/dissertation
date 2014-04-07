@@ -470,20 +470,6 @@ getModelVsPredTbl <- function(modelHashtagsTbl, hashtagsTbl, config) {
 	modelVsPredTbl
 }
 
-compareModelVsExtreme <-function(modelHashtagsTbl, extremesTbl) {
-	modelHashtagsTbl[d==max(d)][topHashtag==T]
-	setkey(extremesTbl, user_screen_name, dt, hashtag)
-	extremesTbl
-	modelHashtagsTbl
-	?data.table
-	fooTbl = extremesTbl[modelHashtagsTbl[d==max(d)], allow.cartesian=T, nomatch=0][, list(tagCount, user_screen_name, dt, hashtag, hashtagChosenP, topHashtag, lapply(prevHashtags, function(x) x[1:4]))]
-	fooTbl
-	extremesTbl
-	fooTbl
-	fooTbl[, sum(topHashtag)]
-	fooTbl
-}
-
 writeModelVsPredTbl <- function(modelVsPredTbl, outFile) {
 	setkey(modelVsPredTbl, user_screen_name, DVName, d, topHashtag, hashtagUsedP)
 	myWriteCSV(modelVsPredTbl, file=outFile)
@@ -1717,8 +1703,6 @@ computeActPermOrderless <- function(context, pos, config) {
 }
 
 curWS <- function() {
-	fooTbl = data.table(a=c(1,2,3), b=c(1,1,2), key='a')
-	fooTbl
 	sjiTblTOrderless
 	priorTblGlobT[, N:=.N, by=hashtag][, N := N/nrow(.SD)]
 	priorTblGlobT[, N:=NULL]
