@@ -1408,7 +1408,9 @@ computeActSji <- function(contextVect, sjiTbl, config) {
 wsFile = '/Volumes/SSDSupernova/RWorkspace/workspace.RData'
 
 mySaveImage <- function() {
-	eval(quote(save(list=c('sjiTblTOrderless', 'sjiTblTOrder', 'priorTblGlobT', 'sjiTblSOOrderless', 'priorTblUserSO'), file=wsFile, compress=F)),
+	eval(quote(save(list=c('sjiTblTOrderless', 'sjiTblTOrder', 'priorTblGlobT', 'sjiTblSOOrderless', 'priorTblUserSO',
+			       'permEnvTblT', 'permEnvTblSO', 'permMemMatTOrder', 'permMemMatTOrderless',
+			       'permMemMatSOOrderless'), file=wsFile, compress=F)),
 	     envir=parent.frame())
 }
 
@@ -1423,6 +1425,11 @@ getCurWorkspace <- function(maxIdSOSji, maxIdSOPrior, maxIdTSji, maxIdTPrior) {
 	sjiTblTOrderless <<- getSjiTblTOrderless(defaultTConfig, 1, maxIdTSji)
 	sjiTblTOrder <<- getSjiTblTOrder(defaultTConfig, 1, maxIdTSji)
 	sjiTblSOOrderless <<- getSjiTblSO(defaultSOConfig, 1, maxIdSOSji)
+	permEnvTblT <<- makeEnvironmentTbl(sjiTblTOrderless, defaultBaseConfig)
+	permEnvTblSO <<- makeEnvironmentTbl(sjiTblSOOrderless, defaultBaseConfig)
+	permMemMatTOrder <<- makeMemMat(sjiTblTOrder, permEnvTblT, defaultBaseConfig)
+	permMemMatTOrderless <<- makeMemMat(sjiTblTOrderless, permEnvTblT, defaultBaseConfig)
+	permMemMatSOOrderless <<- makeMemMat(sjiTblSOOrderless, permEnvTblSO, defaultBaseConfig)
 	return()
 }
 
@@ -1602,6 +1609,7 @@ runContextTest <- function(regen=T) {
 		getCurWorkspace(1e5, 100e6, 3e6, 1e5)
 	}
 	actDVs = c('actBestFit', 'actPriorStd')
+	tables()
 	resTbls = runContext(modConfig(defaultTSjiConfig, list(modelVsPredOutFile=getModelVsPredOutFile('testingTC'), actDVs=actDVs)))
 	resTbls = runContext(modConfig(defaultSOSjiConfig, list(modelVsPredOutFile=getModelVsPredOutFile('testingSOC'), actDVs=actDVs)))
 	resTbls = runContext(modConfig(defaultTPermConfig, list(modelVsPredOutFile=getModelVsPredOutFile('testingTCPerm'), actDVs=actDVs)))
@@ -1712,11 +1720,6 @@ curWS <- function() {
 	priorTblGlobT[, N:=NULL]
 	priorTblGlobT[order(N, decreasing=T)]
 	#FIXME: Get SO to work
-	permEnvTblT = makeEnvironmentTbl(sjiTblTOrderless, defaultBaseConfig)
-	permMemMatTOrder = makeMemMat(sjiTblTOrder, permEnvTblT, defaultBaseConfig)
-	permMemMatTOrderless = makeMemMat(sjiTblTOrderless, permEnvTblT, defaultBaseConfig)
-	permEnvTblSO = makeEnvironmentTbl(sjiTblSOOrderless, defaultBaseConfig)
-	permMemMatSOOrderless = makeMemMat(sjiTblSOOrderless, permEnvTblSO, defaultBaseConfig)
 	permMemMatSOOrderless
 	key(sjiTblTOrderless)
 	key(sjiTblTOrder)
@@ -1725,7 +1728,6 @@ curWS <- function() {
 	setLogLevel(2)
 	computeActPermOrder(context, pos, defaultTConfig)
 	sjiTblTOrderless
-	tables()
 	.ls.objects(order.by="Size")
 	runContextTest(regen=F)
 	sqldf('select hashtag_group, retweeted, count(text) from top_hashtag_tweets group by hashtag_group, retweeted order by hashtag_group, retweeted')
