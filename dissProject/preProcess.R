@@ -632,29 +632,31 @@ defaultSOConfig = c(defaultBaseConfig,
 			      tagTypeName = 'tag',
 			      groupName = 'SOShuffledFull',
 			      priorTbl = 'priorTblUserSO',
-			      sjiTbl = 'sjiTblSO',
+			      sjiTbl = 'sjiTblSOOrderless',
 			      getTokenizedFromSubsetFun='getTokenizedFromSubsetSO',
 			      makeChunkTblFun='make_chunk_table_SO'
 			      ))
 
-defaultPermConfig = list(computeActFromContextTbl = 'computeActPermFromContextTbl')
+defaultPermConfig = list()
 
 defaultSjiConfig = list(computeActFromContextTbl = 'computeActSjiFromContextTbl')
 
 defaultTPermConfig = c(defaultTConfig, defaultPermConfig,
-		       list(contextIVNames=c('tweetOrder', 'tweetOrderless')))
+		       list(contextIVNames=c('tweetOrder', 'tweetOrderless'),
+			    permEnvTbl='permEnvTblT',
+			    permMemMatOrder='permMemMatTOrder',
+			    permMemMatOrderless='permMemMatTOrderless',
+			    computeActFromContextTbl = 'computeActPermTFromContextTbl'))
 
 defaultSOPermConfig = c(defaultSOConfig, defaultPermConfig,
-			list(contextIVNames=c('titleOrder', 'titleOrderless', 'bodyOrder', 'bodyOrderless'),
+			list(contextIVNames=c('titleOrderless', 'bodyOrderless'),
 			     permEnvTbl='permEnvTblSO',
-			     permMemMatOrder='permMemMatSOOrder',
-			     permMemMatOrderless='permMemMatSOOrderless'))
+			     permMemMatOrder='',
+			     permMemMatOrderless='permMemMatSOOrderless',
+			     computeActFromContextTbl = 'computeActPermSOFromContextTbl'))
 
 defaultTSjiConfig = c(defaultTConfig, defaultSjiConfig,
-		      list(contextIVNames=c('tweet'),
-			   permEnvTbl='permEnvTblT',
-			   permMemMatOrder='permMemMatTOrder',
-			   permMemMatOrderless='permMemMatTOrderless'))
+		      list(contextIVNames=c('tweet')))
 
 defaultSOSjiConfig = c(defaultSOConfig, defaultSjiConfig,
 		       list(contextIVNames=c('title', 'body')))
@@ -1406,7 +1408,7 @@ computeActSji <- function(contextVect, sjiTbl, config) {
 wsFile = '/Volumes/SSDSupernova/RWorkspace/workspace.RData'
 
 mySaveImage <- function() {
-	eval(quote(save(list=c('sjiTblTOrderless', 'sjiTblTOrder', 'priorTblGlobT', 'sjiTblSO', 'priorTblUserSO'), file=wsFile, compress=F)),
+	eval(quote(save(list=c('sjiTblTOrderless', 'sjiTblTOrder', 'priorTblGlobT', 'sjiTblSOOrderless', 'priorTblUserSO'), file=wsFile, compress=F)),
 	     envir=parent.frame())
 }
 
@@ -1420,7 +1422,7 @@ getCurWorkspace <- function(maxIdSOSji, maxIdSOPrior, maxIdTSji, maxIdTPrior) {
 	priorTblUserSO <<- getPriorTblUserSO(defaultSOConfig, 1, maxIdSOPrior)
 	sjiTblTOrderless <<- getSjiTblTOrderless(defaultTConfig, 1, maxIdTSji)
 	sjiTblTOrder <<- getSjiTblTOrder(defaultTConfig, 1, maxIdTSji)
-	sjiTblSO <<- getSjiTblSO(defaultSOConfig, 1, maxIdSOSji)
+	sjiTblSOOrderless <<- getSjiTblSO(defaultSOConfig, 1, maxIdSOSji)
 	return()
 }
 
@@ -1437,9 +1439,14 @@ computeActSjiFromContextTbl <- function(contextTbl, config) {
 	contextTbl[, computeActSji(chunk, getConfig(config, 'sjiTbl'), config), by=type]
 }
 
-computeActPermFromContextTbl <- function(contextTbl, config) {
+computeActPermTFromContextTbl <- function(contextTbl, config) {
 	contextTbl = rbind(copy(contextTbl)[,type:=paste0(type,'Order')][,fun:='computeActPermOrder'],
 			   copy(contextTbl)[,type:=paste0(type,'Orderless')][,fun:='computeActPermOrderless'])
+	contextTbl[, get(fun[1])(chunk, pos, config), by=type]
+}
+
+computeActPermSOFromContextTbl <- function(contextTbl, config) {
+	contextTbl = copy(contextTbl)[,type:=paste0(type,'Orderless')][,fun:='computeActPermOrderless']
 	contextTbl[, get(fun[1])(chunk, pos, config), by=type]
 }
 
@@ -1578,7 +1585,7 @@ getFullPostResTbl <- function(tokenTbl, config) {
 }
 
 runContext <- function(config) {
-	tokenTbl = get(getConfig(config, 'getTokenizedFromSubsetFun'))(3000001, 3000200, config)
+	tokenTbl = get(getConfig(config, 'getTokenizedFromSubsetFun'))(3000001, 3000020, config)
 	postResTbl = getFullPostResTbl(tokenTbl, config)
 	myLogit = analyzePostResTbl(postResTbl, getConfig(config, 'contextIVNames'))
 	hashtagsTbl = getHashtagsTblFromSubsetTbl(tokenTbl, config)
@@ -1597,7 +1604,7 @@ runContextTest <- function(regen=T) {
 	actDVs = c('actBestFit', 'actPriorStd')
 	resTbls = runContext(modConfig(defaultTSjiConfig, list(modelVsPredOutFile=getModelVsPredOutFile('testingTC'), actDVs=actDVs)))
 	resTbls = runContext(modConfig(defaultSOSjiConfig, list(modelVsPredOutFile=getModelVsPredOutFile('testingSOC'), actDVs=actDVs)))
-	resTbls = withProf(runContext(modConfig(defaultTPermConfig, list(modelVsPredOutFile=getModelVsPredOutFile('testingTCPerm'), actDVs=actDVs))))
+	resTbls = runContext(modConfig(defaultTPermConfig, list(modelVsPredOutFile=getModelVsPredOutFile('testingTCPerm'), actDVs=actDVs)))
 	resTbls = runContext(modConfig(defaultSOPermConfig, list(modelVsPredOutFile=getModelVsPredOutFile('testingSOCPerm'), actDVs=actDVs)))
 	resTbls
 }
@@ -1709,9 +1716,8 @@ curWS <- function() {
 	permMemMatTOrder = makeMemMat(sjiTblTOrder, permEnvTblT, defaultBaseConfig)
 	permMemMatTOrderless = makeMemMat(sjiTblTOrderless, permEnvTblT, defaultBaseConfig)
 	permEnvTblSO = makeEnvironmentTbl(sjiTblSOOrderless, defaultBaseConfig)
-	permMemMatTOrder = makeMemMat(sjiTblSOOrder, permEnvTblSO, defaultBaseConfig)
-	permMemMatTOrderless = makeMemMat(sjiTblSOOrderless, permEnvTblSO, defaultBaseConfig)
-	permMemMatTOrderless
+	permMemMatSOOrderless = makeMemMat(sjiTblSOOrderless, permEnvTblSO, defaultBaseConfig)
+	permMemMatSOOrderless
 	key(sjiTblTOrderless)
 	key(sjiTblTOrder)
 	context = c('a', 'it', 'i')
