@@ -4,3 +4,6 @@
 [submodule "submodules/so2db"]
 	path = submodules/so2db
 	url = https://github.com/tessellator/so2db.git
+[submodule "submodules/python-boilerpipe"]
+	path = submodules/python-boilerpipe
+	url = https://github.com/misja/python-boilerpipe.git
