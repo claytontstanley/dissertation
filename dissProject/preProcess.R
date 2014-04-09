@@ -485,6 +485,11 @@ writeModelVsPredTbl <- function(modelVsPredTbl, outFile) {
 	myWriteCSV(modelVsPredTbl, file=outFile)
 }
 
+writeModelHashtagsTbl <- function(modelHashtagsTbl, outFile) {
+	setkey(modelHashtagsTbl, user_screen_name, id, hashtag)
+	myWriteCSV(modelHashtagsTbl, file=outFile)
+}
+
 genAggModelVsPredTbl <- function(hashtagsTbl, config) {
 	outFile = getConfig(config, "modelVsPredOutFile")
 	ds = getConfig(config, "ds")
@@ -561,6 +566,10 @@ hashtagsTblDir <- function() {
 	sprintf('%s/dissertationData/hashtagsTbl', PATH)
 }
 
+modelHashtagsTblDir <- function() {
+	sprintf('%s/dissertationData/modelHashtagsTbl', PATH)
+}
+
 getCoocDir <- function() {
 	sprintf('%s/dissertationData/cooc', PATH)
 }
@@ -573,6 +582,10 @@ getModelVsPredOutFile <- function(name) {
 
 getHashtagsOutFile <- function(name) {
 	sprintf('%s/%s.csv', hashtagsTblDir(), name)
+}
+
+getModelHashtagsOutFile <- function(name) {
+	sprintf('%s/%s.csv', modelHashtagsTblDir(), name)
 }
 
 runPrior <- function(config) {
@@ -606,6 +619,7 @@ getConfig <- function(config, slot) {
 defaultBaseConfig = list(ds=c(0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1.0,1.1,1.2,1.3,1.4,1.5,1.6,1.8,2,5,10,20),
 			 dStd=0.5,
 			 modelVsPredOutFile='/tmp/modelVsPred.csv',
+			 modelHashtagsOutFile='',
 			 actDVs = c('actPriorStd', 'actPriorOL', 'actPriorOL2'),
 			 permNRows = 2048,
 			 query=NULL)
@@ -1636,6 +1650,9 @@ runContext <- function(config, numSamples) {
 	modelVsPredTbl = getModelVsPredTbl(postResTbl, hashtagsTbl, config)	
 	outFile = getConfig(config, "modelVsPredOutFile")
 	writeModelVsPredTbl(modelVsPredTbl, outFile)
+	outFile = getConfig(config, 'modelHashtagsOutFile')
+	postResTbl
+	writeModelHashtagsTbl(postResTbl, outFile)
 	list(modelVsPredTbl=modelVsPredTbl, modelHashtagsTbl=postResTbl, hashtagsTbl=hashtagsTbl, logregTbl=logregTbl)
 }
 
@@ -1651,10 +1668,14 @@ getCurWorkspaceBy <- function(regen) {
 runContextWithConfig <- function(regen, numSamples) {
 	getCurWorkspaceBy(regen)
 	addNumSamples = function(str) sprintf('%s-%s', str, numSamples)
-	resTbls = runContext(modConfig(defaultTSjiConfig, list(modelVsPredOutFile=getModelVsPredOutFile(addNumSamples('testingTC')))), numSamples)
-	resTbls = runContext(modConfig(defaultSOSjiConfig, list(modelVsPredOutFile=getModelVsPredOutFile(addNumSamples('testingSOC')))), numSamples)
-	resTbls = runContext(modConfig(defaultTPermConfig, list(modelVsPredOutFile=getModelVsPredOutFile(addNumSamples('testingTCPerm')))), numSamples)
-	resTbls = runContext(modConfig(defaultSOPermConfig, list(modelVsPredOutFile=getModelVsPredOutFile(addNumSamples('testingSOCPerm')))), numSamples)
+	getConfigMods <- function(name) {
+		list(modelVsPredOutFile=getModelVsPredOutFile(addNumSamples(name)),
+		     modelHashtagsOutFile=getModelHashtagsOutFile(addNumSamples(name)))
+	}
+	resTbls = runContext(modConfig(defaultTSjiConfig, getConfigMods('testingTC')), numSamples)
+	resTbls = runContext(modConfig(defaultSOSjiConfig, getConfigMods('testingSOC')), numSamples)
+	resTbls = runContext(modConfig(defaultTPermConfig, getConfigMods('testingTCPerm')), numSamples)
+	resTbls = runContext(modConfig(defaultSOPermConfig, getConfigMods('testingSOCPerm')), numSamples)
 	resTbls
 }
 
