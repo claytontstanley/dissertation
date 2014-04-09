@@ -1557,16 +1557,16 @@ handleNAs <- function(validPostResTbl, predictors) {
 	#validPostResTbl = postResTbl[!naRows]
 }
 
-updateBestFitCol <- function(postResTbl, coeffsTbl, bestFitName) {
+updateBestFitCol <- function(postResTbl, logregTbl, bestFitName) {
 	bestFitName = as.symbol(bestFitName)
-	predictors = coeffsTbl[predName != '(Intercept)', predName]
-	postResTbl[, eval(bquote(.(bestFitName) := coeffsTbl[predName == '(Intercept)', coeff]))]
+	predictors = logregTbl[predName != '(Intercept)', predName]
+	postResTbl[, eval(bquote(.(bestFitName) := logregTbl[predName == '(Intercept)', coeff]))]
 	predictors
 	postResTbl
 	for (predictor in predictors) {
 		sym = as.symbol(predictor)
 		sym
-		e = bquote(postResTbl[, .(bestFitName) := .(bestFitName) + .(sym) * .(coeffsTbl[predName == predictor, coeff])])
+		e = bquote(postResTbl[, .(bestFitName) := .(bestFitName) + .(sym) * .(logregTbl[predName == predictor, coeff])])
 		e
 		myLog(e)
 		eval(e)
@@ -1595,15 +1595,15 @@ analyzePostResTbl <- function(validPostResTbl, predictors, bestFitName) {
 	model = reformulate(termlabels = predictors, response = 'hashtagUsedP')
 	myLogit = glm(model, data=validPostResTbl, family=binomial(link="logit"))
 	coeffs = summary(myLogit)$coefficients[,"Estimate"]
-	coeffsTbl = data.table(coeff=coeffs, predName=names(coeffs))
-	updateBestFitCol(validPostResTbl, coeffsTbl, bestFitName)
+	logregTbl = data.table(coeff=coeffs, predName=names(coeffs))
+	updateBestFitCol(validPostResTbl, logregTbl, bestFitName)
 	validPostResTbl
 	ppvTbl = getPPVTbl(validPostResTbl, bestFitName)
 	ppvTbl[, plot(x,y)]
 	print(summary(myLogit))
 	print(ClassLog(myLogit, validPostResTbl$hashtagUsedP))
 	myLogit
-	coeffsTbl
+	logregTbl
 }
 
 getHashtagsTblFromSubsetTbl <- function(tokenTbl, config) {
@@ -1626,8 +1626,8 @@ runContext <- function(config, numSamples) {
 	runTbl = getConfig(config, 'runTbl')
 	postResTbl
 	runTbl
-	coeffsTbl = runTbl[, analyzePostResTbl(postResTbl, predName, name[1]), by=name]
-	coeffsTbl
+	logregTbl = runTbl[, analyzePostResTbl(postResTbl, predName, name[1]), by=name]
+	logregTbl
 	hashtagsTbl = getHashtagsTblFromSubsetTbl(tokenTbl, config)
 	postResTbl
 	addMetrics(hashtagsTbl, postResTbl, config)
@@ -1635,7 +1635,7 @@ runContext <- function(config, numSamples) {
 	modelVsPredTbl = getModelVsPredTbl(postResTbl, hashtagsTbl, config)	
 	outFile = getConfig(config, "modelVsPredOutFile")
 	writeModelVsPredTbl(modelVsPredTbl, outFile)
-	list(modelVsPredTbl=modelVsPredTbl, modelHashtagsTbl=postResTbl, hashtagsTbl=hashtagsTbl, coeffsTbl=coeffsTbl)
+	list(modelVsPredTbl=modelVsPredTbl, modelHashtagsTbl=postResTbl, hashtagsTbl=hashtagsTbl, logregTbl=logregTbl)
 }
 
 getCurWorkspaceBy <- function(regen) {
