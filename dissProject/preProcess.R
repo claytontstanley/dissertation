@@ -31,6 +31,7 @@ USER = Sys.getenv("USER")
 options(sqldf.RPostgreSQL.user = USER,
 	sqldf.RPostgreSQL.dbname = USER)
 options("scipen"=100, "digits"=4)
+options(error=traceback)
 
 withDBConnect <- function(var, thunk) {
 	var = substitute(var)
@@ -389,6 +390,7 @@ visCompare <- function(hashtagsTbl, modelHashtagsTbl, bestDTbl) {
 
 topHashtagDVFromActDV <- function(actDV) {
 	myStopifnot(grepl(pattern='^act', x=actDV))
+	actDV = gsub(pattern='_act', replacement='', x=actDV)
 	res = c(gsub(pattern='^act', replacement='topHashtagPost', x=actDV),
 		gsub(pattern='^act', replacement='topHashtagAcross', x=actDV))
 }
@@ -651,29 +653,42 @@ defaultPermConfig = list()
 
 defaultSjiConfig = list(computeActFromContextTbl = 'computeActSjiFromContextTbl')
 
+makeRunTbl <- function(runs) {
+	makeTbl <- function(run) {
+		name = paste(run, collapse='_', sep='')
+		data.table(name=name, predName=run)
+	}
+	rbindlist(lapply(runs, makeTbl))
+}
+
 defaultTPermConfig = modConfig(c(defaultTConfig, defaultPermConfig,
-				 list(allPredNames=c('actPriorStd', 'actTweetOrder', 'actTweetOrderless'),
+				 list(runTbl=makeRunTbl(list(c('actPriorStd', 'actTweetOrder', 'actTweetOrderless'),
+							     c('actTweetOrder', 'actTweetOrderless'))),
 				      permEnvTbl='permEnvTblT',
 				      permMemMatOrder='permMemMatTOrder',
 				      permMemMatOrderless='permMemMatTOrderless',
 				      computeActFromContextTbl = 'computeActPermTFromContextTbl')),
-			       list(actDVs=c('actBestFit', 'actPriorStd', 'actTweetOrder', 'actTweetOrderless')))
+			       list(actDVs=c('actPriorStd_actTweetOrder_actTweetOrderless', 'actPriorStd',
+					     'actTweetOrder', 'actTweetOrderless', 'actTweetOrder_actTweetOrderless')))
 
 defaultSOPermConfig = modConfig(c(defaultSOConfig, defaultPermConfig,
-				  list(allPredNames=c('actPriorStd', 'actTitleOrderless', 'actBodyOrderless'),
+				  list(runTbl=makeRunTbl(list(c('actPriorStd', 'actTitleOrderless', 'actBodyOrderless'),
+							      c('actTitleOrderless', 'actBodyOrderless'))),
 				       permEnvTbl='permEnvTblSO',
 				       permMemMatOrder='',
 				       permMemMatOrderless='permMemMatSOOrderless',
 				       computeActFromContextTbl = 'computeActPermSOFromContextTbl')),
-				list(actDVs=c('actBestFit', 'actPriorStd', 'actTitleOrderless', 'actBodyOrderless')))
+				list(actDVs=c('actPriorStd_actTitleOrderless_actBodyOrderless', 'actPriorStd',
+					      'actTitleOrderless', 'actBodyOrderless', 'actTitleOrderless_actBodyOrderless')))
 
 defaultTSjiConfig = modConfig(c(defaultTConfig, defaultSjiConfig,
-				list(allPredNames=c('actPriorStd', 'actTweet'))),
-			      list(actDVs=c('actBestFit', 'actPriorStd', 'actTweet')))
+				list(runTbl=makeRunTbl(list(c('actPriorStd', 'actTweet'))))),
+			      list(actDVs=c('actPriorStd_actTweet', 'actPriorStd', 'actTweet')))
 
 defaultSOSjiConfig = modConfig(c(defaultSOConfig, defaultSjiConfig,
-				 list(allPredNames=c('actPriorStd', 'actTitle', 'actBody'))),
-			       list(actDVs=c('actBestFit', 'actPriorStd', 'actTitle', 'actBody')))
+				 list(runTbl=makeRunTbl(list(c('actPriorStd', 'actTitle', 'actBody'),
+							     c('actTitle', 'actBody'))))),
+			       list(actDVs=c('actPriorStd_actTitle_actBody', 'actPriorStd', 'actTitle', 'actBody', 'actTitle_actBody')))
 
 defaultGGPlotOpts <- theme_bw() + theme_classic()
 
@@ -1457,7 +1472,8 @@ computeActPermSOFromContextTbl <- function(contextTbl, config) {
 }
 
 getContextPredNames <- function(config) {
-	res = getConfig(config, 'allPredNames')
+	res = getConfig(config, 'runTbl')
+	res = res[, unique(predName)]
 	res = res[!grepl(pattern='Prior', x=res)]
 	res
 }
@@ -1541,19 +1557,24 @@ handleNAs <- function(validPostResTbl, predictors) {
 	#validPostResTbl = postResTbl[!naRows]
 }
 
-updateBestFitCol <- function(postResTbl, coeffsTbl) {
+updateBestFitCol <- function(postResTbl, coeffsTbl, bestFitName) {
+	bestFitName = as.symbol(bestFitName)
 	predictors = coeffsTbl[name != '(Intercept)', name]
-	postResTbl[, actBestFit := coeffsTbl[name == '(Intercept)', coeff]]
+	postResTbl[, eval(bquote(.(bestFitName) := coeffsTbl[name == '(Intercept)', coeff]))]
+	predictors
+	postResTbl
 	for (predictor in predictors) {
 		sym = as.symbol(predictor)
-		e = bquote(postResTbl[, actBestFit := actBestFit + .(sym) * .(coeffsTbl[name == predictor, coeff])])
+		sym
+		e = bquote(postResTbl[, .(bestFitName) := .(bestFitName) + .(sym) * .(coeffsTbl[name == predictor, coeff])])
+		e
 		myLog(e)
 		eval(e)
 	}
 }
 
-getPPVTbl = function(tbl) {
-	pred = with(tbl, prediction(actBestFit, hashtagUsedP))
+getPPVTbl = function(tbl, bestFitName) {
+	pred = prediction(tbl[[bestFitName]], tbl[, hashtagUsedP])
 	perf = performance(pred, "tpr", "fpr")
 	fp = unlist(perf@x.values)*sum(!tbl$hashtagUsedP)
 	tp = unlist(perf@y.values)*sum(tbl$hashtagUsedP)
@@ -1565,7 +1586,7 @@ getPPVTbl = function(tbl) {
 	data.table(x=x, y=y)
 }
 
-analyzePostResTbl <- function(validPostResTbl, predictors) {
+analyzePostResTbl <- function(validPostResTbl, predictors, bestFitName) {
 	setkey(validPostResTbl, user_screen_name, dt, hashtag, d)
 	#validPostResTbl = copy(postResTbl)
 	predictors
@@ -1575,13 +1596,14 @@ analyzePostResTbl <- function(validPostResTbl, predictors) {
 	myLogit = glm(model, data=validPostResTbl, family=binomial(link="logit"))
 	coeffs = summary(myLogit)$coefficients[,"Estimate"]
 	coeffsTbl = data.table(coeff=coeffs, name=names(coeffs))
-	updateBestFitCol(validPostResTbl, coeffsTbl)
+	updateBestFitCol(validPostResTbl, coeffsTbl, bestFitName)
 	validPostResTbl
-	ppvTbl = getPPVTbl(validPostResTbl)
+	ppvTbl = getPPVTbl(validPostResTbl, bestFitName)
 	ppvTbl[, plot(x,y)]
 	print(summary(myLogit))
 	print(ClassLog(myLogit, validPostResTbl$hashtagUsedP))
 	myLogit
+	list()
 }
 
 getHashtagsTblFromSubsetTbl <- function(tokenTbl, config) {
@@ -1601,7 +1623,10 @@ runContext <- function(config, numSamples) {
 	endId = startId + numSamples - 1
 	tokenTbl = get(getConfig(config, 'getTokenizedFromSubsetFun'))(startId, endId, config)
 	postResTbl = getFullPostResTbl(tokenTbl, config)
-	myLogit = analyzePostResTbl(postResTbl, getConfig(config, 'allPredNames'))
+	runTbl = getConfig(config, 'runTbl')
+	postResTbl
+	runTbl
+	runTbl[, analyzePostResTbl(postResTbl, predName, name[1]), by=name]
 	hashtagsTbl = getHashtagsTblFromSubsetTbl(tokenTbl, config)
 	postResTbl
 	addMetrics(hashtagsTbl, postResTbl, config)
