@@ -1540,21 +1540,21 @@ getTokenizedFromSubsetSO <- function(minId, maxId, config) {
 	resTbl
 }
 
-handleNAs <- function(validPostResTbl, predictors) {
-	#validPostResTbl = copy(postResTbl)
-	#validPostResTbl[is.na(postResTbl)] = -4
-	#validPostResTbl = lapply(postResTbl, function(col) if !is.numeric(col) col[is.na(col)] = mean(col, na.rm=T))
+handleNAs <- function(postResTbl, predictors) {
+	#postResTbl = copy(postResTbl)
+	#postResTbl[is.na(postResTbl)] = -4
+	#postResTbl = lapply(postResTbl, function(col) if !is.numeric(col) col[is.na(col)] = mean(col, na.rm=T))
 	for (col in predictors) {
-		oldVal = validPostResTbl[[col]]
+		oldVal = postResTbl[[col]]
 		meanVal = mean(oldVal, na.rm=T)
 		linds = is.na(oldVal)
 		myLog(sprintf('Imputing mean of %s for %s of %s values in column name %s', meanVal, sum(linds), length(linds), col))
 		oldVal[linds] = meanVal 
-		eval(bquote(validPostResTbl[, .(col) := oldVal]))
+		eval(bquote(postResTbl[, .(col) := oldVal]))
 	}
-	validPostResTbl
+	postResTbl
 	#naRows = postResTbl[, predictors, with=F][, rowSums(is.na(as.matrix(.SD))) > 0]
-	#validPostResTbl = postResTbl[!naRows]
+	#postResTbl = postResTbl[!naRows]
 }
 
 updateBestFitCol <- function(postResTbl, logregTbl, bestFitName) {
@@ -1586,22 +1586,23 @@ getPPVTbl = function(tbl, bestFitName) {
 	data.table(x=x, y=y)
 }
 
-analyzePostResTbl <- function(validPostResTbl, predictors, bestFitName) {
-	setkey(validPostResTbl, user_screen_name, dt, hashtag, d)
-	#validPostResTbl = copy(postResTbl)
+analyzePostResTbl <- function(postResTbl, predictors, bestFitName) {
+	setkey(postResTbl, user_screen_name, dt, hashtag, d)
+	#postResTbl = copy(postResTbl)
 	predictors
-	validPostResTbl
-	handleNAs(validPostResTbl, predictors)
+	postResTbl
+	handleNAs(postResTbl, predictors)
 	model = reformulate(termlabels = predictors, response = 'hashtagUsedP')
-	myLogit = glm(model, data=validPostResTbl, family=binomial(link="logit"))
+	myLogit = glm(model, data=postResTbl, family=binomial(link="logit"))
 	coeffs = summary(myLogit)$coefficients[,"Estimate"]
 	logregTbl = data.table(coeff=coeffs, predName=names(coeffs))
-	updateBestFitCol(validPostResTbl, logregTbl, bestFitName)
-	validPostResTbl
-	ppvTbl = getPPVTbl(validPostResTbl, bestFitName)
+	updateBestFitCol(postResTbl, logregTbl, bestFitName)
+	postResTbl
+	# FIXME: Move the ppv stuff into the vis code after loading the results
+	ppvTbl = getPPVTbl(postResTbl, bestFitName)
 	ppvTbl[, plot(x,y)]
 	print(summary(myLogit))
-	print(ClassLog(myLogit, validPostResTbl$hashtagUsedP))
+	print(ClassLog(myLogit, postResTbl$hashtagUsedP))
 	myLogit
 	logregTbl
 }
