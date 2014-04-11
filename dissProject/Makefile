@@ -37,3 +37,6 @@ getContext:
 
 checkPostgresTimes:
 	sudo tail -n 10000 /opt/local/var/db/postgresql93/defaultdb/system.log | egrep '(statement:|duration:)'
+
+showLatestUpdates:
+	find dissertationData/ -type f -exec stat --format '%Y :%y %n' {} \; | sort -n | cut -d: -f2- | tail

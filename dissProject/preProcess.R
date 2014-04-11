@@ -566,7 +566,7 @@ hashtagsTblDir <- function() {
 	sprintf('%s/dissertationData/hashtagsTbl', PATH)
 }
 
-modelHashtagsTblDir <- function() {
+modelHashtagsDir <- function() {
 	sprintf('%s/dissertationData/modelHashtagsTbl', PATH)
 }
 
@@ -585,7 +585,7 @@ getHashtagsOutFile <- function(name) {
 }
 
 getModelHashtagsOutFile <- function(name) {
-	sprintf('%s/%s.csv', modelHashtagsTblDir(), name)
+	sprintf('%s/%s.csv', modelHashtagsDir(), name)
 }
 
 runPrior <- function(config) {
@@ -639,7 +639,8 @@ defaultTConfig = c(defaultBaseConfig,
 			groupName = '2014-02-27 17:13:30 initial',
 			allGroupNames = c('2014-02-27 17:13:30 initial',
 					  '2014-03-17 11:28:15 trendsmap',
-					  '2014-03-24 13:06:19 trendsmap'),
+					  '2014-03-24 13:06:19 trendsmap',
+					  '2014-04-04 15:03:59 trendsmap'),
 			priorTbl = 'priorTblGlobT',
 			sjiTbl = 'sjiTblTOrderless',
 			getTokenizedFromSubsetFun='getTokenizedFromSubsetT',
@@ -897,6 +898,18 @@ runSOQgt200r2 <- makeSORunr4(200, 'SOQgt200r2')
 runSOQgt100r2 <- makeSORunr4(100, 'SOQgt100r2')
 runSOQgt050r2 <- makeSORunr4(050, 'SOQgt050r2')
 
+buildModelHashtagsTables <- function(outFileNames) {
+	buildTable <- function(outFileName) {
+		tbl = myReadCSV(getModelHashtagsOutFile(outFileName))
+		tbl[, datasetName := outFileName]
+		tbl
+	}
+	modelHashtagsTbl = lapply(outFileNames, buildTable)
+	names(modelHashtagsTbl) = outFileNames
+	modelHashtagsTbl
+}
+
+
 buildTables <- function(outFileNames) {
 	buildTable <- function(outFileName) {
 		colClasses = c('character', 'logical', 'logical', 'numeric', 'integer', 'character', 'logical', 'integer')
@@ -923,6 +936,8 @@ buildTables <- function(outFileNames) {
 		modelVsPredTbl[grepl('^SOg', datasetName), datasetGroup := 'topReputation']
 		modelVsPredTbl[grepl('^TT', datasetName), datasetGroup := 'topTweets']
 		modelVsPredTbl[grepl('^TF', datasetName), datasetGroup := 'topFollowers']
+		modelVsPredTbl[grepl('^TContext', datasetName), datasetGroup := 'topHashtags']
+		modelVsPredTbl[grepl('^SOContext', datasetName), datasetGroup := 'sampleAcross']
 	}
 	addMiscellaneous <- function(modelVsPredTbl) {
 		modelVsPredTbl[, predUsedBest := F]
@@ -930,12 +945,14 @@ buildTables <- function(outFileNames) {
 		modelVsPredTbl[hashtagUsedP == T, acc := NCell/totN]
 	}
 	modelVsPredTbl = rbindlist(lapply(outFileNames, buildTable))
+	modelVsPredTbl
 	addRunNum(modelVsPredTbl)
 	addDatasetNameRoot(modelVsPredTbl)
 	addDatasetType(modelVsPredTbl)
 	addDatasetGroup(modelVsPredTbl)
 	addMiscellaneous(modelVsPredTbl)
-	modelVsPredTbl[datasetType != 'unknown']
+	stopifnot(nrow(modelVsPredTbl[datasetType == 'unknown']) == 0)
+	modelVsPredTbl
 }
 
 withCI <- function(dat) {
@@ -1672,10 +1689,10 @@ runContextWithConfig <- function(regen, numSamples) {
 		list(modelVsPredOutFile=getModelVsPredOutFile(addNumSamples(name)),
 		     modelHashtagsOutFile=getModelHashtagsOutFile(addNumSamples(name)))
 	}
-	resTbls = runContext(modConfig(defaultTSjiConfig, getConfigMods('testingTC')), numSamples)
-	resTbls = runContext(modConfig(defaultSOSjiConfig, getConfigMods('testingSOC')), numSamples)
-	resTbls = runContext(modConfig(defaultTPermConfig, getConfigMods('testingTCPerm')), numSamples)
-	resTbls = runContext(modConfig(defaultSOPermConfig, getConfigMods('testingSOCPerm')), numSamples)
+	resTbls = runContext(modConfig(defaultTSjiConfig, getConfigMods('TContextSji')), numSamples)
+	resTbls = runContext(modConfig(defaultSOSjiConfig, getConfigMods('SOContextSji')), numSamples)
+	resTbls = runContext(modConfig(defaultTPermConfig, getConfigMods('TContextPerm')), numSamples)
+	resTbls = runContext(modConfig(defaultSOPermConfig, getConfigMods('SOContextPerm')), numSamples)
 	resTbls
 }
 
@@ -1780,8 +1797,18 @@ computeActPermOrderless <- function(context, pos, config) {
 		       config)
 }
 
+isContextRun <- function(fname) {
+	grepl(pattern = 'Context', x = fname) 
+}
+
+
+
 curWS <- function() {
 	runContext20(regen='useAlreadyLoaded')
+	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isContextRun, list.files(path=modelVsPredDir()))))
+	modelHashtagsTbl = buildModelHashtagsTables(file_path_sans_ext(Filter(isContextRun, list.files(path=modelHashtagsDir()))))
+	modelVsPredTbl
+	?Filter
 	sjiTblTOrderless
 	priorTblGlobT[, N:=.N, by=hashtag][, N := N/nrow(.SD)]
 	priorTblGlobT[, N:=NULL]
