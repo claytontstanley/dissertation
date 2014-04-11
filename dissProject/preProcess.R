@@ -1629,9 +1629,6 @@ analyzePostResTbl <- function(postResTbl, predictors, bestFitName) {
 	logregTbl = data.table(coeff=coeffs, predName=names(coeffs))
 	updateBestFitCol(postResTbl, logregTbl, bestFitName)
 	postResTbl
-	# FIXME: Move the ppv stuff into the vis code after loading the results
-	ppvTbl = getPPVTbl(postResTbl, bestFitName)
-	ppvTbl[, plot(x,y)]
 	print(summary(myLogit))
 	print(ClassLog(myLogit, postResTbl$hashtagUsedP))
 	myLogit
@@ -1801,12 +1798,40 @@ isContextRun <- function(fname) {
 	grepl(pattern = 'Context', x = fname) 
 }
 
-
+getConfigFile <- function(fname) {
+	stopifnot(isContextRun(fname))
+	dataset=''
+	model=''
+	if (grepl(pattern='ContextSji', x=fname)) model='sji'
+	if (grepl(pattern='ContextPerm', x=fname)) model='perm'
+	if (grepl(pattern='^SO', x=fname)) dataset='SO'
+	if (grepl(pattern='^T', x=fname)) dataset='T'
+	stopifnot(dataset != '')
+	stopifnot(model != '')
+	if (dataset=='T' & model=='sji') res = defaultTSjiConfig
+	if (dataset=='T' & model=='perm') res = defaultTPermConfig
+	if (dataset=='SO' & model=='sji') res = defaultSOSjiConfig
+	if (dataset=='SO' & model=='perm') res = defaultTPermConfig
+	res
+}
 
 curWS <- function() {
 	runContext20(regen='useAlreadyLoaded')
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isContextRun, list.files(path=modelVsPredDir()))))
-	modelHashtagsTbl = buildModelHashtagsTables(file_path_sans_ext(Filter(isContextRun, list.files(path=modelHashtagsDir()))))
+	modelHashtagsTbls = buildModelHashtagsTables(file_path_sans_ext(Filter(isContextRun, list.files(path=modelHashtagsDir()))))
+	modelHashtagsTbls[['TContextSji-200']]
+	names(modelHashtagsTbls)
+	lapply(names(modelHashtagsTbls), getConfigFile)
+	postResTbl = modelHashtagsTbls[['TContextPerm-200']]
+	postResTbl
+	bestFitName = 'actPriorStd_actTweetOrder_actTweetOrderless'
+	# FIXME: Move the ppv stuff into the vis code after loading the results
+
+	ppvTbl = getPPVTbl(postResTbl, bestFitName)
+	ppvTbl[, plot(x,y)]
+	ppvTbl
+	tables()
+
 	modelVsPredTbl
 	?Filter
 	sjiTblTOrderless
