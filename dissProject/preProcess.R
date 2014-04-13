@@ -1875,6 +1875,7 @@ computeActPermOrderless <- function(context, pos, config) {
 }
 
 curWS <- function() {
+	#FIXME: use d=c(.5,.7) and not just .5 for context runs
 	runContext20(regen='useAlreadyLoaded')
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isContextRun, list.files(path=modelVsPredDir()))))
 	modelHashtagsTbls = buildModelHashtagsTables(file_path_sans_ext(Filter(isContextRun, list.files(path=modelHashtagsDir()))))
