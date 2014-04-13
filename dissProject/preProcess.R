@@ -1083,7 +1083,7 @@ renameDVDirection <- function(tbl) {
 					  'best d - min d for topHashtagPostPriorStd', 'best d - max d for topHashtagPostPriorStd',
 					  'best d - min d for topHashtagPostPriorOL2', 'best d - max d for topHashtagPostPriorOL2'),
 			    newName=c('Standard - Optimized Learning', 'Standard - Standard Relaxed Across Posts', 
-				      'Best Fit - All Frequency for Standard Model', 'Best Fit - All Recency for Standard Model',
+				      'Best Fit - All Frequency for Standard Prior Model', 'Best Fit - All Recency for Standard Prior Model',
 				      'Best Fit - All Frequency for Optimized Learning Model', 'Best Fit - All Recency for Optimized Learning Model'))
 	setkey(mapTbl, DVDirection)
 	tbl[mapTbl, DVDirection := newName]
@@ -1095,7 +1095,7 @@ renameColDVName <- function(tbl) {
 	mapTbl = data.table(DVName=c('topHashtagAcrossPriorStd', 'topHashtagPostPriorStd', 'topHashtagPostPriorOL2',
 				     'topHashtagPostTitle', 'topHashtagPostBody', 'topHashtagPostTitleBody', 'topHashtagPostPriorStdTitleBody',
 				     'topHashtagPostTitleOrderless', 'topHashtagPostBodyOrderless', 'topHashtagPostTitleOrderlessBodyOrderless', 'topHashtagPostPriorStdTitleOrderlessBodyOrderless'),
-			    newName=c('Standard Model Relaxed Across Posts', 'Standard Model', 'Optimized Learning Model',
+			    newName=c('Standard Prior Model Relaxed Across Posts', 'Standard Prior Model', 'Optimized Learning Model',
 				      'Bayes only title', 'Bayes only body', 'Bayes combined title and body', 'Bayes combined full',
 				      'RP only title', 'RP only body', 'RP combined title and body', 'RP combined full'))
 	setkey(mapTbl, DVName)
