@@ -949,6 +949,10 @@ buildModelHashtagsTables <- function(outFileNames) {
 	modelHashtagsTbl
 }
 
+isContextRun <- function(fname) {
+	grepl(pattern = 'Context', x = fname) 
+}
+
 getConfigFile <- function(fname) {
 	stopifnot(isContextRun(fname))
 	dataset=''
@@ -1119,6 +1123,22 @@ plotTemporal <- function(runTbls) {
 	visCompare(runTbls$hashtagsTbl, runTbls$modelHashtagsTbl[topHashtagPostPriorStd==T], bestDTbl)
 }
 
+plotPPVTbl <- function(ppvTbl) {
+	ppvTbl = ppvTbl[!is.na(x)][!is.na(y)]
+	print(ggplot(ppvTbl, aes(x, y, colour=bestFitName, linetype=modelType)) + 
+	      geom_line() +
+	      theme(legend.position='top', legend.direction='vertical') + 
+	      guides(linetype=F)
+	      #guides(fill=guide_legend(reverse=T)) +
+	)
+}
+
+getPPVTblAll <- function(modelHashtagsTbl) {
+	bestFitNameTbl = getBestFitNames(modelHashtagsTbl)
+	ppvTbl = bestFitNameTbl[, getPPVTbl(modelHashtagsTbl, bestFitName), by=list(datasetNameRoot, datasetType, bestFitName, modelType)]
+	ppvTbl
+}
+
 analyzeTemporal <- function(modelVsPredTbl) {
 	modelVsPredTbl[, unique(datasetName)]
 	#screenTbl = modelVsPredTbl[datasetName=='SOQgt300r2'][, list(user_screen_name=wrapQuotes(sample(user_screen_name, 10))), by=list(datasetName, datasetType)]
@@ -1133,6 +1153,17 @@ analyzeTemporal <- function(modelVsPredTbl) {
 	runTbls = runPriorSO(config=modConfig(defaultSOConfig, list(accumModelHashtagsTbl=T,
 								    query=sprintf("select %s from posts where post_type_id = 1 and user_screen_name in (%s)", defaultSOCols, user_screen_names))))
 	plotTemporal(runTbls)
+}
+
+getBestFitNames <- function(modelHashtagsTbl) {
+	fname = modelHashtagsTbl[, guardAllEqualP(datasetNameRoot)[1]]
+	modelType = modelHashtagsTbl[, guardAllEqualP(modelType)[1]]
+	datasetType = modelHashtagsTbl[, guardAllEqualP(datasetType)[1]]
+	config = getConfigFile(fname)
+	runTbl = getConfig(config, 'runTbl')
+	bestFitNameTbl = data.table(datasetNameRoot=fname, modelType=modelType, datasetType=datasetType, bestFitName=runTbl[, unique(c(predName, name))])
+	modelHashtagsTbl
+	bestFitNameTbl	
 }
 
 analyzeModelVsPredTbl <- function(modelVsPredTbl) {
@@ -1834,37 +1865,6 @@ computeActPermOrderless <- function(context, pos, config) {
 		       permEnvTbl = get(getConfig(config, 'permEnvTbl'), envir=parent.frame()),
 		       permMemMat = get(getConfig(config, 'permMemMatOrderless'), envir=parent.frame()),
 		       config)
-}
-
-isContextRun <- function(fname) {
-	grepl(pattern = 'Context', x = fname) 
-}
-
-getBestFitNames <- function(modelHashtagsTbl) {
-	fname = modelHashtagsTbl[, guardAllEqualP(datasetNameRoot)[1]]
-	modelType = modelHashtagsTbl[, guardAllEqualP(modelType)[1]]
-	datasetType = modelHashtagsTbl[, guardAllEqualP(datasetType)[1]]
-	config = getConfigFile(fname)
-	runTbl = getConfig(config, 'runTbl')
-	bestFitNameTbl = data.table(datasetNameRoot=fname, modelType=modelType, datasetType=datasetType, bestFitName=runTbl[, unique(c(predName, name))])
-	modelHashtagsTbl
-	bestFitNameTbl	
-}
-
-getPPVTblAll <- function(modelHashtagsTbl) {
-	bestFitNameTbl = getBestFitNames(modelHashtagsTbl)
-	ppvTbl = bestFitNameTbl[, getPPVTbl(modelHashtagsTbl, bestFitName), by=list(datasetNameRoot, datasetType, bestFitName, modelType)]
-	ppvTbl
-}
-
-plotPPVTbl <- function(ppvTbl) {
-	ppvTbl = ppvTbl[!is.na(x)][!is.na(y)]
-	print(ggplot(ppvTbl, aes(x, y, colour=bestFitName, linetype=modelType)) + 
-	      geom_line() +
-	      theme(legend.position='top', legend.direction='vertical') + 
-	      guides(linetype=F)
-	      #guides(fill=guide_legend(reverse=T)) +
-	)
 }
 
 curWS <- function() {
