@@ -989,6 +989,7 @@ buildTables <- function(outFileNames) {
 	addDatasetType(modelVsPredTbl)
 	addDatasetGroup(modelVsPredTbl)
 	addMiscellaneous(modelVsPredTbl)
+	addModelType(modelVsPredTbl)
 	stopifnot(nrow(modelVsPredTbl[datasetType == 'unknown']) == 0)
 	modelVsPredTbl
 }
@@ -1091,10 +1092,12 @@ renameDVDirection <- function(tbl) {
 
 renameColDVName <- function(tbl) {
 	setkey(tbl, DVName)
-	mapTbl = data.table(DVName=c('topHashtagAcrossPriorStd', 'topHashtagPostPriorStd', 'topHashtagPostPriorOL2'),
-			    newName=c('Standard Model Relaxed Across Posts',
-				      'Standard Model',
-				      'Optimized Learning Model'))
+	mapTbl = data.table(DVName=c('topHashtagAcrossPriorStd', 'topHashtagPostPriorStd', 'topHashtagPostPriorOL2',
+				     'topHashtagPostTitle', 'topHashtagPostBody', 'topHashtagPostTitleBody', 'topHashtagPostPriorStdTitleBody',
+				     'topHashtagPostTitleOrderless', 'topHashtagPostBodyOrderless', 'topHashtagPostTitleOrderlessBodyOrderless', 'topHashtagPostPriorStdTitleOrderlessBodyOrderless'),
+			    newName=c('Standard Model Relaxed Across Posts', 'Standard Model', 'Optimized Learning Model',
+				      'Bayes only title', 'Bayes only body', 'Bayes combined title and body', 'Bayes combined full',
+				      'RP only title', 'RP only body', 'RP combined title and body', 'RP combined full'))
 	setkey(mapTbl, DVName)
 	tbl[mapTbl, DVName := newName]
 	tbl
@@ -1196,10 +1199,14 @@ analyzeModelVsPredTbl <- function(modelVsPredTbl) {
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostPriorOL2' & datasetName=='SOQgt500r2' & d < 1])
 }
 
-analyzeContext <- function(modelHashtagTbls) {
+analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 	ppvTbl = rbindlist(lapply(modelHashtagsTbls, getPPVTblAll))
 	plotPPVTbl(ppvTbl[datasetType=='stackoverflow' & grepl('200$', datasetNameRoot)])
 	plotPPVTbl(ppvTbl[datasetType=='twitter' & grepl('200$', datasetNameRoot)])
+	tbl = modelVsPredTbl[predUsedBest == T][grepl('200$', datasetName)][grepl('^topHashtagPost', DVName)]
+	compareMeanDV(tbl[datasetType == 'stackoverflow'], acc)
+	compareMeanDV(tbl[datasetType == 'twitter'], acc)
+
 }
 
 getNcoocTbl <- function(type, chunkTableQuery, config) {
