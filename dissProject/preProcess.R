@@ -926,6 +926,11 @@ addDatasetGroup <- function(modelVsPredTbl) {
 	modelVsPredTbl[grepl('^SOContext', datasetName), datasetGroup := 'sampleAcross']
 }
 
+addModelType <- function(modelVsPredTbl) {
+	modelVsPredTbl[, modelType := 'unknown']
+	modelVsPredTbl[grepl('ContextSji', datasetName), modelType := 'sji']
+	modelVsPredTbl[grepl('ContextPerm', datasetName), modelType := 'perm']
+}
 buildModelHashtagsTables <- function(outFileNames) {
 	buildTable <- function(outFileName) {
 		tbl = myReadCSV(getModelHashtagsOutFile(outFileName))
@@ -938,6 +943,7 @@ buildModelHashtagsTables <- function(outFileNames) {
 		addDatasetNameRoot(tbl)
 		addDatasetType(tbl) 
 		addDatasetGroup(tbl)
+		addModelType(tbl)
 	}
 	names(modelHashtagsTbl) = outFileNames
 	modelHashtagsTbl
@@ -1157,6 +1163,12 @@ analyzeModelVsPredTbl <- function(modelVsPredTbl) {
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostPriorStd' & datasetName=='SOQgt500r2'])
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostPriorOL2' & datasetName=='TFollowgt10Mr2' & d < 1])
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostPriorOL2' & datasetName=='SOQgt500r2' & d < 1])
+}
+
+analyzeContext <- function(modelHashtagTbls) {
+	ppvTbl = rbindlist(lapply(modelHashtagsTbls, getPPVTblAll))
+	plotPPVTbl(ppvTbl[datasetType=='stackoverflow' & grepl('200$', datasetNameRoot)])
+	plotPPVTbl(ppvTbl[datasetType=='twitter' & grepl('200$', datasetNameRoot)])
 }
 
 getNcoocTbl <- function(type, chunkTableQuery, config) {
@@ -1830,16 +1842,29 @@ isContextRun <- function(fname) {
 
 getBestFitNames <- function(modelHashtagsTbl) {
 	fname = modelHashtagsTbl[, guardAllEqualP(datasetNameRoot)[1]]
+	modelType = modelHashtagsTbl[, guardAllEqualP(modelType)[1]]
+	datasetType = modelHashtagsTbl[, guardAllEqualP(datasetType)[1]]
 	config = getConfigFile(fname)
 	runTbl = getConfig(config, 'runTbl')
-	bestFitNameTbl = data.table(datasetNameRoot=fname, bestFitName=runTbl[, unique(c(predName, name))])
+	bestFitNameTbl = data.table(datasetNameRoot=fname, modelType=modelType, datasetType=datasetType, bestFitName=runTbl[, unique(c(predName, name))])
+	modelHashtagsTbl
 	bestFitNameTbl	
 }
 
 getPPVTblAll <- function(modelHashtagsTbl) {
 	bestFitNameTbl = getBestFitNames(modelHashtagsTbl)
-	ppvTbl = bestFitNameTbl[, getPPVTbl(modelHashtagsTbls[[datasetNameRoot]], bestFitName), by=list(datasetNameRoot, bestFitName)]
+	ppvTbl = bestFitNameTbl[, getPPVTbl(modelHashtagsTbl, bestFitName), by=list(datasetNameRoot, datasetType, bestFitName, modelType)]
 	ppvTbl
+}
+
+plotPPVTbl <- function(ppvTbl) {
+	ppvTbl = ppvTbl[!is.na(x)][!is.na(y)]
+	print(ggplot(ppvTbl, aes(x, y, colour=bestFitName, linetype=modelType)) + 
+	      geom_line() +
+	      theme(legend.position='top', legend.direction='vertical') + 
+	      guides(linetype=F)
+	      #guides(fill=guide_legend(reverse=T)) +
+	)
 }
 
 curWS <- function() {
@@ -1847,20 +1872,6 @@ curWS <- function() {
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isContextRun, list.files(path=modelVsPredDir()))))
 	modelHashtagsTbls = buildModelHashtagsTables(file_path_sans_ext(Filter(isContextRun, list.files(path=modelHashtagsDir()))))
 	modelHashtagsTbls[['TContextSji-200']]
-	ppvTbl = rbindlist(lapply(modelHashtagsTbls, getPPVTblAll))
-	ppvTbl
-	postResTbl = modelHashtagsTbls[['TContextPerm-200']]
-	postResTbl
-	bestFitName = 'actPriorStd_actTweetOrder_actTweetOrderless'
-	# FIXME: Move the ppv stuff into the vis code after loading the results
-
-	ppvTbl = getPPVTbl(postResTbl, bestFitName)
-	ppvTbl[, plot(x,y)]
-	ppvTbl
-	tables()
-
-	modelVsPredTbl
-	?Filter
 	sjiTblTOrderless
 	priorTblGlobT[, N:=.N, by=hashtag][, N := N/nrow(.SD)]
 	priorTblGlobT[, N:=NULL]
