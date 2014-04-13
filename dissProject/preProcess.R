@@ -20,6 +20,7 @@ library(QuantPsyc)
 library(Hmisc)
 library(dplyr)
 library(ggplot2)
+library(magrittr)
 library(sqldf)
 library(data.table)
 library(reshape2)
@@ -898,6 +899,33 @@ runSOQgt200r2 <- makeSORunr4(200, 'SOQgt200r2')
 runSOQgt100r2 <- makeSORunr4(100, 'SOQgt100r2')
 runSOQgt050r2 <- makeSORunr4(050, 'SOQgt050r2')
 
+addRunNum <- function(modelVsPredTbl) {
+	modelVsPredTbl
+	modelVsPredTbl[, runNum := 1]
+	modelVsPredTbl[grepl('r[0-9]$', datasetName), runNum := as.numeric(substr(datasetName, nchar(datasetName), nchar(datasetName)))]
+}
+
+addDatasetNameRoot <- function(modelVsPredTbl) {
+	modelVsPredTbl[, datasetNameRoot := datasetName]
+	modelVsPredTbl[grepl('r[0-9]$', datasetName), datasetNameRoot := substr(datasetName, 1, nchar(datasetName)-2)] 
+}
+
+addDatasetType <- function(modelVsPredTbl) {
+	modelVsPredTbl[, datasetType := 'unknown']
+	modelVsPredTbl[grepl('^SO', datasetName), datasetType := 'stackoverflow']
+	modelVsPredTbl[grepl('^T', datasetName), datasetType := 'twitter']
+}
+
+addDatasetGroup <- function(modelVsPredTbl) {
+	modelVsPredTbl[, datasetGroup := 'unknown']
+	modelVsPredTbl[grepl('^SOQ', datasetName), datasetGroup := 'topQuestions']
+	modelVsPredTbl[grepl('^SOg', datasetName), datasetGroup := 'topReputation']
+	modelVsPredTbl[grepl('^TT', datasetName), datasetGroup := 'topTweets']
+	modelVsPredTbl[grepl('^TF', datasetName), datasetGroup := 'topFollowers']
+	modelVsPredTbl[grepl('^TContext', datasetName), datasetGroup := 'topHashtags']
+	modelVsPredTbl[grepl('^SOContext', datasetName), datasetGroup := 'sampleAcross']
+}
+
 buildModelHashtagsTables <- function(outFileNames) {
 	buildTable <- function(outFileName) {
 		tbl = myReadCSV(getModelHashtagsOutFile(outFileName))
@@ -905,10 +933,32 @@ buildModelHashtagsTables <- function(outFileNames) {
 		tbl
 	}
 	modelHashtagsTbl = lapply(outFileNames, buildTable)
+	for (tbl in modelHashtagsTbl) {
+		addRunNum(tbl)
+		addDatasetNameRoot(tbl)
+		addDatasetType(tbl) 
+		addDatasetGroup(tbl)
+	}
 	names(modelHashtagsTbl) = outFileNames
 	modelHashtagsTbl
 }
 
+getConfigFile <- function(fname) {
+	stopifnot(isContextRun(fname))
+	dataset=''
+	model=''
+	if (grepl(pattern='ContextSji', x=fname)) model='sji'
+	if (grepl(pattern='ContextPerm', x=fname)) model='perm'
+	if (grepl(pattern='^SO', x=fname)) dataset='SO'
+	if (grepl(pattern='^T', x=fname)) dataset='T'
+	stopifnot(dataset != '')
+	stopifnot(model != '')
+	if (dataset=='T' & model=='sji') res = defaultTSjiConfig
+	if (dataset=='T' & model=='perm') res = defaultTPermConfig
+	if (dataset=='SO' & model=='sji') res = defaultSOSjiConfig
+	if (dataset=='SO' & model=='perm') res = defaultSOPermConfig
+	res
+}
 
 buildTables <- function(outFileNames) {
 	buildTable <- function(outFileName) {
@@ -916,28 +966,6 @@ buildTables <- function(outFileNames) {
 		tbl = myReadCSV(getModelVsPredOutFile(outFileName), colClasses=colClasses)
 		tbl[, datasetName := outFileName]
 		tbl
-	}
-	addRunNum <- function(modelVsPredTbl) {
-		modelVsPredTbl[, runNum := 1]
-		modelVsPredTbl[grepl('r[0-9]$', datasetName), runNum := as.numeric(substr(datasetName, nchar(datasetName), nchar(datasetName)))]
-	}
-	addDatasetNameRoot <- function(modelVsPredTbl) {
-		modelVsPredTbl[, datasetNameRoot := datasetName]
-		modelVsPredTbl[grepl('r[0-9]$', datasetName), datasetNameRoot := substr(datasetName, 1, nchar(datasetName)-2)] 
-	}
-	addDatasetType <- function(modelVsPredTbl) {
-		modelVsPredTbl[, datasetType := 'unknown']
-		modelVsPredTbl[grepl('^SO', datasetName), datasetType := 'stackoverflow']
-		modelVsPredTbl[grepl('^T', datasetName), datasetType := 'twitter']
-	}
-	addDatasetGroup <- function(modelVsPredTbl) {
-		modelVsPredTbl[, datasetGroup := 'unknown']
-		modelVsPredTbl[grepl('^SOQ', datasetName), datasetGroup := 'topQuestions']
-		modelVsPredTbl[grepl('^SOg', datasetName), datasetGroup := 'topReputation']
-		modelVsPredTbl[grepl('^TT', datasetName), datasetGroup := 'topTweets']
-		modelVsPredTbl[grepl('^TF', datasetName), datasetGroup := 'topFollowers']
-		modelVsPredTbl[grepl('^TContext', datasetName), datasetGroup := 'topHashtags']
-		modelVsPredTbl[grepl('^SOContext', datasetName), datasetGroup := 'sampleAcross']
 	}
 	addMiscellaneous <- function(modelVsPredTbl) {
 		modelVsPredTbl[, predUsedBest := F]
@@ -1605,6 +1633,8 @@ updateBestFitCol <- function(postResTbl, logregTbl, bestFitName) {
 }
 
 getPPVTbl = function(tbl, bestFitName) {
+	tbl
+	bestFitName
 	pred = prediction(tbl[[bestFitName]], tbl[, hashtagUsedP])
 	perf = performance(pred, "tpr", "fpr")
 	fp = unlist(perf@x.values)*sum(!tbl$hashtagUsedP)
@@ -1798,21 +1828,18 @@ isContextRun <- function(fname) {
 	grepl(pattern = 'Context', x = fname) 
 }
 
-getConfigFile <- function(fname) {
-	stopifnot(isContextRun(fname))
-	dataset=''
-	model=''
-	if (grepl(pattern='ContextSji', x=fname)) model='sji'
-	if (grepl(pattern='ContextPerm', x=fname)) model='perm'
-	if (grepl(pattern='^SO', x=fname)) dataset='SO'
-	if (grepl(pattern='^T', x=fname)) dataset='T'
-	stopifnot(dataset != '')
-	stopifnot(model != '')
-	if (dataset=='T' & model=='sji') res = defaultTSjiConfig
-	if (dataset=='T' & model=='perm') res = defaultTPermConfig
-	if (dataset=='SO' & model=='sji') res = defaultSOSjiConfig
-	if (dataset=='SO' & model=='perm') res = defaultTPermConfig
-	res
+getBestFitNames <- function(modelHashtagsTbl) {
+	fname = modelHashtagsTbl[, guardAllEqualP(datasetNameRoot)[1]]
+	config = getConfigFile(fname)
+	runTbl = getConfig(config, 'runTbl')
+	bestFitNameTbl = data.table(datasetNameRoot=fname, bestFitName=runTbl[, unique(c(predName, name))])
+	bestFitNameTbl	
+}
+
+getPPVTblAll <- function(modelHashtagsTbl) {
+	bestFitNameTbl = getBestFitNames(modelHashtagsTbl)
+	ppvTbl = bestFitNameTbl[, getPPVTbl(modelHashtagsTbls[[datasetNameRoot]], bestFitName), by=list(datasetNameRoot, bestFitName)]
+	ppvTbl
 }
 
 curWS <- function() {
@@ -1820,8 +1847,8 @@ curWS <- function() {
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isContextRun, list.files(path=modelVsPredDir()))))
 	modelHashtagsTbls = buildModelHashtagsTables(file_path_sans_ext(Filter(isContextRun, list.files(path=modelHashtagsDir()))))
 	modelHashtagsTbls[['TContextSji-200']]
-	names(modelHashtagsTbls)
-	lapply(names(modelHashtagsTbls), getConfigFile)
+	ppvTbl = rbindlist(lapply(modelHashtagsTbls, getPPVTblAll))
+	ppvTbl
 	postResTbl = modelHashtagsTbls[['TContextPerm-200']]
 	postResTbl
 	bestFitName = 'actPriorStd_actTweetOrder_actTweetOrderless'
