@@ -1103,10 +1103,14 @@ renameColDVName <- function(tbl) {
 	setkey(tbl, DVName)
 	mapTbl = data.table(DVName=c('topHashtagAcrossPriorStd', 'topHashtagPostPriorStd', 'topHashtagPostPriorOL2',
 				     'topHashtagPostTitle', 'topHashtagPostBody', 'topHashtagPostTitleBody', 'topHashtagPostPriorStdTitleBody',
-				     'topHashtagPostTitleOrderless', 'topHashtagPostBodyOrderless', 'topHashtagPostTitleOrderlessBodyOrderless', 'topHashtagPostPriorStdTitleOrderlessBodyOrderless'),
+				     'topHashtagPostTitleOrderless', 'topHashtagPostBodyOrderless', 'topHashtagPostTitleOrderlessBodyOrderless', 'topHashtagPostPriorStdTitleOrderlessBodyOrderless',
+				     'topHashtagPostTweet', 'topHashtagPostPriorStdTweet',
+				     'topHashtagPostTweetOrderless', 'topHashtagPostTweetOrder', 'topHashtagPostTweetOrderTweetOrderless', 'topHashtagPostPriorStdTweetOrderTweetOrderless'),
 			    newName=c('Standard Prior Model Relaxed Across Posts', 'Standard Prior Model', 'Optimized Learning Model',
 				      'Bayes only title', 'Bayes only body', 'Bayes combined title and body', 'Bayes combined full',
-				      'RP only title', 'RP only body', 'RP combined title and body', 'RP combined full'))
+				      'RP only title', 'RP only body', 'RP combined title and body', 'RP combined full',
+				      'Bayes only context', 'Bayes combined full',
+				      'RP only orderless context', 'RP only order context', 'RP combined orderless and order', 'RP combined full'))
 	setkey(mapTbl, DVName)
 	tbl[mapTbl, DVName := newName]
 	tbl
@@ -1147,7 +1151,8 @@ plotPPVTbl <- function(ppvTbl) {
 
 getPPVTblAll <- function(modelHashtagsTbl) {
 	bestFitNameTbl = getBestFitNames(modelHashtagsTbl)
-	ppvTbl = bestFitNameTbl[, getPPVTbl(modelHashtagsTbl, bestFitName), by=list(datasetNameRoot, datasetType, bestFitName, modelType)]
+	bestFitNameTbl
+	ppvTbl = bestFitNameTbl[, getPPVTbl(modelHashtagsTbl, bestFitName), by=eval(colnames(bestFitNameTbl))]
 	ppvTbl
 }
 
@@ -1171,9 +1176,10 @@ getBestFitNames <- function(modelHashtagsTbl) {
 	fname = modelHashtagsTbl[, guardAllEqualP(datasetNameRoot)[1]]
 	modelType = modelHashtagsTbl[, guardAllEqualP(modelType)[1]]
 	datasetType = modelHashtagsTbl[, guardAllEqualP(datasetType)[1]]
+	runNum = modelHashtagsTbl[, guardAllEqualP(runNum)[1]]
 	config = getConfigFile(fname)
 	runTbl = getConfig(config, 'runTbl')
-	bestFitNameTbl = data.table(datasetNameRoot=fname, modelType=modelType, datasetType=datasetType, bestFitName=runTbl[, unique(c(predName, name))])
+	bestFitNameTbl = data.table(datasetNameRoot=fname, modelType=modelType, datasetType=datasetType, runNum=runNum, bestFitName=runTbl[, unique(c(predName, name))])
 	modelHashtagsTbl
 	bestFitNameTbl	
 }
@@ -1210,9 +1216,9 @@ analyzeModelVsPredTbl <- function(modelVsPredTbl) {
 
 analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 	ppvTbl = rbindlist(lapply(modelHashtagsTbls, getPPVTblAll))
-	plotPPVTbl(ppvTbl[datasetType=='stackoverflow' & grepl('-200', datasetNameRoot)])
-	plotPPVTbl(ppvTbl[datasetType=='twitter' & grepl('-200', datasetNameRoot)])
-	tbl = modelVsPredTbl[predUsedBest == T][grepl('-200', datasetName)][grepl('^topHashtagPost', DVName)]
+	plotPPVTbl(ppvTbl[datasetType=='stackoverflow' & runNum==1 & grepl('-500', datasetNameRoot)])
+	plotPPVTbl(ppvTbl[datasetType=='twitter' & runNum==1 & grepl('-500', datasetNameRoot)])
+	tbl = modelVsPredTbl[predUsedBest == T][grepl('-500', datasetName)][grepl('^topHashtagPost', DVName)]
 	tbl
 	compareMeanDV(tbl[datasetType == 'stackoverflow'], acc)
 	compareMeanDV(tbl[datasetType == 'twitter'], acc)
@@ -1798,8 +1804,9 @@ runContextWithConfig <- function(regen, samplesPerRun, numRuns=1) {
 	resTbls
 }
 
-runContext200 <- function(regen=F, numRuns=5) runContextWithConfig(regen=regen, 200, numRuns=numRuns)
 runContext20 <- function(regen=F, numRuns=1) runContextWithConfig(regen=regen, 20, numRuns=numRuns)
+runContext200 <- function(regen=F, numRuns=5) runContextWithConfig(regen=regen, 200, numRuns=numRuns)
+runContext500 <- function(regen=F, numRuns=1) runContextWithConfig(regen=regen, 500, numRuns=numRuns)
 
 createSampleInd <- function(tbl, num, config) {
 	indName = as.symbol(paste0('ind', num))
@@ -1903,10 +1910,9 @@ curWS <- function() {
 	# to both modelVsPredTbl and modelHashtagsTbl
 	#FIXME: Rename group name for first dataset
 	runContext20(regen='useAlreadyLoaded')
-	runContext200(regen='useAlreadyLoaded', numRuns=1)
+	runContext500(regen='useAlreadyLoaded', numRuns=1)
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isContextRun, list.files(path=modelVsPredDir()))))
 	modelHashtagsTbls = buildModelHashtagsTables(file_path_sans_ext(Filter(isContextRun, list.files(path=modelHashtagsDir()))))
-	modelHashtagsTbls[['TContextSji-200']]
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isPriorRun, list.files(path=modelVsPredDir()))))
 	modelVsPredTbl
 	sjiTblTOrderless
