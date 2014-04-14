@@ -684,23 +684,29 @@ makeRunTbl <- function(runs) {
 
 defaultTPermConfig = modConfig(c(defaultTConfig, defaultPermConfig,
 				 list(runTbl=makeRunTbl(list(c('actPriorStd', 'actTweetOrder', 'actTweetOrderless'),
-							     c('actTweetOrder', 'actTweetOrderless'))),
+							     c('actTweetOrder', 'actTweetOrderless'),
+							     c('actPriorStd', 'actTweetOrder'),
+							     c('actPriorStd', 'actTweetOrderless'))),
 				      permEnvTbl='permEnvTblT',
 				      permMemMatOrder='permMemMatTOrder',
 				      permMemMatOrderless='permMemMatTOrderless',
 				      computeActFromContextTbl = 'computeActPermTFromContextTbl')),
 			       list(actDVs=c('actPriorStd_actTweetOrder_actTweetOrderless', 'actPriorStd',
-					     'actTweetOrder', 'actTweetOrderless', 'actTweetOrder_actTweetOrderless')))
+					     'actTweetOrder', 'actTweetOrderless', 'actTweetOrder_actTweetOrderless',
+					     'actPriorStd_actTweetOrder', 'actPriorStd_actTweetOrderless')))
 
 defaultSOPermConfig = modConfig(c(defaultSOConfig, defaultPermConfig,
 				  list(runTbl=makeRunTbl(list(c('actPriorStd', 'actTitleOrderless', 'actBodyOrderless'),
-							      c('actTitleOrderless', 'actBodyOrderless'))),
+							      c('actTitleOrderless', 'actBodyOrderless'),
+							      c('actPriorStd', 'actTitleOrderless'),
+							      c('actPriorStd', 'actBodyOrderless'))),
 				       permEnvTbl='permEnvTblSO',
 				       permMemMatOrder='',
 				       permMemMatOrderless='permMemMatSOOrderless',
 				       computeActFromContextTbl = 'computeActPermSOFromContextTbl')),
 				list(actDVs=c('actPriorStd_actTitleOrderless_actBodyOrderless', 'actPriorStd',
-					      'actTitleOrderless', 'actBodyOrderless', 'actTitleOrderless_actBodyOrderless')))
+					      'actTitleOrderless', 'actBodyOrderless', 'actTitleOrderless_actBodyOrderless',
+					      'actPriorStd_actTitleOrderless', 'actPriorStd_actBodyOrderless')))
 
 defaultTSjiConfig = modConfig(c(defaultTConfig, defaultSjiConfig,
 				list(runTbl=makeRunTbl(list(c('actPriorStd', 'actTweet'))))),
