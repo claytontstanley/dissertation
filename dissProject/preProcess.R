@@ -130,6 +130,11 @@ myReadCSV <- function(file, ...) {
 	setDT(read.csv(file, stringsAsFactors=F, ...))
 }
 
+myFread <- function(file, ...) {
+	myLog(sprintf('Using fread to read results from file "%s"', file))
+	fread(file, ...)
+}
+
 myWriteCSV <- function(data, file, ...) {
 	myLog(sprintf('Writing results to "%s"', file))
 	write.csv(data, file=file, row.names=F, ...)
@@ -933,7 +938,7 @@ addModelType <- function(modelVsPredTbl) {
 }
 buildModelHashtagsTables <- function(outFileNames) {
 	buildTable <- function(outFileName) {
-		tbl = myReadCSV(getModelHashtagsOutFile(outFileName))
+		tbl = myFread(getModelHashtagsOutFile(outFileName))
 		tbl[, datasetName := outFileName]
 		tbl
 	}
@@ -951,6 +956,10 @@ buildModelHashtagsTables <- function(outFileNames) {
 
 isContextRun <- function(fname) {
 	grepl(pattern = 'Context', x = fname) 
+}
+
+isPriorRun <- function(fname) {
+	grepl('^(SOg)|(SOQ)|(TTweets)|(TFollow)', fname, perl = T)
 }
 
 getConfigFile <- function(fname) {
@@ -1201,9 +1210,10 @@ analyzeModelVsPredTbl <- function(modelVsPredTbl) {
 
 analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 	ppvTbl = rbindlist(lapply(modelHashtagsTbls, getPPVTblAll))
-	plotPPVTbl(ppvTbl[datasetType=='stackoverflow' & grepl('200$', datasetNameRoot)])
-	plotPPVTbl(ppvTbl[datasetType=='twitter' & grepl('200$', datasetNameRoot)])
-	tbl = modelVsPredTbl[predUsedBest == T][grepl('200$', datasetName)][grepl('^topHashtagPost', DVName)]
+	plotPPVTbl(ppvTbl[datasetType=='stackoverflow' & grepl('-200', datasetNameRoot)])
+	plotPPVTbl(ppvTbl[datasetType=='twitter' & grepl('-200', datasetNameRoot)])
+	tbl = modelVsPredTbl[predUsedBest == T][grepl('-200', datasetName)][grepl('^topHashtagPost', DVName)]
+	tbl
 	compareMeanDV(tbl[datasetType == 'stackoverflow'], acc)
 	compareMeanDV(tbl[datasetType == 'twitter'], acc)
 
@@ -1606,12 +1616,17 @@ getPostResTbl <- function(tokenTbl, config) {
 	priorTbl[, user_screen_name := tokenTbl$user_screen_name[1]]
 	priorTbl[, dt := tokenTbl[, dt[1]]]
 	priorTbl[, d := dStd]
-	sjiTbl = get(getConfig(config, 'computeActFromContextTbl'))(contextTbl, config)
+	if (nrow(contextTbl) > 0) {
+		sjiTbl = get(getConfig(config, 'computeActFromContextTbl'))(contextTbl, config)
+	} else {
+		sjiTbl = data.table() 
+	}
 	if (nrow(sjiTbl) > 0) {
 		sjiTblWide = dcast.data.table(sjiTbl, hashtag ~ type, value.var='act')
 	} else {
 		sjiTblWide = copy(sjiTbl)
 		lapply(getContextPredNames(config), function(x) sjiTblWide[[x]] <<- double(0))
+		lapply('hashtag', function(x) sjiTblWide[[x]] <<- character())
 		sjiTblWide[, act := NULL][, type := NULL]
 	}
 	setkey(sjiTblWide, hashtag)
@@ -1727,27 +1742,37 @@ getFullPostResTbl <- function(tokenTbl, config) {
 	postResTbl
 }
 
-runContext <- function(config, numSamples) {
-	startId = 3000001
-	endId = startId + numSamples - 1
-	tokenTbl = get(getConfig(config, 'getTokenizedFromSubsetFun'))(startId, endId, config)
-	postResTbl = getFullPostResTbl(tokenTbl, config)
-	runTbl = getConfig(config, 'runTbl')
-	postResTbl
-	runTbl
-	logregTbl = runTbl[, analyzePostResTbl(postResTbl, predName, name[1]), by=name]
-	logregTbl
-	hashtagsTbl = getHashtagsTblFromSubsetTbl(tokenTbl, config)
-	postResTbl
-	addMetrics(hashtagsTbl, postResTbl, config)
-	hashtagsTbl
-	modelVsPredTbl = getModelVsPredTbl(postResTbl, hashtagsTbl, config)	
-	outFile = getConfig(config, "modelVsPredOutFile")
-	writeModelVsPredTbl(modelVsPredTbl, outFile)
-	outFile = getConfig(config, 'modelHashtagsOutFile')
-	postResTbl
-	writeModelHashtagsTbl(postResTbl, outFile)
-	list(modelVsPredTbl=modelVsPredTbl, modelHashtagsTbl=postResTbl, hashtagsTbl=hashtagsTbl, logregTbl=logregTbl)
+runContext <- function(config, samplesPerRun, numRuns) {
+	runSubset <- function(startId, endId, runNum) {
+		tokenTbl = get(getConfig(config, 'getTokenizedFromSubsetFun'))(startId, endId, config)
+		config
+		postResTbl = getFullPostResTbl(tokenTbl, config)
+		runTbl = getConfig(config, 'runTbl')
+		postResTbl
+		runTbl
+		logregTbl = runTbl[, analyzePostResTbl(postResTbl, predName, name[1]), by=name]
+		logregTbl
+		hashtagsTbl = getHashtagsTblFromSubsetTbl(tokenTbl, config)
+		addMetrics(hashtagsTbl, postResTbl, config)
+		hashtagsTbl
+		modelVsPredTbl = getModelVsPredTbl(postResTbl, hashtagsTbl, config)
+		modelVsPredTbl
+		groupName='g1' #FIXME: Will need to be fixed when running all sampled datasets for Twitter
+		outFile = getConfig(config, "modelVsPredOutFile")
+		outFile = gsub('.csv$', sprintf('%sr%s%s', groupName, runNum, '.csv'), outFile)
+		writeModelVsPredTbl(modelVsPredTbl, outFile)
+		outFile = getConfig(config, 'modelHashtagsOutFile')
+		outFile = gsub('.csv$', sprintf('%sr%s%s', groupName, runNum, '.csv'), outFile)
+		postResTbl
+		writeModelHashtagsTbl(postResTbl, outFile)
+		list(modelVsPredTbl=modelVsPredTbl, modelHashtagsTbl=postResTbl, hashtagsTbl=hashtagsTbl, logregTbl=logregTbl)
+	}
+	endId = 3000000
+	for (runNum in seq(numRuns)) {
+		startId = endId + 1
+		endId = startId + samplesPerRun - 1
+		runSubset(startId, endId, runNum)
+	}
 }
 
 getCurWorkspaceBy <- function(regen) {
@@ -1759,22 +1784,22 @@ getCurWorkspaceBy <- function(regen) {
 	}
 }
 
-runContextWithConfig <- function(regen, numSamples) {
+runContextWithConfig <- function(regen, samplesPerRun, numRuns=1) {
 	getCurWorkspaceBy(regen)
-	addNumSamples = function(str) sprintf('%s-%s', str, numSamples)
+	addNumSamples = function(str) sprintf('%s-%s', str, samplesPerRun)
 	getConfigMods <- function(name) {
 		list(modelVsPredOutFile=getModelVsPredOutFile(addNumSamples(name)),
 		     modelHashtagsOutFile=getModelHashtagsOutFile(addNumSamples(name)))
 	}
-	resTbls = runContext(modConfig(defaultTSjiConfig, getConfigMods('TContextSji')), numSamples)
-	resTbls = runContext(modConfig(defaultSOSjiConfig, getConfigMods('SOContextSji')), numSamples)
-	resTbls = runContext(modConfig(defaultTPermConfig, getConfigMods('TContextPerm')), numSamples)
-	resTbls = runContext(modConfig(defaultSOPermConfig, getConfigMods('SOContextPerm')), numSamples)
+	resTbls = runContext(modConfig(defaultTSjiConfig, getConfigMods('TContextSji')), samplesPerRun, numRuns)
+	resTbls = runContext(modConfig(defaultSOSjiConfig, getConfigMods('SOContextSji')), samplesPerRun, numRuns)
+	resTbls = runContext(modConfig(defaultTPermConfig, getConfigMods('TContextPerm')), samplesPerRun, numRuns)
+	resTbls = runContext(modConfig(defaultSOPermConfig, getConfigMods('SOContextPerm')), samplesPerRun, numRuns)
 	resTbls
 }
 
-runContext200 <- function() runContextWithConfig(regen=F, 200)
-runContext20 <- function(regen=F) runContextWithConfig(regen=regen, 20)
+runContext200 <- function(regen=F, numRuns=5) runContextWithConfig(regen=regen, 200, numRuns=numRuns)
+runContext20 <- function(regen=F, numRuns=1) runContextWithConfig(regen=regen, 20, numRuns=numRuns)
 
 createSampleInd <- function(tbl, num, config) {
 	indName = as.symbol(paste0('ind', num))
@@ -1845,7 +1870,6 @@ computeActPerm <- function(context, pos, permEnvTbl, permMemMat, config) {
 	permEnvTbl
 	permMemMat
 	contextTbl = data.table(context=context, posFromTag=pos, hashtag='context', partialN=1, key='context')
-	contextTbl
 	contextMemMat = makeMemMat(contextTbl, permEnvTbl, config)
 	contextMemVect = rowSums(contextMemMat) 
 	if (sd(contextMemVect) == 0) {
@@ -1877,12 +1901,14 @@ computeActPermOrderless <- function(context, pos, config) {
 curWS <- function() {
 	#FIXME: use d=c(.5,.7) and not just .5 for context runs. Will change results, but should only append values
 	# to both modelVsPredTbl and modelHashtagsTbl
-	#FIXME: Rename files to appropriate names for [1] adding additional runs for that file, and [2] supporting multiple datasets. Rerun base.
-	#FIXME: Run all runs and datasets.
+	#FIXME: Rename group name for first dataset
 	runContext20(regen='useAlreadyLoaded')
+	runContext200(regen='useAlreadyLoaded', numRuns=1)
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isContextRun, list.files(path=modelVsPredDir()))))
 	modelHashtagsTbls = buildModelHashtagsTables(file_path_sans_ext(Filter(isContextRun, list.files(path=modelHashtagsDir()))))
 	modelHashtagsTbls[['TContextSji-200']]
+	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isPriorRun, list.files(path=modelVsPredDir()))))
+	modelVsPredTbl
 	sjiTblTOrderless
 	priorTblGlobT[, N:=.N, by=hashtag][, N := N/nrow(.SD)]
 	priorTblGlobT[, N:=NULL]
