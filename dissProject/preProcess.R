@@ -1631,14 +1631,14 @@ getPostResTbl <- function(tokenTbl, config) {
 	if (nrow(contextTbl) > 0) {
 		sjiTbl = get(getConfig(config, 'computeActFromContextTbl'))(contextTbl, config)
 	} else {
-		sjiTbl = data.table() 
+		sjiTbl = data.table(act=double(0)) # Need to add a column b/c more 0-row columns can only be added to a DT with at least one col.
 	}
 	if (nrow(sjiTbl) > 0) {
 		sjiTblWide = dcast.data.table(sjiTbl, hashtag ~ type, value.var='act')
 	} else {
 		sjiTblWide = copy(sjiTbl)
-		lapply(getContextPredNames(config), function(x) sjiTblWide[[x]] <<- double(0))
-		lapply('hashtag', function(x) sjiTblWide[[x]] <<- character())
+		lapply(lapply(getContextPredNames(config), as.symbol), function(x) sjiTblWide[, eval(bquote(.(x) :=  double(0)))])
+		lapply(as.symbol('hashtag'), function(x) sjiTblWide[, eval(bquote(.(x) := character()))])
 		sjiTblWide[, act := NULL][, type := NULL]
 	}
 	setkey(sjiTblWide, hashtag)
@@ -1944,8 +1944,6 @@ curWS <- function() {
 	withProf(myLoadImage())
 	priorTblGlobT[, .N, by=hashtag][, list(hashtag, p=N/sum(N))][order(p, decreasing=T)][1:50][, plot(1:length(p), p)]
 	priorTblUserSO[, .N, by=hashtag][, list(hashtag, p=N/sum(N))][order(p, decreasing=T)][1:50][, plot(1:length(p), p)]
-	BTbl = getPriorForUserAtEpoch(priorTblUserSO, '4653', 1390076773, c(.5, .6))
-	BTbl = getPriorForUserAtEpoch(priorTblUserSO, '4653', 1220886841, c(.5, .6))
 	BTbl
 	test_dir(sprintf("%s/%s", PATH, 'tests'), reporter='summary')
 	.ls.objects(order.by='Size')
