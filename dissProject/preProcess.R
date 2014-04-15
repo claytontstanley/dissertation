@@ -1917,7 +1917,6 @@ computeActPermOrderless <- function(context, pos, config) {
 }
 
 curWS <- function() {
-	#FIXME: Add prior and orderless and prior and order to RP context runs
 	#FIXME: Run rest of 500s
 	#FIXME: Fix speed for query
 	#FIXME: use d=c(.5,.7) and not just .5 for context runs. Will change results, but should only append values
