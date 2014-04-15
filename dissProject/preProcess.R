@@ -1111,12 +1111,16 @@ renameColDVName <- function(tbl) {
 				     'topHashtagPostTitle', 'topHashtagPostBody', 'topHashtagPostTitleBody', 'topHashtagPostPriorStdTitleBody',
 				     'topHashtagPostTitleOrderless', 'topHashtagPostBodyOrderless', 'topHashtagPostTitleOrderlessBodyOrderless', 'topHashtagPostPriorStdTitleOrderlessBodyOrderless',
 				     'topHashtagPostTweet', 'topHashtagPostPriorStdTweet',
-				     'topHashtagPostTweetOrderless', 'topHashtagPostTweetOrder', 'topHashtagPostTweetOrderTweetOrderless', 'topHashtagPostPriorStdTweetOrderTweetOrderless'),
+				     'topHashtagPostTweetOrderless', 'topHashtagPostTweetOrder', 'topHashtagPostTweetOrderTweetOrderless', 'topHashtagPostPriorStdTweetOrderTweetOrderless',
+				     'topHashtagPostPriorStdTitleOrderless', 'topHashtagPostPriorStdBodyOrderless',
+				     'topHashtagPostPriorStdTweetOrderless', 'topHashtagPostPriorStdTweetOrder'),
 			    newName=c('Standard Prior Model Relaxed Across Posts', 'Standard Prior Model', 'Optimized Learning Model',
 				      'Bayes only title', 'Bayes only body', 'Bayes combined title and body', 'Bayes combined full',
 				      'RP only title', 'RP only body', 'RP combined title and body', 'RP combined full',
 				      'Bayes only context', 'Bayes combined full',
-				      'RP only orderless context', 'RP only order context', 'RP combined orderless and order', 'RP combined full'))
+				      'RP only orderless context', 'RP only order context', 'RP combined orderless and order', 'RP combined full',
+				      'RP combined prior and title', 'RP combined prior and body',
+				      'RP combined prior and orderless', 'RP combined prior and order'))
 	setkey(mapTbl, DVName)
 	tbl[mapTbl, DVName := newName]
 	tbl
@@ -1221,10 +1225,11 @@ analyzeModelVsPredTbl <- function(modelVsPredTbl) {
 }
 
 analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
+	modelHashtagsTbls = Filter(x = modelHashtagsTbls, f = function(tbl) !grepl('-500', tbl[, datasetName[1]]))
 	ppvTbl = rbindlist(lapply(modelHashtagsTbls, getPPVTblAll))
-	plotPPVTbl(ppvTbl[datasetType=='stackoverflow' & runNum==1 & grepl('-500', datasetNameRoot)])
-	plotPPVTbl(ppvTbl[datasetType=='twitter' & runNum==1 & grepl('-500', datasetNameRoot)])
-	tbl = modelVsPredTbl[predUsedBest == T][grepl('-500', datasetName)][grepl('^topHashtagPost', DVName)]
+	plotPPVTbl(ppvTbl[datasetType=='stackoverflow' & runNum==1 & grepl('-200', datasetNameRoot)])
+	plotPPVTbl(ppvTbl[datasetType=='twitter' & runNum==1 & grepl('-200', datasetNameRoot)])
+	tbl = modelVsPredTbl[predUsedBest == T][grepl('-200', datasetName)][grepl('^topHashtagPost', DVName)]
 	tbl
 	compareMeanDV(tbl[datasetType == 'stackoverflow'], acc)
 	compareMeanDV(tbl[datasetType == 'twitter'], acc)
