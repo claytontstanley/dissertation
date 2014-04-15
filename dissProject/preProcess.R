@@ -1817,7 +1817,7 @@ runContextWithConfig <- function(regen, samplesPerRun, numRuns=1) {
 
 runContext20 <- function(regen=F, numRuns=1) runContextWithConfig(regen=regen, 20, numRuns=numRuns)
 runContext200 <- function(regen=F, numRuns=5) runContextWithConfig(regen=regen, 200, numRuns=numRuns)
-runContext500 <- function(regen=F, numRuns=1) runContextWithConfig(regen=regen, 500, numRuns=numRuns)
+runContext500 <- function(regen=F, numRuns=5) runContextWithConfig(regen=regen, 500, numRuns=numRuns)
 
 createSampleInd <- function(tbl, num, config) {
 	indName = as.symbol(paste0('ind', num))
@@ -1918,7 +1918,6 @@ computeActPermOrderless <- function(context, pos, config) {
 
 curWS <- function() {
 	#FIXME: Run rest of 500s
-	#FIXME: Fix speed for query
 	#FIXME: use d=c(.5,.7) and not just .5 for context runs. Will change results, but should only append values
 	# to both modelVsPredTbl and modelHashtagsTbl
 	#FIXME: Rename group name for first dataset
