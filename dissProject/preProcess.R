@@ -1930,11 +1930,6 @@ curWS <- function() {
 	#FIXME: use d=c(.5,.7) and not just .5 for context runs. Will change results, but should only append values
 	# to both modelVsPredTbl and modelHashtagsTbl
 	#FIXME: Rename group name for first dataset
-	fooFun2 <- function(val) {
-		if (val == 'geteeee') return(data.table(x=4,y=3))
-		if (val == 'get') return(data.table(y=3,x=4))
-	}
-	fooTbl[, fooFun2(x), by=x]
 	runContext20(regen='useAlreadyLoaded')
 	runContext500(regen='useAlreadyLoaded', numRuns=5)
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isContextRun, list.files(path=modelVsPredDir()))))
