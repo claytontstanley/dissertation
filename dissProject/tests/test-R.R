@@ -1,7 +1,7 @@
-context("All")
-
 priorLogLevel = getLogLevel()
 setLogLevel(0)
+
+context('Prior Model')
 
 test_that("testPriorActivations", {
 	  sortExpectedTbl <- function(tbl) {
@@ -60,6 +60,13 @@ test_that("testGetTokenizedTbl", {
 	  expect_equivalent(testTokenizedTbl, expectedTokenizedTbl)
 })
 
+context("Miscellaneous Unit")
+
+test_that("testAggregation", {
+	foo = data.table(a=rep(c(0,1,0,1),2), b=rep(c(T,T,F,F),2), c=c(1,1,1,1,1,1,1,1))
+	expect_equivalent(foo[, .N, by=list(b, a)][, list(a,b)], foo[, .N, by=list(a, b)][, list(a,b)])
+})
+
 test_that("testOnlyFirstT", {
 	  expect_equal(onlyFirstT(c(F,F,T,T,F,F)), c(F,F,T,F,F,F))
 	  expect_error(onlyFirstT(c(F,F)))
@@ -67,6 +74,8 @@ test_that("testOnlyFirstT", {
 	  expect_equal(onlyFirstT(c(F,F,T,F,F)), c(F,F,T,F,F))
 	  expect_error(onlyFirstT(c()))
 })
+
+context("ModelVsPred Full Runs")
 
 test_that("testModelVsPred", {
 	  expectedTbl = myReadCSV(getModelVsPredOutFile('testing1'))
@@ -97,10 +106,7 @@ test_that("testModelVsPredSO", {
 	  expect_equivalent(expectedHashtagsTbl, resTbl$hashtagsTbl)
 })
 
-test_that("testAggregation", {
-	foo = data.table(a=rep(c(0,1,0,1),2), b=rep(c(T,T,F,F),2), c=c(1,1,1,1,1,1,1,1))
-	expect_equivalent(foo[, .N, by=list(b, a)][, list(a,b)], foo[, .N, by=list(a, b)][, list(a,b)])
-})
+context('Sji Model')
 
 test_that("testAddSjiAttrs", {
 	sjiTestTbl = data.table(context=c('a','a','b','b'), hashtag=c('x','y','x','y'), partialN=c(1,2,3,4))
@@ -142,6 +148,8 @@ test_that('testGetPriorTbl', {
 	  priorTblUserSOExp[, user_screen_name := as.character(user_screen_name)]
 	  expect_equivalent(priorTblUserSO, priorTblUserSOExp)
 })
+
+context("RP Model")
 
 test_that('testMakeMemMat', {
 	config = list(permNRows=5)
@@ -193,6 +201,8 @@ test_that('testComputePermAct', {
 	  testComputePermAct('#', 1, testEnvTbl, testMemMat, testConfig, data.table(hashtag=c('a','b'), act=c(cor(c(0,1,0,-2,0), c(0,0,-1,0,0)),
 													      cor(c(0,0,-1,0,0), c(0,0,-1,0,0)))))
 })
+
+context('Context Run')
 
 test_that('testGetPostResTbl', {
 	  fooTbl = data.table(x=c('geteeee####@@@@!!!!****', 'get'))
