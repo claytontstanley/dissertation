@@ -194,4 +194,12 @@ test_that('testComputePermAct', {
 													      cor(c(0,0,-1,0,0), c(0,0,-1,0,0)))))
 })
 
+test_that('testGetPostResTbl', {
+	  fooTbl = data.table(x=c('geteeee####@@@@!!!!****', 'get'))
+	  fooTbl[, getPostResTbl(data.table(user_screen_name='allUsers', creation_epoch=1376577513,
+					    chunk=c('get', 'get', x, 'get'), type=c('title', 'title', 'body', 'tag'),
+					    user_screen_name_prior='1945104', dt=156734298),
+				 defaultSOSjiConfig, "18255072"), by=x]
+})
+
 setLogLevel(priorLogLevel)

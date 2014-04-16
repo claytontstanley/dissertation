@@ -47,12 +47,12 @@ getHashes <- function(vals, db) {
 	ret = ret[!is.na(ret)]
 	#myStopifnot(length(ret) > 0)
 	debugPrint(str_c(length(vals), "->", length(ret)))
-	return(ret)
+	ret
 }
 
 # And vice versa
 getVals <- function(hashes, db) {
-	return(names(db[match(hashes, db)]))
+	names(db[match(hashes, db)])
 }
 
 makeDB <- function(vals) {
@@ -1548,6 +1548,8 @@ addSjiAttrs <- function(sjiTbl) {
 }
 
 computeActSji <- function(contextVect, sjiTbl, config) {
+	contextVect
+	sjiTbl
 	myLog(sprintf("computing sji act for context with length %s", length(contextVect)))
 	resTbl = sjiTbl[J(contextVect), nomatch=0, allow.cartesian=T]
 	resTbl = resTbl[, {WContext = EContext/sum(EContext); list(act=sum(WContext * sji))}, keyby=hashtag]
@@ -1614,7 +1616,8 @@ getContextPredNames <- function(config) {
 	res
 }
 
-getPostResTbl <- function(tokenTbl, config) {
+getPostResTbl <- function(tokenTbl, config, id) {
+	myLog(sprintf("Getting results for id=%s", id))
 	tokenTbl
 	dStd = getConfig(config, 'dStd')
 	guardAllEqualP(tokenTbl[, creation_epoch])
@@ -1640,6 +1643,11 @@ getPostResTbl <- function(tokenTbl, config) {
 	}
 	if (nrow(sjiTbl) > 0) {
 		sjiTblWide = dcast.data.table(sjiTbl, hashtag ~ type, value.var='act')
+		for (predName in getContextPredNames(config)) {
+			if (! predName %in% colnames(sjiTblWide)) {
+				sjiTblWide[, eval(bquote( .(as.symbol(predName)) := NA_real_))]
+			}
+		}
 	} else {
 		sjiTblWide = copy(sjiTbl)
 		lapply(lapply(getContextPredNames(config), as.symbol), function(x) sjiTblWide[, eval(bquote(.(x) :=  double(0)))])
@@ -1647,6 +1655,7 @@ getPostResTbl <- function(tokenTbl, config) {
 		sjiTblWide[, act := NULL][, type := NULL]
 	}
 	setkey(sjiTblWide, hashtag)
+	setcolorder(sjiTblWide, c('hashtag', getContextPredNames(config)))
 	sjiTblWide
 	postResTbl = sjiTblWide[priorTbl]
 	postResTbl[, hashtagUsedP := F]
@@ -1755,7 +1764,7 @@ getHashtagsTblFromSubsetTbl <- function(tokenTbl, config) {
 }
 
 getFullPostResTbl <- function(tokenTbl, config) {
-	postResTbl = tokenTbl[, getPostResTbl(.SD, config), by=id]
+	postResTbl = tokenTbl[, getPostResTbl(.SD, config, id), by=id]
 	postResTbl
 }
 
@@ -1921,8 +1930,13 @@ curWS <- function() {
 	#FIXME: use d=c(.5,.7) and not just .5 for context runs. Will change results, but should only append values
 	# to both modelVsPredTbl and modelHashtagsTbl
 	#FIXME: Rename group name for first dataset
+	fooFun2 <- function(val) {
+		if (val == 'geteeee') return(data.table(x=4,y=3))
+		if (val == 'get') return(data.table(y=3,x=4))
+	}
+	fooTbl[, fooFun2(x), by=x]
 	runContext20(regen='useAlreadyLoaded')
-	runContext500(regen='useAlreadyLoaded', numRuns=1)
+	runContext500(regen='useAlreadyLoaded', numRuns=5)
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isContextRun, list.files(path=modelVsPredDir()))))
 	modelHashtagsTbls = buildModelHashtagsTables(file_path_sans_ext(Filter(isContextRun, list.files(path=modelHashtagsDir()))))
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isPriorRun, list.files(path=modelVsPredDir()))))
