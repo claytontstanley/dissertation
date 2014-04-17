@@ -1080,7 +1080,7 @@ plotBarSumTbl <- function(sumTbl, fillCol, figName, extras=NULL) {
 	sumTbl
 }
 
-compareMeanDV <- function(modelVsPredTbl, DV, extras=NULL) {
+compareMeanDV <- function(modelVsPredTbl, DV, extras=NULL, figName='') {
 	DV = substitute(DV)
 	modelVsPredTbl
 	expr = bquote(tableModelVsPredTbl(modelVsPredTbl)[, withCI(.(DV)), keyby=list(DVName, dsetGroup)])
@@ -1088,10 +1088,11 @@ compareMeanDV <- function(modelVsPredTbl, DV, extras=NULL) {
 	sumTbl = eval(expr)
 	sumTbl
 	renameColDVName(sumTbl)
-	plotBarSumTbl(sumTbl, DVName, sprintf('compareMeanDV-%s', deparse(DV)), extras=c(list(theme(legend.position='top', legend.direction='vertical', axis.title.y=element_blank()),
-											      guides(fill=guide_legend(title='Model Name', reverse=T)),
-											      coord_flip()
-											      ), extras))
+	plotBarSumTbl(sumTbl, DVName, sprintf('compareMeanDV-%s-%s', deparse(DV), figName),
+		      extras=c(list(theme(legend.position='top', legend.direction='vertical', axis.title.y=element_blank()),
+				    guides(fill=guide_legend(title='Model Name', reverse=T)),
+				    coord_flip()
+				    ), extras))
 }
 
 plotDatasetDescriptives <- function(modelVsPredTbl) {
@@ -1187,16 +1188,16 @@ plotTemporal <- function(runTbls) {
 	visCompare(runTbls$hashtagsTbl, runTbls$modelHashtagsTbl[topHashtagPostPriorStd==T], bestDTbl)
 }
 
-plotPPVTbl <- function(ppvTbl) {
+plotPPVTbl <- function(ppvTbl, figName) {
 	ppvTbl = ppvTbl[!is.na(x)][!is.na(y)]
 	ppvTbl
 	renameColDVName(ppvTbl)
-	print(ggplot(ppvTbl, aes(x, y, colour=DVName, linetype=modelType)) + 
+	myPlotPrint(ggplot(ppvTbl, aes(x, y, colour=DVName, linetype=modelType)) + 
 	      geom_line() +
 	      theme(legend.position='top', legend.direction='vertical') + 
 	      guides(linetype=F)
 	      #guides(fill=guide_legend(reverse=T)) +
-	)
+	      , figName)
 }
 
 getPPVTblAll <- function(modelHashtagsTbl) {
@@ -1271,12 +1272,12 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 	ppvTbl
 	modelHashtagsTbls
 	modelVsPredTbl
-	plotPPVTbl(ppvTbl[dsetType=='stackoverflow' & runNum==1 & dsetSize==500])
-	plotPPVTbl(ppvTbl[dsetType=='twitter' & runNum==1 & dsetSize==500] )
+	plotPPVTbl(ppvTbl[dsetType=='stackoverflow' & runNum==1 & dsetSize==500], 'contextPpvSO')
+	plotPPVTbl(ppvTbl[dsetType=='twitter' & runNum==1 & dsetSize==500], 'contextPpvT')
 	tbl = modelVsPredTbl[predUsedBest == T][dsetSize==500][grepl('^topHashtagPost', DVName)]
 	tbl
-	compareMeanDV(tbl[dsetType == 'stackoverflow'], acc)
-	compareMeanDV(tbl[dsetType == 'twitter'], acc)
+	compareMeanDV(tbl[dsetType == 'stackoverflow'], acc, figName='ContextMeanDVSO')
+	compareMeanDV(tbl[dsetType == 'twitter'], acc, figName='ContextMeanDVT')
 
 }
 
