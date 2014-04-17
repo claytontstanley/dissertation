@@ -395,11 +395,25 @@ visCompare <- function(hashtagsTbl, modelHashtagsTbl, bestDTbl) {
 }
 
 topHashtagDVFromActDV <- function(actDV) {
+	res = c(topHashtagPostDVFromActDV(actDV),
+		topHashtagAcrossDVFromActDV(actDV))
+	res
+}
+
+topHashtagAcrossDVFromActDV <- function(actDV) {
 	myStopifnot(grepl(pattern='^act', x=actDV))
 	actDV = gsub(pattern='_act', replacement='', x=actDV)
-	res = c(gsub(pattern='^act', replacement='topHashtagPost', x=actDV),
-		gsub(pattern='^act', replacement='topHashtagAcross', x=actDV))
+	res = gsub(pattern='^act', replacement='topHashtagAcross', x=actDV)
+	res
 }
+
+topHashtagPostDVFromActDV <- function(actDV) {
+	myStopifnot(grepl(pattern='^act', x=actDV))
+	actDV = gsub(pattern='_act', replacement='', x=actDV)
+	res = gsub(pattern='^act', replacement='topHashtagPost', x=actDV)
+	res
+}
+
 
 addMetrics <- function(hashtagsTbl, modelHashtagsTbl, config) {
 	actDVs = getConfig(config, 'actDVs')
@@ -1059,8 +1073,11 @@ plotBarSumTbl <- function(sumTbl, fillCol, figName, extras=NULL) {
 
 compareMeanDV <- function(modelVsPredTbl, DV, extras=NULL) {
 	DV = substitute(DV)
+	modelVsPredTbl
 	expr = bquote(tableModelVsPredTbl(modelVsPredTbl)[, withCI(.(DV)), keyby=list(DVName, datasetGroup)])
+	expr
 	sumTbl = eval(expr)
+	sumTbl
 	renameColDVName(sumTbl)
 	plotBarSumTbl(sumTbl, DVName, sprintf('compareMeanDV-%s', deparse(DV)), extras=c(list(theme(legend.position='top', legend.direction='vertical', axis.title.y=element_blank()),
 											      guides(fill=guide_legend(title='Model Name', reverse=T)),
@@ -1109,17 +1126,29 @@ renameColDVName <- function(tbl) {
 	setkey(tbl, DVName)
 	mapTbl = data.table(DVName=c('topHashtagAcrossPriorStd', 'topHashtagPostPriorStd', 'topHashtagPostPriorOL2',
 				     'topHashtagPostTitle', 'topHashtagPostBody', 'topHashtagPostTitleBody', 'topHashtagPostPriorStdTitleBody',
+				     'topHashtagAcrossTitle', 'topHashtagAcrossBody', 'topHashtagAcrossTitleBody', 'topHashtagAcrossPriorStdTitleBody',
 				     'topHashtagPostTitleOrderless', 'topHashtagPostBodyOrderless', 'topHashtagPostTitleOrderlessBodyOrderless', 'topHashtagPostPriorStdTitleOrderlessBodyOrderless',
+				     'topHashtagAcrossTitleOrderless', 'topHashtagAcrossBodyOrderless', 'topHashtagAcrossTitleOrderlessBodyOrderless', 'topHashtagAcrossPriorStdTitleOrderlessBodyOrderless',
 				     'topHashtagPostTweet', 'topHashtagPostPriorStdTweet',
+				     'topHashtagAcrossTweet', 'topHashtagAcrossPriorStdTweet',
 				     'topHashtagPostTweetOrderless', 'topHashtagPostTweetOrder', 'topHashtagPostTweetOrderTweetOrderless', 'topHashtagPostPriorStdTweetOrderTweetOrderless',
+				     'topHashtagAcrossTweetOrderless', 'topHashtagAcrossTweetOrder', 'topHashtagAcrossTweetOrderTweetOrderless', 'topHashtagAcrossPriorStdTweetOrderTweetOrderless',
 				     'topHashtagPostPriorStdTitleOrderless', 'topHashtagPostPriorStdBodyOrderless',
-				     'topHashtagPostPriorStdTweetOrderless', 'topHashtagPostPriorStdTweetOrder'),
+				     'topHashtagAcrossPriorStdTitleOrderless', 'topHashtagAcrossPriorStdBodyOrderless',
+				     'topHashtagPostPriorStdTweetOrderless', 'topHashtagPostPriorStdTweetOrder',
+				     'topHashtagAcrossPriorStdTweetOrderless', 'topHashtagAcrossPriorStdTweetOrder'),
 			    newName=c('Standard Prior Model Relaxed Across Posts', 'Standard Prior Model', 'Optimized Learning Model',
 				      'Bayes only title', 'Bayes only body', 'Bayes combined title and body', 'Bayes combined full',
+				      'Bayes only title', 'Bayes only body', 'Bayes combined title and body', 'Bayes combined full',
+				      'RP only title', 'RP only body', 'RP combined title and body', 'RP combined full',
 				      'RP only title', 'RP only body', 'RP combined title and body', 'RP combined full',
 				      'Bayes only context', 'Bayes combined full',
+				      'Bayes only context', 'Bayes combined full',
+				      'RP only orderless context', 'RP only order context', 'RP combined orderless and order', 'RP combined full',
 				      'RP only orderless context', 'RP only order context', 'RP combined orderless and order', 'RP combined full',
 				      'RP combined prior and title', 'RP combined prior and body',
+				      'RP combined prior and title', 'RP combined prior and body',
+				      'RP combined prior and orderless', 'RP combined prior and order',
 				      'RP combined prior and orderless', 'RP combined prior and order'))
 	setkey(mapTbl, DVName)
 	tbl[mapTbl, DVName := newName]
@@ -1151,7 +1180,9 @@ plotTemporal <- function(runTbls) {
 
 plotPPVTbl <- function(ppvTbl) {
 	ppvTbl = ppvTbl[!is.na(x)][!is.na(y)]
-	print(ggplot(ppvTbl, aes(x, y, colour=bestFitName, linetype=modelType)) + 
+	ppvTbl
+	renameColDVName(ppvTbl)
+	print(ggplot(ppvTbl, aes(x, y, colour=DVName, linetype=modelType)) + 
 	      geom_line() +
 	      theme(legend.position='top', legend.direction='vertical') + 
 	      guides(linetype=F)
@@ -1162,7 +1193,8 @@ plotPPVTbl <- function(ppvTbl) {
 getPPVTblAll <- function(modelHashtagsTbl) {
 	bestFitNameTbl = getBestFitNames(modelHashtagsTbl)
 	bestFitNameTbl
-	ppvTbl = bestFitNameTbl[, getPPVTbl(modelHashtagsTbl, bestFitName), by=eval(colnames(bestFitNameTbl))]
+	ppvTbl = bestFitNameTbl[, getPPVTbl(modelHashtagsTbl, DVName), by=eval(colnames(bestFitNameTbl))]
+	ppvTbl[, DVName := topHashtagAcrossDVFromActDV(DVName)]  
 	ppvTbl
 }
 
@@ -1189,9 +1221,9 @@ getBestFitNames <- function(modelHashtagsTbl) {
 	runNum = modelHashtagsTbl[, guardAllEqualP(runNum)[1]]
 	config = getConfigFile(fname)
 	runTbl = getConfig(config, 'runTbl')
-	bestFitNameTbl = data.table(datasetNameRoot=fname, modelType=modelType, datasetType=datasetType, runNum=runNum, bestFitName=runTbl[, unique(c(predName, name))])
+	bestFitNameTbl = data.table(datasetNameRoot=fname, modelType=modelType, datasetType=datasetType, runNum=runNum, DVName=runTbl[, unique(c(predName, name))])
 	modelHashtagsTbl
-	bestFitNameTbl	
+	bestFitNameTbl
 }
 
 analyzeModelVsPredTbl <- function(modelVsPredTbl) {
@@ -1225,11 +1257,14 @@ analyzeModelVsPredTbl <- function(modelVsPredTbl) {
 }
 
 analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
-	modelHashtagsTbls = Filter(x = modelHashtagsTbls, f = function(tbl) !grepl('-500', tbl[, datasetName[1]]))
+	#modelHashtagsTbls = Filter(x = modelHashtagsTbls, f = function(tbl) !grepl('-500', tbl[, datasetName[1]]))
 	ppvTbl = rbindlist(lapply(modelHashtagsTbls, getPPVTblAll))
-	plotPPVTbl(ppvTbl[datasetType=='stackoverflow' & runNum==1 & grepl('-200', datasetNameRoot)])
-	plotPPVTbl(ppvTbl[datasetType=='twitter' & runNum==1 & grepl('-200', datasetNameRoot)])
-	tbl = modelVsPredTbl[predUsedBest == T][grepl('-200', datasetName)][grepl('^topHashtagPost', DVName)]
+	ppvTbl
+	modelHashtagsTbls
+	modelVsPredTbl
+	plotPPVTbl(ppvTbl[datasetType=='stackoverflow' & runNum==1 & grepl('-500', datasetNameRoot)])
+	plotPPVTbl(ppvTbl[datasetType=='twitter' & runNum==1 & grepl('-500', datasetNameRoot)])
+	tbl = modelVsPredTbl[predUsedBest == T][grepl('-500', datasetName)][grepl('^topHashtagPost', DVName)]
 	tbl
 	compareMeanDV(tbl[datasetType == 'stackoverflow'], acc)
 	compareMeanDV(tbl[datasetType == 'twitter'], acc)

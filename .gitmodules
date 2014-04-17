@@ -1,6 +1,6 @@
 [submodule "submodules/dissertationData"]
 	path = submodules/dissertationData
-	url = ssh://raid@raid/srv/git/dissertationData
+	url = ssh://chilLaptop/~/srv/git/dissertationData
 [submodule "submodules/so2db"]
 	path = submodules/so2db
 	url = https://github.com/tessellator/so2db.git
