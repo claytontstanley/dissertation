@@ -1224,15 +1224,14 @@ analyzeTemporal <- function(modelVsPredTbl) {
 }
 
 getBestFitNames <- function(modelHashtagsTbl) {
-	fname = modelHashtagsTbl[, guardAllEqualP(datasetNameRoot)[1]]
-	modelType = modelHashtagsTbl[, guardAllEqualP(modelType)[1]]
-	dsetType = modelHashtagsTbl[, guardAllEqualP(dsetType)[1]]
-	dsetSize = modelHashtagsTbl[, guardAllEqualP(dsetSize)[1]]
-	runNum = modelHashtagsTbl[, guardAllEqualP(runNum)[1]]
-	config = getConfigFile(fname)
-	runTbl = getConfig(config, 'runTbl')
-	bestFitNameTbl = data.table(datasetNameRoot=fname, modelType=modelType, dsetType=dsetType, dsetSize=dsetSize, runNum=runNum, actDVName=runTbl[, unique(c(predName, name))])
 	modelHashtagsTbl
+	bestFitNameTbl = modelHashtagsTbl[, list(datasetNameRoot, modelType, dsetType, dsetSize, runNum)]
+	setkeyv(bestFitNameTbl, colnames(bestFitNameTbl))
+	bestFitNameTbl = unique(bestFitNameTbl)
+	stopifnot(nrow(bestFitNameTbl) == 1)
+	config = getConfigFile(bestFitNameTbl[, datasetNameRoot])
+	runTbl = getConfig(config, 'runTbl')
+	bestFitNameTbl = do.call(data.table, c(bestFitNameTbl, list(actDVName=runTbl[, unique(c(predName, name))])))
 	bestFitNameTbl
 }
 
