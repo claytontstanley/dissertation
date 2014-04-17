@@ -1278,7 +1278,6 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 	tbl
 	compareMeanDV(tbl[dsetType == 'stackoverflow'], acc, figName='ContextMeanDVSO')
 	compareMeanDV(tbl[dsetType == 'twitter'], acc, figName='ContextMeanDVT')
-
 }
 
 getNcoocTbl <- function(type, chunkTableQuery, config) {
