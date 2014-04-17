@@ -1,6 +1,6 @@
 
 unit:
-	Rscript -e 'source("preProcess.R")' -e 'test_dir(sprintf("%s/%s", PATH, "tests"))'
+	Rscript -e 'source("preProcess.R")' -e 'myLoadImage()' -e 'test_dir(sprintf("%s/%s", PATH, "tests"))'
 
 run%:
 	Rscript -e 'source("preProcess.R")' -e 'run$*()'
