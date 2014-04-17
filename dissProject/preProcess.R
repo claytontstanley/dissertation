@@ -2001,7 +2001,6 @@ computeActPermOrderless <- function(context, pos, config) {
 curWS <- function() {
 	#FIXME: Rename group name for first dataset
 	#FIXME: Run for different size co-occurrence tables
-	#FIXME: Add additional columns for context runs to modelVsPredTbls, etc.
 	#FIXME: Get coefficient tables
 	#FIXME: Quickly rerun logreg analysis for actDV
 	runContext20(regen='useAlreadyLoaded')
