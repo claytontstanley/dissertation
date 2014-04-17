@@ -1193,8 +1193,8 @@ plotPPVTbl <- function(ppvTbl) {
 getPPVTblAll <- function(modelHashtagsTbl) {
 	bestFitNameTbl = getBestFitNames(modelHashtagsTbl)
 	bestFitNameTbl
-	ppvTbl = bestFitNameTbl[, getPPVTbl(modelHashtagsTbl, DVName), by=eval(colnames(bestFitNameTbl))]
-	ppvTbl[, DVName := topHashtagAcrossDVFromActDV(DVName)]  
+	ppvTbl = bestFitNameTbl[, getPPVTbl(modelHashtagsTbl, actDVName), by=eval(colnames(bestFitNameTbl))]
+	ppvTbl[, DVName := topHashtagAcrossDVFromActDV(actDVName)][, actDVName := NULL]
 	ppvTbl
 }
 
@@ -1221,7 +1221,7 @@ getBestFitNames <- function(modelHashtagsTbl) {
 	runNum = modelHashtagsTbl[, guardAllEqualP(runNum)[1]]
 	config = getConfigFile(fname)
 	runTbl = getConfig(config, 'runTbl')
-	bestFitNameTbl = data.table(datasetNameRoot=fname, modelType=modelType, datasetType=datasetType, runNum=runNum, DVName=runTbl[, unique(c(predName, name))])
+	bestFitNameTbl = data.table(datasetNameRoot=fname, modelType=modelType, datasetType=datasetType, runNum=runNum, actDVName=runTbl[, unique(c(predName, name))])
 	modelHashtagsTbl
 	bestFitNameTbl
 }
