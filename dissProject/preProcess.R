@@ -623,7 +623,7 @@ getConfig <- function(config, slot) {
 }
 
 defaultBaseConfig = list(ds=c(0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1.0,1.1,1.2,1.3,1.4,1.5,1.6,1.8,2,5,10,20),
-			 dStd=0.5,
+			 dStd=c(0.5,0.7),
 			 modelVsPredOutFile='/tmp/modelVsPred.csv',
 			 modelHashtagsOutFile='',
 			 actDVs = c('actPriorStd', 'actPriorOL', 'actPriorOL2'),
@@ -1616,26 +1616,7 @@ getContextPredNames <- function(config) {
 	res
 }
 
-getPostResTbl <- function(tokenTbl, config, id) {
-	myLog(sprintf("Getting results for id=%s", id))
-	tokenTbl
-	dStd = getConfig(config, 'dStd')
-	guardAllEqualP(tokenTbl[, creation_epoch])
-	guardAllEqualP(tokenTbl[, user_screen_name])
-	guardAllEqualP(tokenTbl[, user_screen_name_prior])
-	guardAllEqualP(tokenTbl[, dt])
-	myStopifnot(length(dStd) == 1)
-	contextTbl = tokenTbl[type != getConfig(config, "tagTypeName")]
-	tagTbl = tokenTbl[type == getConfig(config, "tagTypeName")]
-	setkey(tagTbl, chunk)
-	priorTbl = getPriorForUserAtEpoch(get(getConfig(config, 'priorTbl')), tokenTbl$user_screen_name_prior[1], tokenTbl$creation_epoch[1], dStd)
-	setkey(priorTbl, hashtag)
-	tempTagTbl = tagTbl[, list(hashtag=chunk)]
-	setkey(tempTagTbl, hashtag)
-	priorTbl = merge(priorTbl, unique(tempTagTbl), all=T)
-	priorTbl[, user_screen_name := tokenTbl$user_screen_name[1]]
-	priorTbl[, dt := tokenTbl[, dt[1]]]
-	priorTbl[, d := dStd]
+getSjiTblWide <- function(contextTbl, config) {
 	if (nrow(contextTbl) > 0) {
 		sjiTbl = get(getConfig(config, 'computeActFromContextTbl'))(contextTbl, config)
 	} else {
@@ -1657,6 +1638,32 @@ getPostResTbl <- function(tokenTbl, config, id) {
 	setkey(sjiTblWide, hashtag)
 	setcolorder(sjiTblWide, c('hashtag', getContextPredNames(config)))
 	sjiTblWide
+}
+
+getPostResTbl <- function(tokenTbl, config, id) {
+	myLog(sprintf("Getting results for id=%s", id))
+	tokenTbl
+	dStd = getConfig(config, 'dStd')
+	guardAllEqualP(tokenTbl[, creation_epoch])
+	guardAllEqualP(tokenTbl[, user_screen_name])
+	guardAllEqualP(tokenTbl[, user_screen_name_prior])
+	guardAllEqualP(tokenTbl[, dt])
+	contextTbl = tokenTbl[type != getConfig(config, "tagTypeName")]
+	contextTbl
+	tagTbl = tokenTbl[type == getConfig(config, "tagTypeName")]
+	tagTbl
+	setkey(tagTbl, chunk)
+	priorTbl = getPriorForUserAtEpoch(get(getConfig(config, 'priorTbl')), tokenTbl$user_screen_name_prior[1], tokenTbl$creation_epoch[1], dStd)
+	priorTbl
+	setkey(priorTbl, hashtag, d)
+	tempTagTbl = tagTbl[, list(hashtag=rep(chunk, each=length(dStd)), d=dStd)]
+	setkey(tempTagTbl, hashtag, d)
+	priorTbl = merge(priorTbl, unique(tempTagTbl), all=T)
+	priorTbl[, user_screen_name := tokenTbl$user_screen_name[1]]
+	priorTbl[, dt := tokenTbl[, dt[1]]]
+	sjiTblWide = getSjiTblWide(contextTbl, config)
+	key(priorTbl)
+	key(tagTbl)
 	postResTbl = sjiTblWide[priorTbl]
 	postResTbl[, hashtagUsedP := F]
 	postResTbl[tagTbl, hashtagUsedP := T]
@@ -1740,6 +1747,7 @@ getPPVTbl = function(tbl, bestFitName) {
 
 analyzePostResTbl <- function(postResTbl, predictors, bestFitName) {
 	setkey(postResTbl, user_screen_name, dt, hashtag, d)
+	guardAllEqualP(postResTbl[, d])
 	#postResTbl = copy(postResTbl)
 	predictors
 	postResTbl
@@ -1747,7 +1755,7 @@ analyzePostResTbl <- function(postResTbl, predictors, bestFitName) {
 	model = reformulate(termlabels = predictors, response = 'hashtagUsedP')
 	myLogit = glm(model, data=postResTbl, family=binomial(link="logit"))
 	coeffs = summary(myLogit)$coefficients[,"Estimate"]
-	logregTbl = data.table(coeff=coeffs, predName=names(coeffs))
+	logregTbl = data.table(coeff=coeffs, predName=names(coeffs), d=postResTbl[, d[1]])
 	updateBestFitCol(postResTbl, logregTbl, bestFitName)
 	postResTbl
 	print(summary(myLogit))
@@ -1768,6 +1776,25 @@ getFullPostResTbl <- function(tokenTbl, config) {
 	postResTbl
 }
 
+analyzePostResTblAcrossDs <- function(postResTbl, runTbl) {
+	analyzePostResTblForD <- function(curD) {
+		tbl = postResTbl[d == curD] 
+		tbl
+		runTbl
+		logregTbl = runTbl[, analyzePostResTbl(tbl, predName, name), by=name]
+		logregTbl
+		list(postResTbl=tbl, logregTbl=logregTbl)	
+	}
+	ds = postResTbl[, unique(d)]
+	res = lapply(ds, analyzePostResTblForD)
+	res
+	postResTbl = rbindlist(lapply(res, `[[`, "postResTbl"))
+	logregTbl = rbindlist(lapply(res, `[[`, "logregTbl"))	
+	logregTbl
+	postResTbl
+	list(postResTbl=postResTbl, logregTbl=logregTbl)
+}
+
 runContext <- function(config, samplesPerRun, numRuns) {
 	runSubset <- function(startId, endId, runNum) {
 		tokenTbl = get(getConfig(config, 'getTokenizedFromSubsetFun'))(startId, endId, config)
@@ -1776,13 +1803,15 @@ runContext <- function(config, samplesPerRun, numRuns) {
 		runTbl = getConfig(config, 'runTbl')
 		postResTbl
 		runTbl
-		logregTbl = runTbl[, analyzePostResTbl(postResTbl, predName, name[1]), by=name]
+		resTbl = analyzePostResTblAcrossDs(postResTbl, runTbl)
+		logregTbl = resTbl$logregTbl
+		postResTbl = resTbl$postResTbl
+		setkey(postResTbl, user_screen_name, dt, hashtag, d)
 		logregTbl
 		hashtagsTbl = getHashtagsTblFromSubsetTbl(tokenTbl, config)
 		addMetrics(hashtagsTbl, postResTbl, config)
 		hashtagsTbl
 		modelVsPredTbl = getModelVsPredTbl(postResTbl, hashtagsTbl, config)
-		modelVsPredTbl
 		groupName='g1' #FIXME: Will need to be fixed when running all sampled datasets for Twitter
 		outFile = getConfig(config, "modelVsPredOutFile")
 		outFile = gsub('.csv$', sprintf('%sr%s%s', groupName, runNum, '.csv'), outFile)
