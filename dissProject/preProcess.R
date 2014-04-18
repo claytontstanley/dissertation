@@ -1977,17 +1977,20 @@ makeEnvironmentSubsetTbl <- function(tbl, config) {
 	if (nrow(redoTbl) == 0) {
 		tbl
 	} else {
-		rbind(tbl[uniq == T], makeEnvironmentSubsetTbl(redoTbl[, list(EContext = EContext,chunk=chunk)], config))
+		rbind(tbl[uniq == T], makeEnvironmentSubsetTbl(redoTbl[, list(chunk=chunk)], config))
 	}
 }
 
 makeEnvironmentTbl <- function(sjiTbl, config) {
-	permEnvTbl = sjiTbl[, .N, by=list(context, EContext)][, N := NULL][, chunk := context][, context := NULL]
-	setkey(permEnvTbl, chunk)
-	stopifnot(sum(duplicated(permEnvTbl)) == 0)
+	permEnvTbl = with(sjiTbl, data.table(chunk=unique(context)))
 	permEnvTbl
+	key(sjiTbl)
 	permEnvTbl = makeEnvironmentSubsetTbl(permEnvTbl, config)
 	permEnvTbl[, uniq := NULL]
+	setkey(permEnvTbl, chunk)
+	entTbl = sjiTbl[, .N, keyby=list(context, EContext)][, N := NULL]
+	stopifnot(nrow(entTbl) == entTbl[, length(unique(context))])
+	permEnvTbl[entTbl, EContext := EContext]
 	permEnvTbl = melt(permEnvTbl,
 			  id=c('chunk', 'EContext'),
 			  measure=c('ind1', 'ind2', 'ind3', 'ind4'),
