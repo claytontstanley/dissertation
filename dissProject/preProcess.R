@@ -1999,8 +1999,8 @@ computeActPermOrderless <- function(context, pos, config) {
 }
 
 curWS <- function() {
-	#FIXME: Rename group name for first dataset
-	#FIXME: Run for different size co-occurrence tables
+	#FIXME: Stop words / entropy for RP (same run files)
+	#FIXME: Size of sji across RP and Bayesian (new run files)
 	#FIXME: Get coefficient tables
 	#FIXME: Quickly rerun logreg analysis for actDV
 	runContext20(regen='useAlreadyLoaded')
