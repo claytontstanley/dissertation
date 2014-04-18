@@ -1643,6 +1643,7 @@ computeActSjiFromContextTbl <- function(contextTbl, config) {
 }
 
 computeActPermTFromContextTbl <- function(contextTbl, config) {
+	
 	contextTbl = rbind(copy(contextTbl)[,type:=paste0('act', capitalize(type),'Order')][,fun:='computeActPermOrder'],
 			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'Orderless')][,fun:='computeActPermOrderless'])
 	contextTbl[, get(fun[1])(chunk, pos, config), by=type]
@@ -1890,11 +1891,14 @@ runContextWithConfig <- function(regen, samplesPerRun, numRuns=1) {
 		list(modelVsPredOutFile=getModelVsPredOutFile(addNumSamples(name)),
 		     modelHashtagsOutFile=getModelHashtagsOutFile(addNumSamples(name)))
 	}
-	resTbls = runContext(modConfig(defaultTSjiConfig, getConfigMods('TContextSji')), samplesPerRun, numRuns)
-	resTbls = runContext(modConfig(defaultSOSjiConfig, getConfigMods('SOContextSji')), samplesPerRun, numRuns)
-	resTbls = runContext(modConfig(defaultTPermConfig, getConfigMods('TContextPerm')), samplesPerRun, numRuns)
-	resTbls = runContext(modConfig(defaultSOPermConfig, getConfigMods('SOContextPerm')), samplesPerRun, numRuns)
-	resTbls
+	runContextFor <- function(config) {
+		runContext(config, samplesPerRun, numRuns)
+	}
+	runs = list(modConfig(defaultTSjiConfig, getConfigMods('TContextSji')),
+		    modConfig(defaultSOSjiConfig, getConfigMods('SOContextSji')),
+		    modConfig(defaultTPermConfig, getConfigMods('TContextPerm')),
+		    modConfig(defaultSOPermConfig, getConfigMods('SOContextPerm')))
+	lapply(runs, runContextFor)
 }
 
 runContext20 <- function(regen=F, numRuns=1) runContextWithConfig(regen=regen, 20, numRuns=numRuns)
