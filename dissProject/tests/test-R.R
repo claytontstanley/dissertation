@@ -152,7 +152,7 @@ test_that('testGetPriorTbl', {
 context("RP Model")
 
 test_that('testMakeMemMat', {
-	config = list(permNRows=5)
+	config = list(permNRows=5, permUseEntropyP=F)
 	testMemMat <- function(testSjiTbl, testPermEnvTbl, resTbl) {
 		testMemMat = makeMemMat(testSjiTbl, testPermEnvTbl, config) 
 		expect_equivalent(testMemMat, as.matrix(data.table(resTbl)))
@@ -175,7 +175,7 @@ test_that('testMakeMemMat', {
 })
 
 test_that('testComputePermAct', {
-	  testConfig = list(permNRows=5, permEnvTbl='testEnvTbl', permMemMatOrder='testMemMat', permMemMat='')
+	  testConfig = list(permNRows=5, permEnvTbl='testEnvTbl', permMemMatOrder='testMemMat', permMemMat='', permUseEntropyP=F)
 	  testComputePermAct <- function(testContext, testPos, testEnvTbl, testMemMat, testConfig, expectedTbl) {
 		  resTbl = computeActPermOrder(testContext, testPos, testConfig)
 		  expect_equivalent(resTbl, expectedTbl)
