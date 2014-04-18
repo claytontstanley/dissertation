@@ -510,6 +510,11 @@ writeModelHashtagsTbl <- function(modelHashtagsTbl, outFile) {
 	myWriteCSV(modelHashtagsTbl, file=outFile)
 }
 
+writeLogregTbl <- function(logregTbl, outFile) {
+	setkey(logregTbl, name, predName, d)
+	myWriteCSV(logregTbl, file=outFile)
+}
+
 genAggModelVsPredTbl <- function(hashtagsTbl, config) {
 	outFile = getConfig(config, "modelVsPredOutFile")
 	ds = getConfig(config, "ds")
@@ -590,6 +595,10 @@ modelHashtagsDir <- function() {
 	sprintf('%s/dissertationData/modelHashtagsTbl', PATH)
 }
 
+logregDir <- function() {
+	sprintf('%s/dissertationData/logregTbl', PATH)
+}
+
 getCoocDir <- function() {
 	sprintf('%s/dissertationData/cooc', PATH)
 }
@@ -606,6 +615,10 @@ getHashtagsOutFile <- function(name) {
 
 getModelHashtagsOutFile <- function(name) {
 	sprintf('%s/%s.csv', modelHashtagsDir(), name)
+}
+
+getLogregOutFile <- function(name) {
+	sprintf('%s/%s.csv', logregDir(), name)
 }
 
 runPrior <- function(config) {
@@ -640,6 +653,7 @@ defaultBaseConfig = list(ds=c(0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1.0,1.1,1.2,1.3,1.4,1
 			 dStd=c(0.5,0.7),
 			 modelVsPredOutFile='/tmp/modelVsPred.csv',
 			 modelHashtagsOutFile='',
+			 logregOutFile='',
 			 actDVs = c('actPriorStd', 'actPriorOL', 'actPriorOL2'),
 			 permNRows = 2048,
 			 query=NULL)
@@ -1881,13 +1895,18 @@ runContext <- function(config, samplesPerRun, numRuns) {
 		hashtagsTbl
 		modelVsPredTbl = getModelVsPredTbl(postResTbl, hashtagsTbl, config)
 		groupName='g1' #FIXME: Will need to be fixed when running all sampled datasets for Twitter
-		outFile = getConfig(config, "modelVsPredOutFile")
-		outFile = gsub('.csv$', sprintf('%sr%s%s', groupName, runNum, '.csv'), outFile)
+		getOutFileForName <- function(name) {
+			outFile = getConfig(config, name)
+			outFile = gsub('.csv$', sprintf('%sr%s%s', groupName, runNum, '.csv'), outFile)
+			outFile
+		}
+		outFile = getOutFileForName("modelVsPredOutFile")
 		writeModelVsPredTbl(modelVsPredTbl, outFile)
-		outFile = getConfig(config, 'modelHashtagsOutFile')
-		outFile = gsub('.csv$', sprintf('%sr%s%s', groupName, runNum, '.csv'), outFile)
-		postResTbl
+		outFile = getOutFileForName('modelHashtagsOutFile')
 		writeModelHashtagsTbl(postResTbl, outFile)
+		outFile = getOutFileForName('logregOutFile')
+		writeLogregTbl(logregTbl, outFile)
+		postResTbl
 		list(modelVsPredTbl=modelVsPredTbl, modelHashtagsTbl=postResTbl, hashtagsTbl=hashtagsTbl, logregTbl=logregTbl)
 	}
 	endId = 3000000
@@ -1912,7 +1931,8 @@ runContextWithConfig <- function(regen, samplesPerRun, numRuns=1) {
 	addNumSamples = function(str) sprintf('%s-%s', str, samplesPerRun)
 	getConfigMods <- function(name) {
 		list(modelVsPredOutFile=getModelVsPredOutFile(addNumSamples(name)),
-		     modelHashtagsOutFile=getModelHashtagsOutFile(addNumSamples(name)))
+		     modelHashtagsOutFile=getModelHashtagsOutFile(addNumSamples(name)),
+		     logregOutFile=getLogregOutFile(addNumSamples(name)))
 	}
 	runContextFor <- function(config) {
 		runContext(config, samplesPerRun, numRuns)
@@ -2037,7 +2057,7 @@ curWS <- function() {
 
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isContextRun, list.files(path=modelVsPredDir()))))
 	modelHashtagsTbls = buildModelHashtagsTables(file_path_sans_ext(Filter(isContextRun, list.files(path=modelHashtagsDir()))))
-	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isPriorRun, list.files(path=modelVsPredDir()))))
+	#modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isPriorRun, list.files(path=modelVsPredDir()))))
 	modelVsPredTbl
 	sjiTblTOrderless
 	priorTblGlobT[, N:=.N, by=hashtag][, N := N/nrow(.SD)]
