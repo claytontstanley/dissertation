@@ -1271,6 +1271,12 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 	ppvTbl = rbindlist(lapply(modelHashtagsTbls, getPPVTblAll))
 	ppvTbl
 	modelHashtagsTbls
+	modelHashtagsTbl = modelHashtagsTbls[['TContextSji-500g1r5']]
+	modelHashtagsTbl
+	logit = runLogReg(modelHashtagsTbl, c('actPriorStd', 'actTweet'))
+	summary(logit)
+	tables()
+	print(ClassLog(logit, modelHashtagsTbl$hashtagUsedP))
 	modelVsPredTbl
 	plotPPVTbl(ppvTbl[dsetType=='stackoverflow' & runNum==1 & dsetSize==500], 'contextPpvSO')
 	plotPPVTbl(ppvTbl[dsetType=='twitter' & runNum==1 & dsetSize==500], 'contextPpvT')
@@ -1789,6 +1795,21 @@ getPPVTbl = function(tbl, bestFitName) {
 	data.table(x=x, y=y)
 }
 
+runLogReg <- function(postResTbl, predictors) {
+	model = reformulate(termlabels = predictors, response = 'hashtagUsedP')
+	postResTbl
+	myLogit = glm(model, data=postResTbl, weights=weights, family=binomial(link="logit"))
+	myLogit
+}
+
+addWeights <- function(postResTbl) {
+	missCRWeight = postResTbl[, .N, by=hashtagUsedP][, NTot := sum(N)][, min(N)/max(N)]
+	missCRWeight
+	postResTbl[, weights := missCRWeight]
+	postResTbl[hashtagUsedP == T, weights := 1]
+	return()
+}
+
 analyzePostResTbl <- function(postResTbl, predictors, bestFitName) {
 	setkey(postResTbl, user_screen_name, dt, hashtag, d)
 	guardAllEqualP(postResTbl[, d])
@@ -1796,8 +1817,8 @@ analyzePostResTbl <- function(postResTbl, predictors, bestFitName) {
 	predictors
 	postResTbl
 	handleNAs(postResTbl, predictors)
-	model = reformulate(termlabels = predictors, response = 'hashtagUsedP')
-	myLogit = glm(model, data=postResTbl, family=binomial(link="logit"))
+	addWeights(postResTbl)
+	myLogit = runLogReg(postResTbl, predictors)
 	coeffs = summary(myLogit)$coefficients[,"Estimate"]
 	logregTbl = data.table(coeff=coeffs, predName=names(coeffs), d=postResTbl[, d[1]])
 	updateBestFitCol(postResTbl, logregTbl, bestFitName)
@@ -1896,7 +1917,8 @@ runContextWithConfig <- function(regen, samplesPerRun, numRuns=1) {
 	runs = list(modConfig(defaultTSjiConfig, getConfigMods('TContextSji')),
 		    modConfig(defaultSOSjiConfig, getConfigMods('SOContextSji')),
 		    modConfig(defaultTPermConfig, getConfigMods('TContextPerm')),
-		    modConfig(defaultSOPermConfig, getConfigMods('SOContextPerm')))
+		    modConfig(defaultSOPermConfig, getConfigMods('SOContextPerm'))
+		    )
 	lapply(runs, runContextFor)
 }
 
@@ -2002,9 +2024,10 @@ computeActPermOrderless <- function(context, pos, config) {
 }
 
 curWS <- function() {
+	#FIXME: Get coefficient tables
+	#FIXME: Then work on sampling
 	#FIXME: Stop words / entropy for RP (same run files)
 	#FIXME: Size of sji across RP and Bayesian (new run files)
-	#FIXME: Get coefficient tables
 	#FIXME: Quickly rerun logreg analysis for actDV
 	runContext20(regen='useAlreadyLoaded')
 	runContext500(regen='useAlreadyLoaded', numRuns=5)
