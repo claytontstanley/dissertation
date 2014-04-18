@@ -688,7 +688,7 @@ defaultSOConfig = c(defaultBaseConfig,
 			      makeChunkTblFun='make_chunk_table_SO'
 			      ))
 
-defaultPermConfig = list()
+defaultPermConfig = list(permUseEntropyP=F)
 
 defaultSjiConfig = list(computeActFromContextTbl = 'computeActSjiFromContextTbl')
 
@@ -1548,6 +1548,7 @@ getSjiTblTOrder <- function(config, startId, endId) {
 	sjiTbl = getSjiTblT(config, startId, endId)
 	sjiTbl = sjiTbl[, list(partialN), by=list(context, hashtag, posFromTag)]
 	setkey(sjiTbl, context, hashtag, posFromTag)
+	addSjiAttrs(sjiTbl)
 	sjiTbl
 }
 
@@ -1591,7 +1592,6 @@ getPriorTblGlobT <- function(config, startId, endId) {
 	globPriorTbl
 }
 
-
 addSjiAttrs <- function(sjiTbl) {
 	sjiTbl[, contextSums := sum(partialN), by=context]
 	sjiTbl[, hashtagSums := sum(partialN), by=hashtag]
@@ -1624,6 +1624,13 @@ myLoadImage <- function() {
 	     envir=globalenv())
 }
 
+makeCombinedMemMat <- function(sjiTbl, envTbl, config) {
+	res = list()
+	res[['orig']] = makeMemMat(sjiTbl, envTbl, config)
+	res[['entropy']] = makeMemMat(sjiTbl, envTbl, modConfig(config, list(permUseEntropyP=T)))
+	res
+}
+
 getCurWorkspace <- function(maxIdSOSji, maxIdSOPrior, maxIdTSji, maxIdTPrior) {
 	priorTblGlobT <<- getPriorTblGlobT(defaultTConfig, 1, maxIdTPrior)
 	priorTblUserSO <<- getPriorTblUserSO(defaultSOConfig, 1, maxIdSOPrior)
@@ -1632,9 +1639,9 @@ getCurWorkspace <- function(maxIdSOSji, maxIdSOPrior, maxIdTSji, maxIdTPrior) {
 	sjiTblSOOrderless <<- getSjiTblSO(defaultSOConfig, 1, maxIdSOSji)
 	permEnvTblT <<- makeEnvironmentTbl(sjiTblTOrderless, defaultBaseConfig)
 	permEnvTblSO <<- makeEnvironmentTbl(sjiTblSOOrderless, defaultBaseConfig)
-	permMemMatTOrder <<- makeMemMat(sjiTblTOrder, permEnvTblT, defaultBaseConfig)
-	permMemMatTOrderless <<- makeMemMat(sjiTblTOrderless, permEnvTblT, defaultBaseConfig)
-	permMemMatSOOrderless <<- makeMemMat(sjiTblSOOrderless, permEnvTblSO, defaultBaseConfig)
+	permMemMatTOrder <<- makeCombinedMemMat(sjiTblTOrder, permEnvTblT, defaultTPermConfig)
+	permMemMatTOrderless <<- makeCombinedMemMat(sjiTblTOrderless, permEnvTblT, defaultTPermConfig)
+	permMemMatSOOrderless <<- makeCombinedMemMat(sjiTblSOOrderless, permEnvTblSO, defaultSOPermConfig)
 	return()
 }
 
@@ -1964,21 +1971,25 @@ makeEnvironmentSubsetTbl <- function(tbl, config) {
 	createSampleInd(tbl, 2, config)
 	createSampleInd(tbl, 3, config)
 	createSampleInd(tbl, 4, config)
+	tbl
 	tbl[, eval(allColUniqExpr(c('ind1', 'ind2', 'ind3', 'ind4'), 'uniq'))]
 	redoTbl = tbl[uniq == F]
 	if (nrow(redoTbl) == 0) {
 		tbl
 	} else {
-		rbind(tbl[uniq == T], makeEnvironmentSubsetTbl(redoTbl[, list(chunk = chunk)], config))
+		rbind(tbl[uniq == T], makeEnvironmentSubsetTbl(redoTbl[, list(EContext = EContext,chunk=chunk)], config))
 	}
 }
 
 makeEnvironmentTbl <- function(sjiTbl, config) {
-	permEnvTbl = with(sjiTbl, data.table(chunk=unique(context)))
+	permEnvTbl = sjiTbl[, .N, by=list(context, EContext)][, N := NULL][, chunk := context][, context := NULL]
+	setkey(permEnvTbl, chunk)
+	stopifnot(sum(duplicated(permEnvTbl)) == 0)
+	permEnvTbl
 	permEnvTbl = makeEnvironmentSubsetTbl(permEnvTbl, config)
 	permEnvTbl[, uniq := NULL]
 	permEnvTbl = melt(permEnvTbl,
-			  id=c('chunk'),
+			  id=c('chunk', 'EContext'),
 			  measure=c('ind1', 'ind2', 'ind3', 'ind4'),
 			  variable.name='val',
 			  value.name='ind')
@@ -1992,7 +2003,15 @@ makeEnvironmentTbl <- function(sjiTbl, config) {
 
 makeMemMat <- function(sjiTbl, permEnvTbl, config) {
 	memTbl = permEnvTbl[sjiTbl, allow.cartesian=T, nomatch=0]
+	if (getConfig(config, 'permUseEntropyP')) {
+		myLog(sprintf('Weighting val in memory matrix based on entropy'))
+		memTbl[, val := val * EContext]
+	}
+	sjiTbl
+	key(sjiTbl)
 	memTbl
+	key(memTbl)
+	permEnvTbl
 	NRows = getConfig(config, 'permNRows')
 	NRows
 	memTbl[, rotInd := ((ind-1 + posFromTag) %% NRows) + 1]
@@ -2013,7 +2032,9 @@ computeActPerm <- function(context, pos, permEnvTbl, permMemMat, config) {
 	permMemMat
 	contextTbl = data.table(context=context, posFromTag=pos, hashtag='context', partialN=1, key='context')
 	contextMemMat = makeMemMat(contextTbl, permEnvTbl, config)
+	contextMemMat
 	contextMemVect = rowSums(contextMemMat) 
+	contextMemVect
 	if (sd(contextMemVect) == 0) {
 		contextCorVect = matrix(data=0, nrow=dim(permMemMat)[2], ncol=1, dimnames=list(colnames(permMemMat)))
 	} else {
@@ -2023,12 +2044,23 @@ computeActPerm <- function(context, pos, permEnvTbl, permMemMat, config) {
 	resTbl
 }
 
+getMemMatFromList <- function(lst, config) {
+	acc = {
+		if (getConfig(config, 'permUseEntropyP')) {
+			'entropy'
+		} else {
+			'orig'
+	}}
+	lst[[acc]]
+}
+
 computeActPermOrder <- function(context, pos, config) {
 	computeActPerm(context,
 		       pos,
 		       # Cannot get from global environment or test 'testComputePermAct' will fail
 		       permEnvTbl = get(getConfig(config, 'permEnvTbl'), envir=parent.frame()),
-		       permMemMat = get(getConfig(config, 'permMemMatOrder'), envir=parent.frame()),
+		       permMemMat = getMemMatFromList(get(getConfig(config, 'permMemMatOrder'), envir=parent.frame()),
+						      config),
 		       config)
 }
 
@@ -2036,7 +2068,8 @@ computeActPermOrderless <- function(context, pos, config) {
 	computeActPerm(context,
 		       rep(0, length(context)),
 		       permEnvTbl = get(getConfig(config, 'permEnvTbl'), envir=parent.frame()),
-		       permMemMat = get(getConfig(config, 'permMemMatOrderless'), envir=parent.frame()),
+		       permMemMat = getMemMatFromList(get(getConfig(config, 'permMemMatOrderless'), envir=parent.frame()),
+						      config),
 		       config)
 }
 
@@ -2057,7 +2090,6 @@ curWS <- function() {
 	priorTblGlobT[, N:=.N, by=hashtag][, N := N/nrow(.SD)]
 	priorTblGlobT[, N:=NULL]
 	priorTblGlobT[order(N, decreasing=T)]
-	permMemMatSOOrderless
 	context = c('a', 'it', 'i')
 	pos = c(1, 3, 1)
 	setLogLevel(1)
