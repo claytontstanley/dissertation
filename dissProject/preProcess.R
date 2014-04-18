@@ -583,43 +583,33 @@ tableModelVsPredTbl <- function(modelVsPredTbl) {
 						 sd=sd(d)), by=list(datasetNameRoot, runNum, DVName)]
 }
 
-modelVsPredDir <- function() {
-	sprintf('%s/dissertationData/modelVsPred', PATH)
+getDirGen <- function(tblDir) {
+	sprintf('%s/dissertationData/%s', PATH, tblDir)
 }
 
-hashtagsTblDir <- function() {
-	sprintf('%s/dissertationData/hashtagsTbl', PATH)
+getDirModelVsPred <- function() getDirGen('modelVsPred')
+
+getDirHashtagsTbl <- function() getDirGen('hashtagsTbl')
+
+getDirModelHashtags <- function() getDirGen('modelHashtagsTbl')
+
+getDirLogreg <- function() getDirGen('logregTbl')
+
+getDirCooc <- function() getDirGen('cooc')
+
+getDirPrior <- function() getDirGen('prior') 
+
+getOutFileGen <- function(dir, name) {
+	sprintf('%s/%s.csv', dir, name)
 }
 
-modelHashtagsDir <- function() {
-	sprintf('%s/dissertationData/modelHashtagsTbl', PATH)
-}
+getOutFileModelVsPred <- function(name) getOutFileGen(getDirModelVsPred(), name)
 
-logregDir <- function() {
-	sprintf('%s/dissertationData/logregTbl', PATH)
-}
+getOutFileHashtags <- function(name) getOutFileGen(getDirHashtagsTbl(), name)
 
-getCoocDir <- function() {
-	sprintf('%s/dissertationData/cooc', PATH)
-}
+getOutFileModelHashtags <- function(name) getOutFileGen(getDirModelHashtags(), name)
 
-getPriorDir <- function() sprintf('%s/dissertationData/prior', PATH)
-
-getModelVsPredOutFile <- function(name) {
-	sprintf('%s/%s.csv', modelVsPredDir(), name)
-}
-
-getHashtagsOutFile <- function(name) {
-	sprintf('%s/%s.csv', hashtagsTblDir(), name)
-}
-
-getModelHashtagsOutFile <- function(name) {
-	sprintf('%s/%s.csv', modelHashtagsDir(), name)
-}
-
-getLogregOutFile <- function(name) {
-	sprintf('%s/%s.csv', logregDir(), name)
-}
+getLogregOutFile <- function(name) getOutFileGen(getDirLogreg(), name)
 
 runPrior <- function(config) {
 	myStopifnot(!any(sapply(config,is.null)))
@@ -790,7 +780,7 @@ combineFilters <- function(f1, f2='1=1') {
 }
 
 makeTRun <- function(val, outFileName, config) {
-	function() runPriorT(config=modConfig(config, list(query=getConfig(config, "query")(val), modelVsPredOutFile=getModelVsPredOutFile(outFileName))))
+	function() runPriorT(config=modConfig(config, list(query=getConfig(config, "query")(val), modelVsPredOutFile=getOutFileModelVsPred(outFileName))))
 }
 
 makeTRunr1 <- function(val, outFileName, query) {
@@ -900,7 +890,7 @@ runTTweets5e4 <- makeTRunr1(50000, 'TTweetsgt5e4', queryRunTTweets5e4)
 runTTweets5e4r2 <- makeTRunr2(50000, 'TTweetsgt5e4r2', queryRunTTweets5e4)
 
 makeSORun <- function(val, outFileName, config) {
-	runFun = function() runPriorSO(config=modConfig(config, list(query=getConfig(config, "query")(val), modelVsPredOutFile=getModelVsPredOutFile(outFileName))))
+	runFun = function() runPriorSO(config=modConfig(config, list(query=getConfig(config, "query")(val), modelVsPredOutFile=getOutFileModelVsPred(outFileName))))
 	runFun
 }
 
@@ -979,7 +969,7 @@ addModelType <- function(modelVsPredTbl) {
 }
 buildModelHashtagsTables <- function(outFileNames) {
 	buildTable <- function(outFileName) {
-		tbl = myFread(getModelHashtagsOutFile(outFileName))
+		tbl = myFread(getOutFileModelHashtags(outFileName))
 		tbl[, datasetName := outFileName]
 		tbl
 	}
@@ -1024,7 +1014,7 @@ getConfigFile <- function(fname) {
 buildTables <- function(outFileNames) {
 	buildTable <- function(outFileName) {
 		colClasses = c('character', 'logical', 'logical', 'numeric', 'integer', 'character', 'logical', 'integer')
-		tbl = myReadCSV(getModelVsPredOutFile(outFileName), colClasses=colClasses)
+		tbl = myReadCSV(getOutFileModelVsPred(outFileName), colClasses=colClasses)
 		tbl[, datasetName := outFileName]
 		tbl
 	}
@@ -1345,9 +1335,9 @@ genNcoocTblSO <- function(subsetName, startId, endId) {
 	genTempPostTokenizedTbl(chunkTableQuery)
 	NcoocTblTitle = getNcoocTbl('title', chunkTableQuery, config) 
 	NcoocTblBody = getNcoocTbl('body', chunkTableQuery, config) 
-	outFile = sprintf('%s/NcoocTblTitle-%s.csv', getCoocDir(), fullSubsetName)
+	outFile = sprintf('%s/NcoocTblTitle-%s.csv', getDirCooc(), fullSubsetName)
 	myWriteCSV(NcoocTblTitle, file=outFile)
-	outFile = sprintf('%s/NcoocTblBody-%s.csv', getCoocDir(), fullSubsetName)
+	outFile = sprintf('%s/NcoocTblBody-%s.csv', getDirCooc(), fullSubsetName)
 	myWriteCSV(NcoocTblBody, file=outFile) 
 	sqldf('truncate table temp_tokenized')
 
@@ -1359,7 +1349,7 @@ genNcoocTblTwitter <- function(subsetName, startId, endId) {
 	chunkTableQuery = makeChunkTableQuery(subsetName, startId, endId, config)
 	genTempPostTokenizedTbl(chunkTableQuery)
 	NcoocTblTweet = getNcoocTbl('tweet', chunkTableQuery, config) 
-	outFile = sprintf('%s/NcoocTblTweet-%s.csv', getCoocDir(), fullSubsetName)
+	outFile = sprintf('%s/NcoocTblTweet-%s.csv', getDirCooc(), fullSubsetName)
 	myWriteCSV(NcoocTblTweet, file=outFile)
 	sqldf('truncate table temp_tokenized')
 }
@@ -1520,8 +1510,8 @@ getSjiTblSO <- function(config, startId, endId) {
 	sjiTitleName = paste('NcoocTblTitle', fileName, sep='-')
 	sjiBodyName = paste('NcoocTblBody', fileName, sep='-')
 	sjiColClasses = c('character', 'character', 'integer', 'integer', 'integer')	
-	sjiTitleTbl = myReadCSV(sprintf('%s/%s', getCoocDir(), sjiTitleName), colClasses=sjiColClasses)
-	sjiBodyTbl = myReadCSV(sprintf('%s/%s', getCoocDir(), sjiBodyName), colClasses=sjiColClasses)
+	sjiTitleTbl = myReadCSV(sprintf('%s/%s', getDirCooc(), sjiTitleName), colClasses=sjiColClasses)
+	sjiBodyTbl = myReadCSV(sprintf('%s/%s', getDirCooc(), sjiBodyName), colClasses=sjiColClasses)
 	sjiTitleTbl[, type := 'title']
 	sjiBodyTbl[, type := 'body']
 	sjiTbl = rbind(sjiTitleTbl, sjiBodyTbl)
@@ -1538,7 +1528,7 @@ getSjiTblT <- function(config, startId, endId) {
 	fileName = sprintf('%s.csv', makeSubsetName(getConfig(config, "groupName"), startId, endId))
 	sjiTblName = sprintf('NcoocTblTweet-%s', fileName)
 	sjiColClasses = c('character', 'character', 'integer', 'integer', 'integer')	
-	sjiTbl = myReadCSV(sprintf('%s/%s', getCoocDir(), sjiTblName), colClasses=sjiColClasses)
+	sjiTbl = myReadCSV(sprintf('%s/%s', getDirCooc(), sjiTblName), colClasses=sjiColClasses)
 	sjiTbl[, context := chunk][, chunk := NULL]
 	sjiTbl[, hashtag := tag][, tag := NULL]
 	topHashtagsTbl = sqldt(sprintf("select hashtag from top_hashtag_hashtags where hashtag_group = '%s'", getConfig(config, "groupName")))
@@ -1930,8 +1920,8 @@ runContextWithConfig <- function(regen, samplesPerRun, numRuns=1) {
 	getCurWorkspaceBy(regen)
 	addNumSamples = function(str) sprintf('%s-%s', str, samplesPerRun)
 	getConfigMods <- function(name) {
-		list(modelVsPredOutFile=getModelVsPredOutFile(addNumSamples(name)),
-		     modelHashtagsOutFile=getModelHashtagsOutFile(addNumSamples(name)),
+		list(modelVsPredOutFile=getOutFileModelVsPred(addNumSamples(name)),
+		     modelHashtagsOutFile=getOutFileModelHashtags(addNumSamples(name)),
 		     logregOutFile=getLogregOutFile(addNumSamples(name)))
 	}
 	runContextFor <- function(config) {
@@ -2055,9 +2045,9 @@ curWS <- function() {
 	runContext20(regen='useAlreadyLoaded')
 	runContext500(regen='useAlreadyLoaded', numRuns=5)
 
-	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isContextRun, list.files(path=modelVsPredDir()))))
-	modelHashtagsTbls = buildModelHashtagsTables(file_path_sans_ext(Filter(isContextRun, list.files(path=modelHashtagsDir()))))
-	#modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isPriorRun, list.files(path=modelVsPredDir()))))
+	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelVsPred()))))
+	modelHashtagsTbls = buildModelHashtagsTables(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelHashtags()))))
+	#modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isPriorRun, list.files(path=getDirModelVsPred()))))
 	modelVsPredTbl
 	sjiTblTOrderless
 	priorTblGlobT[, N:=.N, by=hashtag][, N := N/nrow(.SD)]
