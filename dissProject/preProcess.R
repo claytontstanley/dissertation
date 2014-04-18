@@ -1643,7 +1643,6 @@ computeActSjiFromContextTbl <- function(contextTbl, config) {
 }
 
 computeActPermTFromContextTbl <- function(contextTbl, config) {
-	
 	contextTbl = rbind(copy(contextTbl)[,type:=paste0('act', capitalize(type),'Order')][,fun:='computeActPermOrder'],
 			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'Orderless')][,fun:='computeActPermOrderless'])
 	contextTbl[, get(fun[1])(chunk, pos, config), by=type]
