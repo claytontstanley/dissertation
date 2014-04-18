@@ -1826,8 +1826,12 @@ analyzePostResTbl <- function(postResTbl, predictors, bestFitName) {
 	handleNAs(postResTbl, predictors)
 	addWeights(postResTbl)
 	myLogit = runLogReg(postResTbl, predictors)
-	coeffs = summary(myLogit)$coefficients[,"Estimate"]
-	logregTbl = data.table(coeff=coeffs, predName=names(coeffs), d=postResTbl[, d[1]])
+	coeffs = summary(myLogit)$coefficients
+	logregTbl = as.data.table(coeffs)
+	logregTbl[, coeff := Estimate][, Estimate := NULL]
+	logregTbl
+	logregTbl[, predName := rownames(coeffs)][, d := postResTbl[, d[1]]]
+	summary(myLogit)
 	updateBestFitCol(postResTbl, logregTbl, bestFitName)
 	postResTbl
 	print(summary(myLogit))
