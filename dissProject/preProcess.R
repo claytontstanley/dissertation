@@ -1803,7 +1803,8 @@ runLogReg <- function(postResTbl, predictors) {
 }
 
 addWeights <- function(postResTbl) {
-	missCRWeight = postResTbl[, .N, by=hashtagUsedP][, NTot := sum(N)][, min(N)/max(N)]
+	#missCRWeight = postResTbl[, .N, by=hashtagUsedP][, NTot := sum(N)][, min(N)/max(N)]
+	missCRWeight = 1 
 	missCRWeight
 	postResTbl[, weights := missCRWeight]
 	postResTbl[hashtagUsedP == T, weights := 1]
@@ -1813,6 +1814,8 @@ addWeights <- function(postResTbl) {
 analyzePostResTbl <- function(postResTbl, predictors, bestFitName) {
 	setkey(postResTbl, user_screen_name, dt, hashtag, d)
 	guardAllEqualP(postResTbl[, d])
+	myLog(sprintf('Analyzing post result table for d=%s, bestFitName=%s, and predictors=%s',
+		      postResTbl[, d[1]], bestFitName, paste(predictors, collapse=',')))
 	#postResTbl = copy(postResTbl)
 	predictors
 	postResTbl
@@ -2031,6 +2034,7 @@ curWS <- function() {
 	#FIXME: Quickly rerun logreg analysis for actDV
 	runContext20(regen='useAlreadyLoaded')
 	runContext500(regen='useAlreadyLoaded', numRuns=5)
+
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isContextRun, list.files(path=modelVsPredDir()))))
 	modelHashtagsTbls = buildModelHashtagsTables(file_path_sans_ext(Filter(isContextRun, list.files(path=modelHashtagsDir()))))
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isPriorRun, list.files(path=modelVsPredDir()))))
