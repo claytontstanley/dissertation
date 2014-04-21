@@ -1674,13 +1674,13 @@ computeActPermTFromContextTbl <- function(contextTbl, config) {
 			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'Orderless')][,fun:='computeActPermOrderless'][,funConfig:='funConfigNEntropy'],
 			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderEntropy')][,fun:='computeActPermOrder'][,funConfig:='funConfigWEntropy'],
 			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderlessEntropy')][,fun:='computeActPermOrderless'][,funConfig:='funConfigWEntropy'])
-	contextTbl[, get(fun[1])(chunk, pos, get(funConfig)(config)), by=list(type, funConfig)]
+	contextTbl[, get(fun[1])(chunk, pos, get(funConfig)(config)), by=type]
 }
 
 computeActPermSOFromContextTbl <- function(contextTbl, config) {
 	contextTbl = rbind(copy(contextTbl)[,type:=paste0('act', capitalize(type),'Orderless')][,fun:='computeActPermOrderless'][,funConfig:='funConfigNEntropy'],
 			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderlessEntropy')][,fun:='computeActPermOrderless'][,funConfig:='funConfigWEntropy'])
-	contextTbl[, get(fun[1])(chunk, pos, get(funConfig)(config)), by=list(type, funConfig)]
+	contextTbl[, get(fun[1])(chunk, pos, get(funConfig)(config)), by=type]
 }
 
 getContextPredNames <- function(config) {
