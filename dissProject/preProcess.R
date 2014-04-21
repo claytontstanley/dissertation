@@ -2090,10 +2090,9 @@ computeActPermOrderless <- function(context, pos, config) {
 
 curWS <- function() {
 	#FIXME: Stop words / entropy for RP (same run files)
-	#FIXME: Size of sji across RP and Bayesian (new run files)
-	#FIXME: Then work on sampling
-	#FIXME: Quickly rerun logreg analysis for actDV
 	#FIXME: Methods to import and anlyze coefficient tables
+	#FIXME: Size of sji across RP and Bayesian (new run files)
+	#FIXME: Quickly rerun logreg analysis for actDV
 
 	runContext20(regen='useAlreadyLoaded')
 	runContext500(regen='useAlreadyLoaded', numRuns=5)
