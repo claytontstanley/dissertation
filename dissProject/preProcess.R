@@ -2018,8 +2018,7 @@ makeMemMat <- function(sjiTbl, permEnvTbl, config) {
 	NRows = getConfig(config, 'permNRows')
 	NRows
 	memTbl[, rotInd := ((ind-1 + posFromTag) %% NRows) + 1]
-	memTbl = memTbl[, list(sumPartialN=sum(partialN)), by=list(rotInd, val, hashtag)]
-	memTbl = memTbl[, list(totVal=sum(val*sumPartialN)), by=list(rotInd, hashtag)]
+	memTbl = memTbl[, list(totVal=sum(val*partialN)), by=list(rotInd, hashtag)]
 	db = makeDB(memTbl[, unique(hashtag)])
 	db
 	memMat = with(memTbl, sparseMatrix(i=rotInd, j=getHashes(hashtag, db), x=totVal, dims=c(NRows, length(db))))
@@ -2083,7 +2082,6 @@ curWS <- function() {
 	#FIXME: Quickly rerun logreg analysis for actDV
 	#FIXME: Methods to import and anlyze coefficient tables
 	#FIXME: add unit test for entropy perm makeMatrix
-	#FIXME: afterwards, double check the list(list lines
 
 	runContext20(regen='useAlreadyLoaded')
 	runContext500(regen='useAlreadyLoaded', numRuns=5)
