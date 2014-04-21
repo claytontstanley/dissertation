@@ -77,10 +77,6 @@ myLog <- function(str, forLogLevel=1) {
 	if (logLevel >= forLogLevel) print(str)
 }
 
-myGetGlobal <- function(...) {
-	get(..., envir=globalenv())
-}
-
 myStopifnot <- function(...) {
 	debugPrint(substitute(...))
 	stopifnot(...)
@@ -1161,7 +1157,9 @@ renameColDVName <- function(tbl) {
 				     'topHashtagPostPriorStdTweetOrderless', 'topHashtagPostPriorStdTweetOrder',
 				     'topHashtagAcrossPriorStdTweetOrderless', 'topHashtagAcrossPriorStdTweetOrder',
 				     'topHashtagPostTweetOrderlessEntropy', 'topHashtagPostPriorStdTweetOrderEntropyTweetOrderlessEntropy',
-				     'topHashtagPostTitleOrderlessEntropyBodyOrderlessEntropy', 'topHashtagPostPriorStdTitleOrderlessEntropyBodyOrderlessEntropy'),
+				     'topHashtagPostTitleOrderlessEntropyBodyOrderlessEntropy', 'topHashtagPostPriorStdTitleOrderlessEntropyBodyOrderlessEntropy',
+				     'topHashtagPostTitleOrderlessEntropy', 'topHashtagPostBodyOrderlessEntropy',
+				     'topHashtagPostTweetOrderEntropyTweetOrderlessEntropy', 'topHashtagPostTweetOrderEntropy'),
 			    newName=c('Standard Prior Model Relaxed Across Posts', 'Standard Prior Model', 'Optimized Learning Model',
 				      'Bayes only title', 'Bayes only body', 'Bayes combined title and body', 'Bayes combined full',
 				      'Bayes only title', 'Bayes only body', 'Bayes combined title and body', 'Bayes combined full',
@@ -1176,7 +1174,9 @@ renameColDVName <- function(tbl) {
 				      'RP combined prior and orderless', 'RP combined prior and order',
 				      'RP combined prior and orderless', 'RP combined prior and order',
 				      'RP only orderless context w/ entropy', 'RP combined full w/ entropy',
-				      'RP combined title and body w/ entropy', 'RP combined full w/ entropy'))
+				      'RP combined title and body w/ entropy', 'RP combined full w/ entropy',
+				      'RP only title w/ entropy', 'RP only body w/ entropy',
+				      'RP combined orderless and order w/ entropy', 'RP only order context w/ entropy'))
 	setkey(mapTbl, DVName)
 	tbl[mapTbl, DVName := newName]
 	tbl
@@ -1623,17 +1623,22 @@ computeActSji <- function(contextVect, sjiTbl, config) {
 	resTbl
 }
 
-wsFile = '/Volumes/SSDSupernova/RWorkspace/workspace.RData'
+getWsFile <- function(groupConfig) {
+	wsFile = with(groupConfig, sprintf('%s/workspace-g%ss%s.RData', '/Volumes/SSDSupernova/RWorkspace', groupNum, sizeNum))
+	wsFile
+}
 
-mySaveImage <- function() {
-	eval(quote(save(list=c('sjiTblTOrderless', 'sjiTblTOrder', 'priorTblGlobT', 'sjiTblSOOrderless', 'priorTblUserSO',
+mySaveImage <- function(groupConfig) {
+	file=getWsFile(groupConfig)
+	eval(bquote(save(list=c('sjiTblTOrderless', 'sjiTblTOrder', 'priorTblGlobT', 'sjiTblSOOrderless', 'priorTblUserSO',
 			       'permEnvTblT', 'permEnvTblSO', 'permMemMatTOrder', 'permMemMatTOrderless',
-			       'permMemMatSOOrderless'), file=wsFile, compress=F)),
+			       'permMemMatSOOrderless'), file=.(file), compress=F)),
 	     envir=globalenv())
 }
 
-myLoadImage <- function() {
-	eval(quote(load(file=wsFile)),
+myLoadImage <- function(groupConfig) {
+	file=getWsFile(groupConfig)
+	eval(bquote(load(file=.(file))),
 	     envir=globalenv())
 }
 
@@ -1644,27 +1649,29 @@ makeCombinedMemMat <- function(sjiTbl, envTbl, config) {
 	res
 }
 
-getCurWorkspace <- function(maxIdSOSji, maxIdSOPrior, maxIdTSji, maxIdTPrior) {
-	priorTblGlobT <<- getPriorTblGlobT(defaultTConfig, 1, maxIdTPrior)
+getCurWorkspace <- function(groupConfig) {
+	maxIdSOSji = getConfig(groupConfig, 'maxIdSOSji')
+	maxIdSOPrior = getConfig(groupConfig, 'maxIdSOPrior')
+	maxIdTSji = getConfig(groupConfig, 'maxIdTSji')
+	maxIdTPrior = getConfig(groupConfig, 'maxIdTPrior')
+	configT = modConfig(defaultTConfig, list(groupName=getConfig(groupConfig, 'groupName')))
+	configTPerm = modConfig(defaultTPermConfig, list(groupName=getConfig(groupConfig, 'groupName')))
+	priorTblGlobT <<- getPriorTblGlobT(configT, 1, maxIdTPrior)
 	priorTblUserSO <<- getPriorTblUserSO(defaultSOConfig, 1, maxIdSOPrior)
-	sjiTblTOrderless <<- getSjiTblTOrderless(defaultTConfig, 1, maxIdTSji)
-	sjiTblTOrder <<- getSjiTblTOrder(defaultTConfig, 1, maxIdTSji)
+	sjiTblTOrderless <<- getSjiTblTOrderless(configT, 1, maxIdTSji)
+	sjiTblTOrder <<- getSjiTblTOrder(configT, 1, maxIdTSji)
 	sjiTblSOOrderless <<- getSjiTblSO(defaultSOConfig, 1, maxIdSOSji)
 	permEnvTblT <<- makeEnvironmentTbl(sjiTblTOrderless, defaultBaseConfig)
 	permEnvTblSO <<- makeEnvironmentTbl(sjiTblSOOrderless, defaultBaseConfig)
-	permMemMatTOrder <<- makeCombinedMemMat(sjiTblTOrder, permEnvTblT, defaultTPermConfig)
-	permMemMatTOrderless <<- makeCombinedMemMat(sjiTblTOrderless, permEnvTblT, defaultTPermConfig)
+	permMemMatTOrder <<- makeCombinedMemMat(sjiTblTOrder, permEnvTblT, configTPerm)
+	permMemMatTOrderless <<- makeCombinedMemMat(sjiTblTOrderless, permEnvTblT, configTPerm)
 	permMemMatSOOrderless <<- makeCombinedMemMat(sjiTblSOOrderless, permEnvTblSO, defaultSOPermConfig)
 	return()
 }
 
-genAndSaveCurWorkspace <- function() {
-	maxIdSOSji = 1e5
-	maxIdSOPrior = 100e6
-	maxIdTSji = 3e6 
-	maxIdTPrior = 1e5 
-	getCurWorkspace(maxIdSOSji, maxIdSOPrior, maxIdTSji, maxIdTPrior)
-	mySaveImage()
+genAndSaveCurWorkspace <- function(groupConfig) {
+	getCurWorkspace(groupConfig)
+	mySaveImage(groupConfig)
 }
 
 computeActSjiFromContextTbl <- function(contextTbl, config) {
@@ -1914,10 +1921,9 @@ runContext <- function(config, samplesPerRun, numRuns) {
 		addMetrics(hashtagsTbl, postResTbl, config)
 		hashtagsTbl
 		modelVsPredTbl = getModelVsPredTbl(postResTbl, hashtagsTbl, config)
-		groupName='g1' #FIXME: Will need to be fixed when running all sampled datasets for Twitter
 		getOutFileForName <- function(name) {
 			outFile = getConfig(config, name)
-			outFile = gsub('.csv$', sprintf('%sr%s%s', groupName, runNum, '.csv'), outFile)
+			outFile = gsub('.csv$', sprintf('r%s%s', runNum, '.csv'), outFile)
 			outFile
 		}
 		outFile = getOutFileForName("modelVsPredOutFile")
@@ -1937,37 +1943,64 @@ runContext <- function(config, samplesPerRun, numRuns) {
 	}
 }
 
-getCurWorkspaceBy <- function(regen) {
+getCurWorkspaceBy <- function(regen, groupConfig) {
 	if (regen == 'useAlreadyLoaded') return()
 	if (regen == T) {
-		eval(quote(getCurWorkspace(1e5, 100e6, 3e6, 1e5)), envir=globalenv())
+		eval(bquote(getCurWorkspace(.(groupConfig))), envir=globalenv())
 	} else {
-		eval(quote(myLoadImage()), envir=globalenv())
+		eval(bquote(myLoadImage(.(groupConfig))), envir=globalenv())
 	}
 }
 
-runContextWithConfig <- function(regen, samplesPerRun, numRuns=1) {
-	getCurWorkspaceBy(regen)
+runContextWithConfig <- function(regen, samplesPerRun, numRuns, groupConfig) {
+	getCurWorkspaceBy(regen, groupConfig)
 	addNumSamples = function(str) sprintf('%s-%s', str, samplesPerRun)
-	getConfigMods <- function(name) {
-		list(modelVsPredOutFile=getOutFileModelVsPred(addNumSamples(name)),
-		     modelHashtagsOutFile=getOutFileModelHashtags(addNumSamples(name)),
-		     logregOutFile=getLogregOutFile(addNumSamples(name)))
+	addGroupName = function(str) sprintf('%sg%s', str, getConfig(groupConfig, 'groupNum'))
+	addSizeName = function(str) sprintf('%ss%s', str, getConfig(groupConfig, 'sizeNum'))
+	addAll = function(str) addSizeName(addGroupName(addNumSamples(str)))
+	addSO = function(str) addSizeName(addNumSamples(str))
+	getConfigMods <- function(name, addFun) {
+		list(modelVsPredOutFile=getOutFileModelVsPred(addFun(name)),
+		     modelHashtagsOutFile=getOutFileModelHashtags(addFun(name)),
+		     logregOutFile=getLogregOutFile(addFun(name)))
 	}
+	getConfigModsT <- function(name) getConfigMods(name, addAll)
+	getConfigModsSO <- function(name) getConfigMods(name, addSO)
 	runContextFor <- function(config) {
 		runContext(config, samplesPerRun, numRuns)
 	}
-	runs = list(modConfig(defaultTSjiConfig, getConfigMods('TContextSji')),
-		    modConfig(defaultSOSjiConfig, getConfigMods('SOContextSji')),
-		    modConfig(defaultTPermConfig, getConfigMods('TContextPerm')),
-		    modConfig(defaultSOPermConfig, getConfigMods('SOContextPerm'))
+	runs = list(modConfig(defaultTSjiConfig, getConfigModsT('TContextSji')),
+		    modConfig(defaultSOSjiConfig, getConfigModsSO('SOContextSji')),
+		    modConfig(defaultTPermConfig, getConfigModsT('TContextPerm')),
+		    modConfig(defaultSOPermConfig, getConfigModsSO('SOContextPerm'))
 		    )
 	lapply(runs, runContextFor)
 }
 
-runContext20 <- function(regen=F, numRuns=1) runContextWithConfig(regen=regen, 20, numRuns=numRuns)
-runContext200 <- function(regen=F, numRuns=5) runContextWithConfig(regen=regen, 200, numRuns=numRuns)
-runContext500 <- function(regen=F, numRuns=5) runContextWithConfig(regen=regen, 500, numRuns=numRuns)
+groupConfigS1 <- list(sizeNum=1,
+		      maxIdSOSji=1e5, maxIdSOPrior=100e6, maxIdTSji=3e6, maxIdTPrior=1e5)
+
+groupConfigG1 <- list(groupNum=1,
+		      groupName = '2014-02-27 17:13:30 initial')
+
+groupConfigG2 <- list(groupNum=2,
+		      groupName = '2014-03-17 11:28:15 trendsmap')
+
+groupConfigG3 <- list(groupNum=3,
+		      groupName = '2014-03-24 13:06:19 trendsmap')
+
+groupConfigG4 <- list(groupNum=4,
+		      groupName = '2014-04-04 15:03:59 trendsmap')
+
+groupConfig1 <- c(groupConfigS1, groupConfigG1)
+groupConfig2 <- c(groupConfigS1, groupConfigG2)
+groupConfig3 <- c(groupConfigS1, groupConfigG3)
+groupConfig4 <- c(groupConfigS1, groupConfigG4)
+
+runContext20g1 <- function(regen=F, numRuns=1) runContextWithConfig(regen=regen, 20, numRuns=numRuns, groupConfig=groupConfig1)
+runContext200g1 <- function(regen=F, numRuns=5) runContextWithConfig(regen=regen, 200, numRuns=numRuns, groupConfig=groupConfig1)
+runContext500g1 <- function(regen=F, numRuns=5) runContextWithConfig(regen=regen, 500, numRuns=numRuns, groupConfig=groupConfig1)
+
 
 createSampleInd <- function(tbl, num, config) {
 	indName = as.symbol(paste0('ind', num))
@@ -2094,13 +2127,19 @@ computeActPermOrderless <- function(context, pos, config) {
 		       config)
 }
 
+runGenAndSaveCurWS1 <- function() genAndSaveCurWorkspace(groupConfig1)
+runGenAndSaveCurWS2 <- function() genAndSaveCurWorkspace(groupConfig2)
+runGenAndSaveCurWS3 <- function() genAndSaveCurWorkspace(groupConfig3)
+runGenAndSaveCurWS4 <- function() genAndSaveCurWorkspace(groupConfig4)
+
 curWS <- function() {
 	#FIXME: Run across all four datasets (new files; changes the r number)
 	#FIXME: Methods to import and anlyze coefficient tables
 	#FIXME: Size of sji across RP and Bayesian (new run files)
 	#FIXME: Quickly rerun logreg analysis for actDV
 
-	runContext20(regen='useAlreadyLoaded')
+	runContext20g1(regen='useAlreadyLoaded')
+	runContext20g1(regen=F)
 	runContext500(regen='useAlreadyLoaded', numRuns=5)
 
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelVsPred()))))
