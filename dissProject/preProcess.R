@@ -688,7 +688,7 @@ defaultSOConfig = c(defaultBaseConfig,
 			      makeChunkTblFun='make_chunk_table_SO'
 			      ))
 
-defaultPermConfig = list(permUseEntropyP=F)
+defaultPermConfig = list(permUseEntropyP='')
 
 defaultSjiConfig = list(computeActFromContextTbl = 'computeActSjiFromContextTbl')
 
@@ -1633,7 +1633,7 @@ myLoadImage <- function() {
 
 makeCombinedMemMat <- function(sjiTbl, envTbl, config) {
 	res = list()
-	res[['orig']] = makeMemMat(sjiTbl, envTbl, config)
+	res[['orig']] = makeMemMat(sjiTbl, envTbl, modConfig(config, list(permUseEntropyP=F)))
 	res[['entropy']] = makeMemMat(sjiTbl, envTbl, modConfig(config, list(permUseEntropyP=T)))
 	res
 }
