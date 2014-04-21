@@ -2082,6 +2082,9 @@ curWS <- function() {
 	#FIXME: Then work on sampling
 	#FIXME: Quickly rerun logreg analysis for actDV
 	#FIXME: Methods to import and anlyze coefficient tables
+	#FIXME: add unit test for entropy perm makeMatrix
+	#FIXME: afterwards, double check the list(list lines
+
 	runContext20(regen='useAlreadyLoaded')
 	runContext500(regen='useAlreadyLoaded', numRuns=5)
 
