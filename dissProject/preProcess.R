@@ -2177,6 +2177,7 @@ curWS <- function() {
 	runContext20g1(regen='useAlreadyLoaded')
 	runContext20g1()
 	runContext20g2(regen='useAlreadyLoaded')
+	runContext20g2(regen='useAlreadyLoaded')
 
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelVsPred()))))
 	modelHashtagsTbls = buildModelHashtagsTables(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelHashtags()))))
