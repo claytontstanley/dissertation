@@ -1515,6 +1515,8 @@ runUpdateTwitterWithNewGroup <- function() {
 	runGenTokenizedTblTwitter()
 	sqldf('select * from fill_top_hashtag_tokenized_chunk_types()')
 	sqldf('vacuum analyze top_hashtag_tokenized_chunk_types')
+	sqldf('select * from fill_top_hashtag_tweets_creation_epoch()')
+	sqldf('vacuum analyze top_hashtag_tweets')
 	runMakeTarget('parrunTSjisAll')
 	runPythonFun('backupTopHashtags()')
 }
@@ -1799,6 +1801,8 @@ getTokenizedFromSubsetT <- function(minId, maxId, config) {
 }
 
 getTokenizedFromSubsetSO <- function(minId, maxId, config) {
+	minId
+	maxId
 	resTbl = getTokenizedFromSubset(minId, maxId, config)
 	resTbl[, user_screen_name_prior := user_screen_name][, user_screen_name := 'allUsers']
 	addDtToTbl(resTbl)
@@ -1975,7 +1979,7 @@ getCurWorkspaceBy <- function(regen, groupConfig) {
 
 
 runContextWithConfig <- function(regen, samplesPerRun, numRunsT, numRunsSO, groupConfig) {
-	getContextRunConfig <- function(config, name, groupConfig) {
+	getContextRunConfig <- function(config, name) {
 		addNumSamples = function(str) sprintf('%s-%s', str, samplesPerRun)
 		addGroupName = function(str) sprintf('%sg%s', str, getConfig(groupConfig, 'groupNum'))
 		addSizeName = function(str) sprintf('%ss%s', str, getConfig(groupConfig, 'sizeNum'))
@@ -1983,17 +1987,17 @@ runContextWithConfig <- function(regen, samplesPerRun, numRunsT, numRunsSO, grou
 		getConfigMods <- function(name, addFun) {
 			list(modelVsPredOutFile=getOutFileModelVsPred(addFun(name)),
 			     modelHashtagsOutFile=getOutFileModelHashtags(addFun(name)),
-			     logregOutFile=getLogregOutFile(addFun(name)),
-			     groupName=getConfig(groupConfig, 'groupName'))
+			     logregOutFile=getLogregOutFile(addFun(name)))
 		}
 		modConfig(config, getConfigMods(name, addAll))
 	}
 	getCurWorkspaceBy(regen, groupConfig)
-	runContext(getContextRunConfig(defaultTSjiConfig, 'TContextSji', groupConfig), samplesPerRun, numRunsT)
-	runContext(getContextRunConfig(defaultTPermConfig, 'TContextPerm', groupConfig), samplesPerRun, numRunsT)
+	updateGroupName <- function(config) modConfig(config, list(groupName=getConfig(groupConfig, 'groupName')))
+	runContext(updateGroupName(getContextRunConfig(defaultTSjiConfig, 'TContextSji')), samplesPerRun, numRunsT)
+	runContext(updateGroupName(getContextRunConfig(defaultTPermConfig, 'TContextPerm')), samplesPerRun, numRunsT)
 	if (getConfig(groupConfig, 'groupNum') == 1) {
-		runContext(getContextRunConfig(defaultSOSjiConfig, 'SOContextSji', groupConfig), samplesPerRun, numRunsSO)
-		runContext(getContextRunConfig(defaultSOPermConfig, 'SOContextPerm', groupConfig), samplesPerRun, numRunsSO)
+		runContext(getContextRunConfig(defaultSOSjiConfig, 'SOContextSji'), samplesPerRun, numRunsSO)
+		runContext(getContextRunConfig(defaultSOPermConfig, 'SOContextPerm'), samplesPerRun, numRunsSO)
 	}
 }
 
@@ -2021,13 +2025,6 @@ runContext20g1 <- function(regen=F, numRunsT=1, numRunsSO=1) runContextWithConfi
 runContext20g2 <- function(regen=F, numRunsT=1, numRunsSO=1) runContextWithConfig(regen=regen, 20, numRunsT=numRunsT, numRunsSO=numRunsSO, groupConfig=groupConfig2)
 runContext20g3 <- function(regen=F, numRunsT=1, numRunsSO=1) runContextWithConfig(regen=regen, 20, numRunsT=numRunsT, numRunsSO=numRunsSO, groupConfig=groupConfig3)
 runContext20g4 <- function(regen=F, numRunsT=1, numRunsSO=1) runContextWithConfig(regen=regen, 20, numRunsT=numRunsT, numRunsSO=numRunsSO, groupConfig=groupConfig4)
-
-runContext20 <- function() {
-	runContext20g1()
-	runContext20g2()
-	runContext20g3()
-	runContext20g4()
-}
 
 runContext200g1 <- function(regen=F, numRunsT=10, numRunsSO=5) runContextWithConfig(regen=regen, 200, numRunsT=numRunsT, numRunsSO=numRunsSO, groupConfig=groupConfig1)
 runContext200g2 <- function(regen=F, numRunsT=10, numRunsSO=5) runContextWithConfig(regen=regen, 200, numRunsT=numRunsT, numRunsSO=numRunsSO, groupConfig=groupConfig2)
@@ -2169,15 +2166,15 @@ runGenAndSaveCurWorkspace3 <- function() genAndSaveCurWorkspace(groupConfig3)
 runGenAndSaveCurWorkspace4 <- function() genAndSaveCurWorkspace(groupConfig4)
 
 curWS <- function() {
-	#FIXME: Run across all four datasets (new files; changes the r number)
+	#FIXME: Run across all four datasets (new files; changes the g number)
+	#FIXME: Size of sji across RP and Bayesian (new run files; changes the s number)
 	#FIXME: Methods to import and anlyze coefficient tables
-	#FIXME: Size of sji across RP and Bayesian (new run files)
 	#FIXME: Quickly rerun logreg analysis for actDV
 
 	runContext20g1(regen='useAlreadyLoaded')
 	runContext20g1()
 	runContext20g2(regen='useAlreadyLoaded')
-	runContext20g2(regen='useAlreadyLoaded')
+	runContext20g2(regen=F)
 
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelVsPred()))))
 	modelHashtagsTbls = buildModelHashtagsTables(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelHashtags()))))
