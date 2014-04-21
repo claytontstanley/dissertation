@@ -2095,6 +2095,7 @@ computeActPermOrderless <- function(context, pos, config) {
 }
 
 curWS <- function() {
+	#FIXME: Run across all four datasets (new files; changes the r number)
 	#FIXME: Methods to import and anlyze coefficient tables
 	#FIXME: Size of sji across RP and Bayesian (new run files)
 	#FIXME: Quickly rerun logreg analysis for actDV
