@@ -49,7 +49,15 @@ create table if not exists top_hashtag_tweets (
 	primary key (id)
 	);
 
+create or replace function fill_top_hashtag_tweets_creation_epoch()
+returns void as
+$$
 update top_hashtag_tweets set creation_epoch = extract(epoch from to_timestamp(created_at, 'YYYY-MM-DD HH24:MI:SS')::timestamp without time zone) where creation_epoch is null; 
+;
+$$
+language sql;
+
+select * from fill_top_hashtag_tweets_creation_epoch();
 
 --drop table if exists temp_tweets_id cascade;
 create table if not exists temp_tweets_id (

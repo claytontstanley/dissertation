@@ -1983,7 +1983,8 @@ runContextWithConfig <- function(regen, samplesPerRun, numRunsT, numRunsSO, grou
 		getConfigMods <- function(name, addFun) {
 			list(modelVsPredOutFile=getOutFileModelVsPred(addFun(name)),
 			     modelHashtagsOutFile=getOutFileModelHashtags(addFun(name)),
-			     logregOutFile=getLogregOutFile(addFun(name)))
+			     logregOutFile=getLogregOutFile(addFun(name)),
+			     groupName=getConfig(groupConfig, 'groupName'))
 		}
 		modConfig(config, getConfigMods(name, addAll))
 	}
@@ -2028,9 +2029,10 @@ runContext20 <- function() {
 	runContext20g4()
 }
 
-runContext200g1 <- function(regen=F, numRunsT=10, numRunsSO=5) {
-	runContextWithConfig(regen=regen, 200, numRunsT=numRunsT, numRunsSO=numRunsSO, groupConfig=groupConfig1)
-}
+runContext200g1 <- function(regen=F, numRunsT=10, numRunsSO=5) runContextWithConfig(regen=regen, 200, numRunsT=numRunsT, numRunsSO=numRunsSO, groupConfig=groupConfig1)
+runContext200g2 <- function(regen=F, numRunsT=10, numRunsSO=5) runContextWithConfig(regen=regen, 200, numRunsT=numRunsT, numRunsSO=numRunsSO, groupConfig=groupConfig2)
+runContext200g3 <- function(regen=F, numRunsT=10, numRunsSO=5) runContextWithConfig(regen=regen, 200, numRunsT=numRunsT, numRunsSO=numRunsSO, groupConfig=groupConfig3)
+runContext200g4 <- function(regen=F, numRunsT=10, numRunsSO=5) runContextWithConfig(regen=regen, 200, numRunsT=numRunsT, numRunsSO=numRunsSO, groupConfig=groupConfig4)
 
 runContext500g1 <- function(regen=F, numRunsT=10, numRunsSO=5) {
 	runContextWithConfig(regen=regen, 500, numRunsT=numRunsT, numRunsSO=numRunsSO, groupConfig=groupConfig1)
@@ -2174,7 +2176,7 @@ curWS <- function() {
 
 	runContext20g1(regen='useAlreadyLoaded')
 	runContext20g1()
-	runContext20g2()
+	runContext20g2(regen='useAlreadyLoaded')
 
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelVsPred()))))
 	modelHashtagsTbls = buildModelHashtagsTables(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelHashtags()))))
