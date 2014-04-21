@@ -1952,7 +1952,7 @@ getCurWorkspaceBy <- function(regen, groupConfig) {
 	}
 }
 
-runContextWithConfig <- function(regen, samplesPerRun, numRuns, groupConfig) {
+runContextWithConfig <- function(regen, samplesPerRun, numRunsT, numRunsSO, groupConfig) {
 	getCurWorkspaceBy(regen, groupConfig)
 	addNumSamples = function(str) sprintf('%s-%s', str, samplesPerRun)
 	addGroupName = function(str) sprintf('%sg%s', str, getConfig(groupConfig, 'groupNum'))
@@ -1966,15 +1966,10 @@ runContextWithConfig <- function(regen, samplesPerRun, numRuns, groupConfig) {
 	}
 	getConfigModsT <- function(name) getConfigMods(name, addAll)
 	getConfigModsSO <- function(name) getConfigMods(name, addSO)
-	runContextFor <- function(config) {
-		runContext(config, samplesPerRun, numRuns)
-	}
-	runs = list(modConfig(defaultTSjiConfig, getConfigModsT('TContextSji')),
-		    modConfig(defaultSOSjiConfig, getConfigModsSO('SOContextSji')),
-		    modConfig(defaultTPermConfig, getConfigModsT('TContextPerm')),
-		    modConfig(defaultSOPermConfig, getConfigModsSO('SOContextPerm'))
-		    )
-	lapply(runs, runContextFor)
+	runContext(modConfig(defaultTSjiConfig, getConfigModsT('TContextSji')), samplesPerRun, numRunsT)
+	runContext(modConfig(defaultSOSjiConfig, getConfigModsSO('SOContextSji')), samplesPerRun, numRunsSO)
+	runContext(modConfig(defaultTPermConfig, getConfigModsT('TContextPerm')), samplesPerRun, numRunsT)
+	runContext(modConfig(defaultSOPermConfig, getConfigModsSO('SOContextPerm')), samplesPerRun, numRunsSO)
 }
 
 groupConfigS1 <- list(sizeNum=1,
@@ -1997,10 +1992,17 @@ groupConfig2 <- c(groupConfigS1, groupConfigG2)
 groupConfig3 <- c(groupConfigS1, groupConfigG3)
 groupConfig4 <- c(groupConfigS1, groupConfigG4)
 
-runContext20g1 <- function(regen=F, numRuns=1) runContextWithConfig(regen=regen, 20, numRuns=numRuns, groupConfig=groupConfig1)
-runContext200g1 <- function(regen=F, numRuns=5) runContextWithConfig(regen=regen, 200, numRuns=numRuns, groupConfig=groupConfig1)
-runContext500g1 <- function(regen=F, numRuns=5) runContextWithConfig(regen=regen, 500, numRuns=numRuns, groupConfig=groupConfig1)
+runContext20g1 <- function(regen=F, numRunsT=1, numRunsSO=1) {
+	runContextWithConfig(regen=regen, 20, numRunsT=numRunsT, numRunsSO=numRunsSO, groupConfig=groupConfig1)
+}
 
+runContext200g1 <- function(regen=F, numRunsT=10, numRunsSO=5) {
+	runContextWithConfig(regen=regen, 200, numRunsT=numRunsT, numRunsSO=numRunsSO, groupConfig=groupConfig1)
+}
+
+runContext500g1 <- function(regen=F, numRunsT=10, numRunsSO=5) {
+	runContextWithConfig(regen=regen, 500, numRunsT=numRunsT, numRunsSO=numRunsSO, groupConfig=groupConfig1)
+}
 
 createSampleInd <- function(tbl, num, config) {
 	indName = as.symbol(paste0('ind', num))
@@ -2140,7 +2142,6 @@ curWS <- function() {
 
 	runContext20g1(regen='useAlreadyLoaded')
 	runContext20g1(regen=F)
-	runContext500(regen='useAlreadyLoaded', numRuns=5)
 
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelVsPred()))))
 	modelHashtagsTbls = buildModelHashtagsTables(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelHashtags()))))
