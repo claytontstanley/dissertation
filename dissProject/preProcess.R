@@ -704,27 +704,34 @@ defaultTPermConfig = modConfig(c(defaultTConfig, defaultPermConfig,
 				 list(runTbl=makeRunTbl(list(c('actPriorStd', 'actTweetOrder', 'actTweetOrderless'),
 							     c('actTweetOrder', 'actTweetOrderless'),
 							     c('actPriorStd', 'actTweetOrder'),
-							     c('actPriorStd', 'actTweetOrderless'))),
+							     c('actPriorStd', 'actTweetOrderless'),
+							     c('actPriorStd', 'actTweetOrderEntropy', 'actTweetOrderlessEntropy'))),
 				      permEnvTbl='permEnvTblT',
 				      permMemMatOrder='permMemMatTOrder',
 				      permMemMatOrderless='permMemMatTOrderless',
 				      computeActFromContextTbl = 'computeActPermTFromContextTbl')),
 			       list(actDVs=c('actPriorStd_actTweetOrder_actTweetOrderless', 'actPriorStd',
 					     'actTweetOrder', 'actTweetOrderless', 'actTweetOrder_actTweetOrderless',
-					     'actPriorStd_actTweetOrder', 'actPriorStd_actTweetOrderless')))
+					     'actPriorStd_actTweetOrder', 'actPriorStd_actTweetOrderless',
+					     'actPriorStd_actTweetOrderEntropy_actTweetOrderlessEntropy',
+					     'actTweetOrderlessEntropy')))
 
 defaultSOPermConfig = modConfig(c(defaultSOConfig, defaultPermConfig,
 				  list(runTbl=makeRunTbl(list(c('actPriorStd', 'actTitleOrderless', 'actBodyOrderless'),
 							      c('actTitleOrderless', 'actBodyOrderless'),
 							      c('actPriorStd', 'actTitleOrderless'),
-							      c('actPriorStd', 'actBodyOrderless'))),
+							      c('actPriorStd', 'actBodyOrderless'),
+							      c('actPriorStd', 'actTitleOrderlessEntropy', 'actBodyOrderlessEntropy'),
+							      c('actTitleOrderlessEntropy', 'actBodyOrderlessEntropy'))),
 				       permEnvTbl='permEnvTblSO',
 				       permMemMatOrder='',
 				       permMemMatOrderless='permMemMatSOOrderless',
 				       computeActFromContextTbl = 'computeActPermSOFromContextTbl')),
 				list(actDVs=c('actPriorStd_actTitleOrderless_actBodyOrderless', 'actPriorStd',
 					      'actTitleOrderless', 'actBodyOrderless', 'actTitleOrderless_actBodyOrderless',
-					      'actPriorStd_actTitleOrderless', 'actPriorStd_actBodyOrderless')))
+					      'actPriorStd_actTitleOrderless', 'actPriorStd_actBodyOrderless',
+					      'actPriorStd_actTitleOrderlessEntropy_actBodyOrderlessEntropy',
+					      'actTitleOrderlessEntropy_actBodyOrderlessEntropy')))
 
 defaultTSjiConfig = modConfig(c(defaultTConfig, defaultSjiConfig,
 				list(runTbl=makeRunTbl(list(c('actPriorStd', 'actTweet'))))),
@@ -1659,15 +1666,21 @@ computeActSjiFromContextTbl <- function(contextTbl, config) {
 	contextTbl[, computeActSji(chunk, get(getConfig(config, 'sjiTbl')), config), by=type]
 }
 
+funConfigWEntropy <- function(config) modConfig(config, list(permUseEntropyP=T))
+funConfigNEntropy <- function(config) modConfig(config, list(permUseEntropyP=F))
+
 computeActPermTFromContextTbl <- function(contextTbl, config) {
-	contextTbl = rbind(copy(contextTbl)[,type:=paste0('act', capitalize(type),'Order')][,fun:='computeActPermOrder'],
-			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'Orderless')][,fun:='computeActPermOrderless'])
-	contextTbl[, get(fun[1])(chunk, pos, config), by=type]
+	contextTbl = rbind(copy(contextTbl)[,type:=paste0('act', capitalize(type),'Order')][,fun:='computeActPermOrder'][,funConfig:='funConfigNEntropy'],
+			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'Orderless')][,fun:='computeActPermOrderless'][,funConfig:='funConfigNEntropy'],
+			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderEntropy')][,fun:='computeActPermOrder'][,funConfig:='funConfigWEntropy'],
+			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderlessEntropy')][,fun:='computeActPermOrderless'][,funConfig:='funConfigWEntropy'])
+	contextTbl[, get(fun[1])(chunk, pos, get(funConfig)(config)), by=list(type, funConfig)]
 }
 
 computeActPermSOFromContextTbl <- function(contextTbl, config) {
-	contextTbl = copy(contextTbl)[,type:=paste0('act', capitalize(type),'Orderless')][,fun:='computeActPermOrderless']
-	contextTbl[, get(fun[1])(chunk, pos, config), by=type]
+	contextTbl = rbind(copy(contextTbl)[,type:=paste0('act', capitalize(type),'Orderless')][,fun:='computeActPermOrderless'][,funConfig:='funConfigNEntropy'],
+			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderlessEntropy')][,fun:='computeActPermOrderless'][,funConfig:='funConfigWEntropy'])
+	contextTbl[, get(fun[1])(chunk, pos, get(funConfig)(config)), by=list(type, funConfig)]
 }
 
 getContextPredNames <- function(config) {
