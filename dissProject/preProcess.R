@@ -1141,42 +1141,63 @@ renameDVDirection <- function(tbl) {
 	tbl
 }
 
+groupN <- function(n, d) {
+	split(d, ceiling(seq_along(d)/n))
+}
+
 renameColDVName <- function(tbl) {
 	setkey(tbl, DVName)
-	mapTbl = data.table(DVName=c('topHashtagAcrossPriorStd', 'topHashtagPostPriorStd', 'topHashtagPostPriorOL2',
-				     'topHashtagPostTitle', 'topHashtagPostBody', 'topHashtagPostTitleBody', 'topHashtagPostPriorStdTitleBody',
-				     'topHashtagAcrossTitle', 'topHashtagAcrossBody', 'topHashtagAcrossTitleBody', 'topHashtagAcrossPriorStdTitleBody',
-				     'topHashtagPostTitleOrderless', 'topHashtagPostBodyOrderless', 'topHashtagPostTitleOrderlessBodyOrderless', 'topHashtagPostPriorStdTitleOrderlessBodyOrderless',
-				     'topHashtagAcrossTitleOrderless', 'topHashtagAcrossBodyOrderless', 'topHashtagAcrossTitleOrderlessBodyOrderless', 'topHashtagAcrossPriorStdTitleOrderlessBodyOrderless',
-				     'topHashtagPostTweet', 'topHashtagPostPriorStdTweet',
-				     'topHashtagAcrossTweet', 'topHashtagAcrossPriorStdTweet',
-				     'topHashtagPostTweetOrderless', 'topHashtagPostTweetOrder', 'topHashtagPostTweetOrderTweetOrderless', 'topHashtagPostPriorStdTweetOrderTweetOrderless',
-				     'topHashtagAcrossTweetOrderless', 'topHashtagAcrossTweetOrder', 'topHashtagAcrossTweetOrderTweetOrderless', 'topHashtagAcrossPriorStdTweetOrderTweetOrderless',
-				     'topHashtagPostPriorStdTitleOrderless', 'topHashtagPostPriorStdBodyOrderless',
-				     'topHashtagAcrossPriorStdTitleOrderless', 'topHashtagAcrossPriorStdBodyOrderless',
-				     'topHashtagPostPriorStdTweetOrderless', 'topHashtagPostPriorStdTweetOrder',
-				     'topHashtagAcrossPriorStdTweetOrderless', 'topHashtagAcrossPriorStdTweetOrder',
-				     'topHashtagPostTweetOrderlessEntropy', 'topHashtagPostPriorStdTweetOrderEntropyTweetOrderlessEntropy',
-				     'topHashtagPostTitleOrderlessEntropyBodyOrderlessEntropy', 'topHashtagPostPriorStdTitleOrderlessEntropyBodyOrderlessEntropy',
-				     'topHashtagPostTitleOrderlessEntropy', 'topHashtagPostBodyOrderlessEntropy',
-				     'topHashtagPostTweetOrderEntropyTweetOrderlessEntropy', 'topHashtagPostTweetOrderEntropy'),
-			    newName=c('Standard Prior Model Relaxed Across Posts', 'Standard Prior Model', 'Optimized Learning Model',
-				      'Bayes only title', 'Bayes only body', 'Bayes combined title and body', 'Bayes combined full',
-				      'Bayes only title', 'Bayes only body', 'Bayes combined title and body', 'Bayes combined full',
-				      'RP only title', 'RP only body', 'RP combined title and body', 'RP combined full',
-				      'RP only title', 'RP only body', 'RP combined title and body', 'RP combined full',
-				      'Bayes only context', 'Bayes combined full',
-				      'Bayes only context', 'Bayes combined full',
-				      'RP only orderless context', 'RP only order context', 'RP combined orderless and order', 'RP combined full',
-				      'RP only orderless context', 'RP only order context', 'RP combined orderless and order', 'RP combined full',
-				      'RP combined prior and title', 'RP combined prior and body',
-				      'RP combined prior and title', 'RP combined prior and body',
-				      'RP combined prior and orderless', 'RP combined prior and order',
-				      'RP combined prior and orderless', 'RP combined prior and order',
-				      'RP only orderless context w/ entropy', 'RP combined full w/ entropy',
-				      'RP combined title and body w/ entropy', 'RP combined full w/ entropy',
-				      'RP only title w/ entropy', 'RP only body w/ entropy',
-				      'RP combined orderless and order w/ entropy', 'RP only order context w/ entropy'))
+	mapping = c('topHashtagAcrossPriorStd', 'Standard Prior Model Relaxed Across Posts',
+		    'topHashtagPostPriorStd', 'Standard Prior Model',
+		    'topHashtagPostPriorOL2', 'Optimized Learning Model',
+		    'topHashtagPostTitle', 'Bayes only title',
+		    'topHashtagPostBody', 'Bayes only body',
+		    'topHashtagPostTitleBody', 'Bayes combined title and body',
+		    'topHashtagPostPriorStdTitleBody', 'Bayes combined full',
+		    'topHashtagAcrossTitle', 'Bayes only title',
+		    'topHashtagAcrossBody', 'Bayes only body',
+		    'topHashtagAcrossTitleBody', 'Bayes combined title and body',
+		    'topHashtagAcrossPriorStdTitleBody', 'Bayes combined full',
+		    'topHashtagPostTitleOrderless', 'RP only title',
+		    'topHashtagPostBodyOrderless', 'RP only body',
+		    'topHashtagPostTitleOrderlessBodyOrderless', 'RP combined title and body',
+		    'topHashtagPostPriorStdTitleOrderlessBodyOrderless', 'RP combined full',
+		    'topHashtagAcrossTitleOrderless', 'RP only title',
+		    'topHashtagAcrossBodyOrderless', 'RP only body',
+		    'topHashtagAcrossTitleOrderlessBodyOrderless', 'RP combined title and body',
+		    'topHashtagAcrossPriorStdTitleOrderlessBodyOrderless', 'RP combined full',
+		    'topHashtagPostTweet', 'Bayes only context',
+		    'topHashtagPostPriorStdTweet', 'Bayes combined full',
+		    'topHashtagAcrossTweet', 'Bayes only context',
+		    'topHashtagAcrossPriorStdTweet', 'Bayes combined full',
+		    'topHashtagPostTweetOrderless', 'RP only orderless context',
+		    'topHashtagPostTweetOrder', 'RP only order context',
+		    'topHashtagPostTweetOrderTweetOrderless', 'RP combined orderless and order',
+		    'topHashtagPostPriorStdTweetOrderTweetOrderless', 'RP combined full',
+		    'topHashtagAcrossTweetOrderless', 'RP only orderless context',
+		    'topHashtagAcrossTweetOrder', 'RP only order context',
+		    'topHashtagAcrossTweetOrderTweetOrderless', 'RP combined orderless and order',
+		    'topHashtagAcrossPriorStdTweetOrderTweetOrderless', 'RP combined full',
+		    'topHashtagPostPriorStdTitleOrderless', 'RP combined prior and title',
+		    'topHashtagPostPriorStdBodyOrderless', 'RP combined prior and body',
+		    'topHashtagAcrossPriorStdTitleOrderless', 'RP combined prior and title',
+		    'topHashtagAcrossPriorStdBodyOrderless', 'RP combined prior and body',
+		    'topHashtagPostPriorStdTweetOrderless', 'RP combined prior and orderless',
+		    'topHashtagPostPriorStdTweetOrder', 'RP combined prior and order',
+		    'topHashtagAcrossPriorStdTweetOrderless', 'RP combined prior and orderless',
+		    'topHashtagAcrossPriorStdTweetOrder', 'RP combined prior and order',
+		    'topHashtagPostTweetOrderlessEntropy', 'RP only orderless context w/ entropy',
+		    'topHashtagPostPriorStdTweetOrderEntropyTweetOrderlessEntropy', 'RP combined full w/ entropy',
+		    'topHashtagPostTitleOrderlessEntropyBodyOrderlessEntropy', 'RP combined title and body w/ entropy',
+		    'topHashtagPostPriorStdTitleOrderlessEntropyBodyOrderlessEntropy', 'RP combined full w/ entropy',
+		    'topHashtagPostTitleOrderlessEntropy', 'RP only title w/ entropy',
+		    'topHashtagPostBodyOrderlessEntropy', 'RP only body w/ entropy',
+		    'topHashtagPostTweetOrderEntropyTweetOrderlessEntropy', 'RP combined orderless and order w/ entropy',
+		    'topHashtagPostTweetOrderEntropy', 'RP only order context w/ entropy')
+	mapping = groupN(2, mapping)
+	mapping
+	mapTbl = data.table(DVName=sapply(mapping, `[`, 1), newName=sapply(mapping, `[`, 2))
+	mapTbl
 	setkey(mapTbl, DVName)
 	tbl[mapTbl, DVName := newName]
 	tbl
@@ -1952,24 +1973,27 @@ getCurWorkspaceBy <- function(regen, groupConfig) {
 	}
 }
 
+
 runContextWithConfig <- function(regen, samplesPerRun, numRunsT, numRunsSO, groupConfig) {
-	getCurWorkspaceBy(regen, groupConfig)
-	addNumSamples = function(str) sprintf('%s-%s', str, samplesPerRun)
-	addGroupName = function(str) sprintf('%sg%s', str, getConfig(groupConfig, 'groupNum'))
-	addSizeName = function(str) sprintf('%ss%s', str, getConfig(groupConfig, 'sizeNum'))
-	addAll = function(str) addSizeName(addGroupName(addNumSamples(str)))
-	addSO = function(str) addSizeName(addNumSamples(str))
-	getConfigMods <- function(name, addFun) {
-		list(modelVsPredOutFile=getOutFileModelVsPred(addFun(name)),
-		     modelHashtagsOutFile=getOutFileModelHashtags(addFun(name)),
-		     logregOutFile=getLogregOutFile(addFun(name)))
+	getContextRunConfig <- function(config, name, groupConfig) {
+		addNumSamples = function(str) sprintf('%s-%s', str, samplesPerRun)
+		addGroupName = function(str) sprintf('%sg%s', str, getConfig(groupConfig, 'groupNum'))
+		addSizeName = function(str) sprintf('%ss%s', str, getConfig(groupConfig, 'sizeNum'))
+		addAll = function(str) addSizeName(addGroupName(addNumSamples(str)))
+		getConfigMods <- function(name, addFun) {
+			list(modelVsPredOutFile=getOutFileModelVsPred(addFun(name)),
+			     modelHashtagsOutFile=getOutFileModelHashtags(addFun(name)),
+			     logregOutFile=getLogregOutFile(addFun(name)))
+		}
+		modConfig(config, getConfigMods(name, addAll))
 	}
-	getConfigModsT <- function(name) getConfigMods(name, addAll)
-	getConfigModsSO <- function(name) getConfigMods(name, addSO)
-	runContext(modConfig(defaultTSjiConfig, getConfigModsT('TContextSji')), samplesPerRun, numRunsT)
-	runContext(modConfig(defaultSOSjiConfig, getConfigModsSO('SOContextSji')), samplesPerRun, numRunsSO)
-	runContext(modConfig(defaultTPermConfig, getConfigModsT('TContextPerm')), samplesPerRun, numRunsT)
-	runContext(modConfig(defaultSOPermConfig, getConfigModsSO('SOContextPerm')), samplesPerRun, numRunsSO)
+	getCurWorkspaceBy(regen, groupConfig)
+	runContext(getContextRunConfig(defaultTSjiConfig, 'TContextSji', groupConfig), samplesPerRun, numRunsT)
+	runContext(getContextRunConfig(defaultTPermConfig, 'TContextPerm', groupConfig), samplesPerRun, numRunsT)
+	if (getConfig(groupConfig, 'groupNum') == 1) {
+		runContext(getContextRunConfig(defaultSOSjiConfig, 'SOContextSji', groupConfig), samplesPerRun, numRunsSO)
+		runContext(getContextRunConfig(defaultSOPermConfig, 'SOContextPerm', groupConfig), samplesPerRun, numRunsSO)
+	}
 }
 
 groupConfigS1 <- list(sizeNum=1,
@@ -1992,8 +2016,16 @@ groupConfig2 <- c(groupConfigS1, groupConfigG2)
 groupConfig3 <- c(groupConfigS1, groupConfigG3)
 groupConfig4 <- c(groupConfigS1, groupConfigG4)
 
-runContext20g1 <- function(regen=F, numRunsT=1, numRunsSO=1) {
-	runContextWithConfig(regen=regen, 20, numRunsT=numRunsT, numRunsSO=numRunsSO, groupConfig=groupConfig1)
+runContext20g1 <- function(regen=F, numRunsT=1, numRunsSO=1) runContextWithConfig(regen=regen, 20, numRunsT=numRunsT, numRunsSO=numRunsSO, groupConfig=groupConfig1)
+runContext20g2 <- function(regen=F, numRunsT=1, numRunsSO=1) runContextWithConfig(regen=regen, 20, numRunsT=numRunsT, numRunsSO=numRunsSO, groupConfig=groupConfig2)
+runContext20g3 <- function(regen=F, numRunsT=1, numRunsSO=1) runContextWithConfig(regen=regen, 20, numRunsT=numRunsT, numRunsSO=numRunsSO, groupConfig=groupConfig3)
+runContext20g4 <- function(regen=F, numRunsT=1, numRunsSO=1) runContextWithConfig(regen=regen, 20, numRunsT=numRunsT, numRunsSO=numRunsSO, groupConfig=groupConfig4)
+
+runContext20 <- function() {
+	runContext20g1()
+	runContext20g2()
+	runContext20g3()
+	runContext20g4()
 }
 
 runContext200g1 <- function(regen=F, numRunsT=10, numRunsSO=5) {
@@ -2129,10 +2161,10 @@ computeActPermOrderless <- function(context, pos, config) {
 		       config)
 }
 
-runGenAndSaveCurWS1 <- function() genAndSaveCurWorkspace(groupConfig1)
-runGenAndSaveCurWS2 <- function() genAndSaveCurWorkspace(groupConfig2)
-runGenAndSaveCurWS3 <- function() genAndSaveCurWorkspace(groupConfig3)
-runGenAndSaveCurWS4 <- function() genAndSaveCurWorkspace(groupConfig4)
+runGenAndSaveCurWorkspace1 <- function() genAndSaveCurWorkspace(groupConfig1)
+runGenAndSaveCurWorkspace2 <- function() genAndSaveCurWorkspace(groupConfig2)
+runGenAndSaveCurWorkspace3 <- function() genAndSaveCurWorkspace(groupConfig3)
+runGenAndSaveCurWorkspace4 <- function() genAndSaveCurWorkspace(groupConfig4)
 
 curWS <- function() {
 	#FIXME: Run across all four datasets (new files; changes the r number)
@@ -2141,7 +2173,8 @@ curWS <- function() {
 	#FIXME: Quickly rerun logreg analysis for actDV
 
 	runContext20g1(regen='useAlreadyLoaded')
-	runContext20g1(regen=F)
+	runContext20g1()
+	runContext20g2()
 
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelVsPred()))))
 	modelHashtagsTbls = buildModelHashtagsTables(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelHashtags()))))
