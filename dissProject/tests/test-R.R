@@ -152,10 +152,10 @@ test_that('testGetPriorTbl', {
 context("RP Model")
 
 test_that('testMakeMemMat', {
-	config = list(permNRows=5, permUseEntropyP=F)
-	testMemMat <- function(testSjiTbl, testPermEnvTbl, resTbl) {
-		testMemMat = makeMemMat(testSjiTbl, testPermEnvTbl, config) 
-		expect_equivalent(testMemMat, as.matrix(data.table(resTbl)))
+	configNEntropy = list(permNRows=5, permUseEntropyP=F)
+	testMemMat <- function(testSjiTbl, testPermEnvTbl, resTbl, config=configNEntropy) {
+		resMemMat = makeMemMat(testSjiTbl, testPermEnvTbl, config) 
+		expect_equivalent(resMemMat, as.matrix(data.table(resTbl)))
 	}
 	testSjiTbl = data.table(context=c('!'), hashtag=c('b'), posFromTag=0, partialN=1, key='context')
 	testPermEnvTbl = data.table(chunk=c('!', '!', '!', '!'), val=c(1,1,-1,-1), ind=c(1,2,3,4), key='chunk')
@@ -172,6 +172,13 @@ test_that('testMakeMemMat', {
 	testSjiTbl = data.table(context=c('!','#'), hashtag=c('b', 'c'), posFromTag=c(0,0), partialN=1, key='context')
 	testPermEnvTbl = data.table(chunk=c('!', '!', '#', '#'), val=c(1,1,-1,-1), ind=c(1,2,3,4), key='chunk')
 	testMemMat(testSjiTbl, testPermEnvTbl, data.table(b=c(1,1,0,0,0), c=c(0,0,-1,-1,0)))
+	configWEntropy = modConfig(configNEntropy, list(permUseEntropyP=T))
+	testSjiTbl = data.table(context=c('!'), hashtag=c('b'), posFromTag=0, partialN=3, key='context')
+	testPermEnvTbl = data.table(chunk=c('!', '!'), val=c(1,-4), ind=c(1,2), EContext=c(.5,.5), key='chunk')
+	testMemMat(testSjiTbl, testPermEnvTbl, data.table(b=c(3/2, -12/2,0,0,0)), config=configWEntropy)
+	testSjiTbl = data.table(context=c('!','#'), hashtag=c('b','b'), posFromTag=c(0,0), partialN=c(3,3), key='context')
+	testPermEnvTbl = data.table(chunk=c('!','#'), val=c(1,-3),ind=c(1,2),EContext=c(.5,1.5),key='chunk')
+	testMemMat(testSjiTbl, testPermEnvTbl, data.table(b=c(3*.5, 3*-3*1.5, 0, 0, 0)), config=configWEntropy)
 })
 
 test_that('testComputePermAct', {
