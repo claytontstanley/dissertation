@@ -705,7 +705,8 @@ defaultTPermConfig = modConfig(c(defaultTConfig, defaultPermConfig,
 							     c('actTweetOrder', 'actTweetOrderless'),
 							     c('actPriorStd', 'actTweetOrder'),
 							     c('actPriorStd', 'actTweetOrderless'),
-							     c('actPriorStd', 'actTweetOrderEntropy', 'actTweetOrderlessEntropy'))),
+							     c('actPriorStd', 'actTweetOrderEntropy', 'actTweetOrderlessEntropy'),
+							     c('actTweetOrderEntropy', 'actTweetOrderlessEntropy'))),
 				      permEnvTbl='permEnvTblT',
 				      permMemMatOrder='permMemMatTOrder',
 				      permMemMatOrderless='permMemMatTOrderless',
@@ -714,7 +715,7 @@ defaultTPermConfig = modConfig(c(defaultTConfig, defaultPermConfig,
 					     'actTweetOrder', 'actTweetOrderless', 'actTweetOrder_actTweetOrderless',
 					     'actPriorStd_actTweetOrder', 'actPriorStd_actTweetOrderless',
 					     'actPriorStd_actTweetOrderEntropy_actTweetOrderlessEntropy',
-					     'actTweetOrderlessEntropy')))
+					     'actTweetOrderlessEntropy', 'actTweetOrderEntropy', 'actTweetOrderEntropy_actTweetOrderlessEntropy')))
 
 defaultSOPermConfig = modConfig(c(defaultSOConfig, defaultPermConfig,
 				  list(runTbl=makeRunTbl(list(c('actPriorStd', 'actTitleOrderless', 'actBodyOrderless'),
@@ -731,7 +732,8 @@ defaultSOPermConfig = modConfig(c(defaultSOConfig, defaultPermConfig,
 					      'actTitleOrderless', 'actBodyOrderless', 'actTitleOrderless_actBodyOrderless',
 					      'actPriorStd_actTitleOrderless', 'actPriorStd_actBodyOrderless',
 					      'actPriorStd_actTitleOrderlessEntropy_actBodyOrderlessEntropy',
-					      'actTitleOrderlessEntropy_actBodyOrderlessEntropy')))
+					      'actTitleOrderlessEntropy_actBodyOrderlessEntropy',
+					      'actTitleOrderlessEntropy', 'actBodyOrderlessEntropy')))
 
 defaultTSjiConfig = modConfig(c(defaultTConfig, defaultSjiConfig,
 				list(runTbl=makeRunTbl(list(c('actPriorStd', 'actTweet'))))),
@@ -1157,7 +1159,9 @@ renameColDVName <- function(tbl) {
 				     'topHashtagPostPriorStdTitleOrderless', 'topHashtagPostPriorStdBodyOrderless',
 				     'topHashtagAcrossPriorStdTitleOrderless', 'topHashtagAcrossPriorStdBodyOrderless',
 				     'topHashtagPostPriorStdTweetOrderless', 'topHashtagPostPriorStdTweetOrder',
-				     'topHashtagAcrossPriorStdTweetOrderless', 'topHashtagAcrossPriorStdTweetOrder'),
+				     'topHashtagAcrossPriorStdTweetOrderless', 'topHashtagAcrossPriorStdTweetOrder',
+				     'topHashtagPostTweetOrderlessEntropy', 'topHashtagPostPriorStdTweetOrderEntropyTweetOrderlessEntropy',
+				     'topHashtagPostTitleOrderlessEntropyBodyOrderlessEntropy', 'topHashtagPostPriorStdTitleOrderlessEntropyBodyOrderlessEntropy'),
 			    newName=c('Standard Prior Model Relaxed Across Posts', 'Standard Prior Model', 'Optimized Learning Model',
 				      'Bayes only title', 'Bayes only body', 'Bayes combined title and body', 'Bayes combined full',
 				      'Bayes only title', 'Bayes only body', 'Bayes combined title and body', 'Bayes combined full',
@@ -1170,7 +1174,9 @@ renameColDVName <- function(tbl) {
 				      'RP combined prior and title', 'RP combined prior and body',
 				      'RP combined prior and title', 'RP combined prior and body',
 				      'RP combined prior and orderless', 'RP combined prior and order',
-				      'RP combined prior and orderless', 'RP combined prior and order'))
+				      'RP combined prior and orderless', 'RP combined prior and order',
+				      'RP only orderless context w/ entropy', 'RP combined full w/ entropy',
+				      'RP combined title and body w/ entropy', 'RP combined full w/ entropy'))
 	setkey(mapTbl, DVName)
 	tbl[mapTbl, DVName := newName]
 	tbl
