@@ -33,9 +33,11 @@ getTSjis:
 getTSjisAll:
 	egrep '^runGenNcoocTblT.* <-' preProcess.R | awk '{print $$1}'
 
+# FIXME: Only running s1's for now
 getContext:
-	egrep '^runContext[0-9]+.+<-' preProcess.R | awk '{print $$1}'
+	egrep '^runContext[0-9]+.*s1.*<-' preProcess.R | awk '{print $$1}'
 
+# FIXME: Only running s[4-6]'s for now
 getGenAndSaveCurWorkspace:
 	egrep '^runGenAndSaveCurWorkspace.*s[4-6] <-' preProcess.R | awk '{print $$1}'
 

@@ -2082,6 +2082,21 @@ runContext500g2s1 <- buildRunFunContext(regen=F, numRunsT=10, numRunsSO=5, sampl
 runContext500g3s1 <- buildRunFunContext(regen=F, numRunsT=10, numRunsSO=5, samplesPerRun=500, groupConfig=groupConfigG3S1)
 runContext500g4s1 <- buildRunFunContext(regen=F, numRunsT=10, numRunsSO=5, samplesPerRun=500, groupConfig=groupConfigG4S1)
 
+runContext500g1s4 <- buildRunFunContext(regen=F, numRunsT=10, numRunsSO=5, samplesPerRun=500, groupConfig=groupConfigG1S4)
+runContext500g2s4 <- buildRunFunContext(regen=F, numRunsT=10, numRunsSO=5, samplesPerRun=500, groupConfig=groupConfigG2S4)
+runContext500g3s4 <- buildRunFunContext(regen=F, numRunsT=10, numRunsSO=5, samplesPerRun=500, groupConfig=groupConfigG3S4)
+runContext500g4s4 <- buildRunFunContext(regen=F, numRunsT=10, numRunsSO=5, samplesPerRun=500, groupConfig=groupConfigG4S4)
+
+runContext500g1s5 <- buildRunFunContext(regen=F, numRunsT=10, numRunsSO=5, samplesPerRun=500, groupConfig=groupConfigG1S5)
+runContext500g2s5 <- buildRunFunContext(regen=F, numRunsT=10, numRunsSO=5, samplesPerRun=500, groupConfig=groupConfigG2S5)
+runContext500g3s5 <- buildRunFunContext(regen=F, numRunsT=10, numRunsSO=5, samplesPerRun=500, groupConfig=groupConfigG3S5)
+runContext500g4s5 <- buildRunFunContext(regen=F, numRunsT=10, numRunsSO=5, samplesPerRun=500, groupConfig=groupConfigG4S5)
+
+runContext500g1s6 <- buildRunFunContext(regen=F, numRunsT=10, numRunsSO=5, samplesPerRun=500, groupConfig=groupConfigG1S6)
+runContext500g2s6 <- buildRunFunContext(regen=F, numRunsT=10, numRunsSO=5, samplesPerRun=500, groupConfig=groupConfigG2S6)
+runContext500g3s6 <- buildRunFunContext(regen=F, numRunsT=10, numRunsSO=5, samplesPerRun=500, groupConfig=groupConfigG3S6)
+runContext500g4s6 <- buildRunFunContext(regen=F, numRunsT=10, numRunsSO=5, samplesPerRun=500, groupConfig=groupConfigG4S6)
+
 createSampleInd <- function(tbl, num, config) {
 	indName = as.symbol(paste0('ind', num))
 	expr = bquote(.(indName) := sample(1:getConfig(config, 'permNRows'), size=nrow(tbl), replace=T))
