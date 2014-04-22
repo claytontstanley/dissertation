@@ -2016,25 +2016,32 @@ groupConfigG3 <- list(groupNum=3,
 groupConfigG4 <- list(groupNum=4,
 		      groupName = '2014-04-04 15:03:59 trendsmap')
 
-groupConfig1 <- c(groupConfigS1, groupConfigG1)
-groupConfig2 <- c(groupConfigS1, groupConfigG2)
-groupConfig3 <- c(groupConfigS1, groupConfigG3)
-groupConfig4 <- c(groupConfigS1, groupConfigG4)
+groupConfigG1S1 <- c(groupConfigS1, groupConfigG1)
+groupConfigG2S1 <- c(groupConfigS1, groupConfigG2)
+groupConfigG3S1 <- c(groupConfigS1, groupConfigG3)
+groupConfigG4S1 <- c(groupConfigS1, groupConfigG4)
 
-runContext20g1 <- function(regen=F, numRunsT=1, numRunsSO=1) runContextWithConfig(regen=regen, 20, numRunsT=numRunsT, numRunsSO=numRunsSO, groupConfig=groupConfig1)
-runContext20g2 <- function(regen=F, numRunsT=1, numRunsSO=1) runContextWithConfig(regen=regen, 20, numRunsT=numRunsT, numRunsSO=numRunsSO, groupConfig=groupConfig2)
-runContext20g3 <- function(regen=F, numRunsT=1, numRunsSO=1) runContextWithConfig(regen=regen, 20, numRunsT=numRunsT, numRunsSO=numRunsSO, groupConfig=groupConfig3)
-runContext20g4 <- function(regen=F, numRunsT=1, numRunsSO=1) runContextWithConfig(regen=regen, 20, numRunsT=numRunsT, numRunsSO=numRunsSO, groupConfig=groupConfig4)
+buildRunFunContext <- function(regen, numRunsT, numRunsSO, samplesPerRun, groupConfig) {
+	eval(bquote(
+		    function(regen=.(regen), numRunsT=.(numRunsT), numRunsSO=.(numRunsSO)) {
+			    runContextWithConfig(regen=regen, samplesPerRun=samplesPerRun, numRunsT=numRunsT, numRunsSO=numRunsSO, groupConfig=groupConfig)
+		    }))
+}
 
-runContext200g1 <- function(regen=F, numRunsT=10, numRunsSO=5) runContextWithConfig(regen=regen, 200, numRunsT=numRunsT, numRunsSO=numRunsSO, groupConfig=groupConfig1)
-runContext200g2 <- function(regen=F, numRunsT=10, numRunsSO=5) runContextWithConfig(regen=regen, 200, numRunsT=numRunsT, numRunsSO=numRunsSO, groupConfig=groupConfig2)
-runContext200g3 <- function(regen=F, numRunsT=10, numRunsSO=5) runContextWithConfig(regen=regen, 200, numRunsT=numRunsT, numRunsSO=numRunsSO, groupConfig=groupConfig3)
-runContext200g4 <- function(regen=F, numRunsT=10, numRunsSO=5) runContextWithConfig(regen=regen, 200, numRunsT=numRunsT, numRunsSO=numRunsSO, groupConfig=groupConfig4)
+runContext20g1s1 <- buildRunFunContext(regen=F, numRunsT=1, numRunsSO=1, samplesPerRun=20, groupConfig=groupConfigG1S1)
+runContext20g2s1 <- buildRunFunContext(regen=F, numRunsT=1, numRunsSO=1, samplesPerRun=20, groupConfig=groupConfigG2S1)
+runContext20g3s1 <- buildRunFunContext(regen=F, numRunsT=1, numRunsSO=1, samplesPerRun=20, groupConfig=groupConfigG3S1)
+runContext20g4s1 <- buildRunFunContext(regen=F, numRunsT=1, numRunsSO=1, samplesPerRun=20, groupConfig=groupConfigG4S1)
 
-runContext500g1 <- function(regen=F, numRunsT=10, numRunsSO=5) runContextWithConfig(regen=regen, 500, numRunsT=numRunsT, numRunsSO=numRunsSO, groupConfig=groupConfig1)
-runContext500g2 <- function(regen=F, numRunsT=10, numRunsSO=5) runContextWithConfig(regen=regen, 500, numRunsT=numRunsT, numRunsSO=numRunsSO, groupConfig=groupConfig2)
-runContext500g3 <- function(regen=F, numRunsT=10, numRunsSO=5) runContextWithConfig(regen=regen, 500, numRunsT=numRunsT, numRunsSO=numRunsSO, groupConfig=groupConfig3)
-runContext500g4 <- function(regen=F, numRunsT=10, numRunsSO=5) runContextWithConfig(regen=regen, 500, numRunsT=numRunsT, numRunsSO=numRunsSO, groupConfig=groupConfig4)
+runContext200g1s1 <- buildRunFunContext(regen=F, numRunsT=10, numRunsSO=5, samplesPerRun=200, groupConfig=groupConfigG1S1)
+runContext200g2s1 <- buildRunFunContext(regen=F, numRunsT=10, numRunsSO=5, samplesPerRun=200, groupConfig=groupConfigG2S1)
+runContext200g3s1 <- buildRunFunContext(regen=F, numRunsT=10, numRunsSO=5, samplesPerRun=200, groupConfig=groupConfigG3S1)
+runContext200g4s1 <- buildRunFunContext(regen=F, numRunsT=10, numRunsSO=5, samplesPerRun=200, groupConfig=groupConfigG4S1)
+
+runContext500g1s1 <- buildRunFunContext(regen=F, numRunsT=10, numRunsSO=5, samplesPerRun=500, groupConfig=groupConfigG1S1)
+runContext500g2s1 <- buildRunFunContext(regen=F, numRunsT=10, numRunsSO=5, samplesPerRun=500, groupConfig=groupConfigG2S1)
+runContext500g3s1 <- buildRunFunContext(regen=F, numRunsT=10, numRunsSO=5, samplesPerRun=500, groupConfig=groupConfigG3S1)
+runContext500g4s1 <- buildRunFunContext(regen=F, numRunsT=10, numRunsSO=5, samplesPerRun=500, groupConfig=groupConfigG4S1)
 
 createSampleInd <- function(tbl, num, config) {
 	indName = as.symbol(paste0('ind', num))
@@ -2161,21 +2168,20 @@ computeActPermOrderless <- function(context, pos, config) {
 		       config)
 }
 
-runGenAndSaveCurWorkspace1 <- function() genAndSaveCurWorkspace(groupConfig1)
-runGenAndSaveCurWorkspace2 <- function() genAndSaveCurWorkspace(groupConfig2)
-runGenAndSaveCurWorkspace3 <- function() genAndSaveCurWorkspace(groupConfig3)
-runGenAndSaveCurWorkspace4 <- function() genAndSaveCurWorkspace(groupConfig4)
+runGenAndSaveCurWorkspace1 <- function() genAndSaveCurWorkspace(groupConfigG1S1)
+runGenAndSaveCurWorkspace2 <- function() genAndSaveCurWorkspace(groupConfigG2S1)
+runGenAndSaveCurWorkspace3 <- function() genAndSaveCurWorkspace(groupConfigG3S1)
+runGenAndSaveCurWorkspace4 <- function() genAndSaveCurWorkspace(groupConfigG4S1)
 
 curWS <- function() {
 	#FIXME: Run across all four datasets (new files; changes the g number)
 	#FIXME: Size of sji across RP and Bayesian (new run files; changes the s number)
 	#FIXME: Methods to import and anlyze coefficient tables
 	#FIXME: Quickly rerun logreg analysis for actDV
-
-	runContext20g1(regen='useAlreadyLoaded')
-	runContext20g1()
-	runContext20g2(regen='useAlreadyLoaded')
-	runContext20g2(regen=F)
+	runContext20g1s1(regen='useAlreadyLoaded')
+	runContext20g1s1()
+	runContext20g2s1(regen='useAlreadyLoaded')
+	runContext20g2s1(regen=F)
 
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelVsPred()))))
 	modelHashtagsTbls = buildModelHashtagsTables(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelHashtags()))))
@@ -2196,7 +2202,7 @@ curWS <- function() {
 	postResTblSO
 	postResTblT
 	postResTblT
-	withProf(myLoadImage())
+	withProf(myLoadImage(groupConfigG1S1))
 	priorTblGlobT[, .N, by=hashtag][, list(hashtag, p=N/sum(N))][order(p, decreasing=T)][1:50][, plot(1:length(p), p)]
 	priorTblUserSO[, .N, by=hashtag][, list(hashtag, p=N/sum(N))][order(p, decreasing=T)][1:50][, plot(1:length(p), p)]
 	BTbl
