@@ -2028,25 +2028,37 @@ runContextWithConfig <- function(regen, samplesPerRun, numRunsT, numRunsSO, grou
 	}
 }
 
-groupConfigS1 <- list(sizeNum=1,
-		      maxIdSOSji=1e5, maxIdSOPrior=100e6, maxIdTSji=3e6, maxIdTPrior=1e5)
+groupConfigS1 <- list(sizeNum=1, maxIdSOSji=1e5, maxIdSOPrior=100e6, maxIdTSji=3e6, maxIdTPrior=1e5)
+groupConfigS2 <- list(sizeNum=2, maxIdSOSji=3e6, maxIdSOPrior=100e6, maxIdTSji=3e6, maxIdTPrior=1e5)
+groupConfigS3 <- list(sizeNum=3, maxIdSOSji=1e6, maxIdSOPrior=100e6, maxIdTSji=1e6, maxIdTPrior=1e5)
+groupConfigS4 <- list(sizeNum=4, maxIdSOSji=1e5, maxIdSOPrior=100e6, maxIdTSji=1e5, maxIdTPrior=1e5)
+groupConfigS5 <- list(sizeNum=5, maxIdSOSji=1e4, maxIdSOPrior=100e6, maxIdTSji=1e4, maxIdTPrior=1e5)
+groupConfigS6 <- list(sizeNum=6, maxIdSOSji=1e3, maxIdSOPrior=100e6, maxIdTSji=1e3, maxIdTPrior=1e5)
 
-groupConfigG1 <- list(groupNum=1,
-		      groupName = '2014-02-27 17:13:30 initial')
-
-groupConfigG2 <- list(groupNum=2,
-		      groupName = '2014-03-17 11:28:15 trendsmap')
-
-groupConfigG3 <- list(groupNum=3,
-		      groupName = '2014-03-24 13:06:19 trendsmap')
-
-groupConfigG4 <- list(groupNum=4,
-		      groupName = '2014-04-04 15:03:59 trendsmap')
+groupConfigG1 <- list(groupNum=1, groupName = '2014-02-27 17:13:30 initial')
+groupConfigG2 <- list(groupNum=2, groupName = '2014-03-17 11:28:15 trendsmap')
+groupConfigG3 <- list(groupNum=3, groupName = '2014-03-24 13:06:19 trendsmap')
+groupConfigG4 <- list(groupNum=4, groupName = '2014-04-04 15:03:59 trendsmap')
 
 groupConfigG1S1 <- c(groupConfigS1, groupConfigG1)
 groupConfigG2S1 <- c(groupConfigS1, groupConfigG2)
 groupConfigG3S1 <- c(groupConfigS1, groupConfigG3)
 groupConfigG4S1 <- c(groupConfigS1, groupConfigG4)
+
+groupConfigG1S4 <- c(groupConfigS4, groupConfigG1)
+groupConfigG2S4 <- c(groupConfigS4, groupConfigG2)
+groupConfigG3S4 <- c(groupConfigS4, groupConfigG3)
+groupConfigG4S4 <- c(groupConfigS4, groupConfigG4)
+
+groupConfigG1S5 <- c(groupConfigS5, groupConfigG1)
+groupConfigG2S5 <- c(groupConfigS5, groupConfigG2)
+groupConfigG3S5 <- c(groupConfigS5, groupConfigG3)
+groupConfigG4S5 <- c(groupConfigS5, groupConfigG4)
+
+groupConfigG1S6 <- c(groupConfigS6, groupConfigG1)
+groupConfigG2S6 <- c(groupConfigS6, groupConfigG2)
+groupConfigG3S6 <- c(groupConfigS6, groupConfigG3)
+groupConfigG4S6 <- c(groupConfigS6, groupConfigG4)
 
 buildRunFunContext <- function(regen, numRunsT, numRunsSO, samplesPerRun, groupConfig) {
 	eval(bquote(
@@ -2200,9 +2212,27 @@ runGenAndSaveCurWorkspaceg2s1 <- function() genAndSaveCurWorkspace(groupConfigG2
 runGenAndSaveCurWorkspaceg3s1 <- function() genAndSaveCurWorkspace(groupConfigG3S1)
 runGenAndSaveCurWorkspaceg4s1 <- function() genAndSaveCurWorkspace(groupConfigG4S1)
 
+runGenAndSaveCurWorkspaceg1s4 <- function() genAndSaveCurWorkspace(groupConfigG1S4)
+runGenAndSaveCurWorkspaceg2s4 <- function() genAndSaveCurWorkspace(groupConfigG2S4)
+runGenAndSaveCurWorkspaceg3s4 <- function() genAndSaveCurWorkspace(groupConfigG3S4)
+runGenAndSaveCurWorkspaceg4s4 <- function() genAndSaveCurWorkspace(groupConfigG4S4)
+
+runGenAndSaveCurWorkspaceg1s5 <- function() genAndSaveCurWorkspace(groupConfigG1S5)
+runGenAndSaveCurWorkspaceg2s5 <- function() genAndSaveCurWorkspace(groupConfigG2S5)
+runGenAndSaveCurWorkspaceg3s5 <- function() genAndSaveCurWorkspace(groupConfigG3S5)
+runGenAndSaveCurWorkspaceg4s5 <- function() genAndSaveCurWorkspace(groupConfigG4S5)
+
+runGenAndSaveCurWorkspaceg1s6 <- function() genAndSaveCurWorkspace(groupConfigG1S6)
+runGenAndSaveCurWorkspaceg2s6 <- function() genAndSaveCurWorkspace(groupConfigG2S6)
+runGenAndSaveCurWorkspaceg3s6 <- function() genAndSaveCurWorkspace(groupConfigG3S6)
+runGenAndSaveCurWorkspaceg4s6 <- function() genAndSaveCurWorkspace(groupConfigG4S6)
+
 curWS <- function() {
 	#FIXME: Run across all four datasets (new files; changes the g number)
 	#FIXME: Size of sji across RP and Bayesian (new run files; changes the s number)
+	#FIXME: s1 is incorrect. Fix but make sure that broken regression issues are handled
+	#FIXME: address word order low predictiveness
+	#FIXME: Stop-word removal method and compare to entropy
 	#FIXME: Methods to import and anlyze coefficient tables
 	#FIXME: Quickly rerun logreg analysis for actDV
 	runContext20g1s1(regen='useAlreadyLoaded')

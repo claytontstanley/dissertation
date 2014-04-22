@@ -13,6 +13,7 @@ parrunSjis: NP = 1
 parrunTSjis: NP = 1
 parrunTSjisAll: NP = 1
 parrunContext: NP = 1
+parrunGenAndSaveCurWorkspace: NP = 1
 
 parrun%:
 	make -s get$* | parallel -P ${NP} --progress make {}
@@ -34,6 +35,9 @@ getTSjisAll:
 
 getContext:
 	egrep '^runContext[0-9]+.+<-' preProcess.R | awk '{print $$1}'
+
+getGenAndSaveCurWorkspace:
+	egrep '^runGenAndSaveCurWorkspace.*s[4-6] <-' preProcess.R | awk '{print $$1}'
 
 checkPostgresTimes:
 	sudo tail -n 10000 /opt/local/var/db/postgresql93/defaultdb/system.log | egrep '(statement:|duration:)'
