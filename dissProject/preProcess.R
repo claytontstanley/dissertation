@@ -2191,8 +2191,6 @@ curWS <- function() {
 	#FIXME: Quickly rerun logreg analysis for actDV
 	runContext20g1s1(regen='useAlreadyLoaded')
 	runContext20g1s1()
-	runContext20g2s1(regen='useAlreadyLoaded')
-	runContext20g2s1(regen=F)
 
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelVsPred()))))
 	modelHashtagsTbls = buildModelHashtagsTables(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelHashtags()))))
