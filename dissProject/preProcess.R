@@ -1750,6 +1750,13 @@ getSjiTblWide <- function(contextTbl, config) {
 	sjiTblWide
 }
 
+setColOrderWithAtFront <- function(tbl, front) {
+	front = c('hashtag', 'd')
+	order = c(front, setdiff(colnames(tbl), front))
+	setcolorder(tbl, order)
+	tbl
+}
+
 getPostResTbl <- function(tokenTbl, config, id) {
 	myLog(sprintf("Getting results for id=%s", id))
 	tokenTbl
@@ -1766,9 +1773,13 @@ getPostResTbl <- function(tokenTbl, config, id) {
 	priorTbl = getPriorForUserAtEpoch(get(getConfig(config, 'priorTbl')), tokenTbl$user_screen_name_prior[1], tokenTbl$creation_epoch[1], dStd)
 	priorTbl
 	setkey(priorTbl, hashtag, d)
-	tempTagTbl = tagTbl[, list(hashtag=rep(chunk, each=length(dStd)), d=dStd)]
-	setkey(tempTagTbl, hashtag, d)
-	priorTbl = merge(priorTbl, unique(tempTagTbl), all=T)
+	if (nrow(tagTbl) > 0) {
+		tempTagTbl = tagTbl[, list(hashtag=rep(chunk, each=length(dStd)), d=dStd)]
+		setkey(tempTagTbl, hashtag, d)
+		priorTbl = merge(priorTbl, unique(tempTagTbl), all=T)
+	} else {
+		setColOrderWithAtFront(priorTbl, c('hashtag', 'd'))
+	}
 	priorTbl[, user_screen_name := tokenTbl$user_screen_name[1]]
 	priorTbl[, dt := tokenTbl[, dt[1]]]
 	sjiTblWide = getSjiTblWide(contextTbl, config)
