@@ -2168,10 +2168,10 @@ computeActPermOrderless <- function(context, pos, config) {
 		       config)
 }
 
-runGenAndSaveCurWorkspace1 <- function() genAndSaveCurWorkspace(groupConfigG1S1)
-runGenAndSaveCurWorkspace2 <- function() genAndSaveCurWorkspace(groupConfigG2S1)
-runGenAndSaveCurWorkspace3 <- function() genAndSaveCurWorkspace(groupConfigG3S1)
-runGenAndSaveCurWorkspace4 <- function() genAndSaveCurWorkspace(groupConfigG4S1)
+runGenAndSaveCurWorkspaceg1s1 <- function() genAndSaveCurWorkspace(groupConfigG1S1)
+runGenAndSaveCurWorkspaceg2s1 <- function() genAndSaveCurWorkspace(groupConfigG2S1)
+runGenAndSaveCurWorkspaceg3s1 <- function() genAndSaveCurWorkspace(groupConfigG3S1)
+runGenAndSaveCurWorkspaceg4s1 <- function() genAndSaveCurWorkspace(groupConfigG4S1)
 
 curWS <- function() {
 	#FIXME: Run across all four datasets (new files; changes the g number)
