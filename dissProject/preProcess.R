@@ -936,7 +936,12 @@ runSOQgt050r2 <- makeSORunr4(050, 'SOQgt050r2')
 addRunNum <- function(modelVsPredTbl) {
 	modelVsPredTbl
 	modelVsPredTbl[, runNum := 1]
-	modelVsPredTbl[grepl('r[0-9]$', datasetName), runNum := as.numeric(substr(datasetName, nchar(datasetName), nchar(datasetName)))]
+	modelVsPredTbl[grepl('r[0-9]+$', datasetName), runNum := as.numeric(sub('^.*r([0-9]+).*$', "\\1", datasetName))]
+}
+
+addGroupNum <- function(modelVsPredTbl) {
+	modelVsPredTbl[, groupNum := 1]
+	modelVsPredTbl[grepl('g[0-9]+', datasetName), groupNum := as.numeric(sub('^.*g([0-9]+).*$', "\\1", datasetName))]
 }
 
 addDatasetNameRoot <- function(modelVsPredTbl) {
@@ -981,6 +986,7 @@ buildModelHashtagsTables <- function(outFileNames) {
 	modelHashtagsTbl = lapply(outFileNames, buildTable)
 	for (tbl in modelHashtagsTbl) {
 		addRunNum(tbl)
+		addGroupNum(tbl)
 		addDatasetNameRoot(tbl)
 		addDatasetType(tbl) 
 		addDatasetGroup(tbl)
@@ -1031,6 +1037,7 @@ buildTables <- function(outFileNames) {
 	modelVsPredTbl = rbindlist(lapply(outFileNames, buildTable))
 	modelVsPredTbl
 	addRunNum(modelVsPredTbl)
+	addGroupNum(modelVsPredTbl)
 	addDatasetNameRoot(modelVsPredTbl)
 	addDatasetType(modelVsPredTbl)
 	addDatasetGroup(modelVsPredTbl)
@@ -1193,7 +1200,15 @@ renameColDVName <- function(tbl) {
 		    'topHashtagPostTitleOrderlessEntropy', 'RP only title w/ entropy',
 		    'topHashtagPostBodyOrderlessEntropy', 'RP only body w/ entropy',
 		    'topHashtagPostTweetOrderEntropyTweetOrderlessEntropy', 'RP combined orderless and order w/ entropy',
-		    'topHashtagPostTweetOrderEntropy', 'RP only order context w/ entropy')
+		    'topHashtagPostTweetOrderEntropy', 'RP only order context w/ entropy',
+		    'topHashtagAcrossTweetOrderlessEntropy', 'RP only orderless context w/ entropy',
+		    'topHashtagAcrossPriorStdTweetOrderEntropyTweetOrderlessEntropy', 'RP combined full w/ entropy',
+		    'topHashtagAcrossTitleOrderlessEntropyBodyOrderlessEntropy', 'RP combined title and body w/ entropy',
+		    'topHashtagAcrossPriorStdTitleOrderlessEntropyBodyOrderlessEntropy', 'RP combined full w/ entropy',
+		    'topHashtagAcrossTitleOrderlessEntropy', 'RP only title w/ entropy',
+		    'topHashtagAcrossBodyOrderlessEntropy', 'RP only body w/ entropy',
+		    'topHashtagAcrossTweetOrderEntropyTweetOrderlessEntropy', 'RP combined orderless and order w/ entropy',
+		    'topHashtagAcrossTweetOrderEntropy', 'RP only order context w/ entropy')
 	mapping = groupN(2, mapping)
 	mapping
 	mapTbl = data.table(DVName=sapply(mapping, `[`, 1), newName=sapply(mapping, `[`, 2))
@@ -1315,10 +1330,11 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 	summary(logit)
 	tables()
 	print(ClassLog(logit, modelHashtagsTbl$hashtagUsedP))
-	modelVsPredTbl
+	modelVsPredTbl[, .N, by=list(runNum, groupNum)] #FIXME: These should be evenly distributed, after successful full run, check
 	plotPPVTbl(ppvTbl[dsetType=='stackoverflow' & runNum==1 & dsetSize==500], 'contextPpvSO')
 	plotPPVTbl(ppvTbl[dsetType=='twitter' & runNum==1 & dsetSize==500], 'contextPpvT')
 	tbl = modelVsPredTbl[predUsedBest == T][dsetSize==500][grepl('^topHashtagPost', DVName)]
+	tbl = modelVsPredTbl[predUsedBest == T][dsetSize==500][grepl('^topHashtagAcross', DVName)]
 	tbl
 	compareMeanDV(tbl[dsetType == 'stackoverflow'], acc, figName='ContextMeanDVSO')
 	compareMeanDV(tbl[dsetType == 'twitter'], acc, figName='ContextMeanDVT')
