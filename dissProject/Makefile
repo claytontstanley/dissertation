@@ -45,9 +45,9 @@ getContext: getContextS1
 getContextS%:
 	egrep '^runContext[0-9]+.*s$*.*<-' ${rFile} | awk '{print $$1}'
 
-# FIXME: Only running s[2]'s for now
+# FIXME: Only running s[23]'s for now
 getGenAndSaveCurWorkspace:
-	egrep '^runGenAndSaveCurWorkspace.*s[2] <-' ${rFile} | awk '{print $$1}'
+	egrep '^runGenAndSaveCurWorkspace.*s[23] <-' ${rFile} | awk '{print $$1}'
 
 checkPostgresTimes:
 	sudo tail -n 10000 /opt/local/var/db/postgresql93/defaultdb/system.log | egrep '(statement:|duration:)'
