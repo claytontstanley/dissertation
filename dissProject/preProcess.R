@@ -24,6 +24,7 @@ library(magrittr)
 library(sqldf)
 library(data.table)
 library(reshape2)
+library(boot)
 
 PATH = getPathToThisFile()
 FILE = getNameOfThisFile()
@@ -140,25 +141,18 @@ sqldt <- function(...) {
 	setDT(sqldf(...))
 }
 
-# Computing CIs around a variance statistic
+# Computing CIs around statistics
 
-CIVar <- function(vals) {
-	sSize = length(vals)	
-	sVar = sd(vals)^2
-	ci = .95
-	df = sSize - 1
-	halfalpha = (1 - ci) / 2
-	ub = sVar * df / qchisq(halfalpha,df)
-	ua = sVar * df / qchisq(1-halfalpha,df)
-	c(upper=ub, mean=sVar, lower=ua)
-}
-
-CIVar2 <- function(vals) {
-	df = data.frame(x=vals)
-	model = 'x ~~ x'
-	fit = sem(model, data=df, likelihood = "wishart" )
-	res = parameterEstimates(fit)
-	with(res, c(upper=ci.upper, mean=est, lower=ci.lower))
+CIMedian <- function(x) {
+	res = boot(x,function(x,i) median(x[i]), R=1000)
+	res
+	res = boot.ci(res, type="norm")
+	lower = unlist(res)[['normal2']]
+	upper = unlist(res)[['normal3']]
+	mid = median(x)
+	if (is.null(lower)) lower=mid
+	if (is.null(upper)) upper=mid
+	c(lower, mid, upper)
 }
 
 getTokenizedTbl <- function(tweetsTbl, from, regex) {
@@ -568,15 +562,6 @@ visModelVsPredTbl <- function(modelVsPredTbl) {
 	myPlotPrint(p3, sprintf('visAcc-%s', ext)) 
 	myPlotPrint(p4, sprintf('visHistD-%s', ext)) 
 	return()
-}
-
-tableModelVsPredTbl <- function(modelVsPredTbl) {
-	# Summary table of optimal d values and sample variance
-	modelVsPredTbl[predUsedBest == T][, list(mean=mean(d), median=median(d), totN=mean(totN), NCell=mean(NCell), acc=mean(NCell/totN),
-						 datasetName=guardAllEqualP(datasetName)[1],
-						 dsetGroup=guardAllEqualP(dsetGroup)[1],
-						 #sdCI=sqrt(CIVar(d)), sdCI1=sqrt(CIVar2(d)), meanCI=CI(d))
-						 sd=sd(d)), by=list(datasetNameRoot, runNum, DVName)]
 }
 
 getDirGen <- function(tblDir) {
@@ -1051,8 +1036,8 @@ buildTables <- function(outFileNames) {
 	modelVsPredTbl
 }
 
-withCI <- function(dat) {
-	res = CI(dat)
+withCI <- function(dat, CIFun=CI) {
+	res = CIFun(dat)
 	list(N=length(dat), meanVal=res[2], minCI=res[1], maxCI=res[3])
 }
 
@@ -1086,11 +1071,13 @@ compareDBestVsMax <- function(modelVsPredTbl) {
 	sumTbl[, list(diff=acc[2]-acc[1], direction=paste('best d', '-', 'max d')), by=list(datasetName, user_screen_name, DVName)][, getComparisonTbl(.SD)]
 }
 
-plotBarSumTbl <- function(sumTbl, fillCol, figName, extras=NULL) {
+plotBarSumTbl <- function(sumTbl, fillCol, figName, extras=NULL, groupCol='dsetGroup') {
+	groupCol = as.symbol(groupCol)
 	fillCol = substitute(fillCol)
-	renameColDatasetGroup(sumTbl)
-	expr = bquote(ggplot(sumTbl, aes(x=factor(dsetGroup), y=meanVal, fill=.(fillCol))) +
-		      geom_bar(width=0.7, position=position_dodge(), stat='identity') +
+	renameCols(sumTbl)
+	sumTbl
+	expr = bquote(ggplot(sumTbl, aes(x=factor(.(groupCol)), y=meanVal, fill=.(fillCol))) +
+		      geom_bar(aes(y=meanVal), width=0.7, position=position_dodge(), stat='identity') +
 		      geom_errorbar(aes(ymin=minCI, ymax=maxCI), position=position_dodge(width=0.7), width=0.1, size=0.3) + 
 		      defaultGGPlotOpts)
 	plot = eval(expr)
@@ -1099,15 +1086,15 @@ plotBarSumTbl <- function(sumTbl, fillCol, figName, extras=NULL) {
 	sumTbl
 }
 
-compareMeanDV <- function(modelVsPredTbl, DV, extras=NULL, figName='') {
+compareMeanDV <- function(modelVsPredTbl, DV, extras=NULL, figName='', groupCol='dsetGroup', CIFun=CI) {
 	DV = substitute(DV)
 	modelVsPredTbl
-	expr = bquote(tableModelVsPredTbl(modelVsPredTbl)[, withCI(.(DV)), keyby=list(DVName, dsetGroup)])
+	expr = bquote(modelVsPredTbl[predUsedBest == T][, withCI(.(DV), CIFun=CIFun), keyby=list(DVName, .(as.symbol(groupCol)))])
 	expr
 	sumTbl = eval(expr)
 	sumTbl
 	renameColDVName(sumTbl)
-	plotBarSumTbl(sumTbl, DVName, sprintf('compareMeanDV-%s-%s', deparse(DV), figName),
+	plotBarSumTbl(sumTbl, DVName, sprintf('compareMeanDV-%s-%s', deparse(DV), figName), groupCol=groupCol,
 		      extras=c(list(theme(legend.position='top', legend.direction='vertical', axis.title.y=element_blank()),
 				    guides(fill=guide_legend(title='Model Name', reverse=T)),
 				    coord_flip()
@@ -1128,6 +1115,21 @@ plotDatasetDescriptives <- function(modelVsPredTbl) {
 				  ylab('Number of Hashtag Occurrences')))
 	sumTbl
 }
+
+renameCols <- function(tbl) {
+	cnames = colnames(tbl)
+	if ('dsetGroup' %in% cnames) renameColDatasetGroup(tbl)
+	if ('groupNum' %in% cnames) renameColGroupNum(tbl)
+}
+
+renameColGroupNum <- function(tbl) {
+	mapTbl = data.table(groupNum=as.character(c(1,2,3,4)),
+			    newName=c('Dataset 1', 'Dataset 2', 'Dataset 3', 'Dataset 4'), key='groupNum')
+	tbl[, groupNum := as.character(groupNum)]
+	setkey(tbl, groupNum)
+	tbl[mapTbl, groupNum := newName]
+}
+
 
 renameColDatasetGroup <- function(tbl) {
 	setkey(tbl, dsetGroup)
@@ -1232,7 +1234,7 @@ plotDVDiffs <- function(sumTbl) {
 										  ))
 }
 
-compareOptimalDs <- function(modelVsPredTbl) compareMeanDV(modelVsPredTbl, median, list(labs(y='Mean Optimal Decay Rate Parameter (d)')))
+compareOptimalDs <- function(modelVsPredTbl) compareMeanDV(modelVsPredTbl, d, list(labs(y='Mean Optimal Decay Rate Parameter (d)')), CIFun=CIMedian)
 compareOptimalAcc <- function(modelVsPredTbl) compareMeanDV(modelVsPredTbl, acc, list(labs(y='Mean Accuracy')))
 
 wrapQuotes <- function(charVect) {
@@ -1292,7 +1294,7 @@ getBestFitNames <- function(modelHashtagsTbl) {
 	bestFitNameTbl
 }
 
-analyzeModelVsPredTbl <- function(modelVsPredTbl) {
+analyzePrior <- function(modelVsPredTbl) {
 	analyzeTemporal(modelVsPredTbl)
 	plotDatasetDescriptives(modelVsPredTbl)[, list(meanNUsers=mean(NUsers),totNUsers=sum(NUsers),meanNHO=mean(NHashtagObs),totNHO=sum(NHashtagObs)), by=list(dsetType)]
 	# Check that totN calculated makes sense. Result should be small.
@@ -1340,10 +1342,18 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 	plotPPVTbl(ppvTbl[dsetType=='stackoverflow' & runNum==1 & dsetSize==500], 'contextPpvSO')
 	plotPPVTbl(ppvTbl[dsetType=='twitter' & runNum==1 & dsetSize==500], 'contextPpvT')
 	tbl = modelVsPredTbl[predUsedBest == T][dsetSize==500][grepl('^topHashtagPost', DVName)]
-	tbl = modelVsPredTbl[predUsedBest == T][dsetSize==500][grepl('^topHashtagAcross', DVName)]
+	tbl = modelVsPredTbl[predUsedBest == T][dsetSize==500][sizeNum == 1][grepl('^topHashtagAcross', DVName)]
 	tbl
+	# SO standard
+	compareMeanDV(tbl[dsetType == 'stackoverflow' & !grepl('Entropy', DVName)], acc, figName='ContextMeanDVSO')
+	# T standard
+	compareMeanDV(tbl[dsetType == 'twitter' & !grepl('Entropy', DVName)][groupNum == 1], acc, figName='foo', groupCol='dsetGroup')
+	# T standard all groups
+	compareMeanDV(tbl[dsetType == 'twitter' & !grepl('Entropy', DVName)], acc, figName='ContextMeanDVT', groupCol='groupNum')
+	# SO Entropy
 	compareMeanDV(tbl[dsetType == 'stackoverflow'], acc, figName='ContextMeanDVSO')
-	compareMeanDV(tbl[dsetType == 'twitter'], acc, figName='ContextMeanDVT')
+	# T Entropy 
+	compareMeanDV(tbl[dsetType == 'twitter'][groupNum == 1], acc, figName='foo', groupCol='dsetGroup')
 }
 
 getNcoocTbl <- function(type, chunkTableQuery, config) {
@@ -2282,7 +2292,7 @@ curWS <- function() {
 
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelVsPred()))))
 	modelHashtagsTbls = buildModelHashtagsTables(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelHashtags()))))
-	#modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isPriorRun, list.files(path=getDirModelVsPred()))))
+	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isPriorRun, list.files(path=getDirModelVsPred()))))
 	modelVsPredTbl
 	sjiTblTOrderless
 	priorTblGlobT[, N:=.N, by=hashtag][, N := N/nrow(.SD)]
