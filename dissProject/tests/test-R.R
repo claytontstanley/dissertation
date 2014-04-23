@@ -78,26 +78,26 @@ test_that("testOnlyFirstT", {
 context("ModelVsPred Full Runs")
 
 test_that("testModelVsPred", {
-	  expectedTbl = myReadCSV(getModelVsPredOutFile('testing1'))
+	  expectedTbl = myReadCSV(getOutFileModelVsPred('testing1'))
 	  hashtagsTblColClasses = c('character', 'character', 'integer', 'character', 'integer', 'integer', 'character')
-	  expectedHashtagsTbl = myReadCSV(getHashtagsOutFile('testing1'), colClasses=hashtagsTblColClasses)
+	  expectedHashtagsTbl = myReadCSV(getOutFileHashtags('testing1'), colClasses=hashtagsTblColClasses)
 	  resTbl = runPriorT(config=modConfig(defaultTConfig, list(query=sprintf("select %s from tweets where user_screen_name = 'ap'", defaultTCols))))
 	  expect_equivalent(expectedTbl, resTbl$modelVsPredTbl)
 	  expect_equivalent(expectedHashtagsTbl, resTbl$hashtagsTbl)
-	  expectedTbl = myReadCSV(getModelVsPredOutFile('testing2'))
+	  expectedTbl = myReadCSV(getOutFileModelVsPred('testing2'))
 	  expectedTbl[, totN := as.integer(totN)]
-	  expectedHashtagsTbl = myReadCSV(getHashtagsOutFile('testing2'), colClasses=hashtagsTblColClasses)
+	  expectedHashtagsTbl = myReadCSV(getOutFileHashtags('testing2'), colClasses=hashtagsTblColClasses)
 	  resTbl = runPriorT(config=modConfig(defaultTConfig, list(query=sprintf("select %s from tweets where user_screen_name = 'thebucktlist'", defaultTCols))))
 	  expect_equivalent(expectedTbl, resTbl$modelVsPredTbl)
 	  expect_equivalent(expectedHashtagsTbl, resTbl$hashtagsTbl)
-	  expectedTbl = myReadCSV(getModelVsPredOutFile('twitter_ru'))
+	  expectedTbl = myReadCSV(getOutFileModelVsPred('twitter_ru'))
 	  resTbl = runPriorT(config=modConfig(defaultTConfig, list(query=sprintf("select %s from tweets where user_screen_name = 'twitter_ru'", defaultTCols))))
 	  expect_equivalent(expectedTbl, resTbl$modelVsPredTbl)
 })
 
 test_that("testModelVsPredSO", {
-	  expectedModelVsPredTbl = myReadCSV(getModelVsPredOutFile('testingSO1'))
-	  expectedHashtagsTbl = myReadCSV(getHashtagsOutFile('testingSO1'))
+	  expectedModelVsPredTbl = myReadCSV(getOutFileModelVsPred('testingSO1'))
+	  expectedHashtagsTbl = myReadCSV(getOutFileHashtags('testingSO1'))
 	  expectedModelVsPredTbl[, user_screen_name := as.character(user_screen_name)]
 	  expectedHashtagsTbl[, user_screen_name := as.character(user_screen_name)]
 	  resTbl = runPriorSO(config=modConfig(defaultSOConfig, list(query=sprintf("select %s from posts where post_type_id = 1 and owner_user_id = 20", defaultSOCols))))
@@ -142,9 +142,9 @@ test_that("testComputeAct", {
 test_that('testGetPriorTbl', {
 	  priorTblGlobT = getPriorTblGlobT(defaultTConfig, 1, 1000)
 	  priorTblUserSO = getPriorTblUserSO(defaultSOConfig, 1, 100)
-	  priorTblGlobTExp = myReadCSV(sprintf('%s/priorTblGlobT-1-1000.csv', getPriorDir()))
+	  priorTblGlobTExp = myReadCSV(sprintf('%s/priorTblGlobT-1-1000.csv', getDirPrior()))
 	  expect_equivalent(priorTblGlobT, priorTblGlobTExp)
-	  priorTblUserSOExp = myReadCSV(sprintf('%s/priorTblUserSO-1-100.csv', getPriorDir()))
+	  priorTblUserSOExp = myReadCSV(sprintf('%s/priorTblUserSO-1-100.csv', getDirPrior()))
 	  priorTblUserSOExp[, user_screen_name := as.character(user_screen_name)]
 	  expect_equivalent(priorTblUserSO, priorTblUserSOExp)
 })
