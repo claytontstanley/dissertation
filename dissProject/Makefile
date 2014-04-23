@@ -24,6 +24,9 @@ parrunGenAndSaveCurWorkspace: NP = 1
 parrun%:
 	make -s get$* | parallel -P ${NP} --progress make {}
 
+parrunContextAll: parrunContextS1 parrunContextS4 parrunContextS5 parrunContextS6
+	exit 0
+
 runAll: unit parrunPriors parrunSjis parrunTSjis parrunContext
 	exit 0
 
