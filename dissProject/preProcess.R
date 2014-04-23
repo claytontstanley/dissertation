@@ -2051,6 +2051,11 @@ groupConfigG2S1 <- c(groupConfigS1, groupConfigG2)
 groupConfigG3S1 <- c(groupConfigS1, groupConfigG3)
 groupConfigG4S1 <- c(groupConfigS1, groupConfigG4)
 
+groupConfigG1S2 <- c(groupConfigS2, groupConfigG1)
+groupConfigG2S2 <- c(groupConfigS2, groupConfigG2)
+groupConfigG3S2 <- c(groupConfigS2, groupConfigG3)
+groupConfigG4S2 <- c(groupConfigS2, groupConfigG4)
+
 groupConfigG1S4 <- c(groupConfigS4, groupConfigG1)
 groupConfigG2S4 <- c(groupConfigS4, groupConfigG2)
 groupConfigG3S4 <- c(groupConfigS4, groupConfigG3)
