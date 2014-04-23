@@ -2270,9 +2270,9 @@ runGenAndSaveCurWorkspaceg3s6 <- function() genAndSaveCurWorkspace(groupConfigG3
 runGenAndSaveCurWorkspaceg4s6 <- function() genAndSaveCurWorkspace(groupConfigG4S6)
 
 curWS <- function() {
-	#FIXME: Run across all four datasets (new files; changes the g number)
+	#runGenAndSave for 2 and 3 after 1Mil is finished
+	#runContext for 1,2,3,4,5,6 after
 	#FIXME: Size of sji across RP and Bayesian (new run files; changes the s number)
-	#FIXME: s1 is incorrect. Fix but make sure that broken regression issues are handled
 	#FIXME: address word order low predictiveness
 	#FIXME: Stop-word removal method and compare to entropy
 	#FIXME: Methods to import and anlyze coefficient tables
