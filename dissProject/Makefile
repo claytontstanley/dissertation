@@ -11,9 +11,8 @@ createSOSmall:
 	(cd /Volumes/SuperSupernova/stackExchange/ && rm stackOverflowSmall/* && cd stackOverflow2014 && find *.xml -print -exec bash -ic "(head '{}' && tail '{}') > ../stackOverflowSmall/{}" \;)
 
 parrunPriors: NP = 4
-parrunSjis: NP = 1
-parrunTSjis: NP = 1
-parrunTSjisAll: NP = 1
+parrunSjisSOAll: NP = 1
+parrunSjisTAll: NP = 1
 parrunContext: NP = 1
 parrunContextS1: NP = 1
 parrunContextS2: NP = 1
@@ -28,19 +27,16 @@ parrun%:
 parrunContextAll: parrunContextS2 parrunContextS4 parrunContextS5 parrunContextS6
 	exit 0
 
-runAll: unit parrunPriors parrunSjis parrunTSjis parrunContext
+runAll: unit parrunPriors parrunSjis parrunSjisT parrunContext
 	exit 0
 
 getPriors:
 	grep '^run.* <- make' ${rFile} | awk '{print $$1}'
 
-getSjis:
-	egrep '^runGenNcoocTblSO1thru10+ <-' ${rFile} | awk '{print $$1}'
+getSjisSOAll:
+	egrep '^runGenNcoocTblSO.* <-' ${rFile} | awk '{print $$1}'
 
-getTSjis:
-	egrep '^runGenNcoocTblT.*10+ <-' ${rFile} | awk '{print $$1}'
-
-getTSjisAll:
+getSjisTAll:
 	egrep '^runGenNcoocTblT.* <-' ${rFile} | awk '{print $$1}'
 
 # FIXME: Only running s1's for now

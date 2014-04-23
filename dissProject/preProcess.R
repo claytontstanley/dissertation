@@ -1539,7 +1539,7 @@ runUpdateTwitterWithNewGroup <- function() {
 	sqldf('vacuum analyze top_hashtag_tokenized_chunk_types')
 	sqldf('select * from fill_top_hashtag_tweets_creation_epoch()')
 	sqldf('vacuum analyze top_hashtag_tweets')
-	runMakeTarget('parrunTSjisAll')
+	runMakeTarget('parrunSjisTAll')
 	runPythonFun('backupTopHashtags()')
 }
 
@@ -1547,6 +1547,7 @@ runGenNcoocTblSO1thru100 <- function() genNcoocTblSO('SOShuffledFull', 1, 100)
 runGenNcoocTblSO1thru1000 <- function() genNcoocTblSO('SOShuffledFull', 1, 1000)
 runGenNcoocTblSO1thru10000 <- function() genNcoocTblSO('SOShuffledFull', 1, 10000)
 runGenNcoocTblSO1thru100000 <- function() genNcoocTblSO('SOShuffledFull', 1, 100000)
+runGenNcoocTblSO1thru1000000 <- function() genNcoocTblSO('SOShuffledFull', 1, 1000000)
 runGenNcoocTblSO1thru3000000 <- function() genNcoocTblSO('SOShuffledFull', 1, 3000000)
 
 runGenNcoocTblT11thru100 <- function() genAllNcoocTblTwitter(1, 100)
