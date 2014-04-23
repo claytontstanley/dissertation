@@ -934,14 +934,15 @@ runSOQgt100r2 <- makeSORunr4(100, 'SOQgt100r2')
 runSOQgt050r2 <- makeSORunr4(050, 'SOQgt050r2')
 
 addRunNum <- function(modelVsPredTbl) {
-	modelVsPredTbl
-	modelVsPredTbl[, runNum := 1]
 	modelVsPredTbl[grepl('r[0-9]+$', datasetName), runNum := as.numeric(sub('^.*r([0-9]+).*$', "\\1", datasetName))]
 }
 
 addGroupNum <- function(modelVsPredTbl) {
-	modelVsPredTbl[, groupNum := 1]
 	modelVsPredTbl[grepl('g[0-9]+', datasetName), groupNum := as.numeric(sub('^.*g([0-9]+).*$', "\\1", datasetName))]
+}
+
+addSizeNum <- function(modelVsPredTbl) {
+	modelVsPredTbl[grepl('s[0-9]+', datasetName), sizeNum := as.numeric(sub('^.*s([0-9]+).*$', "\\1", datasetName))]
 }
 
 addDatasetNameRoot <- function(modelVsPredTbl) {
@@ -987,6 +988,7 @@ buildModelHashtagsTables <- function(outFileNames) {
 	for (tbl in modelHashtagsTbl) {
 		addRunNum(tbl)
 		addGroupNum(tbl)
+		addSizeNum(tbl)
 		addDatasetNameRoot(tbl)
 		addDatasetType(tbl) 
 		addDatasetGroup(tbl)
@@ -1038,6 +1040,7 @@ buildTables <- function(outFileNames) {
 	modelVsPredTbl
 	addRunNum(modelVsPredTbl)
 	addGroupNum(modelVsPredTbl)
+	addSizeNum(modelVsPredTbl)
 	addDatasetNameRoot(modelVsPredTbl)
 	addDatasetType(modelVsPredTbl)
 	addDatasetGroup(modelVsPredTbl)
@@ -1330,7 +1333,10 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 	summary(logit)
 	tables()
 	print(ClassLog(logit, modelHashtagsTbl$hashtagUsedP))
-	modelVsPredTbl[, .N, by=list(runNum, groupNum)] #FIXME: These should be evenly distributed, after successful full run, check
+	modelVsPredTbl
+	
+	modelVsPredTbl[dsetSize==20, list(N=.N, Ndsets=length(unique(datasetName))), keyby=list(runNum, groupNum, sizeNum, dsetSize, dsetType)]
+	modelVsPredTbl[, list(N=.N, Ndsets=length(unique(datasetName))), keyby=list(sizeNum, dsetSize, dsetType)]
 	plotPPVTbl(ppvTbl[dsetType=='stackoverflow' & runNum==1 & dsetSize==500], 'contextPpvSO')
 	plotPPVTbl(ppvTbl[dsetType=='twitter' & runNum==1 & dsetSize==500], 'contextPpvT')
 	tbl = modelVsPredTbl[predUsedBest == T][dsetSize==500][grepl('^topHashtagPost', DVName)]
