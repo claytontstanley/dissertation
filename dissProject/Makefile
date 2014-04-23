@@ -16,7 +16,8 @@ parrunTSjis: NP = 1
 parrunTSjisAll: NP = 1
 parrunContext: NP = 1
 parrunContextS1: NP = 1
-parrunContextS4: NP = 2 
+parrunContextS2: NP = 1
+parrunContextS4: NP = 2
 parrunContextS5: NP = 2
 parrunContextS6: NP = 4
 parrunGenAndSaveCurWorkspace: NP = 1
@@ -24,7 +25,7 @@ parrunGenAndSaveCurWorkspace: NP = 1
 parrun%:
 	make -s get$* | parallel -P ${NP} --progress make {}
 
-parrunContextAll: parrunContextS1 parrunContextS4 parrunContextS5 parrunContextS6
+parrunContextAll: parrunContextS2 parrunContextS4 parrunContextS5 parrunContextS6
 	exit 0
 
 runAll: unit parrunPriors parrunSjis parrunTSjis parrunContext
@@ -48,9 +49,9 @@ getContext: getContextS1
 getContextS%:
 	egrep '^runContext[0-9]+.*s$*.*<-' ${rFile} | awk '{print $$1}'
 
-# FIXME: Only running s[4-6]'s for now
+# FIXME: Only running s[2]'s for now
 getGenAndSaveCurWorkspace:
-	egrep '^runGenAndSaveCurWorkspace.*s[4-6] <-' ${rFile} | awk '{print $$1}'
+	egrep '^runGenAndSaveCurWorkspace.*s[2] <-' ${rFile} | awk '{print $$1}'
 
 checkPostgresTimes:
 	sudo tail -n 10000 /opt/local/var/db/postgresql93/defaultdb/system.log | egrep '(statement:|duration:)'
