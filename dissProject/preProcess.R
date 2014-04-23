@@ -2036,8 +2036,8 @@ runContextWithConfig <- function(regen, samplesPerRun, numRunsT, numRunsSO, grou
 }
 
 groupConfigS1 <- list(sizeNum=1, maxIdSOSji=1e5, maxIdSOPrior=100e6, maxIdTSji=3e6, maxIdTPrior=1e5)
-groupConfigS2 <- list(sizeNum=2, maxIdSOSji=3e6, maxIdSOPrior=100e6, maxIdTSji=3e6, maxIdTPrior=1e5)
-#groupConfigS3 <- list(sizeNum=3, maxIdSOSji=1e6, maxIdSOPrior=100e6, maxIdTSji=1e6, maxIdTPrior=1e5) FIXME: Add 1Mil for SO
+groupConfigS2 <- list(sizeNum=2, maxIdSOSji=1e6, maxIdSOPrior=100e6, maxIdTSji=3e6, maxIdTPrior=1e5) # FIXME: Change to 3Mil for SO when possible
+groupConfigS3 <- list(sizeNum=3, maxIdSOSji=1e6, maxIdSOPrior=100e6, maxIdTSji=1e6, maxIdTPrior=1e5) # FIXME: Add 1Mil for SO
 groupConfigS4 <- list(sizeNum=4, maxIdSOSji=1e5, maxIdSOPrior=100e6, maxIdTSji=1e5, maxIdTPrior=1e5)
 groupConfigS5 <- list(sizeNum=5, maxIdSOSji=1e4, maxIdSOPrior=100e6, maxIdTSji=1e4, maxIdTPrior=1e5)
 groupConfigS6 <- list(sizeNum=6, maxIdSOSji=1e3, maxIdSOPrior=100e6, maxIdTSji=1e3, maxIdTPrior=1e5)
@@ -2056,6 +2056,11 @@ groupConfigG1S2 <- c(groupConfigS2, groupConfigG1)
 groupConfigG2S2 <- c(groupConfigS2, groupConfigG2)
 groupConfigG3S2 <- c(groupConfigS2, groupConfigG3)
 groupConfigG4S2 <- c(groupConfigS2, groupConfigG4)
+
+groupConfigG1S3 <- c(groupConfigS3, groupConfigG1)
+groupConfigG2S3 <- c(groupConfigS3, groupConfigG2)
+groupConfigG3S3 <- c(groupConfigS3, groupConfigG3)
+groupConfigG4S3 <- c(groupConfigS3, groupConfigG4)
 
 groupConfigG1S4 <- c(groupConfigS4, groupConfigG1)
 groupConfigG2S4 <- c(groupConfigS4, groupConfigG2)
@@ -2243,6 +2248,11 @@ runGenAndSaveCurWorkspaceg1s2 <- function() genAndSaveCurWorkspace(groupConfigG1
 runGenAndSaveCurWorkspaceg2s2 <- function() genAndSaveCurWorkspace(groupConfigG2S2)
 runGenAndSaveCurWorkspaceg3s2 <- function() genAndSaveCurWorkspace(groupConfigG3S2)
 runGenAndSaveCurWorkspaceg4s2 <- function() genAndSaveCurWorkspace(groupConfigG4S2)
+
+runGenAndSaveCurWorkspaceg1s3 <- function() genAndSaveCurWorkspace(groupConfigG1S3)
+runGenAndSaveCurWorkspaceg2s3 <- function() genAndSaveCurWorkspace(groupConfigG2S3)
+runGenAndSaveCurWorkspaceg3s3 <- function() genAndSaveCurWorkspace(groupConfigG3S3)
+runGenAndSaveCurWorkspaceg4s3 <- function() genAndSaveCurWorkspace(groupConfigG4S3)
 
 runGenAndSaveCurWorkspaceg1s4 <- function() genAndSaveCurWorkspace(groupConfigG1S4)
 runGenAndSaveCurWorkspaceg2s4 <- function() genAndSaveCurWorkspace(groupConfigG2S4)
