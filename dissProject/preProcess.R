@@ -2020,8 +2020,10 @@ runContext <- function(config, samplesPerRun, numRuns) {
 		}
 		outFile = getOutFileForName("modelVsPredOutFile")
 		writeModelVsPredTbl(modelVsPredTbl, outFile)
-		outFile = getOutFileForName('modelHashtagsOutFile')
-		writeModelHashtagsTbl(postResTbl, outFile)
+		if (getConfig(config, 'modelHashtagsOutFile') != '') {
+			outFile = getOutFileForName('modelHashtagsOutFile')
+			writeModelHashtagsTbl(postResTbl, outFile)
+		}
 		outFile = getOutFileForName('logregOutFile')
 		writeLogregTbl(logregTbl, outFile)
 		postResTbl
@@ -2050,9 +2052,11 @@ runContextWithConfig <- function(regen, samplesPerRun, numRunsT, numRunsSO, grou
 		addGroupName = function(str) sprintf('%sg%s', str, getConfig(groupConfig, 'groupNum'))
 		addSizeName = function(str) sprintf('%ss%s', str, getConfig(groupConfig, 'sizeNum'))
 		addAll = function(str) addSizeName(addGroupName(addNumSamples(str)))
+		genModelHashtagsP = {if (getConfig(groupConfig, 'groupNum') == 1 &
+					 getConfig(groupConfig, 'sizeNum') == 1) T else F}
 		getConfigMods <- function(name, addFun) {
 			list(modelVsPredOutFile=getOutFileModelVsPred(addFun(name)),
-			     modelHashtagsOutFile=getOutFileModelHashtags(addFun(name)),
+			     modelHashtagsOutFile={if (!genModelHashtagsP) '' else getOutFileModelHashtags(addFun(name))},
 			     logregOutFile=getLogregOutFile(addFun(name)))
 		}
 		modConfig(config, getConfigMods(name, addAll))
@@ -2309,7 +2313,6 @@ runGenAndSaveCurWorkspaceg4s6 <- function() genAndSaveCurWorkspace(groupConfigG4
 
 curWS <- function() {
 	#FIXME: runContext for 1,2,3,4,5,6 after
-	#FIXME: modelHashtagsTbl is too large
 	#FIXME: address word order low predictiveness
 	#FIXME: Stop-word removal method and compare to entropy
 	#FIXME: Methods to import and anlyze coefficient tables
