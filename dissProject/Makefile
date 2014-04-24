@@ -18,7 +18,7 @@ parrunContextS1: NP = 1
 parrunContextS2: NP = 1
 parrunContextS3: NP = 1
 parrunContextS4: NP = 2
-parrunContextS5: NP = 2
+parrunContextS5: NP = 4
 parrunContextS6: NP = 4
 parrunGenAndSaveCurWorkspace: NP = 1
 
