@@ -152,7 +152,7 @@ CIMedian <- function(x) {
 	mid = median(x)
 	if (is.null(lower)) lower=mid
 	if (is.null(upper)) upper=mid
-	c(lower, mid, upper)
+	c(upper, mid, lower)
 }
 
 getTokenizedTbl <- function(tweetsTbl, from, regex) {
@@ -1049,7 +1049,7 @@ buildTables <- function(outFileNames) {
 
 withCI <- function(dat, CIFun=CI) {
 	res = CIFun(dat)
-	list(N=length(dat), meanVal=res[2], minCI=res[1], maxCI=res[3])
+	list(N=length(dat), meanVal=res[2], minCI=res[3], maxCI=res[1])
 }
 
 getComparisonTbl <- function(SD) {
@@ -1357,11 +1357,11 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 	print(ClassLog(logit, modelHashtagsTbl$hashtagUsedP))
 	modelVsPredTbl
 	
-	modelVsPredTbl[dsetSize==20, list(N=.N, Ndsets=length(unique(datasetName))), keyby=list(runNum, groupNum, sizeNum, dsetSize, dsetType)]
+	modelVsPredTbl[dsetSize==500, list(N=.N, Ndsets=length(unique(datasetName))), keyby=list(runNum, groupNum, sizeNum, dsetSize, dsetType)]
 	modelVsPredTbl[, list(N=.N, Ndsets=length(unique(datasetName))), keyby=list(sizeNum, dsetSize, dsetType)]
 	plotPPVTbl(ppvTbl[dsetType=='stackoverflow' & runNum==1 & dsetSize==500], 'contextPpvSO')
 	plotPPVTbl(ppvTbl[dsetType=='twitter' & runNum==1 & dsetSize==500], 'contextPpvT')
-	tbl = modelVsPredTbl[predUsedBest == T][dsetSize==500][grepl('^topHashtagPost', DVName)]
+	#tbl = modelVsPredTbl[predUsedBest == T][dsetSize==500][grepl('^topHashtagPost', DVName)]
 	tbl = modelVsPredTbl[predUsedBest == T][dsetSize==500][grepl('^topHashtagAcross', DVName)]
 	DVNamesSO = c('topHashtagAcrossPriorStd', 'topHashtagAcrossBodyOrderlessEntropy', 'topHashtagAcrossBody', 
 		      'topHashtagAcrossTitleOrderlessEntropy', 'topHashtagAcrossTitle',
@@ -1378,7 +1378,7 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 	# T Entropy 
 	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'twitter'], acc, figName='foo', groupCol='dsetGroup')
 	# SO Entropy all sizes
-	compareMeanDV(tbl[sizeNum != 1 & dsetType == 'stackoverflow' & DVName %in% DVNamesSO], acc, figName='foo', groupCol='sizeNum')
+	compareMeanDV(tbl[dsetType == 'stackoverflow' & DVName %in% DVNamesSO], acc, figName='foo', groupCol='sizeNum')
 }
 
 getNcoocTbl <- function(type, chunkTableQuery, config) {
