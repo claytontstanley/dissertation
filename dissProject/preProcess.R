@@ -1661,6 +1661,25 @@ getPriorTblGlobT <- function(config, startId, endId) {
 	globPriorTbl
 }
 
+createStoplistTbl <- function() {
+	sqldf('truncate table stoplists')
+	sqldf('create table stoplists (
+	      chunk text not null,
+	      lst text not null,
+	      primary key (chunk, lst))')
+	stoplistTbl = myReadCSV(sprintf('%s/dissertationData/stoplists/smart.txt', PATH), header=F)
+	stoplistTbl[, chunk := V1][, V1 := NULL][, lst := 'smart']
+	setkey(stoplistTbl, chunk, lst)
+	myStopifnot(!duplicated(stoplistTbl))
+	appendDTbl(stoplistTbl, 'stoplists')
+}
+
+getStoplistTbl <- function() {
+	resTbl = sqldt("select chunk from stoplists where lst = 'smart'")
+	setkey(resTbl, chunk)
+	resTbl
+}
+
 addSjiAttrs <- function(sjiTbl) {
 	sjiTbl[, contextSums := sum(partialN), by=context]
 	sjiTbl[, hashtagSums := sum(partialN), by=hashtag]
@@ -1668,6 +1687,10 @@ addSjiAttrs <- function(sjiTbl) {
 	sjiTbl[, pHashtagGivenContext := partialN/contextSums]
 	sjiTbl[, HContext := - sum(pHashtagGivenContext * log(pHashtagGivenContext)), by=context]
 	sjiTbl[, EContext := 1 - HContext/max(HContext)]
+	sjiTbl[, stopWordWeight := 1]
+	stoplistTbl = getStoplistTbl()
+	sjiTbl[stoplistTbl, stopWordWeight := 0]
+	sjiTbl
 }
 
 computeActSji <- function(contextVect, sjiTbl, config) {
@@ -2021,7 +2044,6 @@ getCurWorkspaceBy <- function(regen, groupConfig) {
 	}
 }
 
-
 runContextWithConfig <- function(regen, samplesPerRun, numRunsT, numRunsSO, groupConfig) {
 	getContextRunConfig <- function(config, name) {
 		addNumSamples = function(str) sprintf('%s-%s', str, samplesPerRun)
@@ -2095,19 +2117,21 @@ buildRunFunContext <- function(regen, numRunsT, numRunsSO, samplesPerRun, groupC
 }
 
 runContext20g1s1 <- buildRunFunContext(regen=F, numRunsT=1, numRunsSO=1, samplesPerRun=20, groupConfig=groupConfigG1S1)
-runContext20g2s1 <- buildRunFunContext(regen=F, numRunsT=1, numRunsSO=1, samplesPerRun=20, groupConfig=groupConfigG2S1)
-runContext20g3s1 <- buildRunFunContext(regen=F, numRunsT=1, numRunsSO=1, samplesPerRun=20, groupConfig=groupConfigG3S1)
-runContext20g4s1 <- buildRunFunContext(regen=F, numRunsT=1, numRunsSO=1, samplesPerRun=20, groupConfig=groupConfigG4S1)
 
-runContext200g1s1 <- buildRunFunContext(regen=F, numRunsT=10, numRunsSO=5, samplesPerRun=200, groupConfig=groupConfigG1S1)
-runContext200g2s1 <- buildRunFunContext(regen=F, numRunsT=10, numRunsSO=5, samplesPerRun=200, groupConfig=groupConfigG2S1)
-runContext200g3s1 <- buildRunFunContext(regen=F, numRunsT=10, numRunsSO=5, samplesPerRun=200, groupConfig=groupConfigG3S1)
-runContext200g4s1 <- buildRunFunContext(regen=F, numRunsT=10, numRunsSO=5, samplesPerRun=200, groupConfig=groupConfigG4S1)
+#runContext200g1s1 <- buildRunFunContext(regen=F, numRunsT=10, numRunsSO=5, samplesPerRun=200, groupConfig=groupConfigG1S1)
+#runContext200g2s1 <- buildRunFunContext(regen=F, numRunsT=10, numRunsSO=5, samplesPerRun=200, groupConfig=groupConfigG2S1)
+#runContext200g3s1 <- buildRunFunContext(regen=F, numRunsT=10, numRunsSO=5, samplesPerRun=200, groupConfig=groupConfigG3S1)
+#runContext200g4s1 <- buildRunFunContext(regen=F, numRunsT=10, numRunsSO=5, samplesPerRun=200, groupConfig=groupConfigG4S1)
 
-runContext500g1s1 <- buildRunFunContext(regen=F, numRunsT=10, numRunsSO=5, samplesPerRun=500, groupConfig=groupConfigG1S1)
-runContext500g2s1 <- buildRunFunContext(regen=F, numRunsT=10, numRunsSO=5, samplesPerRun=500, groupConfig=groupConfigG2S1)
-runContext500g3s1 <- buildRunFunContext(regen=F, numRunsT=10, numRunsSO=5, samplesPerRun=500, groupConfig=groupConfigG3S1)
-runContext500g4s1 <- buildRunFunContext(regen=F, numRunsT=10, numRunsSO=5, samplesPerRun=500, groupConfig=groupConfigG4S1)
+runContext500g1s2 <- buildRunFunContext(regen=F, numRunsT=10, numRunsSO=5, samplesPerRun=500, groupConfig=groupConfigG1S2)
+runContext500g2s2 <- buildRunFunContext(regen=F, numRunsT=10, numRunsSO=5, samplesPerRun=500, groupConfig=groupConfigG2S2)
+runContext500g3s2 <- buildRunFunContext(regen=F, numRunsT=10, numRunsSO=5, samplesPerRun=500, groupConfig=groupConfigG3S2)
+runContext500g4s2 <- buildRunFunContext(regen=F, numRunsT=10, numRunsSO=5, samplesPerRun=500, groupConfig=groupConfigG4S2)
+
+runContext500g1s3 <- buildRunFunContext(regen=F, numRunsT=10, numRunsSO=5, samplesPerRun=500, groupConfig=groupConfigG1S3)
+runContext500g2s3 <- buildRunFunContext(regen=F, numRunsT=10, numRunsSO=5, samplesPerRun=500, groupConfig=groupConfigG2S3)
+runContext500g3s3 <- buildRunFunContext(regen=F, numRunsT=10, numRunsSO=5, samplesPerRun=500, groupConfig=groupConfigG3S3)
+runContext500g4s3 <- buildRunFunContext(regen=F, numRunsT=10, numRunsSO=5, samplesPerRun=500, groupConfig=groupConfigG4S3)
 
 runContext500g1s4 <- buildRunFunContext(regen=F, numRunsT=10, numRunsSO=5, samplesPerRun=500, groupConfig=groupConfigG1S4)
 runContext500g2s4 <- buildRunFunContext(regen=F, numRunsT=10, numRunsSO=5, samplesPerRun=500, groupConfig=groupConfigG2S4)
@@ -2162,11 +2186,8 @@ makeEnvironmentTbl <- function(sjiTbl, config) {
 	permEnvTbl = makeEnvironmentSubsetTbl(permEnvTbl, config)
 	permEnvTbl[, uniq := NULL]
 	setkey(permEnvTbl, chunk)
-	entTbl = sjiTbl[, .N, keyby=list(context, EContext)][, N := NULL]
-	stopifnot(nrow(entTbl) == entTbl[, length(unique(context))])
-	permEnvTbl[entTbl, EContext := EContext]
 	permEnvTbl = melt(permEnvTbl,
-			  id=c('chunk', 'EContext'),
+			  id=c('chunk'),
 			  measure=c('ind1', 'ind2', 'ind3', 'ind4'),
 			  variable.name='val',
 			  value.name='ind')
@@ -2175,7 +2196,17 @@ makeEnvironmentTbl <- function(sjiTbl, config) {
 	permEnvTbl[valTbl, valAsNum := valAsNum]
 	permEnvTbl[, val := valAsNum][, valAsNum := NULL]
 	setkey(permEnvTbl, chunk)
+	addEnvironmentTblAttrs(permEnvTbl, sjiTbl)
 	permEnvTbl
+}
+
+addEnvironmentTblAttrs <- function(permEnvTbl, sjiTbl) {
+	entTbl = sjiTbl[, .N, keyby=list(context, EContext)][, N := NULL]
+	stopifnot(nrow(entTbl) == entTbl[, length(unique(context))])
+	permEnvTbl[entTbl, EContext := EContext]
+	stopwordWeightTbl = sjiTbl[, .N, keyby=list(context, stopWordWeight)][, N := NULL]
+	stopifnot(nrow(stopwordWeightTbl) == stopwordWeightTbl[, length(unique(context))])
+	permEnvTbl[stopwordWeightTbl, stopWordWeight := stopWordWeight]
 }
 
 makeMemMat <- function(sjiTbl, permEnvTbl, config) {
@@ -2280,15 +2311,13 @@ runGenAndSaveCurWorkspaceg3s6 <- function() genAndSaveCurWorkspace(groupConfigG3
 runGenAndSaveCurWorkspaceg4s6 <- function() genAndSaveCurWorkspace(groupConfigG4S6)
 
 curWS <- function() {
-	#runGenAndSave for 2 and 3 after 1Mil is finished
-	#runContext for 1,2,3,4,5,6 after
+	#FIXME: runContext for 1,2,3,4,5,6 after
 	#FIXME: Size of sji across RP and Bayesian (new run files; changes the s number)
 	#FIXME: address word order low predictiveness
 	#FIXME: Stop-word removal method and compare to entropy
 	#FIXME: Methods to import and anlyze coefficient tables
 	#FIXME: Quickly rerun logreg analysis for actDV
 	runContext20g1s1(regen='useAlreadyLoaded')
-	runContext20g1s1()
 
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelVsPred()))))
 	modelHashtagsTbls = buildModelHashtagsTables(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelHashtags()))))
@@ -2310,6 +2339,7 @@ curWS <- function() {
 	postResTblT
 	postResTblT
 	withProf(myLoadImage(groupConfigG1S1))
+	mySaveImage(groupConfigG1S1)
 	priorTblGlobT[, .N, by=hashtag][, list(hashtag, p=N/sum(N))][order(p, decreasing=T)][1:50][, plot(1:length(p), p)]
 	priorTblUserSO[, .N, by=hashtag][, list(hashtag, p=N/sum(N))][order(p, decreasing=T)][1:50][, plot(1:length(p), p)]
 	BTbl

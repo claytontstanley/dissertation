@@ -16,6 +16,7 @@ parrunSjisTAll: NP = 1
 parrunContext: NP = 1
 parrunContextS1: NP = 1
 parrunContextS2: NP = 1
+parrunContextS3: NP = 1
 parrunContextS4: NP = 2
 parrunContextS5: NP = 2
 parrunContextS6: NP = 4
@@ -24,7 +25,7 @@ parrunGenAndSaveCurWorkspace: NP = 1
 parrun%:
 	make -s get$* | parallel -P ${NP} --progress make {}
 
-parrunContextAll: parrunContextS4 parrunContextS5 parrunContextS6
+parrunContextAll: parrunContextS1 parrunContextS2 parrunContextS3 parrunContextS4 parrunContextS5 parrunContextS6
 	exit 0
 
 runAll: unit parrunPriors parrunSjis parrunSjisT parrunContext
