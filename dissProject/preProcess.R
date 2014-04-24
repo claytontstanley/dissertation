@@ -669,7 +669,7 @@ defaultSOConfig = c(defaultBaseConfig,
 			      makeChunkTblFun='make_chunk_table_SO'
 			      ))
 
-defaultPermConfig = list(permUseEntropyP='', permUseStoplistP='')
+defaultPermConfig = list(permUseEntropyP='', permUseStoplistP='', permOnlyDirectionP='')
 
 defaultSjiConfig = list(computeActFromContextTbl = 'computeActSjiFromContextTbl')
 
@@ -688,7 +688,8 @@ defaultTPermConfig = modConfig(c(defaultTConfig, defaultPermConfig,
 							     c('actPriorStd', 'actTweetOrderless'),
 							     c('actPriorStd', 'actTweetOrderEntropy', 'actTweetOrderlessEntropy'),
 							     c('actTweetOrderEntropy', 'actTweetOrderlessEntropy'),
-							     c('actTweetOrderStoplist', 'actTweetOrderlessStoplist')
+							     c('actTweetOrderStoplist', 'actTweetOrderlessStoplist'),
+							     c('actTweetOrderDirection', 'actTweetOrderlessDirection')
 							     )),
 				      permEnvTbl='permEnvTblT',
 				      permMemMatOrder='permMemMatTOrder',
@@ -699,7 +700,8 @@ defaultTPermConfig = modConfig(c(defaultTConfig, defaultPermConfig,
 					     'actPriorStd_actTweetOrder', 'actPriorStd_actTweetOrderless',
 					     'actPriorStd_actTweetOrderEntropy_actTweetOrderlessEntropy',
 					     'actTweetOrderlessEntropy', 'actTweetOrderEntropy', 'actTweetOrderEntropy_actTweetOrderlessEntropy',
-					     'actTweetOrderlessStoplist', 'actTweetOrderlessStoplist', 'actTweetOrderStoplist_actTweetOrderlessStoplist'
+					     'actTweetOrderlessStoplist', 'actTweetOrderStoplist', 'actTweetOrderStoplist_actTweetOrderlessStoplist',
+					     'actTweetOrderlessDirection', 'actTweetOrderDirection', 'actTweetOrderDirection_actTweetOrderlessDirection'
 					     )))
 
 defaultSOPermConfig = modConfig(c(defaultSOConfig, defaultPermConfig,
@@ -710,7 +712,9 @@ defaultSOPermConfig = modConfig(c(defaultSOConfig, defaultPermConfig,
 							      c('actPriorStd', 'actTitleOrderlessEntropy', 'actBodyOrderlessEntropy'),
 							      c('actTitleOrderlessEntropy', 'actBodyOrderlessEntropy'),
 							      c('actPriorStd', 'actTitleOrderlessStoplist', 'actBodyOrderlessStoplist'),
-							      c('actTitleOrderlessStoplist', 'actBodyOrderlessStoplist')
+							      c('actTitleOrderlessStoplist', 'actBodyOrderlessStoplist'),
+							      c('actPriorStd', 'actTitleOrderlessDirection', 'actBodyOrderlessDirection'),
+							      c('actTitleOrderlessDirection', 'actBodyOrderlessDirection')
 							      )),
 				       permEnvTbl='permEnvTblSO',
 				       permMemMatOrder='',
@@ -724,7 +728,10 @@ defaultSOPermConfig = modConfig(c(defaultSOConfig, defaultPermConfig,
 					      'actTitleOrderlessEntropy', 'actBodyOrderlessEntropy',
 					      'actPriorStd_actTitleOrderlessStoplist_actBodyOrderlessStoplist',
 					      'actTitleOrderlessStoplist_actBodyOrderlessStoplist',
-					      'actTitleOrderlessStoplist', 'actBodyOrderlessStoplist'
+					      'actTitleOrderlessStoplist', 'actBodyOrderlessStoplist',
+					      'actPriorStd_actTitleOrderlessDirection_actBodyOrderlessDirection',
+					      'actTitleOrderlessDirection_actBodyOrderlessDirection',
+					      'actTitleOrderlessDirection', 'actBodyOrderlessDirection'
 					      )))
 
 defaultTSjiConfig = modConfig(c(defaultTConfig, defaultSjiConfig,
@@ -1752,15 +1759,17 @@ myLoadImage <- function(groupConfig) {
 	     envir=globalenv())
 }
 
-funConfigEntropy <- function(config) modConfig(config, list(permUseEntropyP=T, permUseStoplistP=F))
-funConfigOrig <- function(config) modConfig(config, list(permUseEntropyP=F, permUseStoplistP=F))
-funConfigStoplist <- function(config) modConfig(config, list(permUseEntropyP=F, permUseStoplistP=T))
+funConfigEntropy <- function(config) modConfig(config, list(permUseEntropyP=T, permUseStoplistP=F, permOnlyDirectionP=F))
+funConfigOrig <- function(config) modConfig(config, list(permUseEntropyP=F, permUseStoplistP=F, permOnlyDirectionP=F))
+funConfigStoplist <- function(config) modConfig(config, list(permUseEntropyP=F, permUseStoplistP=T, permOnlyDirectionP=F))
+funConfigDirection <- function(config) modConfig(config, list(permUseEntropyP=T, permUseStoplistP=F, permOnlyDirectionP=T))
 
 makeCombinedMemMat <- function(sjiTbl, envTbl, config) {
 	res = list()
-	res[['orig']] = makeMemMat(sjiTbl, envTbl, funConfigOrig(config))
+	res[['direction']] = makeMemMat(sjiTbl, envTbl, funConfigDirection(config))
 	res[['entropy']] = makeMemMat(sjiTbl, envTbl, funConfigEntropy(config))
 	res[['stoplist']] = makeMemMat(sjiTbl, envTbl, funConfigStoplist(config))
+	res[['orig']] = makeMemMat(sjiTbl, envTbl, funConfigOrig(config))
 	res
 }
 
@@ -1801,7 +1810,9 @@ computeActPermTFromContextTbl <- function(contextTbl, config) {
 			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderEntropy')][,fun:='computeActPermOrder'][,funConfig:='funConfigEntropy'],
 			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderlessEntropy')][,fun:='computeActPermOrderless'][,funConfig:='funConfigEntropy'],
 			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderStoplist')][,fun:='computeActPermOrder'][,funConfig:='funConfigStoplist'],
-			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderlessStoplist')][,fun:='computeActPermOrderless'][,funConfig:='funConfigStoplist']
+			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderlessStoplist')][,fun:='computeActPermOrderless'][,funConfig:='funConfigStoplist'],
+			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderDirection')][,fun:='computeActPermOrder'][,funConfig:='funConfigDirection'],
+			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderlessDirection')][,fun:='computeActPermOrderless'][,funConfig:='funConfigDirection']
 			   )
 	contextTbl[, get(fun[1])(chunk, pos, get(funConfig)(config)), by=type]
 }
@@ -1809,7 +1820,8 @@ computeActPermTFromContextTbl <- function(contextTbl, config) {
 computeActPermSOFromContextTbl <- function(contextTbl, config) {
 	contextTbl = rbind(copy(contextTbl)[,type:=paste0('act', capitalize(type),'Orderless')][,fun:='computeActPermOrderless'][,funConfig:='funConfigOrig'],
 			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderlessEntropy')][,fun:='computeActPermOrderless'][,funConfig:='funConfigEntropy'],
-			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderlessStoplist')][,fun:='computeActPermOrderless'][,funConfig:='funConfigStoplist']
+			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderlessStoplist')][,fun:='computeActPermOrderless'][,funConfig:='funConfigStoplist'],
+			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderlessDirection')][,fun:='computeActPermOrderless'][,funConfig:='funConfigDirection']
 			   )
 	contextTbl[, get(fun[1])(chunk, pos, get(funConfig)(config)), by=type]
 }
@@ -2263,6 +2275,10 @@ makeMemMat <- function(sjiTbl, permEnvTbl, config) {
 		myLog(sprintf('Weighting val in memory matrix based on stoplist'))
 		memTbl[, val := val * stopWordWeight]
 	}
+	if (getConfig(config, 'permOnlyDirectionP')) {
+		myLog(sprintf('Collapsing posFromTag to sign(posFromTag)'))
+		memTbl[, posFromTag := sign(posFromTag)]
+	}
 	sjiTbl
 	key(sjiTbl)
 	memTbl
@@ -2300,15 +2316,21 @@ computeActPerm <- function(context, pos, permEnvTbl, permMemMat, config) {
 }
 
 getMemMatFromList <- function(lst, config) {
+	permUseEntropyP = getConfig(config, 'permUseEntropyP')
+	permUseStoplistP = getConfig(config, 'permUseStoplistP')
+	permOnlyDirectionP = getConfig(config, 'permOnlyDirectionP')
 	acc = {
-		if (getConfig(config, 'permUseEntropyP')) {
+		if (permUseEntropyP & !permOnlyDirectionP) {
 			'entropy'
-		} else if (getConfig(config, 'permUseStoplistP')) {
+		} else if (!permUseEntropyP) {
 			'stoplist'
+		} else if (permUseEntropyP & permOnlyDirectionP) { 
+			'direction'
 		} else {
 			'orig'
 		}
 	}
+	myStopifnot(acc %in% names(lst))
 	lst[[acc]]
 }
 
@@ -2359,12 +2381,11 @@ runGenAndSaveCurWorkspaceg3s6 <- function() genAndSaveCurWorkspace(groupConfigG3
 runGenAndSaveCurWorkspaceg4s6 <- function() genAndSaveCurWorkspace(groupConfigG4S6)
 
 curWS <- function() {
-	#FIXME: runContext for 1,2,3,4,5,6 after
 	#FIXME: Stop-word removal method and compare to entropy
 	#FIXME: address word order low predictiveness
 	#FIXME: Methods to import and anlyze coefficient tables
 	#FIXME: Quickly rerun logreg analysis for actDV
-	withProf(runContext20g1s1(regen='useAlreadyLoaded'))
+	runContext20g1s1(regen='useAlreadyLoaded')
 
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelVsPred()))))
 	modelHashtagsTbls = buildModelHashtagsTables(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelHashtags()))))
@@ -2385,8 +2406,8 @@ curWS <- function() {
 	postResTblSO
 	postResTblT
 	postResTblT
-	withProf(myLoadImage(groupConfigG1S1))
 	mySaveImage(groupConfigG1S1)
+	withProf(myLoadImage(groupConfigG1S1))
 	priorTblGlobT[, .N, by=hashtag][, list(hashtag, p=N/sum(N))][order(p, decreasing=T)][1:50][, plot(1:length(p), p)]
 	priorTblUserSO[, .N, by=hashtag][, list(hashtag, p=N/sum(N))][order(p, decreasing=T)][1:50][, plot(1:length(p), p)]
 	BTbl
