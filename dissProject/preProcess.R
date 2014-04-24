@@ -1363,10 +1363,14 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 	plotPPVTbl(ppvTbl[dsetType=='twitter' & runNum==1 & dsetSize==500], 'contextPpvT')
 	#tbl = modelVsPredTbl[predUsedBest == T][dsetSize==500][grepl('^topHashtagPost', DVName)]
 	tbl = modelVsPredTbl[predUsedBest == T][dsetSize==500][grepl('^topHashtagAcross', DVName)]
+	tbl[, .N, by=DVName]
 	DVNamesSO = c('topHashtagAcrossPriorStd', 'topHashtagAcrossBodyOrderlessEntropy', 'topHashtagAcrossBody', 
 		      'topHashtagAcrossTitleOrderlessEntropy', 'topHashtagAcrossTitle',
 		      'topHashtagAcrossPriorStdTitleOrderlessEntropyBodyOrderlessEntropy',
 		      'topHashtagAcrossPriorStdTitleBody')
+	DVNamesT = c('topHashtagAcrossPriorStd', 'topHashtagAcrossTweet', 'topHashtagAcrossTweetOrderlessEntropy',
+		     'topHashtagAcrossTweetOrderEntropy',
+		     'topHashtagAcrossPriorStdTweet', 'topHashtagAcrossPriorStdTweetOrderEntropyTweetOrderlessEntropy')
 	# SO standard
 	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & !grepl('Entropy', DVName)], acc, figName='ContextMeanDVSO')
 	# T standard
@@ -1379,6 +1383,8 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'twitter'], acc, figName='foo', groupCol='dsetGroup')
 	# SO Entropy all sizes
 	compareMeanDV(tbl[dsetType == 'stackoverflow' & DVName %in% DVNamesSO], acc, figName='foo', groupCol='sizeNum')
+	# T Entropy all sizes
+	compareMeanDV(tbl[dsetType == 'twitter' & DVName %in% DVNamesT], acc, figName='foo', groupCol='sizeNum')
 }
 
 getNcoocTbl <- function(type, chunkTableQuery, config) {
