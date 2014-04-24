@@ -1131,6 +1131,7 @@ renameCols <- function(tbl) {
 	cnames = colnames(tbl)
 	if ('dsetGroup' %in% cnames) renameColDatasetGroup(tbl)
 	if ('groupNum' %in% cnames) renameColGroupNum(tbl)
+	if ('sizeNum' %in% cnames) renameColSizeNum(tbl)
 }
 
 renameColGroupNum <- function(tbl) {
@@ -1141,6 +1142,14 @@ renameColGroupNum <- function(tbl) {
 	tbl[mapTbl, groupNum := newName]
 }
 
+renameColSizeNum <- function(tbl) {
+	mapTbl = data.table(sizeNum=as.character(c(1,6,5,4,3,2)),
+			    newName=c('Testing 1e5 SO, 3e6 Twitter', '1e3 Documents', '1e4 Documents', '1e5 Documents', '1e6 Documents',
+				      '1Mil SO, 3Mil Twitter'))
+	tbl[, sizeNum := as.character(sizeNum)]
+	setkey(tbl, sizeNum)
+	tbl[mapTbl, sizeNum := newName]
+}
 
 renameColDatasetGroup <- function(tbl) {
 	setkey(tbl, dsetGroup)
@@ -1353,18 +1362,23 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 	plotPPVTbl(ppvTbl[dsetType=='stackoverflow' & runNum==1 & dsetSize==500], 'contextPpvSO')
 	plotPPVTbl(ppvTbl[dsetType=='twitter' & runNum==1 & dsetSize==500], 'contextPpvT')
 	tbl = modelVsPredTbl[predUsedBest == T][dsetSize==500][grepl('^topHashtagPost', DVName)]
-	tbl = modelVsPredTbl[predUsedBest == T][dsetSize==500][sizeNum == 1][grepl('^topHashtagAcross', DVName)]
-	tbl
+	tbl = modelVsPredTbl[predUsedBest == T][dsetSize==500][grepl('^topHashtagAcross', DVName)]
+	DVNamesSO = c('topHashtagAcrossPriorStd', 'topHashtagAcrossBodyOrderlessEntropy', 'topHashtagAcrossBody', 
+		      'topHashtagAcrossTitleOrderlessEntropy', 'topHashtagAcrossTitle',
+		      'topHashtagAcrossPriorStdTitleOrderlessEntropyBodyOrderlessEntropy',
+		      'topHashtagAcrossPriorStdTitleBody')
 	# SO standard
-	compareMeanDV(tbl[dsetType == 'stackoverflow' & !grepl('Entropy', DVName)], acc, figName='ContextMeanDVSO')
+	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & !grepl('Entropy', DVName)], acc, figName='ContextMeanDVSO')
 	# T standard
-	compareMeanDV(tbl[dsetType == 'twitter' & !grepl('Entropy', DVName)][groupNum == 1], acc, figName='foo', groupCol='dsetGroup')
+	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'twitter' & !grepl('Entropy', DVName)][groupNum == 1], acc, figName='foo', groupCol='dsetGroup')
 	# T standard all groups
-	compareMeanDV(tbl[dsetType == 'twitter' & !grepl('Entropy', DVName)], acc, figName='ContextMeanDVT', groupCol='groupNum')
+	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'twitter' & !grepl('Entropy', DVName)], acc, figName='ContextMeanDVT', groupCol='groupNum')
 	# SO Entropy
-	compareMeanDV(tbl[dsetType == 'stackoverflow'], acc, figName='ContextMeanDVSO')
+	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'stackoverflow'], acc, figName='ContextMeanDVSO')
 	# T Entropy 
-	compareMeanDV(tbl[dsetType == 'twitter'][groupNum == 1], acc, figName='foo', groupCol='dsetGroup')
+	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'twitter'], acc, figName='foo', groupCol='dsetGroup')
+	# SO Entropy all sizes
+	compareMeanDV(tbl[sizeNum != 1 & dsetType == 'stackoverflow' & DVName %in% DVNamesSO], acc, figName='foo', groupCol='sizeNum')
 }
 
 getNcoocTbl <- function(type, chunkTableQuery, config) {
