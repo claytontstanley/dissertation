@@ -109,9 +109,10 @@ test_that("testModelVsPredSO", {
 context('Sji Model')
 
 test_that("testAddSjiAttrs", {
-	sjiTestTbl = data.table(context=c('a','a','b','b'), hashtag=c('x','y','x','y'), partialN=c(1,2,3,4))
+	sjiTestTbl = data.table(context=c('a','a','b','b'), hashtag=c('x','y','x','y'), partialN=c(1,2,3,4), key=c('context', 'hashtag'))
 	expectedTbl = copy(sjiTestTbl)[, contextSums := c(3,3,7,7)][, tagSums := c(4,6,4,6)][, sji := log( 10 * partialN / (contextSums * tagSums))]
 	expectedTbl[, pTagGivenChunk := c(1/3, 2/3, 3/7, 4/7)][, HContext := - sum(pTagGivenChunk * log(pTagGivenChunk)), by=context][, EContext := 1 - HContext/max(HContext)]
+	expectedTbl[, stopWordWeight := 0]
 	addSjiAttrs(sjiTestTbl)
 	expect_equivalent(expectedTbl, sjiTestTbl)
 })

@@ -2281,9 +2281,6 @@ computeActPermOrderless <- function(context, pos, config) {
 }
 
 runGenAndSaveCurWorkspaceg1s1 <- function() genAndSaveCurWorkspace(groupConfigG1S1)
-runGenAndSaveCurWorkspaceg2s1 <- function() genAndSaveCurWorkspace(groupConfigG2S1)
-runGenAndSaveCurWorkspaceg3s1 <- function() genAndSaveCurWorkspace(groupConfigG3S1)
-runGenAndSaveCurWorkspaceg4s1 <- function() genAndSaveCurWorkspace(groupConfigG4S1)
 
 runGenAndSaveCurWorkspaceg1s2 <- function() genAndSaveCurWorkspace(groupConfigG1S2)
 runGenAndSaveCurWorkspaceg2s2 <- function() genAndSaveCurWorkspace(groupConfigG2S2)
@@ -2312,7 +2309,7 @@ runGenAndSaveCurWorkspaceg4s6 <- function() genAndSaveCurWorkspace(groupConfigG4
 
 curWS <- function() {
 	#FIXME: runContext for 1,2,3,4,5,6 after
-	#FIXME: Size of sji across RP and Bayesian (new run files; changes the s number)
+	#FIXME: modelHashtagsTbl is too large
 	#FIXME: address word order low predictiveness
 	#FIXME: Stop-word removal method and compare to entropy
 	#FIXME: Methods to import and anlyze coefficient tables
