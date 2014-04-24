@@ -1374,7 +1374,7 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 	# SO standard
 	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & !grepl('Entropy', DVName)], acc, figName='ContextMeanDVSO')
 	# T standard
-	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'twitter' & !grepl('Entropy', DVName)][groupNum == 1], acc, figName='foo', groupCol='dsetGroup')
+	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'twitter' & !grepl('Entropy', DVName)], acc, figName='foo', groupCol='dsetGroup')
 	# T standard all groups
 	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'twitter' & !grepl('Entropy', DVName)], acc, figName='ContextMeanDVT', groupCol='groupNum')
 	# SO Entropy
