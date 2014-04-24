@@ -2344,7 +2344,7 @@ curWS <- function() {
 	#FIXME: address word order low predictiveness
 	#FIXME: Methods to import and anlyze coefficient tables
 	#FIXME: Quickly rerun logreg analysis for actDV
-	runContext20g1s1(regen='useAlreadyLoaded')
+	withProf(runContext20g1s1(regen='useAlreadyLoaded'))
 
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelVsPred()))))
 	modelHashtagsTbls = buildModelHashtagsTables(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelHashtags()))))
