@@ -669,7 +669,7 @@ defaultSOConfig = c(defaultBaseConfig,
 			      makeChunkTblFun='make_chunk_table_SO'
 			      ))
 
-defaultPermConfig = list(permUseEntropyP='')
+defaultPermConfig = list(permUseEntropyP='', permUseStoplistP='')
 
 defaultSjiConfig = list(computeActFromContextTbl = 'computeActSjiFromContextTbl')
 
@@ -687,7 +687,9 @@ defaultTPermConfig = modConfig(c(defaultTConfig, defaultPermConfig,
 							     c('actPriorStd', 'actTweetOrder'),
 							     c('actPriorStd', 'actTweetOrderless'),
 							     c('actPriorStd', 'actTweetOrderEntropy', 'actTweetOrderlessEntropy'),
-							     c('actTweetOrderEntropy', 'actTweetOrderlessEntropy'))),
+							     c('actTweetOrderEntropy', 'actTweetOrderlessEntropy'),
+							     c('actTweetOrderStoplist', 'actTweetOrderlessStoplist')
+							     )),
 				      permEnvTbl='permEnvTblT',
 				      permMemMatOrder='permMemMatTOrder',
 				      permMemMatOrderless='permMemMatTOrderless',
@@ -696,7 +698,9 @@ defaultTPermConfig = modConfig(c(defaultTConfig, defaultPermConfig,
 					     'actTweetOrder', 'actTweetOrderless', 'actTweetOrder_actTweetOrderless',
 					     'actPriorStd_actTweetOrder', 'actPriorStd_actTweetOrderless',
 					     'actPriorStd_actTweetOrderEntropy_actTweetOrderlessEntropy',
-					     'actTweetOrderlessEntropy', 'actTweetOrderEntropy', 'actTweetOrderEntropy_actTweetOrderlessEntropy')))
+					     'actTweetOrderlessEntropy', 'actTweetOrderEntropy', 'actTweetOrderEntropy_actTweetOrderlessEntropy',
+					     'actTweetOrderlessStoplist', 'actTweetOrderlessStoplist', 'actTweetOrderStoplist_actTweetOrderlessStoplist'
+					     )))
 
 defaultSOPermConfig = modConfig(c(defaultSOConfig, defaultPermConfig,
 				  list(runTbl=makeRunTbl(list(c('actPriorStd', 'actTitleOrderless', 'actBodyOrderless'),
@@ -704,7 +708,10 @@ defaultSOPermConfig = modConfig(c(defaultSOConfig, defaultPermConfig,
 							      c('actPriorStd', 'actTitleOrderless'),
 							      c('actPriorStd', 'actBodyOrderless'),
 							      c('actPriorStd', 'actTitleOrderlessEntropy', 'actBodyOrderlessEntropy'),
-							      c('actTitleOrderlessEntropy', 'actBodyOrderlessEntropy'))),
+							      c('actTitleOrderlessEntropy', 'actBodyOrderlessEntropy'),
+							      c('actPriorStd', 'actTitleOrderlessStoplist', 'actBodyOrderlessStoplist'),
+							      c('actTitleOrderlessStoplist', 'actBodyOrderlessStoplist')
+							      )),
 				       permEnvTbl='permEnvTblSO',
 				       permMemMatOrder='',
 				       permMemMatOrderless='permMemMatSOOrderless',
@@ -714,7 +721,11 @@ defaultSOPermConfig = modConfig(c(defaultSOConfig, defaultPermConfig,
 					      'actPriorStd_actTitleOrderless', 'actPriorStd_actBodyOrderless',
 					      'actPriorStd_actTitleOrderlessEntropy_actBodyOrderlessEntropy',
 					      'actTitleOrderlessEntropy_actBodyOrderlessEntropy',
-					      'actTitleOrderlessEntropy', 'actBodyOrderlessEntropy')))
+					      'actTitleOrderlessEntropy', 'actBodyOrderlessEntropy',
+					      'actPriorStd_actTitleOrderlessStoplist_actBodyOrderlessStoplist',
+					      'actTitleOrderlessStoplist_actBodyOrderlessStoplist',
+					      'actTitleOrderlessStoplist', 'actBodyOrderlessStoplist'
+					      )))
 
 defaultTSjiConfig = modConfig(c(defaultTConfig, defaultSjiConfig,
 				list(runTbl=makeRunTbl(list(c('actPriorStd', 'actTweet'))))),
@@ -1721,10 +1732,15 @@ myLoadImage <- function(groupConfig) {
 	     envir=globalenv())
 }
 
+funConfigEntropy <- function(config) modConfig(config, list(permUseEntropyP=T, permUseStoplistP=F))
+funConfigOrig <- function(config) modConfig(config, list(permUseEntropyP=F, permUseStoplistP=F))
+funConfigStoplist <- function(config) modConfig(config, list(permUseEntropyP=F, permUseStoplistP=T))
+
 makeCombinedMemMat <- function(sjiTbl, envTbl, config) {
 	res = list()
-	res[['orig']] = makeMemMat(sjiTbl, envTbl, modConfig(config, list(permUseEntropyP=F)))
-	res[['entropy']] = makeMemMat(sjiTbl, envTbl, modConfig(config, list(permUseEntropyP=T)))
+	res[['orig']] = makeMemMat(sjiTbl, envTbl, funConfigOrig(config))
+	res[['entropy']] = makeMemMat(sjiTbl, envTbl, funConfigEntropy(config))
+	res[['stoplist']] = makeMemMat(sjiTbl, envTbl, funConfigStoplist(config))
 	res
 }
 
@@ -1758,20 +1774,23 @@ computeActSjiFromContextTbl <- function(contextTbl, config) {
 	contextTbl[, computeActSji(chunk, get(getConfig(config, 'sjiTbl')), config), by=type]
 }
 
-funConfigWEntropy <- function(config) modConfig(config, list(permUseEntropyP=T))
-funConfigNEntropy <- function(config) modConfig(config, list(permUseEntropyP=F))
 
 computeActPermTFromContextTbl <- function(contextTbl, config) {
-	contextTbl = rbind(copy(contextTbl)[,type:=paste0('act', capitalize(type),'Order')][,fun:='computeActPermOrder'][,funConfig:='funConfigNEntropy'],
-			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'Orderless')][,fun:='computeActPermOrderless'][,funConfig:='funConfigNEntropy'],
-			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderEntropy')][,fun:='computeActPermOrder'][,funConfig:='funConfigWEntropy'],
-			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderlessEntropy')][,fun:='computeActPermOrderless'][,funConfig:='funConfigWEntropy'])
+	contextTbl = rbind(copy(contextTbl)[,type:=paste0('act', capitalize(type),'Order')][,fun:='computeActPermOrder'][,funConfig:='funConfigOrig'],
+			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'Orderless')][,fun:='computeActPermOrderless'][,funConfig:='funConfigOrig'],
+			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderEntropy')][,fun:='computeActPermOrder'][,funConfig:='funConfigEntropy'],
+			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderlessEntropy')][,fun:='computeActPermOrderless'][,funConfig:='funConfigEntropy'],
+			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderStoplist')][,fun:='computeActPermOrder'][,funConfig:='funConfigStoplist'],
+			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderlessStoplist')][,fun:='computeActPermOrderless'][,funConfig:='funConfigStoplist']
+			   )
 	contextTbl[, get(fun[1])(chunk, pos, get(funConfig)(config)), by=type]
 }
 
 computeActPermSOFromContextTbl <- function(contextTbl, config) {
-	contextTbl = rbind(copy(contextTbl)[,type:=paste0('act', capitalize(type),'Orderless')][,fun:='computeActPermOrderless'][,funConfig:='funConfigNEntropy'],
-			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderlessEntropy')][,fun:='computeActPermOrderless'][,funConfig:='funConfigWEntropy'])
+	contextTbl = rbind(copy(contextTbl)[,type:=paste0('act', capitalize(type),'Orderless')][,fun:='computeActPermOrderless'][,funConfig:='funConfigOrig'],
+			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderlessEntropy')][,fun:='computeActPermOrderless'][,funConfig:='funConfigEntropy'],
+			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderlessStoplist')][,fun:='computeActPermOrderless'][,funConfig:='funConfigStoplist']
+			   )
 	contextTbl[, get(fun[1])(chunk, pos, get(funConfig)(config)), by=type]
 }
 
@@ -2211,6 +2230,7 @@ addEnvironmentTblAttrs <- function(permEnvTbl, sjiTbl) {
 	stopwordWeightTbl = sjiTbl[, .N, keyby=list(context, stopWordWeight)][, N := NULL]
 	stopifnot(nrow(stopwordWeightTbl) == stopwordWeightTbl[, length(unique(context))])
 	permEnvTbl[stopwordWeightTbl, stopWordWeight := stopWordWeight]
+	permEnvTbl
 }
 
 makeMemMat <- function(sjiTbl, permEnvTbl, config) {
@@ -2218,6 +2238,10 @@ makeMemMat <- function(sjiTbl, permEnvTbl, config) {
 	if (getConfig(config, 'permUseEntropyP')) {
 		myLog(sprintf('Weighting val in memory matrix based on entropy'))
 		memTbl[, val := val * EContext]
+	}
+	if (getConfig(config, 'permUseStoplistP')) {
+		myLog(sprintf('Weighting val in memory matrix based on stoplist'))
+		memTbl[, val := val * stopWordWeight]
 	}
 	sjiTbl
 	key(sjiTbl)
@@ -2259,9 +2283,12 @@ getMemMatFromList <- function(lst, config) {
 	acc = {
 		if (getConfig(config, 'permUseEntropyP')) {
 			'entropy'
+		} else if (getConfig(config, 'permUseStoplistP')) {
+			'stoplist'
 		} else {
 			'orig'
-	}}
+		}
+	}
 	lst[[acc]]
 }
 
