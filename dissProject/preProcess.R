@@ -2053,7 +2053,7 @@ runContextWithConfig <- function(regen, samplesPerRun, numRunsT, numRunsSO, grou
 		addSizeName = function(str) sprintf('%ss%s', str, getConfig(groupConfig, 'sizeNum'))
 		addAll = function(str) addSizeName(addGroupName(addNumSamples(str)))
 		genModelHashtagsP = {if (getConfig(groupConfig, 'groupNum') == 1 &
-					 getConfig(groupConfig, 'sizeNum') == 1) T else F}
+					 getConfig(groupConfig, 'sizeNum') %in% c(1,2)) T else F}
 		getConfigMods <- function(name, addFun) {
 			list(modelVsPredOutFile=getOutFileModelVsPred(addFun(name)),
 			     modelHashtagsOutFile={if (!genModelHashtagsP) '' else getOutFileModelHashtags(addFun(name))},
