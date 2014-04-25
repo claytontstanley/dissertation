@@ -48,7 +48,7 @@ getContextS%:
 
 # FIXME: Only running s[]'s for now
 getGenAndSaveCurWorkspace:
-	egrep '^runGenAndSaveCurWorkspace.*s[23456] <-' ${rFile} | awk '{print $$1}'
+	egrep '^runGenAndSaveCurWorkspace.*s[123456] <-' ${rFile} | awk '{print $$1}'
 
 checkPostgresTimes:
 	sudo tail -n 10000 /opt/local/var/db/postgresql93/defaultdb/system.log | egrep '(statement:|duration:)'
