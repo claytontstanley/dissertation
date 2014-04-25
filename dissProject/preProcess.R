@@ -2244,12 +2244,11 @@ makeEnvironmentTbl <- function(sjiTbl, config) {
 	permEnvTbl = melt(permEnvTbl,
 			  id=c('chunk'),
 			  measure=c('ind1', 'ind2', 'ind3', 'ind4'),
-			  variable.name='val',
+			  variable.name='valIndID',
 			  value.name='ind')
-	setkey(permEnvTbl, val)
+	setkey(permEnvTbl, valIndID)
 	valTbl = data.table(name=c('ind1', 'ind2', 'ind3', 'ind4'), valAsNum=c(1,1,-1,-1), key='name')
-	permEnvTbl[valTbl, valAsNum := valAsNum]
-	permEnvTbl[, val := valAsNum][, valAsNum := NULL]
+	permEnvTbl[valTbl, val := valAsNum]
 	setkey(permEnvTbl, chunk)
 	addEnvironmentTblAttrs(permEnvTbl, sjiTbl)
 	permEnvTbl
@@ -2266,7 +2265,22 @@ addEnvironmentTblAttrs <- function(permEnvTbl, sjiTbl) {
 }
 
 makeMemMat <- function(sjiTbl, permEnvTbl, config) {
+	permEnvTbl
+	agg <- function(curValIndID) {
+		myLog(sprintf('Generating memory matrix for all vals in env table with valIndID=%s', curValIndID))
+		makeMemMatInner(sjiTbl, permEnvTbl[valIndID == curValIndID], config)
+	}
+	res = lapply(permEnvTbl[, unique(valIndID)], agg)
+	myStopifnot(length(unique(lapply(res, colnames))) == 1)
+	res = Reduce(`+`, res)
+	res
+}
+
+makeMemMatInner <- function(sjiTbl, permEnvTbl, config) {
 	memTbl = permEnvTbl[sjiTbl, allow.cartesian=T, nomatch=0]
+	sjiTbl
+	permEnvTbl
+	memTbl
 	if (getConfig(config, 'permUseEntropyP')) {
 		myLog(sprintf('Weighting val in memory matrix based on entropy'))
 		memTbl[, val := val * EContext]
@@ -2279,11 +2293,6 @@ makeMemMat <- function(sjiTbl, permEnvTbl, config) {
 		myLog(sprintf('Collapsing posFromTag to sign(posFromTag)'))
 		memTbl[, posFromTag := sign(posFromTag)]
 	}
-	sjiTbl
-	key(sjiTbl)
-	memTbl
-	key(memTbl)
-	permEnvTbl
 	NRows = getConfig(config, 'permNRows')
 	NRows
 	memTbl[, rotInd := ((ind-1 + posFromTag) %% NRows) + 1]
@@ -2302,7 +2311,7 @@ computeActPerm <- function(context, pos, permEnvTbl, permMemMat, config) {
 	permEnvTbl
 	permMemMat
 	contextTbl = data.table(context=context, posFromTag=pos, hashtag='context', partialN=1, key='context')
-	contextMemMat = makeMemMat(contextTbl, permEnvTbl, config)
+	contextMemMat = makeMemMatInner(contextTbl, permEnvTbl, config)
 	contextMemMat
 	contextMemVect = rowSums(contextMemMat) 
 	contextMemVect
@@ -2335,13 +2344,11 @@ getMemMatFromList <- function(lst, config) {
 }
 
 computeActPermOrder <- function(context, pos, config) {
-	computeActPerm(context,
-		       pos,
-		       # Cannot get from global environment or test 'testComputePermAct' will fail
-		       permEnvTbl = get(getConfig(config, 'permEnvTbl'), envir=parent.frame()),
-		       permMemMat = getMemMatFromList(get(getConfig(config, 'permMemMatOrder'), envir=parent.frame()),
-						      config),
-		       config)
+	# Cannot get from global environment or test 'testComputePermAct' will fail
+	envTbl = get(getConfig(config, 'permEnvTbl'), envir=parent.frame())
+	memMat = getMemMatFromList(get(getConfig(config, 'permMemMatOrder'), envir=parent.frame()), config)
+	getMemMatFromList(get(getConfig(config, 'permMemMatOrder'), envir=parent.frame()), config)
+	computeActPerm(context, pos, permEnvTbl = envTbl, permMemMat = memMat, config)
 }
 
 computeActPermOrderless <- function(context, pos, config) {
@@ -2354,6 +2361,7 @@ computeActPermOrderless <- function(context, pos, config) {
 }
 
 runGenAndSaveCurWorkspaceg1s1 <- function() genAndSaveCurWorkspace(groupConfigG1S1)
+runGenAndSaveCurWorkspaceg1s6 <- function() genAndSaveCurWorkspace(groupConfigG1S6)
 
 runGenAndSaveCurWorkspaceg1s2 <- function() genAndSaveCurWorkspace(groupConfigG1S2)
 runGenAndSaveCurWorkspaceg2s2 <- function() genAndSaveCurWorkspace(groupConfigG2S2)
@@ -2397,20 +2405,15 @@ curWS <- function() {
 	priorTblGlobT[order(N, decreasing=T)]
 	context = c('a', 'it', 'i')
 	pos = c(1, 3, 1)
-	setLogLevel(1)
-	withProf(computeActPermOrderless(context, pos, defaultSOPermConfig))
 	sjiTblTOrderless
 	.ls.objects(order.by="Size")
 	sqldf('select hashtag_group, retweeted, count(text) from top_hashtag_tweets group by hashtag_group, retweeted order by hashtag_group, retweeted')
 	sessionInfo()
-	postResTblSO
-	postResTblT
-	postResTblT
 	mySaveImage(groupConfigG1S1)
 	withProf(myLoadImage(groupConfigG1S1))
+	withProf(myLoadImage(groupConfigG1S6))
 	priorTblGlobT[, .N, by=hashtag][, list(hashtag, p=N/sum(N))][order(p, decreasing=T)][1:50][, plot(1:length(p), p)]
 	priorTblUserSO[, .N, by=hashtag][, list(hashtag, p=N/sum(N))][order(p, decreasing=T)][1:50][, plot(1:length(p), p)]
-	BTbl
 	test_dir(sprintf("%s/%s", PATH, 'tests'), reporter='summary')
 	.ls.objects(order.by='Size')
 	# Checking that tweets for twitter users from each followers_count,statuses_count scale are being collected properly
