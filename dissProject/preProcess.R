@@ -2415,8 +2415,6 @@ curWS <- function() {
 	priorTblGlobT[, N:=.N, by=hashtag][, N := N/nrow(.SD)]
 	priorTblGlobT[, N:=NULL]
 	priorTblGlobT[order(N, decreasing=T)]
-	context = c('a', 'it', 'i')
-	pos = c(1, 3, 1)
 	sjiTblTOrderless
 	.ls.objects(order.by="Size")
 	sqldf('select hashtag_group, retweeted, count(text) from top_hashtag_tweets group by hashtag_group, retweeted order by hashtag_group, retweeted')
