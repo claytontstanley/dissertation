@@ -2372,7 +2372,6 @@ computeActPermOrderless <- function(context, pos, config) {
 }
 
 runGenAndSaveCurWorkspaceg1s1 <- function() genAndSaveCurWorkspace(groupConfigG1S1)
-runGenAndSaveCurWorkspaceg1s6 <- function() genAndSaveCurWorkspace(groupConfigG1S6)
 
 runGenAndSaveCurWorkspaceg1s2 <- function() genAndSaveCurWorkspace(groupConfigG1S2)
 runGenAndSaveCurWorkspaceg2s2 <- function() genAndSaveCurWorkspace(groupConfigG2S2)
