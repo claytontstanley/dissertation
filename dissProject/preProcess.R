@@ -2411,7 +2411,7 @@ curWS <- function() {
 	sessionInfo()
 	mySaveImage(groupConfigG1S1)
 	withProf(myLoadImage(groupConfigG1S1))
-	withProf(myLoadImage(groupConfigG1S6))
+	#withProf(myLoadImage(groupConfigG1S6))
 	priorTblGlobT[, .N, by=hashtag][, list(hashtag, p=N/sum(N))][order(p, decreasing=T)][1:50][, plot(1:length(p), p)]
 	priorTblUserSO[, .N, by=hashtag][, list(hashtag, p=N/sum(N))][order(p, decreasing=T)][1:50][, plot(1:length(p), p)]
 	test_dir(sprintf("%s/%s", PATH, 'tests'), reporter='summary')
@@ -2424,6 +2424,4 @@ curWS <- function() {
 	usersWithTweetsTbl[order(statuses_count), plot(log10(statuses_count))]
 	usersWithTweetsTbl[order(followers_count),][followers_count > 10000000]
 }
-
-#curWS()
 
