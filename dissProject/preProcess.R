@@ -25,6 +25,7 @@ library(sqldf)
 library(data.table)
 library(reshape2)
 library(boot)
+library(digest)
 
 PATH = getPathToThisFile()
 FILE = getNameOfThisFile()
@@ -2172,6 +2173,7 @@ buildRunFunContext <- function(regen, numRunsT, numRunsSO, samplesPerRun, groupC
 }
 
 runContext20g1s1 <- buildRunFunContext(regen=F, numRunsT=1, numRunsSO=1, samplesPerRun=20, groupConfig=groupConfigG1S1)
+runContext20g1s6 <- buildRunFunContext(regen=F, numRunsT=1, numRunsSO=1, samplesPerRun=20, groupConfig=groupConfigG1S6)
 
 #runContext200g1s1 <- buildRunFunContext(regen=F, numRunsT=10, numRunsSO=5, samplesPerRun=200, groupConfig=groupConfigG1S1)
 #runContext200g2s1 <- buildRunFunContext(regen=F, numRunsT=10, numRunsSO=5, samplesPerRun=200, groupConfig=groupConfigG2S1)
@@ -2234,10 +2236,19 @@ makeEnvironmentSubsetTbl <- function(tbl, config) {
 	}
 }
 
+digestAsInteger <- function(x) {
+	require("digest")
+	hexval <- paste0("0x",digest(x,"crc32"))
+	intval <- type.convert(hexval) %% .Machine$integer.max
+	intval
+}
+
 makeEnvironmentTbl <- function(sjiTbl, config) {
 	permEnvTbl = with(sjiTbl, data.table(chunk=unique(context)))
 	permEnvTbl
 	key(sjiTbl)
+	sjiTbl
+	set.seed(digestAsInteger(sjiTbl))
 	permEnvTbl = makeEnvironmentSubsetTbl(permEnvTbl, config)
 	permEnvTbl[, uniq := NULL]
 	setkey(permEnvTbl, chunk)
@@ -2394,6 +2405,7 @@ curWS <- function() {
 	#FIXME: Methods to import and anlyze coefficient tables
 	#FIXME: Quickly rerun logreg analysis for actDV
 	runContext20g1s1(regen='useAlreadyLoaded')
+	runContext20g1s6(regen='useAlreadyLoaded')
 
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelVsPred()))))
 	modelHashtagsTbls = buildModelHashtagsTables(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelHashtags()))))
@@ -2411,7 +2423,7 @@ curWS <- function() {
 	sessionInfo()
 	mySaveImage(groupConfigG1S1)
 	withProf(myLoadImage(groupConfigG1S1))
-	#withProf(myLoadImage(groupConfigG1S6))
+	withProf(myLoadImage(groupConfigG1S6))
 	priorTblGlobT[, .N, by=hashtag][, list(hashtag, p=N/sum(N))][order(p, decreasing=T)][1:50][, plot(1:length(p), p)]
 	priorTblUserSO[, .N, by=hashtag][, list(hashtag, p=N/sum(N))][order(p, decreasing=T)][1:50][, plot(1:length(p), p)]
 	test_dir(sprintf("%s/%s", PATH, 'tests'), reporter='summary')
