@@ -2402,6 +2402,7 @@ runGenAndSaveCurWorkspaceg4s6 <- function() genAndSaveCurWorkspace(groupConfigG4
 curWS <- function() {
 	#FIXME: Stop-word removal method and compare to entropy
 	#FIXME: address word order low predictiveness
+	#FIXME: proper combination of prior and context for RP
 	#FIXME: Methods to import and anlyze coefficient tables
 	#FIXME: Quickly rerun logreg analysis for actDV
 	runContext20g1s1(regen='useAlreadyLoaded')
