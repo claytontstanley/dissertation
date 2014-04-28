@@ -2425,6 +2425,7 @@ curWS <- function() {
 	#FIXME: add word order to Bayesian sji
 	#FIXME: Methods to import and anlyze coefficient tables
 	#FIXME: Quickly rerun logreg analysis for actDV
+	#FIXME: Do something with the 2 different ds
 	runContext20g1s1(regen='useAlreadyLoaded')
 	runContext20g1s6(regen='useAlreadyLoaded')
 
