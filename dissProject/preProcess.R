@@ -670,7 +670,7 @@ defaultSOConfig = c(defaultBaseConfig,
 			      makeChunkTblFun='make_chunk_table_SO'
 			      ))
 
-defaultPermConfig = list(permUseEntropyP='', permUseStoplistP='', permOnlyDirectionP='')
+defaultPermConfig = list(permUseEntropyP='', permUseStoplistP='', permOnlyDirectionP='', permHymanP='')
 
 defaultSjiConfig = list(computeActFromContextTbl = 'computeActSjiFromContextTbl')
 
@@ -689,20 +689,28 @@ defaultTPermConfig = modConfig(c(defaultTConfig, defaultPermConfig,
 							     c('actPriorStd', 'actTweetOrderless'),
 							     c('actPriorStd', 'actTweetOrderEntropy', 'actTweetOrderlessEntropy'),
 							     c('actTweetOrderEntropy', 'actTweetOrderlessEntropy'),
+							     c('actPriorStd', 'actTweetOrderStoplist', 'actTweetOrderlessStoplist'),
 							     c('actTweetOrderStoplist', 'actTweetOrderlessStoplist'),
-							     c('actTweetOrderDirection', 'actTweetOrderlessDirection')
+							     c('actPriorStd', 'actTweetOrderDirection', 'actTweetOrderlessDirection'),
+							     c('actTweetOrderDirection', 'actTweetOrderlessDirection'),
+							     c('actPriorStd', 'actTweetOrderHyman', 'actTweetOrderlessHyman'),
+							     c('actTweetOrderHyman', 'actTweetOrderlessHyman')
 							     )),
 				      permEnvTbl='permEnvTblT',
 				      permMemMatOrder='permMemMatTOrder',
 				      permMemMatOrderless='permMemMatTOrderless',
 				      computeActFromContextTbl = 'computeActPermTFromContextTbl')),
 			       list(actDVs=c('actPriorStd_actTweetOrder_actTweetOrderless', 'actPriorStd',
-					     'actTweetOrder', 'actTweetOrderless', 'actTweetOrder_actTweetOrderless',
 					     'actPriorStd_actTweetOrder', 'actPriorStd_actTweetOrderless',
+					     'actTweetOrder', 'actTweetOrderless', 'actTweetOrder_actTweetOrderless',
 					     'actPriorStd_actTweetOrderEntropy_actTweetOrderlessEntropy',
 					     'actTweetOrderlessEntropy', 'actTweetOrderEntropy', 'actTweetOrderEntropy_actTweetOrderlessEntropy',
+					     'actPriorStd_actTweetOrderStoplist_actTweetOrderlessStoplist',
 					     'actTweetOrderlessStoplist', 'actTweetOrderStoplist', 'actTweetOrderStoplist_actTweetOrderlessStoplist',
-					     'actTweetOrderlessDirection', 'actTweetOrderDirection', 'actTweetOrderDirection_actTweetOrderlessDirection'
+					     'actPriorStd_actTweetOrderDirection_actTweetOrderlessDirection',
+					     'actTweetOrderlessDirection', 'actTweetOrderDirection', 'actTweetOrderDirection_actTweetOrderlessDirection',
+					     'actPriorStd_actTweetOrderHyman_actTweetOrderlessHyman',
+					     'actTweetOrderlessHyman', 'actTweetOrderHyman', 'actTweetOrderHyman_actTweetOrderlessHyman'
 					     )))
 
 defaultSOPermConfig = modConfig(c(defaultSOConfig, defaultPermConfig,
@@ -715,7 +723,9 @@ defaultSOPermConfig = modConfig(c(defaultSOConfig, defaultPermConfig,
 							      c('actPriorStd', 'actTitleOrderlessStoplist', 'actBodyOrderlessStoplist'),
 							      c('actTitleOrderlessStoplist', 'actBodyOrderlessStoplist'),
 							      c('actPriorStd', 'actTitleOrderlessDirection', 'actBodyOrderlessDirection'),
-							      c('actTitleOrderlessDirection', 'actBodyOrderlessDirection')
+							      c('actTitleOrderlessDirection', 'actBodyOrderlessDirection'),
+							      c('actPriorStd', 'actTitleOrderlessHyman', 'actBodyOrderlessHyman'),
+							      c('actTitleOrderlessHyman', 'actBodyOrderlessHyman')
 							      )),
 				       permEnvTbl='permEnvTblSO',
 				       permMemMatOrder='',
@@ -725,14 +735,13 @@ defaultSOPermConfig = modConfig(c(defaultSOConfig, defaultPermConfig,
 					      'actTitleOrderless', 'actBodyOrderless', 'actTitleOrderless_actBodyOrderless',
 					      'actPriorStd_actTitleOrderless', 'actPriorStd_actBodyOrderless',
 					      'actPriorStd_actTitleOrderlessEntropy_actBodyOrderlessEntropy',
-					      'actTitleOrderlessEntropy_actBodyOrderlessEntropy',
-					      'actTitleOrderlessEntropy', 'actBodyOrderlessEntropy',
+					      'actTitleOrderlessEntropy', 'actBodyOrderlessEntropy', 'actTitleOrderlessEntropy_actBodyOrderlessEntropy',
 					      'actPriorStd_actTitleOrderlessStoplist_actBodyOrderlessStoplist',
-					      'actTitleOrderlessStoplist_actBodyOrderlessStoplist',
-					      'actTitleOrderlessStoplist', 'actBodyOrderlessStoplist',
+					      'actTitleOrderlessStoplist', 'actBodyOrderlessStoplist', 'actTitleOrderlessStoplist_actBodyOrderlessStoplist',
 					      'actPriorStd_actTitleOrderlessDirection_actBodyOrderlessDirection',
-					      'actTitleOrderlessDirection_actBodyOrderlessDirection',
-					      'actTitleOrderlessDirection', 'actBodyOrderlessDirection'
+					      'actTitleOrderlessDirection', 'actBodyOrderlessDirection', 'actTitleOrderlessDirection_actBodyOrderlessDirection',
+					      'actPriorStd_actTitleOrderlessHyman_actBodyOrderlessHyman',
+					      'actTitleOrderlessHyman', 'actBodyOrderlessHyman', 'actTitleOrderlessHyman_actBodyOrderlessHyman'
 					      )))
 
 defaultTSjiConfig = modConfig(c(defaultTConfig, defaultSjiConfig,
@@ -1760,10 +1769,11 @@ myLoadImage <- function(groupConfig) {
 	     envir=globalenv())
 }
 
-funConfigEntropy <- function(config) modConfig(config, list(permUseEntropyP=T, permUseStoplistP=F, permOnlyDirectionP=F))
-funConfigOrig <- function(config) modConfig(config, list(permUseEntropyP=F, permUseStoplistP=F, permOnlyDirectionP=F))
-funConfigStoplist <- function(config) modConfig(config, list(permUseEntropyP=F, permUseStoplistP=T, permOnlyDirectionP=F))
-funConfigDirection <- function(config) modConfig(config, list(permUseEntropyP=T, permUseStoplistP=F, permOnlyDirectionP=T))
+funConfigEntropy <- function(config) modConfig(config, list(permUseEntropyP=T, permUseStoplistP=F, permOnlyDirectionP=F, permHymanP=F))
+funConfigOrig <- function(config) modConfig(config, list(permUseEntropyP=F, permUseStoplistP=F, permOnlyDirectionP=F, permHymanP=F))
+funConfigStoplist <- function(config) modConfig(config, list(permUseEntropyP=F, permUseStoplistP=T, permOnlyDirectionP=F, permHymanP=F))
+funConfigDirection <- function(config) modConfig(config, list(permUseEntropyP=T, permUseStoplistP=F, permOnlyDirectionP=T, permHymanP=F))
+funConfigHyman <- function(config) modConfig(config, list(permUseEntropyP=T, permUseStoplistP=F, permOnlyDirectionP=F, permHymanP=T))
 
 makeCombinedMemMat <- function(sjiTbl, envTbl, config) {
 	res = list()
@@ -1813,7 +1823,9 @@ computeActPermTFromContextTbl <- function(contextTbl, config) {
 			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderStoplist')][,fun:='computeActPermOrder'][,funConfig:='funConfigStoplist'],
 			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderlessStoplist')][,fun:='computeActPermOrderless'][,funConfig:='funConfigStoplist'],
 			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderDirection')][,fun:='computeActPermOrder'][,funConfig:='funConfigDirection'],
-			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderlessDirection')][,fun:='computeActPermOrderless'][,funConfig:='funConfigDirection']
+			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderlessDirection')][,fun:='computeActPermOrderless'][,funConfig:='funConfigDirection'],
+			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderHyman')][,fun:='computeActPermOrder'][,funConfig:='funConfigHyman'],
+			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderlessHyman')][,fun:='computeActPermOrderless'][,funConfig:='funConfigHyman']
 			   )
 	contextTbl[, get(fun[1])(chunk, pos, get(funConfig)(config)), by=type]
 }
@@ -1822,7 +1834,8 @@ computeActPermSOFromContextTbl <- function(contextTbl, config) {
 	contextTbl = rbind(copy(contextTbl)[,type:=paste0('act', capitalize(type),'Orderless')][,fun:='computeActPermOrderless'][,funConfig:='funConfigOrig'],
 			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderlessEntropy')][,fun:='computeActPermOrderless'][,funConfig:='funConfigEntropy'],
 			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderlessStoplist')][,fun:='computeActPermOrderless'][,funConfig:='funConfigStoplist'],
-			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderlessDirection')][,fun:='computeActPermOrderless'][,funConfig:='funConfigDirection']
+			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderlessDirection')][,fun:='computeActPermOrderless'][,funConfig:='funConfigDirection'],
+			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderlessHyman')][,fun:='computeActPermOrderless'][,funConfig:='funConfigHyman']
 			   )
 	contextTbl[, get(fun[1])(chunk, pos, get(funConfig)(config)), by=type]
 }
@@ -2332,6 +2345,13 @@ computeActPerm <- function(context, pos, permEnvTbl, permMemMat, config) {
 		contextCorVect = cor(permMemMat, contextMemVect)
 	}
 	resTbl = data.table(hashtag=rownames(contextCorVect), act=as.vector(contextCorVect))
+	if (getConfig(config, 'permHymanP')) {
+		resTbl[, mean(act)]
+		resTbl[, cdf := pnorm(act, mean=mean(act), sd=sd(act))]
+		resTbl[, cdf := min(.9999, cdf)] # So that log(1/0)'s don't produce Inf's
+		resTbl[, actLog := log(cdf/(1-cdf))]
+		resTbl[, act := actLog][, actLog := NULL][, cdf := NULL]
+	}
 	resTbl
 }
 
