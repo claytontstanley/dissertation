@@ -2,7 +2,7 @@ library(tools)
 library(RPostgreSQL)
 library(lavaan)
 library(Rmisc)
-require(gridExtra)
+library(gridExtra)
 library(memoise)
 library(microbenchmark)
 library(popbio)
@@ -2250,7 +2250,6 @@ makeEnvironmentSubsetTbl <- function(tbl, config) {
 }
 
 digestAsInteger <- function(x) {
-	require("digest")
 	hexval <- paste0("0x",digest(x,"crc32"))
 	intval <- type.convert(hexval) %% .Machine$integer.max
 	intval
@@ -2261,7 +2260,7 @@ makeEnvironmentTbl <- function(sjiTbl, config) {
 	permEnvTbl
 	key(sjiTbl)
 	sjiTbl
-	set.seed(digestAsInteger(sjiTbl))
+	set.seed(digestAsInteger(sjiTbl[1:100]))
 	permEnvTbl = makeEnvironmentSubsetTbl(permEnvTbl, config)
 	permEnvTbl[, uniq := NULL]
 	setkey(permEnvTbl, chunk)
@@ -2419,9 +2418,11 @@ runGenAndSaveCurWorkspaceg3s6 <- function() genAndSaveCurWorkspace(groupConfigG3
 runGenAndSaveCurWorkspaceg4s6 <- function() genAndSaveCurWorkspace(groupConfigG4S6)
 
 curWS <- function() {
+	#FIXME: Add way to plot test results
 	#FIXME: Stop-word removal method and compare to entropy
 	#FIXME: address word order low predictiveness
 	#FIXME: proper combination of prior and context for RP
+	#FIXME: add word order to Bayesian sji
 	#FIXME: Methods to import and anlyze coefficient tables
 	#FIXME: Quickly rerun logreg analysis for actDV
 	runContext20g1s1(regen='useAlreadyLoaded')
