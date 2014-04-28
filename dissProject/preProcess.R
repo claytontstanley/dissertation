@@ -2329,6 +2329,11 @@ makeMemMatInner <- function(sjiTbl, permEnvTbl, config) {
 	memMat
 }
 
+myCor <- function(permMemMat, contextMemVect) {
+	stats::cor(permMemMat, contextMemVect)
+	#WGCNA::corFast(permMemMat, contextMemVect) # Slower currently
+}
+
 computeActPerm <- function(context, pos, permEnvTbl, permMemMat, config) {
 	myLog(sprintf("computing perm act for context with length %s", length(context)))
 	permEnvTbl
@@ -2341,7 +2346,7 @@ computeActPerm <- function(context, pos, permEnvTbl, permMemMat, config) {
 	if (sd(contextMemVect) == 0) {
 		contextCorVect = matrix(data=0, nrow=dim(permMemMat)[2], ncol=1, dimnames=list(colnames(permMemMat)))
 	} else {
-		contextCorVect = cor(permMemMat, contextMemVect)
+		contextCorVect = myCor(permMemMat, contextMemVect)
 	}
 	resTbl = data.table(hashtag=rownames(contextCorVect), act=as.vector(contextCorVect))
 	if (getConfig(config, 'permHymanP')) {
@@ -2426,7 +2431,7 @@ curWS <- function() {
 	#FIXME: Methods to import and anlyze coefficient tables
 	#FIXME: Quickly rerun logreg analysis for actDV
 	#FIXME: Do something with the 2 different ds
-	runContext20g1s1(regen='useAlreadyLoaded')
+	withProf(runContext20g1s1(regen='useAlreadyLoaded'))
 	runContext20g1s6(regen='useAlreadyLoaded')
 
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelVsPred()))))
