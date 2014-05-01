@@ -100,8 +100,12 @@ test_that("testModelVsPredSO", {
 	  expectedHashtagsTbl = myReadCSV(getOutFileHashtags('testingSO1'))
 	  expectedModelVsPredTbl[, user_screen_name := as.character(user_screen_name)]
 	  expectedHashtagsTbl[, user_screen_name := as.character(user_screen_name)]
-	  resTbl = runPriorSO(config=modConfig(defaultSOConfig, list(query=sprintf("select %s from posts where post_type_id = 1 and owner_user_id = 20", defaultSOCols))))
-	  resTbl$hashtagsTbl[, created_at := as.character(created_at)]
+	  expectedHashtagsTbl[, user_screen_name_prior := as.character(user_screen_name_prior)]
+	  expectedHashtagsTbl[, id := as.character(id)]
+	  expectedHashtagsTbl[, pos := as.numeric(pos)]
+	  resTbl = runPriorSO(config=modConfig(defaultSOSjiPConfig, list(query=sprintf("owner_user_id = 20", defaultSOCols))))
+	  #resTbl$hashtagsTbl[, pos := NULL][, creation_epoch := NULL][, type := NULL][, user_id := as.numeric(user_screen_name)][, user_screen_name_prior := NULL][, id := as.numeric(id)]
+	  #setcolorder(resTbl$hashtagsTbl, colnames(expectedHashtagsTbl))
 	  expect_equivalent(expectedModelVsPredTbl, resTbl$modelVsPredTbl)
 	  expect_equivalent(expectedHashtagsTbl, resTbl$hashtagsTbl)
 })

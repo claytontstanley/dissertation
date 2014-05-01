@@ -107,11 +107,27 @@ create table top_hashtag_tokenized (
 create index id_index_top_hashtag_tokenized on top_hashtag_tokenized (id);
 create index type_index_top_hashtag_tokenized on top_hashtag_tokenized (type) where type = 'tag';
 
+create table tweets_tokenized (
+	id bigint not null,
+	chunk text not null,
+	pos integer not null,
+	type text not null
+);
+
+create index id_index_tweets_tokenized on tweets_tokenized (id);
+create index type_index_tweets_tokenized on tweets_tokenized (type) where type = 'tag';
+
 --drop table if exists post_filtered;
 create table if not exists post_filtered (
 	post_id integer not null,
 	reason text,
 	primary key (post_id)
+	);
+
+create table if not exists tweets_filtered (
+	id bigint not null,
+	reason text,
+	primary key (id)
 	);
 
 --drop table if exists twitter_users;
@@ -187,6 +203,14 @@ create table if not exists top_hashtag_tokenized_type_types (
 insert into top_hashtag_tokenized_type_types (type_name) values ('tweet'), ('hashtag');
 vacuum analyze top_hahtag_tokenized_type_types;
 
+create table if not exists tweets_tokenized_type_types (
+	id serial not null,
+	type_name text unique,
+	primary key (id)
+	);
+insert into tweets_tokenized_type_types (type_name) values ('tweet'), ('hashtag');
+vacuum analyze tweets_tokenized_type_types;
+
 create table if not exists post_tokenized_chunk_types (
 	id serial not null,
 	type_name text unique,
@@ -215,6 +239,17 @@ language sql;
 
 select * from fill_top_hashtag_tokenized_chunk_types();
 vacuum analyze top_hashtag_tokenized_chunk_types;
+
+create table if not exists tweets_tokenized_chunk_types (
+	id serial not null,
+	type_name text unique,
+	primary key (id)
+	);
+
+insert into tweets_tokenized_chunk_types (type_name)
+select distinct chunk
+from tweets_tokenized as t;
+vacuum analyze tweets_tokenized_chunk_types;
 
 create type chunk_table_type as ("chunk_id" int, "post_id" bigint, "pos" int, "post_type_id" int);
 

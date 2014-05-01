@@ -238,7 +238,8 @@ def storeCurTagSynonyms():
 
 def backupTables(tableNames=['topUsers', 'tweets', 'top_hashtag_hashtags', 'top_hashtag_tweets', 'post_subsets', 'top_hashtag_subsets',
                              'post_tokenized', 'top_hashtag_tokenized', 'post_filtered', 'twitter_users', 'tag_synonyms', 'users', 'posts',
-                             'post_tokenized_type_types', 'top_hashtag_tokenized_type_types', 'post_tokenized_chunk_types', 'top_hashtag_tokenized_chunk_types']):
+                             'post_tokenized_type_types', 'top_hashtag_tokenized_type_types', 'post_tokenized_chunk_types', 'top_hashtag_tokenized_chunk_types',
+                             'tweets_tokenized', 'tweets_tokenized_chunk_types', 'tweets_tokenized_type_types']):
     for tableName in tableNames:
         file = "%s/dissertationData/tables/%s.csv" % (_dir, tableName)
         cmd = string.Template("copy ${tableName} to '${file}' delimiter ',' csv header").substitute(locals())
@@ -423,6 +424,12 @@ def backupTopHashtags():
                              'top_hashtag_tokenized_chunk_types',
                              'top_hashtag_tokenized_type_types',
                              'top_hashtag_tweets'])
+
+def backupTweets():
+    backupTables(tableNames=['tweets',
+                             'tweets_tokenized',
+                             'tweets_tokenized_chunk_types',
+                             'tweets_tokenized_type_types'])
 
 # Current run selections
 #generateTopUsers100k()

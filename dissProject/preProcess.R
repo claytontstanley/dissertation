@@ -237,6 +237,7 @@ getHashtagsTbl <- function(tweetsTbl, config) {
 }
 
 convertTagSynonyms <- function(tokenizedTbl) {
+	myLog('converting tag synomyms for tokenized tbl')
 	withKey(tokenizedTbl, chunk,
 		{tokenizedTbl[getTagSynonymsTbl(), chunk := target_tag_name]
 		})
@@ -281,13 +282,13 @@ compareHashtagTbls <- function() {
 computeActPrior <- function(hashtags, dtP, cTime, d) {
 	myStopifnot(length(dtP) == length(hashtags))
 	myStopifnot(length(dtP) == length(cTime))
-	debugPrint(hashtags)
-	debugPrint(d)
-	debugPrint(cTime)
+	#debugPrint(hashtags)
+	#debugPrint(d)
+	#debugPrint(cTime)
 	dtP = cTime - dtP
 	indeces = dtP>0
 	hashtagsSub = hashtags[indeces] 
-	debugPrint(hashtagsSub)
+	#debugPrint(hashtagsSub)
 	cTimeSub = cTime[indeces]
 	cTimeSubRep = rep(cTimeSub, times=length(d))
 	dtPSub = dtP[indeces]
@@ -331,7 +332,8 @@ computeActPriorByUser <- function(hashtagsTbl, ds) {
 
 getPriorAtEpoch <- function(priorTbl, cEpoch, d) {
 	myLog(sprintf('computing prior at epoch %s', cEpoch))
-	curUserPriorTbl = priorTbl[creation_epoch <= cEpoch]
+	curUserPriorTbl = priorTbl[creation_epoch < cEpoch]
+	myLog(sprintf('Using %s prior observations to compute prior', nrow(curUserPriorTbl)))
 	curUserPriorTbl
 	if (nrow(curUserPriorTbl) > 0) {
 		curUserPriorTbl[, cTime := cEpoch - min(creation_epoch)]
@@ -418,18 +420,27 @@ addMetrics <- function(hashtagsTbl, modelHashtagsTbl, config) {
 		col = as.symbol(col)
 		newDVPost = as.symbol(newDVPost)
 		newDVAct = as.symbol(newDVAct)
+		col
+		newDVPost
 		expr = bquote(modelHashtagsTbl[order(.(col), decreasing=T), .(newDVPost) := 1:length(.(col)) <= tagCount[1], by=list(user_screen_name, dt, d)])
+		eval(expr)
+		expr = bquote(modelHashtagsTbl[is.na(.(col)) & .(newDVPost), .(newDVPost) := F])
 		eval(expr)
 		expr = bquote(modelHashtagsTbl[order(.(col), decreasing=T), .(newDVAct) := 1:length(.(col)) <= tagCountUser[1], by=list(user_screen_name, d)])
 		eval(expr)
+		expr = bquote(modelHashtagsTbl[is.na(.(col)) & .(newDVAct), .(newDVAct) := F])
+		eval(expr)
+		return()
 	}
 	for (actDV in actDVs) {
 		actDV
 		do.call(addDVCols, as.list(c(actDV, topHashtagDVFromActDV(actDV))))
 	}
+	modelHashtagsTbl
 	myStopifnot(key(modelHashtagsTbl) == (c('user_screen_name', 'dt', 'hashtag', 'd')))
 	myStopifnot(key(hashtagsTbl) == (c('user_screen_name', 'dt', 'hashtag')))
 	modelHashtagsTbl[, hashtagUsedP := F]
+	key(modelHashtagsTbl)
 	modelHashtagsTbl[hashtagsTbl, hashtagUsedP := T]
 	#wideTbl = hashtagsTbl[, list(usedHashtags=list(hashtag)), by=list(user_screen_name, dt)]
 	#modelHashtagsTbl[wideTbl, usedHashtags := usedHashtags]
@@ -508,7 +519,7 @@ writeLogregTbl <- function(logregTbl, outFile) {
 
 genAggModelVsPredTbl <- function(hashtagsTbl, config) {
 	outFile = getConfig(config, "modelVsPredOutFile")
-	ds = getConfig(config, "ds")
+	ds = getConfig(config, "dFull")
 	modelHashtagsTbls = data.table()
 	getModelVsPredTblFromHashtagsTbl <- function(hashtagsTbl, ds, userScreenName) {
 		myLog(sprintf('generating model predictions for user %s', userScreenName))
@@ -593,6 +604,7 @@ getOutFileModelHashtags <- function(name) getOutFileGen(getDirModelHashtags(), n
 
 getLogregOutFile <- function(name) getOutFileGen(getDirLogreg(), name)
 
+
 runPrior <- function(config) {
 	myStopifnot(!any(sapply(config,is.null)))
 	withProf({
@@ -602,6 +614,26 @@ runPrior <- function(config) {
 		modelVsPredTbl = res$modelVsPredTbl
 		modelHashtagsTbl = res$modelHashtagsTbl
 		list(modelVsPredTbl=modelVsPredTbl, modelHashtagsTbl=modelHashtagsTbl, hashtagsTbl=hashtagsTbl)
+	})
+}
+
+runPrior <- function(config) {
+	myStopifnot(!any(sapply(config,is.null)))
+	withProf({
+		config=modConfig(config, list(dStd=getConfig(config, 'dFull')))
+		tokenTbl = getTokenizedForUsers(config)
+		tokenTbl
+		tagTbl = tokenTbl[type == 'tag']
+		tagTbl
+		if (getConfig(config, "convertTagSynonymsP")) convertTagSynonyms(tagTbl)
+		tokenTbl = rbind(tokenTbl[type != 'tag'], tagTbl)
+		setkey(tokenTbl, user_screen_name, dt)
+		getOutFileForNameFun <- function(name) {
+			getConfig(config, name)
+		}
+		#FIXME: some logic in the following function needs to be moved here
+		#res = genAggModelVsPredTbl(hashtagsTbl, config=config)
+		runForTokenTbl(tokenTbl, config, getOutFileForNameFun) 
 	})
 }
 
@@ -621,7 +653,19 @@ getConfig <- function(config, slot) {
 	config[[slot]]
 }
 
-defaultBaseConfig = list(ds=c(0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1.0,1.1,1.2,1.3,1.4,1.5,1.6,1.8,2,5,10,20),
+makeRunTbl <- function(runs) {
+	makeTbl <- function(run) {
+		name = paste(run, collapse='_', sep='')
+		data.table(name=name, predName=run)
+	}
+	if (length(runs) > 0) {
+		rbindlist(lapply(runs, makeTbl))
+	} else {
+		data.table(name=character(0), predName=character(0))
+	}
+}
+
+defaultBaseConfig = list(dFull=c(0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1.0,1.1,1.2,1.3,1.4,1.5,1.6,1.8,2,5,10,20),
 			 dStd=c(0.5,0.7),
 			 modelVsPredOutFile='/tmp/modelVsPred.csv',
 			 modelHashtagsOutFile='',
@@ -670,17 +714,9 @@ defaultSOConfig = c(defaultBaseConfig,
 			      makeChunkTblFun='make_chunk_table_SO'
 			      ))
 
-defaultPermConfig = list(permUseEntropyP='', permUseStoplistP='', permOnlyDirectionP='', permHymanP='')
+defaultPermConfig = list(permUseEntropyP='', permUseStoplistP='', permOnlyDirectionP='', permHymanP='', permUseFreqP='', permUseWindowP='')
 
 defaultSjiConfig = list(computeActFromContextTbl = 'computeActSjiFromContextTbl')
-
-makeRunTbl <- function(runs) {
-	makeTbl <- function(run) {
-		name = paste(run, collapse='_', sep='')
-		data.table(name=name, predName=run)
-	}
-	rbindlist(lapply(runs, makeTbl))
-}
 
 defaultTPermConfig = modConfig(c(defaultTConfig, defaultPermConfig,
 				 list(runTbl=makeRunTbl(list(c('actPriorStd', 'actTweetOrder', 'actTweetOrderless'),
@@ -694,7 +730,11 @@ defaultTPermConfig = modConfig(c(defaultTConfig, defaultPermConfig,
 							     c('actPriorStd', 'actTweetOrderDirection', 'actTweetOrderlessDirection'),
 							     c('actTweetOrderDirection', 'actTweetOrderlessDirection'),
 							     c('actPriorStd', 'actTweetOrderHyman', 'actTweetOrderlessHyman'),
-							     c('actTweetOrderHyman', 'actTweetOrderlessHyman')
+							     c('actTweetOrderHyman', 'actTweetOrderlessHyman'),
+							     c('actPriorStd', 'actTweetOrderFreq', 'actTweetOrderlessFreq'),
+							     c('actTweetOrderFreq', 'actTweetOrderlessFreq'),
+							     c('actPriorStd', 'actTweetOrderWindow', 'actTweetOrderlessWindow'),
+							     c('actTweetOrderWindow', 'actTweetOrderlessWindow')
 							     )),
 				      permEnvTbl='permEnvTblT',
 				      permMemMatOrder='permMemMatTOrder',
@@ -710,7 +750,11 @@ defaultTPermConfig = modConfig(c(defaultTConfig, defaultPermConfig,
 					     'actPriorStd_actTweetOrderDirection_actTweetOrderlessDirection',
 					     'actTweetOrderlessDirection', 'actTweetOrderDirection', 'actTweetOrderDirection_actTweetOrderlessDirection',
 					     'actPriorStd_actTweetOrderHyman_actTweetOrderlessHyman',
-					     'actTweetOrderlessHyman', 'actTweetOrderHyman', 'actTweetOrderHyman_actTweetOrderlessHyman'
+					     'actTweetOrderlessHyman', 'actTweetOrderHyman', 'actTweetOrderHyman_actTweetOrderlessHyman',
+					     'actPriorStd_actTweetOrderFreq_actTweetOrderlessFreq',
+					     'actTweetOrderlessFreq', 'actTweetOrderFreq', 'actTweetOrderFreq_actTweetOrderlessFreq',
+					     'actPriorStd_actTweetOrderWindow_actTweetOrderlessWindow',
+					     'actTweetOrderlessWindow', 'actTweetOrderWindow', 'actTweetOrderWindow_actTweetOrderlessWindow'
 					     )))
 
 defaultSOPermConfig = modConfig(c(defaultSOConfig, defaultPermConfig,
@@ -725,7 +769,11 @@ defaultSOPermConfig = modConfig(c(defaultSOConfig, defaultPermConfig,
 							      c('actPriorStd', 'actTitleOrderlessDirection', 'actBodyOrderlessDirection'),
 							      c('actTitleOrderlessDirection', 'actBodyOrderlessDirection'),
 							      c('actPriorStd', 'actTitleOrderlessHyman', 'actBodyOrderlessHyman'),
-							      c('actTitleOrderlessHyman', 'actBodyOrderlessHyman')
+							      c('actTitleOrderlessHyman', 'actBodyOrderlessHyman'),
+							      c('actPriorStd', 'actTitleOrderlessFreq', 'actBodyOrderlessFreq'),
+							      c('actTitleOrderlessFreq', 'actBodyOrderlessFreq'),
+							      c('actPriorStd', 'actTitleOrderlessWindow', 'actBodyOrderlessWindow'),
+							      c('actTitleOrderlessWindow', 'actBodyOrderlessWindow')
 							      )),
 				       permEnvTbl='permEnvTblSO',
 				       permMemMatOrder='',
@@ -741,7 +789,11 @@ defaultSOPermConfig = modConfig(c(defaultSOConfig, defaultPermConfig,
 					      'actPriorStd_actTitleOrderlessDirection_actBodyOrderlessDirection',
 					      'actTitleOrderlessDirection', 'actBodyOrderlessDirection', 'actTitleOrderlessDirection_actBodyOrderlessDirection',
 					      'actPriorStd_actTitleOrderlessHyman_actBodyOrderlessHyman',
-					      'actTitleOrderlessHyman', 'actBodyOrderlessHyman', 'actTitleOrderlessHyman_actBodyOrderlessHyman'
+					      'actTitleOrderlessHyman', 'actBodyOrderlessHyman', 'actTitleOrderlessHyman_actBodyOrderlessHyman',
+					      'actPriorStd_actTitleOrderlessFreq_actBodyOrderlessFreq',
+					      'actTitleOrderlessFreq', 'actBodyOrderlessFreq', 'actTitleOrderlessFreq_actBodyOrderlessFreq',
+					      'actPriorStd_actTitleOrderlessWindow_actBodyOrderlessWindow',
+					      'actTitleOrderlessWindow', 'actBodyOrderlessWindow', 'actTitleOrderlessWindow_actBodyOrderlessWindow'
 					      )))
 
 defaultTSjiConfig = modConfig(c(defaultTConfig, defaultSjiConfig,
@@ -752,6 +804,16 @@ defaultSOSjiConfig = modConfig(c(defaultSOConfig, defaultSjiConfig,
 				 list(runTbl=makeRunTbl(list(c('actPriorStd', 'actTitle', 'actBody'),
 							     c('actTitle', 'actBody'))))),
 			       list(actDVs=c('actPriorStd_actTitle_actBody', 'actPriorStd', 'actTitle', 'actBody', 'actTitle_actBody')))
+
+defaultSOSjiPConfig = modConfig(c(defaultSOConfig, defaultSjiConfig,
+				  list(runTbl=makeRunTbl(list()))),
+				list(actDVs = c('actPriorStd', 'actPriorOL', 'actPriorOL2'),
+				     computeActFromContextTbl='computeActNullFromContextTbl'))
+
+defaultTSjiPConfig = modConfig(c(defaultTConfig, defaultSjiConfig,
+				 list(runTbl=makeRunTbl(list()))),
+			       list(actDVs=c('actPriorStd', 'actPriorOL', 'actPriorOL2'),
+				    computeActFromContextTbl='computeActNullFromContextTbl'))
 
 defaultGGPlotOpts <- theme_bw() + theme_classic()
 
@@ -1250,7 +1312,32 @@ renameColDVName <- function(tbl) {
 		    'topHashtagAcrossTitleOrderlessEntropy', 'RP only title w/ entropy',
 		    'topHashtagAcrossBodyOrderlessEntropy', 'RP only body w/ entropy',
 		    'topHashtagAcrossTweetOrderEntropyTweetOrderlessEntropy', 'RP combined orderless and order w/ entropy',
-		    'topHashtagAcrossTweetOrderEntropy', 'RP only order context w/ entropy')
+		    'topHashtagAcrossTweetOrderEntropy', 'RP only order context w/ entropy',
+		    'topHashtagAcrossTitleOrderlessStoplistBodyOrderlessStoplist', 'RP combined title and body w/ stoplist',
+		    'topHashtagAcrossTitleOrderlessStoplist', 'RP only title w/ stoplist',
+		    'topHashtagAcrossBodyOrderlessStoplist', 'RP only body w/ stoplist',
+		    'topHashtagAcrossTweetOrderStoplistTweetOrderlessStoplist', 'RP combined orderless and order w/ stoplist',
+		    'topHashtagAcrossTweetOrderStoplist', 'RP only order context w/ stoplist',
+		    'topHashtagAcrossTweetOrderlessStoplist', 'RP only orderless context w/ stoplist',
+		    'topHashtagAcrossPriorStdTweetOrderStoplistTweetOrderlessStoplist', 'RP combined full w/ stoplist',
+		    'topHashtagAcrossPriorStdTitleOrderlessStoplistBodyOrderlessStoplist', 'RP combined full w/ stoplist',
+		    'topHashtagAcrossTitleOrderlessHymanBodyOrderlessHyman', 'RP combined title and body w/ entropy and logodds',
+		    'topHashtagAcrossTitleOrderlessHyman', 'RP only title w/ entropy and logodds',
+		    'topHashtagAcrossBodyOrderlessHyman', 'RP only body w/ entropy and logodds',
+		    'topHashtagAcrossTweetOrderHymanTweetOrderlessHyman', 'RP combined orderless and order w/ entropy and logodds',
+		    'topHashtagAcrossTweetOrderHyman', 'RP only order context w/ entropy and logodds',
+		    'topHashtagAcrossTweetOrderlessHyman', 'RP only orderless context w/ entropy and logodds',
+		    'topHashtagAcrossPriorStdTweetOrderHymanTweetOrderlessHyman', 'RP combined full w/ entropy and logodds',
+		    'topHashtagAcrossPriorStdTitleOrderlessHymanBodyOrderlessHyman', 'RP combined full w/ entropy and logodds',
+		    'topHashtagAcrossTitleOrderlessDirectionBodyOrderlessDirection', 'RP combined title and body w/ entropy and direction',
+		    'topHashtagAcrossTitleOrderlessDirection', 'RP only title w/ entropy and direction',
+		    'topHashtagAcrossBodyOrderlessDirection', 'RP only body w/ entropy and direction',
+		    'topHashtagAcrossTweetOrderDirectionTweetOrderlessDirection', 'RP combined orderless and order w/ entropy and direction',
+		    'topHashtagAcrossTweetOrderDirection', 'RP only order context w/ entropy and direction',
+		    'topHashtagAcrossTweetOrderlessDirection', 'RP only orderless context w/ entropy and direction',
+		    'topHashtagAcrossPriorStdTweetOrderDirectionTweetOrderlessDirection', 'RP combined full w/ entropy and direction',
+		    'topHashtagAcrossPriorStdTitleOrderlessDirectionBodyOrderlessDirection', 'RP combined full w/ entropy and direction'
+		    )
 	mapping = groupN(2, mapping)
 	mapping
 	mapTbl = data.table(DVName=sapply(mapping, `[`, 1), newName=sapply(mapping, `[`, 2))
@@ -1361,6 +1448,14 @@ analyzePrior <- function(modelVsPredTbl) {
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostPriorOL2' & datasetName=='SOQgt500r2' & d < 1])
 }
 
+asTopHashtagAcross <- function(vect) {
+	paste0('topHashtagAcross', vect)
+}
+
+asTopHashtagPost <- function(vect) {
+	paste0('topHashtagPost', vect)
+}
+
 analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 	#modelHashtagsTbls = Filter(x = modelHashtagsTbls, f = function(tbl) !grepl('-500', tbl[, datasetName[1]]))
 	ppvTbl = rbindlist(lapply(modelHashtagsTbls, getPPVTblAll))
@@ -1378,7 +1473,7 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 	modelVsPredTbl[, list(N=.N, Ndsets=length(unique(datasetName))), keyby=list(sizeNum, dsetSize, dsetType)]
 	plotPPVTbl(ppvTbl[dsetType=='stackoverflow' & runNum==1 & dsetSize==500], 'contextPpvSO')
 	plotPPVTbl(ppvTbl[dsetType=='twitter' & runNum==1 & dsetSize==500], 'contextPpvT')
-	#tbl = modelVsPredTbl[predUsedBest == T][dsetSize==500][grepl('^topHashtagPost', DVName)]
+	tblPost = modelVsPredTbl[predUsedBest == T][dsetSize==500][grepl('^topHashtagPost', DVName)]
 	tbl = modelVsPredTbl[predUsedBest == T][dsetSize==500][grepl('^topHashtagAcross', DVName)]
 	tbl[, .N, by=DVName]
 	DVNamesSO = c('topHashtagAcrossPriorStd', 'topHashtagAcrossBodyOrderlessEntropy', 'topHashtagAcrossBody', 
@@ -1388,20 +1483,66 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 	DVNamesT = c('topHashtagAcrossPriorStd', 'topHashtagAcrossTweet', 'topHashtagAcrossTweetOrderlessEntropy',
 		     'topHashtagAcrossTweetOrderEntropy',
 		     'topHashtagAcrossPriorStdTweet', 'topHashtagAcrossPriorStdTweetOrderEntropyTweetOrderlessEntropy')
-	# SO standard
-	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & !grepl('Entropy', DVName)], acc, figName='ContextMeanDVSO')
-	# T standard
-	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'twitter' & !grepl('Entropy', DVName)], acc, figName='foo', groupCol='dsetGroup')
-	# T standard all groups
-	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'twitter' & !grepl('Entropy', DVName)], acc, figName='ContextMeanDVT', groupCol='groupNum')
-	# SO Entropy
+	# SO full
 	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'stackoverflow'], acc, figName='ContextMeanDVSO')
-	# T Entropy 
+	# SO standard
+	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & !grepl('(Entropy)|(Direction)|(Hyman)|(Stoplist)', DVName)], acc, figName='ContextMeanDVSO')
+	# T full
 	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'twitter'], acc, figName='foo', groupCol='dsetGroup')
+	# T standard
+	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'twitter' & !grepl('(Entropy)|(Direction)|(Hyman)|(Stoplist)', DVName)], acc, figName='foo', groupCol='dsetGroup')
+	# T standard all groups
+	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'twitter' & !grepl('(Entropy)|(Direction)|(Hyman)|(Stoplist)', DVName)], acc, figName='ContextMeanDVT', groupCol='groupNum')
+	# SO Entropy
+	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleBody',
+				       'BodyOrderlessEntropy', 'Body', 'BodyOrderless',
+				       'TitleOrderlessEntropy', 'Title', 'TitleOrderless',
+				       'PriorStdTitleOrderlessEntropyBodyOrderlessEntropy', 'PriorStdTitleOrderlessBodyOrderless'))
+	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='ContextMeanDVSO')
 	# SO Entropy all sizes
-	compareMeanDV(tbl[dsetType == 'stackoverflow' & DVName %in% DVNamesSO], acc, figName='foo', groupCol='sizeNum')
+	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleBody', 
+				       'PriorStdTitleOrderlessEntropyBodyOrderlessEntropy', 'PriorStdTitleOrderlessBodyOrderless'))
+	compareMeanDV(tbl[dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='foo', groupCol='sizeNum')
+	# T Entropy 
+	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweet',
+				       'TweetOrderlessEntropy', 'TweetOrderEntropy',
+				       'TweetOrderless', 'TweetOrder',
+				       'PriorStdTweetOrderTweetOrderless', 'PriorStdTweetOrderEntropyTweetOrderlessEntropy'))
+	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='foo', groupCol='dsetGroup')
 	# T Entropy all sizes
-	compareMeanDV(tbl[dsetType == 'twitter' & DVName %in% DVNamesT], acc, figName='foo', groupCol='sizeNum')
+	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweet',
+				       'PriorStdTweetOrderTweetOrderless', 'PriorStdTweetOrderEntropyTweetOrderlessEntropy'))
+	compareMeanDV(tbl[dsetType == 'twitter' & DVName %in% DVNames], acc, figName='foo', groupCol='sizeNum')
+	# SO compare entropy to stoplist
+	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleBody',
+				       'TitleOrderlessEntropy', 'Title', 'TitleOrderless', 'TitleOrderlessStoplist',
+				       'PriorStdTitleOrderlessEntropyBodyOrderlessEntropy', 'PriorStdTitleOrderlessBodyOrderless',
+				       'PriorStdTitleOrderlessStoplistBodyOrderlessStoplist'))
+	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='ContextMeanDVSO')
+	# T compare entropy to stoplist
+	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweet',
+				       'TweetOrderlessEntropy', 'Tweet', 'TweetOrderless', 'TweetOrderlessStoplist', 
+				       'PriorStdTweetOrderEntropyTweetOrderlessEntropy', 'PriorStdTweetOrderTweetOrderless',
+				       'PriorStdTweetOrderStoplistTweetOrderlessStoplist'))
+	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='foo', groupCol='dsetGroup')
+	# SO compare entropy w/ logodds to entropy
+	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleBody',
+				       'TitleOrderlessEntropy', 'Title', 'TitleOrderless', 'TitleOrderlessHyman',
+				       'PriorStdTitleOrderlessEntropyBodyOrderlessEntropy', 'PriorStdTitleOrderlessBodyOrderless',
+				       'PriorStdTitleOrderlessHymanBodyOrderlessHyman'))
+	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='ContextMeanDVSO')
+	# T compare entropy w/ loggodds to entropy
+	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweet',
+				       'TweetOrderlessEntropy', 'Tweet', 'TweetOrderless', 'TweetOrderlessHyman',
+				       'PriorStdTweetOrderEntropyTweetOrderlessEntropy', 'PriorStdTweetOrderTweetOrderless',
+				       'PriorStdTweetOrderHymanTweetOrderlessHyman'))
+	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='foo', groupCol='dsetGroup')
+	# T compare entropy w/ direction to entropy
+	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweet',
+				       'TweetOrderEntropy', 'Tweet', 'TweetOrder', 'TweetOrderDirection',
+				       'TweetOrderlessEntropy', 'TweetOrderless', 'TweetOrderlessDirection',
+				       'PriorStdTweetOrderEntropyTweetOrderlessEntropy', 'PriorStdTweetOrderTweetOrderless', 'PriorStdTweetOrderDirectionTweetOrderlessDirection'))
+	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='foo', groupCol='dsetGroup')
 }
 
 getNcoocTbl <- function(type, chunkTableQuery, config) {
@@ -1518,17 +1659,12 @@ genTokenizedTblSO <- function(filters='1=1', bundleSize=10000) {
 	return()
 }
 
-genTokenizedTblTwitter <- function(hashtagGroup, bundleSize=10000) {
-	query = sprintf("select %s from top_hashtag_tweets 
-			where hashtag_group = '%s'
-			and id not in (select distinct id from top_hashtag_tokenized)
-			",
-			defaultTCols, hashtagGroup, hashtagGroup)
+genTokenizedTblTwitter <- function(bundleSize=10000, query, tokenizedTblName) {
 	withDBConnect(dbCon,
 		      {dbRs = dbSendQuery(dbCon, query)
 		      writePartialTbl <- function(tbl) {
 			      setcolorder(tbl, c('id', 'chunk', 'pos', 'type'))
-			      appendDTbl(tbl, 'top_hashtag_tokenized')
+			      appendDTbl(tbl, tokenizedTblName)
 		      }
 		      while (T) {
 			      tweetsTbl = data.table(fetch(dbRs, n=bundleSize))
@@ -1542,12 +1678,38 @@ genTokenizedTblTwitter <- function(hashtagGroup, bundleSize=10000) {
 	return()
 }
 
+genTokenizedTblTwitterContext <- function(hashtagGroup) {
+	query = sprintf("select %s from top_hashtag_tweets 
+			where hashtag_group = '%s'
+			and id not in (select distinct id from top_hashtag_tokenized)
+			",
+			defaultTCols, hashtagGroup, hashtagGroup)
+	genTokenizedTblTwitter(query=query, tokenizedTblName='top_hashtag_tokenized')
+}
+
+genTokenizedTblTwitterPrior <- function() {
+	query = sprintf("select %s from tweets
+			where id not in (select distinct id from tweets_tokenized)
+			and id not in (select id from tweets_filtered)",
+			defaultTCols)
+	genTokenizedTblTwitter(query=query, tokenizedTblName='tweets_tokenized')
+}
+
 addFilteredPosts <- function() {
 	ids = c('17801882', '9965709', '9204391', '15837898', '18893489', '20156201', '3245809')
 	reasons = c('java so', 'java so', 'java so', 'java so', 'java so', 'java so', 'nonprintable U+FFFF')
 	filteredPostsTbl = data.table(post_id=ids, reason=reasons);
 	setcolorder (filteredPostsTbl, c('post_id', 'reason'))
 	appendDTbl(filteredPostsTbl, 'post_filtered')
+}
+
+addFilteredTweets <- function() {
+	sqldf('truncate table tweets_filtered')
+	ids = c('12466832063')
+	reasons = c('nonprintable')
+	filteredTweetsTbl = data.table(id=ids, reason=reasons);
+	setcolorder(filteredTweetsTbl, c('id', 'reason'))
+	appendDTbl(filteredTweetsTbl, 'tweets_filtered')
 }
 
 addPostSubsets <- function() {
@@ -1616,11 +1778,13 @@ runGenNcoocTblT11thru1000000 <- function() genAllNcoocTblTwitter(1, 1000000)
 runGenNcoocTblT11thru3000000 <- function() genAllNcoocTblTwitter(1, 3000000)
 
 runGenTokenizedTblSO <- function() genTokenizedTblSO()
-runGenTokenizedTblTwitter <- function() {
+runGenTokenizedTblTwitterContext <- function() {
 	for (groupName in getConfig(defaultTConfig, 'allGroupNames')) {
-		genTokenizedTblTwitter(groupName)
+		genTokenizedTblTwitterContext(groupName)
 	}
 }
+
+runGenTokenizedTblTwitterPrior <- genTokenizedTblTwitterPrior
 
 getSjiTblSO <- function(config, startId, endId) {
 	fileName = sprintf('%s.csv', makeSubsetName(getConfig(config, "groupName"), startId, endId))
@@ -1751,7 +1915,7 @@ computeActSji <- function(contextVect, sjiTbl, config) {
 }
 
 getWsFile <- function(groupConfig) {
-	wsFile = with(groupConfig, sprintf('%s/workspace-g%ss%s.RData', '/Volumes/SSDSupernova/RWorkspace', groupNum, sizeNum))
+	wsFile = with(groupConfig, sprintf('%s/workspace-g%ss%s.RData', '/Volumes/SuperSupernova/RWorkspace', groupNum, sizeNum))
 	wsFile
 }
 
@@ -1769,19 +1933,56 @@ myLoadImage <- function(groupConfig) {
 	     envir=globalenv())
 }
 
-funConfigEntropy <- function(config) modConfig(config, list(permUseEntropyP=T, permUseStoplistP=F, permOnlyDirectionP=F, permHymanP=F))
-funConfigOrig <- function(config) modConfig(config, list(permUseEntropyP=F, permUseStoplistP=F, permOnlyDirectionP=F, permHymanP=F))
-funConfigStoplist <- function(config) modConfig(config, list(permUseEntropyP=F, permUseStoplistP=T, permOnlyDirectionP=F, permHymanP=F))
-funConfigDirection <- function(config) modConfig(config, list(permUseEntropyP=T, permUseStoplistP=F, permOnlyDirectionP=T, permHymanP=F))
-funConfigHyman <- function(config) modConfig(config, list(permUseEntropyP=T, permUseStoplistP=F, permOnlyDirectionP=F, permHymanP=T))
+getFunConfigMods <- function(permUseEntropyP=F, permUseStoplistP=F, permOnlyDirectionP=F, permHymanP=F, permUseFreqP=F, permUseWindowP=F) {
+	list(permUseEntropyP=permUseEntropyP,
+	     permUseStoplistP=permUseStoplistP,
+	     permOnlyDirectionP=permOnlyDirectionP,
+	     permHymanP=permHymanP,
+	     permUseFreqP=permUseFreqP,
+	     permUseWindowP=permUseWindowP)
+}
+
+funConfigOrig <- function(config) modConfig(config, getFunConfigMods())
+funConfigEntropy <- function(config) modConfig(config, getFunConfigMods(permUseEntropyP=T))
+funConfigStoplist <- function(config) modConfig(config, getFunConfigMods(permUseStoplistP=T))
+funConfigFreq <- function(config) modConfig(config, getFunConfigMods(permUseFreqP=T))
+funConfigDirection <- function(config) modConfig(config, getFunConfigMods(permUseEntropyP=T, permOnlyDirectionP=T))
+funConfigHyman <- function(config) modConfig(config, getFunConfigMods(permUseEntropyP=T, permHymanP=T))
+funConfigWindow <- function(config) modConfig(config, getFunConfigMods(permUseEntropyP=T, permUseWindowP=T))
 
 makeCombinedMemMat <- function(sjiTbl, envTbl, config) {
 	res = list()
 	res[['direction']] = makeMemMat(sjiTbl, envTbl, funConfigDirection(config))
 	res[['entropy']] = makeMemMat(sjiTbl, envTbl, funConfigEntropy(config))
 	res[['stoplist']] = makeMemMat(sjiTbl, envTbl, funConfigStoplist(config))
+	res[['freq']] = makeMemMat(sjiTbl, envTbl, funConfigFreq(config))
+	res[['window']] = makeMemMat(sjiTbl, envTbl, funConfigWindow(config))
 	res[['orig']] = makeMemMat(sjiTbl, envTbl, funConfigOrig(config))
 	res
+}
+
+plotMemMat <- function() {
+	sdStoplist = apply(permMemMatSOOrderless$stoplist, 2, sd)
+	sdFreq = apply(permMemMatSOOrderless$freq, 2, sd)
+	sdEntropy = apply(permMemMatSOOrderless$entropy, 2, sd)
+	sdOrig = apply(permMemMatSOOrderless$orig, 2, sd)
+	sdStoplist = apply(permMemMatTOrderless$stoplist, 2, sd)
+	sdFreq = apply(permMemMatTOrderless$freq, 2, sd)
+	sdEntropy = apply(permMemMatTOrderless$entropy, 2, sd)
+	sdOrig = apply(permMemMatTOrderless$orig, 2, sd)
+	permEnvTblSO[, .N, by=stopWordWeight]
+	permEnvTblSO[, .N, by=freqWeight]
+	permEnvTblT[, .N, by=stopWordWeight]
+	permEnvTblT[, .N, by=freqWeight]
+	permEnvTblSO
+	sd(sdOrig)
+	sd(sdEntropy)
+	sd(sdFreq)
+	sd(sdStoplist)
+	plot(sdOrig)
+	plot(sdStoplist)
+	plot(sdEntropy)
+	plot(sdFreq)
 }
 
 getCurWorkspace <- function(groupConfig) {
@@ -1814,6 +2015,9 @@ computeActSjiFromContextTbl <- function(contextTbl, config) {
 	contextTbl[, computeActSji(chunk, get(getConfig(config, 'sjiTbl')), config), by=type]
 }
 
+computeActNullFromContextTbl <- function(contextTbl, config) {
+	data.table(type=character(), hashtag=character(), act=double())
+}
 
 computeActPermTFromContextTbl <- function(contextTbl, config) {
 	contextTbl = rbind(copy(contextTbl)[,type:=paste0('act', capitalize(type),'Order')][,fun:='computeActPermOrder'][,funConfig:='funConfigOrig'],
@@ -1825,7 +2029,11 @@ computeActPermTFromContextTbl <- function(contextTbl, config) {
 			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderDirection')][,fun:='computeActPermOrder'][,funConfig:='funConfigDirection'],
 			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderlessDirection')][,fun:='computeActPermOrderless'][,funConfig:='funConfigDirection'],
 			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderHyman')][,fun:='computeActPermOrder'][,funConfig:='funConfigHyman'],
-			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderlessHyman')][,fun:='computeActPermOrderless'][,funConfig:='funConfigHyman']
+			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderlessHyman')][,fun:='computeActPermOrderless'][,funConfig:='funConfigHyman'],
+			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderFreq')][,fun:='computeActPermOrder'][,funConfig:='funConfigFreq'],
+			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderlessFreq')][,fun:='computeActPermOrderless'][,funConfig:='funConfigFreq'],
+			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderWindow')][,fun:='computeActPermOrder'][,funConfig:='funConfigWindow'],
+			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderlessWindow')][,fun:='computeActPermOrderless'][,funConfig:='funConfigWindow']
 			   )
 	contextTbl[, get(fun[1])(chunk, pos, get(funConfig)(config)), by=type]
 }
@@ -1835,7 +2043,9 @@ computeActPermSOFromContextTbl <- function(contextTbl, config) {
 			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderlessEntropy')][,fun:='computeActPermOrderless'][,funConfig:='funConfigEntropy'],
 			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderlessStoplist')][,fun:='computeActPermOrderless'][,funConfig:='funConfigStoplist'],
 			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderlessDirection')][,fun:='computeActPermOrderless'][,funConfig:='funConfigDirection'],
-			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderlessHyman')][,fun:='computeActPermOrderless'][,funConfig:='funConfigHyman']
+			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderlessHyman')][,fun:='computeActPermOrderless'][,funConfig:='funConfigHyman'],
+			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderlessFreq')][,fun:='computeActPermOrderless'][,funConfig:='funConfigFreq'],
+			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderlessWindow')][,fun:='computeActPermOrderless'][,funConfig:='funConfigWindow']
 			   )
 	contextTbl[, get(fun[1])(chunk, pos, get(funConfig)(config)), by=type]
 }
@@ -1853,6 +2063,7 @@ getSjiTblWide <- function(contextTbl, config) {
 	} else {
 		sjiTbl = data.table(act=double(0)) # Need to add a column b/c more 0-row columns can only be added to a DT with at least one col.
 	}
+	sjiTbl
 	if (nrow(sjiTbl) > 0) {
 		sjiTblWide = dcast.data.table(sjiTbl, hashtag ~ type, value.var='act')
 		for (predName in getContextPredNames(config)) {
@@ -1904,6 +2115,7 @@ getPostResTbl <- function(tokenTbl, config, id) {
 	priorTbl[, user_screen_name := tokenTbl$user_screen_name[1]]
 	priorTbl[, dt := tokenTbl[, dt[1]]]
 	sjiTblWide = getSjiTblWide(contextTbl, config)
+	sjiTblWide
 	key(priorTbl)
 	key(tagTbl)
 	postResTbl = sjiTblWide[priorTbl]
@@ -1922,6 +2134,18 @@ getTokenizedFromSubset <- function(minId, maxId, config) {
 							  and group_name = '%s')",
 			       getConfig(config, "tokenizedTbl"), getConfig(config, "postsTbl"), getConfig(config, "subsetsTbl"), minId, maxId, getConfig(config, "groupName") 
 			       ))
+	resTbl
+}
+
+getTokenizedForUsers <- function(config) {
+	resTbl = sqldt(sprintf("select tokenized_tbl.id::text, user_screen_name, creation_epoch, chunk, pos, type from post_tokenized as tokenized_tbl
+			       join posts as posts_tbl
+			       on tokenized_tbl.id = posts_tbl.id
+			       where 1=1
+			       and %s", getConfig(config, 'query') 
+			       ))
+	addDtToTbl(resTbl)
+	resTbl[, user_screen_name_prior := user_screen_name]
 	resTbl
 }
 
@@ -2047,7 +2271,11 @@ analyzePostResTblAcrossDs <- function(postResTbl, runTbl) {
 		tbl = postResTbl[d == curD] 
 		tbl
 		runTbl
-		logregTbl = runTbl[, analyzePostResTbl(tbl, predName, name), by=name]
+		if (nrow(runTbl) > 0) {
+			logregTbl = runTbl[, analyzePostResTbl(tbl, predName, name), by=name]
+		} else {
+			logregTbl = data.table(name=character(), predName=character(), d=double())
+		}
 		logregTbl
 		list(postResTbl=tbl, logregTbl=logregTbl)	
 	}
@@ -2061,44 +2289,48 @@ analyzePostResTblAcrossDs <- function(postResTbl, runTbl) {
 	list(postResTbl=postResTbl, logregTbl=logregTbl)
 }
 
+runForTokenTbl <- function(tokenTbl, config, getOutFileForNameFun=identity) {
+	tokenTbl
+	config
+	postResTbl = getFullPostResTbl(tokenTbl, config)
+	runTbl = getConfig(config, 'runTbl')
+	postResTbl
+	runTbl
+	resTbl = analyzePostResTblAcrossDs(postResTbl, runTbl)
+	resTbl
+	logregTbl = resTbl$logregTbl
+	postResTbl = resTbl$postResTbl
+	setkey(postResTbl, user_screen_name, dt, hashtag, d)
+	logregTbl
+	hashtagsTbl = getHashtagsTblFromSubsetTbl(tokenTbl, config)
+	addMetrics(hashtagsTbl, postResTbl, config)
+	hashtagsTbl
+	modelVsPredTbl = getModelVsPredTbl(postResTbl, hashtagsTbl, config)
+	modelVsPredTbl
+	outFile = getOutFileForNameFun("modelVsPredOutFile")
+	writeModelVsPredTbl(modelVsPredTbl, outFile)
+	if (getConfig(config, 'modelHashtagsOutFile') != '') {
+		outFile = getOutFileForNameFun('modelHashtagsOutFile')
+		writeModelHashtagsTbl(postResTbl, outFile)
+	}
+	outFile = getOutFileForNameFun('logregOutFile')
+	writeLogregTbl(logregTbl, outFile)
+	postResTbl
+	list(modelVsPredTbl=modelVsPredTbl, modelHashtagsTbl=postResTbl, hashtagsTbl=hashtagsTbl, logregTbl=logregTbl)
+}
+
 runContext <- function(config, samplesPerRun, numRuns) {
-	runSubset <- function(startId, endId, runNum) {
-		tokenTbl = get(getConfig(config, 'getTokenizedFromSubsetFun'))(startId, endId, config)
-		config
-		postResTbl = getFullPostResTbl(tokenTbl, config)
-		runTbl = getConfig(config, 'runTbl')
-		postResTbl
-		runTbl
-		resTbl = analyzePostResTblAcrossDs(postResTbl, runTbl)
-		logregTbl = resTbl$logregTbl
-		postResTbl = resTbl$postResTbl
-		setkey(postResTbl, user_screen_name, dt, hashtag, d)
-		logregTbl
-		hashtagsTbl = getHashtagsTblFromSubsetTbl(tokenTbl, config)
-		addMetrics(hashtagsTbl, postResTbl, config)
-		hashtagsTbl
-		modelVsPredTbl = getModelVsPredTbl(postResTbl, hashtagsTbl, config)
-		getOutFileForName <- function(name) {
+	endId = 3000000
+	for (runNum in seq(numRuns)) {
+		getOutFileForNameFun <- function(name) {
 			outFile = getConfig(config, name)
 			outFile = gsub('.csv$', sprintf('r%s%s', runNum, '.csv'), outFile)
 			outFile
 		}
-		outFile = getOutFileForName("modelVsPredOutFile")
-		writeModelVsPredTbl(modelVsPredTbl, outFile)
-		if (getConfig(config, 'modelHashtagsOutFile') != '') {
-			outFile = getOutFileForName('modelHashtagsOutFile')
-			writeModelHashtagsTbl(postResTbl, outFile)
-		}
-		outFile = getOutFileForName('logregOutFile')
-		writeLogregTbl(logregTbl, outFile)
-		postResTbl
-		list(modelVsPredTbl=modelVsPredTbl, modelHashtagsTbl=postResTbl, hashtagsTbl=hashtagsTbl, logregTbl=logregTbl)
-	}
-	endId = 3000000
-	for (runNum in seq(numRuns)) {
 		startId = endId + 1
 		endId = startId + samplesPerRun - 1
-		runSubset(startId, endId, runNum)
+		tokenTbl = get(getConfig(config, 'getTokenizedFromSubsetFun'))(startId, endId, config)
+		runForTokenTbl(tokenTbl, config, getOutFileForNameFun)
 	}
 }
 
@@ -2284,6 +2516,11 @@ addEnvironmentTblAttrs <- function(permEnvTbl, sjiTbl) {
 	stopwordWeightTbl = sjiTbl[, .N, keyby=list(context, stopWordWeight)][, N := NULL]
 	stopifnot(nrow(stopwordWeightTbl) == stopwordWeightTbl[, length(unique(context))])
 	permEnvTbl[stopwordWeightTbl, stopWordWeight := stopWordWeight]
+	freqTbl = sjiTbl[!duplicated(sjiTbl[, context]), list(context, contextSums)][order(contextSums, decreasing=T)][, totFreq := sum(contextSums)][, pFreq := contextSums/totFreq]
+	freqTbl[, freqWeight := 1]
+	freqTbl[pFreq > .0004, freqWeight := 0]
+	setkey(freqTbl, context)
+	permEnvTbl[freqTbl, freqWeight := freqWeight]
 	permEnvTbl
 }
 
@@ -2312,9 +2549,18 @@ makeMemMatInner <- function(sjiTbl, permEnvTbl, config) {
 		myLog(sprintf('Weighting val in memory matrix based on stoplist'))
 		memTbl[, val := val * stopWordWeight]
 	}
+	if (getConfig(config, 'permUseFreqP')) {
+		myLog(sprintf('Weighting val in memory matrix based on frequency'))
+		memTbl[, val := val * freqWeight]
+	}
 	if (getConfig(config, 'permOnlyDirectionP')) {
 		myLog(sprintf('Collapsing posFromTag to sign(posFromTag)'))
 		memTbl[, posFromTag := sign(posFromTag)]
+	}
+	if (getConfig(config, 'permUseWindowP')) {
+		cnt = memTbl[abs(posFromTag) > 2, .N]
+		myLog(sprintf('Trimming %s of %s rows from memory table to constrain window size', cnt, nrow(memTbl)))
+		memTbl[abs(posFromTag) > 2, val := 0]
 	}
 	NRows = getConfig(config, 'permNRows')
 	NRows
@@ -2363,14 +2609,21 @@ getMemMatFromList <- function(lst, config) {
 	permUseEntropyP = getConfig(config, 'permUseEntropyP')
 	permUseStoplistP = getConfig(config, 'permUseStoplistP')
 	permOnlyDirectionP = getConfig(config, 'permOnlyDirectionP')
+	permUseFreqP = getConfig(config, 'permUseFreqP')
+	permUseWindowP = getConfig(config, 'permUseWindowP')
 	acc = {
-		if (permUseEntropyP & !permOnlyDirectionP) {
+		if (permUseEntropyP & !permOnlyDirectionP & !permUseFreqP & !permUseStoplistP & !permUseWindowP) {
 			'entropy'
-		} else if (!permUseEntropyP) {
+		} else if (!permUseEntropyP & !permOnlyDirectionP & !permUseFreqP & permUseStoplistP & !permUseWindowP) {
 			'stoplist'
-		} else if (permUseEntropyP & permOnlyDirectionP) { 
+		} else if (permUseEntropyP & permOnlyDirectionP & !permUseFreqP & !permUseStoplistP & !permUseWindowP) { 
 			'direction'
+		} else if (!permUseEntropyP & !permOnlyDirectionP & permUseFreqP & !permUseStoplistP & !permUseWindowP) {
+			'freq'
+		} else if (permUseEntropyP & !permOnlyDirectionP & !permUseFreqP & !permUseStoplistP & permUseWindowP) {
+			'window'
 		} else {
+			myStopifnot(!permUseEntropyP & !permOnlyDirectionP & !permUseFreqP & !permUseStoplistP & !permUseWindowP)
 			'orig'
 		}
 	}
@@ -2423,6 +2676,17 @@ runGenAndSaveCurWorkspaceg3s6 <- function() genAndSaveCurWorkspace(groupConfigG3
 runGenAndSaveCurWorkspaceg4s6 <- function() genAndSaveCurWorkspace(groupConfigG4S6)
 
 curWS <- function() {
+	runContext20g1s1(regen='useAlreadyLoaded')
+	runContext20g1s6(regen='useAlreadyLoaded')
+	fooTbl = sqldt("select * from top_hashtag_tokenized where id = '441134226961092608'")
+	fooTbl
+	envTblTOrder
+	permEnvTblT
+	#FIXME: Fix bug in pos vs posFromTag in mem perm
+	#FIXME: < and <= should have been slightly off, yes?
+	#FIXME: ensure runPrior works for twitter, might have to add new tokenized table
+	#FIXME: check unit tests
+	#FIXME: rerun all priors: diffs should be in OL's and FALSE,TRUE NCell's only
 	#FIXME: Add way to plot test results
 	#FIXME: Stop-word removal method and compare to entropy
 	#FIXME: address word order low predictiveness
@@ -2431,26 +2695,19 @@ curWS <- function() {
 	#FIXME: Methods to import and anlyze coefficient tables
 	#FIXME: Quickly rerun logreg analysis for actDV
 	#FIXME: Do something with the 2 different ds
-	withProf(runContext20g1s1(regen='useAlreadyLoaded'))
-	runContext20g1s6(regen='useAlreadyLoaded')
+	#FIXME: Rename Hyman to LogOdds
 
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelVsPred()))))
 	modelHashtagsTbls = buildModelHashtagsTables(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelHashtags()))))
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isPriorRun, list.files(path=getDirModelVsPred()))))
 	modelVsPredTbl
 	sjiTblTOrderless
-	priorTblGlobT[, N:=.N, by=hashtag][, N := N/nrow(.SD)]
-	priorTblGlobT[, N:=NULL]
-	priorTblGlobT[order(N, decreasing=T)]
-	sjiTblTOrderless
-	.ls.objects(order.by="Size")
 	sqldf('select hashtag_group, retweeted, count(text) from top_hashtag_tweets group by hashtag_group, retweeted order by hashtag_group, retweeted')
 	sessionInfo()
 	mySaveImage(groupConfigG1S1)
+	mySaveImage(groupConfigG1S6)
 	withProf(myLoadImage(groupConfigG1S1))
 	withProf(myLoadImage(groupConfigG1S6))
-	priorTblGlobT[, .N, by=hashtag][, list(hashtag, p=N/sum(N))][order(p, decreasing=T)][1:50][, plot(1:length(p), p)]
-	priorTblUserSO[, .N, by=hashtag][, list(hashtag, p=N/sum(N))][order(p, decreasing=T)][1:50][, plot(1:length(p), p)]
 	test_dir(sprintf("%s/%s", PATH, 'tests'), reporter='summary')
 	.ls.objects(order.by='Size')
 	# Checking that tweets for twitter users from each followers_count,statuses_count scale are being collected properly
