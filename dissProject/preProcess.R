@@ -1659,10 +1659,6 @@ genTokenizedTblSO <- function(filters='1=1', bundleSize=10000) {
 	return()
 }
 
-allWhitespaceP <- function(vect) {
-	all(grepl('^\\W*$', vect, perl=T))
-}
-
 genTokenizedTblTwitter <- function(bundleSize=10000, query, tokenizedTblName) {
 	withDBConnect(dbCon,
 		      {dbRs = dbSendQuery(dbCon, query)
@@ -1673,7 +1669,6 @@ genTokenizedTblTwitter <- function(bundleSize=10000, query, tokenizedTblName) {
 		      while (T) {
 			      tweetsTbl = data.table(fetch(dbRs, n=bundleSize))
 			      if (nrow(tweetsTbl) == 0) break
-			      if (nrow(tweetsTbl) < bundleSize && allWhitespaceP(tweetsTbl[, text])) break # Handles case where people tweet nothingness
 			      setupTweetsTbl(tweetsTbl, defaultTConfig)
 			      tokenizedTbl = getTokenizedTbl(tweetsTbl, from='tokenText', regex=matchWhitespace)[, type := 'tweet']
 			      tokenizedTbl[grepl(pattern=matchHashtag, x=chunk), type := 'hashtag']
