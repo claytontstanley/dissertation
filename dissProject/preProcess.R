@@ -2587,7 +2587,6 @@ makeMemMatInner <- function(sjiTbl, permEnvTbl, config) {
 	memMat = as.matrix(memMat)
 	colnames(memMat) = getVals(seq(1, length=ncol(memMat)), db)
 	memMat = as.matrix(memMat[, apply(memMat, 2, sd) > 0])
-	dim(memMat)
 	memMat
 }
 
@@ -2691,7 +2690,7 @@ runGenAndSaveCurWorkspaceg4s6 <- function() genAndSaveCurWorkspace(groupConfigG4
 
 curWS <- function() {
 	runContext20g1s1(regen='useAlreadyLoaded')
-	runContext20g1s6(regen='useAlreadyLoaded')
+	withProf(runContext20g1s6(regen='useAlreadyLoaded'))
 	runGenTokenizedTblTwitterPrior()
 	fooTbl = sqldt("select * from top_hashtag_tokenized where id = '441134226961092608'")
 	fooTbl
