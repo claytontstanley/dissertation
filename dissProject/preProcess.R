@@ -2037,6 +2037,7 @@ computeActPermTFromContextTbl <- function(contextTbl, config) {
 			   copy(cTblOrder)[,type:=paste0('act', capitalize(type),'OrderWindow')][,fun:='computeActPermOrder'][,funConfig:='funConfigWindow'],
 			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessWindow')][,fun:='computeActPermOrderless'][,funConfig:='funConfigWindow']
 			   )
+	contextTbl
 	contextTbl[, get(fun[1])(chunk, posFromTag, get(funConfig)(config)), by=type]
 }
 
@@ -2093,13 +2094,10 @@ setColOrderWithAtFront <- function(tbl, front) {
 }
 
 getContextTbl <- function(contextTbl, tagTbl) {
-	resTbl = setkey(contextTbl[, id:=1:nrow(.SD)], user_screen_name)[setkey(tagTbl, user_screen_name), allow.cartesian=T]
+	resTbl = setkey(contextTbl[, id:=1:nrow(.SD)], user_screen_name)[setkey(tagTbl, user_screen_name), allow.cartesian=T, nomatch=0]
 	resTbl = resTbl[, list(id, chunk, hashtag=chunk.1, pos, hashtagPos=pos.1, type)][, posFromTag := pos - hashtagPos]
 	resTbl = resTbl[, list(chunk, posFromTag, type)][, orderType := 'order']
-	resTbl = rbind(resTbl, contextTbl[, list(chunk, posFromTag=0, type, orderType='orderless')])
-	# FIXME: Remove following line when confident things are working
-	resTbl = rbind(contextTbl[, list(chunk, posFromTag=0, type, orderType='orderless')],
-		       contextTbl[, list(chunk, posFromTag=pos, type, orderType='order')])
+	resTbl = rbind(resTbl, contextTbl[, list(chunk, posFromTag=rep(0, nrow(.SD)), type, orderType=rep('orderless', nrow(.SD)))])
 	resTbl
 }
 

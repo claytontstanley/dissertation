@@ -219,6 +219,25 @@ test_that('testComputePermAct', {
 
 context('Context Run')
 
+test_that('testGetContextTbl', {
+	testGetContextTblInner <- function(contextTbl, tagTbl, expectedTbl) {
+		resTbl = getContextTbl(contextTbl, tagTbl)
+		expect_equivalent(resTbl, expectedTbl)
+	}
+	contextTbl = data.table(user_screen_name=c('a','a'), chunk=c('b','c'), pos=c(1,3), type=c('t','t'))
+	tagTbl = data.table(user_screen_name=c('a','a'), chunk=c('#a', '#b'), pos=c(2,4), type=c('h','h'))
+	testGetContextTblInner(contextTbl, tagTbl, data.table(chunk=c('b','c','b','c','b','c'), posFromTag=c(-1,1,-3,-1,0,0), type='t', orderType=c(rep('order', 4), rep('orderless', 2))))
+	contextTbl = data.table(user_screen_name=character(), chunk=character(), pos=integer(), type=character())
+	tagTbl = data.table(user_screen_name=c('a'), chunk=c('#a'), pos=c(1), type=c('h'))
+	testGetContextTblInner(contextTbl, tagTbl, data.table(chunk=character(), posFromTag=integer(), type=character(), orderType=character()))
+	contextTbl = data.table(user_screen_name=c('a'), chunk=c('b'), pos=c(1), type=c('t'))
+	tagTbl = data.table(user_screen_name=character(), chunk=character(), pos=integer(), type=character())
+	testGetContextTblInner(contextTbl, tagTbl, data.table(chunk='b', posFromTag=0, type='t', orderType='orderless'))
+	contextTbl = data.table(user_screen_name=character(), chunk=character(), pos=integer(), type=character())
+	tagTbl = data.table(user_screen_name=character(), chunk=character(), pos=integer(), type=character())
+	testGetContextTblInner(contextTbl, tagTbl, data.table(chunk=character(), posFromTag=integer(), type=character(), orderType=character()))
+})
+
 test_that('testGetPostResTbl', {
 	  fooTbl = data.table(x=c('geteeee####@@@@!!!!****', 'get'))
 	  fooTbl[, getPostResTbl(data.table(user_screen_name='allUsers', creation_epoch=1376577513,
