@@ -2586,6 +2586,7 @@ makeMemMatInner <- function(sjiTbl, permEnvTbl, config) {
 	memMat = with(memTbl, sparseMatrix(i=rotInd, j=getHashes(hashtag, db), x=totVal, dims=c(NRows, length(db))))
 	memMat = as.matrix(memMat)
 	colnames(memMat) = getVals(seq(1, length=ncol(memMat)), db)
+	memMat = as.matrix(memMat[, apply(memMat, 2, sd) > 0])
 	dim(memMat)
 	memMat
 }
@@ -2600,6 +2601,7 @@ computeActPerm <- function(context, pos, permEnvTbl, permMemMat, config) {
 	permEnvTbl
 	permMemMat
 	contextTbl = data.table(context=context, posFromTag=pos, hashtag='context', partialN=1, key='context')
+	contextTbl
 	contextMemMat = makeMemMatInner(contextTbl, permEnvTbl, config)
 	contextMemMat
 	contextMemVect = rowSums(contextMemMat) 
