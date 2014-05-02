@@ -2694,7 +2694,6 @@ curWS <- function() {
 	fooTbl
 	envTblTOrder
 	permEnvTblT
-	#FIXME: Add back in correct posFromTag and check new G1S1 and G1S6 into src (see FIXME) 
 	#FIXME: < and <= should have been slightly off, yes?
 	#FIXME: ensure runPrior works for twitter, might have to add new tokenized table
 	#FIXME: check unit tests
