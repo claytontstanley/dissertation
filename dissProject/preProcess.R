@@ -2011,7 +2011,7 @@ genAndSaveCurWorkspace <- function(groupConfig) {
 }
 
 computeActSjiFromContextTbl <- function(contextTbl, config) {
-	contextTbl = copy(contextTbl)[, type := paste0('act', capitalize(type))]
+	contextTbl = copy(contextTbl[orderType=='orderless'])[, type := paste0('act', capitalize(type))]
 	contextTbl[, computeActSji(chunk, get(getConfig(config, 'sjiTbl')), config), by=type]
 }
 
@@ -2020,34 +2020,37 @@ computeActNullFromContextTbl <- function(contextTbl, config) {
 }
 
 computeActPermTFromContextTbl <- function(contextTbl, config) {
-	contextTbl = rbind(copy(contextTbl)[,type:=paste0('act', capitalize(type),'Order')][,fun:='computeActPermOrder'][,funConfig:='funConfigOrig'],
-			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'Orderless')][,fun:='computeActPermOrderless'][,funConfig:='funConfigOrig'],
-			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderEntropy')][,fun:='computeActPermOrder'][,funConfig:='funConfigEntropy'],
-			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderlessEntropy')][,fun:='computeActPermOrderless'][,funConfig:='funConfigEntropy'],
-			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderStoplist')][,fun:='computeActPermOrder'][,funConfig:='funConfigStoplist'],
-			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderlessStoplist')][,fun:='computeActPermOrderless'][,funConfig:='funConfigStoplist'],
-			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderDirection')][,fun:='computeActPermOrder'][,funConfig:='funConfigDirection'],
-			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderlessDirection')][,fun:='computeActPermOrderless'][,funConfig:='funConfigDirection'],
-			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderHyman')][,fun:='computeActPermOrder'][,funConfig:='funConfigHyman'],
-			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderlessHyman')][,fun:='computeActPermOrderless'][,funConfig:='funConfigHyman'],
-			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderFreq')][,fun:='computeActPermOrder'][,funConfig:='funConfigFreq'],
-			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderlessFreq')][,fun:='computeActPermOrderless'][,funConfig:='funConfigFreq'],
-			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderWindow')][,fun:='computeActPermOrder'][,funConfig:='funConfigWindow'],
-			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderlessWindow')][,fun:='computeActPermOrderless'][,funConfig:='funConfigWindow']
+	cTblOrder = contextTbl[orderType=='order']
+	cTblOrderless = contextTbl[orderType=='orderless']
+	contextTbl = rbind(copy(cTblOrder)[,type:=paste0('act', capitalize(type),'Order')][,fun:='computeActPermOrder'][,funConfig:='funConfigOrig'],
+			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'Orderless')][,fun:='computeActPermOrderless'][,funConfig:='funConfigOrig'],
+			   copy(cTblOrder)[,type:=paste0('act', capitalize(type),'OrderEntropy')][,fun:='computeActPermOrder'][,funConfig:='funConfigEntropy'],
+			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessEntropy')][,fun:='computeActPermOrderless'][,funConfig:='funConfigEntropy'],
+			   copy(cTblOrder)[,type:=paste0('act', capitalize(type),'OrderStoplist')][,fun:='computeActPermOrder'][,funConfig:='funConfigStoplist'],
+			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessStoplist')][,fun:='computeActPermOrderless'][,funConfig:='funConfigStoplist'],
+			   copy(cTblOrder)[,type:=paste0('act', capitalize(type),'OrderDirection')][,fun:='computeActPermOrder'][,funConfig:='funConfigDirection'],
+			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessDirection')][,fun:='computeActPermOrderless'][,funConfig:='funConfigDirection'],
+			   copy(cTblOrder)[,type:=paste0('act', capitalize(type),'OrderHyman')][,fun:='computeActPermOrder'][,funConfig:='funConfigHyman'],
+			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessHyman')][,fun:='computeActPermOrderless'][,funConfig:='funConfigHyman'],
+			   copy(cTblOrder)[,type:=paste0('act', capitalize(type),'OrderFreq')][,fun:='computeActPermOrder'][,funConfig:='funConfigFreq'],
+			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessFreq')][,fun:='computeActPermOrderless'][,funConfig:='funConfigFreq'],
+			   copy(cTblOrder)[,type:=paste0('act', capitalize(type),'OrderWindow')][,fun:='computeActPermOrder'][,funConfig:='funConfigWindow'],
+			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessWindow')][,fun:='computeActPermOrderless'][,funConfig:='funConfigWindow']
 			   )
-	contextTbl[, get(fun[1])(chunk, pos, get(funConfig)(config)), by=type]
+	contextTbl[, get(fun[1])(chunk, posFromTag, get(funConfig)(config)), by=type]
 }
 
 computeActPermSOFromContextTbl <- function(contextTbl, config) {
-	contextTbl = rbind(copy(contextTbl)[,type:=paste0('act', capitalize(type),'Orderless')][,fun:='computeActPermOrderless'][,funConfig:='funConfigOrig'],
-			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderlessEntropy')][,fun:='computeActPermOrderless'][,funConfig:='funConfigEntropy'],
-			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderlessStoplist')][,fun:='computeActPermOrderless'][,funConfig:='funConfigStoplist'],
-			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderlessDirection')][,fun:='computeActPermOrderless'][,funConfig:='funConfigDirection'],
-			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderlessHyman')][,fun:='computeActPermOrderless'][,funConfig:='funConfigHyman'],
-			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderlessFreq')][,fun:='computeActPermOrderless'][,funConfig:='funConfigFreq'],
-			   copy(contextTbl)[,type:=paste0('act', capitalize(type),'OrderlessWindow')][,fun:='computeActPermOrderless'][,funConfig:='funConfigWindow']
+	cTblOrderless = contextTbl[orderType=='orderless']
+	contextTbl = rbind(copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'Orderless')][,fun:='computeActPermOrderless'][,funConfig:='funConfigOrig'],
+			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessEntropy')][,fun:='computeActPermOrderless'][,funConfig:='funConfigEntropy'],
+			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessStoplist')][,fun:='computeActPermOrderless'][,funConfig:='funConfigStoplist'],
+			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessDirection')][,fun:='computeActPermOrderless'][,funConfig:='funConfigDirection'],
+			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessHyman')][,fun:='computeActPermOrderless'][,funConfig:='funConfigHyman'],
+			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessFreq')][,fun:='computeActPermOrderless'][,funConfig:='funConfigFreq'],
+			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessWindow')][,fun:='computeActPermOrderless'][,funConfig:='funConfigWindow']
 			   )
-	contextTbl[, get(fun[1])(chunk, pos, get(funConfig)(config)), by=type]
+	contextTbl[, get(fun[1])(chunk, posFromTag, get(funConfig)(config)), by=type]
 }
 
 getContextPredNames <- function(config) {
@@ -2089,6 +2092,17 @@ setColOrderWithAtFront <- function(tbl, front) {
 	tbl
 }
 
+getContextTbl <- function(contextTbl, tagTbl) {
+	resTbl = setkey(contextTbl[, id:=1:nrow(.SD)], user_screen_name)[setkey(tagTbl, user_screen_name), allow.cartesian=T]
+	resTbl = resTbl[, list(id, chunk, hashtag=chunk.1, pos, hashtagPos=pos.1, type)][, posFromTag := pos - hashtagPos]
+	resTbl = resTbl[, list(chunk, posFromTag, type)][, orderType := 'order']
+	resTbl = rbind(resTbl, contextTbl[, list(chunk, posFromTag=0, type, orderType='orderless')])
+	# FIXME: Remove following line when confident things are working
+	resTbl = rbind(contextTbl[, list(chunk, posFromTag=0, type, orderType='orderless')],
+		       contextTbl[, list(chunk, posFromTag=pos, type, orderType='order')])
+	resTbl
+}
+
 getPostResTbl <- function(tokenTbl, config, id) {
 	myLog(sprintf("Getting results for id=%s", id))
 	tokenTbl
@@ -2098,8 +2112,9 @@ getPostResTbl <- function(tokenTbl, config, id) {
 	guardAllEqualP(tokenTbl[, user_screen_name_prior])
 	guardAllEqualP(tokenTbl[, dt])
 	contextTbl = tokenTbl[type != getConfig(config, "tagTypeName")]
-	contextTbl
 	tagTbl = tokenTbl[type == getConfig(config, "tagTypeName")]
+	contextTbl = getContextTbl(contextTbl, tagTbl)
+	contextTbl
 	tagTbl
 	setkey(tagTbl, chunk)
 	priorTbl = getPriorForUserAtEpoch(get(getConfig(config, 'priorTbl')), tokenTbl$user_screen_name_prior[1], tokenTbl$creation_epoch[1], dStd)
@@ -2635,17 +2650,14 @@ computeActPermOrder <- function(context, pos, config) {
 	# Cannot get from global environment or test 'testComputePermAct' will fail
 	envTbl = get(getConfig(config, 'permEnvTbl'), envir=parent.frame())
 	memMat = getMemMatFromList(get(getConfig(config, 'permMemMatOrder'), envir=parent.frame()), config)
-	getMemMatFromList(get(getConfig(config, 'permMemMatOrder'), envir=parent.frame()), config)
 	computeActPerm(context, pos, permEnvTbl = envTbl, permMemMat = memMat, config)
 }
 
 computeActPermOrderless <- function(context, pos, config) {
-	computeActPerm(context,
-		       rep(0, length(context)),
-		       permEnvTbl = get(getConfig(config, 'permEnvTbl'), envir=parent.frame()),
-		       permMemMat = getMemMatFromList(get(getConfig(config, 'permMemMatOrderless'), envir=parent.frame()),
-						      config),
-		       config)
+	myLog('computing activation for orderless')
+	envTbl = get(getConfig(config, 'permEnvTbl'), envir=parent.frame())
+	memMat = getMemMatFromList(get(getConfig(config, 'permMemMatOrderless'), envir=parent.frame()), config)
+	computeActPerm(context, pos, permEnvTbl = envTbl, permMemMat = memMat, config)
 }
 
 runGenAndSaveCurWorkspaceg1s1 <- function() genAndSaveCurWorkspace(groupConfigG1S1)
