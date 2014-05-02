@@ -2689,14 +2689,14 @@ runGenAndSaveCurWorkspaceg3s6 <- function() genAndSaveCurWorkspace(groupConfigG3
 runGenAndSaveCurWorkspaceg4s6 <- function() genAndSaveCurWorkspace(groupConfigG4S6)
 
 curWS <- function() {
-	runContext20g1s1(regen='useAlreadyLoaded')
+	withProf(runContext20g1s1(regen='useAlreadyLoaded'))
 	withProf(runContext20g1s6(regen='useAlreadyLoaded'))
 	runGenTokenizedTblTwitterPrior()
 	fooTbl = sqldt("select * from top_hashtag_tokenized where id = '441134226961092608'")
 	fooTbl
 	envTblTOrder
 	permEnvTblT
-	#FIXME: Fix bug in pos vs posFromTag in mem perm
+	#FIXME: Add back in correct posFromTag and check new G1S1 and G1S6 into src (see FIXME) 
 	#FIXME: < and <= should have been slightly off, yes?
 	#FIXME: ensure runPrior works for twitter, might have to add new tokenized table
 	#FIXME: check unit tests
