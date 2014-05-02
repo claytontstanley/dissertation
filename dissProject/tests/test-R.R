@@ -77,27 +77,28 @@ test_that("testOnlyFirstT", {
 
 context("ModelVsPred Full Runs")
 
-test_that("testModelVsPred", {
-	  expectedTbl = myReadCSV(getOutFileModelVsPred('testing1'))
-	  hashtagsTblColClasses = c('character', 'character', 'integer', 'character', 'integer', 'integer', 'character')
-	  expectedHashtagsTbl = myReadCSV(getOutFileHashtags('testing1'), colClasses=hashtagsTblColClasses)
-	  resTbl = runPriorT(config=modConfig(defaultTConfig, list(query=sprintf("select %s from tweets where user_screen_name = 'ap'", defaultTCols))))
-	  expect_equivalent(expectedTbl, resTbl$modelVsPredTbl)
-	  expect_equivalent(expectedHashtagsTbl, resTbl$hashtagsTbl)
-	  expectedTbl = myReadCSV(getOutFileModelVsPred('testing2'))
-	  expectedTbl[, totN := as.integer(totN)]
-	  expectedHashtagsTbl = myReadCSV(getOutFileHashtags('testing2'), colClasses=hashtagsTblColClasses)
-	  resTbl = runPriorT(config=modConfig(defaultTConfig, list(query=sprintf("select %s from tweets where user_screen_name = 'thebucktlist'", defaultTCols))))
-	  expect_equivalent(expectedTbl, resTbl$modelVsPredTbl)
-	  expect_equivalent(expectedHashtagsTbl, resTbl$hashtagsTbl)
-	  expectedTbl = myReadCSV(getOutFileModelVsPred('twitter_ru'))
-	  resTbl = runPriorT(config=modConfig(defaultTConfig, list(query=sprintf("select %s from tweets where user_screen_name = 'twitter_ru'", defaultTCols))))
-	  expect_equivalent(expectedTbl, resTbl$modelVsPredTbl)
-})
+#test_that("testModelVsPred", {
+#	  expectedTbl = myReadCSV(getOutFileModelVsPred('testing1'))
+#	  hashtagsTblColClasses = c('character', 'character', 'integer', 'character', 'integer', 'integer', 'character')
+#	  expectedHashtagsTbl = myReadCSV(getOutFileHashtags('testing1'), colClasses=hashtagsTblColClasses)
+#	  resTbl = runPriorT(config=modConfig(defaultTConfig, list(query=sprintf("select %s from tweets where user_screen_name = 'ap'", defaultTCols))))
+#	  expect_equivalent(expectedTbl, resTbl$modelVsPredTbl)
+#	  expect_equivalent(expectedHashtagsTbl, resTbl$hashtagsTbl)
+#	  expectedTbl = myReadCSV(getOutFileModelVsPred('testing2'))
+#	  expectedTbl[, totN := as.integer(totN)]
+#	  expectedHashtagsTbl = myReadCSV(getOutFileHashtags('testing2'), colClasses=hashtagsTblColClasses)
+#	  resTbl = runPriorT(config=modConfig(defaultTConfig, list(query=sprintf("select %s from tweets where user_screen_name = 'thebucktlist'", defaultTCols))))
+#	  expect_equivalent(expectedTbl, resTbl$modelVsPredTbl)
+#	  expect_equivalent(expectedHashtagsTbl, resTbl$hashtagsTbl)
+#	  expectedTbl = myReadCSV(getOutFileModelVsPred('twitter_ru'))
+#	  resTbl = runPriorT(config=modConfig(defaultTConfig, list(query=sprintf("select %s from tweets where user_screen_name = 'twitter_ru'", defaultTCols))))
+#	  expect_equivalent(expectedTbl, resTbl$modelVsPredTbl)
+#})
 
 test_that("testModelVsPredSO", {
 	  expectedModelVsPredTbl = myReadCSV(getOutFileModelVsPred('testingSO1'))
 	  expectedHashtagsTbl = myReadCSV(getOutFileHashtags('testingSO1'))
+	  expectedHashtagsTbl
 	  expectedModelVsPredTbl[, user_screen_name := as.character(user_screen_name)]
 	  expectedHashtagsTbl[, user_screen_name := as.character(user_screen_name)]
 	  expectedHashtagsTbl[, user_screen_name_prior := as.character(user_screen_name_prior)]
@@ -157,7 +158,7 @@ test_that('testGetPriorTbl', {
 context("RP Model")
 
 test_that('testMakeMemMat', {
-	configNEntropy = list(permNRows=5, permUseEntropyP=F, permUseStoplistP=F, permOnlyDirectionP=F)
+	configNEntropy = c(list(permNRows=5), getFunConfigMods())
 	testMemMat <- function(testSjiTbl, testPermEnvTbl, resTbl, config=configNEntropy) {
 		resMemMat = makeMemMat(testSjiTbl, testPermEnvTbl, config) 
 		expect_equivalent(resMemMat, as.matrix(data.table(resTbl)))
@@ -189,7 +190,7 @@ test_that('testMakeMemMat', {
 })
 
 test_that('testComputePermAct', {
-	  testConfig = list(permNRows=5, permEnvTbl='testEnvTbl', permMemMatOrder='testMemMat', permMemMat='', permUseEntropyP=F, permUseStoplistP=F, permOnlyDirectionP=F)
+	  testConfig = c(list(permNRows=5, permEnvTbl='testEnvTbl', permMemMatOrder='testMemMat', permMemMat=''), getFunConfigMods())
 	  testComputePermAct <- function(testContext, testPos, testEnvTbl, testMemMat, testConfig, expectedTbl) {
 		  resTbl = computeActPermOrder(testContext, testPos, testConfig)
 		  expect_equivalent(resTbl, expectedTbl)
@@ -197,20 +198,20 @@ test_that('testComputePermAct', {
 	  testEnvTbl = data.table(chunk=c('!','!','!','!'), val=c(1,1,-1,-1), valIndID=c('ind1', 'ind2', 'ind3', 'ind4'), ind=c(1,2,3,4), key='chunk')
 	  testSjiTbl = data.table(context=c('!'), hashtag=c('a'), posFromTag=0, partialN=1, key='context')
 	  testMemMat = list()
-	  testMemMat[['stoplist']] = makeMemMat(testSjiTbl, testEnvTbl, testConfig) # Stoplist b/c permUseEntropyP is F, so that EContext doesn't have to be tested
+	  testMemMat[['orig']] = makeMemMat(testSjiTbl, testEnvTbl, testConfig) # Stoplist b/c permUseEntropyP is F, so that EContext doesn't have to be tested
 	  testComputePermAct('!', 0, testEnvTbl, testMemMat, testConfig, data.table(hashtag='a', act=cor(c(1,1,-1,-1), c(1,1,-1,-1))))
 	  testComputePermAct('!', 1, testEnvTbl, testMemMat, testConfig, data.table(hashtag='a', act=cor(c(1,1,-1,-1,0), c(0,1,1,-1,-1))))
 	  testComputePermAct('!', 2, testEnvTbl, testMemMat, testConfig, data.table(hashtag='a', act=cor(c(1,1,-1,-1,0), c(-1,0,1,1,-1))))
 	  testComputePermAct('!', -1, testEnvTbl, testMemMat, testConfig, data.table(hashtag='a', act=cor(c(1,1,-1,-1,0), c(0,1,1,-1,-1))))
 	  testEnvTbl = data.table(chunk=c('!','#'), val=c(1,-1), valIndID=c('1', '1'), ind=c(1,2), key='chunk')
 	  testSjiTbl = data.table(context=c('!','#'), hashtag=c('a','a'), posFromTag=c(0,0), partialN=c(1,1), key='context')
-	  testMemMat[['stoplist']] = makeMemMat(testSjiTbl, testEnvTbl, testConfig)
+	  testMemMat[['orig']] = makeMemMat(testSjiTbl, testEnvTbl, testConfig)
 	  testComputePermAct('!', 0, testEnvTbl, testMemMat, testConfig, data.table(hashtag='a', act=cor(c(1,-1,0,0,0), c(1,0,0,0,0))))
 	  testComputePermAct(c('!', '#', '!'), 0, testEnvTbl, testMemMat, testConfig, data.table(hashtag='a', act=cor(c(1,-1,0,0,0), c(2,-1,0,0,0))))
 	  testComputePermAct('#', -1, testEnvTbl, testMemMat, testConfig, data.table(hashtag='a', act=cor(c(1,-1,0,0,0), c(-1,0,0,0,0))))
 	  testEnvTbl = data.table(chunk=c('!','#','!'), val=c(1,-1,-1), valIndID=c('1', '1', '1'), ind=c(1,2,3), key='chunk')
 	  testSjiTbl = data.table(context=c('!','#','#'), hashtag=c('a','a','b'), posFromTag=c(1,0,1), partialN=c(2,1,1), key='context')
-	  testMemMat[['stoplist']] = makeMemMat(testSjiTbl, testEnvTbl, testConfig)
+	  testMemMat[['orig']] = makeMemMat(testSjiTbl, testEnvTbl, testConfig)
 	  testComputePermAct('#', 0, testEnvTbl, testMemMat, testConfig, data.table(hashtag=c('a','b'), act=c(cor(c(0,1,0,-2,0), c(0,-1,0,0,0)),
 													      cor(c(0,0,-1,0,0), c(0,-1,0,0,0)))))
 	  testComputePermAct('#', 1, testEnvTbl, testMemMat, testConfig, data.table(hashtag=c('a','b'), act=c(cor(c(0,1,0,-2,0), c(0,0,-1,0,0)),
@@ -242,6 +243,7 @@ test_that('testGetPostResTbl', {
 	  fooTbl = data.table(x=c('geteeee####@@@@!!!!****', 'get'))
 	  fooTbl[, getPostResTbl(data.table(user_screen_name='allUsers', creation_epoch=1376577513,
 					    chunk=c('get', 'get', x, 'get'), type=c('title', 'title', 'body', 'tag'),
+					    pos=c(1,2,3,4),
 					    user_screen_name_prior='1945104', dt=156734298),
 				 defaultSOSjiConfig, "18255072"), by=x]
 })

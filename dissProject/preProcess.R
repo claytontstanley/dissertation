@@ -2584,7 +2584,7 @@ makeMemMatInner <- function(sjiTbl, permEnvTbl, config) {
 	memMat = with(memTbl, sparseMatrix(i=rotInd, j=getHashes(hashtag, db), x=totVal, dims=c(NRows, length(db))))
 	memMat = as.matrix(memMat)
 	colnames(memMat) = getVals(seq(1, length=ncol(memMat)), db)
-	memMat = as.matrix(memMat[, apply(memMat, 2, sd) > 0])
+	memMat = memMat[, apply(memMat, 2, sd) > 0, drop=F]
 	memMat
 }
 
