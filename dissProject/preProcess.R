@@ -2720,7 +2720,6 @@ curWS <- function() {
 	#FIXME: check unit tests
 	#FIXME: rerun all priors: diffs should be in OL's and FALSE,TRUE NCell's only
 	#FIXME: Add way to plot test results
-	#FIXME: Stop-word removal method and compare to entropy
 	#FIXME: address word order low predictiveness
 	#FIXME: proper combination of prior and context for RP
 	#FIXME: add word order to Bayesian sji
