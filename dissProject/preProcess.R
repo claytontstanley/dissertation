@@ -2749,10 +2749,6 @@ curWS <- function() {
 	withProf(runContext20g1s1(regen='useAlreadyLoaded'))
 	withProf(runContext20g1s6(regen='useAlreadyLoaded'))
 	runGenTokenizedTblTwitterPrior()
-	fooTbl = sqldt("select * from top_hashtag_tokenized where id = '441134226961092608'")
-	fooTbl
-	envTblTOrder
-	permEnvTblT
 	#FIXME: Run priors through new code path (profile first, worry about loading workspace for prior and runGenTokenized stuff)
 	#FIXME: < and <= should have been slightly off, yes?
 	#FIXME: Add way to plot test results
