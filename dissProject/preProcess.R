@@ -2755,7 +2755,6 @@ curWS <- function() {
 	withProf(runContext20g1s6(regen='useAlreadyLoaded'))
 	runGenTokenizedTblTwitterPrior()
 	fooTbl = sqldt("select * from top_hashtag_tokenized where id = '441134226961092608'")
-	fooTbl = sqldf("select retweeted, count(*) from tweets_tokenized group by retweeted")
 	fooTbl
 	envTblTOrder
 	permEnvTblT
@@ -2777,7 +2776,6 @@ curWS <- function() {
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isPriorRun, list.files(path=getDirModelVsPred()))))
 	modelVsPredTbl
 	sjiTblTOrderless
-	sqldf('select hashtag_group, retweeted, count(text) from top_hashtag_tweets group by hashtag_group, retweeted order by hashtag_group, retweeted')
 	sessionInfo()
 	mySaveImage(groupConfigG1S1)
 	mySaveImage(groupConfigG1S6)
