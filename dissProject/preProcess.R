@@ -199,6 +199,7 @@ getAllowedRetweetedVals <- function(config) {
 	allowedRetweetedVals
 }
 
+# FIXME: Remove this method after running priors through new code path
 getTweetsTbl <- function(sqlStr=sprintf("select %s from tweets limit 10000", defaultTCols), config) {
 	tweetsTbl = sqldt(sqlStr)[retweeted %in% getAllowedRetweetedVals(config)]
 	myStopifnot(unique(tweetsTbl$retweeted) %in% getAllowedRetweetedVals(config))
@@ -220,6 +221,7 @@ setupPostsTbl <- function(postsTbl, config) {
 	postsTbl
 }
 
+# FIXME: Remove this method after running priors through new code path
 getPostsTbl <- function(sqlStr, config) {
 	postsTbl = sqldt(sqlStr)
 	setupPostsTbl(postsTbl, config)
@@ -230,6 +232,7 @@ matchWhitespace = '\\S+'
 matchHashtag = '^#'
 matchTag = '(?<=<)[^>]+(?=>)'
 
+# FIXME: Remove this method after running priors through new code path
 getHashtagsTbl <- function(tweetsTbl, config) {
 	from = getConfig(config, "from")
 	tokenizedTbl = getTokenizedTbl(tweetsTbl, from=from, regex=matchWhitespace)
@@ -247,6 +250,7 @@ convertTagSynonyms <- function(tokenizedTbl) {
 		})
 }
 
+# FIXME: Remove this method after running priors through new code path
 getTagsTbl <- function(postsTbl, config) {
 	tokenizedTbl = getTokenizedTbl(postsTbl, from='tagsNoHtml', regex=matchTag)
 	if (getConfig(config, "convertTagSynonymsP")) convertTagSynonyms(tokenizedTbl)
@@ -272,15 +276,6 @@ getHashtagEntropy <- function(hashtagsTbl) {
 	countTbl[, p := N/sum(N), by=user_id]
 	HTbl = countTbl[, list(N=sum(N), NUnique=.N, H = - sum(p * log(p))), by=user_id]
 	HTbl
-}
-
-compareHashtagTbls <- function() {
-	hashtagTblText = getHashtagsTbl(tweetsTbl, from='text')[, as.data.table(table(hashtag)), by=user_id]
-	hashtagTblTokenText = getHashtagsTbl(tweetsTbl, from='tokenText')[, as.data.table(table(hashtag)), by=user_id]
-	setkeyv(hashtagTblText, c('user_id', 'hashtag'))
-	setkeyv(hashtagTblTokenText, c('user_id', 'hashtag'))
-	hashtagTblText
-	hashtagTblText[hashtagTblTokenText]
 }
 
 computeActPrior <- function(hashtags, dtP, cTime, d) {
@@ -2758,10 +2753,8 @@ curWS <- function() {
 	fooTbl
 	envTblTOrder
 	permEnvTblT
+	#FIXME: Run priors through new code path (profile first, worry about loading workspace for prior and runGenTokenized stuff)
 	#FIXME: < and <= should have been slightly off, yes?
-	#FIXME: ensure runPrior works for twitter, might have to add new tokenized table
-	#FIXME: check unit tests
-	#FIXME: rerun all priors: diffs should be in OL's and FALSE,TRUE NCell's only
 	#FIXME: Add way to plot test results
 	#FIXME: address word order low predictiveness
 	#FIXME: proper combination of prior and context for RP
