@@ -827,7 +827,8 @@ defaultTSjiPConfig = modConfig(c(defaultTConfig, defaultSjiConfig,
 				    computeActFromContextTbl='computeActNullFromContextTbl',
 				    tokenizedTbl = 'tweets_tokenized',
 				    priorTbl = 'priorTblUserT',
-				    postsTbl = 'tweets'))
+				    postsTbl = 'tweets',
+				    defaultColsTokenized = 'defaultColsTokenizedTPrior'))
 
 defaultGGPlotOpts <- theme_bw() + theme_classic()
 
@@ -2191,19 +2192,19 @@ getPostResTbl <- function(tokenTbl, config, id) {
 	postResTbl
 }
 
-#FIXME: Test and use for getTokenizedFromSubset
-
 defaultColsTokenizedSO = "tokenized_tbl.id::text, user_screen_name, creation_epoch, chunk, pos, type"
-defaultColsTokenizedT = "tokenized_tbl.id::text, user_screen_name, creation_epoch, chunk, pos, type, tokenized_tbl.retweeted"
+defaultColsTokenizedT = defaultColsTokenizedSO
+defaultColsTokenizedTPrior = sprintf('%s, %s', defaultColsTokenizedT, 'tokenized_tbl.retweeted')
 
 getTokenizedFromSubset <- function(minId, maxId, config) {
-	resTbl = sqldt(sprintf("select tokenized_tbl.id::text, user_screen_name, creation_epoch, chunk, pos, type from %s as tokenized_tbl
+	resTbl = sqldt(sprintf("select %s from %s as tokenized_tbl
 			       join %s as posts_tbl
 			       on tokenized_tbl.id = posts_tbl.id 
 			       where tokenized_tbl.id in (select post_id from %s 
 							  where id >= %s
 							  and id <= %s
 							  and group_name = '%s')",
+			       get(getConfig(config, 'defaultColsTokenized')),
 			       getConfig(config, "tokenizedTbl"), getConfig(config, "postsTbl"), getConfig(config, "subsetsTbl"), minId, maxId, getConfig(config, "groupName") 
 			       ))
 	resTbl
