@@ -78,28 +78,25 @@ test_that("testOnlyFirstT", {
 context("ModelVsPred Full Runs")
 
 # FIXME: Add this test back in after code is worked to go through new path for prior twitter runs
-#test_that("testModelVsPred", {
-#	  expectedTbl = myReadCSV(getOutFileModelVsPred('testing1'))
-#	  hashtagsTblColClasses = c('character', 'character', 'integer', 'character', 'integer', 'integer', 'character')
-#	  expectedHashtagsTbl = myReadCSV(getOutFileHashtags('testing1'), colClasses=hashtagsTblColClasses)
-#	  resTbl = runPriorT(config=modConfig(defaultTConfig, list(query=sprintf("select %s from tweets where user_screen_name = 'ap'", defaultTCols))))
-#	  expect_equivalent(expectedTbl, resTbl$modelVsPredTbl)
-#	  expect_equivalent(expectedHashtagsTbl, resTbl$hashtagsTbl)
-#	  expectedTbl = myReadCSV(getOutFileModelVsPred('testing2'))
-#	  expectedTbl[, totN := as.integer(totN)]
-#	  expectedHashtagsTbl = myReadCSV(getOutFileHashtags('testing2'), colClasses=hashtagsTblColClasses)
-#	  resTbl = runPriorT(config=modConfig(defaultTConfig, list(query=sprintf("select %s from tweets where user_screen_name = 'thebucktlist'", defaultTCols))))
-#	  expect_equivalent(expectedTbl, resTbl$modelVsPredTbl)
-#	  expect_equivalent(expectedHashtagsTbl, resTbl$hashtagsTbl)
-#	  expectedTbl = myReadCSV(getOutFileModelVsPred('twitter_ru'))
-#	  resTbl = runPriorT(config=modConfig(defaultTConfig, list(query=sprintf("select %s from tweets where user_screen_name = 'twitter_ru'", defaultTCols))))
-#	  expect_equivalent(expectedTbl, resTbl$modelVsPredTbl)
-#})
+test_that("testModelVsPred", {
+	  expectedTbl = myReadCSV(getOutFileModelVsPred('testing1'))
+	  expectedHashtagsTbl = myReadCSV(getOutFileHashtags('testing1'))
+	  resTbl = runPriorT(config=modConfig(defaultTSjiPConfig, list(query=sprintf("user_screen_name = 'ap'", defaultTCols))))
+	  expect_equivalent(expectedTbl, resTbl$modelVsPredTbl)
+	  expect_equivalent(expectedHashtagsTbl, resTbl$hashtagsTbl)
+	  expectedTbl = myReadCSV(getOutFileModelVsPred('testing2'))
+	  expectedHashtagsTbl = myReadCSV(getOutFileHashtags('testing2'))
+	  resTbl = runPriorT(config=modConfig(defaultTSjiPConfig, list(query=sprintf("user_screen_name = 'thebucktlist'"))))
+	  expect_equivalent(expectedTbl, resTbl$modelVsPredTbl)
+	  expect_equivalent(expectedHashtagsTbl, resTbl$hashtagsTbl)
+	  expectedTbl = myReadCSV(getOutFileModelVsPred('twitter_ru'))
+	  resTbl = runPriorT(config=modConfig(defaultTSjiPConfig, list(query=sprintf("user_screen_name = 'twitter_ru'"))))
+	  expect_equivalent(expectedTbl, resTbl$modelVsPredTbl)
+})
 
 test_that("testModelVsPredSO", {
 	  expectedModelVsPredTbl = myReadCSV(getOutFileModelVsPred('testingSO1'))
 	  expectedHashtagsTbl = myReadCSV(getOutFileHashtags('testingSO1'))
-	  expectedHashtagsTbl
 	  expectedModelVsPredTbl[, user_screen_name := as.character(user_screen_name)]
 	  expectedHashtagsTbl[, user_screen_name := as.character(user_screen_name)]
 	  expectedHashtagsTbl[, user_screen_name_prior := as.character(user_screen_name_prior)]

@@ -194,10 +194,14 @@ setupTweetsTbl <- function(tweetsTbl, config) {
 	tweetsTbl
 }
 
-getTweetsTbl <- function(sqlStr=sprintf("select %s from tweets limit 10000", defaultTCols), config) {
+getAllowedRetweetedVals <- function(config) {
 	allowedRetweetedVals = if (getConfig(config, "includeRetweetsP")) c('True', 'False') else c('False')
-	tweetsTbl = sqldt(sqlStr)[retweeted %in% allowedRetweetedVals]
-	myStopifnot(unique(tweetsTbl$retweeted) %in% allowedRetweetedVals)
+	allowedRetweetedVals
+}
+
+getTweetsTbl <- function(sqlStr=sprintf("select %s from tweets limit 10000", defaultTCols), config) {
+	tweetsTbl = sqldt(sqlStr)[retweeted %in% getAllowedRetweetedVals(config)]
+	myStopifnot(unique(tweetsTbl$retweeted) %in% getAllowedRetweetedVals(config))
 	setupTweetsTbl(tweetsTbl, config)
 	tweetsTbl
 }
@@ -619,14 +623,16 @@ runPrior <- function(config) {
 
 runPrior <- function(config) {
 	myStopifnot(!any(sapply(config,is.null)))
-	withProf({
+	#withProf({
 		config=modConfig(config, list(dStd=getConfig(config, 'dFull')))
+		config
 		tokenTbl = getTokenizedForUsers(config)
 		tokenTbl
-		tagTbl = tokenTbl[type == 'tag']
+		tagTbl = tokenTbl[type == getConfig(config, 'tagTypeName')] 
 		tagTbl
 		if (getConfig(config, "convertTagSynonymsP")) convertTagSynonyms(tagTbl)
-		tokenTbl = rbind(tokenTbl[type != 'tag'], tagTbl)
+		tokenTbl = rbind(tokenTbl[type != getConfig(config, 'tagTypeName')], tagTbl)
+		tokenTbl = tokenTbl[, setkey(.SD, id)][tagTbl[, list(id=unique(id))][, setkey(.SD, id)]]
 		setkey(tokenTbl, user_screen_name, dt)
 		getOutFileForNameFun <- function(name) {
 			getConfig(config, name)
@@ -634,7 +640,7 @@ runPrior <- function(config) {
 		#FIXME: some logic in the following function needs to be moved here
 		#res = genAggModelVsPredTbl(hashtagsTbl, config=config)
 		runForTokenTbl(tokenTbl, config, getOutFileForNameFun) 
-	})
+	#})
 }
 
 modConfig <- function(config, mods) {
@@ -675,7 +681,9 @@ defaultBaseConfig = list(dFull=c(0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1.0,1.1,1.2,1.3,1.
 			 query=NULL)
 
 defaultTConfig = c(defaultBaseConfig,
-		   list(from='tokenText',
+		   list(dsetType='twitter',
+			from='tokenText',
+			convertTagSynonymsP=F,
 			accumModelHashtagsTbl=F,
 			getPostsFun=getTweetsTbl,
 			getHashtagsFun=getHashtagsTbl,
@@ -694,25 +702,28 @@ defaultTConfig = c(defaultBaseConfig,
 			priorTbl = 'priorTblGlobT',
 			sjiTbl = 'sjiTblTOrderless',
 			getTokenizedFromSubsetFun='getTokenizedFromSubsetT',
-			includeRetweetsP=F))
+			includeRetweetsP=F,
+			defaultColsTokenized='defaultColsTokenizedT'))
 
 defaultSOConfig = c(defaultBaseConfig,
-			 list(convertTagSynonymsP=T,
-			      accumModelHashtagsTbl=F,
-			      getPostsFun=getPostsTbl,
-			      getHashtagsFun=getTagsTbl,
-			      tokenizedChunkTypeTbl = 'post_tokenized_chunk_types',
-			      tokenizedTypeTypeTbl = 'post_tokenized_type_types',
-			      tokenizedTbl = 'post_tokenized',
-			      subsetsTbl = 'post_subsets',
-			      postsTbl = 'posts',
-			      tagTypeName = 'tag',
-			      groupName = 'SOShuffledFull',
-			      priorTbl = 'priorTblUserSO',
-			      sjiTbl = 'sjiTblSOOrderless',
-			      getTokenizedFromSubsetFun='getTokenizedFromSubsetSO',
-			      makeChunkTblFun='make_chunk_table_SO'
-			      ))
+		    list(dsetType='stackoverflow',
+			 convertTagSynonymsP=T,
+			 accumModelHashtagsTbl=F,
+			 getPostsFun=getPostsTbl,
+			 getHashtagsFun=getTagsTbl,
+			 tokenizedChunkTypeTbl = 'post_tokenized_chunk_types',
+			 tokenizedTypeTypeTbl = 'post_tokenized_type_types',
+			 tokenizedTbl = 'post_tokenized',
+			 subsetsTbl = 'post_subsets',
+			 postsTbl = 'posts',
+			 tagTypeName = 'tag',
+			 groupName = 'SOShuffledFull',
+			 priorTbl = 'priorTblUserSO',
+			 sjiTbl = 'sjiTblSOOrderless',
+			 getTokenizedFromSubsetFun='getTokenizedFromSubsetSO',
+			 makeChunkTblFun='make_chunk_table_SO',
+			 defaultColsTokenized='defaultColsTokenizedSO'
+			 ))
 
 defaultPermConfig = list(permUseEntropyP='', permUseStoplistP='', permOnlyDirectionP='', permHymanP='', permUseFreqP='', permUseWindowP='')
 
@@ -813,7 +824,10 @@ defaultSOSjiPConfig = modConfig(c(defaultSOConfig, defaultSjiConfig,
 defaultTSjiPConfig = modConfig(c(defaultTConfig, defaultSjiConfig,
 				 list(runTbl=makeRunTbl(list()))),
 			       list(actDVs=c('actPriorStd', 'actPriorOL', 'actPriorOL2'),
-				    computeActFromContextTbl='computeActNullFromContextTbl'))
+				    computeActFromContextTbl='computeActNullFromContextTbl',
+				    tokenizedTbl = 'tweets_tokenized',
+				    priorTbl = 'priorTblUserT',
+				    postsTbl = 'tweets'))
 
 defaultGGPlotOpts <- theme_bw() + theme_classic()
 
@@ -1684,7 +1698,7 @@ genTokenizedTblTwitter <- function(bundleSize=10000, query, tokenizedTblName) {
 	withDBConnect(dbCon,
 		      {dbRs = dbSendQuery(dbCon, query)
 		      writePartialTbl <- function(tbl) {
-			      setcolorder(tbl, c('id', 'chunk', 'pos', 'type'))
+			      setcolorder(tbl, c('id', 'chunk', 'pos', 'type', 'retweeted'))
 			      appendDTbl(tbl, tokenizedTblName)
 		      }
 		      while (T) {
@@ -1692,6 +1706,9 @@ genTokenizedTblTwitter <- function(bundleSize=10000, query, tokenizedTblName) {
 			      if (nrow(tweetsTbl) == 0) break
 			      setupTweetsTbl(tweetsTbl, defaultTConfig)
 			      tokenizedTbl = getTokenizedTbl(tweetsTbl, from='tokenText', regex=matchWhitespace)[, type := 'tweet']
+			      myStopifnot(key(tweetsTbl) == 'id')
+			      myStopifnot(key(tokenizedTbl) == 'id')
+			      tokenizedTbl[tweetsTbl, retweeted := retweeted]
 			      tokenizedTbl[grepl(pattern=matchHashtag, x=chunk), type := 'hashtag']
 			      writePartialTbl(tokenizedTbl)
 		      }
@@ -1894,6 +1911,21 @@ getPriorTblGlobT <- function(config, startId, endId) {
 	globPriorTbl
 }
 
+getPriorTblUserT <- function(config) {
+	tbl = sqldt(sprintf("select creation_epoch, user_screen_name, chunk as hashtag, tweets_tokenized.retweeted from tweets_tokenized
+			    join tweets
+			    on tweets.id = tweets_tokenized.id
+			    where type = 'hashtag'
+			    and user_screen_name is not null
+			    and user_screen_name in ('ap', 'thebucktlist', 'twitter_ru')" #FIXME: These are hardcoded for the unit tests
+			    ))
+	addDtToTbl(tbl)
+	tbl = tbl[retweeted %in% getAllowedRetweetedVals(config)]
+	setkey(tbl, user_screen_name, dt, hashtag)
+	tbl
+}
+
+
 createStoplistTbl <- function() {
 	sqldf('truncate table stoplists')
 	sqldf('create table stoplists (
@@ -2015,6 +2047,7 @@ getCurWorkspace <- function(groupConfig) {
 	configTPerm = modConfig(defaultTPermConfig, list(groupName=getConfig(groupConfig, 'groupName')))
 	priorTblGlobT <<- getPriorTblGlobT(configT, 1, maxIdTPrior)
 	priorTblUserSO <<- getPriorTblUserSO(defaultSOConfig, 1, maxIdSOPrior)
+	priorTblUserT <<- getPriorTblUserT(configT) #FIXME: Add to saved vars
 	sjiTblTOrderless <<- getSjiTblTOrderless(configT, 1, maxIdTSji)
 	sjiTblTOrder <<- getSjiTblTOrder(configT, 1, maxIdTSji)
 	sjiTblSOOrderless <<- getSjiTblSO(defaultSOConfig, 1, maxIdSOSji)
@@ -2158,6 +2191,11 @@ getPostResTbl <- function(tokenTbl, config, id) {
 	postResTbl
 }
 
+#FIXME: Test and use for getTokenizedFromSubset
+
+defaultColsTokenizedSO = "tokenized_tbl.id::text, user_screen_name, creation_epoch, chunk, pos, type"
+defaultColsTokenizedT = "tokenized_tbl.id::text, user_screen_name, creation_epoch, chunk, pos, type, tokenized_tbl.retweeted"
+
 getTokenizedFromSubset <- function(minId, maxId, config) {
 	resTbl = sqldt(sprintf("select tokenized_tbl.id::text, user_screen_name, creation_epoch, chunk, pos, type from %s as tokenized_tbl
 			       join %s as posts_tbl
@@ -2172,13 +2210,17 @@ getTokenizedFromSubset <- function(minId, maxId, config) {
 }
 
 getTokenizedForUsers <- function(config) {
-	resTbl = sqldt(sprintf("select tokenized_tbl.id::text, user_screen_name, creation_epoch, chunk, pos, type from post_tokenized as tokenized_tbl
-			       join posts as posts_tbl
+	resTbl = sqldt(sprintf("select %s from %s as tokenized_tbl
+			       join %s as posts_tbl
 			       on tokenized_tbl.id = posts_tbl.id
 			       where 1=1
-			       and %s", getConfig(config, 'query') 
+			       and %s",
+			       get(getConfig(config, 'defaultColsTokenized')), getConfig(config, "tokenizedTbl"), getConfig(config, "postsTbl"), getConfig(config, 'query') 
 			       ))
 	addDtToTbl(resTbl)
+	if (getConfig(config, 'dsetType') == 'twitter') {
+		resTbl = resTbl[retweeted %in% getAllowedRetweetedVals(config)]
+	}
 	resTbl[, user_screen_name_prior := user_screen_name]
 	resTbl
 }
@@ -2712,6 +2754,7 @@ curWS <- function() {
 	withProf(runContext20g1s6(regen='useAlreadyLoaded'))
 	runGenTokenizedTblTwitterPrior()
 	fooTbl = sqldt("select * from top_hashtag_tokenized where id = '441134226961092608'")
+	fooTbl = sqldf("select retweeted, count(*) from tweets_tokenized group by retweeted")
 	fooTbl
 	envTblTOrder
 	permEnvTblT

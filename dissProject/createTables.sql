@@ -111,7 +111,8 @@ create table tweets_tokenized (
 	id bigint not null,
 	chunk text not null,
 	pos integer not null,
-	type text not null
+	type text not null,
+	retweeted text not null
 );
 
 create index id_index_tweets_tokenized on tweets_tokenized (id);
