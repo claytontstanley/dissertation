@@ -35,6 +35,7 @@ options(sqldf.RPostgreSQL.user = USER,
 	sqldf.RPostgreSQL.dbname = USER)
 options("scipen"=100, "digits"=4)
 options(error=traceback)
+options(datatable.alloccol = 900)
 
 withDBConnect <- function(var, thunk) {
 	var = substitute(var)
@@ -435,7 +436,6 @@ addMetrics <- function(hashtagsTbl, modelHashtagsTbl, config) {
 		actDV
 		do.call(addDVCols, as.list(c(actDV, topHashtagDVFromActDV(actDV))))
 	}
-	modelHashtagsTbl
 	myStopifnot(key(modelHashtagsTbl) == (c('user_screen_name', 'dt', 'hashtag', 'd')))
 	myStopifnot(key(hashtagsTbl) == (c('user_screen_name', 'dt', 'hashtag')))
 	modelHashtagsTbl[, hashtagUsedP := F]
@@ -740,7 +740,9 @@ defaultTPermConfig = modConfig(c(defaultTConfig, defaultPermConfig,
 							     c('actPriorStd', 'actTweetOrderFreq', 'actTweetOrderlessFreq'),
 							     c('actTweetOrderFreq', 'actTweetOrderlessFreq'),
 							     c('actPriorStd', 'actTweetOrderWindow', 'actTweetOrderlessWindow'),
-							     c('actTweetOrderWindow', 'actTweetOrderlessWindow')
+							     c('actTweetOrderWindow', 'actTweetOrderlessWindow'),
+							     c('actPriorStd', 'actTweetOrderFrentropy', 'actTweetOrderlessFrentropy'),
+							     c('actTweetOrderFrentropy', 'actTweetOrderlessFrentropy')
 							     )),
 				      permEnvTbl='permEnvTblT',
 				      permMemMatOrder='permMemMatTOrder',
@@ -760,7 +762,9 @@ defaultTPermConfig = modConfig(c(defaultTConfig, defaultPermConfig,
 					     'actPriorStd_actTweetOrderFreq_actTweetOrderlessFreq',
 					     'actTweetOrderlessFreq', 'actTweetOrderFreq', 'actTweetOrderFreq_actTweetOrderlessFreq',
 					     'actPriorStd_actTweetOrderWindow_actTweetOrderlessWindow',
-					     'actTweetOrderlessWindow', 'actTweetOrderWindow', 'actTweetOrderWindow_actTweetOrderlessWindow'
+					     'actTweetOrderlessWindow', 'actTweetOrderWindow', 'actTweetOrderWindow_actTweetOrderlessWindow',
+					     'actPriorStd_actTweetOrderFrentropy_actTweetOrderlessFrentropy',
+					     'actTweetOrderlessFrentropy', 'actTweetOrderFrentropy', 'actTweetOrderFrentropy_actTweetOrderlessFrentropy'
 					     )))
 
 defaultSOPermConfig = modConfig(c(defaultSOConfig, defaultPermConfig,
@@ -779,7 +783,9 @@ defaultSOPermConfig = modConfig(c(defaultSOConfig, defaultPermConfig,
 							      c('actPriorStd', 'actTitleOrderlessFreq', 'actBodyOrderlessFreq'),
 							      c('actTitleOrderlessFreq', 'actBodyOrderlessFreq'),
 							      c('actPriorStd', 'actTitleOrderlessWindow', 'actBodyOrderlessWindow'),
-							      c('actTitleOrderlessWindow', 'actBodyOrderlessWindow')
+							      c('actTitleOrderlessWindow', 'actBodyOrderlessWindow'),
+							      c('actPriorStd', 'actTitleOrderlessFrentropy', 'actBodyOrderlessFrentropy'),
+							      c('actTitleOrderlessFrentropy', 'actBodyOrderlessFrentropy')
 							      )),
 				       permEnvTbl='permEnvTblSO',
 				       permMemMatOrder='',
@@ -799,7 +805,9 @@ defaultSOPermConfig = modConfig(c(defaultSOConfig, defaultPermConfig,
 					      'actPriorStd_actTitleOrderlessFreq_actBodyOrderlessFreq',
 					      'actTitleOrderlessFreq', 'actBodyOrderlessFreq', 'actTitleOrderlessFreq_actBodyOrderlessFreq',
 					      'actPriorStd_actTitleOrderlessWindow_actBodyOrderlessWindow',
-					      'actTitleOrderlessWindow', 'actBodyOrderlessWindow', 'actTitleOrderlessWindow_actBodyOrderlessWindow'
+					      'actTitleOrderlessWindow', 'actBodyOrderlessWindow', 'actTitleOrderlessWindow_actBodyOrderlessWindow',
+					      'actPriorStd_actTitleOrderlessFrentropy_actBodyOrderlessFrentropy',
+					      'actTitleOrderlessFrentropy', 'actBodyOrderlessFrentropy', 'actTitleOrderlessFrentropy_actBodyOrderlessFrentropy'
 					      )))
 
 defaultTSjiConfig = modConfig(c(defaultTConfig, defaultSjiConfig,
@@ -1998,6 +2006,7 @@ funConfigFreq <- function(config) modConfig(config, getFunConfigMods(permUseFreq
 funConfigDirection <- function(config) modConfig(config, getFunConfigMods(permUseEntropyP=T, permOnlyDirectionP=T))
 funConfigHyman <- function(config) modConfig(config, getFunConfigMods(permUseEntropyP=T, permHymanP=T))
 funConfigWindow <- function(config) modConfig(config, getFunConfigMods(permUseEntropyP=T, permUseWindowP=T))
+funConfigFrentropy <- function(config) modConfig(config, getFunConfigMods(permUseEntropyP=T, permUseFreqP=T))
 
 makeCombinedMemMat <- function(sjiTbl, envTbl, config) {
 	res = list()
@@ -2007,6 +2016,7 @@ makeCombinedMemMat <- function(sjiTbl, envTbl, config) {
 	res[['freq']] = makeMemMat(sjiTbl, envTbl, funConfigFreq(config))
 	res[['window']] = makeMemMat(sjiTbl, envTbl, funConfigWindow(config))
 	res[['orig']] = makeMemMat(sjiTbl, envTbl, funConfigOrig(config))
+	res[['frentropy']] = makeMemMat(sjiTbl, envTbl, funConfigFrentropy(config))
 	res
 }
 
@@ -2085,7 +2095,9 @@ computeActPermTFromContextTbl <- function(contextTbl, config) {
 			   copy(cTblOrder)[,type:=paste0('act', capitalize(type),'OrderFreq')][,fun:='computeActPermOrder'][,funConfig:='funConfigFreq'],
 			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessFreq')][,fun:='computeActPermOrderless'][,funConfig:='funConfigFreq'],
 			   copy(cTblOrder)[,type:=paste0('act', capitalize(type),'OrderWindow')][,fun:='computeActPermOrder'][,funConfig:='funConfigWindow'],
-			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessWindow')][,fun:='computeActPermOrderless'][,funConfig:='funConfigWindow']
+			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessWindow')][,fun:='computeActPermOrderless'][,funConfig:='funConfigWindow'],
+			   copy(cTblOrder)[,type:=paste0('act', capitalize(type),'OrderFrentropy')][,fun:='computeActPermOrder'][,funConfig:='funConfigFrentropy'],
+			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessFrentropy')][,fun:='computeActPermOrderless'][,funConfig:='funConfigFrentropy']
 			   )
 	contextTbl
 	contextTbl[, get(fun[1])(chunk, posFromTag, get(funConfig)(config)), by=type]
@@ -2099,7 +2111,8 @@ computeActPermSOFromContextTbl <- function(contextTbl, config) {
 			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessDirection')][,fun:='computeActPermOrderless'][,funConfig:='funConfigDirection'],
 			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessHyman')][,fun:='computeActPermOrderless'][,funConfig:='funConfigHyman'],
 			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessFreq')][,fun:='computeActPermOrderless'][,funConfig:='funConfigFreq'],
-			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessWindow')][,fun:='computeActPermOrderless'][,funConfig:='funConfigWindow']
+			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessWindow')][,fun:='computeActPermOrderless'][,funConfig:='funConfigWindow'],
+			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessFrentropy')][,fun:='computeActPermOrderless'][,funConfig:='funConfigFrentropy']
 			   )
 	contextTbl[, get(fun[1])(chunk, posFromTag, get(funConfig)(config)), by=type]
 }
@@ -2695,6 +2708,8 @@ getMemMatFromList <- function(lst, config) {
 			'freq'
 		} else if (permUseEntropyP & !permOnlyDirectionP & !permUseFreqP & !permUseStoplistP & permUseWindowP) {
 			'window'
+		} else if (permUseEntropyP & !permOnlyDirectionP & permUseFreqP & !permUseStoplistP & !permUseWindowP) {
+			'frentropy'
 		} else {
 			myStopifnot(!permUseEntropyP & !permOnlyDirectionP & !permUseFreqP & !permUseStoplistP & !permUseWindowP)
 			'orig'
@@ -2747,8 +2762,10 @@ runGenAndSaveCurWorkspaceg4s6 <- function() genAndSaveCurWorkspace(groupConfigG4
 
 curWS <- function() {
 	withProf(runContext20g1s1(regen='useAlreadyLoaded'))
-	withProf(runContext20g1s6(regen='useAlreadyLoaded'))
+	setLogLevel(1)
+	runContext20g1s6(regen='useAlreadyLoaded')
 	runGenTokenizedTblTwitterPrior()
+	#FIXME: Get frentropy working
 	#FIXME: Run priors through new code path (profile first, worry about loading workspace for prior and runGenTokenized stuff)
 	#FIXME: < and <= should have been slightly off, yes?
 	#FIXME: Add way to plot test results
