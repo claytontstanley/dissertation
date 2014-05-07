@@ -1677,11 +1677,12 @@ genTokenizedTblSO <- function(filters='1=1', bundleSize=10000) {
 	return()
 }
 
+#FIXME: Rerun this after truncating tweets_tokenized and dropping retweet column
 genTokenizedTblTwitter <- function(bundleSize=10000, query, tokenizedTblName) {
 	withDBConnect(dbCon,
 		      {dbRs = dbSendQuery(dbCon, query)
 		      writePartialTbl <- function(tbl) {
-			      setcolorder(tbl, c('id', 'chunk', 'pos', 'type', 'retweeted'))
+			      setcolorder(tbl, c('id', 'chunk', 'pos', 'type'))
 			      appendDTbl(tbl, tokenizedTblName)
 		      }
 		      while (T) {
@@ -1689,9 +1690,6 @@ genTokenizedTblTwitter <- function(bundleSize=10000, query, tokenizedTblName) {
 			      if (nrow(tweetsTbl) == 0) break
 			      setupTweetsTbl(tweetsTbl, defaultTConfig)
 			      tokenizedTbl = getTokenizedTbl(tweetsTbl, from='tokenText', regex=matchWhitespace)[, type := 'tweet']
-			      myStopifnot(key(tweetsTbl) == 'id')
-			      myStopifnot(key(tokenizedTbl) == 'id')
-			      tokenizedTbl[tweetsTbl, retweeted := retweeted]
 			      tokenizedTbl[grepl(pattern=matchHashtag, x=chunk), type := 'hashtag']
 			      writePartialTbl(tokenizedTbl)
 		      }
@@ -1895,7 +1893,7 @@ getPriorTblGlobT <- function(config, startId, endId) {
 }
 
 getPriorTblUserT <- function(config) {
-	tbl = sqldt(sprintf("select creation_epoch, user_screen_name, chunk as hashtag, tweets_tokenized.retweeted from tweets_tokenized
+	tbl = sqldt(sprintf("select creation_epoch, user_screen_name, chunk as hashtag, tweets.retweeted from tweets_tokenized
 			    join tweets
 			    on tweets.id = tweets_tokenized.id
 			    where type = 'hashtag'
@@ -2174,7 +2172,7 @@ getPostResTbl <- function(tokenTbl, config, id) {
 
 defaultColsTokenizedSO = "tokenized_tbl.id::text, user_screen_name, creation_epoch, chunk, pos, type"
 defaultColsTokenizedT = defaultColsTokenizedSO
-defaultColsTokenizedTPrior = sprintf('%s, %s', defaultColsTokenizedT, 'tokenized_tbl.retweeted')
+defaultColsTokenizedTPrior = sprintf('%s, %s', defaultColsTokenizedT, 'posts_tbl.retweeted')
 
 getTokenizedFromSubset <- function(minId, maxId, config) {
 	resTbl = sqldt(sprintf("select %s from %s as tokenized_tbl
