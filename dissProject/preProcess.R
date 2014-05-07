@@ -598,6 +598,7 @@ runPrior <- function(config) {
 runPrior <- function(config) {
 	myStopifnot(!any(sapply(config,is.null)))
 	withProf({
+		priorTblUserSubset <<- getPriorTblUserSubset(config)
 		config=modConfig(config, list(dStd=getConfig(config, 'dFull')))
 		config
 		tokenTbl = getTokenizedForUsers(config)
@@ -677,7 +678,8 @@ defaultTConfig = c(defaultBaseConfig,
 			sjiTbl = 'sjiTblTOrderless',
 			getTokenizedFromSubsetFun='getTokenizedFromSubsetT',
 			includeRetweetsP=F,
-			defaultColsTokenized='defaultColsTokenizedT'))
+			defaultColsTokenized='defaultColsTokenizedT',
+			defaultColsPriorUser='defaultColsPriorUserT'))
 
 defaultSOConfig = c(defaultBaseConfig,
 		    list(dsetType='stackoverflow',
@@ -696,7 +698,8 @@ defaultSOConfig = c(defaultBaseConfig,
 			 sjiTbl = 'sjiTblSOOrderless',
 			 getTokenizedFromSubsetFun='getTokenizedFromSubsetSO',
 			 makeChunkTblFun='make_chunk_table_SO',
-			 defaultColsTokenized='defaultColsTokenizedSO'
+			 defaultColsTokenized='defaultColsTokenizedSO',
+			 defaultColsPriorUser='defaultColsPriorUserSO'
 			 ))
 
 defaultPermConfig = list(permUseEntropyP='', permUseStoplistP='', permOnlyDirectionP='', permHymanP='', permUseFreqP='', permUseWindowP='')
@@ -801,24 +804,24 @@ defaultSOSjiConfig = modConfig(c(defaultSOConfig, defaultSjiConfig,
 defaultSOSjiPConfig = modConfig(c(defaultSOConfig, defaultSjiConfig,
 				  list(runTbl=makeRunTbl(list()))),
 				list(actDVs = c('actPriorStd', 'actPriorOL', 'actPriorOL2'),
-				     computeActFromContextTbl='computeActNullFromContextTbl'))
+				     computeActFromContextTbl='computeActNullFromContextTbl',
+				     priorTbl = 'priorTblUserSubset'))
 
 defaultTSjiPConfig = modConfig(c(defaultTConfig, defaultSjiConfig,
 				 list(runTbl=makeRunTbl(list()))),
 			       list(actDVs=c('actPriorStd', 'actPriorOL', 'actPriorOL2'),
 				    computeActFromContextTbl='computeActNullFromContextTbl',
 				    tokenizedTbl = 'tweets_tokenized',
-				    priorTbl = 'priorTblUserT',
-				    postsTbl = 'tweets',
-				    defaultColsTokenized = 'defaultColsTokenizedTPrior'))
+				    priorTbl = 'priorTblUserSubset',
+				    postsTbl = 'tweets'))
 
 defaultGGPlotOpts <- theme_bw() + theme_classic()
 
-runPriorT <- function(config=defaultTConfig) {
+runPriorT <- function(config) {
 	runPrior(config)
 }
 
-runPriorSO <- function(config=defaultSOConfig) {
+runPriorSO <- function(config) {
 	runPrior(config)
 }
 
@@ -829,7 +832,7 @@ getQueryUsersSubset <- function(val, from) {
 }
 
 getQueryGeneralT <- function(val, from, filters) {
-	sprintf('select %s from tweets where %s and user_screen_name in (%s)', defaultTCols, filters, getQueryUsersSubset(val, from))
+	sprintf('%s and user_screen_name in (%s)', filters, getQueryUsersSubset(val, from))
 }
 
 getQueryT <- function(val, filters='1=1') {
@@ -843,17 +846,11 @@ getQueryTStatuses <- function(val, filters='1=1') {
 defaultSOCols = sprintf('id, owner_user_id, user_screen_name, creation_date, creation_epoch, title, tags')
 
 getQuerySO <- function(val) {
-	sprintf('select %s from posts
-		where post_type_id = 1 and owner_user_id in (select id from users where reputation > %d order by reputation asc limit 500)', defaultSOCols, val)
+	sprintf('owner_user_id in (select id from users where reputation > %d order by reputation asc limit 500)', val)
 }
 
 getQuerySOQ <- function(val) {
-	sprintf("select %s from posts
-		where post_type_id = 1 and owner_user_id in (select id from users where num_questions > %d order by num_questions asc limit 100)", defaultSOCols, val)
-}
-
-combineFilters <- function(f1, f2='1=1') {
-	paste(f1, f2, sep=' and ')
+	sprintf("owner_user_id in (select id from users where num_questions > %d order by num_questions asc limit 100)", val)
 }
 
 makeTRun <- function(val, outFileName, config) {
@@ -861,11 +858,11 @@ makeTRun <- function(val, outFileName, config) {
 }
 
 makeTRunr1 <- function(val, outFileName, query) {
-	makeTRun(val, outFileName, config=modConfig(defaultTConfig, list(query=query, includeRetweetsP=T)))
+	makeTRun(val, outFileName, config=modConfig(defaultTSjiPConfig, list(query=query, includeRetweetsP=T)))
 }
 
 makeTRunr2 <- function(val, outFileName, query) {
-	makeTRun(val, outFileName, config=modConfig(defaultTConfig, list(query=query, includeRetweetsP=F)))
+	makeTRun(val, outFileName, config=modConfig(defaultTSjiPConfig, list(query=query, includeRetweetsP=F)))
 }
 
 queryRunTFollow1k = getQueryT
@@ -873,7 +870,7 @@ queryRunTFollow5k = function(val) getQueryT(val, filters="user_screen_name != 'g
 queryRunTFollow10k = function(val) getQueryT(val, filters="user_screen_name != 'so_pr'")
 queryRunTFollow100k = function(val) getQueryT(val, filters="user_screen_name != 'hermosa_brisa'")
 queryRunTFollow1M = getQueryT
-queryRunTFollow10M = function(val) getQueryT(val, filters='tweets.id != 12466832063')
+queryRunTFollow10M = function(val) getQueryT(val, filters='posts_tbl.id != 12466832063')
 
 queryRunTTweets1e2 = getQueryTStatuses
 queryRunTTweets5e2 = getQueryTStatuses
@@ -971,10 +968,10 @@ makeSORun <- function(val, outFileName, config) {
 	runFun
 }
 
-getSOr1Config <- function () modConfig(defaultSOConfig, list(convertTagSynonymsP=F, query=getQuerySO))
-getSOr2Config <- function () modConfig(defaultSOConfig, list(convertTagSynonymsP=T, query=getQuerySO))
-getSOr3Config <- function () modConfig(defaultSOConfig, list(convertTagSynonymsP=F, query=getQuerySOQ))
-getSOr4Config <- function () modConfig(defaultSOConfig, list(convertTagSynonymsP=T, query=getQuerySOQ))
+getSOr1Config <- function () modConfig(defaultSOSjiPConfig, list(convertTagSynonymsP=F, query=getQuerySO))
+getSOr2Config <- function () modConfig(defaultSOSjiPConfig, list(convertTagSynonymsP=T, query=getQuerySO))
+getSOr3Config <- function () modConfig(defaultSOSjiPConfig, list(convertTagSynonymsP=F, query=getQuerySOQ))
+getSOr4Config <- function () modConfig(defaultSOSjiPConfig, list(convertTagSynonymsP=T, query=getQuerySOQ))
 makeSORunr1 <- function(val, outFileName) makeSORun(val, outFileName, config=getSOr1Config())
 makeSORunr2 <- function(val, outFileName) makeSORun(val, outFileName, config=getSOr2Config())
 makeSORunr3 <- function(val, outFileName) makeSORun(val, outFileName, config=getSOr3Config())
@@ -1892,16 +1889,24 @@ getPriorTblGlobT <- function(config, startId, endId) {
 	globPriorTbl
 }
 
-getPriorTblUserT <- function(config) {
-	tbl = sqldt(sprintf("select creation_epoch, user_screen_name, chunk as hashtag, tweets.retweeted from tweets_tokenized
-			    join tweets
-			    on tweets.id = tweets_tokenized.id
-			    where type = 'hashtag'
+defaultColsPriorUserSO = 'creation_epoch, user_screen_name, chunk as hashtag'
+defaultColsPriorUserT = sprintf('%s, %s', defaultColsPriorUserSO, 'posts_tbl.retweeted')
+
+getPriorTblUserSubset <- function(config) {
+	tbl = sqldt(sprintf("select %s from %s as tokenized_tbl
+			    join %s as posts_tbl
+			    on posts_tbl.id = tokenized_tbl.id
+			    where type = '%s'
 			    and user_screen_name is not null
-			    and user_screen_name in ('ap', 'thebucktlist', 'twitter_ru')" #FIXME: These are hardcoded for the unit tests
+			    and %s",
+			    get(getConfig(config, 'defaultColsPriorUser')),
+			    getConfig(config, "tokenizedTbl"), getConfig(config, "postsTbl"),
+			    getConfig(config, "tagTypeName"), getConfig(config, 'query')
 			    ))
 	addDtToTbl(tbl)
-	tbl = tbl[retweeted %in% getAllowedRetweetedVals(config)]
+	if (getConfig(config, 'dsetType') == 'twitter') {
+		tbl = tbl[retweeted %in% getAllowedRetweetedVals(config)]
+	}
 	setkey(tbl, user_screen_name, dt, hashtag)
 	tbl
 }
@@ -2030,7 +2035,6 @@ getCurWorkspace <- function(groupConfig) {
 	configTPerm = modConfig(defaultTPermConfig, list(groupName=getConfig(groupConfig, 'groupName')))
 	priorTblGlobT <<- getPriorTblGlobT(configT, 1, maxIdTPrior)
 	priorTblUserSO <<- getPriorTblUserSO(defaultSOConfig, 1, maxIdSOPrior)
-	priorTblUserT <<- getPriorTblUserT(configT) #FIXME: Add to saved vars
 	sjiTblTOrderless <<- getSjiTblTOrderless(configT, 1, maxIdTSji)
 	sjiTblTOrder <<- getSjiTblTOrder(configT, 1, maxIdTSji)
 	sjiTblSOOrderless <<- getSjiTblSO(defaultSOConfig, 1, maxIdSOSji)
@@ -2171,8 +2175,7 @@ getPostResTbl <- function(tokenTbl, config, id) {
 }
 
 defaultColsTokenizedSO = "tokenized_tbl.id::text, user_screen_name, creation_epoch, chunk, pos, type"
-defaultColsTokenizedT = defaultColsTokenizedSO
-defaultColsTokenizedTPrior = sprintf('%s, %s', defaultColsTokenizedT, 'posts_tbl.retweeted')
+defaultColsTokenizedT = sprintf('%s, %s', defaultColsTokenizedSO, 'posts_tbl.retweeted')
 
 getTokenizedFromSubset <- function(minId, maxId, config) {
 	resTbl = sqldt(sprintf("select %s from %s as tokenized_tbl
@@ -2193,8 +2196,10 @@ getTokenizedForUsers <- function(config) {
 			       join %s as posts_tbl
 			       on tokenized_tbl.id = posts_tbl.id
 			       where 1=1
-			       and %s",
-			       get(getConfig(config, 'defaultColsTokenized')), getConfig(config, "tokenizedTbl"), getConfig(config, "postsTbl"), getConfig(config, 'query') 
+			       and %s
+			       and tokenized_tbl.id in (select id from %s where %s)",
+			       get(getConfig(config, 'defaultColsTokenized')), getConfig(config, "tokenizedTbl"), getConfig(config, "postsTbl"), getConfig(config, 'query'),
+			       getConfig(config, 'postsTbl'), getConfig(config, 'query')
 			       ))
 	addDtToTbl(resTbl)
 	if (getConfig(config, 'dsetType') == 'twitter') {
@@ -2734,8 +2739,15 @@ runGenAndSaveCurWorkspaceg3s6 <- function() genAndSaveCurWorkspace(groupConfigG3
 runGenAndSaveCurWorkspaceg4s6 <- function() genAndSaveCurWorkspace(groupConfigG4S6)
 
 curWS <- function() {
+	runTFollow5k()
+	runTFollow1M()
+	runTFollow5k()
+	runTFollow10M()
+	runSO1k()
+	runSOQgt400()
+
 	withProf(runContext20g1s1(regen='useAlreadyLoaded'))
-	setLogLevel(1)
+	setLogLevel(2)
 	runContext20g1s6(regen='useAlreadyLoaded')
 	runGenTokenizedTblTwitterPrior()
 	#FIXME: Run priors through new code path (profile first, worry about loading workspace for prior and runGenTokenized stuff)

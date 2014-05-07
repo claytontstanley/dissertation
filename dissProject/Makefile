@@ -10,7 +10,7 @@ run%:
 createSOSmall:
 	(cd /Volumes/SuperSupernova/stackExchange/ && rm stackOverflowSmall/* && cd stackOverflow2014 && find *.xml -print -exec bash -ic "(head '{}' && tail '{}') > ../stackOverflowSmall/{}" \;)
 
-parrunPriors: NP = 4
+parrunPriors: NP = 8
 parrunSjisSOAll: NP = 1
 parrunSjisTAll: NP = 1
 parrunContext: NP = 1
