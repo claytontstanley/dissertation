@@ -446,27 +446,6 @@ addMetrics <- function(hashtagsTbl, modelHashtagsTbl, config) {
 	return()
 }
 
-summarizeExtremes <- function(hashtagsTbl) {
-	tagCountTbl = hashtagsTbl[, list(tagCount=.N), by=list(user_screen_name, dt)]
-	countTbl = hashtagsTbl[, .N, keyby=list(user_screen_name, hashtag)]
-	countTbl[, rank := {i = sort(N, decreasing=T, index.return=T)$i; r=1:length(i); r[i] = 1:length(i); r}, by=user_screen_name]
-	setkey(countTbl, user_screen_name, rank)
-	getTopNHashtags <- function(topN, userScreenName) {
-		ret = countTbl[J(userScreenName,1:topN)]$hashtag
-		ret
-	}
-	mGetTopNHashtags = memoise(getTopNHashtags)
-	frequencyTbl = hashtagsTbl[, list(hashtagChosenP = hashtag %in% mGetTopNHashtags(length(hashtag), user_screen_name)), by=list(user_screen_name, dt)][, list(NFrequency=sum(hashtagChosenP)), keyby=user_screen_name]
-	flatHashtagsTbl = hashtagsTbl[, list(hashtag=list(hashtag)), by=list(user_screen_name, dt)]
-	joinTbl = hashtagsTbl[, list(userScreenName=user_screen_name, dt1=dt, hashtag=hashtag)]
-	setkey(joinTbl, userScreenName, dt1)
-	recencyTbl = hashtagsTbl[, list(hashtags=list(hashtag), prevHashtags=list(unique(rev(joinTbl[J(user_screen_name),][dt1 < dt,]$hashtag)))), by=list(user_screen_name, dt)]
-	recencyTbl = recencyTbl[, list(hashtag=unlist(hashtags), prevHashtag=prevHashtags, hashtagChosenP = unlist(hashtags) %in% unlist(prevHashtags)[1:length(unlist(hashtags))]), by=list(user_screen_name, dt)]
-	recencyTbl = recencyTbl[, list(NRecency=sum(hashtagChosenP)), by=list(user_screen_name)]
-	res = frequencyTbl[recencyTbl]
-	res
-}
-
 onlyFirstT <- function(bool) {
 	myStopifnot(any(bool == T))
 	ret = rep(F, length(bool))
@@ -618,7 +597,7 @@ runPrior <- function(config) {
 
 runPrior <- function(config) {
 	myStopifnot(!any(sapply(config,is.null)))
-	#withProf({
+	withProf({
 		config=modConfig(config, list(dStd=getConfig(config, 'dFull')))
 		config
 		tokenTbl = getTokenizedForUsers(config)
@@ -634,8 +613,8 @@ runPrior <- function(config) {
 		}
 		#FIXME: some logic in the following function needs to be moved here
 		#res = genAggModelVsPredTbl(hashtagsTbl, config=config)
-		runForTokenTbl(tokenTbl, config, getOutFileForNameFun) 
-	#})
+		runForTokenTbl(tokenTbl, config, getOutFileForNameFun)
+	})
 }
 
 modConfig <- function(config, mods) {
@@ -1500,7 +1479,7 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 	logit = runLogReg(modelHashtagsTbl, c('actPriorStd', 'actTweet'))
 	summary(logit)
 	tables()
-	print(ClassLog(logit, modelHashtagsTbl$hashtagUsedP))
+	myLog(ClassLog(logit, modelHashtagsTbl$hashtagUsedP))
 	modelVsPredTbl
 	
 	modelVsPredTbl[dsetSize==500, list(N=.N, Ndsets=length(unique(datasetName))), keyby=list(runNum, groupNum, sizeNum, dsetSize, dsetType)]
@@ -2070,16 +2049,17 @@ genAndSaveCurWorkspace <- function(groupConfig) {
 	mySaveImage(groupConfig)
 }
 
-computeActSjiFromContextTbl <- function(contextTbl, config) {
-	contextTbl = copy(contextTbl[orderType=='orderless'])[, type := paste0('act', capitalize(type))]
+computeActSjiFromContextTbl <- function(contextTbl, tagTbl, config) {
+	contextTbl = copy(contextTbl)[, type := paste0('act', capitalize(type))]
 	contextTbl[, computeActSji(chunk, get(getConfig(config, 'sjiTbl')), config), by=type]
 }
 
-computeActNullFromContextTbl <- function(contextTbl, config) {
+computeActNullFromContextTbl <- function(contextTbl, tagTbl, config) {
 	data.table(type=character(), hashtag=character(), act=double())
 }
 
-computeActPermTFromContextTbl <- function(contextTbl, config) {
+computeActPermTFromContextTbl <- function(contextTbl, tagTbl, config) {
+	contextTbl = getContextTbl(contextTbl, tagTbl)
 	cTblOrder = contextTbl[orderType=='order']
 	cTblOrderless = contextTbl[orderType=='orderless']
 	contextTbl = rbind(copy(cTblOrder)[,type:=paste0('act', capitalize(type),'Order')][,fun:='computeActPermOrder'][,funConfig:='funConfigOrig'],
@@ -2103,8 +2083,9 @@ computeActPermTFromContextTbl <- function(contextTbl, config) {
 	contextTbl[, get(fun[1])(chunk, posFromTag, get(funConfig)(config)), by=type]
 }
 
-computeActPermSOFromContextTbl <- function(contextTbl, config) {
-	cTblOrderless = contextTbl[orderType=='orderless']
+computeActPermSOFromContextTbl <- function(contextTbl, tagTbl, config) {
+	contextTbl = getContextTbl(contextTbl, tagTbl)
+	cTblOrderless = contextTbl[orderType == 'orderless']
 	contextTbl = rbind(copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'Orderless')][,fun:='computeActPermOrderless'][,funConfig:='funConfigOrig'],
 			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessEntropy')][,fun:='computeActPermOrderless'][,funConfig:='funConfigEntropy'],
 			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessStoplist')][,fun:='computeActPermOrderless'][,funConfig:='funConfigStoplist'],
@@ -2124,9 +2105,9 @@ getContextPredNames <- function(config) {
 	res
 }
 
-getSjiTblWide <- function(contextTbl, config) {
+getSjiTblWide <- function(contextTbl, tagTbl, config) {
 	if (nrow(contextTbl) > 0) {
-		sjiTbl = get(getConfig(config, 'computeActFromContextTbl'))(contextTbl, config)
+		sjiTbl = get(getConfig(config, 'computeActFromContextTbl'))(contextTbl, tagTbl, config)
 	} else {
 		sjiTbl = data.table(act=double(0)) # Need to add a column b/c more 0-row columns can only be added to a DT with at least one col.
 	}
@@ -2157,7 +2138,7 @@ setColOrderWithAtFront <- function(tbl, front) {
 }
 
 getContextTbl <- function(contextTbl, tagTbl) {
-	resTbl = setkey(contextTbl[, id:=1:nrow(.SD)], user_screen_name)[setkey(tagTbl, user_screen_name), allow.cartesian=T, nomatch=0]
+	resTbl = setkey(contextTbl[, id:=1:nrow(.SD)], user_screen_name)[setkey(copy(tagTbl), user_screen_name), allow.cartesian=T, nomatch=0]
 	resTbl = resTbl[, list(id, chunk, hashtag=chunk.1, pos, hashtagPos=pos.1, type)][, posFromTag := pos - hashtagPos]
 	resTbl = resTbl[, list(chunk, posFromTag, type)][, orderType := 'order']
 	resTbl = rbind(resTbl, contextTbl[, list(chunk, posFromTag=rep(0, nrow(.SD)), type, orderType=rep('orderless', nrow(.SD)))])
@@ -2168,16 +2149,10 @@ getPostResTbl <- function(tokenTbl, config, id) {
 	myLog(sprintf("Getting results for id=%s", id))
 	tokenTbl
 	dStd = getConfig(config, 'dStd')
-	guardAllEqualP(tokenTbl[, creation_epoch])
-	guardAllEqualP(tokenTbl[, user_screen_name])
-	guardAllEqualP(tokenTbl[, user_screen_name_prior])
-	guardAllEqualP(tokenTbl[, dt])
 	contextTbl = tokenTbl[type != getConfig(config, "tagTypeName")]
 	tagTbl = tokenTbl[type == getConfig(config, "tagTypeName")]
-	contextTbl = getContextTbl(contextTbl, tagTbl)
-	contextTbl
-	tagTbl
 	setkey(tagTbl, chunk)
+	tagTbl
 	priorTbl = getPriorForUserAtEpoch(get(getConfig(config, 'priorTbl')), tokenTbl$user_screen_name_prior[1], tokenTbl$creation_epoch[1], dStd)
 	priorTbl
 	setkey(priorTbl, hashtag, d)
@@ -2190,10 +2165,7 @@ getPostResTbl <- function(tokenTbl, config, id) {
 	}
 	priorTbl[, user_screen_name := tokenTbl$user_screen_name[1]]
 	priorTbl[, dt := tokenTbl[, dt[1]]]
-	sjiTblWide = getSjiTblWide(contextTbl, config)
-	sjiTblWide
-	key(priorTbl)
-	key(tagTbl)
+	sjiTblWide = getSjiTblWide(contextTbl, tagTbl, config)
 	postResTbl = sjiTblWide[priorTbl]
 	postResTbl[, hashtagUsedP := F]
 	postResTbl[tagTbl, hashtagUsedP := T]
@@ -2333,8 +2305,8 @@ analyzePostResTbl <- function(postResTbl, predictors, bestFitName) {
 	summary(myLogit)
 	updateBestFitCol(postResTbl, logregTbl, bestFitName)
 	postResTbl
-	print(summary(myLogit))
-	print(ClassLog(myLogit, postResTbl$hashtagUsedP))
+	myLog(summary(myLogit))
+	myLog(ClassLog(myLogit, postResTbl$hashtagUsedP))
 	myLogit
 	logregTbl
 }
@@ -2347,6 +2319,7 @@ getHashtagsTblFromSubsetTbl <- function(tokenTbl, config) {
 }
 
 getFullPostResTbl <- function(tokenTbl, config) {
+	myStopifnot(nrow(tokenTbl[, .N, by=list(id, user_screen_name, creation_epoch, dt, user_screen_name_prior)]) == length(tokenTbl[, unique(id)]))
 	postResTbl = tokenTbl[, getPostResTbl(.SD, config, id), by=id]
 	postResTbl
 }
@@ -2398,8 +2371,10 @@ runForTokenTbl <- function(tokenTbl, config, getOutFileForNameFun=identity) {
 		outFile = getOutFileForNameFun('modelHashtagsOutFile')
 		writeModelHashtagsTbl(postResTbl, outFile)
 	}
-	outFile = getOutFileForNameFun('logregOutFile')
-	writeLogregTbl(logregTbl, outFile)
+	if (getConfig(config, 'logregOutFile') != '') {
+		outFile = getOutFileForNameFun('logregOutFile')
+		writeLogregTbl(logregTbl, outFile)
+	}
 	postResTbl
 	list(modelVsPredTbl=modelVsPredTbl, modelHashtagsTbl=postResTbl, hashtagsTbl=hashtagsTbl, logregTbl=logregTbl)
 }

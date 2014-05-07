@@ -81,6 +81,7 @@ context("ModelVsPred Full Runs")
 test_that("testModelVsPred", {
 	  expectedTbl = myReadCSV(getOutFileModelVsPred('testing1'))
 	  expectedHashtagsTbl = myReadCSV(getOutFileHashtags('testing1'))
+	  #resTbl = runPriorT(config=modConfig(defaultTConfig, list(query=sprintf("select %s from tweets where user_screen_name = 'ap'", defaultTCols))))
 	  resTbl = runPriorT(config=modConfig(defaultTSjiPConfig, list(query=sprintf("user_screen_name = 'ap'", defaultTCols))))
 	  expect_equivalent(expectedTbl, resTbl$modelVsPredTbl)
 	  expect_equivalent(expectedHashtagsTbl, resTbl$hashtagsTbl)
