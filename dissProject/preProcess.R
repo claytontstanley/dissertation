@@ -1898,10 +1898,12 @@ getPriorTblUserSubset <- function(config) {
 			    on posts_tbl.id = tokenized_tbl.id
 			    where type = '%s'
 			    and user_screen_name is not null
-			    and %s",
+			    and %s
+			    and tokenized_tbl.id in (select id from %s where %s)",
 			    get(getConfig(config, 'defaultColsPriorUser')),
 			    getConfig(config, "tokenizedTbl"), getConfig(config, "postsTbl"),
-			    getConfig(config, "tagTypeName"), getConfig(config, 'query')
+			    getConfig(config, "tagTypeName"), getConfig(config, 'query'),
+			    getConfig(config, 'postsTbl'), getConfig(config, 'query')
 			    ))
 	addDtToTbl(tbl)
 	if (getConfig(config, 'dsetType') == 'twitter') {
@@ -2174,9 +2176,6 @@ getPostResTbl <- function(tokenTbl, config, id) {
 	postResTbl
 }
 
-defaultColsTokenizedSO = "tokenized_tbl.id::text, user_screen_name, creation_epoch, chunk, pos, type"
-defaultColsTokenizedT = sprintf('%s, %s', defaultColsTokenizedSO, 'posts_tbl.retweeted')
-
 getTokenizedFromSubset <- function(minId, maxId, config) {
 	resTbl = sqldt(sprintf("select %s from %s as tokenized_tbl
 			       join %s as posts_tbl
@@ -2190,6 +2189,9 @@ getTokenizedFromSubset <- function(minId, maxId, config) {
 			       ))
 	resTbl
 }
+
+defaultColsTokenizedSO = "tokenized_tbl.id::text, user_screen_name, creation_epoch, chunk, pos, type"
+defaultColsTokenizedT = sprintf('%s, %s', defaultColsTokenizedSO, 'posts_tbl.retweeted')
 
 getTokenizedForUsers <- function(config) {
 	resTbl = sqldt(sprintf("select %s from %s as tokenized_tbl
