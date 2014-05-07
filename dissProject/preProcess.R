@@ -2765,7 +2765,6 @@ curWS <- function() {
 	setLogLevel(1)
 	runContext20g1s6(regen='useAlreadyLoaded')
 	runGenTokenizedTblTwitterPrior()
-	#FIXME: Get frentropy working
 	#FIXME: Run priors through new code path (profile first, worry about loading workspace for prior and runGenTokenized stuff)
 	#FIXME: < and <= should have been slightly off, yes?
 	#FIXME: Add way to plot test results
