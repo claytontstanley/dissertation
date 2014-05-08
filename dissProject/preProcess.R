@@ -32,7 +32,9 @@ FILE = getNameOfThisFile()
 
 USER = Sys.getenv("USER")
 options(sqldf.RPostgreSQL.user = USER,
-	sqldf.RPostgreSQL.dbname = USER)
+	sqldf.RPostgreSQL.dbname = USER,
+	sqldf.RPostgreSQL.host ="localhost"
+	)
 options("scipen"=100, "digits"=4)
 options(error=traceback)
 options(datatable.alloccol = 900)
