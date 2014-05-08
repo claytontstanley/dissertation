@@ -2356,7 +2356,9 @@ analyzePostResTblAcrossDs <- function(postResTbl, runTbl) {
 	list(postResTbl=postResTbl, logregTbl=logregTbl)
 }
 
-runForTokenTbl <- function(tokenTbl, config, getOutFileForNameFun=identity) {
+
+
+runForTokenTblForUser <- function(tokenTbl, config) {
 	tokenTbl
 	config
 	postResTbl = getFullPostResTbl(tokenTbl, config)
@@ -2374,18 +2376,27 @@ runForTokenTbl <- function(tokenTbl, config, getOutFileForNameFun=identity) {
 	hashtagsTbl
 	modelVsPredTbl = getModelVsPredTbl(postResTbl, hashtagsTbl, config)
 	modelVsPredTbl
+	list(modelVsPredTbl=modelVsPredTbl, modelHashtagsTbl=postResTbl, hashtagsTbl=hashtagsTbl, logregTbl=logregTbl)
+}
+
+runForTokenTbl <- function(tokenTbl, config, getOutFileForNameFun=identity) {
+	user_screen_names = unique(tokenTbl[, user_screen_name])
+	res = lapply(user_screen_names, function(x) runForTokenTblForUser(tokenTbl[user_screen_name==x], config))
+	modelVsPredTbl = rbindlist(lapply(res, `[[`, 'modelVsPredTbl'))
+	modelHashtagsTbl = rbindlist(lapply(res, `[[`, 'modelHashtagsTbl'))
+	hashtagsTbl = rbindlist(lapply(res, `[[`, 'hashtagsTbl'))
+	logregTbl = rbindlist(lapply(res, `[[`, 'logregTbl'))
 	outFile = getOutFileForNameFun("modelVsPredOutFile")
 	writeModelVsPredTbl(modelVsPredTbl, outFile)
 	if (getConfig(config, 'modelHashtagsOutFile') != '') {
 		outFile = getOutFileForNameFun('modelHashtagsOutFile')
-		writeModelHashtagsTbl(postResTbl, outFile)
+		writeModelHashtagsTbl(modelHashtagsTbl, outFile)
 	}
 	if (getConfig(config, 'logregOutFile') != '') {
 		outFile = getOutFileForNameFun('logregOutFile')
 		writeLogregTbl(logregTbl, outFile)
 	}
-	postResTbl
-	list(modelVsPredTbl=modelVsPredTbl, modelHashtagsTbl=postResTbl, hashtagsTbl=hashtagsTbl, logregTbl=logregTbl)
+	list(modelVsPredTbl=modelVsPredTbl, modelHashtagsTbl=modelHashtagsTbl, hashtagsTbl=hashtagsTbl, logregTbl=logregTbl)
 }
 
 runContext <- function(config, samplesPerRun, numRuns) {
