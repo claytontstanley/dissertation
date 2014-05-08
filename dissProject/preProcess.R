@@ -732,7 +732,8 @@ defaultTPermConfig = modConfig(c(defaultTConfig, defaultPermConfig,
 				      permMemMatOrder='permMemMatTOrder',
 				      permMemMatOrderless='permMemMatTOrderless',
 				      computeActFromContextTbl = 'computeActPermTFromContextTbl')),
-			       list(actDVs=c('actPriorStd_actTweetOrder_actTweetOrderless', 'actPriorStd',
+			       list(accumModelHashtagsTbl=T,
+				    actDVs=c('actPriorStd_actTweetOrder_actTweetOrderless', 'actPriorStd',
 					     'actPriorStd_actTweetOrder', 'actPriorStd_actTweetOrderless',
 					     'actTweetOrder', 'actTweetOrderless', 'actTweetOrder_actTweetOrderless',
 					     'actPriorStd_actTweetOrderEntropy_actTweetOrderlessEntropy',
@@ -775,7 +776,8 @@ defaultSOPermConfig = modConfig(c(defaultSOConfig, defaultPermConfig,
 				       permMemMatOrder='',
 				       permMemMatOrderless='permMemMatSOOrderless',
 				       computeActFromContextTbl = 'computeActPermSOFromContextTbl')),
-				list(actDVs=c('actPriorStd_actTitleOrderless_actBodyOrderless', 'actPriorStd',
+				list(accumModelHashtagsTbl=T,
+				     actDVs=c('actPriorStd_actTitleOrderless_actBodyOrderless', 'actPriorStd',
 					      'actTitleOrderless', 'actBodyOrderless', 'actTitleOrderless_actBodyOrderless',
 					      'actPriorStd_actTitleOrderless', 'actPriorStd_actBodyOrderless',
 					      'actPriorStd_actTitleOrderlessEntropy_actBodyOrderlessEntropy',
@@ -796,12 +798,14 @@ defaultSOPermConfig = modConfig(c(defaultSOConfig, defaultPermConfig,
 
 defaultTSjiConfig = modConfig(c(defaultTConfig, defaultSjiConfig,
 				list(runTbl=makeRunTbl(list(c('actPriorStd', 'actTweet'))))),
-			      list(actDVs=c('actPriorStd_actTweet', 'actPriorStd', 'actTweet')))
+			      list(accumModelHashtagsTbl=T,
+				   actDVs=c('actPriorStd_actTweet', 'actPriorStd', 'actTweet')))
 
 defaultSOSjiConfig = modConfig(c(defaultSOConfig, defaultSjiConfig,
 				 list(runTbl=makeRunTbl(list(c('actPriorStd', 'actTitle', 'actBody'),
 							     c('actTitle', 'actBody'))))),
-			       list(actDVs=c('actPriorStd_actTitle_actBody', 'actPriorStd', 'actTitle', 'actBody', 'actTitle_actBody')))
+			      list(accumModelHashtagsTbl=T,
+				   actDVs=c('actPriorStd_actTitle_actBody', 'actPriorStd', 'actTitle', 'actBody', 'actTitle_actBody')))
 
 defaultSOSjiPConfig = modConfig(c(defaultSOConfig, defaultSjiConfig,
 				  list(runTbl=makeRunTbl(list()))),
@@ -2356,8 +2360,6 @@ analyzePostResTblAcrossDs <- function(postResTbl, runTbl) {
 	list(postResTbl=postResTbl, logregTbl=logregTbl)
 }
 
-
-
 runForTokenTblForUser <- function(tokenTbl, config) {
 	tokenTbl
 	config
@@ -2376,6 +2378,9 @@ runForTokenTblForUser <- function(tokenTbl, config) {
 	hashtagsTbl
 	modelVsPredTbl = getModelVsPredTbl(postResTbl, hashtagsTbl, config)
 	modelVsPredTbl
+	if (getConfig(config, "accumModelHashtagsTbl") == F) {
+		postResTbl = data.table()
+	}
 	list(modelVsPredTbl=modelVsPredTbl, modelHashtagsTbl=postResTbl, hashtagsTbl=hashtagsTbl, logregTbl=logregTbl)
 }
 
