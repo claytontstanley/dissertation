@@ -1894,7 +1894,7 @@ getPriorTblGlobT <- function(config, startId, endId) {
 	globPriorTbl
 }
 
-defaultColsPriorUserSO = 'creation_epoch, user_screen_name, chunk as hashtag'
+defaultColsPriorUserSO = 'creation_epoch, user_screen_name, chunk'
 defaultColsPriorUserT = sprintf('%s, %s', defaultColsPriorUserSO, 'posts_tbl.retweeted')
 
 getPriorTblUserSubset <- function(config) {
@@ -1910,6 +1910,8 @@ getPriorTblUserSubset <- function(config) {
 			    getConfig(config, "tagTypeName"), getConfig(config, 'query'),
 			    getConfig(config, 'postsTbl'), getConfig(config, 'query')
 			    ))
+	if (getConfig(config, "convertTagSynonymsP")) convertTagSynonyms(tbl)
+	tbl[, hashtag := chunk][, chunk := NULL]
 	addDtToTbl(tbl)
 	if (getConfig(config, 'dsetType') == 'twitter') {
 		tbl = tbl[retweeted %in% getAllowedRetweetedVals(config)]
@@ -1917,7 +1919,6 @@ getPriorTblUserSubset <- function(config) {
 	setkey(tbl, user_screen_name, dt, hashtag)
 	tbl
 }
-
 
 createStoplistTbl <- function() {
 	sqldf('truncate table stoplists')
@@ -2766,6 +2767,11 @@ curWS <- function() {
 	runTFollow10M()
 	runSO1k()
 	runSOQgt400()
+	resTbl = runPriorSO(config=modConfig(defaultSOSjiPConfig, list(query=sprintf("owner_user_id = 99834", defaultSOCols))))
+	resTbl$modelVsPredTbl[topHashtag & hashtagUsedP]
+	setLogLevel(2)
+	resTbl = runPriorSO(config=modConfig(defaultSOConfig, list(query=sprintf("select %s from posts where post_type_id = 1 and owner_user_id = 99834", defaultSOCols))))
+	hashtagsTbl
 
 	withProf(runContext20g1s1(regen='useAlreadyLoaded'))
 	setLogLevel(1)
