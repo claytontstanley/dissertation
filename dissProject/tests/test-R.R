@@ -83,6 +83,7 @@ test_that("testModelVsPred", {
 	  expectedHashtagsTbl = myReadCSV(getOutFileHashtags('testing1'))
 	  #resTbl = runPriorT(config=modConfig(defaultTConfig, list(query=sprintf("select %s from tweets where user_screen_name = 'ap'", defaultTCols))))
 	  resTbl = runPriorT(config=modConfig(defaultTSjiPConfig, list(query=sprintf("user_screen_name = 'ap'", defaultTCols))))
+	  expect_equivalent(resTbl$modelHashtagsTbl, data.table())
 	  expect_equivalent(expectedTbl, resTbl$modelVsPredTbl)
 	  expect_equivalent(expectedHashtagsTbl, resTbl$hashtagsTbl)
 	  expectedTbl = myReadCSV(getOutFileModelVsPred('testing2'))
@@ -104,6 +105,7 @@ test_that("testModelVsPredSO", {
 	  expectedHashtagsTbl[, id := as.character(id)]
 	  expectedHashtagsTbl[, pos := as.numeric(pos)]
 	  resTbl = runPriorSO(config=modConfig(defaultSOSjiPConfig, list(query=sprintf("owner_user_id = 20", defaultSOCols))))
+	  expect_equivalent(resTbl$modelHashtagsTbl, data.table())
 	  #resTbl$hashtagsTbl[, pos := NULL][, creation_epoch := NULL][, type := NULL][, user_id := as.numeric(user_screen_name)][, user_screen_name_prior := NULL][, id := as.numeric(id)]
 	  #setcolorder(resTbl$hashtagsTbl, colnames(expectedHashtagsTbl))
 	  expect_equivalent(expectedModelVsPredTbl, resTbl$modelVsPredTbl)
