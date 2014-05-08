@@ -2296,6 +2296,7 @@ addWeights <- function(postResTbl) {
 analyzePostResTbl <- function(postResTbl, predictors, bestFitName) {
 	setkey(postResTbl, user_screen_name, dt, hashtag, d)
 	guardAllEqualP(postResTbl[, d])
+	guardAllEqualP(postResTbl[, user_screen_name])
 	myLog(sprintf('Analyzing post result table for d=%s, bestFitName=%s, and predictors=%s',
 		      postResTbl[, d[1]], bestFitName, paste(predictors, collapse=',')))
 	#postResTbl = copy(postResTbl)
@@ -2309,6 +2310,7 @@ analyzePostResTbl <- function(postResTbl, predictors, bestFitName) {
 	logregTbl[, coeff := Estimate][, Estimate := NULL]
 	logregTbl
 	logregTbl[, predName := rownames(coeffs)][, d := postResTbl[, d[1]]]
+	logregTbl[, user_screen_name := postResTbl[, user_screen_name[1]]]
 	summary(myLogit)
 	updateBestFitCol(postResTbl, logregTbl, bestFitName)
 	postResTbl
@@ -2339,7 +2341,7 @@ analyzePostResTblAcrossDs <- function(postResTbl, runTbl) {
 		if (nrow(runTbl) > 0) {
 			logregTbl = runTbl[, analyzePostResTbl(tbl, predName, name), by=name]
 		} else {
-			logregTbl = data.table(name=character(), predName=character(), d=double())
+			logregTbl = data.table(name=character(), predName=character(), d=double(), user_screen_name=character())
 		}
 		logregTbl
 		list(postResTbl=tbl, logregTbl=logregTbl)	
@@ -2751,7 +2753,7 @@ curWS <- function() {
 	runSOQgt400()
 
 	withProf(runContext20g1s1(regen='useAlreadyLoaded'))
-	setLogLevel(2)
+	setLogLevel(1)
 	runContext20g1s6(regen='useAlreadyLoaded')
 	runGenTokenizedTblTwitterPrior()
 	#FIXME: Run priors through new code path (profile first, worry about loading workspace for prior and runGenTokenized stuff)
