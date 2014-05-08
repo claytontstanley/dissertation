@@ -875,7 +875,7 @@ queryRunTFollow5k = function(val) getQueryT(val, filters="user_screen_name != 'g
 queryRunTFollow10k = function(val) getQueryT(val, filters="user_screen_name != 'so_pr'")
 queryRunTFollow100k = function(val) getQueryT(val, filters="user_screen_name != 'hermosa_brisa'")
 queryRunTFollow1M = getQueryT
-queryRunTFollow10M = function(val) getQueryT(val, filters='posts_tbl.id != 12466832063')
+queryRunTFollow10M = function(val) getQueryT(val)
 
 queryRunTTweets1e2 = getQueryTStatuses
 queryRunTTweets5e2 = getQueryTStatuses
