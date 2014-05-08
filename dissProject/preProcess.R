@@ -246,10 +246,17 @@ getHashtagsTbl <- function(tweetsTbl, config) {
 	hashtagsTbl
 }
 
-convertTagSynonyms <- function(tokenizedTbl) {
+convertTagSynonymsForTokenized <- function(tokenTbl, config) {
+	tagTbl = tokenTbl[type == getConfig(config, 'tagTypeName')] 
+	convertTagSynonyms(tagTbl)
+	tokenTbl = rbind(tokenTbl[type != getConfig(config, 'tagTypeName')], tagTbl)
+	tokenTbl
+}
+
+convertTagSynonyms <- function(tagTbl) {
 	myLog('converting tag synomyms for tokenized tbl')
-	withKey(tokenizedTbl, chunk,
-		{tokenizedTbl[getTagSynonymsTbl(), chunk := target_tag_name]
+	withKey(tagTbl, chunk,
+		{tagTbl[getTagSynonymsTbl(), chunk := target_tag_name]
 		})
 }
 
@@ -604,10 +611,7 @@ runPrior <- function(config) {
 		config=modConfig(config, list(dStd=getConfig(config, 'dFull')))
 		config
 		tokenTbl = getTokenizedForUsers(config)
-		tokenTbl
 		tagTbl = tokenTbl[type == getConfig(config, 'tagTypeName')] 
-		tagTbl
-		if (getConfig(config, "convertTagSynonymsP")) convertTagSynonyms(tagTbl)
 		tokenTbl = rbind(tokenTbl[type != getConfig(config, 'tagTypeName')], tagTbl)
 		tokenTbl = tokenTbl[, setkey(.SD, id)][tagTbl[, list(id=unique(id))][, setkey(.SD, id)]]
 		setkey(tokenTbl, user_screen_name, dt)
@@ -2209,6 +2213,9 @@ getTokenizedForUsers <- function(config) {
 			       get(getConfig(config, 'defaultColsTokenized')), getConfig(config, "tokenizedTbl"), getConfig(config, "postsTbl"), getConfig(config, 'query'),
 			       getConfig(config, 'postsTbl'), getConfig(config, 'query')
 			       ))
+	if (getConfig(config, "convertTagSynonymsP")) {
+		resTbl = convertTagSynonymsForTokenized(resTbl, config)
+	}
 	addDtToTbl(resTbl)
 	if (getConfig(config, 'dsetType') == 'twitter') {
 		resTbl = resTbl[retweeted %in% getAllowedRetweetedVals(config)]
