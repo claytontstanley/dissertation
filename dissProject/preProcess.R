@@ -347,6 +347,7 @@ computeActPriorByUser <- function(hashtagsTbl, ds) {
 }
 
 getPriorAtEpoch <- function(priorTbl, cEpoch, d) {
+	myStopifnot(priorTbl[1,dt] == 0)
 	myLog(sprintf('computing prior at epoch %s', cEpoch))
 	curUserPriorTbl = priorTbl[creation_epoch < cEpoch]
 	myLog(sprintf('Using %s prior observations to compute prior', nrow(curUserPriorTbl)))
@@ -1923,10 +1924,10 @@ getPriorTblUserSubset <- function(config) {
 			    ))
 	if (getConfig(config, "convertTagSynonymsP")) convertTagSynonyms(tbl)
 	tbl[, hashtag := chunk][, chunk := NULL]
-	addDtToTbl(tbl)
 	if (getConfig(config, 'dsetType') == 'twitter') {
 		tbl = tbl[retweeted %in% getAllowedRetweetedVals(config)]
 	}
+	addDtToTbl(tbl)
 	setkey(tbl, user_screen_name, dt, hashtag)
 	tbl
 }
@@ -2223,10 +2224,10 @@ getTokenizedForUsers <- function(config) {
 	if (getConfig(config, "convertTagSynonymsP")) {
 		resTbl = convertTagSynonymsForTokenized(resTbl, config)
 	}
-	addDtToTbl(resTbl)
 	if (getConfig(config, 'dsetType') == 'twitter') {
 		resTbl = resTbl[retweeted %in% getAllowedRetweetedVals(config)]
 	}
+	addDtToTbl(resTbl)
 	resTbl[, user_screen_name_prior := user_screen_name]
 	resTbl
 }
@@ -2783,8 +2784,8 @@ curWS <- function() {
 	runTFollow10M()
 	runSO1k()
 	runSOQgt400()
-	resTbl = runPriorT(config=modConfig(defaultTConfig, list(query=sprintf("select %s from tweets where user_screen_name = 'whiteleyslondon'", defaultTCols), accumModelHashtagsTbl=T)))
-	resTbl.new = runPriorT(config=modConfig(defaultTSjiPConfig, list(query=sprintf("user_screen_name = 'whiteleyslondon'", defaultTCols), accumModelHashtagsTbl=T)))
+	resTbl = runPriorT(config=modConfig(defaultTConfig, list(query=sprintf("select %s from tweets where user_screen_name = 'wyntergordon'", defaultTCols), accumModelHashtagsTbl=T, includeRetweetsP=F)))
+	resTbl.new = runPriorT(config=modConfig(defaultTSjiPConfig, list(query=sprintf("user_screen_name = 'wyntergordon'", defaultTCols), accumModelHashtagsTbl=T, includeRetweetsP=F)))
 	setkey(resTbl$hashtagsTbl, dt, hashtag)
 	setkey(resTbl.new$hashtagsTbl, dt, hashtag)
 	setkey(resTbl$modelHashtagsTbl, user_screen_name, dt, d, hashtag)
@@ -2793,9 +2794,19 @@ curWS <- function() {
 	cTbl.new = resTbl.new$modelHashtagsTbl[hashtagUsedP %in% c(T,F)][!is.na(actPriorStd)][topHashtagAcrossPriorStd %in% c(T)][d == .6][order(dt, decreasing=F)]
 	cTbl = resTbl$modelHashtagsTbl[hashtagUsedP %in% c(T,F)][topHashtagAcrossPriorStd %in% c(T)][d == .6][order(dt, decreasing=F)]
 	cTbl = resTbl$modelHashtagsTbl
+	expect_equivalent(
+			  resTbl$modelVsPredTbl[topHashtag & hashtagUsedP & DVName == 'topHashtagPostPriorStd'],
+			  resTbl.new$modelVsPredTbl[topHashtag & hashtagUsedP & DVName == 'topHashtagPostPriorStd']
+			  )
+	expect_equivalent(
+			  resTbl$hashtagsTbl[,dt],
+			  resTbl.new$hashtagsTbl[,dt]
+			  )
+	resTbl$hashtagsTbl
+	resTbl.new$hashtagsTbl
 	cTbl.new = resTbl.new$modelHashtagsTbl[!is.na(actPriorStd)]
-	cTbl.new[d==.6]
-	cTbl[d==.6]
+	cTbl.new[d==.1]
+	cTbl[d==.1]
 	expect_equivalent(cTbl[, list(dt, actPriorStd, hashtag)], cTbl.new[, list(dt, actPriorStd, hashtag)])
 	cTbl[duplicated(cTbl)]
 	cTbl.new[duplicated(cTbl.new)]
