@@ -2340,7 +2340,9 @@ getHashtagsTblFromSubsetTbl <- function(tokenTbl, config) {
 
 getFullPostResTbl <- function(tokenTbl, config) {
 	myStopifnot(nrow(tokenTbl[, .N, by=list(id, user_screen_name, creation_epoch, dt, user_screen_name_prior)]) == length(tokenTbl[, unique(id)]))
-	postResTbl = tokenTbl[, getPostResTbl(.SD, config, id), by=id]
+	tokenTbl
+	# FIXME: After successful prior run, do a by=id and change addMetrics to work by id and not dt (major structural change)
+	postResTbl = tokenTbl[, getPostResTbl(.SD, config, unique(id)), by=dt, .SDcols=colnames(tokenTbl)]
 	postResTbl
 }
 
@@ -2774,6 +2776,30 @@ curWS <- function() {
 	runTFollow10M()
 	runSO1k()
 	runSOQgt400()
+	resTbl = runPriorT(config=modConfig(defaultTConfig, list(query=sprintf("select %s from tweets where user_screen_name = 'whiteleyslondon'", defaultTCols), accumModelHashtagsTbl=T)))
+	resTbl.new = runPriorT(config=modConfig(defaultTSjiPConfig, list(query=sprintf("user_screen_name = 'whiteleyslondon'", defaultTCols), accumModelHashtagsTbl=T)))
+	setkey(resTbl$hashtagsTbl, dt, hashtag)
+	setkey(resTbl.new$hashtagsTbl, dt, hashtag)
+	setkey(resTbl$modelHashtagsTbl, user_screen_name, dt, d, hashtag)
+	setkey(resTbl.new$modelHashtagsTbl, user_screen_name, dt, d, hashtag)
+
+	cTbl.new = resTbl.new$modelHashtagsTbl[hashtagUsedP %in% c(T,F)][!is.na(actPriorStd)][topHashtagAcrossPriorStd %in% c(T)][d == .6][order(dt, decreasing=F)]
+	cTbl = resTbl$modelHashtagsTbl[hashtagUsedP %in% c(T,F)][topHashtagAcrossPriorStd %in% c(T)][d == .6][order(dt, decreasing=F)]
+	cTbl = resTbl$modelHashtagsTbl
+	cTbl.new = resTbl.new$modelHashtagsTbl[!is.na(actPriorStd)]
+	cTbl.new[d==.6]
+	cTbl[d==.6]
+	expect_equivalent(cTbl[, list(dt, actPriorStd, hashtag)], cTbl.new[, list(dt, actPriorStd, hashtag)])
+	cTbl[duplicated(cTbl)]
+	cTbl.new[duplicated(cTbl.new)]
+	cTbl.new[dt == 41452182][d==.6]
+	cTbl[dt == 41452182][d==.6]
+	sqldf("select * from tweets where id = 82379605574557696")
+	cTbl
+	cTbl.new
+	expect_equivalent(cTbl[, actPriorStd], cTbl.new[, actPriorStd])
+	cTbl[!cTbl.new]
+
 	resTbl = runPriorSO(config=modConfig(defaultSOSjiPConfig, list(query=sprintf("owner_user_id = 99834", defaultSOCols))))
 	resTbl$modelVsPredTbl[topHashtag & hashtagUsedP]
 	setLogLevel(2)
