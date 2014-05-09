@@ -119,6 +119,13 @@ withProf <- function(thunk) {
 	thunk
 }
 
+withLogLevel <- function(newLogLevel, thunk) {
+	.curLogLevel = getLogLevel()
+	on.exit(setLogLevel(.curLogLevel))
+	setLogLevel(newLogLevel)
+	thunk
+}
+
 withKey <- function(tbl, conKey, thunk) {
 	.curKey = key(tbl)
 	on.exit(setkeyv(tbl, .curKey))
@@ -605,8 +612,8 @@ runPrior <- function(config) {
 }
 
 runPrior <- function(config) {
-	myStopifnot(!any(sapply(config,is.null)))
 	withProf({
+		myStopifnot(!any(sapply(config,is.null)))
 		priorTblUserSubset <<- getPriorTblUserSubset(config)
 		config=modConfig(config, list(dStd=getConfig(config, 'dFull')))
 		config
@@ -620,7 +627,7 @@ runPrior <- function(config) {
 		}
 		#FIXME: some logic in the following function needs to be moved here
 		#res = genAggModelVsPredTbl(hashtagsTbl, config=config)
-		runForTokenTbl(tokenTbl, config, getOutFileForNameFun)
+		withLogLevel(0, runForTokenTbl(tokenTbl, config, getOutFileForNameFun))
 	})
 }
 
