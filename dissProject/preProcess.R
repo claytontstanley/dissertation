@@ -276,25 +276,6 @@ getTagsTbl <- function(postsTbl, config) {
 	tagsTbl
 }
 
-getTusersTbl <- function() {
-	tusersTbl = sqldt('select * from twitter_users')
-	tusersTbl[, rank := order(followers_count, decreasing=T)]
-	setkey(tusersTbl, id)
-	tusersTbl
-}
-
-getSOusersTbl <- function() {
-	sousersTbl = sqldt('select * from users limit 1000')
-	sousersTbl
-}
-
-getHashtagEntropy <- function(hashtagsTbl) {
-	countTbl = hashtagsTbl[, as.data.table(table(hashtag)) , by=user_id]
-	countTbl[, p := N/sum(N), by=user_id]
-	HTbl = countTbl[, list(N=sum(N), NUnique=.N, H = - sum(p * log(p))), by=user_id]
-	HTbl
-}
-
 computeActPrior <- function(hashtags, dtP, cTime, d) {
 	myStopifnot(length(dtP) == length(hashtags))
 	myStopifnot(length(dtP) == length(cTime))
@@ -314,6 +295,7 @@ computeActPrior <- function(hashtags, dtP, cTime, d) {
 	list(hashtag=hashtagsSubRep, partialAct=dtPSubRep^(-dRep), dt=cTimeSubRep, d=dRep, dtP=dtPSubRep)
 }
 
+# FIXME: This goes away with new prior code path
 computeActPriorForUser <- function(hashtag, dt, ds, user_screen_name) {
 	#myLog(sprintf('computing partial activation for user %s', user_screen_name))
 	retIndeces = which(!duplicated(dt))[-1]
@@ -323,8 +305,6 @@ computeActPriorForUser <- function(hashtag, dt, ds, user_screen_name) {
 	partialRes = with(partialRes, as.data.table(computeActPrior(hashtag, dtP, cTime, d=ds)))
 	partialRes
 }
-
-
 
 getModelHashtagsTbl <- function(partialRes) {
 	debugPrint(partialRes)
@@ -340,6 +320,7 @@ getModelHashtagsTbl <- function(partialRes) {
 	res
 }
 
+# FIXME: This goes away with new prior code path
 computeActPriorByUser <- function(hashtagsTbl, ds) {
 	partialRes = hashtagsTbl[, computeActPriorForUser(hashtag, dt, ds, user_screen_name), by=user_screen_name]
 	modelHashtagsTbl = getModelHashtagsTbl(partialRes)
@@ -423,7 +404,6 @@ topHashtagPostDVFromActDV <- function(actDV) {
 	res = gsub(pattern='^act', replacement='topHashtagPost', x=actDV)
 	res
 }
-
 
 addMetrics <- function(hashtagsTbl, modelHashtagsTbl, config) {
 	actDVs = getConfig(config, 'actDVs')
@@ -512,6 +492,7 @@ writeLogregTbl <- function(logregTbl, outFile) {
 	myWriteCSV(logregTbl, file=outFile)
 }
 
+#FIXME: This goes away with new prior path
 genAggModelVsPredTbl <- function(hashtagsTbl, config) {
 	outFile = getConfig(config, "modelVsPredOutFile")
 	ds = getConfig(config, "dFull")
@@ -599,7 +580,7 @@ getOutFileModelHashtags <- function(name) getOutFileGen(getDirModelHashtags(), n
 
 getLogregOutFile <- function(name) getOutFileGen(getDirLogreg(), name)
 
-
+# FIXME: this goes away with new code prior path
 runPrior <- function(config) {
 	myStopifnot(!any(sapply(config,is.null)))
 	withProf({
@@ -923,7 +904,6 @@ runSOQueries = list(getQuerySO(100000),
 		    getQuerySOQ(050)
 		    )
 
-
 getTUsersFromRunQuery <- function(runQuery) {
 	sqldt(sprintf("select distinct user_screen_name from (%s) as foo", runQuery))[, dataset := 'twitter']
 }
@@ -953,7 +933,6 @@ getSummaryStats <- function() {
 	modelVsPredTbl[hashtagUsedP == T][topHashtag == T][DVName == 'topHashtagAcrossPriorStd'][, sum(totN), by=dsetType]
 	modelVsPredTbl[, .N, by=d]
 }
-
 
 runTFollow1k <- makeTRunr1(1000, 'TFollowgt1k', queryRunTFollow1k)
 runTFollow1kr2 <- makeTRunr2(1000, 'TFollowgt1kr2', queryRunTFollow1k)
@@ -1064,6 +1043,7 @@ addModelType <- function(modelVsPredTbl) {
 	modelVsPredTbl[grepl('ContextSji', datasetName), modelType := 'sji']
 	modelVsPredTbl[grepl('ContextPerm', datasetName), modelType := 'perm']
 }
+
 buildModelHashtagsTables <- function(outFileNames) {
 	buildTable <- function(outFileName) {
 		tbl = myFread(getOutFileModelHashtags(outFileName))
@@ -1373,7 +1353,6 @@ renameColDVName <- function(tbl) {
 	tbl[mapTbl, DVName := newName]
 	tbl
 }
-
 
 plotDVDiffs <- function(sumTbl) {
 	renameDVDirection(sumTbl)
