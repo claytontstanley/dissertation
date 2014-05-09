@@ -2809,7 +2809,6 @@ curWS <- function() {
 
 	resTbl = runPriorSO(config=modConfig(defaultSOSjiPConfig, list(query=sprintf("owner_user_id = 99834", defaultSOCols))))
 	resTbl$modelVsPredTbl[topHashtag & hashtagUsedP]
-	setLogLevel(2)
 	resTbl = runPriorSO(config=modConfig(defaultSOConfig, list(query=sprintf("select %s from posts where post_type_id = 1 and owner_user_id = 99834", defaultSOCols))))
 	hashtagsTbl
 
