@@ -2,7 +2,7 @@
 rFile = preProcess.R
 
 unit:
-	Rscript -e 'source("${rFile}")' -e 'myLoadImage()' -e 'test_dir(sprintf("%s/%s", PATH, "tests"))'
+	Rscript -e 'source("${rFile}")' -e 'myLoadImage(groupConfigG1S6)' -e 'test_dir(sprintf("%s/%s", PATH, "tests"))'
 
 run%:
 	Rscript -e 'source("${rFile}")' -e 'run$*()'
