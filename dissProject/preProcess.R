@@ -2762,7 +2762,7 @@ curWS <- function() {
 	runTFollow10M()
 	runSO1k()
 	runSOQgt400()
-		#FIXME: Run priors through new code path (profile first, worry about loading workspace for prior and runGenTokenized stuff)
+	#FIXME: Run priors through new code path (profile first, worry about loading workspace for prior and runGenTokenized stuff)
 	#FIXME: < and <= should have been slightly off, yes?
 	#FIXME: Add way to plot test results
 	#FIXME: address word order low predictiveness
