@@ -407,9 +407,9 @@ topHashtagPostDVFromActDV <- function(actDV) {
 
 addMetrics <- function(hashtagsTbl, modelHashtagsTbl, config) {
 	actDVs = getConfig(config, 'actDVs')
-	tagCountTbl = hashtagsTbl[, list(tagCountN=.N), by=list(user_screen_name, dt)]
-	tagCountTbl
+	tagCountTbl = hashtagsTbl[, list(tagCountN=.N), keyby=list(user_screen_name, dt, id)]
 	modelHashtagsTbl
+	myStopifnot(key(modelHashtagsTbl)[1:3] == c('user_screen_name', 'dt', 'id'))
 	modelHashtagsTbl[tagCountTbl, tagCount := tagCountN, nomatch=0]
 	modelHashtagsTbl[tagCountTbl[, list(tagCountUserN=sum(tagCountN)), keyby=user_screen_name], tagCountUser := tagCountUserN]
 	myLog('adding metrics for modelHashtagsTbl')
@@ -419,7 +419,7 @@ addMetrics <- function(hashtagsTbl, modelHashtagsTbl, config) {
 		newDVAct = as.symbol(newDVAct)
 		col
 		newDVPost
-		expr = bquote(modelHashtagsTbl[order(.(col), decreasing=T), .(newDVPost) := 1:length(.(col)) <= tagCount[1], by=list(user_screen_name, dt, d)])
+		expr = bquote(modelHashtagsTbl[order(.(col), decreasing=T), .(newDVPost) := 1:length(.(col)) <= tagCount[1], by=list(user_screen_name, dt, id, d)])
 		eval(expr)
 		expr = bquote(modelHashtagsTbl[is.na(.(col)) & .(newDVPost), .(newDVPost) := F])
 		eval(expr)
@@ -433,8 +433,8 @@ addMetrics <- function(hashtagsTbl, modelHashtagsTbl, config) {
 		actDV
 		do.call(addDVCols, as.list(c(actDV, topHashtagDVFromActDV(actDV))))
 	}
-	myStopifnot(key(modelHashtagsTbl) == (c('user_screen_name', 'dt', 'hashtag', 'd')))
-	myStopifnot(key(hashtagsTbl) == (c('user_screen_name', 'dt', 'hashtag')))
+	myStopifnot(key(modelHashtagsTbl) == (c('user_screen_name', 'dt', 'id', 'hashtag', 'd')))
+	myStopifnot(key(hashtagsTbl) == (c('user_screen_name', 'dt', 'id', 'hashtag')))
 	modelHashtagsTbl[, hashtagUsedP := F]
 	key(modelHashtagsTbl)
 	modelHashtagsTbl[hashtagsTbl, hashtagUsedP := T]
@@ -483,7 +483,7 @@ writeModelVsPredTbl <- function(modelVsPredTbl, outFile) {
 }
 
 writeModelHashtagsTbl <- function(modelHashtagsTbl, outFile) {
-	setkey(modelHashtagsTbl, user_screen_name, id, hashtag)
+	setkey(modelHashtagsTbl, user_screen_name, dt, id, hashtag, d)
 	myWriteCSV(modelHashtagsTbl, file=outFile)
 }
 
@@ -2168,6 +2168,7 @@ getPostResTbl <- function(tokenTbl, config, id) {
 	postResTbl = sjiTblWide[priorTbl]
 	postResTbl[, hashtagUsedP := F]
 	postResTbl[tagTbl, hashtagUsedP := T]
+	postResTbl[, id := id]
 	postResTbl
 }
 
@@ -2319,7 +2320,7 @@ analyzePostResTbl <- function(postResTbl, predictors, bestFitName) {
 getHashtagsTblFromSubsetTbl <- function(tokenTbl, config) {
 	hashtagsTbl = tokenTbl[type==getConfig(config, 'tagTypeName')]
 	hashtagsTbl[, hashtag := chunk][, chunk := NULL]
-	setkey(hashtagsTbl, user_screen_name, dt, hashtag)
+	setkey(hashtagsTbl, user_screen_name, dt, id, hashtag)
 	hashtagsTbl
 }
 
@@ -2365,7 +2366,7 @@ runForTokenTblForUser <- function(tokenTbl, config) {
 	resTbl
 	logregTbl = resTbl$logregTbl
 	postResTbl = resTbl$postResTbl
-	setkey(postResTbl, user_screen_name, dt, hashtag, d)
+	setkey(postResTbl, user_screen_name, dt, id, hashtag, d)
 	logregTbl
 	hashtagsTbl = getHashtagsTblFromSubsetTbl(tokenTbl, config)
 	addMetrics(hashtagsTbl, postResTbl, config)
