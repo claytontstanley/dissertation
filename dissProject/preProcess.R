@@ -646,6 +646,7 @@ defaultBaseConfig = list(dFull=c(0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1.0,1.1,1.2,1.3,1.
 			 modelHashtagsOutFile='',
 			 logregOutFile='',
 			 actDVs = c('actPriorStd', 'actPriorOL', 'actPriorOL2'),
+			 permNRowsAll = c(2048, 4000, 10000),
 			 permNRows = 2048,
 			 query=NULL)
 
@@ -716,7 +717,11 @@ defaultTPermConfig = modConfig(c(defaultTConfig, defaultPermConfig,
 							     c('actPriorStd', 'actTweetOrderWindow', 'actTweetOrderlessWindow'),
 							     c('actTweetOrderWindow', 'actTweetOrderlessWindow'),
 							     c('actPriorStd', 'actTweetOrderFrentropy', 'actTweetOrderlessFrentropy'),
-							     c('actTweetOrderFrentropy', 'actTweetOrderlessFrentropy')
+							     c('actTweetOrderFrentropy', 'actTweetOrderlessFrentropy'),
+							     c('actPriorStd', 'actTweetOrderMedDim', 'actTweetOrderlessMedDim'),
+							     c('actTweetOrderMedDim', 'actTweetOrderlessMedDim'),
+							     c('actPriorStd', 'actTweetOrderLgDim', 'actTweetOrderlessLgDim'),
+							     c('actTweetOrderLgDim', 'actTweetOrderlessLgDim')
 							     )),
 				      permEnvTbl='permEnvTblT',
 				      permMemMatOrder='permMemMatTOrder',
@@ -739,7 +744,11 @@ defaultTPermConfig = modConfig(c(defaultTConfig, defaultPermConfig,
 					     'actPriorStd_actTweetOrderWindow_actTweetOrderlessWindow',
 					     'actTweetOrderlessWindow', 'actTweetOrderWindow', 'actTweetOrderWindow_actTweetOrderlessWindow',
 					     'actPriorStd_actTweetOrderFrentropy_actTweetOrderlessFrentropy',
-					     'actTweetOrderlessFrentropy', 'actTweetOrderFrentropy', 'actTweetOrderFrentropy_actTweetOrderlessFrentropy'
+					     'actTweetOrderlessFrentropy', 'actTweetOrderFrentropy', 'actTweetOrderFrentropy_actTweetOrderlessFrentropy',
+					     'actPriorStd_actTweetOrderMedDim_actTweetOrderlessMedDim',
+					     'actTweetOrderlessMedDim', 'actTweetOrderMedDim', 'actTweetOrderMedDim_actTweetOrderlessMedDim',
+					     'actPriorStd_actTweetOrderLgDim_actTweetOrderlessLgDim',
+					     'actTweetOrderlessLgDim', 'actTweetOrderLgDim', 'actTweetOrderLgDim_actTweetOrderlessLgDim'
 					     )))
 
 defaultSOPermConfig = modConfig(c(defaultSOConfig, defaultPermConfig,
@@ -760,7 +769,11 @@ defaultSOPermConfig = modConfig(c(defaultSOConfig, defaultPermConfig,
 							      c('actPriorStd', 'actTitleOrderlessWindow', 'actBodyOrderlessWindow'),
 							      c('actTitleOrderlessWindow', 'actBodyOrderlessWindow'),
 							      c('actPriorStd', 'actTitleOrderlessFrentropy', 'actBodyOrderlessFrentropy'),
-							      c('actTitleOrderlessFrentropy', 'actBodyOrderlessFrentropy')
+							      c('actTitleOrderlessFrentropy', 'actBodyOrderlessFrentropy'),
+							      c('actPriorStd', 'actTitleOrderlessMedDim', 'actBodyOrderlessMedDim'),
+							      c('actTitleOrderlessMedDim', 'actBodyOrderlessMedDim'),
+							      c('actPriorStd', 'actTitleOrderlessLgDim', 'actBodyOrderlessLgDim'),
+							      c('actTitleOrderlessLgDim', 'actBodyOrderlessLgDim')
 							      )),
 				       permEnvTbl='permEnvTblSO',
 				       permMemMatOrder='',
@@ -783,7 +796,11 @@ defaultSOPermConfig = modConfig(c(defaultSOConfig, defaultPermConfig,
 					      'actPriorStd_actTitleOrderlessWindow_actBodyOrderlessWindow',
 					      'actTitleOrderlessWindow', 'actBodyOrderlessWindow', 'actTitleOrderlessWindow_actBodyOrderlessWindow',
 					      'actPriorStd_actTitleOrderlessFrentropy_actBodyOrderlessFrentropy',
-					      'actTitleOrderlessFrentropy', 'actBodyOrderlessFrentropy', 'actTitleOrderlessFrentropy_actBodyOrderlessFrentropy'
+					      'actTitleOrderlessFrentropy', 'actBodyOrderlessFrentropy', 'actTitleOrderlessFrentropy_actBodyOrderlessFrentropy',
+					      'actPriorStd_actTitleOrderlessMedDim_actBodyOrderlessMedDim',
+					      'actTitleOrderlessMedDim', 'actBodyOrderlessMedDim', 'actTitleOrderlessMedDim_actBodyOrderlessMedDim',
+					      'actPriorStd_actTitleOrderlessLgDim_actBodyOrderlessLgDim',
+					      'actTitleOrderlessLgDim', 'actBodyOrderlessLgDim', 'actTitleOrderlessLgDim_actBodyOrderlessLgDim'
 					      )))
 
 defaultTSjiConfig = modConfig(c(defaultTConfig, defaultSjiConfig,
@@ -1969,13 +1986,15 @@ myLoadImage <- function(groupConfig) {
 	     envir=globalenv())
 }
 
-getFunConfigMods <- function(permUseEntropyP=F, permUseStoplistP=F, permOnlyDirectionP=F, permHymanP=F, permUseFreqP=F, permUseWindowP=F) {
+getFunConfigMods <- function(permUseEntropyP=F, permUseStoplistP=F, permOnlyDirectionP=F, permHymanP=F,
+			     permUseFreqP=F, permUseWindowP=F, permNRows=getConfig(defaultBaseConfig, 'permNRows')) {
 	list(permUseEntropyP=permUseEntropyP,
 	     permUseStoplistP=permUseStoplistP,
 	     permOnlyDirectionP=permOnlyDirectionP,
 	     permHymanP=permHymanP,
 	     permUseFreqP=permUseFreqP,
-	     permUseWindowP=permUseWindowP)
+	     permUseWindowP=permUseWindowP,
+	     permNRows=permNRows)
 }
 
 funConfigOrig <- function(config) modConfig(config, getFunConfigMods())
@@ -1986,6 +2005,8 @@ funConfigDirection <- function(config) modConfig(config, getFunConfigMods(permUs
 funConfigHyman <- function(config) modConfig(config, getFunConfigMods(permUseEntropyP=T, permHymanP=T))
 funConfigWindow <- function(config) modConfig(config, getFunConfigMods(permUseEntropyP=T, permUseWindowP=T))
 funConfigFrentropy <- function(config) modConfig(config, getFunConfigMods(permUseEntropyP=T, permUseFreqP=T))
+funConfigMedDim <- function(config) modConfig(config, getFunConfigMods(permUseEntropyP=T, permNRows=4000))
+funConfigLgDim <- function(config) modConfig(config, getFunConfigMods(permUseEntropyP=T, permNRows=10000))
 
 makeCombinedMemMat <- function(sjiTbl, envTbl, config) {
 	res = list()
@@ -1996,6 +2017,17 @@ makeCombinedMemMat <- function(sjiTbl, envTbl, config) {
 	res[['window']] = makeMemMat(sjiTbl, envTbl, funConfigWindow(config))
 	res[['orig']] = makeMemMat(sjiTbl, envTbl, funConfigOrig(config))
 	res[['frentropy']] = makeMemMat(sjiTbl, envTbl, funConfigFrentropy(config))
+	res[['meddim']] = makeMemMat(sjiTbl, envTbl, funConfigMedDim(config))
+	res[['lgdim']] = makeMemMat(sjiTbl, envTbl, funConfigLgDim(config))
+	res
+}
+
+makeCombinedEnvironmentTbl <- function(sjiTbl, config) {
+	res = list()
+	accs = as.character(getConfig(config, 'permNRowsAll'))
+	for (acc in accs) {
+		res[[acc]] = makeEnvironmentTbl(sjiTbl, modConfig(config, list(permNRows=as.integer(acc))))
+	}
 	res
 }
 
@@ -2035,8 +2067,8 @@ getCurWorkspace <- function(groupConfig) {
 	sjiTblTOrderless <<- getSjiTblTOrderless(configT, 1, maxIdTSji)
 	sjiTblTOrder <<- getSjiTblTOrder(configT, 1, maxIdTSji)
 	sjiTblSOOrderless <<- getSjiTblSO(defaultSOConfig, 1, maxIdSOSji)
-	permEnvTblT <<- makeEnvironmentTbl(sjiTblTOrderless, defaultBaseConfig)
-	permEnvTblSO <<- makeEnvironmentTbl(sjiTblSOOrderless, defaultBaseConfig)
+	permEnvTblT <<- makeCombinedEnvironmentTbl(sjiTblTOrderless, defaultBaseConfig)
+	permEnvTblSO <<- makeCombinedEnvironmentTbl(sjiTblSOOrderless, defaultBaseConfig)
 	permMemMatTOrder <<- makeCombinedMemMat(sjiTblTOrder, permEnvTblT, configTPerm)
 	permMemMatTOrderless <<- makeCombinedMemMat(sjiTblTOrderless, permEnvTblT, configTPerm)
 	permMemMatSOOrderless <<- makeCombinedMemMat(sjiTblSOOrderless, permEnvTblSO, defaultSOPermConfig)
@@ -2076,7 +2108,11 @@ computeActPermTFromContextTbl <- function(contextTbl, tagTbl, config) {
 			   copy(cTblOrder)[,type:=paste0('act', capitalize(type),'OrderWindow')][,fun:='computeActPermOrder'][,funConfig:='funConfigWindow'],
 			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessWindow')][,fun:='computeActPermOrderless'][,funConfig:='funConfigWindow'],
 			   copy(cTblOrder)[,type:=paste0('act', capitalize(type),'OrderFrentropy')][,fun:='computeActPermOrder'][,funConfig:='funConfigFrentropy'],
-			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessFrentropy')][,fun:='computeActPermOrderless'][,funConfig:='funConfigFrentropy']
+			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessFrentropy')][,fun:='computeActPermOrderless'][,funConfig:='funConfigFrentropy'],
+			   copy(cTblOrder)[,type:=paste0('act', capitalize(type),'OrderMedDim')][,fun:='computeActPermOrder'][,funConfig:='funConfigMedDim'],
+			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessMedDim')][,fun:='computeActPermOrderless'][,funConfig:='funConfigMedDim'],
+			   copy(cTblOrder)[,type:=paste0('act', capitalize(type),'OrderLgDim')][,fun:='computeActPermOrder'][,funConfig:='funConfigLgDim'],
+			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessLgDim')][,fun:='computeActPermOrderless'][,funConfig:='funConfigLgDim']
 			   )
 	contextTbl
 	contextTbl[, get(fun[1])(chunk, posFromTag, get(funConfig)(config)), by=type]
@@ -2092,7 +2128,9 @@ computeActPermSOFromContextTbl <- function(contextTbl, tagTbl, config) {
 			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessHyman')][,fun:='computeActPermOrderless'][,funConfig:='funConfigHyman'],
 			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessFreq')][,fun:='computeActPermOrderless'][,funConfig:='funConfigFreq'],
 			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessWindow')][,fun:='computeActPermOrderless'][,funConfig:='funConfigWindow'],
-			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessFrentropy')][,fun:='computeActPermOrderless'][,funConfig:='funConfigFrentropy']
+			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessFrentropy')][,fun:='computeActPermOrderless'][,funConfig:='funConfigFrentropy'],
+			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessMedDim')][,fun:='computeActPermOrderless'][,funConfig:='funConfigMedDim'],
+			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessLgDim')][,fun:='computeActPermOrderless'][,funConfig:='funConfigLgDim']
 			   )
 	contextTbl[, get(fun[1])(chunk, posFromTag, get(funConfig)(config)), by=type]
 }
@@ -2603,7 +2641,7 @@ addEnvironmentTblAttrs <- function(permEnvTbl, sjiTbl) {
 }
 
 makeMemMat <- function(sjiTbl, permEnvTbl, config) {
-	permEnvTbl
+	permEnvTbl = getEnvTblFromList(permEnvTbl, config)
 	agg <- function(curValIndID) {
 		myLog(sprintf('Generating memory matrix for all vals in env table with valIndID=%s', curValIndID))
 		makeMemMatInner(sjiTbl, permEnvTbl[valIndID == curValIndID], config)
@@ -2690,21 +2728,26 @@ getMemMatFromList <- function(lst, config) {
 	permOnlyDirectionP = getConfig(config, 'permOnlyDirectionP')
 	permUseFreqP = getConfig(config, 'permUseFreqP')
 	permUseWindowP = getConfig(config, 'permUseWindowP')
+	permNRows = getConfig(config, 'permNRows')
 	acc = {
-		if (permUseEntropyP & !permOnlyDirectionP & !permUseFreqP & !permUseStoplistP & !permUseWindowP) {
+		if (permUseEntropyP & !permOnlyDirectionP & !permUseFreqP & !permUseStoplistP & !permUseWindowP & permNRows == 2048) {
 			'entropy'
-		} else if (!permUseEntropyP & !permOnlyDirectionP & !permUseFreqP & permUseStoplistP & !permUseWindowP) {
+		} else if (!permUseEntropyP & !permOnlyDirectionP & !permUseFreqP & permUseStoplistP & !permUseWindowP & permNRows == 2048) {
 			'stoplist'
-		} else if (permUseEntropyP & permOnlyDirectionP & !permUseFreqP & !permUseStoplistP & !permUseWindowP) { 
+		} else if (permUseEntropyP & permOnlyDirectionP & !permUseFreqP & !permUseStoplistP & !permUseWindowP & permNRows == 2048) { 
 			'direction'
-		} else if (!permUseEntropyP & !permOnlyDirectionP & permUseFreqP & !permUseStoplistP & !permUseWindowP) {
+		} else if (!permUseEntropyP & !permOnlyDirectionP & permUseFreqP & !permUseStoplistP & !permUseWindowP & permNRows == 2048) {
 			'freq'
-		} else if (permUseEntropyP & !permOnlyDirectionP & !permUseFreqP & !permUseStoplistP & permUseWindowP) {
+		} else if (permUseEntropyP & !permOnlyDirectionP & !permUseFreqP & !permUseStoplistP & permUseWindowP & permNRows == 2048) {
 			'window'
-		} else if (permUseEntropyP & !permOnlyDirectionP & permUseFreqP & !permUseStoplistP & !permUseWindowP) {
+		} else if (permUseEntropyP & !permOnlyDirectionP & permUseFreqP & !permUseStoplistP & !permUseWindowP & permNRows == 2048) {
 			'frentropy'
+		} else if (permUseEntropyP & !permOnlyDirectionP & !permUseFreqP & !permUseStoplistP & !permUseWindowP & permNRows == 4000) {
+			'meddim'
+		} else if (permUseEntropyP & !permOnlyDirectionP & !permUseFreqP & !permUseStoplistP & !permUseWindowP & permNRows == 10000) {
+			'lgdim'
 		} else {
-			myStopifnot(!permUseEntropyP & !permOnlyDirectionP & !permUseFreqP & !permUseStoplistP & !permUseWindowP)
+			myStopifnot(!permUseEntropyP & !permOnlyDirectionP & !permUseFreqP & !permUseStoplistP & !permUseWindowP & permNRows == 2048)
 			'orig'
 		}
 	}
@@ -2712,16 +2755,22 @@ getMemMatFromList <- function(lst, config) {
 	lst[[acc]]
 }
 
+getEnvTblFromList <- function(lst, config) {
+	acc = as.character(getConfig(config, 'permNRows'))
+	myStopifnot(acc %in% names(lst))
+	lst[[acc]]
+}
+
 computeActPermOrder <- function(context, pos, config) {
 	# Cannot get from global environment or test 'testComputePermAct' will fail
-	envTbl = get(getConfig(config, 'permEnvTbl'), envir=parent.frame())
+	envTbl = getEnvTblFromList(get(getConfig(config, 'permEnvTbl'), envir=parent.frame()), config)
 	memMat = getMemMatFromList(get(getConfig(config, 'permMemMatOrder'), envir=parent.frame()), config)
 	computeActPerm(context, pos, permEnvTbl = envTbl, permMemMat = memMat, config)
 }
 
 computeActPermOrderless <- function(context, pos, config) {
 	myLog('computing activation for orderless')
-	envTbl = get(getConfig(config, 'permEnvTbl'), envir=parent.frame())
+	envTbl = getEnvTblFromList(get(getConfig(config, 'permEnvTbl'), envir=parent.frame()), config)
 	memMat = getMemMatFromList(get(getConfig(config, 'permMemMatOrderless'), envir=parent.frame()), config)
 	computeActPerm(context, pos, permEnvTbl = envTbl, permMemMat = memMat, config)
 }
