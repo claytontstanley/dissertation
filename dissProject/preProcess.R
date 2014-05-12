@@ -2763,10 +2763,6 @@ curWS <- function() {
 	runSOQgt400()
 	resTbl = runPriorT(config=modConfig(defaultTConfig, list(query=sprintf("select %s from tweets where user_screen_name = 'wyntergordon'", defaultTCols), accumModelHashtagsTbl=T, includeRetweetsP=F)))
 	resTbl.new = runPriorT(config=modConfig(defaultTSjiPConfig, list(query=sprintf("user_screen_name = 'wyntergordon'", defaultTCols), accumModelHashtagsTbl=T, includeRetweetsP=F)))
-	setkey(resTbl$hashtagsTbl, dt, hashtag)
-	setkey(resTbl.new$hashtagsTbl, dt, hashtag)
-	setkey(resTbl$modelHashtagsTbl, user_screen_name, dt, d, hashtag)
-	setkey(resTbl.new$modelHashtagsTbl, user_screen_name, dt, d, hashtag)
 
 	cTbl.new = resTbl.new$modelHashtagsTbl[hashtagUsedP %in% c(T,F)][!is.na(actPriorStd)][topHashtagAcrossPriorStd %in% c(T)][d == .6][order(dt, decreasing=F)]
 	cTbl = resTbl$modelHashtagsTbl[hashtagUsedP %in% c(T,F)][topHashtagAcrossPriorStd %in% c(T)][d == .6][order(dt, decreasing=F)]
