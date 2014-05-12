@@ -2762,6 +2762,31 @@ curWS <- function() {
 	runTFollow10M()
 	runSO1k()
 	runSOQgt400()
+		#FIXME: Run priors through new code path (profile first, worry about loading workspace for prior and runGenTokenized stuff)
+	#FIXME: < and <= should have been slightly off, yes?
+	#FIXME: Add way to plot test results
+	#FIXME: address word order low predictiveness
+	#FIXME: proper combination of prior and context for RP
+	#FIXME: add word order to Bayesian sji
+	#FIXME: Methods to import and anlyze coefficient tables
+	#FIXME: Quickly rerun logreg analysis for actDV
+	#FIXME: Do something with the 2 different ds
+	#FIXME: Rename Hyman to LogOdds
+	withProf(runContext20g1s1(regen='useAlreadyLoaded'))
+	setLogLevel(1)
+	runContext20g1s6(regen='useAlreadyLoaded')
+	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelVsPred()))))
+	modelHashtagsTbls = buildModelHashtagsTables(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelHashtags()))))
+	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isPriorRun, list.files(path=getDirModelVsPred()))))
+	modelVsPredTbl
+	sjiTblTOrderless
+	sessionInfo()
+	mySaveImage(groupConfigG1S1)
+	mySaveImage(groupConfigG1S6)
+	withProf(myLoadImage(groupConfigG1S1))
+	withProf(myLoadImage(groupConfigG1S6))
+	test_dir(sprintf("%s/%s", PATH, 'tests'), reporter='summary')
+	.ls.objects(order.by='Size')
 	resTbl = runPriorT(config=modConfig(defaultTConfig, list(query=sprintf("select %s from tweets where user_screen_name = 'wyntergordon'", defaultTCols), accumModelHashtagsTbl=T, includeRetweetsP=F)))
 	resTbl.new = runPriorT(config=modConfig(defaultTSjiPConfig, list(query=sprintf("user_screen_name = 'wyntergordon'", defaultTCols), accumModelHashtagsTbl=T, includeRetweetsP=F)))
 
@@ -2791,39 +2816,11 @@ curWS <- function() {
 	cTbl.new
 	expect_equivalent(cTbl[, actPriorStd], cTbl.new[, actPriorStd])
 	cTbl[!cTbl.new]
-
 	resTbl = runPriorSO(config=modConfig(defaultSOSjiPConfig, list(query=sprintf("owner_user_id = 99834", defaultSOCols))))
 	resTbl$modelVsPredTbl[topHashtag & hashtagUsedP]
 	resTbl = runPriorSO(config=modConfig(defaultSOConfig, list(query=sprintf("select %s from posts where post_type_id = 1 and owner_user_id = 99834", defaultSOCols))))
 	hashtagsTbl
-
-	withProf(runContext20g1s1(regen='useAlreadyLoaded'))
-	setLogLevel(1)
-	runContext20g1s6(regen='useAlreadyLoaded')
 	runGenTokenizedTblTwitterPrior()
-	#FIXME: Run priors through new code path (profile first, worry about loading workspace for prior and runGenTokenized stuff)
-	#FIXME: < and <= should have been slightly off, yes?
-	#FIXME: Add way to plot test results
-	#FIXME: address word order low predictiveness
-	#FIXME: proper combination of prior and context for RP
-	#FIXME: add word order to Bayesian sji
-	#FIXME: Methods to import and anlyze coefficient tables
-	#FIXME: Quickly rerun logreg analysis for actDV
-	#FIXME: Do something with the 2 different ds
-	#FIXME: Rename Hyman to LogOdds
-
-	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelVsPred()))))
-	modelHashtagsTbls = buildModelHashtagsTables(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelHashtags()))))
-	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isPriorRun, list.files(path=getDirModelVsPred()))))
-	modelVsPredTbl
-	sjiTblTOrderless
-	sessionInfo()
-	mySaveImage(groupConfigG1S1)
-	mySaveImage(groupConfigG1S6)
-	withProf(myLoadImage(groupConfigG1S1))
-	withProf(myLoadImage(groupConfigG1S6))
-	test_dir(sprintf("%s/%s", PATH, 'tests'), reporter='summary')
-	.ls.objects(order.by='Size')
 	# Checking that tweets for twitter users from each followers_count,statuses_count scale are being collected properly
 	usersWithTweetsTbl = sqldt("select distinct on (t.user_screen_name) t.user_screen_name,u.followers_count,u.statuses_count
 				   from tweets as t join twitter_users as u on t.user_screen_name = u.user_screen_name"
