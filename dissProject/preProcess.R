@@ -718,10 +718,10 @@ defaultTPermConfig = modConfig(c(defaultTConfig, defaultPermConfig,
 							     c('actTweetOrderWindow', 'actTweetOrderlessWindow'),
 							     c('actPriorStd', 'actTweetOrderFrentropy', 'actTweetOrderlessFrentropy'),
 							     c('actTweetOrderFrentropy', 'actTweetOrderlessFrentropy'),
-							     c('actPriorStd', 'actTweetOrderMedDim', 'actTweetOrderlessMedDim'),
-							     c('actTweetOrderMedDim', 'actTweetOrderlessMedDim'),
-							     c('actPriorStd', 'actTweetOrderLgDim', 'actTweetOrderlessLgDim'),
-							     c('actTweetOrderLgDim', 'actTweetOrderlessLgDim')
+							     c('actPriorStd', 'actTweetOrderMeddim', 'actTweetOrderlessMeddim'),
+							     c('actTweetOrderMeddim', 'actTweetOrderlessMeddim'),
+							     c('actPriorStd', 'actTweetOrderLgdim', 'actTweetOrderlessLgdim'),
+							     c('actTweetOrderLgdim', 'actTweetOrderlessLgdim')
 							     )),
 				      permEnvTbl='permEnvTblT',
 				      permMemMatOrder='permMemMatTOrder',
@@ -745,10 +745,10 @@ defaultTPermConfig = modConfig(c(defaultTConfig, defaultPermConfig,
 					     'actTweetOrderlessWindow', 'actTweetOrderWindow', 'actTweetOrderWindow_actTweetOrderlessWindow',
 					     'actPriorStd_actTweetOrderFrentropy_actTweetOrderlessFrentropy',
 					     'actTweetOrderlessFrentropy', 'actTweetOrderFrentropy', 'actTweetOrderFrentropy_actTweetOrderlessFrentropy',
-					     'actPriorStd_actTweetOrderMedDim_actTweetOrderlessMedDim',
-					     'actTweetOrderlessMedDim', 'actTweetOrderMedDim', 'actTweetOrderMedDim_actTweetOrderlessMedDim',
-					     'actPriorStd_actTweetOrderLgDim_actTweetOrderlessLgDim',
-					     'actTweetOrderlessLgDim', 'actTweetOrderLgDim', 'actTweetOrderLgDim_actTweetOrderlessLgDim'
+					     'actPriorStd_actTweetOrderMeddim_actTweetOrderlessMeddim',
+					     'actTweetOrderlessMeddim', 'actTweetOrderMeddim', 'actTweetOrderMeddim_actTweetOrderlessMeddim',
+					     'actPriorStd_actTweetOrderLgdim_actTweetOrderlessLgdim',
+					     'actTweetOrderlessLgdim', 'actTweetOrderLgdim', 'actTweetOrderLgdim_actTweetOrderlessLgdim'
 					     )))
 
 defaultSOPermConfig = modConfig(c(defaultSOConfig, defaultPermConfig,
@@ -770,10 +770,10 @@ defaultSOPermConfig = modConfig(c(defaultSOConfig, defaultPermConfig,
 							      c('actTitleOrderlessWindow', 'actBodyOrderlessWindow'),
 							      c('actPriorStd', 'actTitleOrderlessFrentropy', 'actBodyOrderlessFrentropy'),
 							      c('actTitleOrderlessFrentropy', 'actBodyOrderlessFrentropy'),
-							      c('actPriorStd', 'actTitleOrderlessMedDim', 'actBodyOrderlessMedDim'),
-							      c('actTitleOrderlessMedDim', 'actBodyOrderlessMedDim'),
-							      c('actPriorStd', 'actTitleOrderlessLgDim', 'actBodyOrderlessLgDim'),
-							      c('actTitleOrderlessLgDim', 'actBodyOrderlessLgDim')
+							      c('actPriorStd', 'actTitleOrderlessMeddim', 'actBodyOrderlessMeddim'),
+							      c('actTitleOrderlessMeddim', 'actBodyOrderlessMeddim'),
+							      c('actPriorStd', 'actTitleOrderlessLgdim', 'actBodyOrderlessLgdim'),
+							      c('actTitleOrderlessLgdim', 'actBodyOrderlessLgdim')
 							      )),
 				       permEnvTbl='permEnvTblSO',
 				       permMemMatOrder='',
@@ -797,10 +797,10 @@ defaultSOPermConfig = modConfig(c(defaultSOConfig, defaultPermConfig,
 					      'actTitleOrderlessWindow', 'actBodyOrderlessWindow', 'actTitleOrderlessWindow_actBodyOrderlessWindow',
 					      'actPriorStd_actTitleOrderlessFrentropy_actBodyOrderlessFrentropy',
 					      'actTitleOrderlessFrentropy', 'actBodyOrderlessFrentropy', 'actTitleOrderlessFrentropy_actBodyOrderlessFrentropy',
-					      'actPriorStd_actTitleOrderlessMedDim_actBodyOrderlessMedDim',
-					      'actTitleOrderlessMedDim', 'actBodyOrderlessMedDim', 'actTitleOrderlessMedDim_actBodyOrderlessMedDim',
-					      'actPriorStd_actTitleOrderlessLgDim_actBodyOrderlessLgDim',
-					      'actTitleOrderlessLgDim', 'actBodyOrderlessLgDim', 'actTitleOrderlessLgDim_actBodyOrderlessLgDim'
+					      'actPriorStd_actTitleOrderlessMeddim_actBodyOrderlessMeddim',
+					      'actTitleOrderlessMeddim', 'actBodyOrderlessMeddim', 'actTitleOrderlessMeddim_actBodyOrderlessMeddim',
+					      'actPriorStd_actTitleOrderlessLgdim_actBodyOrderlessLgdim',
+					      'actTitleOrderlessLgdim', 'actBodyOrderlessLgdim', 'actTitleOrderlessLgdim_actBodyOrderlessLgdim'
 					      )))
 
 defaultTSjiConfig = modConfig(c(defaultTConfig, defaultSjiConfig,
@@ -2005,8 +2005,8 @@ funConfigDirection <- function(config) modConfig(config, getFunConfigMods(permUs
 funConfigHyman <- function(config) modConfig(config, getFunConfigMods(permUseEntropyP=T, permHymanP=T))
 funConfigWindow <- function(config) modConfig(config, getFunConfigMods(permUseEntropyP=T, permUseWindowP=T))
 funConfigFrentropy <- function(config) modConfig(config, getFunConfigMods(permUseEntropyP=T, permUseFreqP=T))
-funConfigMedDim <- function(config) modConfig(config, getFunConfigMods(permUseEntropyP=T, permNRows=4000))
-funConfigLgDim <- function(config) modConfig(config, getFunConfigMods(permUseEntropyP=T, permNRows=10000))
+funConfigMeddim <- function(config) modConfig(config, getFunConfigMods(permUseEntropyP=T, permNRows=4000))
+funConfigLgdim <- function(config) modConfig(config, getFunConfigMods(permUseEntropyP=T, permNRows=10000))
 
 makeCombinedMemMat <- function(sjiTbl, envTbl, config) {
 	res = list()
@@ -2017,8 +2017,8 @@ makeCombinedMemMat <- function(sjiTbl, envTbl, config) {
 	res[['window']] = makeMemMat(sjiTbl, envTbl, funConfigWindow(config))
 	res[['orig']] = makeMemMat(sjiTbl, envTbl, funConfigOrig(config))
 	res[['frentropy']] = makeMemMat(sjiTbl, envTbl, funConfigFrentropy(config))
-	res[['meddim']] = makeMemMat(sjiTbl, envTbl, funConfigMedDim(config))
-	res[['lgdim']] = makeMemMat(sjiTbl, envTbl, funConfigLgDim(config))
+	res[['meddim']] = makeMemMat(sjiTbl, envTbl, funConfigMeddim(config))
+	res[['lgdim']] = makeMemMat(sjiTbl, envTbl, funConfigLgdim(config))
 	res
 }
 
@@ -2109,10 +2109,10 @@ computeActPermTFromContextTbl <- function(contextTbl, tagTbl, config) {
 			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessWindow')][,fun:='computeActPermOrderless'][,funConfig:='funConfigWindow'],
 			   copy(cTblOrder)[,type:=paste0('act', capitalize(type),'OrderFrentropy')][,fun:='computeActPermOrder'][,funConfig:='funConfigFrentropy'],
 			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessFrentropy')][,fun:='computeActPermOrderless'][,funConfig:='funConfigFrentropy'],
-			   copy(cTblOrder)[,type:=paste0('act', capitalize(type),'OrderMedDim')][,fun:='computeActPermOrder'][,funConfig:='funConfigMedDim'],
-			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessMedDim')][,fun:='computeActPermOrderless'][,funConfig:='funConfigMedDim'],
-			   copy(cTblOrder)[,type:=paste0('act', capitalize(type),'OrderLgDim')][,fun:='computeActPermOrder'][,funConfig:='funConfigLgDim'],
-			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessLgDim')][,fun:='computeActPermOrderless'][,funConfig:='funConfigLgDim']
+			   copy(cTblOrder)[,type:=paste0('act', capitalize(type),'OrderMeddim')][,fun:='computeActPermOrder'][,funConfig:='funConfigMeddim'],
+			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessMeddim')][,fun:='computeActPermOrderless'][,funConfig:='funConfigMeddim'],
+			   copy(cTblOrder)[,type:=paste0('act', capitalize(type),'OrderLgdim')][,fun:='computeActPermOrder'][,funConfig:='funConfigLgdim'],
+			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessLgdim')][,fun:='computeActPermOrderless'][,funConfig:='funConfigLgdim']
 			   )
 	contextTbl
 	contextTbl[, get(fun[1])(chunk, posFromTag, get(funConfig)(config)), by=type]
@@ -2129,8 +2129,8 @@ computeActPermSOFromContextTbl <- function(contextTbl, tagTbl, config) {
 			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessFreq')][,fun:='computeActPermOrderless'][,funConfig:='funConfigFreq'],
 			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessWindow')][,fun:='computeActPermOrderless'][,funConfig:='funConfigWindow'],
 			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessFrentropy')][,fun:='computeActPermOrderless'][,funConfig:='funConfigFrentropy'],
-			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessMedDim')][,fun:='computeActPermOrderless'][,funConfig:='funConfigMedDim'],
-			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessLgDim')][,fun:='computeActPermOrderless'][,funConfig:='funConfigLgDim']
+			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessMeddim')][,fun:='computeActPermOrderless'][,funConfig:='funConfigMeddim'],
+			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessLgdim')][,fun:='computeActPermOrderless'][,funConfig:='funConfigLgdim']
 			   )
 	contextTbl[, get(fun[1])(chunk, posFromTag, get(funConfig)(config)), by=type]
 }
