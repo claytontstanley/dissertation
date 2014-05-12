@@ -483,7 +483,7 @@ writeModelVsPredTbl <- function(modelVsPredTbl, outFile) {
 }
 
 writeModelHashtagsTbl <- function(modelHashtagsTbl, outFile) {
-	setkey(modelHashtagsTbl, user_screen_name, dt, id, hashtag, d)
+	setkey(modelHashtagsTbl, user_screen_name, id, hashtag, d)
 	myWriteCSV(modelHashtagsTbl, file=outFile)
 }
 
@@ -2168,7 +2168,6 @@ getPostResTbl <- function(tokenTbl, config, id) {
 	postResTbl = sjiTblWide[priorTbl]
 	postResTbl[, hashtagUsedP := F]
 	postResTbl[tagTbl, hashtagUsedP := T]
-	postResTbl[, id := id]
 	postResTbl
 }
 
@@ -2327,8 +2326,7 @@ getHashtagsTblFromSubsetTbl <- function(tokenTbl, config) {
 getFullPostResTbl <- function(tokenTbl, config) {
 	myStopifnot(nrow(tokenTbl[, .N, by=list(id, user_screen_name, creation_epoch, dt, user_screen_name_prior)]) == length(tokenTbl[, unique(id)]))
 	tokenTbl
-	# FIXME: After successful prior run, do a by=id and change addMetrics to work by id and not dt (major structural change)
-	postResTbl = tokenTbl[, getPostResTbl(.SD, config, unique(id)), by=dt, .SDcols=colnames(tokenTbl)]
+	postResTbl = tokenTbl[, getPostResTbl(.SD, config, id[1]), by=id, .SDcols=colnames(tokenTbl)]
 	postResTbl
 }
 
