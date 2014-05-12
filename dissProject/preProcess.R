@@ -607,8 +607,6 @@ runPrior <- function(config) {
 		getOutFileForNameFun <- function(name) {
 			getConfig(config, name)
 		}
-		#FIXME: some logic in the following function needs to be moved here
-		#res = genAggModelVsPredTbl(hashtagsTbl, config=config)
 		withLogLevel(0, runForTokenTbl(tokenTbl, config, getOutFileForNameFun))
 	})
 }
