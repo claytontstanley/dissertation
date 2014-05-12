@@ -804,15 +804,18 @@ defaultSOPermConfig = modConfig(c(defaultSOConfig, defaultPermConfig,
 					      )))
 
 defaultTSjiConfig = modConfig(c(defaultTConfig, defaultSjiConfig,
-				list(runTbl=makeRunTbl(list(c('actPriorStd', 'actTweet'))))),
+				list(runTbl=makeRunTbl(list(c('actPriorStd', 'actTweet'),
+							    c('actPriorStd', 'actTweetFrentropy'))))),
 			      list(accumModelHashtagsTbl=T,
-				   actDVs=c('actPriorStd_actTweet', 'actPriorStd', 'actTweet')))
+				   actDVs=c('actPriorStd_actTweet', 'actPriorStd', 'actTweet', 'actTweetFrentropy', 'actPriorStd_actTweetFrentropy')))
 
 defaultSOSjiConfig = modConfig(c(defaultSOConfig, defaultSjiConfig,
 				 list(runTbl=makeRunTbl(list(c('actPriorStd', 'actTitle', 'actBody'),
-							     c('actTitle', 'actBody'))))),
+							     c('actTitle', 'actBody'),
+							     c('actPriorStd', 'actTitleFrentropy', 'actBodyFrentropy'))))),
 			      list(accumModelHashtagsTbl=T,
-				   actDVs=c('actPriorStd_actTitle_actBody', 'actPriorStd', 'actTitle', 'actBody', 'actTitle_actBody')))
+				   actDVs=c('actPriorStd_actTitle_actBody', 'actPriorStd', 'actTitle', 'actBody', 'actTitle_actBody',
+					    'actTitleFrentropy', 'actBodyFrentropy', 'actPriorStd_actTitleFrentropy_actBodyFrentropy')))
 
 defaultSOSjiPConfig = modConfig(c(defaultSOConfig, defaultSjiConfig,
 				  list(runTbl=makeRunTbl(list()))),
@@ -1964,9 +1967,11 @@ addSjiAttrs <- function(sjiTbl) {
 
 computeActSji <- function(contextVect, sjiTbl, config) {
 	contextVect
-	sjiTbl
 	myLog(sprintf("computing sji act for context with length %s", length(contextVect)))
 	resTbl = sjiTbl[J(contextVect), nomatch=0, allow.cartesian=T]
+	if (getConfig(config, 'sjiFreqP')) {
+		resTbl = resTbl[freqWeight > 0]
+	}
 	resTbl = resTbl[, {WContext = EContext/sum(EContext); list(act=sum(WContext * sji))}, keyby=hashtag]
 	resTbl
 }
@@ -2016,6 +2021,7 @@ funConfigFrentropy <- function(config) modConfig(config, getFunConfigModsPerm(pe
 funConfigMeddim <- function(config) modConfig(config, getFunConfigModsPerm(permUseEntropyP=T, permNRows=4000))
 funConfigLgdim <- function(config) modConfig(config, getFunConfigModsPerm(permUseEntropyP=T, permNRows=10000))
 
+funConfigOrigSji <- function(config) modConfig(config, getFunConfigModsSji())
 funConfigFrentropySji <- function(config) modConfig(config, getFunConfigModsSji(sjiFreqP=T))
 
 makeCombinedMemMat <- function(sjiTbl, envTbl, config) {
@@ -2091,8 +2097,10 @@ genAndSaveCurWorkspace <- function(groupConfig) {
 }
 
 computeActSjiFromContextTbl <- function(contextTbl, tagTbl, config) {
-	contextTbl = copy(contextTbl)[, type := paste0('act', capitalize(type))]
-	contextTbl[, computeActSji(chunk, get(getConfig(config, 'sjiTbl')), config), by=type]
+	contextTbl = rbind(copy(contextTbl)[, type := paste0('act', capitalize(type))][, funConfig := 'funConfigOrigSji'],
+			   copy(contextTbl)[, type := paste0('act', capitalize(type), 'Frentropy')][, funConfig := 'funConfigFrentropySji']
+			   )
+	contextTbl[, computeActSji(chunk, get(getConfig(config, 'sjiTbl')), get(funConfig)(config)), by=type]
 }
 
 computeActNullFromContextTbl <- function(contextTbl, tagTbl, config) {
