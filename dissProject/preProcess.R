@@ -697,7 +697,7 @@ defaultSOConfig = c(defaultBaseConfig,
 
 defaultPermConfig = list(permUseEntropyP='', permUseStoplistP='', permOnlyDirectionP='', permHymanP='', permUseFreqP='', permUseWindowP='')
 
-defaultSjiConfig = list(computeActFromContextTbl = 'computeActSjiFromContextTbl')
+defaultSjiConfig = list(computeActFromContextTbl = 'computeActSjiFromContextTbl', sjiFreqP='')
 
 defaultTPermConfig = modConfig(c(defaultTConfig, defaultPermConfig,
 				 list(runTbl=makeRunTbl(list(c('actPriorStd', 'actTweetOrder', 'actTweetOrderless'),
@@ -1955,6 +1955,10 @@ addSjiAttrs <- function(sjiTbl) {
 	sjiTbl[, stopWordWeight := 1]
 	stoplistTbl = getStoplistTbl()
 	sjiTbl[stoplistTbl, stopWordWeight := 0]
+	totFreq = sjiTbl[J(unique(context)), mult='first'][, sum(contextSums)]
+	sjiTbl[, pFreq := contextSums/totFreq]
+	sjiTbl[, freqWeight := 1]
+	sjiTbl[pFreq > .0004, freqWeight := 0]
 	sjiTbl
 }
 
@@ -1986,7 +1990,7 @@ myLoadImage <- function(groupConfig) {
 	     envir=globalenv())
 }
 
-getFunConfigMods <- function(permUseEntropyP=F, permUseStoplistP=F, permOnlyDirectionP=F, permHymanP=F,
+getFunConfigModsPerm <- function(permUseEntropyP=F, permUseStoplistP=F, permOnlyDirectionP=F, permHymanP=F,
 			     permUseFreqP=F, permUseWindowP=F, permNRows=getConfig(defaultBaseConfig, 'permNRows')) {
 	list(permUseEntropyP=permUseEntropyP,
 	     permUseStoplistP=permUseStoplistP,
@@ -1997,16 +2001,22 @@ getFunConfigMods <- function(permUseEntropyP=F, permUseStoplistP=F, permOnlyDire
 	     permNRows=permNRows)
 }
 
-funConfigOrig <- function(config) modConfig(config, getFunConfigMods())
-funConfigEntropy <- function(config) modConfig(config, getFunConfigMods(permUseEntropyP=T))
-funConfigStoplist <- function(config) modConfig(config, getFunConfigMods(permUseStoplistP=T))
-funConfigFreq <- function(config) modConfig(config, getFunConfigMods(permUseFreqP=T))
-funConfigDirection <- function(config) modConfig(config, getFunConfigMods(permUseEntropyP=T, permOnlyDirectionP=T))
-funConfigHyman <- function(config) modConfig(config, getFunConfigMods(permUseEntropyP=T, permHymanP=T))
-funConfigWindow <- function(config) modConfig(config, getFunConfigMods(permUseEntropyP=T, permUseWindowP=T))
-funConfigFrentropy <- function(config) modConfig(config, getFunConfigMods(permUseEntropyP=T, permUseFreqP=T))
-funConfigMeddim <- function(config) modConfig(config, getFunConfigMods(permUseEntropyP=T, permNRows=4000))
-funConfigLgdim <- function(config) modConfig(config, getFunConfigMods(permUseEntropyP=T, permNRows=10000))
+getFunConfigModsSji <- function(sjiFreqP=F) {
+	list(sjiFreqP=sjiFreqP)
+}
+
+funConfigOrig <- function(config) modConfig(config, getFunConfigModsPerm())
+funConfigEntropy <- function(config) modConfig(config, getFunConfigModsPerm(permUseEntropyP=T))
+funConfigStoplist <- function(config) modConfig(config, getFunConfigModsPerm(permUseStoplistP=T))
+funConfigFreq <- function(config) modConfig(config, getFunConfigModsPerm(permUseFreqP=T))
+funConfigDirection <- function(config) modConfig(config, getFunConfigModsPerm(permUseEntropyP=T, permOnlyDirectionP=T))
+funConfigHyman <- function(config) modConfig(config, getFunConfigModsPerm(permUseEntropyP=T, permHymanP=T))
+funConfigWindow <- function(config) modConfig(config, getFunConfigModsPerm(permUseEntropyP=T, permUseWindowP=T))
+funConfigFrentropy <- function(config) modConfig(config, getFunConfigModsPerm(permUseEntropyP=T, permUseFreqP=T))
+funConfigMeddim <- function(config) modConfig(config, getFunConfigModsPerm(permUseEntropyP=T, permNRows=4000))
+funConfigLgdim <- function(config) modConfig(config, getFunConfigModsPerm(permUseEntropyP=T, permNRows=10000))
+
+funConfigFrentropySji <- function(config) modConfig(config, getFunConfigModsSji(sjiFreqP=T))
 
 makeCombinedMemMat <- function(sjiTbl, envTbl, config) {
 	res = list()
@@ -2606,9 +2616,8 @@ digestAsInteger <- function(x) {
 makeEnvironmentTbl <- function(sjiTbl, config) {
 	permEnvTbl = with(sjiTbl, data.table(chunk=unique(context)))
 	permEnvTbl
-	key(sjiTbl)
-	sjiTbl
-	set.seed(digestAsInteger(sjiTbl[1:100]))
+	cnames = setdiff(colnames(sjiTbl), c('pFreq', 'freqWeight'))
+	set.seed(digestAsInteger(sjiTbl[1:100, cnames, with=F]))
 	permEnvTbl = makeEnvironmentSubsetTbl(permEnvTbl, config)
 	permEnvTbl[, uniq := NULL]
 	setkey(permEnvTbl, chunk)
@@ -2627,16 +2636,14 @@ makeEnvironmentTbl <- function(sjiTbl, config) {
 
 addEnvironmentTblAttrs <- function(permEnvTbl, sjiTbl) {
 	entTbl = sjiTbl[, .N, keyby=list(context, EContext)][, N := NULL]
-	stopifnot(nrow(entTbl) == entTbl[, length(unique(context))])
+	myStopifnot(nrow(entTbl) == entTbl[, length(unique(context))])
 	permEnvTbl[entTbl, EContext := EContext]
 	stopwordWeightTbl = sjiTbl[, .N, keyby=list(context, stopWordWeight)][, N := NULL]
-	stopifnot(nrow(stopwordWeightTbl) == stopwordWeightTbl[, length(unique(context))])
+	myStopifnot(nrow(stopwordWeightTbl) == stopwordWeightTbl[, length(unique(context))])
 	permEnvTbl[stopwordWeightTbl, stopWordWeight := stopWordWeight]
-	freqTbl = sjiTbl[!duplicated(sjiTbl[, context]), list(context, contextSums)][order(contextSums, decreasing=T)][, totFreq := sum(contextSums)][, pFreq := contextSums/totFreq]
-	freqTbl[, freqWeight := 1]
-	freqTbl[pFreq > .0004, freqWeight := 0]
-	setkey(freqTbl, context)
-	permEnvTbl[freqTbl, freqWeight := freqWeight]
+	freqWeightTbl = sjiTbl[, .N, keyby=list(context, freqWeight)][, N := NULL]
+	myStopifnot(nrow(freqWeightTbl) == freqWeightTbl[, length(unique(context))])
+	permEnvTbl[freqWeightTbl, freqWeight := freqWeight]
 	permEnvTbl
 }
 
@@ -2713,9 +2720,9 @@ computeActPerm <- function(context, pos, permEnvTbl, permMemMat, config) {
 	}
 	resTbl = data.table(hashtag=rownames(contextCorVect), act=as.vector(contextCorVect))
 	if (getConfig(config, 'permHymanP')) {
-		resTbl[, mean(act)]
+		resTbl
 		resTbl[, cdf := pnorm(act, mean=mean(act), sd=sd(act))]
-		resTbl[, cdf := min(.9999, cdf)] # So that log(1/0)'s don't produce Inf's
+		resTbl[cdf >= .9999, cdf := .9999] # So that log(1/0)'s don't produce Inf's
 		resTbl[, actLog := log(cdf/(1-cdf))]
 		resTbl[, act := actLog][, actLog := NULL][, cdf := NULL]
 	}
@@ -2809,8 +2816,9 @@ curWS <- function() {
 	runTFollow10M()
 	runSO1k()
 	runSOQgt400()
-	#FIXME: Run priors through new code path (profile first, worry about loading workspace for prior and runGenTokenized stuff)
-	#FIXME: < and <= should have been slightly off, yes?
+	#FIXME: Run priors through new code path (only difference should be where multiple ids for same dt)
+	#FIXME: Rebuild RWorkspace
+	#FIXME: Run new context
 	#FIXME: Add way to plot test results
 	#FIXME: address word order low predictiveness
 	#FIXME: proper combination of prior and context for RP
@@ -2824,6 +2832,9 @@ curWS <- function() {
 	runContext20g1s6(regen='useAlreadyLoaded')
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelVsPred()))))
 	modelHashtagsTbls = buildModelHashtagsTables(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelHashtags()))))
+	modelHashtagsTbl = modelHashtagsTbls[["TContextPerm-20g1s1r1"]]
+	modelHashtagsTbl[d==.5, list(id, dt, hashtag, actTweetOrderlessEntropy, actTweetOrderlessHyman)][1:100]
+	colnames(modelHashtagsTbl)
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isPriorRun, list.files(path=getDirModelVsPred()))))
 	modelVsPredTbl
 	sjiTblTOrderless
