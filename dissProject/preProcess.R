@@ -2758,40 +2758,6 @@ curWS <- function() {
 	withProf(myLoadImage(groupConfigG1S6))
 	test_dir(sprintf("%s/%s", PATH, 'tests'), reporter='summary')
 	.ls.objects(order.by='Size')
-	resTbl = runPriorT(config=modConfig(defaultTConfig, list(query=sprintf("select %s from tweets where user_screen_name = 'wyntergordon'", defaultTCols), accumModelHashtagsTbl=T, includeRetweetsP=F)))
-	resTbl.new = runPriorT(config=modConfig(defaultTSjiPConfig, list(query=sprintf("user_screen_name = 'wyntergordon'", defaultTCols), accumModelHashtagsTbl=T, includeRetweetsP=F)))
-
-	cTbl.new = resTbl.new$modelHashtagsTbl[hashtagUsedP %in% c(T,F)][!is.na(actPriorStd)][topHashtagAcrossPriorStd %in% c(T)][d == .6][order(dt, decreasing=F)]
-	cTbl = resTbl$modelHashtagsTbl[hashtagUsedP %in% c(T,F)][topHashtagAcrossPriorStd %in% c(T)][d == .6][order(dt, decreasing=F)]
-	cTbl = resTbl$modelHashtagsTbl
-	expect_equivalent(
-			  resTbl$modelVsPredTbl[topHashtag & hashtagUsedP & DVName == 'topHashtagPostPriorStd'],
-			  resTbl.new$modelVsPredTbl[topHashtag & hashtagUsedP & DVName == 'topHashtagPostPriorStd']
-			  )
-	expect_equivalent(
-			  resTbl$hashtagsTbl[,dt],
-			  resTbl.new$hashtagsTbl[,dt]
-			  )
-	resTbl$hashtagsTbl
-	resTbl.new$hashtagsTbl
-	cTbl.new = resTbl.new$modelHashtagsTbl[!is.na(actPriorStd)]
-	cTbl.new[d==.1]
-	cTbl[d==.1]
-	expect_equivalent(cTbl[, list(dt, actPriorStd, hashtag)], cTbl.new[, list(dt, actPriorStd, hashtag)])
-	cTbl[duplicated(cTbl)]
-	cTbl.new[duplicated(cTbl.new)]
-	cTbl.new[dt == 41452182][d==.6]
-	cTbl[dt == 41452182][d==.6]
-	sqldf("select * from tweets where id = 82379605574557696")
-	cTbl
-	cTbl.new
-	expect_equivalent(cTbl[, actPriorStd], cTbl.new[, actPriorStd])
-	cTbl[!cTbl.new]
-	resTbl = runPriorSO(config=modConfig(defaultSOSjiPConfig, list(query=sprintf("owner_user_id = 99834", defaultSOCols))))
-	resTbl$modelVsPredTbl[topHashtag & hashtagUsedP]
-	resTbl = runPriorSO(config=modConfig(defaultSOConfig, list(query=sprintf("select %s from posts where post_type_id = 1 and owner_user_id = 99834", defaultSOCols))))
-	hashtagsTbl
-	runGenTokenizedTblTwitterPrior()
 	# Checking that tweets for twitter users from each followers_count,statuses_count scale are being collected properly
 	usersWithTweetsTbl = sqldt("select distinct on (t.user_screen_name) t.user_screen_name,u.followers_count,u.statuses_count
 				   from tweets as t join twitter_users as u on t.user_screen_name = u.user_screen_name"
