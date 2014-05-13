@@ -209,14 +209,6 @@ getAllowedRetweetedVals <- function(config) {
 	allowedRetweetedVals
 }
 
-# FIXME: Remove this method after running priors through new code path
-getTweetsTbl <- function(sqlStr=sprintf("select %s from tweets limit 10000", defaultTCols), config) {
-	tweetsTbl = sqldt(sqlStr)[retweeted %in% getAllowedRetweetedVals(config)]
-	myStopifnot(unique(tweetsTbl$retweeted) %in% getAllowedRetweetedVals(config))
-	setupTweetsTbl(tweetsTbl, config)
-	tweetsTbl
-}
-
 getTagSynonymsTbl <- function(sqlStr='select * from tag_synonyms') {
 	tagSynonymsTbl = sqldt(sqlStr)
 	setkey(tagSynonymsTbl, source_tag_name)
@@ -231,27 +223,9 @@ setupPostsTbl <- function(postsTbl, config) {
 	postsTbl
 }
 
-# FIXME: Remove this method after running priors through new code path
-getPostsTbl <- function(sqlStr, config) {
-	postsTbl = sqldt(sqlStr)
-	setupPostsTbl(postsTbl, config)
-	postsTbl
-}
-
 matchWhitespace = '\\S+'
 matchHashtag = '^#'
 matchTag = '(?<=<)[^>]+(?=>)'
-
-# FIXME: Remove this method after running priors through new code path
-getHashtagsTbl <- function(tweetsTbl, config) {
-	from = getConfig(config, "from")
-	tokenizedTbl = getTokenizedTbl(tweetsTbl, from=from, regex=matchWhitespace)
-	htOfTokenizedTbl = tokenizedTbl[grepl(matchHashtag, chunk),]
-	myStopifnot(c('id') == key(htOfTokenizedTbl))
-	hashtagsTbl = htOfTokenizedTbl[tweetsTbl, nomatch=0][, list(id=id, hashtag=chunk, pos=pos, created_at=created_at, dt=dt, user_id=user_id, user_screen_name=user_screen_name)]
-	setkey(hashtagsTbl, user_screen_name, dt, hashtag)
-	hashtagsTbl
-}
 
 convertTagSynonymsForTokenized <- function(tokenTbl, config) {
 	tagTbl = tokenTbl[type == getConfig(config, 'tagTypeName')] 
@@ -265,15 +239,6 @@ convertTagSynonyms <- function(tagTbl) {
 	withKey(tagTbl, chunk,
 		{tagTbl[getTagSynonymsTbl(), chunk := target_tag_name]
 		})
-}
-
-# FIXME: Remove this method after running priors through new code path
-getTagsTbl <- function(postsTbl, config) {
-	tokenizedTbl = getTokenizedTbl(postsTbl, from='tagsNoHtml', regex=matchTag)
-	if (getConfig(config, "convertTagSynonymsP")) convertTagSynonyms(tokenizedTbl)
-	tagsTbl = tokenizedTbl[postsTbl, nomatch=0][, list(id=id, hashtag=chunk, pos=pos, created_at=creation_date, dt=dt, user_id=owner_user_id, user_screen_name=user_screen_name)]
-	setkey(tagsTbl, user_screen_name, dt, hashtag)
-	tagsTbl
 }
 
 computeActPrior <- function(hashtags, dtP, cTime, d) {
@@ -295,17 +260,6 @@ computeActPrior <- function(hashtags, dtP, cTime, d) {
 	list(hashtag=hashtagsSubRep, partialAct=dtPSubRep^(-dRep), dt=cTimeSubRep, d=dRep, dtP=dtPSubRep)
 }
 
-# FIXME: This goes away with new prior code path
-computeActPriorForUser <- function(hashtag, dt, ds, user_screen_name) {
-	#myLog(sprintf('computing partial activation for user %s', user_screen_name))
-	retIndeces = which(!duplicated(dt))[-1]
-	myStopifnot(length(retIndeces) > 0)
-	partialRes = data.table(i=retIndeces)
-	partialRes = partialRes[, list(hashtag=hashtag[1:i], dtP=dt[1:i], cTime=dt[i]), by=i]
-	partialRes = with(partialRes, as.data.table(computeActPrior(hashtag, dtP, cTime, d=ds)))
-	partialRes
-}
-
 getModelHashtagsTbl <- function(partialRes) {
 	debugPrint(partialRes)
 	#myLog('setting key for partial table')
@@ -318,13 +272,6 @@ getModelHashtagsTbl <- function(partialRes) {
 	with(res, myStopifnot(!is.infinite(actPriorStd)))
 	with(res, myStopifnot(!is.infinite(actPriorOL2)))
 	res
-}
-
-# FIXME: This goes away with new prior code path
-computeActPriorByUser <- function(hashtagsTbl, ds) {
-	partialRes = hashtagsTbl[, computeActPriorForUser(hashtag, dt, ds, user_screen_name), by=user_screen_name]
-	modelHashtagsTbl = getModelHashtagsTbl(partialRes)
-	modelHashtagsTbl
 }
 
 getPriorAtEpoch <- function(priorTbl, cEpoch, d) {
@@ -492,31 +439,6 @@ writeLogregTbl <- function(logregTbl, outFile) {
 	myWriteCSV(logregTbl, file=outFile)
 }
 
-#FIXME: This goes away with new prior path
-genAggModelVsPredTbl <- function(hashtagsTbl, config) {
-	outFile = getConfig(config, "modelVsPredOutFile")
-	ds = getConfig(config, "dFull")
-	modelHashtagsTbls = data.table()
-	getModelVsPredTblFromHashtagsTbl <- function(hashtagsTbl, ds, userScreenName) {
-		myLog(sprintf('generating model predictions for user %s', userScreenName))
-		modelHashtagsTbl = rbindlist(lapply(ds, function(d) computeActPriorByUser(hashtagsTbl, d=d)))
-		setkey(modelHashtagsTbl, user_screen_name, dt, hashtag, d)
-		addMetrics(hashtagsTbl, modelHashtagsTbl, config)
-		modelVsPredTbl = getModelVsPredTbl(modelHashtagsTbl, hashtagsTbl, config)	
-		if (getConfig(config, "accumModelHashtagsTbl") == T) modelHashtagsTbls <<- rbind(modelHashtagsTbls, modelHashtagsTbl)
-		rm(modelHashtagsTbl)
-		gc()
-		modelVsPredTbl
-	}
-	singleHashtagUsers = hashtagsTbl[, list(uniqueDTs=length(unique(dt)) <= 1), by=user_screen_name][uniqueDTs==T]$user_screen_name
-	myLog(sprintf('not running users (%s) since they all have less than two dt hashtag observations', paste0(singleHashtagUsers, collapse=',')))
-	users = data.table(cur_user_screen_name=Filter(function(v) !(v %in% singleHashtagUsers), unique(hashtagsTbl$user_screen_name)))
-	res = users[, getModelVsPredTblFromHashtagsTbl(hashtagsTbl[cur_user_screen_name], ds, cur_user_screen_name), by=cur_user_screen_name]
-	res[, cur_user_screen_name := NULL]
-	writeModelVsPredTbl(res, outFile)
-	list(modelVsPredTbl=res, modelHashtagsTbl=modelHashtagsTbls)
-}
-
 visModelVsPredTbl <- function(modelVsPredTbl) {
 	assign('p1', ggplot(modelVsPredTbl[predUsedBest == T & d <= 2], aes(totN, d)) +
 	       geom_point() +
@@ -580,19 +502,6 @@ getOutFileModelHashtags <- function(name) getOutFileGen(getDirModelHashtags(), n
 
 getLogregOutFile <- function(name) getOutFileGen(getDirLogreg(), name)
 
-# FIXME: this goes away with new code prior path
-runPrior <- function(config) {
-	myStopifnot(!any(sapply(config,is.null)))
-	withProf({
-		postsTbl = getConfig(config, "getPostsFun")(getConfig(config, "query"), config=config)
-		hashtagsTbl = getConfig(config, "getHashtagsFun")(postsTbl, config=config)
-		res = genAggModelVsPredTbl(hashtagsTbl, config=config)
-		modelVsPredTbl = res$modelVsPredTbl
-		modelHashtagsTbl = res$modelHashtagsTbl
-		list(modelVsPredTbl=modelVsPredTbl, modelHashtagsTbl=modelHashtagsTbl, hashtagsTbl=hashtagsTbl)
-	})
-}
-
 runPrior <- function(config) {
 	withProf({
 		myStopifnot(!any(sapply(config,is.null)))
@@ -654,8 +563,6 @@ defaultTConfig = c(defaultBaseConfig,
 		   list(dsetType='twitter',
 			from='tokenText',
 			convertTagSynonymsP=F,
-			getPostsFun=getTweetsTbl,
-			getHashtagsFun=getHashtagsTbl,
 			makeChunkTblFun='make_chunk_table_Twitter',
 			tokenizedChunkTypeTbl = 'top_hashtag_tokenized_chunk_types',
 			tokenizedTypeTypeTbl = 'top_hashtag_tokenized_type_types',
@@ -678,8 +585,6 @@ defaultTConfig = c(defaultBaseConfig,
 defaultSOConfig = c(defaultBaseConfig,
 		    list(dsetType='stackoverflow',
 			 convertTagSynonymsP=T,
-			 getPostsFun=getPostsTbl,
-			 getHashtagsFun=getTagsTbl,
 			 tokenizedChunkTypeTbl = 'post_tokenized_chunk_types',
 			 tokenizedTypeTypeTbl = 'post_tokenized_type_types',
 			 tokenizedTbl = 'post_tokenized',
@@ -2837,7 +2742,7 @@ curWS <- function() {
 	#FIXME: Rename Hyman to LogOdds
 	withProf(runContext20g1s1(regen='useAlreadyLoaded'))
 	setLogLevel(1)
-	runContext20g1s6(regen='useAlreadyLoaded')
+	withProf(runContext20g1s6(regen='useAlreadyLoaded'))
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelVsPred()))))
 	modelHashtagsTbls = buildModelHashtagsTables(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelHashtags()))))
 	modelHashtagsTbl = modelHashtagsTbls[["TContextPerm-20g1s1r1"]]
