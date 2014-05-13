@@ -323,7 +323,7 @@ visCompare <- function(hashtagsTbl, modelHashtagsTbl, bestDTbl) {
 	setkey(modelHashtagsTbl, user_screen_name, d)
 	setkey(allDsTbl, user_screen_name, allDs)
 	subsetModelHashtagsTbl = modelHashtagsTbl[allDsTbl, nomatch=0]
-	modelPlots = subsetModelHashtagsTbl[, plotBuildFun(.SD, user_screen_name, d), by=list(user_screen_name, d)]
+	modelPlots = subsetModelHashtagsTbl[, plotBuildFun(copy(.SD), user_screen_name, d), by=list(user_screen_name, d)]
 	hashtagPlots = visHashtags(hashtagsTbl)
 	hashtagPlots[, resPlots := list(list(resPlots[[1]] + ggtitle('Observed'))), by=user_screen_name]
 	setkey(hashtagPlots, user_screen_name)
@@ -1013,17 +1013,18 @@ getConfigFile <- function(fname) {
 	res
 }
 
+addMiscellaneous <- function(modelVsPredTbl) {
+	modelVsPredTbl[, predUsedBest := F]
+	modelVsPredTbl[topHashtag & hashtagUsedP & maxNP, predUsedBest := T]
+	modelVsPredTbl[hashtagUsedP == T, acc := NCell/totN]
+}
+
 buildTables <- function(outFileNames) {
 	buildTable <- function(outFileName) {
 		colClasses = c('character', 'logical', 'logical', 'numeric', 'integer', 'character', 'logical', 'integer')
 		tbl = myReadCSV(getOutFileModelVsPred(outFileName), colClasses=colClasses)
 		tbl[, datasetName := outFileName]
 		tbl
-	}
-	addMiscellaneous <- function(modelVsPredTbl) {
-		modelVsPredTbl[, predUsedBest := F]
-		modelVsPredTbl[topHashtag & hashtagUsedP & maxNP, predUsedBest := T]
-		modelVsPredTbl[hashtagUsedP == T, acc := NCell/totN]
 	}
 	modelVsPredTbl = rbindlist(lapply(outFileNames, buildTable))
 	modelVsPredTbl
@@ -1275,13 +1276,13 @@ analyzeTemporal <- function(modelVsPredTbl) {
 	#user_screen_names = screenTbl[, user_screen_name]
 	user_screen_names = wrapQuotes(c('rickeysmiley','fashionista_com','laurenpope','mtvindia','officialrcti'))
 	user_screen_names = wrapQuotes(c('fashionista_com'))
-	runTbls = runPriorT(config=modConfig(defaultTConfig, list(accumModelHashtagsTbl=T,
-								  query=sprintf("select %s from tweets where user_screen_name in (%s)", defaultTCols, user_screen_names))))
+	runTbls = runPriorT(config=modConfig(defaultTSjiPConfig, list(accumModelHashtagsTbl=T,
+								  query=sprintf("user_screen_name in (%s)", user_screen_names))))
 	plotTemporal(runTbls)
 	user_screen_names = wrapQuotes(c('520957','238260','413225','807325','521180'))
 	user_screen_names = wrapQuotes(c('520957','238260'))
-	runTbls = runPriorSO(config=modConfig(defaultSOConfig, list(accumModelHashtagsTbl=T,
-								    query=sprintf("select %s from posts where post_type_id = 1 and user_screen_name in (%s)", defaultSOCols, user_screen_names))))
+	runTbls = runPriorSO(config=modConfig(defaultSOSjiPConfig, list(accumModelHashtagsTbl=T,
+								    query=sprintf("user_screen_name in (%s)", user_screen_names))))
 	plotTemporal(runTbls)
 }
 
@@ -1305,7 +1306,7 @@ analyzePrior <- function(modelVsPredTbl) {
 	# Check that the Ns for each dataset look right	
 	modelVsPredTbl[, list(N=.N, names=list(unique(datasetName))), by=list(dsetType, dsetGroup, runNum,datasetNameRoot)]
 
-	dvDiffsTbl = plotDVDiffs(rbind(modelVsPredTbl[runNum==2, compare2DVs(.SD, c('topHashtagPostPriorStd', 'topHashtagPostPriorOL2'), sortedOrder=c(2,1)), by=list(dsetType, dsetGroup), .SDcols=colnames(modelVsPredTbl)],
+	dvDiffsTbl = plotDVDiffs(rbind(modelVsPredTbl[runNum==2, compare2DVs(.SD, c('topHashtagPostPriorStd', 'topHashtagPostPriorOL2'), sortedOrder=c(1,2)), by=list(dsetType, dsetGroup), .SDcols=colnames(modelVsPredTbl)],
 				       modelVsPredTbl[runNum==2, compare2DVs(.SD, c('topHashtagPostPriorStd', 'topHashtagAcrossPriorStd')), by=list(dsetType, dsetGroup), .SDcols=colnames(modelVsPredTbl)],
 				       #modelVsPredTbl[DVName %in% c('topHashtagPostPriorStd', 'topHashtagPostPriorOL2'), compare2Runs(.SD, c(1,2)), by=list(dsetType, dsetGroup), .SDcols=colnames(modelVsPredTbl)],
 				       modelVsPredTbl[runNum==2 & DVName %in% c('topHashtagPostPriorStd', 'topHashtagPostPriorOL2'), compareDBestVsMin(.SD), by=list(dsetType, dsetGroup)],
