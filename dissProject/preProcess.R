@@ -2691,7 +2691,6 @@ curWS <- function() {
 	runSO1k()
 	runSOQgt400()
 	#FIXME: Run new context
-	#FIXME: Add way to plot test results
 	#FIXME: address word order low predictiveness
 	#FIXME: proper combination of prior and context for RP
 	#FIXME: add word order to Bayesian sji
