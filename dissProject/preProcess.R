@@ -1266,7 +1266,32 @@ renameColDVName <- function(tbl) {
 		    'topHashtagAcrossTweetOrderFreq', 'RP only order context w/ freq',
 		    'topHashtagAcrossTweetOrderlessFreq', 'RP only orderless context w/ freq',
 		    'topHashtagAcrossPriorStdTweetOrderFreqTweetOrderlessFreq', 'RP combined full w/ freq',
-		    'topHashtagAcrossPriorStdTitleOrderlessFreqBodyOrderlessFreq', 'RP combined full w/ freq'
+		    'topHashtagAcrossPriorStdTitleOrderlessFreqBodyOrderlessFreq', 'RP combined full w/ freq',
+		    'topHashtagAcrossTitleOrderlessFrentropyBodyOrderlessFrentropy', 'RP combined title and body w/ freq and entropy',
+		    'topHashtagAcrossTitleOrderlessFrentropy', 'RP only title w/ freq and entropy',
+		    'topHashtagAcrossBodyOrderlessFrentropy', 'RP only body w/ freq and entropy',
+		    'topHashtagAcrossTweetOrderFrentropyTweetOrderlessFrentropy', 'RP combined orderless and order w/ freq and entropy',
+		    'topHashtagAcrossTweetOrderFrentropy', 'RP only order context w/ freq and entropy',
+		    'topHashtagAcrossTweetOrderlessFrentropy', 'RP only orderless context w/ freq and entropy',
+		    'topHashtagAcrossPriorStdTweetOrderFrentropyTweetOrderlessFrentropy', 'RP combined full w/ freq and entropy',
+		    'topHashtagAcrossPriorStdTitleOrderlessFrentropyBodyOrderlessFrentropy', 'RP combined full w/ freq and entropy',
+		    'topHashtagAcrossTitleOrderlessMeddimBodyOrderlessMeddim', 'RP combined title and body w/ entropy and 4000-row matrix',
+		    'topHashtagAcrossTitleOrderlessMeddim', 'RP only title w/ entropy and 4000-row matrix',
+		    'topHashtagAcrossBodyOrderlessMeddim', 'RP only body w/ entropy and 4000-row matrix',
+		    'topHashtagAcrossTweetOrderMeddimTweetOrderlessMeddim', 'RP combined orderless and order w/ entropy and 4000-row matrix',
+		    'topHashtagAcrossTweetOrderMeddim', 'RP only order context w/ entropy and 4000-row matrix',
+		    'topHashtagAcrossTweetOrderlessMeddim', 'RP only orderless context w/ entropy and 4000-row matrix',
+		    'topHashtagAcrossPriorStdTweetOrderMeddimTweetOrderlessMeddim', 'RP combined full w/ entropy and 4000-row matrix',
+		    'topHashtagAcrossPriorStdTitleOrderlessMeddimBodyOrderlessMeddim', 'RP combined full w/ entropy and 4000-row matrix',
+		    'topHashtagAcrossTitleOrderlessLgdimBodyOrderlessLgdim', 'RP combined title and body w/ entropy and 10000-row matrix',
+		    'topHashtagAcrossTitleOrderlessLgdim', 'RP only title w/ entropy and 10000-row matrix',
+		    'topHashtagAcrossBodyOrderlessLgdim', 'RP only body w/ entropy and 10000-row matrix',
+		    'topHashtagAcrossTweetOrderLgdimTweetOrderlessLgdim', 'RP combined orderless and order w/ entropy and 10000-row matrix',
+		    'topHashtagAcrossTweetOrderLgdim', 'RP only order context w/ entropy and 10000-row matrix',
+		    'topHashtagAcrossTweetOrderlessLgdim', 'RP only orderless context w/ entropy and 10000-row matrix',
+		    'topHashtagAcrossPriorStdTweetOrderLgdimTweetOrderlessLgdim', 'RP combined full w/ entropy and 10000-row matrix',
+		    'topHashtagAcrossPriorStdTitleOrderlessLgdimBodyOrderlessLgdim', 'RP combined full w/ entropy and 10000-row matrix',
+		    'topHashtagAcrossPriorStdTitleFrentropyBodyFrentropy', 'Bayes combined full w/ freq'
 		    )
 	mapping = groupN(2, mapping)
 	mapping
@@ -1478,6 +1503,17 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 				       'PriorStdTweetOrderWindowTweetOrderlessWindow'))
 	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='foo', groupCol='dsetGroup')
 }
+
+analyzeContextSmall <- function() {
+	tbl = modelVsPredTbl[predUsedBest & dsetSize==20 & grepl('^topHashtagAcross', DVName)]
+	compareMeanDV(tbl[sizeNum == 6 & dsetType == 'stackoverflow'], acc, figName='foo')
+	compareMeanDV(tbl[sizeNum == 6 & dsetType == 'twitter'], acc, figName='foo')
+	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleBody', 'PriorStdTitleOrderlessBodyOrderless',
+				       'PriorStdTitleOrderlessEntropyBodyOrderlessEntropy',
+				       'PriorStdTitleFrentropyBodyFrentropy', 'PriorStdTitleOrderlessFrentropyBodyOrderlessFrentropy'))
+	compareMeanDV(tbl[sizeNum == 6 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='foo')
+}
+
 
 getNcoocTbl <- function(type, chunkTableQuery, config) {
 	myLog(sprintf('Getting Ncooc table for type %s', type))
