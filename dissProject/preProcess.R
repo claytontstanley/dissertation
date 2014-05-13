@@ -2693,7 +2693,6 @@ curWS <- function() {
 	runSOQgt400()
 	#FIXME: Check size of objects for S1 at least
 	#FIXME: Rerun prior after tokenized finished
-	#FIXME: Replot all prior runs
 	#FIXME: Run new context
 	#FIXME: address word order low predictiveness
 	#FIXME: proper combination of prior and context for RP
