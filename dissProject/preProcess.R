@@ -2690,7 +2690,6 @@ curWS <- function() {
 	runTFollow10M()
 	runSO1k()
 	runSOQgt400()
-	#FIXME: Rebuild RWorkspace
 	#FIXME: Run new context
 	#FIXME: Add way to plot test results
 	#FIXME: address word order low predictiveness
