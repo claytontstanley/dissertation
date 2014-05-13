@@ -2729,7 +2729,6 @@ curWS <- function() {
 	runTFollow10M()
 	runSO1k()
 	runSOQgt400()
-	#FIXME: Run priors through new code path (only difference should be where multiple ids for same dt)
 	#FIXME: Rebuild RWorkspace
 	#FIXME: Run new context
 	#FIXME: Add way to plot test results
