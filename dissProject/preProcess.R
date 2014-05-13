@@ -2762,7 +2762,7 @@ getMemMatFromList <- function(lst, config) {
 		} else if (permUseEntropyP & !permOnlyDirectionP & !permUseFreqP & !permUseStoplistP & !permUseWindowP & permNRows == 10000) {
 			'lgdim'
 		} else {
-			myStopifnot(!permUseEntropyP & !permOnlyDirectionP & !permUseFreqP & !permUseStoplistP & !permUseWindowP & permNRows == 2048)
+			myStopifnot(!permUseEntropyP & !permOnlyDirectionP & !permUseFreqP & !permUseStoplistP & !permUseWindowP & permNRows <= 2048) # '<=' for unit tests
 			'orig'
 		}
 	}

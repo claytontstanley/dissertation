@@ -119,6 +119,7 @@ test_that("testAddSjiAttrs", {
 	expectedTbl = copy(sjiTestTbl)[, contextSums := c(3,3,7,7)][, tagSums := c(4,6,4,6)][, sji := log( 10 * partialN / (contextSums * tagSums))]
 	expectedTbl[, pTagGivenChunk := c(1/3, 2/3, 3/7, 4/7)][, HContext := - sum(pTagGivenChunk * log(pTagGivenChunk)), by=context][, EContext := 1 - HContext/max(HContext)]
 	expectedTbl[, stopWordWeight := 0]
+	expectedTbl[, pFreq := c(.3,.3,.7,.7)][, freqWeight := 0]
 	addSjiAttrs(sjiTestTbl)
 	expect_equivalent(expectedTbl, sjiTestTbl)
 })
@@ -126,7 +127,7 @@ test_that("testAddSjiAttrs", {
 test_that("testComputeAct", {
 	testTestTblVsExpected <- function(sjiTestTbl, expectedTbl, context=c('a', 'b')) {
 		setkey(sjiTestTbl, context, hashtag)
-		resTbl = computeActSji(context, sjiTestTbl)
+		resTbl = computeActSji(context, sjiTestTbl, list(sjiFreqP=F))
 		expect_equivalent(expectedTbl, resTbl)
 	}
 	testTestTblVsExpected(data.table(context=c('a','a','b','b'), hashtag=c('x','y','x','y'), sji=c(1,2,3,4), EContext=c(1,1,1,1)),
@@ -159,14 +160,14 @@ test_that('testGetPriorTbl', {
 context("RP Model")
 
 test_that('testMakeMemMat', {
-	configNEntropy = c(list(permNRows=5), getFunConfigMods())
+	configNEntropy = getFunConfigModsPerm(permNRows=5)
 	testMemMat <- function(testSjiTbl, testPermEnvTbl, resTbl, config=configNEntropy) {
+		testPermEnvTbl = list('5'=testPermEnvTbl)
 		resMemMat = makeMemMat(testSjiTbl, testPermEnvTbl, config) 
 		expect_equivalent(resMemMat, as.matrix(data.table(resTbl)))
 	}
 	testSjiTbl = data.table(context=c('!'), hashtag=c('b'), posFromTag=0, partialN=1, key='context')
 	testPermEnvTbl = data.table(chunk=c('!', '!', '!', '!'), val=c(1,1,-1,-1), valIndID=c('1', '1', '1', '1'), ind=c(1,2,3,4), key='chunk')
-	testMemMat(testSjiTbl, testPermEnvTbl, data.table(b=c(1,1,-1,-1,0)))
 	testSjiTbl = data.table(context=c('!'), hashtag=c('b'), posFromTag=0, partialN=4, key='context')
 	testPermEnvTbl = data.table(chunk=c('!', '!', '!', '!'), val=c(1,1,-1,-1), valIndID=c('1', '1', '1', '1'), ind=c(1,2,3,4), key='chunk')
 	testMemMat(testSjiTbl, testPermEnvTbl, data.table(b=c(4,4,-4,-4,0)))
@@ -191,12 +192,12 @@ test_that('testMakeMemMat', {
 })
 
 test_that('testComputePermAct', {
-	  testConfig = c(list(permNRows=5, permEnvTbl='testEnvTbl', permMemMatOrder='testMemMat', permMemMat=''), getFunConfigMods())
+	  testConfig = c(list(permEnvTbl='testEnvTbl', permMemMatOrder='testMemMat', permMemMat=''), getFunConfigModsPerm(permNRows=5))
 	  testComputePermAct <- function(testContext, testPos, testEnvTbl, testMemMat, testConfig, expectedTbl) {
 		  resTbl = computeActPermOrder(testContext, testPos, testConfig)
 		  expect_equivalent(resTbl, expectedTbl)
 	  }
-	  testEnvTbl = data.table(chunk=c('!','!','!','!'), val=c(1,1,-1,-1), valIndID=c('ind1', 'ind2', 'ind3', 'ind4'), ind=c(1,2,3,4), key='chunk')
+	  testEnvTbl = list('5' = data.table(chunk=c('!','!','!','!'), val=c(1,1,-1,-1), valIndID=c('ind1', 'ind2', 'ind3', 'ind4'), ind=c(1,2,3,4), key='chunk'))
 	  testSjiTbl = data.table(context=c('!'), hashtag=c('a'), posFromTag=0, partialN=1, key='context')
 	  testMemMat = list()
 	  testMemMat[['orig']] = makeMemMat(testSjiTbl, testEnvTbl, testConfig) # Stoplist b/c permUseEntropyP is F, so that EContext doesn't have to be tested
@@ -204,13 +205,13 @@ test_that('testComputePermAct', {
 	  testComputePermAct('!', 1, testEnvTbl, testMemMat, testConfig, data.table(hashtag='a', act=cor(c(1,1,-1,-1,0), c(0,1,1,-1,-1))))
 	  testComputePermAct('!', 2, testEnvTbl, testMemMat, testConfig, data.table(hashtag='a', act=cor(c(1,1,-1,-1,0), c(-1,0,1,1,-1))))
 	  testComputePermAct('!', -1, testEnvTbl, testMemMat, testConfig, data.table(hashtag='a', act=cor(c(1,1,-1,-1,0), c(0,1,1,-1,-1))))
-	  testEnvTbl = data.table(chunk=c('!','#'), val=c(1,-1), valIndID=c('1', '1'), ind=c(1,2), key='chunk')
+	  testEnvTbl = list('5' = data.table(chunk=c('!','#'), val=c(1,-1), valIndID=c('1', '1'), ind=c(1,2), key='chunk'))
 	  testSjiTbl = data.table(context=c('!','#'), hashtag=c('a','a'), posFromTag=c(0,0), partialN=c(1,1), key='context')
 	  testMemMat[['orig']] = makeMemMat(testSjiTbl, testEnvTbl, testConfig)
 	  testComputePermAct('!', 0, testEnvTbl, testMemMat, testConfig, data.table(hashtag='a', act=cor(c(1,-1,0,0,0), c(1,0,0,0,0))))
 	  testComputePermAct(c('!', '#', '!'), 0, testEnvTbl, testMemMat, testConfig, data.table(hashtag='a', act=cor(c(1,-1,0,0,0), c(2,-1,0,0,0))))
 	  testComputePermAct('#', -1, testEnvTbl, testMemMat, testConfig, data.table(hashtag='a', act=cor(c(1,-1,0,0,0), c(-1,0,0,0,0))))
-	  testEnvTbl = data.table(chunk=c('!','#','!'), val=c(1,-1,-1), valIndID=c('1', '1', '1'), ind=c(1,2,3), key='chunk')
+	  testEnvTbl = list('5' = data.table(chunk=c('!','#','!'), val=c(1,-1,-1), valIndID=c('1', '1', '1'), ind=c(1,2,3), key='chunk'))
 	  testSjiTbl = data.table(context=c('!','#','#'), hashtag=c('a','a','b'), posFromTag=c(1,0,1), partialN=c(2,1,1), key='context')
 	  testMemMat[['orig']] = makeMemMat(testSjiTbl, testEnvTbl, testConfig)
 	  testComputePermAct('#', 0, testEnvTbl, testMemMat, testConfig, data.table(hashtag=c('a','b'), act=c(cor(c(0,1,0,-2,0), c(0,-1,0,0,0)),
