@@ -1227,70 +1227,14 @@ renameColDVName <- function(tbl) {
 		    'topHashtagAcrossBodyOrderlessEntropy', 'RP only body w/ entropy',
 		    'topHashtagAcrossTweetOrderEntropyTweetOrderlessEntropy', 'RP combined orderless and order w/ entropy',
 		    'topHashtagAcrossTweetOrderEntropy', 'RP only order context w/ entropy',
-		    'topHashtagAcrossTitleOrderlessStoplistBodyOrderlessStoplist', 'RP combined title and body w/ stoplist',
-		    'topHashtagAcrossTitleOrderlessStoplist', 'RP only title w/ stoplist',
-		    'topHashtagAcrossBodyOrderlessStoplist', 'RP only body w/ stoplist',
-		    'topHashtagAcrossTweetOrderStoplistTweetOrderlessStoplist', 'RP combined orderless and order w/ stoplist',
-		    'topHashtagAcrossTweetOrderStoplist', 'RP only order context w/ stoplist',
-		    'topHashtagAcrossTweetOrderlessStoplist', 'RP only orderless context w/ stoplist',
-		    'topHashtagAcrossPriorStdTweetOrderStoplistTweetOrderlessStoplist', 'RP combined full w/ stoplist',
-		    'topHashtagAcrossPriorStdTitleOrderlessStoplistBodyOrderlessStoplist', 'RP combined full w/ stoplist',
-		    'topHashtagAcrossTitleOrderlessHymanBodyOrderlessHyman', 'RP combined title and body w/ entropy and logodds',
-		    'topHashtagAcrossTitleOrderlessHyman', 'RP only title w/ entropy and logodds',
-		    'topHashtagAcrossBodyOrderlessHyman', 'RP only body w/ entropy and logodds',
-		    'topHashtagAcrossTweetOrderHymanTweetOrderlessHyman', 'RP combined orderless and order w/ entropy and logodds',
-		    'topHashtagAcrossTweetOrderHyman', 'RP only order context w/ entropy and logodds',
-		    'topHashtagAcrossTweetOrderlessHyman', 'RP only orderless context w/ entropy and logodds',
-		    'topHashtagAcrossPriorStdTweetOrderHymanTweetOrderlessHyman', 'RP combined full w/ entropy and logodds',
-		    'topHashtagAcrossPriorStdTitleOrderlessHymanBodyOrderlessHyman', 'RP combined full w/ entropy and logodds',
-		    'topHashtagAcrossTitleOrderlessDirectionBodyOrderlessDirection', 'RP combined title and body w/ entropy and direction',
-		    'topHashtagAcrossTitleOrderlessDirection', 'RP only title w/ entropy and direction',
-		    'topHashtagAcrossBodyOrderlessDirection', 'RP only body w/ entropy and direction',
-		    'topHashtagAcrossTweetOrderDirectionTweetOrderlessDirection', 'RP combined orderless and order w/ entropy and direction',
-		    'topHashtagAcrossTweetOrderDirection', 'RP only order context w/ entropy and direction',
-		    'topHashtagAcrossTweetOrderlessDirection', 'RP only orderless context w/ entropy and direction',
-		    'topHashtagAcrossPriorStdTweetOrderDirectionTweetOrderlessDirection', 'RP combined full w/ entropy and direction',
-		    'topHashtagAcrossPriorStdTitleOrderlessDirectionBodyOrderlessDirection', 'RP combined full w/ entropy and direction',
-		    'topHashtagAcrossTitleOrderlessWindowBodyOrderlessWindow', 'RP combined title and body w/ entropy and window',
-		    'topHashtagAcrossTitleOrderlessWindow', 'RP only title w/ entropy and window',
-		    'topHashtagAcrossBodyOrderlessWindow', 'RP only body w/ entropy and window',
-		    'topHashtagAcrossTweetOrderWindowTweetOrderlessWindow', 'RP combined orderless and order w/ entropy and window',
-		    'topHashtagAcrossTweetOrderWindow', 'RP only order context w/ entropy and window',
-		    'topHashtagAcrossTweetOrderlessWindow', 'RP only orderless context w/ entropy and window',
-		    'topHashtagAcrossPriorStdTweetOrderWindowTweetOrderlessWindow', 'RP combined full w/ entropy and window',
-		    'topHashtagAcrossPriorStdTitleOrderlessWindowBodyOrderlessWindow', 'RP combined full w/ entropy and window',
-		    'topHashtagAcrossTitleOrderlessFreqBodyOrderlessFreq', 'RP combined title and body w/ freq',
-		    'topHashtagAcrossTitleOrderlessFreq', 'RP only title w/ freq',
-		    'topHashtagAcrossBodyOrderlessFreq', 'RP only body w/ freq',
-		    'topHashtagAcrossTweetOrderFreqTweetOrderlessFreq', 'RP combined orderless and order w/ freq',
-		    'topHashtagAcrossTweetOrderFreq', 'RP only order context w/ freq',
-		    'topHashtagAcrossTweetOrderlessFreq', 'RP only orderless context w/ freq',
-		    'topHashtagAcrossPriorStdTweetOrderFreqTweetOrderlessFreq', 'RP combined full w/ freq',
-		    'topHashtagAcrossPriorStdTitleOrderlessFreqBodyOrderlessFreq', 'RP combined full w/ freq',
-		    'topHashtagAcrossTitleOrderlessFrentropyBodyOrderlessFrentropy', 'RP combined title and body w/ freq and entropy',
-		    'topHashtagAcrossTitleOrderlessFrentropy', 'RP only title w/ freq and entropy',
-		    'topHashtagAcrossBodyOrderlessFrentropy', 'RP only body w/ freq and entropy',
-		    'topHashtagAcrossTweetOrderFrentropyTweetOrderlessFrentropy', 'RP combined orderless and order w/ freq and entropy',
-		    'topHashtagAcrossTweetOrderFrentropy', 'RP only order context w/ freq and entropy',
-		    'topHashtagAcrossTweetOrderlessFrentropy', 'RP only orderless context w/ freq and entropy',
-		    'topHashtagAcrossPriorStdTweetOrderFrentropyTweetOrderlessFrentropy', 'RP combined full w/ freq and entropy',
-		    'topHashtagAcrossPriorStdTitleOrderlessFrentropyBodyOrderlessFrentropy', 'RP combined full w/ freq and entropy',
-		    'topHashtagAcrossTitleOrderlessMeddimBodyOrderlessMeddim', 'RP combined title and body w/ entropy and 4000-row matrix',
-		    'topHashtagAcrossTitleOrderlessMeddim', 'RP only title w/ entropy and 4000-row matrix',
-		    'topHashtagAcrossBodyOrderlessMeddim', 'RP only body w/ entropy and 4000-row matrix',
-		    'topHashtagAcrossTweetOrderMeddimTweetOrderlessMeddim', 'RP combined orderless and order w/ entropy and 4000-row matrix',
-		    'topHashtagAcrossTweetOrderMeddim', 'RP only order context w/ entropy and 4000-row matrix',
-		    'topHashtagAcrossTweetOrderlessMeddim', 'RP only orderless context w/ entropy and 4000-row matrix',
-		    'topHashtagAcrossPriorStdTweetOrderMeddimTweetOrderlessMeddim', 'RP combined full w/ entropy and 4000-row matrix',
-		    'topHashtagAcrossPriorStdTitleOrderlessMeddimBodyOrderlessMeddim', 'RP combined full w/ entropy and 4000-row matrix',
-		    'topHashtagAcrossTitleOrderlessLgdimBodyOrderlessLgdim', 'RP combined title and body w/ entropy and 10000-row matrix',
-		    'topHashtagAcrossTitleOrderlessLgdim', 'RP only title w/ entropy and 10000-row matrix',
-		    'topHashtagAcrossBodyOrderlessLgdim', 'RP only body w/ entropy and 10000-row matrix',
-		    'topHashtagAcrossTweetOrderLgdimTweetOrderlessLgdim', 'RP combined orderless and order w/ entropy and 10000-row matrix',
-		    'topHashtagAcrossTweetOrderLgdim', 'RP only order context w/ entropy and 10000-row matrix',
-		    'topHashtagAcrossTweetOrderlessLgdim', 'RP only orderless context w/ entropy and 10000-row matrix',
-		    'topHashtagAcrossPriorStdTweetOrderLgdimTweetOrderlessLgdim', 'RP combined full w/ entropy and 10000-row matrix',
-		    'topHashtagAcrossPriorStdTitleOrderlessLgdimBodyOrderlessLgdim', 'RP combined full w/ entropy and 10000-row matrix',
+		    makeStandardMapping('Stoplist', 'w/ stop list'),
+		    makeStandardMapping('Hyman', 'w/ entropy and log odds'),
+		    makeStandardMapping('Direction', 'w/ entropy and direction'),
+		    makeStandardMapping('Window', 'w/ entropy and window'),
+		    makeStandardMapping('Freq', 'w/ freq'),
+		    makeStandardMapping('Frentropy', 'w/ freq and entropy'),
+		    makeStandardMapping('Meddim', 'w/ entropy and 4000-row matrix'),
+		    makeStandardMapping('Lgdim', 'w/ entropy and 1000-row matrix'),
 		    'topHashtagAcrossPriorStdTitleFrentropyBodyFrentropy', 'Bayes combined full w/ freq'
 		    )
 	mapping = groupN(2, mapping)
@@ -1300,6 +1244,27 @@ renameColDVName <- function(tbl) {
 	setkey(mapTbl, DVName)
 	tbl[mapTbl, DVName := newName]
 	tbl
+}
+
+makeStandardMapping <- function(keyword, text) {
+	res = c('topHashtagAcrossTitleOrderless%sBodyOrderless%s', 'RP combined title and body %s',
+		'topHashtagAcrossTitleOrderless%s', 'RP only title %s',
+		'topHashtagAcrossBodyOrderless%s', 'RP only body %s', 
+		'topHashtagAcrossTweetOrder%sTweetOrderless%s', 'RP combined orderless and order %s' ,
+		'topHashtagAcrossTweetOrder%s', 'RP only order context %s', 
+		'topHashtagAcrossTweetOrderless%s', 'RP only orderless context %s', 
+		'topHashtagAcrossPriorStdTweetOrder%sTweetOrderless%s', 'RP combined full %s', 
+		'topHashtagAcrossPriorStdTitleOrderless%sBodyOrderless%s', 'RP combined full %s')
+	res = groupN(2, res)
+	remapFun <- function(pair) {
+		args = as.list(c(pair[1], rep(keyword, str_count(pair[1], '%s'))))
+		args
+		pair[1] = do.call(sprintf, args)
+		pair[2] = sprintf(pair[2], text)
+		pair
+	}
+	res = lapply(res, remapFun)
+	unlist(res)
 }
 
 plotDVDiffs <- function(sumTbl) {
