@@ -2369,7 +2369,7 @@ runContextWithConfig <- function(regen, samplesPerRun, numRunsT, numRunsSO, grou
 }
 
 groupConfigS1 <- list(sizeNum=1, maxIdSOSji=1e5, maxIdSOPrior=100e6, maxIdTSji=3e6, maxIdTPrior=1e5)
-groupConfigS2 <- list(sizeNum=2, maxIdSOSji=1e6, maxIdSOPrior=100e6, maxIdTSji=3e6, maxIdTPrior=1e5) # FIXME: Change to 3Mil for SO when possible
+groupConfigS2 <- list(sizeNum=2, maxIdSOSji=1e6, maxIdSOPrior=100e6, maxIdTSji=3e6, maxIdTPrior=1e5) # FIXME: Change to 3Mil for maxIdSOSji when possible
 groupConfigS3 <- list(sizeNum=3, maxIdSOSji=1e6, maxIdSOPrior=100e6, maxIdTSji=1e6, maxIdTPrior=1e5)
 groupConfigS4 <- list(sizeNum=4, maxIdSOSji=1e5, maxIdSOPrior=100e6, maxIdTSji=1e5, maxIdTPrior=1e5)
 groupConfigS5 <- list(sizeNum=5, maxIdSOSji=1e4, maxIdSOPrior=100e6, maxIdTSji=1e4, maxIdTPrior=1e5)
