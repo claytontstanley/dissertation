@@ -2,6 +2,20 @@ priorLogLevel = getLogLevel()
 setLogLevel(0)
 
 context('Prior Model')
+computeActPriorForUser <- function(hashtag, dt, ds, user_screen_name) {
+	retIndeces = which(!duplicated(dt))[-1]
+	myStopifnot(length(retIndeces) > 0)
+	partialRes = data.table(i=retIndeces)
+	partialRes = partialRes[, list(hashtag=hashtag[1:i], dtP=dt[1:i], cTime=dt[i]), by=i]
+	partialRes = with(partialRes, as.data.table(computeActPrior(hashtag, dtP, cTime, d=ds)))
+	partialRes
+}
+
+computeActPriorByUser <- function(hashtagsTbl, ds) {
+	partialRes = hashtagsTbl[, computeActPriorForUser(hashtag, dt, ds, user_screen_name), by=user_screen_name]
+	modelHashtagsTbl = getModelHashtagsTbl(partialRes)
+	modelHashtagsTbl
+}
 
 test_that("testPriorActivations", {
 	  sortExpectedTbl <- function(tbl) {
