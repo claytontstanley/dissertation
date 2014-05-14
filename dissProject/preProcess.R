@@ -1308,27 +1308,20 @@ analyzePrior <- function(modelVsPredTbl) {
 	modelVsPredTbl[topHashtag == T & d==min(d)][, list(totN, sum(NCell)), by=list(user_screen_name,d,DVName, datasetName)][!is.na(totN)][,list(res=totN-V2)][, withCI(res)]
 	# Check that the Ns for each dataset look right	
 	modelVsPredTbl[, list(N=.N, names=list(unique(datasetName))), by=list(dsetType, dsetGroup, runNum,datasetNameRoot)]
-
-	dvDiffsTbl = plotDVDiffs(rbind(modelVsPredTbl[runNum==2, compare2DVs(.SD, c('topHashtagPostPriorStd', 'topHashtagPostPriorOL2'), sortedOrder=c(1,2)), by=list(dsetType, dsetGroup), .SDcols=colnames(modelVsPredTbl)],
-				       modelVsPredTbl[runNum==2, compare2DVs(.SD, c('topHashtagPostPriorStd', 'topHashtagAcrossPriorStd')), by=list(dsetType, dsetGroup), .SDcols=colnames(modelVsPredTbl)],
-				       #modelVsPredTbl[DVName %in% c('topHashtagPostPriorStd', 'topHashtagPostPriorOL2'), compare2Runs(.SD, c(1,2)), by=list(dsetType, dsetGroup), .SDcols=colnames(modelVsPredTbl)],
-				       modelVsPredTbl[runNum==2 & DVName %in% c('topHashtagPostPriorStd', 'topHashtagPostPriorOL2'), compareDBestVsMin(.SD), by=list(dsetType, dsetGroup)],
-				       modelVsPredTbl[runNum==2 & DVName %in% c('topHashtagPostPriorStd'), compareDBestVsMax(.SD), by=list(dsetType, dsetGroup)]))
+	bestTbl = modelVsPredTbl[predUsedBest == T]
+	dvDiffsTbl = plotDVDiffs(rbind(bestTbl[runNum==2, compare2DVs(.SD, c('topHashtagPostPriorStd', 'topHashtagPostPriorOL2'), sortedOrder=c(1,2)), by=list(dsetType, dsetGroup), .SDcols=colnames(bestTbl)],
+				       bestTbl[runNum==2, compare2DVs(.SD, c('topHashtagPostPriorStd', 'topHashtagAcrossPriorStd')), by=list(dsetType, dsetGroup), .SDcols=colnames(bestTbl)],
+				       #bestTbl[DVName %in% c('topHashtagPostPriorStd', 'topHashtagPostPriorOL2'), compare2Runs(.SD, c(1,2)), by=list(dsetType, dsetGroup), .SDcols=colnames(bestTbl)],
+				       bestTbl[runNum==2 & DVName %in% c('topHashtagPostPriorStd', 'topHashtagPostPriorOL2'), compareDBestVsMin(.SD), by=list(dsetType, dsetGroup)],
+				       bestTbl[runNum==2 & DVName %in% c('topHashtagPostPriorStd'), compareDBestVsMax(.SD), by=list(dsetType, dsetGroup)]))
 	dvDiffsTbl[, mean(meanVal), by=direction]
-	compareOptimalDs(modelVsPredTbl[DVName %in% c('topHashtagPostPriorStd', 'topHashtagPostPriorOL2', 'topHashtagAcrossPriorStd') & runNum == 2])
-	compareOptimalAcc(modelVsPredTbl[DVName %in% c('topHashtagPostPriorStd', 'topHashtagPostPriorOL2', 'topHashtagAcrossPriorStd') & runNum == 2])
-
-	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostPriorStd' & datasetName=='TFollowgt1kr2'])
-	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostPriorStd' & datasetName=='TTweetsgt5e4r2'])
-	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostPriorStd' & datasetName=='TTweetsgt1e2r2'])
-	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostPriorStd' & datasetName=='SOgt1kr2'])
-	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostPriorStd' & datasetName=='SOgt100kr2'])
-	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostPriorStd' & datasetName=='SOQgt050r2'])
+	compareOptimalDs(bestTbl[DVName %in% c('topHashtagPostPriorStd', 'topHashtagPostPriorOL2', 'topHashtagAcrossPriorStd') & runNum == 2])
+	compareOptimalAcc(bestTbl[DVName %in% c('topHashtagPostPriorStd', 'topHashtagPostPriorOL2', 'topHashtagAcrossPriorStd') & runNum == 2])
 	
-	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostPriorStd' & datasetName=='TFollowgt10Mr2'])
-	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostPriorStd' & datasetName=='SOQgt500r2'])
-	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostPriorOL2' & datasetName=='TFollowgt10Mr2' & d < 1])
-	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostPriorOL2' & datasetName=='SOQgt500r2' & d < 1])
+	visModelVsPredTbl(bestTbl[DVName=='topHashtagPostPriorStd' & datasetName=='TFollowgt10Mr2'])
+	visModelVsPredTbl(bestTbl[DVName=='topHashtagPostPriorStd' & datasetName=='SOQgt500r2'])
+	visModelVsPredTbl(bestTbl[DVName=='topHashtagPostPriorOL2' & datasetName=='TFollowgt10Mr2' & d < 1])
+	visModelVsPredTbl(bestTbl[DVName=='topHashtagPostPriorOL2' & datasetName=='SOQgt500r2' & d < 1])
 }
 
 asTopHashtagAcross <- function(vect) {
