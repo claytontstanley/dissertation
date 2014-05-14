@@ -1353,13 +1353,6 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 	baseTbl = modelVsPredTbl[dsetSize==500][grepl('^topHashtagAcross', DVName)]
 	tbl = baseTbl[predUsedBest == T]
 	tbl[, .N, by=DVName]
-	DVNamesSO = c('topHashtagAcrossPriorStd', 'topHashtagAcrossBodyOrderlessEntropy', 'topHashtagAcrossBody', 
-		      'topHashtagAcrossTitleOrderlessEntropy', 'topHashtagAcrossTitle',
-		      'topHashtagAcrossPriorStdTitleOrderlessEntropyBodyOrderlessEntropy',
-		      'topHashtagAcrossPriorStdTitleBody')
-	DVNamesT = c('topHashtagAcrossPriorStd', 'topHashtagAcrossTweet', 'topHashtagAcrossTweetOrderlessEntropy',
-		     'topHashtagAcrossTweetOrderEntropy',
-		     'topHashtagAcrossPriorStdTweet', 'topHashtagAcrossPriorStdTweetOrderEntropyTweetOrderlessEntropy')
 	# SO full
 	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'stackoverflow'], acc, figName='ContextMeanDVSO')
 	# SO standard
@@ -1370,7 +1363,6 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'twitter' & !grepl('(Entropy)|(Direction)|(Hyman)|(Stoplist)|(Freq)|(Window)', DVName)], acc, figName='foo', groupCol='dsetGroup')
 	# T standard all groups
 	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'twitter' & !grepl('(Entropy)|(Direction)|(Hyman)|(Stoplist)|(Freq)|(Window)', DVName)], acc, figName='ContextMeanDVT', groupCol='groupNum')
-
 	# SO Entropy
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleBody',
 				       'BodyOrderlessEntropy', 'Body', 'BodyOrderless',
@@ -1426,12 +1418,13 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 				       'PriorStdTweetOrderEntropyTweetOrderlessEntropy', 'PriorStdTweetOrderTweetOrderless', 'PriorStdTweetOrderDirectionTweetOrderlessDirection',
 				       'PriorStdTweetOrderWindowTweetOrderlessWindow'))
 	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='foo', groupCol='dsetGroup')
-	
+	# SO compare two d values	
 	dTbl = baseTbl[topHashtag & hashtagUsedP] 
 	dTbl[sizeNum ==2 & dsetType == 'stackoverflow' & DVName %in% DVNames]
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleBody', 'PriorStdTitleOrderlessEntropyBodyOrderlessEntropy',
 				       'PriorStdTitleOrderlessFreqBodyOrderlessFreq'))
 	compareMeanDV(dTbl[sizeNum == 2 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='foo', groupCol='d')
+	# T compare two d values
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweet', 'PriorStdTweetOrderEntropyTweetOrderlessEntropy',
 				       'PriorStdTweetOrderFreqTweetOrderlessFreq'))
 	compareMeanDV(dTbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='foo', groupCol='d')
