@@ -40,6 +40,8 @@ options("scipen"=100, "digits"=4)
 options(error=traceback)
 options(datatable.alloccol = 900)
 
+MCCORES = if (any(grepl('gui', commandArgs()))) 1 else 4
+
 withDBConnect <- function(var, thunk) {
 	var = substitute(var)
 	eval(bquote(assign(.(deparse(var)), dbConnect(PostgreSQL(), host="localhost", user=USER, dbname=USER))), envir=parent.frame())
@@ -2254,7 +2256,7 @@ getFullPostResTbl <- function(tokenTbl, config) {
 		res = getPostResTbl(tokenTbl[id == curId], config, curId)
 		res[, id := curId]
 	}
-	postResTbl = rbindlist(mclapply(tokenTbl[, unique(id)], subFun, mc.cores=1))
+	postResTbl = rbindlist(mclapply(tokenTbl[, unique(id)], subFun, mc.cores=MCCORES))
 	#postResTbl = tokenTbl[, getPostResTbl(.SD, config, id[1]), by=id, .SDcols=colnames(tokenTbl)]
 	postResTbl
 }
