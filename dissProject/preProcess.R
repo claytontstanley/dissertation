@@ -1430,8 +1430,6 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 				       'PriorStdTweetOrderFreqTweetOrderlessFreq'))
 	dWideTbl = getDWideTbl(dTbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames])
 	compareMeanDV(dWideTbl, dDiff, figName='foo')
-	baseTbl[predUsedBest==T, .N, by=list(predUsedBest,DVName,d)][, setkey(.SD, DVName, d)][grepl('Prior', DVName)]
-	baseTbl[sizeNum == 2 & topHashtag & hashtagUsedP & DVName == 'topHashtagAcrossPriorStd']
 }
 
 getDWideTbl <- function(tbl) {
