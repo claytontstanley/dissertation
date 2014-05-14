@@ -1097,7 +1097,7 @@ plotBarSumTbl <- function(sumTbl, fillCol, figName, extras=NULL, groupCol='dsetG
 compareMeanDV <- function(modelVsPredTbl, DV, extras=NULL, figName='', groupCol='dsetGroup', CIFun=CI) {
 	DV = substitute(DV)
 	modelVsPredTbl
-	expr = bquote(modelVsPredTbl[predUsedBest == T][, withCI(.(DV), CIFun=CIFun), keyby=list(DVName, .(as.symbol(groupCol)))])
+	expr = bquote(modelVsPredTbl[, withCI(.(DV), CIFun=CIFun), keyby=list(DVName, .(as.symbol(groupCol)))])
 	expr
 	sumTbl = eval(expr)
 	sumTbl
@@ -1357,7 +1357,8 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 	plotPPVTbl(ppvTbl[dsetType=='stackoverflow' & runNum==1 & dsetSize==500], 'contextPpvSO')
 	plotPPVTbl(ppvTbl[dsetType=='twitter' & runNum==1 & dsetSize==500], 'contextPpvT')
 	tblPost = modelVsPredTbl[predUsedBest == T][dsetSize==500][grepl('^topHashtagPost', DVName)]
-	tbl = modelVsPredTbl[predUsedBest == T][dsetSize==500][grepl('^topHashtagAcross', DVName)]
+	baseTbl = modelVsPredTbl[dsetSize==500][grepl('^topHashtagAcross', DVName)]
+	tbl = baseTbl[predUsedBest == T]
 	tbl[, .N, by=DVName]
 	DVNamesSO = c('topHashtagAcrossPriorStd', 'topHashtagAcrossBodyOrderlessEntropy', 'topHashtagAcrossBody', 
 		      'topHashtagAcrossTitleOrderlessEntropy', 'topHashtagAcrossTitle',
@@ -1376,6 +1377,7 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'twitter' & !grepl('(Entropy)|(Direction)|(Hyman)|(Stoplist)|(Freq)|(Window)', DVName)], acc, figName='foo', groupCol='dsetGroup')
 	# T standard all groups
 	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'twitter' & !grepl('(Entropy)|(Direction)|(Hyman)|(Stoplist)|(Freq)|(Window)', DVName)], acc, figName='ContextMeanDVT', groupCol='groupNum')
+
 	# SO Entropy
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleBody',
 				       'BodyOrderlessEntropy', 'Body', 'BodyOrderless',
@@ -1431,6 +1433,15 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 				       'PriorStdTweetOrderEntropyTweetOrderlessEntropy', 'PriorStdTweetOrderTweetOrderless', 'PriorStdTweetOrderDirectionTweetOrderlessDirection',
 				       'PriorStdTweetOrderWindowTweetOrderlessWindow'))
 	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='foo', groupCol='dsetGroup')
+	
+	dTbl = baseTbl[topHashtag & hashtagUsedP] 
+	dTbl[sizeNum ==2 & dsetType == 'stackoverflow' & DVName %in% DVNames]
+	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleBody', 'PriorStdTitleOrderlessEntropyBodyOrderlessEntropy',
+				       'PriorStdTitleOrderlessFreqBodyOrderlessFreq'))
+	compareMeanDV(dTbl[sizeNum == 2 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='foo', groupCol='d')
+	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweet', 'PriorStdTweetOrderEntropyTweetOrderlessEntropy',
+				       'PriorStdTweetOrderFreqTweetOrderlessFreq'))
+	compareMeanDV(dTbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='foo', groupCol='d')
 }
 
 analyzeContextSmall <- function() {
