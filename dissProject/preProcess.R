@@ -1423,7 +1423,6 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleBody', 'PriorStdTitleOrderlessEntropyBodyOrderlessEntropy',
 				       'PriorStdTitleOrderlessFreqBodyOrderlessFreq'))
 	dWideTbl = getDWideTbl(dTbl[sizeNum == 2 & dsetType == 'stackoverflow' & DVName %in% DVNames])
-	dWideTbl
 	compareMeanDV(dWideTbl, dDiff, figName='foo')
 	# T compare two d values
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweet', 'PriorStdTweetOrderEntropyTweetOrderlessEntropy',
