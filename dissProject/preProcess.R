@@ -26,6 +26,7 @@ library(data.table)
 library(reshape2)
 library(boot)
 library(digest)
+library(parallel)
 
 PATH = getPathToThisFile()
 FILE = getNameOfThisFile()
@@ -2249,7 +2250,12 @@ getHashtagsTblFromSubsetTbl <- function(tokenTbl, config) {
 getFullPostResTbl <- function(tokenTbl, config) {
 	myStopifnot(nrow(tokenTbl[, .N, by=list(id, user_screen_name, creation_epoch, dt, user_screen_name_prior)]) == length(tokenTbl[, unique(id)]))
 	tokenTbl
-	postResTbl = tokenTbl[, getPostResTbl(.SD, config, id[1]), by=id, .SDcols=colnames(tokenTbl)]
+	subFun <- function(curId) {
+		res = getPostResTbl(tokenTbl[id == curId], config, curId)
+		res[, id := curId]
+	}
+	postResTbl = rbindlist(mclapply(tokenTbl[, unique(id)], subFun, mc.cores=1))
+	#postResTbl = tokenTbl[, getPostResTbl(.SD, config, id[1]), by=id, .SDcols=colnames(tokenTbl)]
 	postResTbl
 }
 
