@@ -1420,14 +1420,29 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='foo', groupCol='dsetGroup')
 	# SO compare two d values	
 	dTbl = baseTbl[topHashtag & hashtagUsedP] 
-	dTbl[sizeNum ==2 & dsetType == 'stackoverflow' & DVName %in% DVNames]
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleBody', 'PriorStdTitleOrderlessEntropyBodyOrderlessEntropy',
 				       'PriorStdTitleOrderlessFreqBodyOrderlessFreq'))
-	compareMeanDV(dTbl[sizeNum == 2 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='foo', groupCol='d')
+	dWideTbl = getDWideTbl(dTbl[sizeNum == 2 & dsetType == 'stackoverflow' & DVName %in% DVNames])
+	dWideTbl
+	compareMeanDV(dWideTbl, dDiff, figName='foo')
 	# T compare two d values
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweet', 'PriorStdTweetOrderEntropyTweetOrderlessEntropy',
 				       'PriorStdTweetOrderFreqTweetOrderlessFreq'))
-	compareMeanDV(dTbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='foo', groupCol='d')
+	dWideTbl = getDWideTbl(dTbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames])
+	compareMeanDV(dWideTbl, dDiff, figName='foo')
+	baseTbl[predUsedBest==T, .N, by=list(predUsedBest,DVName,d)][, setkey(.SD, DVName, d)][grepl('Prior', DVName)]
+	baseTbl[sizeNum == 2 & topHashtag & hashtagUsedP & DVName == 'topHashtagAcrossPriorStd']
+}
+
+getDWideTbl <- function(tbl) {
+	tbl = copy(tbl)[, d := gsub('\\.', 'p', paste0('d', d))]
+	lhs = setdiff(colnames(tbl), c('d', 'acc', 'maxNP', 'NCell', 'predUsedBest'))
+	lhs = paste0(lhs, c(rep(' + ', length(lhs)-1), ' ~ '), collapse='')
+	model = sprintf('%s%s', lhs, 'd')
+	model
+	resTbl = dcast.data.table(tbl, model, value.var='acc')
+	resTbl[, dDiff := d0p7 - d0p5]
+	resTbl
 }
 
 analyzeContextSmall <- function() {
