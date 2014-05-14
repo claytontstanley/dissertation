@@ -2699,15 +2699,15 @@ curWS <- function() {
 	runTFollow10M()
 	runSO1k()
 	runSOQgt400()
-	#FIXME: Check size of objects for S1 at least
 	#FIXME: Rerun prior after tokenized finished
+	#FIXME: Rerun prior again to test mclapply 
 	#FIXME: Run new context
+	#FIXME: Do something with the 2 different ds
 	#FIXME: address word order low predictiveness
 	#FIXME: proper combination of prior and context for RP
 	#FIXME: add word order to Bayesian sji
 	#FIXME: Methods to import and anlyze coefficient tables
 	#FIXME: Quickly rerun logreg analysis for actDV
-	#FIXME: Do something with the 2 different ds
 	#FIXME: Rename Hyman to LogOdds
 	withProf(runContext20g1s1(regen='useAlreadyLoaded'))
 	setLogLevel(1)
