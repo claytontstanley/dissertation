@@ -40,7 +40,7 @@ options("scipen"=100, "digits"=4)
 options(error=traceback)
 options(datatable.alloccol = 900)
 
-MCCORES = if (any(grepl('gui', commandArgs()))) 1 else 5
+MCCORES = if (any(grepl('gui', commandArgs()))) 1 else 4
 
 withDBConnect <- function(var, thunk) {
 	var = substitute(var)
