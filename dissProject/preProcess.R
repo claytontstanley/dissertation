@@ -438,7 +438,7 @@ writeModelHashtagsTbl <- function(modelHashtagsTbl, outFile) {
 }
 
 writeLogregTbl <- function(logregTbl, outFile) {
-	setkey(logregTbl, name, predName, d)
+	setkey(logregTbl, bestFitName, predName, d)
 	myWriteCSV(logregTbl, file=outFile)
 }
 
@@ -2224,6 +2224,16 @@ addWeights <- function(postResTbl) {
 	return()
 }
 
+preProcessPostResTbl <- function(postResTbl, runTbl) {
+	guardAllEqualP(postResTbl[, d])
+	guardAllEqualP(postResTbl[, user_screen_name])
+	preProcess <- function(predictors) {
+		handleNAs(postResTbl, predictors)
+	}
+	runTbl[, preProcess(predName), by=name]
+	addWeights(postResTbl)
+}
+
 analyzePostResTbl <- function(postResTbl, predictors, bestFitName) {
 	setkey(postResTbl, user_screen_name, dt, hashtag, d)
 	guardAllEqualP(postResTbl[, d])
@@ -2233,8 +2243,6 @@ analyzePostResTbl <- function(postResTbl, predictors, bestFitName) {
 	#postResTbl = copy(postResTbl)
 	predictors
 	postResTbl
-	handleNAs(postResTbl, predictors)
-	addWeights(postResTbl)
 	myLogit = runLogReg(postResTbl, predictors)
 	coeffs = summary(myLogit)$coefficients
 	logregTbl = as.data.table(coeffs)
@@ -2242,8 +2250,8 @@ analyzePostResTbl <- function(postResTbl, predictors, bestFitName) {
 	logregTbl
 	logregTbl[, predName := rownames(coeffs)][, d := postResTbl[, d[1]]]
 	logregTbl[, user_screen_name := postResTbl[, user_screen_name[1]]]
+	logregTbl[, bestFitName := bestFitName]
 	summary(myLogit)
-	updateBestFitCol(postResTbl, logregTbl, bestFitName)
 	postResTbl
 	myLog(summary(myLogit))
 	myLog(ClassLog(myLogit, postResTbl$hashtagUsedP))
@@ -2273,14 +2281,20 @@ getFullPostResTbl <- function(tokenTbl, config) {
 analyzePostResTblAcrossDs <- function(postResTbl, runTbl) {
 	analyzePostResTblForD <- function(curD) {
 		tbl = postResTbl[d == curD] 
+		preProcessPostResTbl(tbl, runTbl)
 		tbl
 		runTbl
 		if (nrow(runTbl) > 0) {
-			logregTbl = runTbl[, analyzePostResTbl(tbl, predName, name), by=name]
+			runTbl
+			bestFitNames = runTbl[, unique(name)]
+			analyzeFun <- function(bestFitName) {
+				analyzePostResTbl(tbl, runTbl[name==bestFitName, predName], bestFitName)
+			}
+			logregTbl = rbindlist(mclapply(bestFitNames, analyzeFun, mc.cores=MCCORES))
+			logregTbl[, updateBestFitCol(tbl, .SD, bestFitName), by=bestFitName]
 		} else {
-			logregTbl = data.table(name=character(), predName=character(), d=double(), user_screen_name=character())
+			logregTbl = data.table(bestFitName=character(), predName=character(), d=double(), user_screen_name=character())
 		}
-		logregTbl
 		list(postResTbl=tbl, logregTbl=logregTbl)	
 	}
 	ds = postResTbl[, unique(d)]
@@ -2708,7 +2722,6 @@ curWS <- function() {
 	runTFollow10M()
 	runSO1k()
 	runSOQgt400()
-	#FIXME: Rerun prior after tokenized finished (running)
 	#FIXME: Rerun prior again to test mclapply 
 	#FIXME: Parallelize process to get coefficients.
 	#FIXME: Run new context
