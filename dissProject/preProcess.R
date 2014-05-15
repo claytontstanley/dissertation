@@ -2722,8 +2722,8 @@ curWS <- function() {
 	runTFollow10M()
 	runSO1k()
 	runSOQgt400()
-	#FIXME: Rerun prior again to test mclapply 
-	#FIXME: Parallelize process to get coefficients.
+	#FIXME: Rerun prior again to test mclapply (running)
+	#FIXME: Parallelize process to get coefficients. (testing)
 	#FIXME: Run new context
 	#FIXME: address word order low predictiveness
 	#FIXME: proper combination of prior and context for RP
