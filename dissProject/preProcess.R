@@ -2235,7 +2235,6 @@ preProcessPostResTbl <- function(postResTbl, runTbl) {
 }
 
 analyzePostResTbl <- function(postResTbl, predictors, bestFitName) {
-	setkey(postResTbl, user_screen_name, dt, hashtag, d)
 	guardAllEqualP(postResTbl[, d])
 	guardAllEqualP(postResTbl[, user_screen_name])
 	myLog(sprintf('Analyzing post result table for d=%s, bestFitName=%s, and predictors=%s',
