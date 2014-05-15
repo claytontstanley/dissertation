@@ -40,7 +40,7 @@ options("scipen"=100, "digits"=4)
 options(error=traceback)
 options(datatable.alloccol = 900)
 
-MCCORES = if (any(grepl('gui', commandArgs()))) 1 else 4
+MCCORES = if (any(grepl('gui', commandArgs()))) 1 else 5
 
 withDBConnect <- function(var, thunk) {
 	var = substitute(var)
@@ -2711,7 +2711,6 @@ curWS <- function() {
 	#FIXME: Rerun prior after tokenized finished
 	#FIXME: Rerun prior again to test mclapply 
 	#FIXME: Run new context
-	#FIXME: Do something with the 2 different ds
 	#FIXME: address word order low predictiveness
 	#FIXME: proper combination of prior and context for RP
 	#FIXME: add word order to Bayesian sji

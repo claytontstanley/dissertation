@@ -14,12 +14,12 @@ parrunPriors: NP = 8
 parrunSjisSOAll: NP = 1
 parrunSjisTAll: NP = 1
 parrunContext: NP = 1
-parrunContextS1: NP = 4
-parrunContextS2: NP = 2
-parrunContextS3: NP = 2
-parrunContextS4: NP = 4
-parrunContextS5: NP = 4
-parrunContextS6: NP = 4
+parrunContextS1: NP = 2
+parrunContextS2: NP = 1
+parrunContextS3: NP = 1
+parrunContextS4: NP = 2
+parrunContextS5: NP = 2
+parrunContextS6: NP = 2
 parrunGenAndSaveCurWorkspace: NP = 1
 
 parrun%:
