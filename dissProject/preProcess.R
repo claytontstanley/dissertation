@@ -541,13 +541,13 @@ getConfig <- function(config, slot) {
 
 makeRunTbl <- function(runs) {
 	makeTbl <- function(run) {
-		name = paste(run, collapse='_', sep='')
-		data.table(name=name, predName=run)
+		bestFitName = paste(run, collapse='_', sep='')
+		data.table(bestFitName=bestFitName, predName=run)
 	}
 	if (length(runs) > 0) {
 		rbindlist(lapply(runs, makeTbl))
 	} else {
-		data.table(name=character(0), predName=character(0))
+		data.table(bestFitName=character(0), predName=character(0))
 	}
 }
 
@@ -1297,7 +1297,7 @@ getBestFitNames <- function(modelHashtagsTbl) {
 	stopifnot(nrow(bestFitNameTbl) == 1)
 	config = getConfigFile(bestFitNameTbl[, datasetNameRoot])
 	runTbl = getConfig(config, 'runTbl')
-	bestFitNameTbl = do.call(data.table, c(bestFitNameTbl, list(actDVName=runTbl[, unique(c(predName, name))])))
+	bestFitNameTbl = do.call(data.table, c(bestFitNameTbl, list(actDVName=runTbl[, unique(c(predName, bestFitName))])))
 	bestFitNameTbl
 }
 
@@ -2230,7 +2230,7 @@ preProcessPostResTbl <- function(postResTbl, runTbl) {
 	preProcess <- function(predictors) {
 		handleNAs(postResTbl, predictors)
 	}
-	runTbl[, preProcess(predName), by=name]
+	runTbl[, preProcess(predName), by=bestFitName]
 	addWeights(postResTbl)
 }
 
@@ -2285,9 +2285,9 @@ analyzePostResTblAcrossDs <- function(postResTbl, runTbl) {
 		runTbl
 		if (nrow(runTbl) > 0) {
 			runTbl
-			bestFitNames = runTbl[, unique(name)]
-			analyzeFun <- function(bestFitName) {
-				analyzePostResTbl(tbl, runTbl[name==bestFitName, predName], bestFitName)
+			bestFitNames = runTbl[, unique(bestFitName)]
+			analyzeFun <- function(curBestFitName) {
+				analyzePostResTbl(tbl, runTbl[bestFitName==curBestFitName, predName], curBestFitName)
 			}
 			logregTbl = rbindlist(mclapply(bestFitNames, analyzeFun, mc.cores=MCCORES))
 			logregTbl[, updateBestFitCol(tbl, .SD, bestFitName), by=bestFitName]
