@@ -2708,7 +2708,7 @@ curWS <- function() {
 	runTFollow10M()
 	runSO1k()
 	runSOQgt400()
-	#FIXME: Rerun prior after tokenized finished
+	#FIXME: Rerun prior after tokenized finished (running)
 	#FIXME: Rerun prior again to test mclapply 
 	#FIXME: Run new context
 	#FIXME: address word order low predictiveness
