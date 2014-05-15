@@ -2710,6 +2710,7 @@ curWS <- function() {
 	runSOQgt400()
 	#FIXME: Rerun prior after tokenized finished (running)
 	#FIXME: Rerun prior again to test mclapply 
+	#FIXME: Parallelize process to get coefficients.
 	#FIXME: Run new context
 	#FIXME: address word order low predictiveness
 	#FIXME: proper combination of prior and context for RP
