@@ -40,7 +40,10 @@ options("scipen"=100, "digits"=4)
 options(error=traceback)
 options(datatable.alloccol = 900)
 
-MCCORES = if (any(grepl('gui', commandArgs()))) 1 else 4
+getCores <- function(config, name) {
+	cores = getConfig(config, name)
+	if (any(grepl('gui', commandArgs()))) 1 else cores
+}
 
 withDBConnect <- function(var, thunk) {
 	var = substitute(var)
@@ -278,7 +281,9 @@ getModelHashtagsTbl <- function(partialRes) {
 }
 
 getPriorAtEpoch <- function(priorTbl, cEpoch, d) {
-	myStopifnot(priorTbl[1,dt] == 0)
+	if (nrow(priorTbl) > 0) {
+		myStopifnot(priorTbl[1,dt] == 0)
+	}
 	myLog(sprintf('computing prior at epoch %s', cEpoch))
 	curUserPriorTbl = priorTbl[creation_epoch < cEpoch]
 	myLog(sprintf('Using %s prior observations to compute prior', nrow(curUserPriorTbl)))
@@ -506,21 +511,19 @@ getOutFileModelHashtags <- function(name) getOutFileGen(getDirModelHashtags(), n
 getLogregOutFile <- function(name) getOutFileGen(getDirLogreg(), name)
 
 runPrior <- function(config) {
-	withProf({
-		myStopifnot(!any(sapply(config,is.null)))
-		priorTblUserSubset <<- getPriorTblUserSubset(config)
-		config=modConfig(config, list(dStd=getConfig(config, 'dFull')))
-		config
-		tokenTbl = getTokenizedForUsers(config)
-		tagTbl = tokenTbl[type == getConfig(config, 'tagTypeName')] 
-		tokenTbl = rbind(tokenTbl[type != getConfig(config, 'tagTypeName')], tagTbl)
-		tokenTbl = tokenTbl[, setkey(.SD, id)][tagTbl[, list(id=unique(id))][, setkey(.SD, id)]]
-		setkey(tokenTbl, user_screen_name, dt)
-		getOutFileForNameFun <- function(name) {
-			getConfig(config, name)
-		}
-		withLogLevel(0, runForTokenTbl(tokenTbl, config, getOutFileForNameFun))
-	})
+	myStopifnot(!any(sapply(config,is.null)))
+	priorTblUserSubset <<- getPriorTblUserSubset(config)
+	config=modConfig(config, list(dStd=getConfig(config, 'dFull')))
+	config
+	tokenTbl = getTokenizedForUsers(config)
+	tagTbl = tokenTbl[type == getConfig(config, 'tagTypeName')] 
+	tokenTbl = rbind(tokenTbl[type != getConfig(config, 'tagTypeName')], tagTbl)
+	tokenTbl = tokenTbl[, setkey(.SD, id)][tagTbl[, list(id=unique(id))][, setkey(.SD, id)]]
+	setkey(tokenTbl, user_screen_name, dt)
+	getOutFileForNameFun <- function(name) {
+		getConfig(config, name)
+	}
+	withLogLevel(0, runForTokenTbl(tokenTbl, config, getOutFileForNameFun))
 }
 
 modConfig <- function(config, mods) {
@@ -560,6 +563,8 @@ defaultBaseConfig = list(dFull=c(0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1.0,1.1,1.2,1.3,1.
 			 actDVs = c('actPriorStd', 'actPriorOL', 'actPriorOL2'),
 			 permNRowsAll = c(2048, 4000, 10000),
 			 permNRows = 2048,
+			 MCCORESAct = 4,
+			 MCCORESReg = 2,
 			 query=NULL)
 
 defaultTConfig = c(defaultBaseConfig,
@@ -709,7 +714,9 @@ defaultSOPermConfig = modConfig(c(defaultSOConfig, defaultPermConfig,
 					      'actTitleOrderlessMeddim', 'actBodyOrderlessMeddim', 'actTitleOrderlessMeddim_actBodyOrderlessMeddim',
 					      'actPriorStd_actTitleOrderlessLgdim_actBodyOrderlessLgdim',
 					      'actTitleOrderlessLgdim', 'actBodyOrderlessLgdim', 'actTitleOrderlessLgdim_actBodyOrderlessLgdim'
-					      )))
+					      ),
+				     MCCORESAct = 2
+				     ))
 
 defaultTSjiConfig = modConfig(c(defaultTConfig, defaultSjiConfig,
 				list(runTbl=makeRunTbl(list(c('actPriorStd', 'actTweet'),
@@ -723,7 +730,9 @@ defaultSOSjiConfig = modConfig(c(defaultSOConfig, defaultSjiConfig,
 							     c('actPriorStd', 'actTitleFrentropy', 'actBodyFrentropy'))))),
 			      list(accumModelHashtagsTbl=T,
 				   actDVs=c('actPriorStd_actTitle_actBody', 'actPriorStd', 'actTitle', 'actBody', 'actTitle_actBody',
-					    'actTitleFrentropy', 'actBodyFrentropy', 'actPriorStd_actTitleFrentropy_actBodyFrentropy')))
+					    'actTitleFrentropy', 'actBodyFrentropy', 'actPriorStd_actTitleFrentropy_actBodyFrentropy'),
+				   MCCORESAct = 2
+				   ))
 
 defaultSOSjiPConfig = modConfig(c(defaultSOConfig, defaultSjiConfig,
 				  list(runTbl=makeRunTbl(list()))),
@@ -2208,10 +2217,33 @@ getPPVTbl = function(tbl, bestFitName) {
 	data.table(x=x, y=y)
 }
 
+samplePostResTbl <- function(postResTbl, predictors) {
+	nones = nrow(postResTbl[hashtagUsedP == T])
+	nzeros = nrow(postResTbl[hashtagUsedP == F])
+	res = sapply(predictors, function(p) postResTbl[, p, with=F])
+	res = Reduce(`+`, res)
+	topRows = order(res, decreasing=T)
+	nranked = nzeros*.4
+	nleft = nzeros - nranked
+	nsampled = nzeros*.4 
+	#nsampled = nones * 3
+	set.seed(digestAsInteger(list(predictors, postResTbl[1:100])))
+	postResTblSample = rbind(postResTbl[hashtagUsedP == T],
+				 postResTbl[topRows][hashtagUsedP == F][1 : nranked],
+				 postResTbl[topRows][hashtagUsedP == F][nranked + 1 : nzeros][sample(nleft, nsampled)])
+	postResTblSample
+}
+
+samplePostResTbl <- function(postResTbl, predictors) {
+	postResTbl
+}
+
 runLogReg <- function(postResTbl, predictors) {
 	model = reformulate(termlabels = predictors, response = 'hashtagUsedP')
-	postResTbl
-	myLogit = glm(model, data=postResTbl, weights=weights, family=binomial(link="logit"))
+	postResTblSample = samplePostResTbl(postResTbl, predictors)
+	myLogit = glm(model, data=postResTblSample, weights=weights, family=binomial(link="logit"))
+	myLog(summary(myLogit))
+	myLog(ClassLog(myLogit, postResTblSample$hashtagUsedP))
 	myLogit
 }
 
@@ -2250,10 +2282,7 @@ analyzePostResTbl <- function(postResTbl, predictors, bestFitName) {
 	logregTbl[, predName := rownames(coeffs)][, d := postResTbl[, d[1]]]
 	logregTbl[, user_screen_name := postResTbl[, user_screen_name[1]]]
 	logregTbl[, bestFitName := bestFitName]
-	summary(myLogit)
 	postResTbl
-	myLog(summary(myLogit))
-	myLog(ClassLog(myLogit, postResTbl$hashtagUsedP))
 	myLogit
 	logregTbl
 }
@@ -2272,12 +2301,12 @@ getFullPostResTbl <- function(tokenTbl, config) {
 		res = getPostResTbl(tokenTbl[id == curId], config, curId)
 		res[, id := curId]
 	}
-	postResTbl = rbindlist(mclapply(tokenTbl[, unique(id)], subFun, mc.cores=MCCORES))
+	postResTbl = rbindlist(mclapply(tokenTbl[, unique(id)], subFun, mc.cores=getCores(config, 'MCCORESAct')))
 	#postResTbl = tokenTbl[, getPostResTbl(.SD, config, id[1]), by=id, .SDcols=colnames(tokenTbl)]
 	postResTbl
 }
 
-analyzePostResTblAcrossDs <- function(postResTbl, runTbl) {
+analyzePostResTblAcrossDs <- function(postResTbl, runTbl, config) {
 	analyzePostResTblForD <- function(curD) {
 		tbl = postResTbl[d == curD] 
 		preProcessPostResTbl(tbl, runTbl)
@@ -2289,7 +2318,7 @@ analyzePostResTblAcrossDs <- function(postResTbl, runTbl) {
 			analyzeFun <- function(curBestFitName) {
 				analyzePostResTbl(tbl, runTbl[bestFitName==curBestFitName, predName], curBestFitName)
 			}
-			logregTbl = rbindlist(mclapply(bestFitNames, analyzeFun, mc.cores=MCCORES))
+			logregTbl = rbindlist(mclapply(bestFitNames, analyzeFun, mc.cores=getCores(config, 'MCCORESReg')))
 			logregTbl[, updateBestFitCol(tbl, .SD, bestFitName), by=bestFitName]
 		} else {
 			logregTbl = data.table(bestFitName=character(), predName=character(), d=double(), user_screen_name=character())
@@ -2313,7 +2342,7 @@ runForTokenTblForUser <- function(tokenTbl, config) {
 	runTbl = getConfig(config, 'runTbl')
 	postResTbl
 	runTbl
-	resTbl = analyzePostResTblAcrossDs(postResTbl, runTbl)
+	resTbl = analyzePostResTblAcrossDs(postResTbl, runTbl, config)
 	resTbl
 	logregTbl = resTbl$logregTbl
 	postResTbl = resTbl$postResTbl
@@ -2351,6 +2380,7 @@ runForTokenTbl <- function(tokenTbl, config, getOutFileForNameFun=identity) {
 }
 
 runContext <- function(config, samplesPerRun, numRuns) {
+	myLog(sprintf("running context with act/reg cores: %s/%s", getCores(config, 'MCCORESAct'), getCores(config, 'MCCORESReg')))
 	endId = 3000000
 	for (runNum in seq(numRuns)) {
 		getOutFileForNameFun <- function(name) {
@@ -2731,9 +2761,10 @@ curWS <- function() {
 	#FIXME: Quickly rerun logreg analysis for actDV
 	#FIXME: Rename Hyman to LogOdds
 	withProf(runContext20g1s1(regen='useAlreadyLoaded'))
-	setLogLevel(1)
+	setLogLevel(2)
 	withProf(runContext20g1s6(regen='useAlreadyLoaded'))
 	withProf(runContext500g1s2(regen='useAlreadyLoaded'))
+	withProf(runContext500g1s3(regen='useAlreadyLoaded'))
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelVsPred()))))
 	modelHashtagsTbls = buildModelHashtagsTables(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelHashtags()))))
 	modelHashtagsTbl = modelHashtagsTbls[["TContextPerm-20g1s1r1"]]
@@ -2748,6 +2779,7 @@ curWS <- function() {
 	withProf(myLoadImage(groupConfigG1S1))
 	withProf(myLoadImage(groupConfigG1S6))
 	withProf(myLoadImage(groupConfigG1S2))
+	withProf(myLoadImage(groupConfigG1S3))
 	test_dir(sprintf("%s/%s", PATH, 'tests'), reporter='summary')
 	tables()
 	.ls.objects(order.by='Size')
