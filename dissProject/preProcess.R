@@ -565,6 +565,7 @@ defaultBaseConfig = list(dFull=c(0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1.0,1.1,1.2,1.3,1.
 			 permNRows = 2048,
 			 MCCORESAct = 4,
 			 MCCORESReg = 2,
+			 MCCORESActUser = 1,
 			 query=NULL)
 
 defaultTConfig = c(defaultBaseConfig,
@@ -738,7 +739,9 @@ defaultSOSjiPConfig = modConfig(c(defaultSOConfig, defaultSjiConfig,
 				  list(runTbl=makeRunTbl(list()))),
 				list(actDVs = c('actPriorStd', 'actPriorOL', 'actPriorOL2'),
 				     computeActFromContextTbl='computeActNullFromContextTbl',
-				     priorTbl = 'priorTblUserSubset'))
+				     priorTbl = 'priorTblUserSubset',
+				     MCCORESActUser=4,
+				     MCCORESAct=1))
 
 defaultTSjiPConfig = modConfig(c(defaultTConfig, defaultSjiConfig,
 				 list(runTbl=makeRunTbl(list()))),
@@ -746,7 +749,9 @@ defaultTSjiPConfig = modConfig(c(defaultTConfig, defaultSjiConfig,
 				    computeActFromContextTbl='computeActNullFromContextTbl',
 				    tokenizedTbl = 'tweets_tokenized',
 				    priorTbl = 'priorTblUserSubset',
-				    postsTbl = 'tweets'))
+				    postsTbl = 'tweets',
+				    MCCORESActUser=4,
+				    MCCORESAct=1))
 
 defaultGGPlotOpts <- theme_bw() + theme_classic()
 
@@ -2361,7 +2366,9 @@ runForTokenTblForUser <- function(tokenTbl, config) {
 
 runForTokenTbl <- function(tokenTbl, config, getOutFileForNameFun=identity) {
 	user_screen_names = unique(tokenTbl[, user_screen_name])
-	res = lapply(user_screen_names, function(x) runForTokenTblForUser(tokenTbl[user_screen_name==x], config))
+	res = mclapply(user_screen_names,
+		       function(x) runForTokenTblForUser(tokenTbl[user_screen_name==x], config),
+		       mc.cores = getCores(config, 'MCCORESActUser'))
 	modelVsPredTbl = rbindlist(lapply(res, `[[`, 'modelVsPredTbl'))
 	modelHashtagsTbl = rbindlist(lapply(res, `[[`, 'modelHashtagsTbl'))
 	hashtagsTbl = rbindlist(lapply(res, `[[`, 'hashtagsTbl'))
@@ -2380,7 +2387,8 @@ runForTokenTbl <- function(tokenTbl, config, getOutFileForNameFun=identity) {
 }
 
 runContext <- function(config, samplesPerRun, numRuns) {
-	myLog(sprintf("running context with act/reg cores: %s/%s", getCores(config, 'MCCORESAct'), getCores(config, 'MCCORESReg')))
+	myLog(sprintf("running context with act/actUser/reg cores: %s/%s",
+		      getCores(config, 'MCCORESAct'), getCores(config, 'MCCORESActUser'), getCores(config, 'MCCORESReg')))
 	endId = 3000000
 	for (runNum in seq(numRuns)) {
 		getOutFileForNameFun <- function(name) {
