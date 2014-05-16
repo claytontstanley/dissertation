@@ -1155,8 +1155,7 @@ renameColGroupNum <- function(tbl) {
 
 renameColSizeNum <- function(tbl) {
 	mapTbl = data.table(sizeNum=as.character(c(1,6,5,4,3,2)),
-			    newName=c('Testing 1e5 SO, 3e6 Twitter', '1e3 Documents', '1e4 Documents', '1e5 Documents', '1e6 Documents',
-				      '1Mil SO, 3Mil Twitter'))
+			    newName=c('Testing 1e5 SO, 3e6 Twitter', '1e3 Documents', '1e4 Documents', '1e5 Documents', '1e6 Documents', '3e6 Documents'))
 	tbl[, sizeNum := as.character(sizeNum)]
 	setkey(tbl, sizeNum)
 	tbl[mapTbl, sizeNum := newName]
@@ -1394,7 +1393,7 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleBody', 
 				       'PriorStdTitleOrderlessEntropyBodyOrderlessEntropy', 'PriorStdTitleOrderlessBodyOrderless',
 				       'PriorStdTitleOrderlessFreqBodyOrderlessFreq'))
-	compareMeanDV(tbl[dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='foo', groupCol='sizeNum')
+	compareMeanDV(tbl[dsetType == 'stackoverflow' & DVName %in% DVNames & sizeNum != 2], acc, figName='foo', groupCol='sizeNum')
 	# T Entropy 
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweet',
 				       'TweetOrderlessEntropy', 'TweetOrderEntropy',
