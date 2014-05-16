@@ -2753,12 +2753,6 @@ runGenAndSaveCurWorkspaceg3s6 <- function() genAndSaveCurWorkspace(groupConfigG3
 runGenAndSaveCurWorkspaceg4s6 <- function() genAndSaveCurWorkspace(groupConfigG4S6)
 
 curWS <- function() {
-	runTFollow5k()
-	runTFollow1M()
-	runTFollow5k()
-	runTFollow10M()
-	runSO1k()
-	runSOQgt400()
 	#FIXME: Rerun prior again to test error at end after mclapply addition (running)
 	#FIXME: Parallelize process to get coefficients. (testing)
 	#FIXME: Run new context (testing)
