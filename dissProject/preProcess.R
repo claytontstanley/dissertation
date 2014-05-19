@@ -1152,6 +1152,7 @@ renameCols <- function(tbl) {
 	if ('dsetGroup' %in% cnames) renameColDatasetGroup(tbl)
 	if ('groupNum' %in% cnames) renameColGroupNum(tbl)
 	if ('sizeNum' %in% cnames) renameColSizeNum(tbl)
+	if ('dsetType' %in% cnames) renameColDatasetType(tbl)
 }
 
 renameColGroupNum <- function(tbl) {
@@ -1172,10 +1173,20 @@ renameColSizeNum <- function(tbl) {
 
 renameColDatasetGroup <- function(tbl) {
 	setkey(tbl, dsetGroup)
-	mapTbl = data.table(dsetGroup = c('topReputation', 'topQuestions', 'topFollowers', 'topTweets'),
-			    newName = c('SO Top Reputation', 'SO Top Questions', 'Twitter Top Followers', 'Twitter Top Tweets'))
+	mapTbl = data.table(dsetGroup = c('topReputation', 'topQuestions', 'topFollowers', 'topTweets', 'sampleAcross', 'topHashtags'),
+			    newName = c('SO Top Reputation', 'SO Top Questions', 'Twitter Top Followers', 'Twitter Top Tweets',
+					'SO Sample Across', 'Twitter Popular Hashtags'))
 	setkey(mapTbl, dsetGroup)
 	tbl[mapTbl, dsetGroup := newName]
+	tbl
+}
+
+renameColDatasetType <- function(tbl) {
+	setkey(tbl, dsetType)
+	mapTbl = data.table(dsetType = c('twitter', 'stackoverflow'),
+			    newName = c('Twitter', 'Stack Overflow'),
+			    key = 'dsetType')
+	tbl[mapTbl, dsetType := newName]
 	tbl
 }
 
@@ -1206,15 +1217,15 @@ renameColDVName <- function(tbl) {
 		    makeStandardMappingBayes('Frentropy', 'w/ entropy and freq'),
 		    makeStandardMappingBayes('Nentropy', ''),
 		    makeStandardMapping('', ''),
-		    makeStandardMapping('Entropy', ' w/ entropy'),
-		    makeStandardMapping('Stoplist', ' w/ stoplist'),
-		    makeStandardMapping('Hyman', ' w/ entropy and log odds'),
-		    makeStandardMapping('Direction', ' w/ entropy and direction'),
-		    makeStandardMapping('Window', ' w/ entropy and window'),
-		    makeStandardMapping('Freq', ' w/ freq'),
-		    makeStandardMapping('Frentropy', ' w/ entropy and freq'),
-		    makeStandardMapping('Meddim', ' w/ entropy and 4000-row matrix'),
-		    makeStandardMapping('Lgdim', ' w/ entropy and 10000-row matrix')
+		    makeStandardMapping('Entropy', 'w/ entropy'),
+		    makeStandardMapping('Stoplist', 'w/ stoplist'),
+		    makeStandardMapping('Hyman', 'w/ entropy and log odds'),
+		    makeStandardMapping('Direction', 'w/ entropy and direction'),
+		    makeStandardMapping('Window', 'w/ entropy and window'),
+		    makeStandardMapping('Freq', 'w/ freq'),
+		    makeStandardMapping('Frentropy', 'w/ entropy and freq'),
+		    makeStandardMapping('Meddim', 'w/ entropy and 4000-row matrix'),
+		    makeStandardMapping('Lgdim', 'w/ entropy and 10000-row matrix')
 		    )
 	mapping = groupN(2, mapping)
 	mapping
@@ -1399,18 +1410,21 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'twitter' & !grepl('(Entropy)|(Direction)|(Hyman)|(Stoplist)|(Freq)|(Window)', DVName)], acc, figName='ContextMeanDVT', groupCol='groupNum')
 	# RESULT: Entropy weighting works for RP for SO and Twitter
 	# SO Entropy
+	compareMeanDVDefault <- function(...) {
+		compareMeanDV(..., extras=list(ylab('Proportion Correct')))
+	}
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleBody',
 				       'BodyOrderlessEntropy', 'Body', 'BodyOrderless',
 				       'TitleOrderlessEntropy', 'Title', 'TitleOrderless',
 				       'PriorStdTitleOrderlessEntropyBodyOrderlessEntropy', 'PriorStdTitleOrderlessBodyOrderless'))
-	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='ContextMeanDVSO')
+	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='EntropyVsRegSO')
 	# T Entropy 
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweet',
 				       'TweetOrderlessEntropy', 'TweetOrderEntropy',
 				       'TweetOrderless', 'TweetOrder',
 				       'PriorStdTweetOrderTweetOrderless', 'PriorStdTweetOrderEntropyTweetOrderlessEntropy'))
-	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='foo', groupCol='dsetGroup')
-	# RESULT: Freq weighting is better than entropy weighting for RP
+	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='EntropyVsRegT', groupCol='dsetGroup')
+	# RESULT: Freq weighting is better than entropy weighting for RP, and standard stoplist doesn't work well at all
 	# SO compare entropy to stoplist to freq to frentropy
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleBody', 'PriorStdTitleFrentropyBodyFrentropy',
 				       'TitleOrderlessEntropy', 'Title', 'TitleOrderless', 'TitleOrderlessStoplist', 'TitleOrderlessFreq', 'TitleOrderlessFrentropy',
@@ -1418,7 +1432,7 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 				       'PriorStdTitleOrderlessStoplistBodyOrderlessStoplist',
 				       'PriorStdTitleOrderlessFreqBodyOrderlessFreq',
 				       'PriorStdTitleOrderlessFrentropyBodyOrderlessFrentropy'))
-	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='ContextMeanDVSO')
+	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='allWeightingsSO')
 	# T compare entropy to stoplist to freq to frentropy
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweet', 'PriorStdTweetFrentropy',
 				       'TweetOrderlessEntropy', 'Tweet', 'TweetOrderless', 'TweetOrderlessStoplist', 'TweetOrderlessFreq', 'TweetOrderlessFrentropy',
@@ -1426,9 +1440,8 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 				       'PriorStdTweetOrderStoplistTweetOrderlessStoplist',
 				       'PriorStdTweetOrderFreqTweetOrderlessFreq',
 				       'PriorStdTweetOrderFrentropyTweetOrderlessFrentropy'))
-	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='foo', groupCol='dsetGroup')
+	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='allWeightingsT', groupCol='dsetGroup')
 	# RESULT: Bayes and RP with frequency cutoff scales; RP with entropy saturates for SO
-	# RESULT: Increasing rows in matrix does not dramatically improve performance, even at different size datasets; entropy and freq cutoff is much more important for RP
 	# SO Entropy all sizes
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleBody', 
 				       'PriorStdTitleOrderlessEntropyBodyOrderlessEntropy', 'PriorStdTitleOrderlessBodyOrderless',
@@ -1436,48 +1449,63 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 				       'PriorStdTitleFrentropyBodyFrentropy',
 				       'PriorStdTitleOrderlessMeddimBodyOrderlessMeddim',
 				       'PriorStdTitleOrderlessLgdimBodyOrderlessLgdim'))
-	compareMeanDV(tbl[dsetType == 'stackoverflow' & DVName %in% DVNames & sizeNum != 2], acc, figName='foo', groupCol='sizeNum')
+	compareMeanDVDefault(tbl[dsetType == 'stackoverflow' & DVName %in% DVNames & sizeNum != 2], acc, figName='freqVsEntropyBySizeSO', groupCol='sizeNum')
 	# T Entropy all sizes
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweet',
 				       'PriorStdTweetOrderTweetOrderless', 'PriorStdTweetOrderEntropyTweetOrderlessEntropy',
 				       'PriorStdTweetOrderFreqTweetOrderlessFreq',
 				       'PriorStdTweetOrderMeddimTweetOrderlessMeddim',
 				       'PriorStdTweetOrderLgdimTweetOrderlessLgdim'))
-	compareMeanDV(tbl[dsetType == 'twitter' & DVName %in% DVNames], acc, figName='foo', groupCol='sizeNum')
+	compareMeanDVDefault(tbl[dsetType == 'twitter' & DVName %in% DVNames], acc, figName='freqVsEntropyBySizeT', groupCol='sizeNum')
+	# RESULT: Increasing rows in matrix does not dramatically improve performance, even at different size datasets; entropy and freq cutoff is much more important for RP
+	# SO Entropy all sizes
+	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleBody', 
+				       'PriorStdTitleOrderlessEntropyBodyOrderlessEntropy', 'PriorStdTitleOrderlessBodyOrderless',
+				       'PriorStdTitleOrderlessFreqBodyOrderlessFreq',
+				       'PriorStdTitleOrderlessMeddimBodyOrderlessMeddim',
+				       'PriorStdTitleOrderlessLgdimBodyOrderlessLgdim'))
+	compareMeanDVDefault(tbl[dsetType == 'stackoverflow' & DVName %in% DVNames & sizeNum != 2], acc, figName='dimBySizeSO', groupCol='sizeNum')
+	# T Entropy all sizes
+	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweet',
+				       'PriorStdTweetOrderTweetOrderless', 'PriorStdTweetOrderEntropyTweetOrderlessEntropy',
+				       'PriorStdTweetOrderFreqTweetOrderlessFreq',
+				       'PriorStdTweetOrderMeddimTweetOrderlessMeddim',
+				       'PriorStdTweetOrderLgdimTweetOrderlessLgdim'))
+	compareMeanDVDefault(tbl[dsetType == 'twitter' & DVName %in% DVNames], acc, figName='dimBySizeT', groupCol='sizeNum')
 	# RESULT: Logodds technique works
 	# SO compare entropy w/ logodds to entropy
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleBody',
 				       'PriorStdTitleOrderlessEntropyBodyOrderlessEntropy', 'PriorStdTitleOrderlessBodyOrderless',
 				       'PriorStdTitleOrderlessHymanBodyOrderlessHyman'))
-	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='ContextMeanDVSO')
+	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='logoddsSO')
 	# T compare entropy w/ loggodds to entropy
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweet',
 				       'PriorStdTweetOrderEntropyTweetOrderlessEntropy', 'PriorStdTweetOrderTweetOrderless',
 				       'PriorStdTweetOrderHymanTweetOrderlessHyman'))
-	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='foo', groupCol='dsetGroup')
+	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='logoddsT', groupCol='dsetGroup')
 	# RESULT: Emphasize main effect: That adding a prior component to RP dramatically improves performance, but only if added in right way
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleBody', 'TitleOrderlessEntropy', 'TitleOrderlessEntropyBodyOrderlessEntropy',
 				       'BodyOrderlessEntropy',
 				       'PriorStdTitleOrderlessEntropyBodyOrderlessEntropy',
 				       'PriorStdTitleOrderlessHymanBodyOrderlessHyman'))
-	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc)
+	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='priorVsContextSO')
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweet', 'TweetOrderlessEntropy', 'PriorStdTweetOrderEntropyTweetOrderlessEntropy',
 				       'PriorStdTweetOrderHymanTweetOrderlessHyman'))
-	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc)
+	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='priorVsContextT')
 	# T compare entropy w/ direction and entropy w/ window to entropy
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweet',
 				       'TweetOrderEntropy', 'Tweet', 'TweetOrder', 'TweetOrderDirection', 'TweetOrderWindow',
 				       'TweetOrderlessEntropy', 'TweetOrderless', 'TweetOrderlessDirection', 'TweetOrderlessWindow',
 				       'PriorStdTweetOrderEntropyTweetOrderlessEntropy', 'PriorStdTweetOrderTweetOrderless', 'PriorStdTweetOrderDirectionTweetOrderlessDirection',
 				       'PriorStdTweetOrderWindowTweetOrderlessWindow'))
-	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='foo', groupCol='dsetGroup')
+	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='orderT', groupCol='dsetGroup')
 	# RESULT: .7 d is better for SO but not for T, lines up with 'relaxed across posts' finding for Prior dataset. Magnitude of effect is very small, not as important as using prior and weighting
 	# SO and T compare two d values	
 	dTbl = rbind(baseTblPost, baseTbl)[topHashtag & hashtagUsedP]
 	DVNames = c('topHashtagPostPriorStd', asTopHashtagAcross(c('PriorStd', 'PriorStdTweet', 'PriorStdTweetOrderHymanTweetOrderlessHyman',
 								   'PriorStdTitleBody', 'PriorStdTitleOrderlessHymanBodyOrderlessHyman')))
 	dWideTbl = getDWideTbl(dTbl[sizeNum == 2 & DVName %in% DVNames])
-	compareMeanDV(dWideTbl, dDiff, figName='foo', groupCol='dsetType')
+	compareMeanDVDefault(dWideTbl, dDiff, figName='dContext', groupCol='dsetType')
 }
 
 getDWideTbl <- function(tbl) {
