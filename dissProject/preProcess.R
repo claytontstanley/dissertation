@@ -611,7 +611,7 @@ defaultSOConfig = c(defaultBaseConfig,
 
 defaultPermConfig = list(permUseEntropyP='', permUseStoplistP='', permOnlyDirectionP='', permHymanP='', permUseFreqP='', permUseWindowP='')
 
-defaultSjiConfig = list(computeActFromContextTbl = 'computeActSjiFromContextTbl', sjiFreqP='')
+defaultSjiConfig = list(computeActFromContextTbl = 'computeActSjiFromContextTbl', sjiFreqP='', sjiEntropyP='')
 
 defaultTPermConfig = modConfig(c(defaultTConfig, defaultPermConfig,
 				 list(runTbl=makeRunTbl(list(c('actPriorStd', 'actTweetOrder', 'actTweetOrderless'),
@@ -721,17 +721,26 @@ defaultSOPermConfig = modConfig(c(defaultSOConfig, defaultPermConfig,
 
 defaultTSjiConfig = modConfig(c(defaultTConfig, defaultSjiConfig,
 				list(runTbl=makeRunTbl(list(c('actPriorStd', 'actTweet'),
-							    c('actPriorStd', 'actTweetFrentropy'))))),
+							    c('actPriorStd', 'actTweetFrentropy'),
+							    c('actPriorStd', 'actTweetFreq'),
+							    c('actPriorStd', 'actTweetNentropy'))))),
 			      list(accumModelHashtagsTbl=T,
-				   actDVs=c('actPriorStd_actTweet', 'actPriorStd', 'actTweet', 'actTweetFrentropy', 'actPriorStd_actTweetFrentropy')))
+				   actDVs=c('actPriorStd_actTweet', 'actPriorStd', 'actTweet',
+					    'actTweetFrentropy', 'actPriorStd_actTweetFrentropy',
+					    'actTweetFreq', 'actPriorStd_actTweetFreq',
+					    'actTweetNentropy', 'actPriorStd_actTweetNentropy')))
 
 defaultSOSjiConfig = modConfig(c(defaultSOConfig, defaultSjiConfig,
 				 list(runTbl=makeRunTbl(list(c('actPriorStd', 'actTitle', 'actBody'),
 							     c('actTitle', 'actBody'),
-							     c('actPriorStd', 'actTitleFrentropy', 'actBodyFrentropy'))))),
+							     c('actPriorStd', 'actTitleFrentropy', 'actBodyFrentropy'),
+							     c('actPriorStd', 'actTitleFreq', 'actBodyFreq'),
+							     c('actPriorStd', 'actTitleNentropy', 'actBodyNentropy'))))),
 			      list(accumModelHashtagsTbl=T,
 				   actDVs=c('actPriorStd_actTitle_actBody', 'actPriorStd', 'actTitle', 'actBody', 'actTitle_actBody',
-					    'actTitleFrentropy', 'actBodyFrentropy', 'actPriorStd_actTitleFrentropy_actBodyFrentropy'),
+					    'actTitleFrentropy', 'actBodyFrentropy', 'actPriorStd_actTitleFrentropy_actBodyFrentropy',
+					    'actTitleFreq', 'actBodyFreq', 'actPriorStd_actTitleFreq_actBodyFreq',
+					    'actTitleNentropy', 'actBodyNentropy', 'actPriorStd_actTitleNentropy_actBodyNentropy'),
 				   MCCORESAct = 2
 				   ))
 
@@ -1192,13 +1201,10 @@ renameColDVName <- function(tbl) {
 	mapping = c('topHashtagAcrossPriorStd', 'Standard Prior Model Relaxed Across Posts',
 		    'topHashtagPostPriorStd', 'Standard Prior Model',
 		    'topHashtagPostPriorOL2', 'Optimized Learning Model',
-		    'topHashtagAcrossTitle', 'Bayes only title',
-		    'topHashtagAcrossBody', 'Bayes only body',
-		    'topHashtagAcrossTweet', 'Bayes only context',
-		    'topHashtagAcrossTitleBody', 'Bayes combined title and body',
-		    'topHashtagAcrossPriorStdTitleBody', 'Bayes combined full',
-		    'topHashtagAcrossPriorStdTweet', 'Bayes combined full',
-		    'topHashtagAcrossPriorStdTitleFrentropyBodyFrentropy', 'Bayes combined full w/ freq',
+		    makeStandardMappingBayes('', 'w/ entropy'),
+		    makeStandardMappingBayes('Freq', 'w/ freq'),
+		    makeStandardMappingBayes('Frentropy', 'w/ entropy and freq'),
+		    makeStandardMappingBayes('Nentropy', ''),
 		    makeStandardMapping('', ''),
 		    makeStandardMapping('Entropy', ' w/ entropy'),
 		    makeStandardMapping('Stoplist', ' w/ stoplist'),
@@ -1208,7 +1214,7 @@ renameColDVName <- function(tbl) {
 		    makeStandardMapping('Freq', ' w/ freq'),
 		    makeStandardMapping('Frentropy', ' w/ entropy and freq'),
 		    makeStandardMapping('Meddim', ' w/ entropy and 4000-row matrix'),
-		    makeStandardMapping('Lgdim', ' w/ entropy and 1000-row matrix')
+		    makeStandardMapping('Lgdim', ' w/ entropy and 10000-row matrix')
 		    )
 	mapping = groupN(2, mapping)
 	mapping
@@ -1217,6 +1223,28 @@ renameColDVName <- function(tbl) {
 	setkey(mapTbl, DVName)
 	tbl[mapTbl, DVName := newName]
 	tbl
+}
+
+makeRemapForMapping <- function(keyword, text) {
+	function(pair) {
+		args = as.list(c(pair[1], rep(keyword, str_count(pair[1], '%s'))))
+		args
+		pair[1] = do.call(sprintf, args)
+		pair[2] = sprintf(pair[2], text)
+		pair
+	}
+}
+
+makeStandardMappingBayes <- function(keyword, text) {
+	res = c('topHashtagAcrossTitle%sBody%s', 'Bayes combined title and body',
+		'topHashtagAcrossTitle%s', 'Bayes only title %s',
+		'topHashtagAcrossBody%s', 'Bayes only body %s',
+		'topHashtagAcrossPriorStdTitle%sBody%s', 'Bayes combined full %s',
+		'topHashtagAcrossTweet%s', 'Bayes only orderless context %s',
+		'topHashtagAcrossPriorStdTweet%s', 'Bayes combined full %s')
+	res = groupN(2, res)
+	res = lapply(res, makeRemapForMapping(keyword, text))
+	unlist(res)
 }
 
 makeStandardMapping <- function(keyword, text) {
@@ -1233,14 +1261,7 @@ makeStandardMapping <- function(keyword, text) {
 		'topHashtagAcrossPriorStdTweetOrderless%s', 'RP combined prior and orderless %s',
 		'topHashtagAcrossPriorStdTweetOrder%s', 'RP combined prior and order %s')
 	res = groupN(2, res)
-	remapFun <- function(pair) {
-		args = as.list(c(pair[1], rep(keyword, str_count(pair[1], '%s'))))
-		args
-		pair[1] = do.call(sprintf, args)
-		pair[2] = sprintf(pair[2], text)
-		pair
-	}
-	res = lapply(res, remapFun)
+	res = lapply(res, makeRemapForMapping(keyword, text))
 	unlist(res)
 }
 
@@ -1362,7 +1383,7 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 	modelVsPredTbl[, list(N=.N, Ndsets=length(unique(datasetName))), keyby=list(sizeNum, dsetSize, dsetType)]
 	plotPPVTbl(ppvTbl[dsetType=='stackoverflow' & runNum==1 & dsetSize==500], 'contextPpvSO')
 	plotPPVTbl(ppvTbl[dsetType=='twitter' & runNum==1 & dsetSize==500], 'contextPpvT')
-	tblPost = modelVsPredTbl[predUsedBest == T][dsetSize==500][grepl('^topHashtagPost', DVName)]
+	baseTblPost = modelVsPredTbl[dsetSize==500][grepl('^topHashtagPost', DVName)]
 	baseTbl = modelVsPredTbl[dsetSize==500][grepl('^topHashtagAcross', DVName)]
 	tbl = baseTbl[predUsedBest == T]
 	tbl[, .N, by=DVName]
@@ -1376,54 +1397,73 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'twitter' & !grepl('(Entropy)|(Direction)|(Hyman)|(Stoplist)|(Freq)|(Window)', DVName)], acc, figName='foo', groupCol='dsetGroup')
 	# T standard all groups
 	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'twitter' & !grepl('(Entropy)|(Direction)|(Hyman)|(Stoplist)|(Freq)|(Window)', DVName)], acc, figName='ContextMeanDVT', groupCol='groupNum')
+	# RESULT: Entropy weighting works for RP for SO and Twitter
 	# SO Entropy
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleBody',
 				       'BodyOrderlessEntropy', 'Body', 'BodyOrderless',
 				       'TitleOrderlessEntropy', 'Title', 'TitleOrderless',
 				       'PriorStdTitleOrderlessEntropyBodyOrderlessEntropy', 'PriorStdTitleOrderlessBodyOrderless'))
 	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='ContextMeanDVSO')
-	# SO compare entropy to stoplist to freq
-	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleBody',
-				       'TitleOrderlessEntropy', 'Title', 'TitleOrderless', 'TitleOrderlessStoplist', 'TitleOrderlessFreq',
-				       'PriorStdTitleOrderlessEntropyBodyOrderlessEntropy', 'PriorStdTitleOrderlessBodyOrderless',
-				       'PriorStdTitleOrderlessStoplistBodyOrderlessStoplist',
-				       'PriorStdTitleOrderlessFreqBodyOrderlessFreq'))
-	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='ContextMeanDVSO')
-	# SO Entropy all sizes
-	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleBody', 
-				       'PriorStdTitleOrderlessEntropyBodyOrderlessEntropy', 'PriorStdTitleOrderlessBodyOrderless',
-				       'PriorStdTitleOrderlessFreqBodyOrderlessFreq'))
-	compareMeanDV(tbl[dsetType == 'stackoverflow' & DVName %in% DVNames & sizeNum != 2], acc, figName='foo', groupCol='sizeNum')
 	# T Entropy 
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweet',
 				       'TweetOrderlessEntropy', 'TweetOrderEntropy',
 				       'TweetOrderless', 'TweetOrder',
 				       'PriorStdTweetOrderTweetOrderless', 'PriorStdTweetOrderEntropyTweetOrderlessEntropy'))
 	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='foo', groupCol='dsetGroup')
-	# T compare entropy to stoplist to freq
-	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweet',
-				       'TweetOrderlessEntropy', 'Tweet', 'TweetOrderless', 'TweetOrderlessStoplist', 'TweetOrderlessFreq',
+	# RESULT: Freq weighting is better than entropy weighting for RP
+	# SO compare entropy to stoplist to freq to frentropy
+	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleBody', 'PriorStdTitleFrentropyBodyFrentropy',
+				       'TitleOrderlessEntropy', 'Title', 'TitleOrderless', 'TitleOrderlessStoplist', 'TitleOrderlessFreq', 'TitleOrderlessFrentropy',
+				       'PriorStdTitleOrderlessEntropyBodyOrderlessEntropy', 'PriorStdTitleOrderlessBodyOrderless',
+				       'PriorStdTitleOrderlessStoplistBodyOrderlessStoplist',
+				       'PriorStdTitleOrderlessFreqBodyOrderlessFreq',
+				       'PriorStdTitleOrderlessFrentropyBodyOrderlessFrentropy'))
+	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='ContextMeanDVSO')
+	# T compare entropy to stoplist to freq to frentropy
+	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweet', 'PriorStdTweetFrentropy',
+				       'TweetOrderlessEntropy', 'Tweet', 'TweetOrderless', 'TweetOrderlessStoplist', 'TweetOrderlessFreq', 'TweetOrderlessFrentropy',
 				       'PriorStdTweetOrderEntropyTweetOrderlessEntropy', 'PriorStdTweetOrderTweetOrderless',
 				       'PriorStdTweetOrderStoplistTweetOrderlessStoplist',
-				       'PriorStdTweetOrderFreqTweetOrderlessFreq'))
+				       'PriorStdTweetOrderFreqTweetOrderlessFreq',
+				       'PriorStdTweetOrderFrentropyTweetOrderlessFrentropy'))
 	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='foo', groupCol='dsetGroup')
+	# RESULT: Bayes and RP with frequency cutoff scales; RP with entropy saturates for SO
+	# RESULT: Increasing rows in matrix does not dramatically improve performance, even at different size datasets; entropy and freq cutoff is much more important for RP
+	# SO Entropy all sizes
+	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleBody', 
+				       'PriorStdTitleOrderlessEntropyBodyOrderlessEntropy', 'PriorStdTitleOrderlessBodyOrderless',
+				       'PriorStdTitleOrderlessFreqBodyOrderlessFreq',
+				       'PriorStdTitleFrentropyBodyFrentropy',
+				       'PriorStdTitleOrderlessMeddimBodyOrderlessMeddim',
+				       'PriorStdTitleOrderlessLgdimBodyOrderlessLgdim'))
+	compareMeanDV(tbl[dsetType == 'stackoverflow' & DVName %in% DVNames & sizeNum != 2], acc, figName='foo', groupCol='sizeNum')
 	# T Entropy all sizes
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweet',
 				       'PriorStdTweetOrderTweetOrderless', 'PriorStdTweetOrderEntropyTweetOrderlessEntropy',
-				       'PriorStdTweetOrderFreqTweetOrderlessFreq'))
+				       'PriorStdTweetOrderFreqTweetOrderlessFreq',
+				       'PriorStdTweetOrderMeddimTweetOrderlessMeddim',
+				       'PriorStdTweetOrderLgdimTweetOrderlessLgdim'))
 	compareMeanDV(tbl[dsetType == 'twitter' & DVName %in% DVNames], acc, figName='foo', groupCol='sizeNum')
+	# RESULT: Logodds technique works
 	# SO compare entropy w/ logodds to entropy
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleBody',
-				       'TitleOrderlessEntropy', 'Title', 'TitleOrderless', 'TitleOrderlessHyman',
 				       'PriorStdTitleOrderlessEntropyBodyOrderlessEntropy', 'PriorStdTitleOrderlessBodyOrderless',
 				       'PriorStdTitleOrderlessHymanBodyOrderlessHyman'))
 	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='ContextMeanDVSO')
 	# T compare entropy w/ loggodds to entropy
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweet',
-				       'TweetOrderlessEntropy', 'Tweet', 'TweetOrderless', 'TweetOrderlessHyman',
 				       'PriorStdTweetOrderEntropyTweetOrderlessEntropy', 'PriorStdTweetOrderTweetOrderless',
 				       'PriorStdTweetOrderHymanTweetOrderlessHyman'))
 	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='foo', groupCol='dsetGroup')
+	# RESULT: Emphasize main effect: That adding a prior component to RP dramatically improves performance, but only if added in right way
+	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleBody', 'TitleOrderlessEntropy', 'TitleOrderlessEntropyBodyOrderlessEntropy',
+				       'BodyOrderlessEntropy',
+				       'PriorStdTitleOrderlessEntropyBodyOrderlessEntropy',
+				       'PriorStdTitleOrderlessHymanBodyOrderlessHyman'))
+	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc)
+	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweet', 'TweetOrderlessEntropy', 'PriorStdTweetOrderEntropyTweetOrderlessEntropy',
+				       'PriorStdTweetOrderHymanTweetOrderlessHyman'))
+	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc)
 	# T compare entropy w/ direction and entropy w/ window to entropy
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweet',
 				       'TweetOrderEntropy', 'Tweet', 'TweetOrder', 'TweetOrderDirection', 'TweetOrderWindow',
@@ -1431,17 +1471,13 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 				       'PriorStdTweetOrderEntropyTweetOrderlessEntropy', 'PriorStdTweetOrderTweetOrderless', 'PriorStdTweetOrderDirectionTweetOrderlessDirection',
 				       'PriorStdTweetOrderWindowTweetOrderlessWindow'))
 	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='foo', groupCol='dsetGroup')
-	# SO compare two d values	
-	dTbl = baseTbl[topHashtag & hashtagUsedP] 
-	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleBody', 'PriorStdTitleOrderlessEntropyBodyOrderlessEntropy',
-				       'PriorStdTitleOrderlessFreqBodyOrderlessFreq'))
-	dWideTbl = getDWideTbl(dTbl[sizeNum == 2 & dsetType == 'stackoverflow' & DVName %in% DVNames])
-	compareMeanDV(dWideTbl, dDiff, figName='foo')
-	# T compare two d values
-	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweet', 'PriorStdTweetOrderEntropyTweetOrderlessEntropy',
-				       'PriorStdTweetOrderFreqTweetOrderlessFreq'))
-	dWideTbl = getDWideTbl(dTbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames])
-	compareMeanDV(dWideTbl, dDiff, figName='foo')
+	# RESULT: .7 d is better for SO but not for T, lines up with 'relaxed across posts' finding for Prior dataset. Magnitude of effect is very small, not as important as using prior and weighting
+	# SO and T compare two d values	
+	dTbl = rbind(baseTblPost, baseTbl)[topHashtag & hashtagUsedP]
+	DVNames = c('topHashtagPostPriorStd', asTopHashtagAcross(c('PriorStd', 'PriorStdTweet', 'PriorStdTweetOrderHymanTweetOrderlessHyman',
+								   'PriorStdTitleBody', 'PriorStdTitleOrderlessHymanBodyOrderlessHyman')))
+	dWideTbl = getDWideTbl(dTbl[sizeNum == 2 & DVName %in% DVNames])
+	compareMeanDV(dWideTbl, dDiff, figName='foo', groupCol='dsetType')
 }
 
 getDWideTbl <- function(tbl) {
@@ -1463,6 +1499,14 @@ analyzeContextSmall <- function() {
 				       'PriorStdTitleOrderlessEntropyBodyOrderlessEntropy',
 				       'PriorStdTitleFrentropyBodyFrentropy', 'PriorStdTitleOrderlessFrentropyBodyOrderlessFrentropy'))
 	compareMeanDV(tbl[sizeNum == 6 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='foo')
+	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleBody', 'Title',
+				       'PriorStdTitleFrentropyBodyFrentropy', 'PriorStdTitleNentropyBodyNentropy',
+				       'PriorStdTitleFreqBodyFreq', 'TitleFrentropy', 'TitleNentropy', 'TitleFreq'))
+	compareMeanDV(tbl[sizeNum == 1 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='foo')
+	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweet', 'Tweet', 
+				       'PriorStdTweetFrentropy', 'PriorStdTweetFreq', 'PriorStdTweetNentropy',
+				       'TweetFrentropy', 'TweetFreq', 'TweetNentropy'))
+	compareMeanDV(tbl[sizeNum == 1 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='foo')
 }
 
 
@@ -1863,6 +1907,9 @@ computeActSji <- function(contextVect, sjiTbl, config) {
 	if (getConfig(config, 'sjiFreqP')) {
 		resTbl = resTbl[freqWeight > 0]
 	}
+	if (! getConfig(config, 'sjiEntropyP')) {
+		resTbl[, EContext := 1]
+	}
 	resTbl = resTbl[, {WContext = EContext/sum(EContext); list(act=sum(WContext * sji))}, keyby=hashtag]
 	resTbl
 }
@@ -1897,8 +1944,9 @@ getFunConfigModsPerm <- function(permUseEntropyP=F, permUseStoplistP=F, permOnly
 	     permNRows=permNRows)
 }
 
-getFunConfigModsSji <- function(sjiFreqP=F) {
-	list(sjiFreqP=sjiFreqP)
+getFunConfigModsSji <- function(sjiFreqP=F, sjiEntropyP=T) {
+	list(sjiFreqP=sjiFreqP,
+	     sjiEntropyP=sjiEntropyP)
 }
 
 funConfigOrig <- function(config) modConfig(config, getFunConfigModsPerm())
@@ -1914,6 +1962,8 @@ funConfigLgdim <- function(config) modConfig(config, getFunConfigModsPerm(permUs
 
 funConfigOrigSji <- function(config) modConfig(config, getFunConfigModsSji())
 funConfigFrentropySji <- function(config) modConfig(config, getFunConfigModsSji(sjiFreqP=T))
+funConfigNentropySji <- function(config) modConfig(config, getFunConfigModsSji(sjiEntropyP=F))
+funConfigFreqSji <- function(config) modConfig(config, getFunConfigModsSji(sjiFreqP=T, sjiEntropyP=F))
 
 makeCombinedMemMat <- function(sjiTbl, envTbl, config) {
 	res = list()
@@ -1989,7 +2039,9 @@ genAndSaveCurWorkspace <- function(groupConfig) {
 
 computeActSjiFromContextTbl <- function(contextTbl, tagTbl, config) {
 	contextTbl = rbind(copy(contextTbl)[, type := paste0('act', capitalize(type))][, funConfig := 'funConfigOrigSji'],
-			   copy(contextTbl)[, type := paste0('act', capitalize(type), 'Frentropy')][, funConfig := 'funConfigFrentropySji']
+			   copy(contextTbl)[, type := paste0('act', capitalize(type), 'Frentropy')][, funConfig := 'funConfigFrentropySji'],
+			   copy(contextTbl)[, type := paste0('act', capitalize(type), 'Nentropy')][, funConfig := 'funConfigNentropySji'],
+			   copy(contextTbl)[, type := paste0('act', capitalize(type), 'Freq')][, funConfig := 'funConfigFreqSji']
 			   )
 	contextTbl[, computeActSji(chunk, get(getConfig(config, 'sjiTbl')), get(funConfig)(config)), by=type]
 }
@@ -2355,7 +2407,6 @@ runForTokenTblForUser <- function(tokenTbl, config) {
 	addMetrics(hashtagsTbl, postResTbl, config)
 	hashtagsTbl
 	modelVsPredTbl = getModelVsPredTbl(postResTbl, hashtagsTbl, config)
-	modelVsPredTbl
 	if (getConfig(config, "accumModelHashtagsTbl") == F) {
 		postResTbl = data.table()
 	}
@@ -2752,11 +2803,9 @@ runGenAndSaveCurWorkspaceg4s6 <- function() genAndSaveCurWorkspace(groupConfigG4
 
 curWS <- function() {
 	#FIXME: address word order low predictiveness
-	#FIXME: proper combination of prior and context for RP
 	#FIXME: add word order to Bayesian sji
 	#FIXME: Methods to import and anlyze coefficient tables
 	#FIXME: Quickly rerun logreg analysis for actDV
-	#FIXME: Rename Hyman to LogOdds
 	withProf(runContext20g1s1(regen='useAlreadyLoaded'))
 	setLogLevel(2)
 	withProf(runContext20g1s6(regen='useAlreadyLoaded'))
