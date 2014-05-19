@@ -1580,7 +1580,6 @@ genTokenizedTblSO <- function(filters='1=1', bundleSize=10000) {
 	return()
 }
 
-#FIXME: Rerun this after truncating tweets_tokenized and dropping retweet column
 genTokenizedTblTwitter <- function(bundleSize=10000, query, tokenizedTblName) {
 	withDBConnect(dbCon,
 		      {dbRs = dbSendQuery(dbCon, query)
@@ -2752,9 +2751,6 @@ runGenAndSaveCurWorkspaceg3s6 <- function() genAndSaveCurWorkspace(groupConfigG3
 runGenAndSaveCurWorkspaceg4s6 <- function() genAndSaveCurWorkspace(groupConfigG4S6)
 
 curWS <- function() {
-	#FIXME: Rerun prior again to test error at end after mclapply addition (running)
-	#FIXME: Parallelize process to get coefficients. (testing)
-	#FIXME: Run new context (testing)
 	#FIXME: address word order low predictiveness
 	#FIXME: proper combination of prior and context for RP
 	#FIXME: add word order to Bayesian sji
