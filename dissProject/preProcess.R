@@ -1400,19 +1400,21 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 	tbl[, .N, by=DVName]
 	# SO full
 	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'stackoverflow'], acc, figName='ContextMeanDVSO')
-	# SO standard
-	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & !grepl('(Entropy)|(Direction)|(Hyman)|(Stoplist)|(Freq)|(Window)', DVName)], acc, figName='ContextMeanDVSO')
 	# T full
 	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'twitter'], acc, figName='foo', groupCol='dsetGroup')
-	# T standard
-	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'twitter' & !grepl('(Entropy)|(Direction)|(Hyman)|(Stoplist)|(Freq)|(Window)', DVName)], acc, figName='foo', groupCol='dsetGroup')
 	# T standard all groups
 	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'twitter' & !grepl('(Entropy)|(Direction)|(Hyman)|(Stoplist)|(Freq)|(Window)', DVName)], acc, figName='ContextMeanDVT', groupCol='groupNum')
-	# RESULT: Entropy weighting works for RP for SO and Twitter
-	# SO Entropy
 	compareMeanDVDefault <- function(...) {
 		compareMeanDV(..., extras=list(ylab('Proportion Correct')))
 	}
+	# RESULT: Show base performance for both models
+	# SO standard
+	stdRegex = '(Entropy)|(Direction)|(Hyman)|(Stoplist)|(Freq)|(Window)|(Frentropy)|(Meddim)|(Lgdim)'
+	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & !grepl(stdRegex, DVName)], acc, figName='contextStandardSO')
+	# T standard
+	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'twitter' & !grepl(stdRegex, DVName)], acc, figName='contextStandardT', groupCol='dsetGroup')
+	# RESULT: Entropy weighting works for RP for SO and Twitter
+	# SO Entropy
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleBody',
 				       'BodyOrderlessEntropy', 'Body', 'BodyOrderless',
 				       'TitleOrderlessEntropy', 'Title', 'TitleOrderless',
@@ -1492,6 +1494,7 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweet', 'TweetOrderlessEntropy', 'PriorStdTweetOrderEntropyTweetOrderlessEntropy',
 				       'PriorStdTweetOrderHymanTweetOrderlessHyman'))
 	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='priorVsContextT')
+	# RESULT: Not much information in order for RP
 	# T compare entropy w/ direction and entropy w/ window to entropy
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweet',
 				       'TweetOrderEntropy', 'Tweet', 'TweetOrder', 'TweetOrderDirection', 'TweetOrderWindow',
@@ -2830,9 +2833,9 @@ runGenAndSaveCurWorkspaceg3s6 <- function() genAndSaveCurWorkspace(groupConfigG3
 runGenAndSaveCurWorkspaceg4s6 <- function() genAndSaveCurWorkspace(groupConfigG4S6)
 
 curWS <- function() {
+	#FIXME: Methods to import and anlyze coefficient tables
 	#FIXME: address word order low predictiveness
 	#FIXME: add word order to Bayesian sji
-	#FIXME: Methods to import and anlyze coefficient tables
 	#FIXME: Quickly rerun logreg analysis for actDV
 	withProf(runContext20g1s1(regen='useAlreadyLoaded'))
 	setLogLevel(2)
