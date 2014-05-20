@@ -2889,11 +2889,12 @@ runGenAndSaveCurWorkspaceg4s6 <- function() genAndSaveCurWorkspace(groupConfigG4
 
 curWS <- function() {
 	# FIXME: Remove duplication in config runTbl area
+	# FIXME: move nrows matrix from 5000 to 200
+	# FIXME: Rerun context
 	# FIXME: Methods to import and anlyze coefficient tables
 	# FIXME: Make sure word order low predictiveness is fully justified
 	# FIXME: Add user-centered sji to popular-users dataset
 	# FIXME: Run popular-users dataset with sji computation
-	# FIXME: move nrows matrix from 5000 to 200
 	withProf(runContext20g1s1(regen='useAlreadyLoaded'))
 	setLogLevel(2)
 	withProf(runContext20g1s6(regen='useAlreadyLoaded'))
