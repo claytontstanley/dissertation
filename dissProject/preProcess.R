@@ -1573,14 +1573,14 @@ analyzeContextSmall <- function() {
 				       'PriorStdTitleOrderlessFreqhymanBodyOrderlessFreqhyman',
 				       'PriorStdTitleOrderlessHymanBodyOrderlessHyman',
 				       'PriorStdTitleOrderlessBodyOrderless'))
-	compareMeanDV(tbl[sizeNum == 1 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='foo')
+	compareMeanDV(tbl[sizeNum == 6 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='foo')
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweetNentropy', 'PriorStdTweet',
 				       'PriorStdTweetOrderFrentropyTweetOrderlessFrentropy',
 				       'PriorStdTweetOrderFrenthymanTweetOrderlessFrenthyman', 'PriorStdTweetOrderTweetOrderless',
 				       'PriorStdTweetOrderNenthymanTweetOrderlessNenthyman',
 				       'PriorStdTweetOrderFreqhymanTweetOrderlessFreqhyman',
 				       'PriorStdTweetOrderHymanTweetOrderlessHyman'))
-	compareMeanDV(tbl[sizeNum == 1 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='foo')
+	compareMeanDV(tbl[sizeNum == 6 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='foo')
 }
 
 
