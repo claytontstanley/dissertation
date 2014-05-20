@@ -613,132 +613,121 @@ defaultPermConfig = list(permUseEntropyP='', permUseStoplistP='', permOnlyDirect
 
 defaultSjiConfig = list(computeActFromContextTbl = 'computeActSjiFromContextTbl', sjiFreqP='', sjiEntropyP='')
 
+makeBestFitsVectFun <- function(res) {
+	function(name) {
+		app = function(str) sprintf(str, name)
+		map = function(vars) sapply(vars, app, USE.NAMES=F)
+		res = lapply(res, map)
+		res
+	}
+}
+
+makeBestFitsVectT <- function(name) {
+	do.call(makeBestFitsVectFun(list(c('actPriorStd', 'actTweetOrder%s', 'actTweetOrderless%s'), c('actTweetOrder%s', 'actTweetOrderless%s'))),
+		list(name))
+}
+
+makeBestFitsVectSO <- function(name) {
+	do.call(makeBestFitsVectFun(list(c('actPriorStd', 'actTitleOrderless%s', 'actBodyOrderless%s'), c('actTitleOrderless%s', 'actBodyOrderless%s'))),
+		list(name))
+}
+
+makeBestFitsStrFun <- function(res) {
+	function(name) {
+		app = function(str) {
+			nReps = str_count(str, '%s')
+			do.call(sprintf, as.list(c(str, rep(name, nReps))))
+		}
+		sapply(res, app, USE.NAMES=F)
+	}
+}
+
+makeBestFitsStrT <- function(name) {
+	do.call(makeBestFitsStrFun(c('actPriorStd_actTweetOrder%s_actTweetOrderless%s',
+				  'actTweetOrderless%s', 'actTweetOrder%s', 'actTweetOrder%s_actTweetOrderless%s')),
+		list(name))
+}
+
+makeBestFitsStrSO <- function(name) {
+	do.call(makeBestFitsStrFun(c('actPriorStd_actTitleOrderless%s_actBodyOrderless%s',
+				  'actTitleOrderless%s', 'actBodyOrderless%s', 'actTitleOrderless%s_actBodyOrderless%s')),
+		list(name))
+}
+
 defaultTPermConfig = modConfig(c(defaultTConfig, defaultPermConfig,
-				 list(runTbl=makeRunTbl(list(c('actPriorStd', 'actTweetOrder', 'actTweetOrderless'),
-							     c('actTweetOrder', 'actTweetOrderless'),
-							     c('actPriorStd', 'actTweetOrder'),
-							     c('actPriorStd', 'actTweetOrderless'),
-							     c('actPriorStd', 'actTweetOrderEntropy', 'actTweetOrderlessEntropy'),
-							     c('actTweetOrderEntropy', 'actTweetOrderlessEntropy'),
-							     c('actPriorStd', 'actTweetOrderStoplist', 'actTweetOrderlessStoplist'),
-							     c('actTweetOrderStoplist', 'actTweetOrderlessStoplist'),
-							     c('actPriorStd', 'actTweetOrderDirection', 'actTweetOrderlessDirection'),
-							     c('actTweetOrderDirection', 'actTweetOrderlessDirection'),
-							     c('actPriorStd', 'actTweetOrderHyman', 'actTweetOrderlessHyman'),
-							     c('actTweetOrderHyman', 'actTweetOrderlessHyman'),
-							     c('actPriorStd', 'actTweetOrderFreq', 'actTweetOrderlessFreq'),
-							     c('actTweetOrderFreq', 'actTweetOrderlessFreq'),
-							     c('actPriorStd', 'actTweetOrderWindow', 'actTweetOrderlessWindow'),
-							     c('actTweetOrderWindow', 'actTweetOrderlessWindow'),
-							     c('actPriorStd', 'actTweetOrderFrentropy', 'actTweetOrderlessFrentropy'),
-							     c('actTweetOrderFrentropy', 'actTweetOrderlessFrentropy'),
-							     c('actPriorStd', 'actTweetOrderMeddim', 'actTweetOrderlessMeddim'),
-							     c('actTweetOrderMeddim', 'actTweetOrderlessMeddim'),
-							     c('actPriorStd', 'actTweetOrderLgdim', 'actTweetOrderlessLgdim'),
-							     c('actTweetOrderLgdim', 'actTweetOrderlessLgdim'),
-							     c('actPriorStd', 'actTweetOrderFrenthyman', 'actTweetOrderlessFrenthyman'),
-							     c('actTweetOrderFrenthyman', 'actTweetOrderlessFrenthyman'),
-							     c('actPriorStd', 'actTweetOrderNenthyman', 'actTweetOrderlessNenthyman'),
-							     c('actTweetOrderNenthyman', 'actTweetOrderlessNenthyman'),
-							     c('actPriorStd', 'actTweetOrderFreqhyman', 'actTweetOrderlessFreqhyman'),
-							     c('actTweetOrderFreqhyman', 'actTweetOrderlessFreqhyman')
-							     )),
+				 list(runTbl=makeRunTbl(c(list(c('actPriorStd', 'actTweetOrder'),
+							       c('actPriorStd', 'actTweetOrderless')),
+							  makeBestFitsVectT(''),
+							  makeBestFitsVectT('Entropy'),
+							  makeBestFitsVectT('Stoplist'),
+							  makeBestFitsVectT('Direction'),
+							  makeBestFitsVectT('Hyman'),
+							  makeBestFitsVectT('Freq'),
+							  makeBestFitsVectT('Window'),
+							  makeBestFitsVectT('Frentropy'),
+							  makeBestFitsVectT('Meddim'),
+							  makeBestFitsVectT('Lgdim'),
+							  makeBestFitsVectT('Frenthyman'),
+							  makeBestFitsVectT('Nenthyman'),
+							  makeBestFitsVectT('Freqhyman')
+							  )),
 				      permEnvTbl='permEnvTblT',
 				      permMemMatOrder='permMemMatTOrder',
 				      permMemMatOrderless='permMemMatTOrderless',
 				      computeActFromContextTbl = 'computeActPermTFromContextTbl')),
 			       list(accumModelHashtagsTbl=T,
-				    actDVs=c('actPriorStd_actTweetOrder_actTweetOrderless', 'actPriorStd',
-					     'actPriorStd_actTweetOrder', 'actPriorStd_actTweetOrderless',
-					     'actTweetOrder', 'actTweetOrderless', 'actTweetOrder_actTweetOrderless',
-					     'actPriorStd_actTweetOrderEntropy_actTweetOrderlessEntropy',
-					     'actTweetOrderlessEntropy', 'actTweetOrderEntropy', 'actTweetOrderEntropy_actTweetOrderlessEntropy',
-					     'actPriorStd_actTweetOrderStoplist_actTweetOrderlessStoplist',
-					     'actTweetOrderlessStoplist', 'actTweetOrderStoplist', 'actTweetOrderStoplist_actTweetOrderlessStoplist',
-					     'actPriorStd_actTweetOrderDirection_actTweetOrderlessDirection',
-					     'actTweetOrderlessDirection', 'actTweetOrderDirection', 'actTweetOrderDirection_actTweetOrderlessDirection',
-					     'actPriorStd_actTweetOrderHyman_actTweetOrderlessHyman',
-					     'actTweetOrderlessHyman', 'actTweetOrderHyman', 'actTweetOrderHyman_actTweetOrderlessHyman',
-					     'actPriorStd_actTweetOrderFreq_actTweetOrderlessFreq',
-					     'actTweetOrderlessFreq', 'actTweetOrderFreq', 'actTweetOrderFreq_actTweetOrderlessFreq',
-					     'actPriorStd_actTweetOrderWindow_actTweetOrderlessWindow',
-					     'actTweetOrderlessWindow', 'actTweetOrderWindow', 'actTweetOrderWindow_actTweetOrderlessWindow',
-					     'actPriorStd_actTweetOrderFrentropy_actTweetOrderlessFrentropy',
-					     'actTweetOrderlessFrentropy', 'actTweetOrderFrentropy', 'actTweetOrderFrentropy_actTweetOrderlessFrentropy',
-					     'actPriorStd_actTweetOrderMeddim_actTweetOrderlessMeddim',
-					     'actTweetOrderlessMeddim', 'actTweetOrderMeddim', 'actTweetOrderMeddim_actTweetOrderlessMeddim',
-					     'actPriorStd_actTweetOrderLgdim_actTweetOrderlessLgdim',
-					     'actTweetOrderlessLgdim', 'actTweetOrderLgdim', 'actTweetOrderLgdim_actTweetOrderlessLgdim',
-					     'actPriorStd_actTweetOrderFrenthyman_actTweetOrderlessFrenthyman',
-					     'actTweetOrderlessFrenthyman', 'actTweetOrderFrenthyman', 'actTweetOrderFrenthyman_actTweetOrderlessFrenthyman',
-					     'actPriorStd_actTweetOrderNenthyman_actTweetOrderlessNenthyman',
-					     'actTweetOrderlessNenthyman', 'actTweetOrderNenthyman', 'actTweetOrderNenthyman_actTweetOrderlessNenthyman',
-					     'actPriorStd_actTweetOrderFreqhyman_actTweetOrderlessFreqhyman',
-					     'actTweetOrderlessFreqhyman', 'actTweetOrderFreqhyman', 'actTweetOrderFreqhyman_actTweetOrderlessFreqhyman'
+				    actDVs=c('actPriorStd_actTweetOrder', 'actPriorStd_actTweetOrderless', 'actPriorStd',
+					     makeBestFitsStrT(''),
+					     makeBestFitsStrT('Entropy'),
+					     makeBestFitsStrT('Stoplist'),
+					     makeBestFitsStrT('Direction'),
+					     makeBestFitsStrT('Hyman'),
+					     makeBestFitsStrT('Freq'),
+					     makeBestFitsStrT('Window'),
+					     makeBestFitsStrT('Frentropy'),
+					     makeBestFitsStrT('Meddim'),
+					     makeBestFitsStrT('Lgdim'),
+					     makeBestFitsStrT('Frenthyman'),
+					     makeBestFitsStrT('Nenthyman'),
+					     makeBestFitsStrT('Freqhyman')
 					     )))
 
 defaultSOPermConfig = modConfig(c(defaultSOConfig, defaultPermConfig,
-				  list(runTbl=makeRunTbl(list(c('actPriorStd', 'actTitleOrderless', 'actBodyOrderless'),
-							      c('actTitleOrderless', 'actBodyOrderless'),
-							      c('actPriorStd', 'actTitleOrderless'),
-							      c('actPriorStd', 'actBodyOrderless'),
-							      c('actPriorStd', 'actTitleOrderlessEntropy', 'actBodyOrderlessEntropy'),
-							      c('actTitleOrderlessEntropy', 'actBodyOrderlessEntropy'),
-							      c('actPriorStd', 'actTitleOrderlessStoplist', 'actBodyOrderlessStoplist'),
-							      c('actTitleOrderlessStoplist', 'actBodyOrderlessStoplist'),
-							      c('actPriorStd', 'actTitleOrderlessDirection', 'actBodyOrderlessDirection'),
-							      c('actTitleOrderlessDirection', 'actBodyOrderlessDirection'),
-							      c('actPriorStd', 'actTitleOrderlessHyman', 'actBodyOrderlessHyman'),
-							      c('actTitleOrderlessHyman', 'actBodyOrderlessHyman'),
-							      c('actPriorStd', 'actTitleOrderlessFreq', 'actBodyOrderlessFreq'),
-							      c('actTitleOrderlessFreq', 'actBodyOrderlessFreq'),
-							      c('actPriorStd', 'actTitleOrderlessWindow', 'actBodyOrderlessWindow'),
-							      c('actTitleOrderlessWindow', 'actBodyOrderlessWindow'),
-							      c('actPriorStd', 'actTitleOrderlessFrentropy', 'actBodyOrderlessFrentropy'),
-							      c('actTitleOrderlessFrentropy', 'actBodyOrderlessFrentropy'),
-							      c('actPriorStd', 'actTitleOrderlessMeddim', 'actBodyOrderlessMeddim'),
-							      c('actTitleOrderlessMeddim', 'actBodyOrderlessMeddim'),
-							      c('actPriorStd', 'actTitleOrderlessLgdim', 'actBodyOrderlessLgdim'),
-							      c('actTitleOrderlessLgdim', 'actBodyOrderlessLgdim'),
-							      c('actPriorStd', 'actTitleOrderlessFrenthyman', 'actBodyOrderlessFrenthyman'),
-							      c('actTitleOrderlessFrenthyman', 'actBodyOrderlessFrenthyman'),
-							      c('actPriorStd', 'actTitleOrderlessNenthyman', 'actBodyOrderlessNenthyman'),
-							      c('actTitleOrderlessNenthyman', 'actBodyOrderlessNenthyman'),
-							      c('actPriorStd', 'actTitleOrderlessFreqhyman', 'actBodyOrderlessFreqhyman'),
-							      c('actTitleOrderlessFreqhyman', 'actBodyOrderlessFreqhyman')
-							      )),
+				  list(runTbl=makeRunTbl(c(list(c('actPriorStd', 'actTitleOrderless'),
+								c('actPriorStd', 'actBodyOrderless')),
+							   makeBestFitsVectSO(''),
+							   makeBestFitsVectSO('Entropy'),
+							   makeBestFitsVectSO('Stoplist'),
+							   makeBestFitsVectSO('Direction'),
+							   makeBestFitsVectSO('Hyman'),
+							   makeBestFitsVectSO('Freq'),
+							   makeBestFitsVectSO('Window'),
+							   makeBestFitsVectSO('Frentropy'),
+							   makeBestFitsVectSO('Meddim'),
+							   makeBestFitsVectSO('Lgdim'),
+							   makeBestFitsVectSO('Frenthyman'),
+							   makeBestFitsVectSO('Nenthyman'),
+							   makeBestFitsVectSO('Freqhyman')
+							   )),
 				       permEnvTbl='permEnvTblSO',
 				       permMemMatOrder='',
 				       permMemMatOrderless='permMemMatSOOrderless',
 				       computeActFromContextTbl = 'computeActPermSOFromContextTbl')),
 				list(accumModelHashtagsTbl=T,
-				     actDVs=c('actPriorStd_actTitleOrderless_actBodyOrderless', 'actPriorStd',
-					      'actTitleOrderless', 'actBodyOrderless', 'actTitleOrderless_actBodyOrderless',
-					      'actPriorStd_actTitleOrderless', 'actPriorStd_actBodyOrderless',
-					      'actPriorStd_actTitleOrderlessEntropy_actBodyOrderlessEntropy',
-					      'actTitleOrderlessEntropy', 'actBodyOrderlessEntropy', 'actTitleOrderlessEntropy_actBodyOrderlessEntropy',
-					      'actPriorStd_actTitleOrderlessStoplist_actBodyOrderlessStoplist',
-					      'actTitleOrderlessStoplist', 'actBodyOrderlessStoplist', 'actTitleOrderlessStoplist_actBodyOrderlessStoplist',
-					      'actPriorStd_actTitleOrderlessDirection_actBodyOrderlessDirection',
-					      'actTitleOrderlessDirection', 'actBodyOrderlessDirection', 'actTitleOrderlessDirection_actBodyOrderlessDirection',
-					      'actPriorStd_actTitleOrderlessHyman_actBodyOrderlessHyman',
-					      'actTitleOrderlessHyman', 'actBodyOrderlessHyman', 'actTitleOrderlessHyman_actBodyOrderlessHyman',
-					      'actPriorStd_actTitleOrderlessFreq_actBodyOrderlessFreq',
-					      'actTitleOrderlessFreq', 'actBodyOrderlessFreq', 'actTitleOrderlessFreq_actBodyOrderlessFreq',
-					      'actPriorStd_actTitleOrderlessWindow_actBodyOrderlessWindow',
-					      'actTitleOrderlessWindow', 'actBodyOrderlessWindow', 'actTitleOrderlessWindow_actBodyOrderlessWindow',
-					      'actPriorStd_actTitleOrderlessFrentropy_actBodyOrderlessFrentropy',
-					      'actTitleOrderlessFrentropy', 'actBodyOrderlessFrentropy', 'actTitleOrderlessFrentropy_actBodyOrderlessFrentropy',
-					      'actPriorStd_actTitleOrderlessMeddim_actBodyOrderlessMeddim',
-					      'actTitleOrderlessMeddim', 'actBodyOrderlessMeddim', 'actTitleOrderlessMeddim_actBodyOrderlessMeddim',
-					      'actPriorStd_actTitleOrderlessLgdim_actBodyOrderlessLgdim',
-					      'actTitleOrderlessLgdim', 'actBodyOrderlessLgdim', 'actTitleOrderlessLgdim_actBodyOrderlessLgdim',
-					      'actPriorStd_actTitleOrderlessFrenthyman_actBodyOrderlessFrenthyman',
-					      'actTitleOrderlessFrenthyman', 'actBodyOrderlessFrenthyman', 'actTitleOrderlessFrenthyman_actBodyOrderlessFrenthyman',
-					      'actPriorStd_actTitleOrderlessNenthyman_actBodyOrderlessNenthyman',
-					      'actTitleOrderlessNenthyman', 'actBodyOrderlessNenthyman', 'actTitleOrderlessNenthyman_actBodyOrderlessNenthyman',
-					      'actPriorStd_actTitleOrderlessFreqhyman_actBodyOrderlessFreqhyman',
-					      'actTitleOrderlessFreqhyman', 'actBodyOrderlessFreqhyman', 'actTitleOrderlessFreqhyman_actBodyOrderlessFreqhyman'
+				     actDVs=c('actPriorStd_actTitleOrderless', 'actPriorStd_actBodyOrderless', 'actPriorStd',
+					      makeBestFitsStrSO(''),
+					      makeBestFitsStrSO('Entropy'),
+					      makeBestFitsStrSO('Stoplist'),
+					      makeBestFitsStrSO('Direction'),
+					      makeBestFitsStrSO('Hyman'),
+					      makeBestFitsStrSO('Freq'),
+					      makeBestFitsStrSO('Window'),
+					      makeBestFitsStrSO('Frentropy'),
+					      makeBestFitsStrSO('Meddim'),
+					      makeBestFitsStrSO('Lgdim'),
+					      makeBestFitsStrSO('Frenthyman'),
+					      makeBestFitsStrSO('Nenthyman'),
+					      makeBestFitsStrSO('Freqhyman')
 					      ),
 				     MCCORESAct = 2
 				     ))
@@ -2888,7 +2877,6 @@ runGenAndSaveCurWorkspaceg3s6 <- function() genAndSaveCurWorkspace(groupConfigG3
 runGenAndSaveCurWorkspaceg4s6 <- function() genAndSaveCurWorkspace(groupConfigG4S6)
 
 curWS <- function() {
-	# FIXME: Remove duplication in config runTbl area
 	# FIXME: move nrows matrix from 5000 to 200
 	# FIXME: Regen RWorkspace files
 	# FIXME: Install 32GB RAM, tune.
