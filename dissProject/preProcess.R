@@ -2890,6 +2890,8 @@ runGenAndSaveCurWorkspaceg4s6 <- function() genAndSaveCurWorkspace(groupConfigG4
 curWS <- function() {
 	# FIXME: Remove duplication in config runTbl area
 	# FIXME: move nrows matrix from 5000 to 200
+	# FIXME: Regen RWorkspace files
+	# FIXME: Install 32GB RAM, tune.
 	# FIXME: Rerun context
 	# FIXME: Methods to import and anlyze coefficient tables
 	# FIXME: Make sure word order low predictiveness is fully justified
