@@ -635,7 +635,9 @@ defaultTPermConfig = modConfig(c(defaultTConfig, defaultPermConfig,
 							     c('actPriorStd', 'actTweetOrderMeddim', 'actTweetOrderlessMeddim'),
 							     c('actTweetOrderMeddim', 'actTweetOrderlessMeddim'),
 							     c('actPriorStd', 'actTweetOrderLgdim', 'actTweetOrderlessLgdim'),
-							     c('actTweetOrderLgdim', 'actTweetOrderlessLgdim')
+							     c('actTweetOrderLgdim', 'actTweetOrderlessLgdim'),
+							     c('actPriorStd', 'actTweetOrderBest', 'actTweetOrderlessBest'),
+							     c('actTweetOrderBest', 'actTweetOrderlessBest')
 							     )),
 				      permEnvTbl='permEnvTblT',
 				      permMemMatOrder='permMemMatTOrder',
@@ -662,7 +664,9 @@ defaultTPermConfig = modConfig(c(defaultTConfig, defaultPermConfig,
 					     'actPriorStd_actTweetOrderMeddim_actTweetOrderlessMeddim',
 					     'actTweetOrderlessMeddim', 'actTweetOrderMeddim', 'actTweetOrderMeddim_actTweetOrderlessMeddim',
 					     'actPriorStd_actTweetOrderLgdim_actTweetOrderlessLgdim',
-					     'actTweetOrderlessLgdim', 'actTweetOrderLgdim', 'actTweetOrderLgdim_actTweetOrderlessLgdim'
+					     'actTweetOrderlessLgdim', 'actTweetOrderLgdim', 'actTweetOrderLgdim_actTweetOrderlessLgdim',
+					     'actPriorStd_actTweetOrderBest_actTweetOrderlessBest',
+					     'actTweetOrderlessBest', 'actTweetOrderBest', 'actTweetOrderBest_actTweetOrderlessBest'
 					     )))
 
 defaultSOPermConfig = modConfig(c(defaultSOConfig, defaultPermConfig,
@@ -687,7 +691,9 @@ defaultSOPermConfig = modConfig(c(defaultSOConfig, defaultPermConfig,
 							      c('actPriorStd', 'actTitleOrderlessMeddim', 'actBodyOrderlessMeddim'),
 							      c('actTitleOrderlessMeddim', 'actBodyOrderlessMeddim'),
 							      c('actPriorStd', 'actTitleOrderlessLgdim', 'actBodyOrderlessLgdim'),
-							      c('actTitleOrderlessLgdim', 'actBodyOrderlessLgdim')
+							      c('actTitleOrderlessLgdim', 'actBodyOrderlessLgdim'),
+							      c('actPriorStd', 'actTitleOrderlessBest', 'actBodyOrderlessBest'),
+							      c('actTitleOrderlessBest', 'actBodyOrderlessBest')
 							      )),
 				       permEnvTbl='permEnvTblSO',
 				       permMemMatOrder='',
@@ -714,7 +720,9 @@ defaultSOPermConfig = modConfig(c(defaultSOConfig, defaultPermConfig,
 					      'actPriorStd_actTitleOrderlessMeddim_actBodyOrderlessMeddim',
 					      'actTitleOrderlessMeddim', 'actBodyOrderlessMeddim', 'actTitleOrderlessMeddim_actBodyOrderlessMeddim',
 					      'actPriorStd_actTitleOrderlessLgdim_actBodyOrderlessLgdim',
-					      'actTitleOrderlessLgdim', 'actBodyOrderlessLgdim', 'actTitleOrderlessLgdim_actBodyOrderlessLgdim'
+					      'actTitleOrderlessLgdim', 'actBodyOrderlessLgdim', 'actTitleOrderlessLgdim_actBodyOrderlessLgdim',
+					      'actPriorStd_actTitleOrderlessBest_actBodyOrderlessBest',
+					      'actTitleOrderlessBest', 'actBodyOrderlessBest', 'actTitleOrderlessBest_actBodyOrderlessBest'
 					      ),
 				     MCCORESAct = 2
 				     ))
@@ -1225,7 +1233,8 @@ renameColDVName <- function(tbl) {
 		    makeStandardMapping('Freq', 'w/ freq'),
 		    makeStandardMapping('Frentropy', 'w/ entropy and freq'),
 		    makeStandardMapping('Meddim', 'w/ entropy and 4000-row matrix'),
-		    makeStandardMapping('Lgdim', 'w/ entropy and 10000-row matrix')
+		    makeStandardMapping('Lgdim', 'w/ entropy and 10000-row matrix'),
+		    makeStandardMapping('Best', 'w/ entropy and freq and log odds')
 		    )
 	mapping = groupN(2, mapping)
 	mapping
@@ -1991,6 +2000,7 @@ funConfigWindow <- function(config) modConfig(config, getFunConfigModsPerm(permU
 funConfigFrentropy <- function(config) modConfig(config, getFunConfigModsPerm(permUseEntropyP=T, permUseFreqP=T))
 funConfigMeddim <- function(config) modConfig(config, getFunConfigModsPerm(permUseEntropyP=T, permNRows=4000))
 funConfigLgdim <- function(config) modConfig(config, getFunConfigModsPerm(permUseEntropyP=T, permNRows=10000))
+funConfigBest <- function(config) modConfig(config, getFunConfigModsPerm(permUseEntropyP=T, permUseFreqP=T, permHymanP=T)) 
 
 funConfigOrigSji <- function(config) modConfig(config, getFunConfigModsSji())
 funConfigFrentropySji <- function(config) modConfig(config, getFunConfigModsSji(sjiFreqP=T))
@@ -2105,7 +2115,9 @@ computeActPermTFromContextTbl <- function(contextTbl, tagTbl, config) {
 			   copy(cTblOrder)[,type:=paste0('act', capitalize(type),'OrderMeddim')][,fun:='computeActPermOrder'][,funConfig:='funConfigMeddim'],
 			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessMeddim')][,fun:='computeActPermOrderless'][,funConfig:='funConfigMeddim'],
 			   copy(cTblOrder)[,type:=paste0('act', capitalize(type),'OrderLgdim')][,fun:='computeActPermOrder'][,funConfig:='funConfigLgdim'],
-			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessLgdim')][,fun:='computeActPermOrderless'][,funConfig:='funConfigLgdim']
+			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessLgdim')][,fun:='computeActPermOrderless'][,funConfig:='funConfigLgdim'],
+			   copy(cTblOrder)[,type:=paste0('act', capitalize(type),'OrderBest')][,fun:='computeActPermOrder'][,funConfig:='funConfigBest'],
+			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessBest')][,fun:='computeActPermOrderless'][,funConfig:='funConfigBest']
 			   )
 	contextTbl
 	contextTbl[, get(fun[1])(chunk, posFromTag, get(funConfig)(config)), by=type]
@@ -2123,7 +2135,8 @@ computeActPermSOFromContextTbl <- function(contextTbl, tagTbl, config) {
 			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessWindow')][,fun:='computeActPermOrderless'][,funConfig:='funConfigWindow'],
 			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessFrentropy')][,fun:='computeActPermOrderless'][,funConfig:='funConfigFrentropy'],
 			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessMeddim')][,fun:='computeActPermOrderless'][,funConfig:='funConfigMeddim'],
-			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessLgdim')][,fun:='computeActPermOrderless'][,funConfig:='funConfigLgdim']
+			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessLgdim')][,fun:='computeActPermOrderless'][,funConfig:='funConfigLgdim'],
+			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessBest')][,fun:='computeActPermOrderless'][,funConfig:='funConfigBest']
 			   )
 	contextTbl[, get(fun[1])(chunk, posFromTag, get(funConfig)(config)), by=type]
 }
@@ -2519,7 +2532,8 @@ runContextWithConfig <- function(regen, samplesPerRun, numRunsT, numRunsSO, grou
 }
 
 groupConfigS1 <- list(sizeNum=1, maxIdSOSji=1e5, maxIdSOPrior=100e6, maxIdTSji=3e6, maxIdTPrior=1e5)
-groupConfigS2 <- list(sizeNum=2, maxIdSOSji=1e6, maxIdSOPrior=100e6, maxIdTSji=3e6, maxIdTPrior=1e5) # FIXME: Change to 3Mil for maxIdSOSji when possible
+# FIXME: Change to 3Mil for maxIdSOSji when possible
+groupConfigS2 <- list(sizeNum=2, maxIdSOSji=1e6, maxIdSOPrior=100e6, maxIdTSji=3e6, maxIdTPrior=1e5) 
 groupConfigS3 <- list(sizeNum=3, maxIdSOSji=1e6, maxIdSOPrior=100e6, maxIdTSji=1e6, maxIdTPrior=1e5)
 groupConfigS4 <- list(sizeNum=4, maxIdSOSji=1e5, maxIdSOPrior=100e6, maxIdTSji=1e5, maxIdTPrior=1e5)
 groupConfigS5 <- list(sizeNum=5, maxIdSOSji=1e4, maxIdSOPrior=100e6, maxIdTSji=1e4, maxIdTPrior=1e5)
@@ -2834,10 +2848,13 @@ runGenAndSaveCurWorkspaceg3s6 <- function() genAndSaveCurWorkspace(groupConfigG3
 runGenAndSaveCurWorkspaceg4s6 <- function() genAndSaveCurWorkspace(groupConfigG4S6)
 
 curWS <- function() {
-	#FIXME: Methods to import and anlyze coefficient tables
-	#FIXME: address word order low predictiveness
-	#FIXME: add word order to Bayesian sji
-	#FIXME: Quickly rerun logreg analysis for actDV
+	# FIXME: Methods to import and anlyze coefficient tables
+	# FIXME: address word order low predictiveness
+	# FIXME: add word order to Bayesian sji
+	# FIXME: Quickly rerun logreg analysis for actDV
+	# FIXME: Add user-centered sji to popular-users dataset
+	# FIXME: Run popular-users dataset with sji computation
+	# FIXME: move nrows matrix from 5000 to 200
 	withProf(runContext20g1s1(regen='useAlreadyLoaded'))
 	setLogLevel(2)
 	withProf(runContext20g1s6(regen='useAlreadyLoaded'))
