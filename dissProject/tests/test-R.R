@@ -91,11 +91,9 @@ test_that("testOnlyFirstT", {
 
 context("ModelVsPred Full Runs")
 
-# FIXME: Add this test back in after code is worked to go through new path for prior twitter runs
 test_that("testModelVsPred", {
 	  expectedTbl = myReadCSV(getOutFileModelVsPred('testing1'))
 	  expectedHashtagsTbl = myReadCSV(getOutFileHashtags('testing1'))
-	  #resTbl = runPriorT(config=modConfig(defaultTConfig, list(query=sprintf("select %s from tweets where user_screen_name = 'ap'", defaultTCols))))
 	  resTbl = runPriorT(config=modConfig(defaultTSjiPConfig, list(query=sprintf("user_screen_name = 'ap'", defaultTCols))))
 	  expect_equivalent(resTbl$modelHashtagsTbl, data.table())
 	  expect_equivalent(expectedTbl, resTbl$modelVsPredTbl)

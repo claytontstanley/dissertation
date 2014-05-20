@@ -1402,17 +1402,18 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'stackoverflow'], acc, figName='ContextMeanDVSO')
 	# T full
 	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'twitter'], acc, figName='foo', groupCol='dsetGroup')
-	# T standard all groups
-	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'twitter' & !grepl('(Entropy)|(Direction)|(Hyman)|(Stoplist)|(Freq)|(Window)', DVName)], acc, figName='ContextMeanDVT', groupCol='groupNum')
 	compareMeanDVDefault <- function(...) {
 		compareMeanDV(..., extras=list(ylab('Proportion Correct')))
 	}
 	# RESULT: Show base performance for both models
 	# SO standard
 	stdRegex = '(Entropy)|(Direction)|(Hyman)|(Stoplist)|(Freq)|(Window)|(Frentropy)|(Meddim)|(Lgdim)'
-	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & !grepl(stdRegex, DVName)], acc, figName='contextStandardSO')
+	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & !grepl(stdRegex, DVName)], acc, figName='contextStandardSO')
 	# T standard
-	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'twitter' & !grepl(stdRegex, DVName)], acc, figName='contextStandardT', groupCol='dsetGroup')
+	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & !grepl(stdRegex, DVName)], acc, figName='contextStandardT', groupCol='dsetGroup')
+	# RESULT: 4 different subsets for twitter popular hashtags show same effects
+	# T standard all groups
+	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & !grepl(stdRegex, DVName)], acc, figName='contextStandardByGroupT', groupCol='groupNum')
 	# RESULT: Entropy weighting works for RP for SO and Twitter
 	# SO Entropy
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleBody',
