@@ -636,8 +636,12 @@ defaultTPermConfig = modConfig(c(defaultTConfig, defaultPermConfig,
 							     c('actTweetOrderMeddim', 'actTweetOrderlessMeddim'),
 							     c('actPriorStd', 'actTweetOrderLgdim', 'actTweetOrderlessLgdim'),
 							     c('actTweetOrderLgdim', 'actTweetOrderlessLgdim'),
-							     c('actPriorStd', 'actTweetOrderBest', 'actTweetOrderlessBest'),
-							     c('actTweetOrderBest', 'actTweetOrderlessBest')
+							     c('actPriorStd', 'actTweetOrderFrenthyman', 'actTweetOrderlessFrenthyman'),
+							     c('actTweetOrderFrenthyman', 'actTweetOrderlessFrenthyman'),
+							     c('actPriorStd', 'actTweetOrderNenthyman', 'actTweetOrderlessNenthyman'),
+							     c('actTweetOrderNenthyman', 'actTweetOrderlessNenthyman'),
+							     c('actPriorStd', 'actTweetOrderFreqhyman', 'actTweetOrderlessFreqhyman'),
+							     c('actTweetOrderFreqhyman', 'actTweetOrderlessFreqhyman')
 							     )),
 				      permEnvTbl='permEnvTblT',
 				      permMemMatOrder='permMemMatTOrder',
@@ -665,8 +669,12 @@ defaultTPermConfig = modConfig(c(defaultTConfig, defaultPermConfig,
 					     'actTweetOrderlessMeddim', 'actTweetOrderMeddim', 'actTweetOrderMeddim_actTweetOrderlessMeddim',
 					     'actPriorStd_actTweetOrderLgdim_actTweetOrderlessLgdim',
 					     'actTweetOrderlessLgdim', 'actTweetOrderLgdim', 'actTweetOrderLgdim_actTweetOrderlessLgdim',
-					     'actPriorStd_actTweetOrderBest_actTweetOrderlessBest',
-					     'actTweetOrderlessBest', 'actTweetOrderBest', 'actTweetOrderBest_actTweetOrderlessBest'
+					     'actPriorStd_actTweetOrderFrenthyman_actTweetOrderlessFrenthyman',
+					     'actTweetOrderlessFrenthyman', 'actTweetOrderFrenthyman', 'actTweetOrderFrenthyman_actTweetOrderlessFrenthyman',
+					     'actPriorStd_actTweetOrderNenthyman_actTweetOrderlessNenthyman',
+					     'actTweetOrderlessNenthyman', 'actTweetOrderNenthyman', 'actTweetOrderNenthyman_actTweetOrderlessNenthyman',
+					     'actPriorStd_actTweetOrderFreqhyman_actTweetOrderlessFreqhyman',
+					     'actTweetOrderlessFreqhyman', 'actTweetOrderFreqhyman', 'actTweetOrderFreqhyman_actTweetOrderlessFreqhyman'
 					     )))
 
 defaultSOPermConfig = modConfig(c(defaultSOConfig, defaultPermConfig,
@@ -692,8 +700,12 @@ defaultSOPermConfig = modConfig(c(defaultSOConfig, defaultPermConfig,
 							      c('actTitleOrderlessMeddim', 'actBodyOrderlessMeddim'),
 							      c('actPriorStd', 'actTitleOrderlessLgdim', 'actBodyOrderlessLgdim'),
 							      c('actTitleOrderlessLgdim', 'actBodyOrderlessLgdim'),
-							      c('actPriorStd', 'actTitleOrderlessBest', 'actBodyOrderlessBest'),
-							      c('actTitleOrderlessBest', 'actBodyOrderlessBest')
+							      c('actPriorStd', 'actTitleOrderlessFrenthyman', 'actBodyOrderlessFrenthyman'),
+							      c('actTitleOrderlessFrenthyman', 'actBodyOrderlessFrenthyman'),
+							      c('actPriorStd', 'actTitleOrderlessNenthyman', 'actBodyOrderlessNenthyman'),
+							      c('actTitleOrderlessNenthyman', 'actBodyOrderlessNenthyman'),
+							      c('actPriorStd', 'actTitleOrderlessFreqhyman', 'actBodyOrderlessFreqhyman'),
+							      c('actTitleOrderlessFreqhyman', 'actBodyOrderlessFreqhyman')
 							      )),
 				       permEnvTbl='permEnvTblSO',
 				       permMemMatOrder='',
@@ -721,8 +733,12 @@ defaultSOPermConfig = modConfig(c(defaultSOConfig, defaultPermConfig,
 					      'actTitleOrderlessMeddim', 'actBodyOrderlessMeddim', 'actTitleOrderlessMeddim_actBodyOrderlessMeddim',
 					      'actPriorStd_actTitleOrderlessLgdim_actBodyOrderlessLgdim',
 					      'actTitleOrderlessLgdim', 'actBodyOrderlessLgdim', 'actTitleOrderlessLgdim_actBodyOrderlessLgdim',
-					      'actPriorStd_actTitleOrderlessBest_actBodyOrderlessBest',
-					      'actTitleOrderlessBest', 'actBodyOrderlessBest', 'actTitleOrderlessBest_actBodyOrderlessBest'
+					      'actPriorStd_actTitleOrderlessFrenthyman_actBodyOrderlessFrenthyman',
+					      'actTitleOrderlessFrenthyman', 'actBodyOrderlessFrenthyman', 'actTitleOrderlessFrenthyman_actBodyOrderlessFrenthyman',
+					      'actPriorStd_actTitleOrderlessNenthyman_actBodyOrderlessNenthyman',
+					      'actTitleOrderlessNenthyman', 'actBodyOrderlessNenthyman', 'actTitleOrderlessNenthyman_actBodyOrderlessNenthyman',
+					      'actPriorStd_actTitleOrderlessFreqhyman_actBodyOrderlessFreqhyman',
+					      'actTitleOrderlessFreqhyman', 'actBodyOrderlessFreqhyman', 'actTitleOrderlessFreqhyman_actBodyOrderlessFreqhyman'
 					      ),
 				     MCCORESAct = 2
 				     ))
@@ -1234,7 +1250,9 @@ renameColDVName <- function(tbl) {
 		    makeStandardMapping('Frentropy', 'w/ entropy and freq'),
 		    makeStandardMapping('Meddim', 'w/ entropy and 4000-row matrix'),
 		    makeStandardMapping('Lgdim', 'w/ entropy and 10000-row matrix'),
-		    makeStandardMapping('Best', 'w/ entropy and freq and log odds')
+		    makeStandardMapping('Frenthyman', 'w/ entropy and freq and log odds'),
+		    makeStandardMapping('Nenthyman', 'w/ log odds'),
+		    makeStandardMapping('Freqhyman', 'w/ freq and log odds')
 		    )
 	mapping = groupN(2, mapping)
 	mapping
@@ -1549,11 +1567,20 @@ analyzeContextSmall <- function() {
 				       'TweetFrentropy', 'TweetFreq', 'TweetNentropy'))
 	compareMeanDV(tbl[sizeNum == 1 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='foo')
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleNentropyBodyNentropy', 'PriorStdTitleBody',
-				       'PriorStdTitleOrderlessBestBodyOrderlessBest', 'PriorStdTitleOrderlessBodyOrderless'))
-	compareMeanDV(tbl[sizeNum == 6 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='foo')
+				       'PriorStdTitleOrderlessFrentropyBodyOrderlessFrentropy',
+				       'PriorStdTitleOrderlessFrenthymanBodyOrderlessFrenthyman',
+				       'PriorStdTitleOrderlessNenthymanBodyOrderlessNenthyman',
+				       'PriorStdTitleOrderlessFreqhymanBodyOrderlessFreqhyman',
+				       'PriorStdTitleOrderlessHymanBodyOrderlessHyman',
+				       'PriorStdTitleOrderlessBodyOrderless'))
+	compareMeanDV(tbl[sizeNum == 1 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='foo')
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweetNentropy', 'PriorStdTweet',
-				       'PriorStdTweetOrderBestTweetOrderlessBest', 'PriorStdTweetOrderTweetOrderless'))
-	compareMeanDV(tbl[sizeNum == 6 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='foo')
+				       'PriorStdTweetOrderFrentropyTweetOrderlessFrentropy',
+				       'PriorStdTweetOrderFrenthymanTweetOrderlessFrenthyman', 'PriorStdTweetOrderTweetOrderless',
+				       'PriorStdTweetOrderNenthymanTweetOrderlessNenthyman',
+				       'PriorStdTweetOrderFreqhymanTweetOrderlessFreqhyman',
+				       'PriorStdTweetOrderHymanTweetOrderlessHyman'))
+	compareMeanDV(tbl[sizeNum == 1 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='foo')
 }
 
 
@@ -2006,7 +2033,9 @@ funConfigWindow <- function(config) modConfig(config, getFunConfigModsPerm(permU
 funConfigFrentropy <- function(config) modConfig(config, getFunConfigModsPerm(permUseEntropyP=T, permUseFreqP=T))
 funConfigMeddim <- function(config) modConfig(config, getFunConfigModsPerm(permUseEntropyP=T, permNRows=4000))
 funConfigLgdim <- function(config) modConfig(config, getFunConfigModsPerm(permUseEntropyP=T, permNRows=10000))
-funConfigBest <- function(config) modConfig(config, getFunConfigModsPerm(permUseEntropyP=T, permUseFreqP=T, permHymanP=T)) 
+funConfigFrenthyman <- function(config) modConfig(config, getFunConfigModsPerm(permUseEntropyP=T, permUseFreqP=T, permHymanP=T)) 
+funConfigNenthyman <- function(config) modConfig(config, getFunConfigModsPerm(permUseEntropyP=F, permUseFreqP=F, permHymanP=T)) 
+funConfigFreqhyman <- function(config) modConfig(config, getFunConfigModsPerm(permUseEntropyP=F, permUseFreqP=T, permHymanP=T)) 
 
 funConfigOrigSji <- function(config) modConfig(config, getFunConfigModsSji())
 funConfigFrentropySji <- function(config) modConfig(config, getFunConfigModsSji(sjiFreqP=T))
@@ -2122,8 +2151,12 @@ computeActPermTFromContextTbl <- function(contextTbl, tagTbl, config) {
 			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessMeddim')][,fun:='computeActPermOrderless'][,funConfig:='funConfigMeddim'],
 			   copy(cTblOrder)[,type:=paste0('act', capitalize(type),'OrderLgdim')][,fun:='computeActPermOrder'][,funConfig:='funConfigLgdim'],
 			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessLgdim')][,fun:='computeActPermOrderless'][,funConfig:='funConfigLgdim'],
-			   copy(cTblOrder)[,type:=paste0('act', capitalize(type),'OrderBest')][,fun:='computeActPermOrder'][,funConfig:='funConfigBest'],
-			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessBest')][,fun:='computeActPermOrderless'][,funConfig:='funConfigBest']
+			   copy(cTblOrder)[,type:=paste0('act', capitalize(type),'OrderFrenthyman')][,fun:='computeActPermOrder'][,funConfig:='funConfigFrenthyman'],
+			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessFrenthyman')][,fun:='computeActPermOrderless'][,funConfig:='funConfigFrenthyman'],
+			   copy(cTblOrder)[,type:=paste0('act', capitalize(type),'OrderNenthyman')][,fun:='computeActPermOrder'][,funConfig:='funConfigNenthyman'],
+			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessNenthyman')][,fun:='computeActPermOrderless'][,funConfig:='funConfigNenthyman'],
+			   copy(cTblOrder)[,type:=paste0('act', capitalize(type),'OrderFreqhyman')][,fun:='computeActPermOrder'][,funConfig:='funConfigFreqhyman'],
+			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessFreqhyman')][,fun:='computeActPermOrderless'][,funConfig:='funConfigFreqhyman']
 			   )
 	contextTbl
 	contextTbl[, get(fun[1])(chunk, posFromTag, get(funConfig)(config)), by=type]
@@ -2142,7 +2175,9 @@ computeActPermSOFromContextTbl <- function(contextTbl, tagTbl, config) {
 			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessFrentropy')][,fun:='computeActPermOrderless'][,funConfig:='funConfigFrentropy'],
 			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessMeddim')][,fun:='computeActPermOrderless'][,funConfig:='funConfigMeddim'],
 			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessLgdim')][,fun:='computeActPermOrderless'][,funConfig:='funConfigLgdim'],
-			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessBest')][,fun:='computeActPermOrderless'][,funConfig:='funConfigBest']
+			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessFrenthyman')][,fun:='computeActPermOrderless'][,funConfig:='funConfigFrenthyman'],
+			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessNenthyman')][,fun:='computeActPermOrderless'][,funConfig:='funConfigNenthyman'],
+			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessFreqhyman')][,fun:='computeActPermOrderless'][,funConfig:='funConfigFreqhyman']
 			   )
 	contextTbl[, get(fun[1])(chunk, posFromTag, get(funConfig)(config)), by=type]
 }
@@ -2446,7 +2481,6 @@ runForTokenTblForUser <- function(tokenTbl, config) {
 	config
 	postResTbl = getFullPostResTbl(tokenTbl, config)
 	runTbl = getConfig(config, 'runTbl')
-	postResTbl
 	runTbl
 	resTbl = analyzePostResTblAcrossDs(postResTbl, runTbl, config)
 	resTbl
@@ -2854,10 +2888,9 @@ runGenAndSaveCurWorkspaceg3s6 <- function() genAndSaveCurWorkspace(groupConfigG3
 runGenAndSaveCurWorkspaceg4s6 <- function() genAndSaveCurWorkspace(groupConfigG4S6)
 
 curWS <- function() {
+	# FIXME: Remove duplication in config runTbl area
 	# FIXME: Methods to import and anlyze coefficient tables
-	# FIXME: address word order low predictiveness
-	# FIXME: add word order to Bayesian sji
-	# FIXME: Quickly rerun logreg analysis for actDV
+	# FIXME: Make sure word order low predictiveness is fully justified
 	# FIXME: Add user-centered sji to popular-users dataset
 	# FIXME: Run popular-users dataset with sji computation
 	# FIXME: move nrows matrix from 5000 to 200
