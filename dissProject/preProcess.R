@@ -622,14 +622,22 @@ makeBestFitsVectFun <- function(res) {
 	}
 }
 
-makeBestFitsVectT <- function(name) {
+makeBestFitsVectTPerm <- function(name) {
 	do.call(makeBestFitsVectFun(list(c('actPriorStd', 'actTweetOrder%s', 'actTweetOrderless%s'), c('actTweetOrder%s', 'actTweetOrderless%s'))),
 		list(name))
 }
 
-makeBestFitsVectSO <- function(name) {
+makeBestFitsVectTSji <- function(name) {
+	do.call(makeBestFitsVectFun(list(c('actPriorStd', 'actTweet%s'))), list(name))
+}
+
+makeBestFitsVectSOPerm <- function(name) {
 	do.call(makeBestFitsVectFun(list(c('actPriorStd', 'actTitleOrderless%s', 'actBodyOrderless%s'), c('actTitleOrderless%s', 'actBodyOrderless%s'))),
 		list(name))
+}
+
+makeBestFitsVectSOSji <- function(name) {
+	do.call(makeBestFitsVectFun(list(c('actPriorStd', 'actTitle%s', 'actBody%s'))), list(name))
 }
 
 makeBestFitsStrFun <- function(res) {
@@ -642,34 +650,42 @@ makeBestFitsStrFun <- function(res) {
 	}
 }
 
-makeBestFitsStrT <- function(name) {
+makeBestFitsStrTPerm <- function(name) {
 	do.call(makeBestFitsStrFun(c('actPriorStd_actTweetOrder%s_actTweetOrderless%s',
 				  'actTweetOrderless%s', 'actTweetOrder%s', 'actTweetOrder%s_actTweetOrderless%s')),
 		list(name))
 }
 
-makeBestFitsStrSO <- function(name) {
+makeBestFitsStrTSji <- function(name) {
+	do.call(makeBestFitsStrFun(c('actPriorStd_actTweet%s', 'actTweet%s')), list(name))
+}
+
+makeBestFitsStrSOPerm <- function(name) {
 	do.call(makeBestFitsStrFun(c('actPriorStd_actTitleOrderless%s_actBodyOrderless%s',
 				  'actTitleOrderless%s', 'actBodyOrderless%s', 'actTitleOrderless%s_actBodyOrderless%s')),
 		list(name))
 }
 
+makeBestFitsStrSOSji <- function(name) {
+	do.call(makeBestFitsStrFun(c('actPriorStd_actTitle%s_actBody%s', 'actTitle%s', 'actBody%s')), list(name))
+}
+
 defaultTPermConfig = modConfig(c(defaultTConfig, defaultPermConfig,
 				 list(runTbl=makeRunTbl(c(list(c('actPriorStd', 'actTweetOrder'),
 							       c('actPriorStd', 'actTweetOrderless')),
-							  makeBestFitsVectT(''),
-							  makeBestFitsVectT('Entropy'),
-							  makeBestFitsVectT('Stoplist'),
-							  makeBestFitsVectT('Direction'),
-							  makeBestFitsVectT('Hyman'),
-							  makeBestFitsVectT('Freq'),
-							  makeBestFitsVectT('Window'),
-							  makeBestFitsVectT('Frentropy'),
-							  makeBestFitsVectT('Meddim'),
-							  makeBestFitsVectT('Lgdim'),
-							  makeBestFitsVectT('Frenthyman'),
-							  makeBestFitsVectT('Nenthyman'),
-							  makeBestFitsVectT('Freqhyman')
+							  makeBestFitsVectTPerm(''),
+							  makeBestFitsVectTPerm('Entropy'),
+							  makeBestFitsVectTPerm('Stoplist'),
+							  makeBestFitsVectTPerm('Direction'),
+							  makeBestFitsVectTPerm('Hyman'),
+							  makeBestFitsVectTPerm('Freq'),
+							  makeBestFitsVectTPerm('Window'),
+							  makeBestFitsVectTPerm('Frentropy'),
+							  makeBestFitsVectTPerm('Meddim'),
+							  makeBestFitsVectTPerm('Lgdim'),
+							  makeBestFitsVectTPerm('Frenthyman'),
+							  makeBestFitsVectTPerm('Nenthyman'),
+							  makeBestFitsVectTPerm('Freqhyman')
 							  )),
 				      permEnvTbl='permEnvTblT',
 				      permMemMatOrder='permMemMatTOrder',
@@ -677,37 +693,37 @@ defaultTPermConfig = modConfig(c(defaultTConfig, defaultPermConfig,
 				      computeActFromContextTbl = 'computeActPermTFromContextTbl')),
 			       list(accumModelHashtagsTbl=T,
 				    actDVs=c('actPriorStd_actTweetOrder', 'actPriorStd_actTweetOrderless', 'actPriorStd',
-					     makeBestFitsStrT(''),
-					     makeBestFitsStrT('Entropy'),
-					     makeBestFitsStrT('Stoplist'),
-					     makeBestFitsStrT('Direction'),
-					     makeBestFitsStrT('Hyman'),
-					     makeBestFitsStrT('Freq'),
-					     makeBestFitsStrT('Window'),
-					     makeBestFitsStrT('Frentropy'),
-					     makeBestFitsStrT('Meddim'),
-					     makeBestFitsStrT('Lgdim'),
-					     makeBestFitsStrT('Frenthyman'),
-					     makeBestFitsStrT('Nenthyman'),
-					     makeBestFitsStrT('Freqhyman')
+					     makeBestFitsStrTPerm(''),
+					     makeBestFitsStrTPerm('Entropy'),
+					     makeBestFitsStrTPerm('Stoplist'),
+					     makeBestFitsStrTPerm('Direction'),
+					     makeBestFitsStrTPerm('Hyman'),
+					     makeBestFitsStrTPerm('Freq'),
+					     makeBestFitsStrTPerm('Window'),
+					     makeBestFitsStrTPerm('Frentropy'),
+					     makeBestFitsStrTPerm('Meddim'),
+					     makeBestFitsStrTPerm('Lgdim'),
+					     makeBestFitsStrTPerm('Frenthyman'),
+					     makeBestFitsStrTPerm('Nenthyman'),
+					     makeBestFitsStrTPerm('Freqhyman')
 					     )))
 
 defaultSOPermConfig = modConfig(c(defaultSOConfig, defaultPermConfig,
 				  list(runTbl=makeRunTbl(c(list(c('actPriorStd', 'actTitleOrderless'),
 								c('actPriorStd', 'actBodyOrderless')),
-							   makeBestFitsVectSO(''),
-							   makeBestFitsVectSO('Entropy'),
-							   makeBestFitsVectSO('Stoplist'),
-							   makeBestFitsVectSO('Direction'),
-							   makeBestFitsVectSO('Hyman'),
-							   makeBestFitsVectSO('Freq'),
-							   makeBestFitsVectSO('Window'),
-							   makeBestFitsVectSO('Frentropy'),
-							   makeBestFitsVectSO('Meddim'),
-							   makeBestFitsVectSO('Lgdim'),
-							   makeBestFitsVectSO('Frenthyman'),
-							   makeBestFitsVectSO('Nenthyman'),
-							   makeBestFitsVectSO('Freqhyman')
+							   makeBestFitsVectSOPerm(''),
+							   makeBestFitsVectSOPerm('Entropy'),
+							   makeBestFitsVectSOPerm('Stoplist'),
+							   makeBestFitsVectSOPerm('Direction'),
+							   makeBestFitsVectSOPerm('Hyman'),
+							   makeBestFitsVectSOPerm('Freq'),
+							   makeBestFitsVectSOPerm('Window'),
+							   makeBestFitsVectSOPerm('Frentropy'),
+							   makeBestFitsVectSOPerm('Meddim'),
+							   makeBestFitsVectSOPerm('Lgdim'),
+							   makeBestFitsVectSOPerm('Frenthyman'),
+							   makeBestFitsVectSOPerm('Nenthyman'),
+							   makeBestFitsVectSOPerm('Freqhyman')
 							   )),
 				       permEnvTbl='permEnvTblSO',
 				       permMemMatOrder='',
@@ -715,47 +731,49 @@ defaultSOPermConfig = modConfig(c(defaultSOConfig, defaultPermConfig,
 				       computeActFromContextTbl = 'computeActPermSOFromContextTbl')),
 				list(accumModelHashtagsTbl=T,
 				     actDVs=c('actPriorStd_actTitleOrderless', 'actPriorStd_actBodyOrderless', 'actPriorStd',
-					      makeBestFitsStrSO(''),
-					      makeBestFitsStrSO('Entropy'),
-					      makeBestFitsStrSO('Stoplist'),
-					      makeBestFitsStrSO('Direction'),
-					      makeBestFitsStrSO('Hyman'),
-					      makeBestFitsStrSO('Freq'),
-					      makeBestFitsStrSO('Window'),
-					      makeBestFitsStrSO('Frentropy'),
-					      makeBestFitsStrSO('Meddim'),
-					      makeBestFitsStrSO('Lgdim'),
-					      makeBestFitsStrSO('Frenthyman'),
-					      makeBestFitsStrSO('Nenthyman'),
-					      makeBestFitsStrSO('Freqhyman')
+					      makeBestFitsStrSOPerm(''),
+					      makeBestFitsStrSOPerm('Entropy'),
+					      makeBestFitsStrSOPerm('Stoplist'),
+					      makeBestFitsStrSOPerm('Direction'),
+					      makeBestFitsStrSOPerm('Hyman'),
+					      makeBestFitsStrSOPerm('Freq'),
+					      makeBestFitsStrSOPerm('Window'),
+					      makeBestFitsStrSOPerm('Frentropy'),
+					      makeBestFitsStrSOPerm('Meddim'),
+					      makeBestFitsStrSOPerm('Lgdim'),
+					      makeBestFitsStrSOPerm('Frenthyman'),
+					      makeBestFitsStrSOPerm('Nenthyman'),
+					      makeBestFitsStrSOPerm('Freqhyman')
 					      ),
 				     MCCORESAct = 2
 				     ))
 
 defaultTSjiConfig = modConfig(c(defaultTConfig, defaultSjiConfig,
-				list(runTbl=makeRunTbl(list(c('actPriorStd', 'actTweet'),
-							    c('actPriorStd', 'actTweetFrentropy'),
-							    c('actPriorStd', 'actTweetFreq'),
-							    c('actPriorStd', 'actTweetNentropy'))))),
+				list(runTbl=makeRunTbl(c(makeBestFitsVectTSji(''),
+							 makeBestFitsVectTSji('Frentropy'),
+							 makeBestFitsVectTSji('Freq'),
+							 makeBestFitsVectTSji('Nentropy'))))),
 			      list(accumModelHashtagsTbl=T,
-				   actDVs=c('actPriorStd_actTweet', 'actPriorStd', 'actTweet',
-					    'actTweetFrentropy', 'actPriorStd_actTweetFrentropy',
-					    'actTweetFreq', 'actPriorStd_actTweetFreq',
-					    'actTweetNentropy', 'actPriorStd_actTweetNentropy')))
+				   actDVs=c('actPriorStd',
+					    makeBestFitsStrTSji(''),
+					    makeBestFitsStrTSji('Frentropy'),
+					    makeBestFitsStrTSji('Freq'),
+					    makeBestFitsStrTSji('Nentropy'))))
 
 defaultSOSjiConfig = modConfig(c(defaultSOConfig, defaultSjiConfig,
-				 list(runTbl=makeRunTbl(list(c('actPriorStd', 'actTitle', 'actBody'),
-							     c('actTitle', 'actBody'),
-							     c('actPriorStd', 'actTitleFrentropy', 'actBodyFrentropy'),
-							     c('actPriorStd', 'actTitleFreq', 'actBodyFreq'),
-							     c('actPriorStd', 'actTitleNentropy', 'actBodyNentropy'))))),
-			      list(accumModelHashtagsTbl=T,
-				   actDVs=c('actPriorStd_actTitle_actBody', 'actPriorStd', 'actTitle', 'actBody', 'actTitle_actBody',
-					    'actTitleFrentropy', 'actBodyFrentropy', 'actPriorStd_actTitleFrentropy_actBodyFrentropy',
-					    'actTitleFreq', 'actBodyFreq', 'actPriorStd_actTitleFreq_actBodyFreq',
-					    'actTitleNentropy', 'actBodyNentropy', 'actPriorStd_actTitleNentropy_actBodyNentropy'),
-				   MCCORESAct = 2
-				   ))
+				 list(runTbl=makeRunTbl(c(list(c('actTitle', 'actBody')),
+							  makeBestFitsVectSOSji(''),
+							  makeBestFitsVectSOSji('Frentropy'),
+							  makeBestFitsVectSOSji('Freq'),
+							  makeBestFitsVectSOSji('Nentropy'))))),
+			       list(accumModelHashtagsTbl=T,
+				    actDVs=c('actPriorStd', 'actTitle_actBody',
+					     makeBestFitsStrSOSji(''),
+					     makeBestFitsStrSOSji('Frentropy'),
+					     makeBestFitsStrSOSji('Freq'),
+					     makeBestFitsStrSOSji('Nentropy')),
+				    MCCORESAct = 2
+				    ))
 
 defaultSOSjiPConfig = modConfig(c(defaultSOConfig, defaultSjiConfig,
 				  list(runTbl=makeRunTbl(list()))),
