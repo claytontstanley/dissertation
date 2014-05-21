@@ -2127,70 +2127,78 @@ genAndSaveCurWorkspace <- function(groupConfig) {
 }
 
 computeActSjiFromContextTbl <- function(contextTbl, tagTbl, config) {
-	contextTbl = rbind(copy(contextTbl)[, type := paste0('act', capitalize(type))][, funConfig := 'funConfigOrigSji'],
-			   copy(contextTbl)[, type := paste0('act', capitalize(type), 'Frentropy')][, funConfig := 'funConfigFrentropySji'],
-			   copy(contextTbl)[, type := paste0('act', capitalize(type), 'Nentropy')][, funConfig := 'funConfigNentropySji'],
-			   copy(contextTbl)[, type := paste0('act', capitalize(type), 'Freq')][, funConfig := 'funConfigFreqSji']
-			   )
-	contextTbl[, computeActSji(chunk, get(getConfig(config, 'sjiTbl')), get(funConfig)(config)), by=type]
+	contextTbl = rbind(makeComputeActRunTbl(contextTbl, '', 'computeActSji', 'funConfigOrigSji'),
+			   makeComputeActRunTbl(contextTbl, 'Frentropy', 'computeActSji', 'funConfigFrentropySji'),
+			   makeComputeActRunTbl(contextTbl, 'Nentropy', 'computeActSji', 'funConfigNentropySji'),
+			   makeComputeActRunTbl(contextTbl, 'Freq', 'computeActSji', 'funConfigFreqSji'))
+	contextTbl[, get(fun[1])(chunk, get(getConfig(config, 'sjiTbl')), get(funConfig)(config)), by=type]
 }
 
 computeActNullFromContextTbl <- function(contextTbl, tagTbl, config) {
 	data.table(type=character(), hashtag=character(), act=double())
 }
 
+makeComputeActRunTbl <- function(tbl, typeExtra, fun, funConfig) {
+	eval(bquote(copy(tbl)[, type := paste0('act', capitalize(type), .(typeExtra))][, fun := .(fun)][, funConfig := .(funConfig)]))
+}
+
+makeComputeActRunTblPerm <- function(tbl, typeExtra, funConfig) {
+	makeComputeActRunTbl(tbl, typeExtra, 'computeActPerm', funConfig)
+}
+
+makeComputeActRunTblPermOrderless <- function(tblOrderless, typeExtra, funConfig) {
+	makeComputeActRunTblPerm(tblOrderless, sprintf('%s%s', 'Orderless', typeExtra), funConfig)[, fun := paste0(fun, 'Orderless')]
+}
+
+makeComputeActRunTblPermOrders <- function(tblOrder, tblOrderless, typeExtra, funConfig) {
+	rbind(makeComputeActRunTblPerm(tblOrder,
+				       typeExtra = sprintf('%s%s', 'Order', typeExtra),
+				       funConfig = funConfig)[, fun := paste0(fun, 'Order')],
+	      makeComputeActRunTblPermOrderless(tblOrderless, typeExtra, funConfig))
+}
+
+makeComputeActRunTblPermOrdersAll <- function(tblOrder, tblOrderless, lst) {
+	res = groupN(2, lst)
+	typeExtras = sapply(res, `[[`, 1, USE.NAMES=F)
+	funConfigs = sapply(res, `[[`, 2, USE.NAMES=F)
+	fun <- function(i) makeComputeActRunTblPermOrders(tblOrder, tblOrderless, typeExtras[i], funConfigs[i])
+	rbindlist(lapply(1:length(typeExtras), fun))
+}
+	
+makeComputeActRunTblPermOrderlessAll <- function(tblOrderless, lst) {
+	res = groupN(2, lst)
+	typeExtras = sapply(res, `[[`, 1, USE.NAMES=F)
+	funConfigs = sapply(res, `[[`, 2, USE.NAMES=F)
+	fun <- function(i) makeComputeActRunTblPermOrderless(tblOrderless, typeExtras[i], funConfigs[i])
+	rbindlist(lapply(1:length(typeExtras), fun))
+}
+
+permTypeConfigs = c('', 'funConfigOrig',
+		    'Entropy', 'funConfigEntropy',
+		    'Stoplist', 'funConfigStoplist',
+		    'Direction', 'funConfigDirection',
+		    'Hyman', 'funConfigHyman',
+		    'Freq', 'funConfigFreq',
+		    'Window', 'funConfigWindow',
+		    'Frentropy', 'funConfigFrentropy',
+		    'Smdim', 'funConfigSmdim',
+		    'Lgdim', 'funConfigLgdim',
+		    'Frenthyman', 'funConfigFrenthyman',
+		    'Nenthyman', 'funConfigNenthyman',
+		    'Freqhyman', 'funConfigFreqhyman')
+
 computeActPermTFromContextTbl <- function(contextTbl, tagTbl, config) {
 	contextTbl = getContextTbl(contextTbl, tagTbl)
 	cTblOrder = contextTbl[orderType=='order']
 	cTblOrderless = contextTbl[orderType=='orderless']
-	contextTbl = rbind(copy(cTblOrder)[,type:=paste0('act', capitalize(type),'Order')][,fun:='computeActPermOrder'][,funConfig:='funConfigOrig'],
-			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'Orderless')][,fun:='computeActPermOrderless'][,funConfig:='funConfigOrig'],
-			   copy(cTblOrder)[,type:=paste0('act', capitalize(type),'OrderEntropy')][,fun:='computeActPermOrder'][,funConfig:='funConfigEntropy'],
-			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessEntropy')][,fun:='computeActPermOrderless'][,funConfig:='funConfigEntropy'],
-			   copy(cTblOrder)[,type:=paste0('act', capitalize(type),'OrderStoplist')][,fun:='computeActPermOrder'][,funConfig:='funConfigStoplist'],
-			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessStoplist')][,fun:='computeActPermOrderless'][,funConfig:='funConfigStoplist'],
-			   copy(cTblOrder)[,type:=paste0('act', capitalize(type),'OrderDirection')][,fun:='computeActPermOrder'][,funConfig:='funConfigDirection'],
-			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessDirection')][,fun:='computeActPermOrderless'][,funConfig:='funConfigDirection'],
-			   copy(cTblOrder)[,type:=paste0('act', capitalize(type),'OrderHyman')][,fun:='computeActPermOrder'][,funConfig:='funConfigHyman'],
-			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessHyman')][,fun:='computeActPermOrderless'][,funConfig:='funConfigHyman'],
-			   copy(cTblOrder)[,type:=paste0('act', capitalize(type),'OrderFreq')][,fun:='computeActPermOrder'][,funConfig:='funConfigFreq'],
-			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessFreq')][,fun:='computeActPermOrderless'][,funConfig:='funConfigFreq'],
-			   copy(cTblOrder)[,type:=paste0('act', capitalize(type),'OrderWindow')][,fun:='computeActPermOrder'][,funConfig:='funConfigWindow'],
-			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessWindow')][,fun:='computeActPermOrderless'][,funConfig:='funConfigWindow'],
-			   copy(cTblOrder)[,type:=paste0('act', capitalize(type),'OrderFrentropy')][,fun:='computeActPermOrder'][,funConfig:='funConfigFrentropy'],
-			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessFrentropy')][,fun:='computeActPermOrderless'][,funConfig:='funConfigFrentropy'],
-			   copy(cTblOrder)[,type:=paste0('act', capitalize(type),'OrderSmdim')][,fun:='computeActPermOrder'][,funConfig:='funConfigSmdim'],
-			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessSmdim')][,fun:='computeActPermOrderless'][,funConfig:='funConfigSmdim'],
-			   copy(cTblOrder)[,type:=paste0('act', capitalize(type),'OrderLgdim')][,fun:='computeActPermOrder'][,funConfig:='funConfigLgdim'],
-			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessLgdim')][,fun:='computeActPermOrderless'][,funConfig:='funConfigLgdim'],
-			   copy(cTblOrder)[,type:=paste0('act', capitalize(type),'OrderFrenthyman')][,fun:='computeActPermOrder'][,funConfig:='funConfigFrenthyman'],
-			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessFrenthyman')][,fun:='computeActPermOrderless'][,funConfig:='funConfigFrenthyman'],
-			   copy(cTblOrder)[,type:=paste0('act', capitalize(type),'OrderNenthyman')][,fun:='computeActPermOrder'][,funConfig:='funConfigNenthyman'],
-			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessNenthyman')][,fun:='computeActPermOrderless'][,funConfig:='funConfigNenthyman'],
-			   copy(cTblOrder)[,type:=paste0('act', capitalize(type),'OrderFreqhyman')][,fun:='computeActPermOrder'][,funConfig:='funConfigFreqhyman'],
-			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessFreqhyman')][,fun:='computeActPermOrderless'][,funConfig:='funConfigFreqhyman']
-			   )
-	contextTbl
+	contextTbl = makeComputeActRunTblPermOrdersAll(cTblOrder, cTblOrderless, permTypeConfigs)
 	contextTbl[, get(fun[1])(chunk, posFromTag, get(funConfig)(config)), by=type]
 }
 
 computeActPermSOFromContextTbl <- function(contextTbl, tagTbl, config) {
 	contextTbl = getContextTbl(contextTbl, tagTbl)
 	cTblOrderless = contextTbl[orderType == 'orderless']
-	contextTbl = rbind(copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'Orderless')][,fun:='computeActPermOrderless'][,funConfig:='funConfigOrig'],
-			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessEntropy')][,fun:='computeActPermOrderless'][,funConfig:='funConfigEntropy'],
-			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessStoplist')][,fun:='computeActPermOrderless'][,funConfig:='funConfigStoplist'],
-			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessDirection')][,fun:='computeActPermOrderless'][,funConfig:='funConfigDirection'],
-			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessHyman')][,fun:='computeActPermOrderless'][,funConfig:='funConfigHyman'],
-			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessFreq')][,fun:='computeActPermOrderless'][,funConfig:='funConfigFreq'],
-			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessWindow')][,fun:='computeActPermOrderless'][,funConfig:='funConfigWindow'],
-			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessFrentropy')][,fun:='computeActPermOrderless'][,funConfig:='funConfigFrentropy'],
-			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessSmdim')][,fun:='computeActPermOrderless'][,funConfig:='funConfigSmdim'],
-			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessLgdim')][,fun:='computeActPermOrderless'][,funConfig:='funConfigLgdim'],
-			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessFrenthyman')][,fun:='computeActPermOrderless'][,funConfig:='funConfigFrenthyman'],
-			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessNenthyman')][,fun:='computeActPermOrderless'][,funConfig:='funConfigNenthyman'],
-			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessFreqhyman')][,fun:='computeActPermOrderless'][,funConfig:='funConfigFreqhyman']
-			   )
+	contextTbl = makeComputeActRunTblPermOrderlessAll(cTblOrderless, permTypeConfigs)
 	contextTbl[, get(fun[1])(chunk, posFromTag, get(funConfig)(config)), by=type]
 }
 
@@ -2901,7 +2909,6 @@ runGenAndSaveCurWorkspaceg4s6 <- function() genAndSaveCurWorkspace(groupConfigG4
 
 curWS <- function() {
 	# FIXME: Regen RWorkspace files
-	# FIXME: get rid of dup around rbind of sji runs
 	# FIXME: Methods to import and anlyze coefficient tables
 	# FIXME: Tune for 64GB
 	# FIXME: Rerun context
@@ -2910,7 +2917,7 @@ curWS <- function() {
 	# FIXME: Run popular-users dataset with sji computation
 	withProf(runContext20g1s1(regen='useAlreadyLoaded'))
 	setLogLevel(2)
-	withProf(runContext20g1s6(regen='useAlreadyLoaded'))
+	runContext20g1s6(regen='useAlreadyLoaded')
 	withProf(runContext500g1s2(regen='useAlreadyLoaded'))
 	withProf(runContext500g1s3(regen='useAlreadyLoaded'))
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelVsPred()))))
