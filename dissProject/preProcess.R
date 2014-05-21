@@ -2895,7 +2895,7 @@ runGenAndSaveCurWorkspaceg3s6 <- function() genAndSaveCurWorkspace(groupConfigG3
 runGenAndSaveCurWorkspaceg4s6 <- function() genAndSaveCurWorkspace(groupConfigG4S6)
 
 curWS <- function() {
-	# FIXME: move nrows matrix from 5000 to 200
+	# FIXME: move nrows matrix from 5000 to 200, test
 	# FIXME: get rid of dup around rbind of sji runs
 	# FIXME: Regen RWorkspace files
 	# FIXME: Install 32GB RAM, tune.
