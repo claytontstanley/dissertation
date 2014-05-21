@@ -2906,7 +2906,8 @@ curWS <- function() {
 	# FIXME: Regen RWorkspace files
 	# FIXME: get rid of dup around rbind of sji runs
 	# FIXME: Methods to import and anlyze coefficient tables
-	# FIXME: Tune for 64GB, Rerun context
+	# FIXME: Tune for 64GB
+	# FIXME: Rerun context
 	# FIXME: Make sure word order low predictiveness is fully justified
 	# FIXME: Add user-centered sji to popular-users dataset
 	# FIXME: Run popular-users dataset with sji computation
