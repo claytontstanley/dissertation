@@ -2896,11 +2896,11 @@ runGenAndSaveCurWorkspaceg4s6 <- function() genAndSaveCurWorkspace(groupConfigG4
 
 curWS <- function() {
 	# FIXME: move nrows matrix from 5000 to 200, test
-	# FIXME: get rid of dup around rbind of sji runs
-	# FIXME: Regen RWorkspace files
 	# FIXME: Install 32GB RAM, tune.
-	# FIXME: Rerun context
+	# FIXME: Regen RWorkspace files
+	# FIXME: get rid of dup around rbind of sji runs
 	# FIXME: Methods to import and anlyze coefficient tables
+	# FIXME: Rerun context
 	# FIXME: Make sure word order low predictiveness is fully justified
 	# FIXME: Add user-centered sji to popular-users dataset
 	# FIXME: Run popular-users dataset with sji computation
