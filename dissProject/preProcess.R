@@ -1464,21 +1464,26 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='EntropyVsRegT', groupCol='dsetGroup')
 	# RESULT: Freq weighting is better than entropy weighting for RP, and standard stoplist doesn't work well at all
 	# SO compare entropy to stoplist to freq to frentropy
-	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleBody', 'PriorStdTitleFrentropyBodyFrentropy',
-				       'TitleOrderlessEntropy', 'Title', 'TitleOrderless', 'TitleOrderlessStoplist', 'TitleOrderlessFreq', 'TitleOrderlessFrentropy',
+	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleBody', 'PriorStdTitleFrentropyBodyFrentropy', 'Title',
+				       'TitleNentropy', 'TitleFreq', 'TitleFrentropy', 'PriorStdTitleNentropyBodyNentropy', 'PriorStdTitleFreqBodyFreq',
+				       'Body', 'BodyNentropy', 'BodyFreq', 'BodyFrentropy'))
+	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='allWeightingsSOSji')
+	DVNames = asTopHashtagAcross(c('PriorStd', 'TitleOrderlessEntropy', 'TitleOrderless', 'TitleOrderlessStoplist', 'TitleOrderlessFreq', 'TitleOrderlessFrentropy',
 				       'PriorStdTitleOrderlessEntropyBodyOrderlessEntropy', 'PriorStdTitleOrderlessBodyOrderless',
 				       'PriorStdTitleOrderlessStoplistBodyOrderlessStoplist',
 				       'PriorStdTitleOrderlessFreqBodyOrderlessFreq',
 				       'PriorStdTitleOrderlessFrentropyBodyOrderlessFrentropy'))
-	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='allWeightingsSO')
+	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='allWeightingsSOPerm')
 	# T compare entropy to stoplist to freq to frentropy
-	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweet', 'PriorStdTweetFrentropy',
-				       'TweetOrderlessEntropy', 'Tweet', 'TweetOrderless', 'TweetOrderlessStoplist', 'TweetOrderlessFreq', 'TweetOrderlessFrentropy',
+	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweet', 'PriorStdTweetFrentropy', 'Tweet',
+				       'TweetNentropy', 'TweetFreq', 'TweetFrentropy', 'PriorStdTweetNentropy', 'PriorStdTweetFreq'))
+	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='allWeightingsTSji', groupCol='dsetGroup')
+	DVNames = asTopHashtagAcross(c('PriorStd', 'TweetOrderlessEntropy', 'TweetOrderless', 'TweetOrderlessStoplist', 'TweetOrderlessFreq', 'TweetOrderlessFrentropy',
 				       'PriorStdTweetOrderEntropyTweetOrderlessEntropy', 'PriorStdTweetOrderTweetOrderless',
 				       'PriorStdTweetOrderStoplistTweetOrderlessStoplist',
 				       'PriorStdTweetOrderFreqTweetOrderlessFreq',
 				       'PriorStdTweetOrderFrentropyTweetOrderlessFrentropy'))
-	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='allWeightingsT', groupCol='dsetGroup')
+	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='allWeightingsTPerm', groupCol='dsetGroup')
 	# RESULT: Bayes and RP with frequency cutoff scales; RP with entropy saturates for SO
 	# SO Entropy all sizes
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleBody', 
