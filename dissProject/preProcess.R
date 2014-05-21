@@ -561,7 +561,7 @@ defaultBaseConfig = list(dFull=c(0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1.0,1.1,1.2,1.3,1.
 			 modelHashtagsOutFile='',
 			 logregOutFile='',
 			 actDVs = c('actPriorStd', 'actPriorOL', 'actPriorOL2'),
-			 permNRowsAll = c(2048, 4000, 10000),
+			 permNRowsAll = c(2048, 10000, 200),
 			 permNRows = 2048,
 			 MCCORESAct = 4,
 			 MCCORESReg = 2,
@@ -681,7 +681,7 @@ defaultTPermConfig = modConfig(c(defaultTConfig, defaultPermConfig,
 							  makeBestFitsVectTPerm('Freq'),
 							  makeBestFitsVectTPerm('Window'),
 							  makeBestFitsVectTPerm('Frentropy'),
-							  makeBestFitsVectTPerm('Meddim'),
+							  makeBestFitsVectTPerm('Smdim'),
 							  makeBestFitsVectTPerm('Lgdim'),
 							  makeBestFitsVectTPerm('Frenthyman'),
 							  makeBestFitsVectTPerm('Nenthyman'),
@@ -701,7 +701,7 @@ defaultTPermConfig = modConfig(c(defaultTConfig, defaultPermConfig,
 					     makeBestFitsStrTPerm('Freq'),
 					     makeBestFitsStrTPerm('Window'),
 					     makeBestFitsStrTPerm('Frentropy'),
-					     makeBestFitsStrTPerm('Meddim'),
+					     makeBestFitsStrTPerm('Smdim'),
 					     makeBestFitsStrTPerm('Lgdim'),
 					     makeBestFitsStrTPerm('Frenthyman'),
 					     makeBestFitsStrTPerm('Nenthyman'),
@@ -719,7 +719,7 @@ defaultSOPermConfig = modConfig(c(defaultSOConfig, defaultPermConfig,
 							   makeBestFitsVectSOPerm('Freq'),
 							   makeBestFitsVectSOPerm('Window'),
 							   makeBestFitsVectSOPerm('Frentropy'),
-							   makeBestFitsVectSOPerm('Meddim'),
+							   makeBestFitsVectSOPerm('Smdim'),
 							   makeBestFitsVectSOPerm('Lgdim'),
 							   makeBestFitsVectSOPerm('Frenthyman'),
 							   makeBestFitsVectSOPerm('Nenthyman'),
@@ -739,7 +739,7 @@ defaultSOPermConfig = modConfig(c(defaultSOConfig, defaultPermConfig,
 					      makeBestFitsStrSOPerm('Freq'),
 					      makeBestFitsStrSOPerm('Window'),
 					      makeBestFitsStrSOPerm('Frentropy'),
-					      makeBestFitsStrSOPerm('Meddim'),
+					      makeBestFitsStrSOPerm('Smdim'),
 					      makeBestFitsStrSOPerm('Lgdim'),
 					      makeBestFitsStrSOPerm('Frenthyman'),
 					      makeBestFitsStrSOPerm('Nenthyman'),
@@ -1255,7 +1255,7 @@ renameColDVName <- function(tbl) {
 		    makeStandardMapping('Window', 'w/ entropy and window'),
 		    makeStandardMapping('Freq', 'w/ freq'),
 		    makeStandardMapping('Frentropy', 'w/ entropy and freq'),
-		    makeStandardMapping('Meddim', 'w/ entropy and 4000-row matrix'),
+		    makeStandardMapping('Smdim', 'w/ entropy and 200-row matrix'),
 		    makeStandardMapping('Lgdim', 'w/ entropy and 10000-row matrix'),
 		    makeStandardMapping('Frenthyman', 'w/ entropy and freq and log odds'),
 		    makeStandardMapping('Nenthyman', 'w/ log odds'),
@@ -1441,7 +1441,7 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 	}
 	# RESULT: Show base performance for both models
 	# SO standard
-	stdRegex = '(Entropy)|(Direction)|(Hyman)|(Stoplist)|(Freq)|(Window)|(Frentropy)|(Meddim)|(Lgdim)'
+	stdRegex = '(Entropy)|(Direction)|(Hyman)|(Stoplist)|(Freq)|(Window)|(Frentropy)|(Smdim)|(Lgdim)'
 	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & !grepl(stdRegex, DVName)], acc, figName='contextStandardSO')
 	# T standard
 	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & !grepl(stdRegex, DVName)], acc, figName='contextStandardT', groupCol='dsetGroup')
@@ -1484,14 +1484,14 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 				       'PriorStdTitleOrderlessEntropyBodyOrderlessEntropy', 'PriorStdTitleOrderlessBodyOrderless',
 				       'PriorStdTitleOrderlessFreqBodyOrderlessFreq',
 				       'PriorStdTitleFrentropyBodyFrentropy',
-				       'PriorStdTitleOrderlessMeddimBodyOrderlessMeddim',
+				       'PriorStdTitleOrderlessSmdimBodyOrderlessSmdim',
 				       'PriorStdTitleOrderlessLgdimBodyOrderlessLgdim'))
 	compareMeanDVDefault(tbl[dsetType == 'stackoverflow' & DVName %in% DVNames & sizeNum != 2], acc, figName='freqVsEntropyBySizeSO', groupCol='sizeNum')
 	# T Entropy all sizes
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweet',
 				       'PriorStdTweetOrderTweetOrderless', 'PriorStdTweetOrderEntropyTweetOrderlessEntropy',
 				       'PriorStdTweetOrderFreqTweetOrderlessFreq',
-				       'PriorStdTweetOrderMeddimTweetOrderlessMeddim',
+				       'PriorStdTweetOrderSmdimTweetOrderlessSmdim',
 				       'PriorStdTweetOrderLgdimTweetOrderlessLgdim'))
 	compareMeanDVDefault(tbl[dsetType == 'twitter' & DVName %in% DVNames], acc, figName='freqVsEntropyBySizeT', groupCol='sizeNum')
 	# RESULT: Increasing rows in matrix does not dramatically improve performance, even at different size datasets; entropy and freq cutoff is much more important for RP
@@ -1499,14 +1499,14 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleBody', 
 				       'PriorStdTitleOrderlessEntropyBodyOrderlessEntropy', 'PriorStdTitleOrderlessBodyOrderless',
 				       'PriorStdTitleOrderlessFreqBodyOrderlessFreq',
-				       'PriorStdTitleOrderlessMeddimBodyOrderlessMeddim',
+				       'PriorStdTitleOrderlessSmdimBodyOrderlessSmdim',
 				       'PriorStdTitleOrderlessLgdimBodyOrderlessLgdim'))
 	compareMeanDVDefault(tbl[dsetType == 'stackoverflow' & DVName %in% DVNames & sizeNum != 2], acc, figName='dimBySizeSO', groupCol='sizeNum')
 	# T Entropy all sizes
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweet',
 				       'PriorStdTweetOrderTweetOrderless', 'PriorStdTweetOrderEntropyTweetOrderlessEntropy',
 				       'PriorStdTweetOrderFreqTweetOrderlessFreq',
-				       'PriorStdTweetOrderMeddimTweetOrderlessMeddim',
+				       'PriorStdTweetOrderSmdimTweetOrderlessSmdim',
 				       'PriorStdTweetOrderLgdimTweetOrderlessLgdim'))
 	compareMeanDVDefault(tbl[dsetType == 'twitter' & DVName %in% DVNames], acc, figName='dimBySizeT', groupCol='sizeNum')
 	# RESULT: Logodds technique works
@@ -2038,7 +2038,7 @@ funConfigDirection <- function(config) modConfig(config, getFunConfigModsPerm(pe
 funConfigHyman <- function(config) modConfig(config, getFunConfigModsPerm(permUseEntropyP=T, permHymanP=T))
 funConfigWindow <- function(config) modConfig(config, getFunConfigModsPerm(permUseEntropyP=T, permUseWindowP=T))
 funConfigFrentropy <- function(config) modConfig(config, getFunConfigModsPerm(permUseEntropyP=T, permUseFreqP=T))
-funConfigMeddim <- function(config) modConfig(config, getFunConfigModsPerm(permUseEntropyP=T, permNRows=4000))
+funConfigSmdim <- function(config) modConfig(config, getFunConfigModsPerm(permUseEntropyP=T, permNRows=200))
 funConfigLgdim <- function(config) modConfig(config, getFunConfigModsPerm(permUseEntropyP=T, permNRows=10000))
 funConfigFrenthyman <- function(config) modConfig(config, getFunConfigModsPerm(permUseEntropyP=T, permUseFreqP=T, permHymanP=T)) 
 funConfigNenthyman <- function(config) modConfig(config, getFunConfigModsPerm(permUseEntropyP=F, permUseFreqP=F, permHymanP=T)) 
@@ -2058,8 +2058,8 @@ makeCombinedMemMat <- function(sjiTbl, envTbl, config) {
 	res[['window']] = makeMemMat(sjiTbl, envTbl, funConfigWindow(config))
 	res[['orig']] = makeMemMat(sjiTbl, envTbl, funConfigOrig(config))
 	res[['frentropy']] = makeMemMat(sjiTbl, envTbl, funConfigFrentropy(config))
-	res[['meddim']] = makeMemMat(sjiTbl, envTbl, funConfigMeddim(config))
 	res[['lgdim']] = makeMemMat(sjiTbl, envTbl, funConfigLgdim(config))
+	res[['smdim']] = makeMemMat(sjiTbl, envTbl, funConfigSmdim(config))
 	res
 }
 
@@ -2154,8 +2154,8 @@ computeActPermTFromContextTbl <- function(contextTbl, tagTbl, config) {
 			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessWindow')][,fun:='computeActPermOrderless'][,funConfig:='funConfigWindow'],
 			   copy(cTblOrder)[,type:=paste0('act', capitalize(type),'OrderFrentropy')][,fun:='computeActPermOrder'][,funConfig:='funConfigFrentropy'],
 			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessFrentropy')][,fun:='computeActPermOrderless'][,funConfig:='funConfigFrentropy'],
-			   copy(cTblOrder)[,type:=paste0('act', capitalize(type),'OrderMeddim')][,fun:='computeActPermOrder'][,funConfig:='funConfigMeddim'],
-			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessMeddim')][,fun:='computeActPermOrderless'][,funConfig:='funConfigMeddim'],
+			   copy(cTblOrder)[,type:=paste0('act', capitalize(type),'OrderSmdim')][,fun:='computeActPermOrder'][,funConfig:='funConfigSmdim'],
+			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessSmdim')][,fun:='computeActPermOrderless'][,funConfig:='funConfigSmdim'],
 			   copy(cTblOrder)[,type:=paste0('act', capitalize(type),'OrderLgdim')][,fun:='computeActPermOrder'][,funConfig:='funConfigLgdim'],
 			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessLgdim')][,fun:='computeActPermOrderless'][,funConfig:='funConfigLgdim'],
 			   copy(cTblOrder)[,type:=paste0('act', capitalize(type),'OrderFrenthyman')][,fun:='computeActPermOrder'][,funConfig:='funConfigFrenthyman'],
@@ -2180,7 +2180,7 @@ computeActPermSOFromContextTbl <- function(contextTbl, tagTbl, config) {
 			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessFreq')][,fun:='computeActPermOrderless'][,funConfig:='funConfigFreq'],
 			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessWindow')][,fun:='computeActPermOrderless'][,funConfig:='funConfigWindow'],
 			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessFrentropy')][,fun:='computeActPermOrderless'][,funConfig:='funConfigFrentropy'],
-			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessMeddim')][,fun:='computeActPermOrderless'][,funConfig:='funConfigMeddim'],
+			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessSmdim')][,fun:='computeActPermOrderless'][,funConfig:='funConfigSmdim'],
 			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessLgdim')][,fun:='computeActPermOrderless'][,funConfig:='funConfigLgdim'],
 			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessFrenthyman')][,fun:='computeActPermOrderless'][,funConfig:='funConfigFrenthyman'],
 			   copy(cTblOrderless)[,type:=paste0('act', capitalize(type),'OrderlessNenthyman')][,fun:='computeActPermOrderless'][,funConfig:='funConfigNenthyman'],
@@ -2834,12 +2834,12 @@ getMemMatFromList <- function(lst, config) {
 			'window'
 		} else if (permUseEntropyP & !permOnlyDirectionP & permUseFreqP & !permUseStoplistP & !permUseWindowP & permNRows == 2048) {
 			'frentropy'
-		} else if (permUseEntropyP & !permOnlyDirectionP & !permUseFreqP & !permUseStoplistP & !permUseWindowP & permNRows == 4000) {
-			'meddim'
+		} else if (permUseEntropyP & !permOnlyDirectionP & !permUseFreqP & !permUseStoplistP & !permUseWindowP & permNRows == 200) {
+			'smdim'
 		} else if (permUseEntropyP & !permOnlyDirectionP & !permUseFreqP & !permUseStoplistP & !permUseWindowP & permNRows == 10000) {
 			'lgdim'
 		} else {
-			myStopifnot(!permUseEntropyP & !permOnlyDirectionP & !permUseFreqP & !permUseStoplistP & !permUseWindowP & permNRows <= 2048) # '<=' for unit tests
+			myStopifnot(!permUseEntropyP & !permOnlyDirectionP & !permUseFreqP & !permUseStoplistP & !permUseWindowP & (permNRows == 2048 | permNRows < 10)) # '< 10' for unit tests
 			'orig'
 		}
 	}
@@ -2896,6 +2896,7 @@ runGenAndSaveCurWorkspaceg4s6 <- function() genAndSaveCurWorkspace(groupConfigG4
 
 curWS <- function() {
 	# FIXME: move nrows matrix from 5000 to 200
+	# FIXME: get rid of dup around rbind of sji runs
 	# FIXME: Regen RWorkspace files
 	# FIXME: Install 32GB RAM, tune.
 	# FIXME: Rerun context
