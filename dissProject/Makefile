@@ -46,7 +46,6 @@ getContext: getContextS1
 getContextS%:
 	egrep '^runContext[0-9]+.*s$*.*<-' ${rFile} | awk '{print $$1}'
 
-# FIXME: Only running s[]'s for now
 getGenAndSaveCurWorkspace:
 	egrep '^runGenAndSaveCurWorkspace.*s[123456] <-' ${rFile} | awk '{print $$1}'
 
