@@ -554,6 +554,7 @@ makeRunTbl <- function(runs) {
 	}
 }
 
+permNRowsSm = 100
 defaultBaseConfig = list(dFull=c(0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1.0,1.1,1.2,1.3,1.4,1.5,1.6,1.8,2,5,10,20),
 			 dStd=c(0.5,0.7),
 			 accumModelHashtagsTbl=F,
@@ -561,7 +562,7 @@ defaultBaseConfig = list(dFull=c(0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1.0,1.1,1.2,1.3,1.
 			 modelHashtagsOutFile='',
 			 logregOutFile='',
 			 actDVs = c('actPriorStd', 'actPriorOL', 'actPriorOL2'),
-			 permNRowsAll = c(2048, 10000, 200),
+			 permNRowsAll = c(2048, 10000, permNRowsSm),
 			 permNRows = 2048,
 			 MCCORESAct = 4,
 			 MCCORESReg = 2,
@@ -1255,7 +1256,7 @@ renameColDVName <- function(tbl) {
 		    makeStandardMapping('Window', 'w/ entropy and window'),
 		    makeStandardMapping('Freq', 'w/ freq'),
 		    makeStandardMapping('Frentropy', 'w/ entropy and freq'),
-		    makeStandardMapping('Smdim', 'w/ entropy and 200-row matrix'),
+		    makeStandardMapping('Smdim', sprintf('w/ entropy and %s-row matrix', permNRowsSm)),
 		    makeStandardMapping('Lgdim', 'w/ entropy and 10000-row matrix'),
 		    makeStandardMapping('Frenthyman', 'w/ entropy and freq and log odds'),
 		    makeStandardMapping('Nenthyman', 'w/ log odds'),
@@ -1588,8 +1589,15 @@ analyzeContextSmall <- function() {
 				       'PriorStdTweetOrderFreqhymanTweetOrderlessFreqhyman',
 				       'PriorStdTweetOrderHymanTweetOrderlessHyman'))
 	compareMeanDV(tbl[sizeNum == 6 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='foo')
+	DVNames = asTopHashtagAcross(c('PriorStdTitleOrderlessEntropyBodyOrderlessEntropy', 'PriorStdTitleOrderlessLgdimBodyOrderlessLgdim',
+				       'PriorStdTitleOrderlessSmdimBodyOrderlessSmdim', 'TitleOrderlessLgdimBodyOrderlessLgdim',
+				       'TitleOrderlessEntropyBodyOrderlessEntropy', 'TitleOrderlessSmdimBodyOrderlessSmdim'))
+	compareMeanDV(tbl[sizeNum == 6 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='foo')
+	DVNames = asTopHashtagAcross(c('PriorStdTweetOrderEntropyTweetOrderlessEntropy', 'PriorStdTweetOrderSmdimTweetOrderlessSmdim',
+				       'PriorStdTweetOrderLgdimTweetOrderlessLgdim', 'TweetOrderEntropyTweetOrderlessEntropy',
+				       'TweetOrderSmdimTweetOrderlessSmdim', 'TweetOrderLgdimTweetOrderlessLgdim'))
+	compareMeanDV(tbl[sizeNum == 6 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='foo')
 }
-
 
 getNcoocTbl <- function(type, chunkTableQuery, config) {
 	myLog(sprintf('Getting Ncooc table for type %s', type))
@@ -2038,7 +2046,7 @@ funConfigDirection <- function(config) modConfig(config, getFunConfigModsPerm(pe
 funConfigHyman <- function(config) modConfig(config, getFunConfigModsPerm(permUseEntropyP=T, permHymanP=T))
 funConfigWindow <- function(config) modConfig(config, getFunConfigModsPerm(permUseEntropyP=T, permUseWindowP=T))
 funConfigFrentropy <- function(config) modConfig(config, getFunConfigModsPerm(permUseEntropyP=T, permUseFreqP=T))
-funConfigSmdim <- function(config) modConfig(config, getFunConfigModsPerm(permUseEntropyP=T, permNRows=200))
+funConfigSmdim <- function(config) modConfig(config, getFunConfigModsPerm(permUseEntropyP=T, permNRows=permNRowsSm))
 funConfigLgdim <- function(config) modConfig(config, getFunConfigModsPerm(permUseEntropyP=T, permNRows=10000))
 funConfigFrenthyman <- function(config) modConfig(config, getFunConfigModsPerm(permUseEntropyP=T, permUseFreqP=T, permHymanP=T)) 
 funConfigNenthyman <- function(config) modConfig(config, getFunConfigModsPerm(permUseEntropyP=F, permUseFreqP=F, permHymanP=T)) 
@@ -2834,7 +2842,7 @@ getMemMatFromList <- function(lst, config) {
 			'window'
 		} else if (permUseEntropyP & !permOnlyDirectionP & permUseFreqP & !permUseStoplistP & !permUseWindowP & permNRows == 2048) {
 			'frentropy'
-		} else if (permUseEntropyP & !permOnlyDirectionP & !permUseFreqP & !permUseStoplistP & !permUseWindowP & permNRows == 200) {
+		} else if (permUseEntropyP & !permOnlyDirectionP & !permUseFreqP & !permUseStoplistP & !permUseWindowP & permNRows == permNRowsSm) {
 			'smdim'
 		} else if (permUseEntropyP & !permOnlyDirectionP & !permUseFreqP & !permUseStoplistP & !permUseWindowP & permNRows == 10000) {
 			'lgdim'
@@ -2895,12 +2903,10 @@ runGenAndSaveCurWorkspaceg3s6 <- function() genAndSaveCurWorkspace(groupConfigG3
 runGenAndSaveCurWorkspaceg4s6 <- function() genAndSaveCurWorkspace(groupConfigG4S6)
 
 curWS <- function() {
-	# FIXME: move nrows matrix from 5000 to 200, test
-	# FIXME: Install 32GB RAM, tune.
 	# FIXME: Regen RWorkspace files
 	# FIXME: get rid of dup around rbind of sji runs
 	# FIXME: Methods to import and anlyze coefficient tables
-	# FIXME: Rerun context
+	# FIXME: Tune for 64GB, Rerun context
 	# FIXME: Make sure word order low predictiveness is fully justified
 	# FIXME: Add user-centered sji to popular-users dataset
 	# FIXME: Run popular-users dataset with sji computation
