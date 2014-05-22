@@ -2653,7 +2653,7 @@ runContext20g1s6 <- buildRunFunContext(regen=F, numRunsT=1, numRunsSO=1, samples
 #runContext200g3s1 <- buildRunFunContext(regen=F, numRunsT=10, numRunsSO=5, samplesPerRun=200, groupConfig=groupConfigG3S1)
 #runContext200g4s1 <- buildRunFunContext(regen=F, numRunsT=10, numRunsSO=5, samplesPerRun=200, groupConfig=groupConfigG4S1)
 
-runContext500g1s2Test <- buildRunFunContext(regen=F, numRunsT=1, numRunsSO=1, samplesPerRun=500, groupConfig=groupConfigG1S2)
+#runContext500g1s2Test <- buildRunFunContext(regen=F, numRunsT=1, numRunsSO=1, samplesPerRun=500, groupConfig=groupConfigG1S2)
 runContext500g1s2 <- buildRunFunContext(regen=F, numRunsT=10, numRunsSO=5, samplesPerRun=500, groupConfig=groupConfigG1S2)
 runContext500g2s2 <- buildRunFunContext(regen=F, numRunsT=10, numRunsSO=5, samplesPerRun=500, groupConfig=groupConfigG2S2)
 runContext500g3s2 <- buildRunFunContext(regen=F, numRunsT=10, numRunsSO=5, samplesPerRun=500, groupConfig=groupConfigG3S2)
