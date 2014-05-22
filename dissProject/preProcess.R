@@ -564,8 +564,8 @@ defaultBaseConfig = list(dFull=c(0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1.0,1.1,1.2,1.3,1.
 			 actDVs = c('actPriorStd', 'actPriorOL', 'actPriorOL2'),
 			 permNRowsAll = c(2048, 10000, permNRowsSm),
 			 permNRows = 2048,
-			 MCCORESAct = 4,
-			 MCCORESReg = 2,
+			 MCCORESAct = 8,
+			 MCCORESReg = 4,
 			 MCCORESActUser = 1,
 			 query=NULL)
 
@@ -707,7 +707,9 @@ defaultTPermConfig = modConfig(c(defaultTConfig, defaultPermConfig,
 					     makeBestFitsStrTPerm('Frenthyman'),
 					     makeBestFitsStrTPerm('Nenthyman'),
 					     makeBestFitsStrTPerm('Freqhyman')
-					     )))
+					     ),
+				    MCCORESAct = 16
+				    ))
 
 defaultSOPermConfig = modConfig(c(defaultSOConfig, defaultPermConfig,
 				  list(runTbl=makeRunTbl(c(list(c('actPriorStd', 'actTitleOrderless'),
@@ -746,7 +748,7 @@ defaultSOPermConfig = modConfig(c(defaultSOConfig, defaultPermConfig,
 					      makeBestFitsStrSOPerm('Nenthyman'),
 					      makeBestFitsStrSOPerm('Freqhyman')
 					      ),
-				     MCCORESAct = 2
+				     MCCORESAct = 16
 				     ))
 
 defaultTSjiConfig = modConfig(c(defaultTConfig, defaultSjiConfig,
@@ -759,7 +761,9 @@ defaultTSjiConfig = modConfig(c(defaultTConfig, defaultSjiConfig,
 					    makeBestFitsStrTSji(''),
 					    makeBestFitsStrTSji('Frentropy'),
 					    makeBestFitsStrTSji('Freq'),
-					    makeBestFitsStrTSji('Nentropy'))))
+					    makeBestFitsStrTSji('Nentropy')),
+				   MCCORESAct = 8
+				   ))
 
 defaultSOSjiConfig = modConfig(c(defaultSOConfig, defaultSjiConfig,
 				 list(runTbl=makeRunTbl(c(list(c('actTitle', 'actBody')),
@@ -773,7 +777,7 @@ defaultSOSjiConfig = modConfig(c(defaultSOConfig, defaultSjiConfig,
 					     makeBestFitsStrSOSji('Frentropy'),
 					     makeBestFitsStrSOSji('Freq'),
 					     makeBestFitsStrSOSji('Nentropy')),
-				    MCCORESAct = 2
+				    MCCORESAct = 4
 				    ))
 
 defaultSOSjiPConfig = modConfig(c(defaultSOConfig, defaultSjiConfig,
@@ -781,7 +785,7 @@ defaultSOSjiPConfig = modConfig(c(defaultSOConfig, defaultSjiConfig,
 				list(actDVs = c('actPriorStd', 'actPriorOL', 'actPriorOL2'),
 				     computeActFromContextTbl='computeActNullFromContextTbl',
 				     priorTbl = 'priorTblUserSubset',
-				     MCCORESActUser=4,
+				     MCCORESActUser=16,
 				     MCCORESAct=1))
 
 defaultTSjiPConfig = modConfig(c(defaultTConfig, defaultSjiConfig,
@@ -791,7 +795,7 @@ defaultTSjiPConfig = modConfig(c(defaultTConfig, defaultSjiConfig,
 				    tokenizedTbl = 'tweets_tokenized',
 				    priorTbl = 'priorTblUserSubset',
 				    postsTbl = 'tweets',
-				    MCCORESActUser=4,
+				    MCCORESActUser=16,
 				    MCCORESAct=1))
 
 defaultGGPlotOpts <- theme_bw() + theme_classic()
@@ -2541,7 +2545,7 @@ runForTokenTbl <- function(tokenTbl, config, getOutFileForNameFun=identity) {
 }
 
 runContext <- function(config, samplesPerRun, numRuns) {
-	myLog(sprintf("running context with act/actUser/reg cores: %s/%s",
+	myLog(sprintf("running context with act/actUser/reg cores: %s/%s/%s",
 		      getCores(config, 'MCCORESAct'), getCores(config, 'MCCORESActUser'), getCores(config, 'MCCORESReg')))
 	endId = 3000000
 	for (runNum in seq(numRuns)) {
@@ -2649,6 +2653,7 @@ runContext20g1s6 <- buildRunFunContext(regen=F, numRunsT=1, numRunsSO=1, samples
 #runContext200g3s1 <- buildRunFunContext(regen=F, numRunsT=10, numRunsSO=5, samplesPerRun=200, groupConfig=groupConfigG3S1)
 #runContext200g4s1 <- buildRunFunContext(regen=F, numRunsT=10, numRunsSO=5, samplesPerRun=200, groupConfig=groupConfigG4S1)
 
+runContext500g1s2Test <- buildRunFunContext(regen=F, numRunsT=1, numRunsSO=1, samplesPerRun=500, groupConfig=groupConfigG1S2)
 runContext500g1s2 <- buildRunFunContext(regen=F, numRunsT=10, numRunsSO=5, samplesPerRun=500, groupConfig=groupConfigG1S2)
 runContext500g2s2 <- buildRunFunContext(regen=F, numRunsT=10, numRunsSO=5, samplesPerRun=500, groupConfig=groupConfigG2S2)
 runContext500g3s2 <- buildRunFunContext(regen=F, numRunsT=10, numRunsSO=5, samplesPerRun=500, groupConfig=groupConfigG3S2)
@@ -2763,24 +2768,24 @@ makeMemMatInner <- function(sjiTbl, permEnvTbl, config) {
 	permEnvTbl
 	memTbl
 	if (getConfig(config, 'permUseEntropyP')) {
-		myLog(sprintf('Weighting val in memory matrix based on entropy'))
+		debugPrint(sprintf('Weighting val in memory matrix based on entropy'))
 		memTbl[, val := val * EContext]
 	}
 	if (getConfig(config, 'permUseStoplistP')) {
-		myLog(sprintf('Weighting val in memory matrix based on stoplist'))
+		debugPrint(sprintf('Weighting val in memory matrix based on stoplist'))
 		memTbl[, val := val * stopWordWeight]
 	}
 	if (getConfig(config, 'permUseFreqP')) {
-		myLog(sprintf('Weighting val in memory matrix based on frequency'))
+		debugPrint(sprintf('Weighting val in memory matrix based on frequency'))
 		memTbl[, val := val * freqWeight]
 	}
 	if (getConfig(config, 'permOnlyDirectionP')) {
-		myLog(sprintf('Collapsing posFromTag to sign(posFromTag)'))
+		debugPrint(sprintf('Collapsing posFromTag to sign(posFromTag)'))
 		memTbl[, posFromTag := sign(posFromTag)]
 	}
 	if (getConfig(config, 'permUseWindowP')) {
 		cnt = memTbl[abs(posFromTag) > 2, .N]
-		myLog(sprintf('Trimming %s of %s rows from memory table to constrain window size', cnt, nrow(memTbl)))
+		debugPrint(sprintf('Trimming %s of %s rows from memory table to constrain window size', cnt, nrow(memTbl)))
 		memTbl[abs(posFromTag) > 2, val := 0]
 	}
 	NRows = getConfig(config, 'permNRows')
@@ -2919,6 +2924,7 @@ curWS <- function() {
 	setLogLevel(2)
 	runContext20g1s6(regen='useAlreadyLoaded')
 	withProf(runContext500g1s2(regen='useAlreadyLoaded'))
+	runContext500g1s2Test(regen='useAlreadyLoaded')
 	withProf(runContext500g1s3(regen='useAlreadyLoaded'))
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelVsPred()))))
 	modelHashtagsTbls = buildModelHashtagsTables(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelHashtags()))))
