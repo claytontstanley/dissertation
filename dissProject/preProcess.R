@@ -2909,8 +2909,8 @@ runGenAndSaveCurWorkspaceg4s6 <- function() genAndSaveCurWorkspace(groupConfigG4
 
 curWS <- function() {
 	# FIXME: Regen RWorkspace files
-	# FIXME: Methods to import and anlyze coefficient tables
 	# FIXME: Tune for 64GB
+	# FIXME: Methods to import and anlyze coefficient tables
 	# FIXME: Rerun context
 	# FIXME: Make sure word order low predictiveness is fully justified
 	# FIXME: Add user-centered sji to popular-users dataset
