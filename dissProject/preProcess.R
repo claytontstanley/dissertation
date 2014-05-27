@@ -1524,13 +1524,15 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 	# RESULT: Logodds technique works
 	# SO compare entropy w/ logodds to entropy
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleBody',
-				       'PriorStdTitleOrderlessEntropyBodyOrderlessEntropy', 'PriorStdTitleOrderlessBodyOrderless',
-				       'PriorStdTitleOrderlessHymanBodyOrderlessHyman'))
+				       'PriorStdTitleOrderlessFreqBodyOrderlessFreq', 'PriorStdTitleOrderlessBodyOrderless',
+				       'PriorStdTitleOrderlessFreqhymanBodyOrderlessFreqhyman',
+				       'PriorStdTitleOrderlessNenthymanBodyOrderlessNenthyman'))
 	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='logoddsSO')
 	# T compare entropy w/ loggodds to entropy
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweet',
-				       'PriorStdTweetOrderEntropyTweetOrderlessEntropy', 'PriorStdTweetOrderTweetOrderless',
-				       'PriorStdTweetOrderHymanTweetOrderlessHyman'))
+				       'PriorStdTweetOrderFreqTweetOrderlessFreq', 'PriorStdTweetOrderTweetOrderless',
+				       'PriorStdTweetOrderFreqhymanTweetOrderlessFreqhyman',
+				       'PriorStdTweetOrderNenthymanTweetOrderlessNenthyman'))
 	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='logoddsT', groupCol='dsetGroup')
 	# SO compare all additions for RP
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleOrderlessFrenthymanBodyOrderlessFrenthyman',
@@ -1559,15 +1561,6 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='priorVsContextT')
 	# T compare all additions for Bayes
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweet', 'PriorStdTweetNentropy', 'PriorStdTweetFreq', 'PriorStdTweetFrentropy', 'Tweet'))
-	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='priorVsContextT')
-	# RESULT: Emphasize main effect: That adding a prior component to RP dramatically improves performance, but only if added in right way
-	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleBody', 'TitleOrderlessFreq', 'TitleOrderlessFreqBodyOrderlessFreq',
-				       'BodyOrderlessFreq',
-				       'PriorStdTitleOrderlessFreqBodyOrderlessFreq',
-				       'PriorStdTitleOrderlessFreqhymanBodyOrderlessFreqhyman'))
-	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='priorVsContextSO')
-	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweet', 'TweetOrderlessEntropy', 'PriorStdTweetOrderEntropyTweetOrderlessEntropy',
-				       'PriorStdTweetOrderHymanTweetOrderlessHyman'))
 	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='priorVsContextT')
 	# RESULT: Not much information in order for RP
 	# T compare entropy w/ direction and entropy w/ window to entropy
