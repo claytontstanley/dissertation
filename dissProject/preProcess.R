@@ -2922,10 +2922,10 @@ runGenAndSaveCurWorkspaceg3s6 <- function() genAndSaveCurWorkspace(groupConfigG3
 runGenAndSaveCurWorkspaceg4s6 <- function() genAndSaveCurWorkspace(groupConfigG4S6)
 
 curWS <- function() {
-	# FIXME: Methods to import and anlyze coefficient tables
-	# FIXME: Make sure word order low predictiveness is fully justified
 	# FIXME: Add user-centered sji to popular-users dataset
 	# FIXME: Run popular-users dataset with sji computation
+	# FIXME: Methods to import and anlyze coefficient tables
+	# FIXME: Make sure word order low predictiveness is fully justified
 	withProf(runContext20g1s1(regen='useAlreadyLoaded'))
 	setLogLevel(2)
 	runContext20g1s6(regen='useAlreadyLoaded')
