@@ -1108,30 +1108,35 @@ withCI <- function(dat, CIFun=CI) {
 	list(N=length(dat), meanVal=res[2], minCI=res[3], maxCI=res[1])
 }
 
+#FIXME: Remove this soon 
 getComparisonTbl <- function(SD) {
 	resTbl = copy(SD)
 	resTbl[, DVDirection := sprintf('%s%s', direction, if (DVName != '') sprintf(' for %s', DVName) else ''), by=list(direction, DVName)]
 	resTbl[!is.na(diff), withCI(diff), by=list(DVDirection, direction, DVName)]
 }
 
+#FIXME: Remove this soon 
 compare2DVs <- function(modelVsPredTbl, DVs, sortedOrder=c(1,2)) {
 	sumTbl = modelVsPredTbl[predUsedBest == T][DVName %in% DVs,]
 	setkey(sumTbl, datasetName, user_screen_name, DVName)
 	sumTbl[, list(diff=acc[sortedOrder[2]]-acc[sortedOrder[1]], direction=paste(DVName[sortedOrder[2]], '-', DVName[sortedOrder[1]])), by=list(datasetName, user_screen_name)][, DVName := ''][, getComparisonTbl(.SD)]
 }
 
+#FIXME: Remove this soon 
 compare2Runs <- function(modelVsPredTbl, runNums) {
 	sumTbl = modelVsPredTbl[predUsedBest == T][runNum %in% runNums]
 	setkey(sumTbl, datasetNameRoot, DVName, user_screen_name, runNum)
 	sumTbl[, list(diff=acc[2]-acc[1], direction=sprintf('run%s - run%s', runNums[2], runNums[1])), by=list(datasetNameRoot, DVName, user_screen_name)][, getComparisonTbl(.SD)]
 }
 
+#FIXME: Remove this soon 
 compareDBestVsMin <- function(modelVsPredTbl) {
 	sumTbl = modelVsPredTbl[topHashtag & hashtagUsedP & (maxNP | d == min(d))]
 	setkey(sumTbl, datasetName, user_screen_name, DVName, maxNP) 
 	sumTbl[, list(diff=acc[2]-acc[1], direction=paste('best d', '-', 'min d')), by=list(datasetName, user_screen_name, DVName)][, getComparisonTbl(.SD)]
 }
 
+#FIXME: Remove this soon 
 compareDBestVsMax <- function(modelVsPredTbl) {
 	sumTbl = modelVsPredTbl[topHashtag & hashtagUsedP & (maxNP | d == max(d))]
 	setkey(sumTbl, datasetName, user_screen_name, DVName, maxNP) 
