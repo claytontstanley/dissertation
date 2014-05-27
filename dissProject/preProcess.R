@@ -1364,12 +1364,12 @@ analyzeTemporal <- function(modelVsPredTbl) {
 	user_screen_names = wrapQuotes(c('rickeysmiley','fashionista_com','laurenpope','mtvindia','officialrcti'))
 	user_screen_names = wrapQuotes(c('fashionista_com'))
 	runTbls = runPriorT(config=modConfig(defaultTSjiPConfig, list(accumModelHashtagsTbl=T,
-								  query=sprintf("user_screen_name in (%s)", user_screen_names))))
+								      query=sprintf("user_screen_name in (%s)", user_screen_names))))
 	plotTemporal(runTbls)
 	user_screen_names = wrapQuotes(c('520957','238260','413225','807325','521180'))
 	user_screen_names = wrapQuotes(c('520957','238260'))
 	runTbls = runPriorSO(config=modConfig(defaultSOSjiPConfig, list(accumModelHashtagsTbl=T,
-								    query=sprintf("user_screen_name in (%s)", user_screen_names))))
+									query=sprintf("user_screen_name in (%s)", user_screen_names))))
 	plotTemporal(runTbls)
 }
 
@@ -1393,19 +1393,15 @@ analyzePrior <- function(modelVsPredTbl) {
 	# Check that the Ns for each dataset look right	
 	modelVsPredTbl[, list(N=.N, names=list(unique(datasetName))), by=list(dsetType, dsetGroup, runNum,datasetNameRoot)]
 	bestTbl = modelVsPredTbl[predUsedBest == T]
-	dvDiffsTbl = plotDVDiffs(rbind(bestTbl[runNum==2, compare2DVs(.SD, c('topHashtagPostPriorStd', 'topHashtagPostPriorOL2'), sortedOrder=c(1,2)), by=list(dsetType, dsetGroup), .SDcols=colnames(bestTbl)],
-				       bestTbl[runNum==2, compare2DVs(.SD, c('topHashtagPostPriorStd', 'topHashtagAcrossPriorStd')), by=list(dsetType, dsetGroup), .SDcols=colnames(bestTbl)],
-				       #bestTbl[DVName %in% c('topHashtagPostPriorStd', 'topHashtagPostPriorOL2'), compare2Runs(.SD, c(1,2)), by=list(dsetType, dsetGroup), .SDcols=colnames(bestTbl)],
-				       bestTbl[runNum==2 & DVName %in% c('topHashtagPostPriorStd', 'topHashtagPostPriorOL2'), compareDBestVsMin(.SD), by=list(dsetType, dsetGroup)],
-				       bestTbl[runNum==2 & DVName %in% c('topHashtagPostPriorStd'), compareDBestVsMax(.SD), by=list(dsetType, dsetGroup)]))
-	dvDiffsTbl[, mean(meanVal), by=direction]
-	compareOptimalDs(bestTbl[DVName %in% c('topHashtagPostPriorStd', 'topHashtagPostPriorOL2', 'topHashtagAcrossPriorStd') & runNum == 2])
-	compareOptimalAcc(bestTbl[DVName %in% c('topHashtagPostPriorStd', 'topHashtagPostPriorOL2', 'topHashtagAcrossPriorStd') & runNum == 2])
-	
-	visModelVsPredTbl(bestTbl[DVName=='topHashtagPostPriorStd' & datasetName=='TFollowgt10Mr2'])
-	visModelVsPredTbl(bestTbl[DVName=='topHashtagPostPriorStd' & datasetName=='SOQgt500r2'])
-	visModelVsPredTbl(bestTbl[DVName=='topHashtagPostPriorOL2' & datasetName=='TFollowgt10Mr2' & d < 1])
-	visModelVsPredTbl(bestTbl[DVName=='topHashtagPostPriorOL2' & datasetName=='SOQgt500r2' & d < 1])
+	#dvDiffsTbl = plotDVDiffs(rbind(bestTbl[runNum==2, compare2DVs(.SD, c('topHashtagPostPriorStd', 'topHashtagPostPriorOL2'), sortedOrder=c(1,2)), by=list(dsetType, dsetGroup), .SDcols=colnames(bestTbl)],
+	#			       bestTbl[runNum==2, compare2DVs(.SD, c('topHashtagPostPriorStd', 'topHashtagAcrossPriorStd')), by=list(dsetType, dsetGroup), .SDcols=colnames(bestTbl)]
+	#			       ))
+	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostPriorStd' & datasetName=='TFollowgt10Mr2'])
+	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostPriorStd' & datasetName=='SOQgt500r2'])
+	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostPriorOL2' & datasetName=='TFollowgt10Mr2' & d < 1])
+	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostPriorOL2' & datasetName=='SOQgt500r2' & d < 1])
+	compareOptimalDs(bestTbl[DVName %in% c('topHashtagPostPriorStd', 'topHashtagPostPriorOL2') & runNum == 2])
+	compareOptimalAcc(bestTbl[DVName %in% c('topHashtagPostPriorStd', 'topHashtagPostPriorOL2') & runNum == 2])
 }
 
 asTopHashtagAcross <- function(vect) {
