@@ -2924,6 +2924,7 @@ runGenAndSaveCurWorkspaceg4s6 <- function() genAndSaveCurWorkspace(groupConfigG4
 curWS <- function() {
 	# FIXME: Add user-centered sji to popular-users dataset
 	# FIXME: Run popular-users dataset with sji computation
+	# FIXME: Address low prior predictability for SO
 	# FIXME: Methods to import and anlyze coefficient tables
 	# FIXME: Make sure word order low predictiveness is fully justified
 	withProf(runContext20g1s1(regen='useAlreadyLoaded'))
