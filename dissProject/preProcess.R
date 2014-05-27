@@ -1286,7 +1286,7 @@ makeRemapForMapping <- function(keyword, text) {
 }
 
 makeStandardMappingBayes <- function(keyword, text) {
-	res = c('topHashtagAcrossTitle%sBody%s', 'Bayes combined title and body',
+	res = c('topHashtagAcrossTitle%sBody%s', 'Bayes combined title and body %s',
 		'topHashtagAcrossTitle%s', 'Bayes only title %s',
 		'topHashtagAcrossBody%s', 'Bayes only body %s',
 		'topHashtagAcrossPriorStdTitle%sBody%s', 'Bayes combined full %s',
@@ -1477,10 +1477,6 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 				       'PriorStdTitleOrderlessStoplistBodyOrderlessStoplist',
 				       'PriorStdTitleOrderlessFreqBodyOrderlessFreq',
 				       'PriorStdTitleOrderlessFrentropyBodyOrderlessFrentropy',
-				       'PriorStdTitleOrderlessFrenthymanBodyOrderlessFrenthyman',
-				       'PriorStdTitleOrderlessNenthymanBodyOrderlessNenthyman',
-				       'PriorStdTitleOrderlessFreqhymanBodyOrderlessFreqhyman',
-				       'PriorStdTitleOrderlessHymanBodyOrderlessHyman'
 				       ))
 	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='allWeightingsSOPerm')
 	# T compare entropy to stoplist to freq to frentropy
@@ -1492,10 +1488,6 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 				       'PriorStdTweetOrderStoplistTweetOrderlessStoplist',
 				       'PriorStdTweetOrderFreqTweetOrderlessFreq',
 				       'PriorStdTweetOrderFrentropyTweetOrderlessFrentropy',
-				       'PriorStdTweetOrderFrenthymanTweetOrderlessFrenthyman',
-				       'PriorStdTweetOrderNenthymanTweetOrderlessNenthyman',
-				       'PriorStdTweetOrderFreqhymanTweetOrderlessFreqhyman',
-				       'PriorStdTweetOrderHymanTweetOrderlessHyman'
 				       ))
 	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='allWeightingsTPerm', groupCol='dsetGroup')
 	# RESULT: Bayes and RP with frequency cutoff scales; RP with entropy saturates for SO
@@ -1540,11 +1532,39 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 				       'PriorStdTweetOrderEntropyTweetOrderlessEntropy', 'PriorStdTweetOrderTweetOrderless',
 				       'PriorStdTweetOrderHymanTweetOrderlessHyman'))
 	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='logoddsT', groupCol='dsetGroup')
-	# RESULT: Emphasize main effect: That adding a prior component to RP dramatically improves performance, but only if added in right way
-	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleBody', 'TitleOrderlessEntropy', 'TitleOrderlessEntropyBodyOrderlessEntropy',
-				       'BodyOrderlessEntropy',
+	# SO compare all additions for RP
+	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleOrderlessFrenthymanBodyOrderlessFrenthyman',
+				       'PriorStdTitleOrderlessNenthymanBodyOrderlessNenthyman',
+				       'PriorStdTitleOrderlessFreqhymanBodyOrderlessFreqhyman',
+				       'PriorStdTitleOrderlessHymanBodyOrderlessHyman',
+				       'PriorStdTitleOrderlessBodyOrderless',
+				       'PriorStdTitleOrderlessFreqBodyOrderlessFreq',
 				       'PriorStdTitleOrderlessEntropyBodyOrderlessEntropy',
-				       'PriorStdTitleOrderlessHymanBodyOrderlessHyman'))
+				       'TitleOrderlessBodyOrderless',
+				       'TitleOrderlessFreqBodyOrderlessFreq'))
+	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='logoddsSO')
+	# SO compare all additions for Bayes
+	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleBody', 'TitleBody', 'PriorStdTitleFreqBodyFreq', 'PriorStdTitleNentropyBodyNentropy',
+				       'PriorStdTitleFrentropyBodyFrentropy'))
+	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='logoddsSO')
+	# T compare all additions for RP
+	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweetOrderFrenthymanTweetOrderlessFrenthyman',
+				       'PriorStdTweetOrderNenthymanTweetOrderlessNenthyman',
+				       'PriorStdTweetOrderFreqhymanTweetOrderlessFreqhyman',
+				       'PriorStdTweetOrderHymanTweetOrderlessHyman',
+				       'PriorStdTweetOrderTweetOrderless',
+				       'PriorStdTweetOrderFreqTweetOrderlessFreq',
+				       'PriorStdTweetOrderEntropyTweetOrderlessEntropy',
+				       'TweetOrderFreqTweetOrderlessFreq'))
+	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='priorVsContextT')
+	# T compare all additions for Bayes
+	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweet', 'PriorStdTweetNentropy', 'PriorStdTweetFreq', 'PriorStdTweetFrentropy', 'Tweet'))
+	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='priorVsContextT')
+	# RESULT: Emphasize main effect: That adding a prior component to RP dramatically improves performance, but only if added in right way
+	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleBody', 'TitleOrderlessFreq', 'TitleOrderlessFreqBodyOrderlessFreq',
+				       'BodyOrderlessFreq',
+				       'PriorStdTitleOrderlessFreqBodyOrderlessFreq',
+				       'PriorStdTitleOrderlessFreqhymanBodyOrderlessFreqhyman'))
 	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='priorVsContextSO')
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweet', 'TweetOrderlessEntropy', 'PriorStdTweetOrderEntropyTweetOrderlessEntropy',
 				       'PriorStdTweetOrderHymanTweetOrderlessHyman'))
