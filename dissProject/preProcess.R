@@ -512,8 +512,11 @@ getLogregOutFile <- function(name) getOutFileGen(getDirLogreg(), name)
 
 runPrior <- function(config) {
 	myStopifnot(!any(sapply(config,is.null)))
+	getCurWorkspaceBy(getConfig(config, 'regen'), get(getConfig(config, 'groupConfig')))
 	priorTblUserSubset <<- getPriorTblUserSubset(config)
-	config=modConfig(config, list(dStd=getConfig(config, 'dFull')))
+	if (is.character(getConfig(config, 'dStd')) && getConfig(config, 'dStd') == 'dFull') {
+		config=modConfig(config, list(dStd=getConfig(config, 'dFull')))
+	}
 	config
 	tokenTbl = getTokenizedForUsers(config)
 	tagTbl = tokenTbl[type == getConfig(config, 'tagTypeName')] 
@@ -780,23 +783,40 @@ defaultSOSjiConfig = modConfig(c(defaultSOConfig, defaultSjiConfig,
 				    MCCORESAct = 4
 				    ))
 
-defaultSOSjiPConfig = modConfig(c(defaultSOConfig, defaultSjiConfig,
+defaultPConfig = list(regen='useAlreadyLoaded')
+
+defaultSOSjiPConfig = modConfig(c(defaultSOConfig, defaultSjiConfig, defaultPConfig,
 				  list(runTbl=makeRunTbl(list()))),
 				list(actDVs = c('actPriorStd', 'actPriorOL', 'actPriorOL2'),
 				     computeActFromContextTbl='computeActNullFromContextTbl',
 				     priorTbl = 'priorTblUserSubset',
+				     dStd = 'dFull',
 				     MCCORESActUser=16,
 				     MCCORESAct=1))
 
-defaultTSjiPConfig = modConfig(c(defaultTConfig, defaultSjiConfig,
+defaultTSjiPConfig = modConfig(c(defaultTConfig, defaultSjiConfig, defaultPConfig,
 				 list(runTbl=makeRunTbl(list()))),
 			       list(actDVs=c('actPriorStd', 'actPriorOL', 'actPriorOL2'),
 				    computeActFromContextTbl='computeActNullFromContextTbl',
 				    tokenizedTbl = 'tweets_tokenized',
 				    priorTbl = 'priorTblUserSubset',
 				    postsTbl = 'tweets',
+				    dStd = 'dFull',
 				    MCCORESActUser=16,
 				    MCCORESAct=1))
+
+defaultPUserConfig = list(regen=F,
+			  groupConfig='groupConfigPUser')
+
+defaultSOSjiPUserConfig = modConfig(c(defaultSOConfig, defaultSjiConfig, defaultPUserConfig,
+				      list(runTbl=makeRunTbl(list(c('actPriorStd', 'actTitle', 'actBody'),
+								  c('actTitle', 'actBody'))))),
+				    list(actDVs=c('actPriorStd', 'actTitle_actBody', 'actPriorStd_actTitle_actBody', 'actTitle', 'actBody'),
+					 computeActFromContextTbl='computeActSjiOptFromContextTbl',
+					 priorTbl='priorTblUserSubset',
+					 convertTagSynonymsP=T,
+					 MCCORESActUser=16,
+					 MCCORESAct=1))
 
 defaultGGPlotOpts <- theme_bw() + theme_classic()
 
@@ -957,6 +977,20 @@ makeSORunr1 <- function(val, outFileName) makeSORun(val, outFileName, config=get
 makeSORunr2 <- function(val, outFileName) makeSORun(val, outFileName, config=getSOr2Config())
 makeSORunr3 <- function(val, outFileName) makeSORun(val, outFileName, config=getSOr3Config())
 makeSORunr4 <- function(val, outFileName) makeSORun(val, outFileName, config=getSOr4Config())
+
+makeSORunSjiPUser <- function(val, outFileName) {
+	function (regen=F) {
+		makeSORun(val, outFileName, modConfig(defaultSOSjiPUserConfig, list(query=getQuerySO, regen=regen)))()
+	}
+}
+
+makeSOQRunSjiPUser <- function(val, outFileName) {
+	function (regen=F) {
+		makeSORun(val, outFileName, modConfig(defaultSOSjiPUserConfig, list(query=getQuerySOQ, regen=regen)))()
+	}
+}
+
+runSOSjiPUser100k <- makeSORunSjiPUser(100000, 'SOSjiPUsergt100k')
 
 runSO100k <- makeSORunr1(100000, 'SOgt100k')
 runSO50k <- makeSORunr1(50000, 'SOgt50k')
@@ -2014,7 +2048,7 @@ computeActSji <- function(contextVect, sjiTbl, config) {
 }
 
 getWsFile <- function(groupConfig) {
-	wsFile = with(groupConfig, sprintf('%s/workspace-g%ss%s.RData', '/Volumes/SuperSupernova/RWorkspace', groupNum, sizeNum))
+	wsFile = with(groupConfig, sprintf('%s/workspace-g%ss%s%s.RData', '/Volumes/SuperSupernova/RWorkspace', groupNum, sizeNum, configType))
 	wsFile
 }
 
@@ -2115,6 +2149,10 @@ plotMemMat <- function() {
 }
 
 getCurWorkspace <- function(groupConfig) {
+	getConfig(groupConfig, 'genFun')(groupConfig)
+}
+
+getCurWorkspaceContext <- function(groupConfig) {
 	maxIdSOSji = getConfig(groupConfig, 'maxIdSOSji')
 	maxIdSOPrior = getConfig(groupConfig, 'maxIdSOPrior')
 	maxIdTSji = getConfig(groupConfig, 'maxIdTSji')
@@ -2134,6 +2172,17 @@ getCurWorkspace <- function(groupConfig) {
 	return()
 }
 
+getCurWorkspacePUser <- function(groupConfig) {
+	maxIdSOSji = getConfig(groupConfig, 'maxIdSOSji')
+	maxIdSOPrior = getConfig(groupConfig, 'maxIdSOPrior')
+	maxIdTSji = getConfig(groupConfig, 'maxIdTSji')
+	maxIdTPrior = getConfig(groupConfig, 'maxIdTPrior')
+	sjiTblSOOrderless <<- getSjiTblSO(defaultSOConfig, 1, maxIdSOSji)
+	# FIXME: Don't use full combined env tbl or mem mat
+	permEnvTblSO <<- makeCombinedEnvironmentTbl(sjiTblSOOrderless, defaultBaseConfig)
+	permMemMatSOOrderless <<- makeCombinedMemMat(sjiTblSOOrderless, permEnvTblSO, defaultSOPermConfig)
+}
+
 genAndSaveCurWorkspace <- function(groupConfig) {
 	getCurWorkspace(groupConfig)
 	mySaveImage(groupConfig)
@@ -2144,6 +2193,11 @@ computeActSjiFromContextTbl <- function(contextTbl, tagTbl, config) {
 			   makeComputeActRunTbl(contextTbl, 'Frentropy', 'computeActSji', 'funConfigFrentropySji'),
 			   makeComputeActRunTbl(contextTbl, 'Nentropy', 'computeActSji', 'funConfigNentropySji'),
 			   makeComputeActRunTbl(contextTbl, 'Freq', 'computeActSji', 'funConfigFreqSji'))
+	contextTbl[, get(fun[1])(chunk, get(getConfig(config, 'sjiTbl')), get(funConfig)(config)), by=type]
+}
+
+computeActSjiOptFromContextTbl <- function(contextTbl, tagTbl, config) {
+	contextTbl = makeComputeActRunTbl(contextTbl, '', 'computeActSji', 'funConfigOrigSji')
 	contextTbl[, get(fun[1])(chunk, get(getConfig(config, 'sjiTbl')), get(funConfig)(config)), by=type]
 }
 
@@ -2350,6 +2404,11 @@ handleNAs <- function(postResTbl, predictors) {
 	for (col in predictors) {
 		oldVal = postResTbl[[col]]
 		meanVal = mean(oldVal, na.rm=T)
+		if (is.nan(meanVal)) {
+			myLog('Using mean of 0 since all rows are NAs')
+			meanVal = 0
+		}
+		meanVal
 		linds = is.na(oldVal)
 		myLog(sprintf('Imputing mean of %s for %s of %s values in column name %s', meanVal, sum(linds), length(linds), col))
 		oldVal[linds] = meanVal 
@@ -2513,6 +2572,8 @@ runForTokenTblForUser <- function(tokenTbl, config) {
 	tokenTbl
 	config
 	postResTbl = getFullPostResTbl(tokenTbl, config)
+	postResTbl
+	tokenTbl
 	runTbl = getConfig(config, 'runTbl')
 	runTbl
 	resTbl = analyzePostResTblAcrossDs(postResTbl, runTbl, config)
@@ -2617,35 +2678,39 @@ groupConfigG2 <- list(groupNum=2, groupName = '2014-03-17 11:28:15 trendsmap')
 groupConfigG3 <- list(groupNum=3, groupName = '2014-03-24 13:06:19 trendsmap')
 groupConfigG4 <- list(groupNum=4, groupName = '2014-04-04 15:03:59 trendsmap')
 
-groupConfigG1S1 <- c(groupConfigS1, groupConfigG1)
-groupConfigG2S1 <- c(groupConfigS1, groupConfigG2)
-groupConfigG3S1 <- c(groupConfigS1, groupConfigG3)
-groupConfigG4S1 <- c(groupConfigS1, groupConfigG4)
+groupConfigContext <- list(genFun=getCurWorkspaceContext, configType='')
+groupConfigPUser <- c(list(genFun=getCurWorkspacePUser, configType='PUser', groupNum=1),
+		      groupConfigS6)
 
-groupConfigG1S2 <- c(groupConfigS2, groupConfigG1)
-groupConfigG2S2 <- c(groupConfigS2, groupConfigG2)
-groupConfigG3S2 <- c(groupConfigS2, groupConfigG3)
-groupConfigG4S2 <- c(groupConfigS2, groupConfigG4)
+groupConfigG1S1 <- c(groupConfigS1, groupConfigG1, groupConfigContext)
+groupConfigG2S1 <- c(groupConfigS1, groupConfigG2, groupConfigContext)
+groupConfigG3S1 <- c(groupConfigS1, groupConfigG3, groupConfigContext)
+groupConfigG4S1 <- c(groupConfigS1, groupConfigG4, groupConfigContext)
 
-groupConfigG1S3 <- c(groupConfigS3, groupConfigG1)
-groupConfigG2S3 <- c(groupConfigS3, groupConfigG2)
-groupConfigG3S3 <- c(groupConfigS3, groupConfigG3)
-groupConfigG4S3 <- c(groupConfigS3, groupConfigG4)
+groupConfigG1S2 <- c(groupConfigS2, groupConfigG1, groupConfigContext)
+groupConfigG2S2 <- c(groupConfigS2, groupConfigG2, groupConfigContext)
+groupConfigG3S2 <- c(groupConfigS2, groupConfigG3, groupConfigContext)
+groupConfigG4S2 <- c(groupConfigS2, groupConfigG4, groupConfigContext)
 
-groupConfigG1S4 <- c(groupConfigS4, groupConfigG1)
-groupConfigG2S4 <- c(groupConfigS4, groupConfigG2)
-groupConfigG3S4 <- c(groupConfigS4, groupConfigG3)
-groupConfigG4S4 <- c(groupConfigS4, groupConfigG4)
+groupConfigG1S3 <- c(groupConfigS3, groupConfigG1, groupConfigContext)
+groupConfigG2S3 <- c(groupConfigS3, groupConfigG2, groupConfigContext)
+groupConfigG3S3 <- c(groupConfigS3, groupConfigG3, groupConfigContext)
+groupConfigG4S3 <- c(groupConfigS3, groupConfigG4, groupConfigContext)
 
-groupConfigG1S5 <- c(groupConfigS5, groupConfigG1)
-groupConfigG2S5 <- c(groupConfigS5, groupConfigG2)
-groupConfigG3S5 <- c(groupConfigS5, groupConfigG3)
-groupConfigG4S5 <- c(groupConfigS5, groupConfigG4)
+groupConfigG1S4 <- c(groupConfigS4, groupConfigG1, groupConfigContext)
+groupConfigG2S4 <- c(groupConfigS4, groupConfigG2, groupConfigContext)
+groupConfigG3S4 <- c(groupConfigS4, groupConfigG3, groupConfigContext)
+groupConfigG4S4 <- c(groupConfigS4, groupConfigG4, groupConfigContext)
 
-groupConfigG1S6 <- c(groupConfigS6, groupConfigG1)
-groupConfigG2S6 <- c(groupConfigS6, groupConfigG2)
-groupConfigG3S6 <- c(groupConfigS6, groupConfigG3)
-groupConfigG4S6 <- c(groupConfigS6, groupConfigG4)
+groupConfigG1S5 <- c(groupConfigS5, groupConfigG1, groupConfigContext)
+groupConfigG2S5 <- c(groupConfigS5, groupConfigG2, groupConfigContext)
+groupConfigG3S5 <- c(groupConfigS5, groupConfigG3, groupConfigContext)
+groupConfigG4S5 <- c(groupConfigS5, groupConfigG4, groupConfigContext)
+
+groupConfigG1S6 <- c(groupConfigS6, groupConfigG1, groupConfigContext)
+groupConfigG2S6 <- c(groupConfigS6, groupConfigG2, groupConfigContext)
+groupConfigG3S6 <- c(groupConfigS6, groupConfigG3, groupConfigContext)
+groupConfigG4S6 <- c(groupConfigS6, groupConfigG4, groupConfigContext)
 
 buildRunFunContext <- function(regen, numRunsT, numRunsSO, samplesPerRun, groupConfig) {
 	eval(bquote(
@@ -2927,6 +2992,8 @@ curWS <- function() {
 	# FIXME: Address low prior predictability for SO
 	# FIXME: Methods to import and anlyze coefficient tables
 	# FIXME: Make sure word order low predictiveness is fully justified
+	# FIXME: Def. look at coefficient tables
+	runSOSjiPUser100k(regen='useAlreadyLoaded')
 	withProf(runContext20g1s1(regen='useAlreadyLoaded'))
 	setLogLevel(2)
 	runContext20g1s6(regen='useAlreadyLoaded')
