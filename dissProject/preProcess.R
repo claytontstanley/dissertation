@@ -1540,7 +1540,7 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 				       'PriorStdTitleOrderlessEntropyBodyOrderlessEntropy', 'PriorStdTitleOrderlessBodyOrderless',
 				       'PriorStdTitleOrderlessStoplistBodyOrderlessStoplist',
 				       'PriorStdTitleOrderlessFreqBodyOrderlessFreq',
-				       'PriorStdTitleOrderlessFrentropyBodyOrderlessFrentropy',
+				       'PriorStdTitleOrderlessFrentropyBodyOrderlessFrentropy'
 				       ))
 	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='allWeightingsSOPerm')
 	# T compare entropy to stoplist to freq to frentropy
@@ -1551,7 +1551,7 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 				       'PriorStdTweetOrderEntropyTweetOrderlessEntropy', 'PriorStdTweetOrderTweetOrderless',
 				       'PriorStdTweetOrderStoplistTweetOrderlessStoplist',
 				       'PriorStdTweetOrderFreqTweetOrderlessFreq',
-				       'PriorStdTweetOrderFrentropyTweetOrderlessFrentropy',
+				       'PriorStdTweetOrderFrentropyTweetOrderlessFrentropy'
 				       ))
 	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='allWeightingsTPerm', groupCol='dsetGroup')
 	# RESULT: Bayes and RP with frequency cutoff scales; RP with entropy saturates for SO
