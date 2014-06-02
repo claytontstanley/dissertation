@@ -818,6 +818,22 @@ defaultSOSjiPUserConfig = modConfig(c(defaultSOConfig, defaultSjiConfig, default
 					 MCCORESActUser=16,
 					 MCCORESAct=1))
 
+
+defaultSOPermPUserConfig = modConfig(c(defaultSOConfig, defaultPermConfig, defaultPUserConfig,
+				      list(runTbl=makeRunTbl(list(c('actPriorStd', 'actTitleOrderlessFreqhyman', 'actBodyOrderlessFreqhyman'),
+								  c('actTitleOrderlessFreqhyman', 'actBodyOrderlessFreqhyman'))),
+					   permEnvTbl='permEnvTblSO',
+					   permMemMatOrder='',
+					   permMemMatOrderless='permMemMatSOOrderless',
+					   computeActFromContextTbl='computeActPermSOOptFromContextTbl'
+					   )),
+				    list(actDVs=c('actPriorStd', 'actTitleOrderlessFreqhyman_actBodyOrderlessFreqhyman',
+						  'actPriorStd_actTitleOrderlessFreqhyman_actBodyOrderlessFreqhyman', 'actTitleOrderlessFreqhyman', 'actBodyOrderlessFreqhyman'),
+					 priorTbl='priorTblUserSubset',
+					 convertTagSynonymsP=T,
+					 MCCORESActUser=16,
+					 MCCORESAct=1))
+
 defaultGGPlotOpts <- theme_bw() + theme_classic()
 
 runPriorT <- function(config) {
@@ -980,17 +996,30 @@ makeSORunr4 <- function(val, outFileName) makeSORun(val, outFileName, config=get
 
 makeSORunSjiPUser <- function(val, outFileName) {
 	function (regen=F) {
-		makeSORun(val, outFileName, modConfig(defaultSOSjiPUserConfig, list(query=getQuerySO, regen=regen)))()
+		makeSORun(val, sprintf('%s%s', 'SOPUserSji', outFileName), modConfig(defaultSOSjiPUserConfig, list(query=getQuerySO, regen=regen)))()
+		makeSORun(val, sprintf('%s%s', 'SOPUserPerm', outFileName), modConfig(defaultSOPermPUserConfig, list(query=getQuerySO, regen='useAlreadyLoaded')))()
 	}
 }
 
 makeSOQRunSjiPUser <- function(val, outFileName) {
 	function (regen=F) {
-		makeSORun(val, outFileName, modConfig(defaultSOSjiPUserConfig, list(query=getQuerySOQ, regen=regen)))()
+		makeSOQRun(val, sprintf('%s%s', 'SOQPUserSji', outFileName), modConfig(defaultSOSjiPUserConfig, list(query=getQuerySO, regen=regen)))()
+		makeSOQRun(val, sprintf('%s%s', 'SOQPUserPerm', outFileName), modConfig(defaultSOPermPUserConfig, list(query=getQuerySO, regen='useAlreadyLoaded')))()
 	}
 }
 
-runSOSjiPUser100k <- makeSORunSjiPUser(100000, 'SOSjiPUsergt100k')
+runPUserSOSji100k <- makeSORunSjiPUser(100000, 'gt100k')
+runPUserSOSji50k <- makeSORunSjiPUser(50000, 'gt50k')
+runPUserSOSji10k <- makeSORunSjiPUser(10000, 'gt10k')
+runPUserSOSji5k <- makeSORunSjiPUser(5000, 'gt5k')
+runPUserSOSji1k <- makeSORunSjiPUser(1000, 'gt1k')
+runPUserSOSji500 <- makeSORunSjiPUser(500, 'gt500')
+runPUserSOQSji500 <- makeSOQRunSjiPUser(500, 'gt500')
+runPUserSOQSji400 <- makeSOQRunSjiPUser(400, 'gt400')
+runPUserSOQSji300 <- makeSOQRunSjiPUser(300, 'gt300')
+runPUserSOQSji200 <- makeSOQRunSjiPUser(200, 'gt200')
+runPUserSOQSji100 <- makeSOQRunSjiPUser(100, 'gt100')
+runPUserSOQSji050 <- makeSOQRunSjiPUser(050, 'gt050')
 
 runSO100k <- makeSORunr1(100000, 'SOgt100k')
 runSO50k <- makeSORunr1(50000, 'SOgt50k')
@@ -2269,6 +2298,13 @@ computeActPermSOFromContextTbl <- function(contextTbl, tagTbl, config) {
 	contextTbl[, get(fun[1])(chunk, posFromTag, get(funConfig)(config)), by=type]
 }
 
+computeActPermSOOptFromContextTbl <- function(contextTbl, tagTbl, config) {
+	contextTbl = getContextTbl(contextTbl, tagTbl)
+	cTblOrderless = contextTbl[orderType == 'orderless']
+	contextTbl = makeComputeActRunTblPermOrderless(cTblOrderless, 'Freqhyman', 'funConfigFreqhyman')
+	contextTbl[, get(fun[1])(chunk, posFromTag, get(funConfig)(config)), by=type]
+}
+
 getContextPredNames <- function(config) {
 	res = getConfig(config, 'runTbl')
 	res = res[, unique(predName)]
@@ -2297,6 +2333,7 @@ getSjiTblWide <- function(contextTbl, tagTbl, config) {
 		sjiTblWide[, act := NULL][, type := NULL]
 	}
 	setkey(sjiTblWide, hashtag)
+	sjiTblWide
 	setcolorder(sjiTblWide, c('hashtag', getContextPredNames(config)))
 	sjiTblWide
 }
@@ -2993,7 +3030,7 @@ curWS <- function() {
 	# FIXME: Methods to import and anlyze coefficient tables
 	# FIXME: Make sure word order low predictiveness is fully justified
 	# FIXME: Def. look at coefficient tables
-	runSOSjiPUser100k(regen='useAlreadyLoaded')
+	runPUserSOSji100k(regen='useAlreadyLoaded')
 	withProf(runContext20g1s1(regen='useAlreadyLoaded'))
 	setLogLevel(2)
 	runContext20g1s6(regen='useAlreadyLoaded')
