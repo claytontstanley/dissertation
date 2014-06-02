@@ -512,7 +512,6 @@ getLogregOutFile <- function(name) getOutFileGen(getDirLogreg(), name)
 
 runPrior <- function(config) {
 	myStopifnot(!any(sapply(config,is.null)))
-	getCurWorkspaceBy(getConfig(config, 'regen'), get(getConfig(config, 'groupConfig')))
 	priorTblUserSubset <<- getPriorTblUserSubset(config)
 	if (is.character(getConfig(config, 'dStd')) && getConfig(config, 'dStd') == 'dFull') {
 		config=modConfig(config, list(dStd=getConfig(config, 'dFull')))
@@ -783,7 +782,7 @@ defaultSOSjiConfig = modConfig(c(defaultSOConfig, defaultSjiConfig,
 				    MCCORESAct = 4
 				    ))
 
-defaultPConfig = list(regen='useAlreadyLoaded')
+defaultPConfig = list()
 
 defaultSOSjiPConfig = modConfig(c(defaultSOConfig, defaultSjiConfig, defaultPConfig,
 				  list(runTbl=makeRunTbl(list()))),
@@ -805,8 +804,7 @@ defaultTSjiPConfig = modConfig(c(defaultTConfig, defaultSjiConfig, defaultPConfi
 				    MCCORESActUser=16,
 				    MCCORESAct=1))
 
-defaultPUserConfig = list(regen=F,
-			  groupConfig='groupConfigPUser')
+defaultPUserConfig = list()
 
 defaultSOSjiPUserConfig = modConfig(c(defaultSOConfig, defaultSjiConfig, defaultPUserConfig,
 				      list(runTbl=makeRunTbl(list(c('actPriorStd', 'actTitle', 'actBody'),
@@ -996,15 +994,17 @@ makeSORunr4 <- function(val, outFileName) makeSORun(val, outFileName, config=get
 
 makeSORunSjiPUser <- function(val, outFileName) {
 	function (regen=F) {
-		makeSORun(val, sprintf('%s%s', 'SOPUserSji', outFileName), modConfig(defaultSOSjiPUserConfig, list(query=getQuerySO, regen=regen)))()
-		makeSORun(val, sprintf('%s%s', 'SOPUserPerm', outFileName), modConfig(defaultSOPermPUserConfig, list(query=getQuerySO, regen='useAlreadyLoaded')))()
+		getCurWorkspaceBy(regen, groupConfigPUser)
+		makeSORun(val, sprintf('%s%s', 'SOPUserSji', outFileName), modConfig(defaultSOSjiPUserConfig, list(query=getQuerySO)))()
+		makeSORun(val, sprintf('%s%s', 'SOPUserPerm', outFileName), modConfig(defaultSOPermPUserConfig, list(query=getQuerySO)))()
 	}
 }
 
 makeSOQRunSjiPUser <- function(val, outFileName) {
 	function (regen=F) {
-		makeSOQRun(val, sprintf('%s%s', 'SOQPUserSji', outFileName), modConfig(defaultSOSjiPUserConfig, list(query=getQuerySO, regen=regen)))()
-		makeSOQRun(val, sprintf('%s%s', 'SOQPUserPerm', outFileName), modConfig(defaultSOPermPUserConfig, list(query=getQuerySO, regen='useAlreadyLoaded')))()
+		getCurWorkspaceBy(regen, groupConfigPUser)
+		makeSOQRun(val, sprintf('%s%s', 'SOQPUserSji', outFileName), modConfig(defaultSOSjiPUserConfig, list(query=getQuerySO)))()
+		makeSOQRun(val, sprintf('%s%s', 'SOQPUserPerm', outFileName), modConfig(defaultSOPermPUserConfig, list(query=getQuerySO)))()
 	}
 }
 
