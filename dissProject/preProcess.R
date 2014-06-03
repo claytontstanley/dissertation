@@ -510,9 +510,40 @@ getOutFileModelHashtags <- function(name) getOutFileGen(getDirModelHashtags(), n
 
 getLogregOutFile <- function(name) getOutFileGen(getDirLogreg(), name)
 
+getSjiTblSOUser <- function(owner_user_id, config) {
+	# FIXME: This is SO specific
+	query = sprintf("select chunk_types.id as chunk_id, tokenized.id::bigint as post_id, tokenized.pos as pos, types.id as post_type_id
+			from post_tokenized as tokenized
+			join post_tokenized_chunk_types as chunk_types
+			on tokenized.chunk = chunk_types.type_name
+			join post_tokenized_type_types as types
+			on tokenized.type = types.type_name
+			join posts as posts
+			on posts.id = tokenized.id
+			where owner_user_id = '%s'",
+			owner_user_id)
+	genTempPostTokenizedTbl(query)
+	NcoocTblTitle = getNcoocTbl('title', chunkTableQuery, config) 
+	NcoocTblBody = getNcoocTbl('body', chunkTableQuery, config) 
+	sqldf('truncate table temp_tokenized')
+	sjiTbl = initSjiTblSO(NcoocTblTitle, NcoocTblBody)
+	sjiTbl
+}
+
+# FIXME: This is SO specific
+makeSjiTblUser <- function(priorTblUserSubset, config) {
+	sjiTblSOOrderlessUser <<- priorTblUserSubset[, getSjiTblSOUser(user_screen_name, config), by=user_screen_name]
+	setkey(sjiTblSOOrderlessUser, user_screen_name, context, hashtag, posFromTag)
+}
+
+makeSjiTblUserDefault <- function(priorTblUserSubset, config) {}
+
 runPrior <- function(config) {
 	myStopifnot(!any(sapply(config,is.null)))
-	priorTblUserSubset <<- getPriorTblUserSubset(config)
+	if (getConfig(config, 'genGlobalsForPriorRun')) {
+		priorTblUserSubset <<- getPriorTblUserSubset(config)
+		get(getConfig(config, 'makeSjiTblUser'))(priorTblUserSubset, config)
+	}
 	if (is.character(getConfig(config, 'dStd')) && getConfig(config, 'dStd') == 'dFull') {
 		config=modConfig(config, list(dStd=getConfig(config, 'dFull')))
 	}
@@ -782,7 +813,8 @@ defaultSOSjiConfig = modConfig(c(defaultSOConfig, defaultSjiConfig,
 				    MCCORESAct = 4
 				    ))
 
-defaultPConfig = list()
+defaultPConfig = list(makeSjiTblUser='makeSjiTblUserDefault',
+		      genGlobalsForPriorRun=T)
 
 defaultSOSjiPConfig = modConfig(c(defaultSOConfig, defaultSjiConfig, defaultPConfig,
 				  list(runTbl=makeRunTbl(list()))),
@@ -804,12 +836,16 @@ defaultTSjiPConfig = modConfig(c(defaultTConfig, defaultSjiConfig, defaultPConfi
 				    MCCORESActUser=16,
 				    MCCORESAct=1))
 
-defaultPUserConfig = list()
+defaultPUserConfig = modConfig(defaultPConfig, list(makeSjiTblUser='makeSjiTblUser'))
 
 defaultSOSjiPUserConfig = modConfig(c(defaultSOConfig, defaultSjiConfig, defaultPUserConfig,
 				      list(runTbl=makeRunTbl(list(c('actPriorStd', 'actTitle', 'actBody'),
-								  c('actTitle', 'actBody'))))),
-				    list(actDVs=c('actPriorStd', 'actTitle_actBody', 'actPriorStd_actTitle_actBody', 'actTitle', 'actBody'),
+								  c('actTitle', 'actBody'),
+								  c('actPriorStd', 'actTitleUsercontext', 'actBodyUsercontext'),
+								  c('actTitleUsercontext', 'actBodyUsercontext'))),
+					   sjiTblUser='sjiTblSOOrderlessUser')),
+				    list(actDVs=c('actPriorStd', 'actTitle_actBody', 'actPriorStd_actTitle_actBody', 'actTitle', 'actBody',
+						  'actTitleUsercontext', 'actBodyUsercontext'),
 					 computeActFromContextTbl='computeActSjiOptFromContextTbl',
 					 priorTbl='priorTblUserSubset',
 					 convertTagSynonymsP=T,
@@ -820,6 +856,7 @@ defaultSOSjiPUserConfig = modConfig(c(defaultSOConfig, defaultSjiConfig, default
 defaultSOPermPUserConfig = modConfig(c(defaultSOConfig, defaultPermConfig, defaultPUserConfig,
 				      list(runTbl=makeRunTbl(list(c('actPriorStd', 'actTitleOrderlessFreqhyman', 'actBodyOrderlessFreqhyman'),
 								  c('actTitleOrderlessFreqhyman', 'actBodyOrderlessFreqhyman'))),
+					   sjiTblUser='sjiTblSOOrderlessUser',
 					   permEnvTbl='permEnvTblSO',
 					   permMemMatOrder='',
 					   permMemMatOrderless='permMemMatSOOrderless',
@@ -996,7 +1033,7 @@ makeSORunSjiPUser <- function(val, outFileName) {
 	function (regen=F) {
 		getCurWorkspaceBy(regen, groupConfigPUser)
 		makeSORun(val, sprintf('%s%s', 'SOPUserSji', outFileName), modConfig(defaultSOSjiPUserConfig, list(query=getQuerySO)))()
-		makeSORun(val, sprintf('%s%s', 'SOPUserPerm', outFileName), modConfig(defaultSOPermPUserConfig, list(query=getQuerySO)))()
+		makeSORun(val, sprintf('%s%s', 'SOPUserPerm', outFileName), modConfig(defaultSOPermPUserConfig, list(query=getQuerySO, genGlobalsForPriorRun=F)))()
 	}
 }
 
@@ -1004,7 +1041,7 @@ makeSOQRunSjiPUser <- function(val, outFileName) {
 	function (regen=F) {
 		getCurWorkspaceBy(regen, groupConfigPUser)
 		makeSOQRun(val, sprintf('%s%s', 'SOQPUserSji', outFileName), modConfig(defaultSOSjiPUserConfig, list(query=getQuerySO)))()
-		makeSOQRun(val, sprintf('%s%s', 'SOQPUserPerm', outFileName), modConfig(defaultSOPermPUserConfig, list(query=getQuerySO)))()
+		makeSOQRun(val, sprintf('%s%s', 'SOQPUserPerm', outFileName), modConfig(defaultSOPermPUserConfig, list(query=getQuerySO, genGlobalsForPriorRun=F)))()
 	}
 }
 
@@ -1920,6 +1957,10 @@ getSjiTblSO <- function(config, startId, endId) {
 	sjiColClasses = c('character', 'character', 'integer', 'integer', 'integer')	
 	sjiTitleTbl = myReadCSV(sprintf('%s/%s', getDirCooc(), sjiTitleName), colClasses=sjiColClasses)
 	sjiBodyTbl = myReadCSV(sprintf('%s/%s', getDirCooc(), sjiBodyName), colClasses=sjiColClasses)
+	initSjiTblSO(sjiTitleTbl, sjiBodyTbl)
+}
+
+initSjiTblSO <- function(sjiTitleTbl, sjiBodyTbl) {
 	sjiTitleTbl[, type := 'title']
 	sjiBodyTbl[, type := 'body']
 	sjiTbl = rbind(sjiTitleTbl, sjiBodyTbl)
@@ -2062,7 +2103,7 @@ addSjiAttrs <- function(sjiTbl) {
 	sjiTbl
 }
 
-computeActSji <- function(contextVect, sjiTbl, config) {
+computeActSji <- function(contextVect, sjiTbl, userScreenName, config) {
 	contextVect
 	myLog(sprintf("computing sji act for context with length %s", length(contextVect)))
 	resTbl = sjiTbl[J(contextVect), nomatch=0, allow.cartesian=T]
@@ -2073,6 +2114,13 @@ computeActSji <- function(contextVect, sjiTbl, config) {
 		resTbl[, EContext := 1]
 	}
 	resTbl = resTbl[, {WContext = EContext/sum(EContext); list(act=sum(WContext * sji))}, keyby=hashtag]
+	resTbl
+}
+
+computeActSjiUser <- function(contextVect, sjiTbl, userScreenName, config) {
+	curSjiTbl = sjiTbl[J(userScreenName)][, user_screen_name := NULL]
+	setkey(curSjiTbl, context, hashtag, posFromTag)
+	resTbl = computeActSji(contextVect, curSjiTbl, userScreenName, config)
 	resTbl
 }
 
@@ -2222,12 +2270,14 @@ computeActSjiFromContextTbl <- function(contextTbl, tagTbl, config) {
 			   makeComputeActRunTbl(contextTbl, 'Frentropy', 'computeActSji', 'funConfigFrentropySji'),
 			   makeComputeActRunTbl(contextTbl, 'Nentropy', 'computeActSji', 'funConfigNentropySji'),
 			   makeComputeActRunTbl(contextTbl, 'Freq', 'computeActSji', 'funConfigFreqSji'))
-	contextTbl[, get(fun[1])(chunk, get(getConfig(config, 'sjiTbl')), get(funConfig)(config)), by=type]
+	contextTbl[, get(fun[1])(chunk, get(getConfig(config, 'sjiTbl')), unique(user_screen_name), get(funConfig)(config)), by=type]
 }
 
 computeActSjiOptFromContextTbl <- function(contextTbl, tagTbl, config) {
-	contextTbl = makeComputeActRunTbl(contextTbl, '', 'computeActSji', 'funConfigOrigSji')
-	contextTbl[, get(fun[1])(chunk, get(getConfig(config, 'sjiTbl')), get(funConfig)(config)), by=type]
+	contextTbl = rbind(makeComputeActRunTbl(contextTbl, '', 'computeActSji', 'funConfigOrigSji')[, sjiTblName := getConfig(config, 'sjiTbl')],
+			   makeComputeActRunTbl(contextTbl, 'Usercontext', 'computeActSjiUser', 'funConfigOrigSji')[, sjiTblName := getConfig(config, 'sjiTblUser')])
+	contextTbl
+	contextTbl[, get(fun[1])(chunk, get(sjiTblName), unique(user_screen_name), get(funConfig)(config)), by=type]
 }
 
 computeActNullFromContextTbl <- function(contextTbl, tagTbl, config) {

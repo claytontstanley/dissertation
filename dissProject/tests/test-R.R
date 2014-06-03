@@ -139,7 +139,7 @@ test_that("testAddSjiAttrs", {
 test_that("testComputeAct", {
 	testTestTblVsExpected <- function(sjiTestTbl, expectedTbl, context=c('a', 'b')) {
 		setkey(sjiTestTbl, context, hashtag)
-		resTbl = computeActSji(context, sjiTestTbl, list(sjiFreqP=F, sjiEntropyP=T))
+		resTbl = computeActSji(context, sjiTestTbl, 'fooUser', list(sjiFreqP=F, sjiEntropyP=T))
 		expect_equivalent(expectedTbl, resTbl)
 	}
 	testTestTblVsExpected(data.table(context=c('a','a','b','b'), hashtag=c('x','y','x','y'), sji=c(1,2,3,4), EContext=c(1,1,1,1)),
