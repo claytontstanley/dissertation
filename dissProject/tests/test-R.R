@@ -206,7 +206,7 @@ test_that('testMakeMemMat', {
 test_that('testComputePermAct', {
 	  testConfig = c(list(permEnvTbl='testEnvTbl', permMemMatOrder='testMemMat', permMemMat=''), getFunConfigModsPerm(permNRows=5))
 	  testComputePermAct <- function(testContext, testPos, testEnvTbl, testMemMat, testConfig, expectedTbl) {
-		  resTbl = computeActPermOrder(testContext, testPos, testConfig)
+		  resTbl = computeActPermOrder(testContext, testPos, 'fooUser', testConfig)
 		  expect_equivalent(resTbl, expectedTbl)
 	  }
 	  testEnvTbl = list('5' = data.table(chunk=c('!','!','!','!'), val=c(1,1,-1,-1), valIndID=c('ind1', 'ind2', 'ind3', 'ind4'), ind=c(1,2,3,4), key='chunk'))
