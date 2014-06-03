@@ -10,7 +10,7 @@ run%:
 createSOSmall:
 	(cd /Volumes/SuperSupernova/stackExchange/ && rm stackOverflowSmall/* && cd stackOverflow2014 && find *.xml -print -exec bash -ic "(head '{}' && tail '{}') > ../stackOverflowSmall/{}" \;)
 
-parrunPriors: NP = 2
+parrunPriors: NP = 1
 parrunSjisSOAll: NP = 1
 parrunSjisTAll: NP = 1
 parrunContext: NP = 1
@@ -31,8 +31,9 @@ parrunContextAll: parrunContextS1 parrunContextS2 parrunContextS3 parrunContextS
 runAll: unit parrunPriors parrunSjis parrunSjisT parrunContext
 	exit 0
 
+# FIXME: Change prior runs to runPrior...
 getPriors:
-	grep '^run.* <- make' ${rFile} | awk '{print $$1}'
+	egrep '^run((SO)|(SOQ)|(TTweets)|(TFollow)).* <- make' ${rFile} | awk '{print $$1}'
 
 getSjisSOAll:
 	egrep '^runGenNcoocTblSO.* <-' ${rFile} | awk '{print $$1}'
