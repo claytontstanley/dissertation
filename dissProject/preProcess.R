@@ -510,34 +510,56 @@ getOutFileModelHashtags <- function(name) getOutFileGen(getDirModelHashtags(), n
 
 getLogregOutFile <- function(name) getOutFileGen(getDirLogreg(), name)
 
-getSjiTblSOUser <- function(owner_user_id, config) {
-	# FIXME: This is SO specific
-	query = sprintf("select chunk_types.id as chunk_id, tokenized.id::bigint as post_id, tokenized.pos as pos, types.id as post_type_id
-			from post_tokenized as tokenized
-			join post_tokenized_chunk_types as chunk_types
-			on tokenized.chunk = chunk_types.type_name
-			join post_tokenized_type_types as types
-			on tokenized.type = types.type_name
-			join posts as posts
-			on posts.id = tokenized.id
-			where owner_user_id = '%s'",
-			owner_user_id)
+genTempPostTokenizedTblUser <- function(owner_user_id, config) {
+	query = with(config,
+		     sprintf("select chunk_types.id as chunk_id, tokenized.id::bigint as post_id, tokenized.pos as pos, types.id as post_type_id
+			     from %s as tokenized
+			     join %s as chunk_types
+			     on tokenized.chunk = chunk_types.type_name
+			     join %s as types
+			     on tokenized.type = types.type_name
+			     join %s as posts
+			     on posts.id = tokenized.id
+			     where %s = '%s'",
+			     tokenizedTbl, tokenizedChunkTypeTbl, tokenizedTypeTypeTbl, postsTbl, userNameCol, owner_user_id))
 	genTempPostTokenizedTbl(query)
-	NcoocTblTitle = getNcoocTbl('title', chunkTableQuery, config) 
+}
+
+getSjiTblUserSO <- function(owner_user_id, config) {
+	genTempPostTokenizedTblUser(owner_user_id, config)
+	NcoocTblTitle = getNcoocTbl('tweet', chunkTableQuery, config) 
 	NcoocTblBody = getNcoocTbl('body', chunkTableQuery, config) 
 	sqldf('truncate table temp_tokenized')
 	sjiTbl = initSjiTblSO(NcoocTblTitle, NcoocTblBody)
 	sjiTbl
 }
 
+getSjiTblUserT <- function(owner_user_id, config) {
+	genTempPostTokenizedTblUser(owner_user_id, config)
+	NcoocTblTweet = getNcoocTbl('tweet', chunkTableQuery, config) 
+	sqldf('truncate table temp_tokenized')
+	sjiTbl = initSjiTblTOrderless(NcoocTblTweet, config)
+	sjiTbl
+}
+
 # FIXME: This is SO specific
-makeSjiTblUser <- function(priorTblUserSubset, config) {
-	sjiTblSOOrderlessUser <<- priorTblUserSubset[, getSjiTblSOUser(user_screen_name, config), by=user_screen_name]
+makeSjiTblUserSO <- function(priorTblUserSubset, config) {
+	sjiTblSOOrderlessUser <<- priorTblUserSubset[, getSjiTblUserSO(user_screen_name, config), by=user_screen_name]
 	setkey(sjiTblSOOrderlessUser, user_screen_name, context, hashtag, posFromTag)
 	permMemMatSOOrderlessUser <<- list()
 	for (user in priorTblUserSubset[, unique(user_screen_name)]) {
 		sjiTblCur = getSjiTblFromUserTbl(sjiTblSOOrderlessUser, user) 
 		permMemMatSOOrderlessUser[[user]] <<- makeCombinedMemMatPUser(sjiTblCur, permEnvTblSO, defaultSOPermConfig)
+	}
+}
+
+makeSjiTblUserT <- function(priorTblUserSubset, config) {
+	sjiTblTOrderlessUser <<- priorTblUserSubset[, getSjiTblUserT(user_screen_name, config), by=user_screen_name]
+	setkey(sjiTblTOrderlessUser, user_screen_name, context, hashtag, posFromTag)
+	permMemMatTOrderlessUser <<- list()
+	for (user in priorTblUserSubset[, unique(user_screen_name)]) {
+		sjiTblCur = getSjiTblFromUserTbl(sjiTblTOrderlessUser, user) 
+		permMemMatTOrderlessUser[[user]] <<- makeCombinedMemMatPUser(sjiTblCur, permEnvTblT, defaultTPermConfig)
 	}
 }
 
@@ -611,12 +633,14 @@ defaultTConfig = c(defaultBaseConfig,
 		   list(dsetType='twitter',
 			from='tokenText',
 			convertTagSynonymsP=F,
+			userNameCol='user_screen_name',
 			makeChunkTblFun='make_chunk_table_Twitter',
 			tokenizedChunkTypeTbl = 'top_hashtag_tokenized_chunk_types',
 			tokenizedTypeTypeTbl = 'top_hashtag_tokenized_type_types',
 			tokenizedTbl = 'top_hashtag_tokenized',
 			postsTbl = 'top_hashtag_tweets',
 			subsetsTbl = 'top_hashtag_subsets',
+			restrictHashtagsP = T,
 			tagTypeName = 'hashtag',
 			groupName = '2014-02-27 17:13:30 initial',
 			allGroupNames = c('2014-02-27 17:13:30 initial',
@@ -633,6 +657,7 @@ defaultTConfig = c(defaultBaseConfig,
 defaultSOConfig = c(defaultBaseConfig,
 		    list(dsetType='stackoverflow',
 			 convertTagSynonymsP=T,
+			 userNameCol='owner_user_id',
 			 tokenizedChunkTypeTbl = 'post_tokenized_chunk_types',
 			 tokenizedTypeTypeTbl = 'post_tokenized_type_types',
 			 tokenizedTbl = 'post_tokenized',
@@ -843,6 +868,12 @@ defaultTSjiPConfig = modConfig(c(defaultTConfig, defaultSjiConfig, defaultPConfi
 
 defaultPUserConfig = modConfig(defaultPConfig, list(makeSjiTblUser='makeSjiTblUser'))
 
+defaultTPUserConfig = modConfig(defaultTConfig, list(tokenizedTbl = 'tweets_tokenized',
+						     postsTbl = 'tweets',
+						     tokenizedChunkTypeTbl = 'tweets_tokenized_chunk_types',
+						     tokenizedTypeTypeTbl = 'tweets_tokenized_type_types',
+						     restrictHashtagsP = F))
+
 defaultSOSjiPUserConfig = modConfig(c(defaultSOConfig, defaultSjiConfig, defaultPUserConfig,
 				      list(runTbl=makeRunTbl(c(makeBestFitsVectSOSji(''),
 							       makeBestFitsVectSOSji('Usercontext'))),
@@ -851,11 +882,24 @@ defaultSOSjiPUserConfig = modConfig(c(defaultSOConfig, defaultSjiConfig, default
 						  makeBestFitsStrSOSji(''),
 						  makeBestFitsStrSOSji('Usercontext')),
 					 computeActFromContextTbl='computeActSjiOptFromContextTbl',
+					 makeSjiTblUser='makeSjiTblUserSO',
 					 priorTbl='priorTblUserSubset',
 					 convertTagSynonymsP=T,
 					 MCCORESActUser=16,
 					 MCCORESAct=1))
 
+defaultTSjiPUserConfig = modConfig(c(defaultTPUserConfig, defaultSjiConfig, defaultPUserConfig,
+				     list(runTbl=makeRunTbl(c(makeBestFitsVectTSji(''),
+							      makeBestFitsVectTSji('Usercontext'))),
+					  sjiTblUser='sjiTblTOrderlessUser')),
+				   list(actDVs=c('actPriorStd',
+						 makeBestFitsStrTSji(''),
+						 makeBestFitsStrTSji('Usercontext')),
+					computeActFromContextTbl='computeActSjiOptFromContextTbl',
+					makeSjiTblUser='makeSjiTblUserT',
+					priorTbl='priorTblUserSubset',
+					MCCORESActUser=16,
+					MCCORESAct=1))
 
 defaultSOPermPUserConfig = modConfig(c(defaultSOConfig, defaultPermConfig, defaultPUserConfig,
 				      list(runTbl=makeRunTbl(c(makeBestFitsVectSOPerm('Freqhyman'),
@@ -870,7 +914,25 @@ defaultSOPermPUserConfig = modConfig(c(defaultSOConfig, defaultPermConfig, defau
 						  makeBestFitsStrSOPerm('Freqhyman'),
 						  makeBestFitsStrSOPerm('Freqhyser')),
 					 priorTbl='priorTblUserSubset',
+					 makeSjiTblUser='makeSjiTblUserSO',
 					 convertTagSynonymsP=T,
+					 MCCORESActUser=16,
+					 MCCORESAct=1))
+
+defaultTPermPUserConfig = modConfig(c(defaultTPUserConfig, defaultPermConfig, defaultPUserConfig,
+				      list(runTbl=makeRunTbl(c(makeBestFitsVectTPerm('Freqhyman'),
+							       makeBestFitsVectTPerm('Freqhyser'))),
+					   permEnvTbl='permEnvTblT',
+					   permMemMatOrder='',
+					   permMemMatOrderless='permMemMatTOrderless',
+					   permMemMatOrderlessUser='permMemMatTOrderlessUser',
+					   computeActFromContextTbl='computeActPermTOptFromContextTbl'
+					   )),
+				    list(actDVs=c('actPriorStd',
+						  makeBestFitsStrTPerm('Freqhyman'),
+						  makeBestFitsStrTPerm('Freqhyser')),
+					 priorTbl='priorTblUserSubset',
+					 makeSjiTblUser='makeSjiTblUserT',
 					 MCCORESActUser=16,
 					 MCCORESAct=1))
 
@@ -994,6 +1056,37 @@ getSummaryStats <- function() {
 	modelVsPredTbl[hashtagUsedP == T][topHashtag == T][DVName == 'topHashtagAcrossPriorStd'][, sum(totN), by=dsetType]
 	modelVsPredTbl[, .N, by=d]
 }
+
+makeTFollowRunSjiPUser <- function(val, outFileName, queryT) {
+	function (regen=F) {
+		getCurWorkspaceBy(regen, groupConfigPUser)
+		makeTRun(val, sprintf('%s%s', 'TFollowPUserSji', outFileName), modConfig(defaultTSjiPUserConfig, list(includeRetweetsP=F, query=queryT)))()
+		makeTRun(val, sprintf('%s%s', 'TFollowPUserPerm', outFileName), modConfig(defaultTPermPUserConfig, list(includeRetweetsP=F, query=queryT, genGlobalsForPriorRun=F)))()
+	}
+
+}
+
+makeTTweetsRunSjiPUser <- function(val, outFileName, queryT) {
+	function (regen=F) {
+		getCurWorkspaceBy(regen, groupConfigPUser)
+		makeTRunr2(val, sprintf('%s%s', 'TTweetsPUserSji', outFileName), modConfig(defaultTSjiPUserConfig, list(query=queryT)))()
+		makeTRunr2(val, sprintf('%s%s', 'TTweetsPUserPerm', outFileName), modConfig(defaultTPermPUserConfig, list(query=queryT, genGlobalsForPriorRun=F)))()
+	}
+}
+
+runPUserTFollowSji1k <- makeTFollowRunSjiPUser(1000, 'gt1k', queryRunTFollow1k)
+runPUserTFollowSji5k <- makeTFollowRunSjiPUser(5000, 'gt5k', queryRunTFollow5k)
+runPUserTFollowSji10k <- makeTFollowRunSjiPUser(10000, 'gt10k', queryRunTFollow10k)
+runPUserTFollowSji100k <- makeTFollowRunSjiPUser(100000, 'gt100k', queryRunTFollow100k)
+runPUserTFollowSji1M <- makeTFollowRunSjiPUser(1000000, 'gt1M', queryRunTFollow1M)
+runPUserTFollowSji10M <- makeTFollowRunSjiPUser(10000000, 'gt10M', queryRunTFollow10M)
+
+runPUSerTTweetsSji1e2 <- makeTTweetsRunSjiPUser(100, 'gt1e2', queryRunTTweets1e2)
+runPUSerTTweetsSji5e2 <- makeTTweetsRunSjiPUser(500, 'gt5e2', queryRunTTweets5e2)
+runPUSerTTweetsSji1e3 <- makeTTweetsRunSjiPUser(1000, 'gt1e3', queryRunTTweets1e3)
+runPUSerTTweetsSji5e3 <- makeTTweetsRunSjiPUser(5000, 'gt5e3', queryRunTTweets5e3)
+runPUSerTTweetsSji1e4 <- makeTTweetsRunSjiPUser(10000, 'gt1e4', queryRunTTweets1e4)
+runPUSerTTweetsSji5e4 <- makeTTweetsRunSjiPUser(50000, 'gt5e4', queryRunTTweets5e4)
 
 runTFollow1k <- makeTRunr1(1000, 'TFollowgt1k', queryRunTFollow1k)
 runTFollow1kr2 <- makeTRunr2(1000, 'TFollowgt1kr2', queryRunTFollow1k)
@@ -1986,21 +2079,23 @@ getSjiTblT <- function(config, startId, endId) {
 	initSjiTblT(sjiTbl)
 }
 
-initSjiTblT <- function(sjiTbl) {
+initSjiTblT <- function(sjiTbl, config) {
 	sjiTbl[, context := chunk][, chunk := NULL]
 	sjiTbl[, hashtag := tag][, tag := NULL]
-	topHashtagsTbl = sqldt(sprintf("select hashtag from top_hashtag_hashtags where hashtag_group = '%s'", getConfig(config, "groupName")))
-	sjiTbl = sjiTbl[hashtag %in% topHashtagsTbl[, hashtag]]
+	if (getConfig(config, 'restrictHashtagsP')) {
+		topHashtagsTbl = sqldt(sprintf("select hashtag from top_hashtag_hashtags where hashtag_group = '%s'", getConfig(config, "groupName")))
+		sjiTbl = sjiTbl[hashtag %in% topHashtagsTbl[, hashtag]]
+	}
 	sjiTbl
 }
 
 getSjiTblTOrderless <- function(config, startId, endId) {
 	sjiTbl = getSjiTblT(config, startId, endId)
-	initSjiTblTOrderless(sjiTbl)
+	initSjiTblTOrderless(sjiTbl, config)
 }
 
-initSjiTblTOrderless <- function(sjiTbl) {
-	sjiTbl = initSjiTblT(sjiTbl)
+initSjiTblTOrderless <- function(sjiTbl, config) {
+	sjiTbl = initSjiTblT(sjiTbl, config)
 	sjiTbl = sjiTbl[, list(posFromTag=0, partialN=sum(partialN)), by=list(context, hashtag)]
 	setkey(sjiTbl, context, hashtag, posFromTag)
 	addSjiAttrs(sjiTbl)
@@ -2009,11 +2104,11 @@ initSjiTblTOrderless <- function(sjiTbl) {
 
 getSjiTblTOrder <- function(config, startId, endId) {
 	sjiTbl = getSjiTblT(config, startId, endId)
-	initSjiTblTOrder(sjiTbl)
+	initSjiTblTOrder(sjiTbl, config)
 }
 
-initSjiTblTOrder <- function(sjiTbl) {
-	sjiTbl = initSjiTblT(sjiTbl)
+initSjiTblTOrder <- function(sjiTbl, config) {
+	sjiTbl = initSjiTblT(sjiTbl, config)
 	sjiTbl = sjiTbl[, list(partialN), by=list(context, hashtag, posFromTag)]
 	setkey(sjiTbl, context, hashtag, posFromTag)
 	addSjiAttrs(sjiTbl)
@@ -2386,6 +2481,10 @@ computeActPermSOOptFromContextTbl <- function(contextTbl, tagTbl, config) {
 	contextTbl = rbind(makeComputeActRunTbl(cTblOrderless, 'OrderlessFreqhyman', 'computeActPermOrderless', 'funConfigFreqhyman'),
 			   makeComputeActRunTbl(cTblOrderless, 'OrderlessFreqhyser', 'computeActPermOrderlessUser', 'funConfigFreqhyman'))
 	contextTbl[, get(fun[1])(chunk, posFromTag, userScreenName, get(funConfig)(config)), by=type]
+}
+
+computeActPermTOptFromContextTbl <- function(contextTbl, tagTbl, config) {
+	computeActPermSOOptFromContextTbl(contextTbl, tagTbl, config)
 }
 
 getContextPredNames <- function(config) {
@@ -3112,13 +3211,12 @@ runGenAndSaveCurWorkspaceg3s6 <- function() genAndSaveCurWorkspace(groupConfigG3
 runGenAndSaveCurWorkspaceg4s6 <- function() genAndSaveCurWorkspace(groupConfigG4S6)
 
 curWS <- function() {
-	# FIXME: Add twitter runs
-	# FIXME: Add user-centered sji to popular-users dataset
 	# FIXME: Run popular-users dataset with sji computation
 	# FIXME: Address low prior predictability for SO
 	# FIXME: Methods to import and anlyze coefficient tables
 	# FIXME: Make sure word order low predictiveness is fully justified
 	# FIXME: Def. look at coefficient tables
+	runPUserTFollowSji1k(regen='useAlreadyLoaded')
 	runPUserSOSji100k(regen='useAlreadyLoaded')
 	withProf(runContext20g1s1(regen='useAlreadyLoaded'))
 	setLogLevel(2)
