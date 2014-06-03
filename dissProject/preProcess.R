@@ -534,6 +534,11 @@ getSjiTblSOUser <- function(owner_user_id, config) {
 makeSjiTblUser <- function(priorTblUserSubset, config) {
 	sjiTblSOOrderlessUser <<- priorTblUserSubset[, getSjiTblSOUser(user_screen_name, config), by=user_screen_name]
 	setkey(sjiTblSOOrderlessUser, user_screen_name, context, hashtag, posFromTag)
+	permMemMatSOOrderlessUser <<- list()
+	for (user in priorTblUserSubset[, unique(user_screen_name)]) {
+		sjiTblCur = getSjiTblFromUserTbl(sjiTblSOOrderlessUser, user) 
+		permMemMatSOOrderlessUser[[user]] <<- makeCombinedMemMatPUser(sjiTblCur, permEnvTblSO, defaultSOPermConfig)
+	}
 }
 
 makeSjiTblUserDefault <- function(priorTblUserSubset, config) {}
@@ -671,7 +676,7 @@ makeBestFitsVectSOPerm <- function(name) {
 }
 
 makeBestFitsVectSOSji <- function(name) {
-	do.call(makeBestFitsVectFun(list(c('actPriorStd', 'actTitle%s', 'actBody%s'))), list(name))
+	do.call(makeBestFitsVectFun(list(c('actPriorStd', 'actTitle%s', 'actBody%s'), c('actTitle%s', 'actBody%s'))), list(name))
 }
 
 makeBestFitsStrFun <- function(res) {
@@ -701,7 +706,7 @@ makeBestFitsStrSOPerm <- function(name) {
 }
 
 makeBestFitsStrSOSji <- function(name) {
-	do.call(makeBestFitsStrFun(c('actPriorStd_actTitle%s_actBody%s', 'actTitle%s', 'actBody%s')), list(name))
+	do.call(makeBestFitsStrFun(c('actPriorStd_actTitle%s_actBody%s', 'actTitle%s', 'actBody%s', 'actTitle%s_actBody%s')), list(name))
 }
 
 defaultTPermConfig = modConfig(c(defaultTConfig, defaultPermConfig,
@@ -839,13 +844,12 @@ defaultTSjiPConfig = modConfig(c(defaultTConfig, defaultSjiConfig, defaultPConfi
 defaultPUserConfig = modConfig(defaultPConfig, list(makeSjiTblUser='makeSjiTblUser'))
 
 defaultSOSjiPUserConfig = modConfig(c(defaultSOConfig, defaultSjiConfig, defaultPUserConfig,
-				      list(runTbl=makeRunTbl(list(c('actPriorStd', 'actTitle', 'actBody'),
-								  c('actTitle', 'actBody'),
-								  c('actPriorStd', 'actTitleUsercontext', 'actBodyUsercontext'),
-								  c('actTitleUsercontext', 'actBodyUsercontext'))),
+				      list(runTbl=makeRunTbl(c(makeBestFitsVectSOSji(''),
+							       makeBestFitsVectSOSji('Usercontext'))),
 					   sjiTblUser='sjiTblSOOrderlessUser')),
-				    list(actDVs=c('actPriorStd', 'actTitle_actBody', 'actPriorStd_actTitle_actBody', 'actTitle', 'actBody',
-						  'actTitleUsercontext', 'actBodyUsercontext'),
+				    list(actDVs=c('actPriorStd',
+						  makeBestFitsStrSOSji(''),
+						  makeBestFitsStrSOSji('Usercontext')),
 					 computeActFromContextTbl='computeActSjiOptFromContextTbl',
 					 priorTbl='priorTblUserSubset',
 					 convertTagSynonymsP=T,
@@ -854,16 +858,17 @@ defaultSOSjiPUserConfig = modConfig(c(defaultSOConfig, defaultSjiConfig, default
 
 
 defaultSOPermPUserConfig = modConfig(c(defaultSOConfig, defaultPermConfig, defaultPUserConfig,
-				      list(runTbl=makeRunTbl(list(c('actPriorStd', 'actTitleOrderlessFreqhyman', 'actBodyOrderlessFreqhyman'),
-								  c('actTitleOrderlessFreqhyman', 'actBodyOrderlessFreqhyman'))),
-					   sjiTblUser='sjiTblSOOrderlessUser',
+				      list(runTbl=makeRunTbl(c(makeBestFitsVectSOPerm('Freqhyman'),
+							       makeBestFitsVectSOPerm('Freqhyser'))),
 					   permEnvTbl='permEnvTblSO',
 					   permMemMatOrder='',
 					   permMemMatOrderless='permMemMatSOOrderless',
+					   permMemMatOrderlessUser='permMemMatSOOrderlessUser',
 					   computeActFromContextTbl='computeActPermSOOptFromContextTbl'
 					   )),
-				    list(actDVs=c('actPriorStd', 'actTitleOrderlessFreqhyman_actBodyOrderlessFreqhyman',
-						  'actPriorStd_actTitleOrderlessFreqhyman_actBodyOrderlessFreqhyman', 'actTitleOrderlessFreqhyman', 'actBodyOrderlessFreqhyman'),
+				    list(actDVs=c('actPriorStd',
+						  makeBestFitsStrSOPerm('Freqhyman'),
+						  makeBestFitsStrSOPerm('Freqhyser')),
 					 priorTbl='priorTblUserSubset',
 					 convertTagSynonymsP=T,
 					 MCCORESActUser=16,
@@ -1978,6 +1983,10 @@ getSjiTblT <- function(config, startId, endId) {
 	sjiTblName = sprintf('NcoocTblTweet-%s', fileName)
 	sjiColClasses = c('character', 'character', 'integer', 'integer', 'integer')	
 	sjiTbl = myReadCSV(sprintf('%s/%s', getDirCooc(), sjiTblName), colClasses=sjiColClasses)
+	initSjiTblT(sjiTbl)
+}
+
+initSjiTblT <- function(sjiTbl) {
 	sjiTbl[, context := chunk][, chunk := NULL]
 	sjiTbl[, hashtag := tag][, tag := NULL]
 	topHashtagsTbl = sqldt(sprintf("select hashtag from top_hashtag_hashtags where hashtag_group = '%s'", getConfig(config, "groupName")))
@@ -1987,6 +1996,11 @@ getSjiTblT <- function(config, startId, endId) {
 
 getSjiTblTOrderless <- function(config, startId, endId) {
 	sjiTbl = getSjiTblT(config, startId, endId)
+	initSjiTblTOrderless(sjiTbl)
+}
+
+initSjiTblTOrderless <- function(sjiTbl) {
+	sjiTbl = initSjiTblT(sjiTbl)
 	sjiTbl = sjiTbl[, list(posFromTag=0, partialN=sum(partialN)), by=list(context, hashtag)]
 	setkey(sjiTbl, context, hashtag, posFromTag)
 	addSjiAttrs(sjiTbl)
@@ -1995,6 +2009,11 @@ getSjiTblTOrderless <- function(config, startId, endId) {
 
 getSjiTblTOrder <- function(config, startId, endId) {
 	sjiTbl = getSjiTblT(config, startId, endId)
+	initSjiTblTOrder(sjiTbl)
+}
+
+initSjiTblTOrder <- function(sjiTbl) {
+	sjiTbl = initSjiTblT(sjiTbl)
 	sjiTbl = sjiTbl[, list(partialN), by=list(context, hashtag, posFromTag)]
 	setkey(sjiTbl, context, hashtag, posFromTag)
 	addSjiAttrs(sjiTbl)
@@ -2117,9 +2136,14 @@ computeActSji <- function(contextVect, sjiTbl, userScreenName, config) {
 	resTbl
 }
 
-computeActSjiUser <- function(contextVect, sjiTbl, userScreenName, config) {
+getSjiTblFromUserTbl <- function(sjiTbl, userScreenName) {
 	curSjiTbl = sjiTbl[J(userScreenName)][, user_screen_name := NULL]
 	setkey(curSjiTbl, context, hashtag, posFromTag)
+	curSjiTbl
+}
+
+computeActSjiUser <- function(contextVect, sjiTbl, userScreenName, config) {
+	curSjiTbl = getSjiTblFromUserTbl(sjiTbl, userScreenName)
 	resTbl = computeActSji(contextVect, curSjiTbl, userScreenName, config)
 	resTbl
 }
@@ -2192,6 +2216,12 @@ makeCombinedMemMat <- function(sjiTbl, envTbl, config) {
 	res
 }
 
+makeCombinedMemMatPUser <- function(sjiTbl, envTbl, config) {
+	res = list()
+	res[['freq']] = makeMemMat(sjiTbl, envTbl, funConfigFreq(config))
+	res
+}
+
 makeCombinedEnvironmentTbl <- function(sjiTbl, config) {
 	res = list()
 	accs = as.character(getConfig(config, 'permNRowsAll'))
@@ -2255,9 +2285,8 @@ getCurWorkspacePUser <- function(groupConfig) {
 	maxIdTSji = getConfig(groupConfig, 'maxIdTSji')
 	maxIdTPrior = getConfig(groupConfig, 'maxIdTPrior')
 	sjiTblSOOrderless <<- getSjiTblSO(defaultSOConfig, 1, maxIdSOSji)
-	# FIXME: Don't use full combined env tbl or mem mat
-	permEnvTblSO <<- makeCombinedEnvironmentTbl(sjiTblSOOrderless, defaultBaseConfig)
-	permMemMatSOOrderless <<- makeCombinedMemMat(sjiTblSOOrderless, permEnvTblSO, defaultSOPermConfig)
+	permEnvTblSO <<- makeCombinedEnvironmentTbl(sjiTblSOOrderless, modConfig(defaultBaseConfig, list(permNRowsAll=getConfig(defaultBaseConfig, 'permNRows'))))
+	permMemMatSOOrderless <<- makeCombinedMemMatPUser(sjiTblSOOrderless, permEnvTblSO, defaultSOPermConfig)
 }
 
 genAndSaveCurWorkspace <- function(groupConfig) {
@@ -2334,25 +2363,29 @@ permTypeConfigs = c('', 'funConfigOrig',
 		    'Freqhyman', 'funConfigFreqhyman')
 
 computeActPermTFromContextTbl <- function(contextTbl, tagTbl, config) {
+	userScreenName = contextTbl[, guardAllEqualP(user_screen_name)[1]]
 	contextTbl = getContextTbl(contextTbl, tagTbl)
 	cTblOrder = contextTbl[orderType=='order']
 	cTblOrderless = contextTbl[orderType=='orderless']
 	contextTbl = makeComputeActRunTblPermOrdersAll(cTblOrder, cTblOrderless, permTypeConfigs)
-	contextTbl[, get(fun[1])(chunk, posFromTag, get(funConfig)(config)), by=type]
+	contextTbl[, get(fun[1])(chunk, posFromTag, userScreenName, get(funConfig)(config)), by=type]
 }
 
 computeActPermSOFromContextTbl <- function(contextTbl, tagTbl, config) {
+	userScreenName = contextTbl[, guardAllEqualP(user_screen_name)[1]]
 	contextTbl = getContextTbl(contextTbl, tagTbl)
 	cTblOrderless = contextTbl[orderType == 'orderless']
 	contextTbl = makeComputeActRunTblPermOrderlessAll(cTblOrderless, permTypeConfigs)
-	contextTbl[, get(fun[1])(chunk, posFromTag, get(funConfig)(config)), by=type]
+	contextTbl[, get(fun[1])(chunk, posFromTag, userScreenName, get(funConfig)(config)), by=type]
 }
 
 computeActPermSOOptFromContextTbl <- function(contextTbl, tagTbl, config) {
+	userScreenName = contextTbl[, guardAllEqualP(user_screen_name)[1]]
 	contextTbl = getContextTbl(contextTbl, tagTbl)
 	cTblOrderless = contextTbl[orderType == 'orderless']
-	contextTbl = makeComputeActRunTblPermOrderless(cTblOrderless, 'Freqhyman', 'funConfigFreqhyman')
-	contextTbl[, get(fun[1])(chunk, posFromTag, get(funConfig)(config)), by=type]
+	contextTbl = rbind(makeComputeActRunTbl(cTblOrderless, 'OrderlessFreqhyman', 'computeActPermOrderless', 'funConfigFreqhyman'),
+			   makeComputeActRunTbl(cTblOrderless, 'OrderlessFreqhyser', 'computeActPermOrderlessUser', 'funConfigFreqhyman'))
+	contextTbl[, get(fun[1])(chunk, posFromTag, userScreenName, get(funConfig)(config)), by=type]
 }
 
 getContextPredNames <- function(config) {
@@ -3032,17 +3065,22 @@ getEnvTblFromList <- function(lst, config) {
 	lst[[acc]]
 }
 
-computeActPermOrder <- function(context, pos, config) {
+computeActPermOrder <- function(context, pos, user, config) {
 	# Cannot get from global environment or test 'testComputePermAct' will fail
 	envTbl = getEnvTblFromList(get(getConfig(config, 'permEnvTbl'), envir=parent.frame()), config)
 	memMat = getMemMatFromList(get(getConfig(config, 'permMemMatOrder'), envir=parent.frame()), config)
 	computeActPerm(context, pos, permEnvTbl = envTbl, permMemMat = memMat, config)
 }
 
-computeActPermOrderless <- function(context, pos, config) {
-	myLog('computing activation for orderless')
+computeActPermOrderless <- function(context, pos, user, config) {
 	envTbl = getEnvTblFromList(get(getConfig(config, 'permEnvTbl'), envir=parent.frame()), config)
 	memMat = getMemMatFromList(get(getConfig(config, 'permMemMatOrderless'), envir=parent.frame()), config)
+	computeActPerm(context, pos, permEnvTbl = envTbl, permMemMat = memMat, config)
+}
+
+computeActPermOrderlessUser <- function(context, pos, user, config) {
+	envTbl = getEnvTblFromList(get(getConfig(config, 'permEnvTbl'), envir=parent.frame()), config)
+	memMat = getMemMatFromList(get(getConfig(config, 'permMemMatOrderlessUser'), envir=parent.frame())[[user]], config)
 	computeActPerm(context, pos, permEnvTbl = envTbl, permMemMat = memMat, config)
 }
 
@@ -3074,6 +3112,8 @@ runGenAndSaveCurWorkspaceg3s6 <- function() genAndSaveCurWorkspace(groupConfigG3
 runGenAndSaveCurWorkspaceg4s6 <- function() genAndSaveCurWorkspace(groupConfigG4S6)
 
 curWS <- function() {
+	# FIXME: Add user sji to perm
+	# FIXME: Add twitter runs
 	# FIXME: Add user-centered sji to popular-users dataset
 	# FIXME: Run popular-users dataset with sji computation
 	# FIXME: Address low prior predictability for SO
