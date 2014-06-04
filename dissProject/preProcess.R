@@ -573,7 +573,8 @@ filterLastNRetrievals <- function(tokenTbl, config) {
 	tagTbl
 	dtTbl = tagTbl[, list(dt=unique(tail(dt, n=40))), by=list(user_screen_name)]
 	dtTbl[, N := .N, by=user_screen_name]
-	selectedUsers = dtTbl[, .N, by=user_screen_name][order(N, decreasing=T)][, head(.SD, n=2)][, user_screen_name]
+	numUsers = getConfig(config, 'numUsers')
+	selectedUsers = dtTbl[, .N, by=user_screen_name][order(N, decreasing=T)][, head(.SD, n=numUsers)][, user_screen_name]
 	dtTbl = dtTbl[user_screen_name %in% selectedUsers]
 	dtTbl
 	setkey(dtTbl, user_screen_name, dt)
@@ -1088,10 +1089,10 @@ getSummaryStats <- function() {
 }
 
 makeTRunPUser <- function(val, outFileNameSji, outFileNamePerm, queryT) {
-	function (regen=F, regenPriorRun=T) {
+	function (regen=F, regenPriorRun=T, numUsers=40) {
 		getCurWorkspaceBy(regen, groupConfigPUser)
-		makeTRun(val, outFileNameSji, modConfig(defaultTSjiPUserConfig, list(includeRetweetsP=F, query=queryT, regenPriorRun=regenPriorRun)))()
-		makeTRun(val, outFileNamePerm, modConfig(defaultTPermPUserConfig, list(includeRetweetsP=F, query=queryT, regenPriorRun=F)))()
+		makeTRun(val, outFileNameSji, c(list(numUsers=numUsers), modConfig(defaultTSjiPUserConfig, list(includeRetweetsP=F, query=queryT, regenPriorRun=regenPriorRun))))()
+		makeTRun(val, outFileNamePerm, c(list(numUsers=numUsers), modConfig(defaultTPermPUserConfig, list(includeRetweetsP=F, query=queryT, regenPriorRun=F))))()
 	}
 }
 
@@ -1115,6 +1116,7 @@ runPUserTFollowSji10k <- makeTFollowRunPUser(10000, 'gt10k', queryRunTFollow10k)
 runPUserTFollowSji100k <- makeTFollowRunPUser(100000, 'gt100k', queryRunTFollow100k)
 runPUserTFollowSji1M <- makeTFollowRunPUser(1000000, 'gt1M', queryRunTFollow1M)
 runPUserTFollowSji10M <- makeTFollowRunPUser(10000000, 'gt10M', queryRunTFollow10M)
+runPUserTFollowSji1kTest <- function(numUsers=2, ...) makeTFollowRunPUser(1000, 'gt1kTest', queryRunTFollow1k)(numUsers=numUsers, ...)
 
 runPUSerTTweetsSji1e2 <- makeTTweetsRunPUser(100, 'gt1e2', queryRunTTweets1e2)
 runPUSerTTweetsSji5e2 <- makeTTweetsRunPUser(500, 'gt5e2', queryRunTTweets5e2)
@@ -1163,10 +1165,10 @@ makeSORunr3 <- function(val, outFileName) makeSORun(val, outFileName, config=get
 makeSORunr4 <- function(val, outFileName) makeSORun(val, outFileName, config=getSOr4Config())
 
 makeSORunPUser <- function(val, outFileNameSji, outFileNamePerm, querySO) {
-	function (regen=F, regenPriorRun=T) {
+	function (regen=F, regenPriorRun=T, numUsers=40) {
 		getCurWorkspaceBy(regen, groupConfigPUser)
-		makeSORun(val, outFileNameSji, modConfig(defaultSOSjiPUserConfig, list(query=querySO, regenPriorRun=regenPriorRun)))()
-		makeSORun(val, outFileNamePerm, modConfig(defaultSOPermPUserConfig, list(query=querySO, regenPriorRun=F)))()
+		makeSORun(val, outFileNameSji, c(list(numUsers=numUsers), modConfig(defaultSOSjiPUserConfig, list(query=querySO, regenPriorRun=regenPriorRun))))()
+		makeSORun(val, outFileNamePerm, c(list(numUsers=numUsers), modConfig(defaultSOPermPUserConfig, list(query=querySO, regenPriorRun=F))))()
 	}
 }
 
@@ -1185,6 +1187,7 @@ makeSOQRunPUser <- function(val, outFileName, querySO) {
 }
 
 runPUserSOSji100k <- makeSOFRunPUser(100000, 'gt100k', getQuerySO)
+runPUserSOSji100kTest <- function(numUsers=2, ...) makeSOFRunPUser(100000, 'gt100kTest', getQuerySO)(numUsers=numUsers, ...)
 runPUserSOSji50k <- makeSOFRunPUser(50000, 'gt50k', getQuerySO)
 runPUserSOSji10k <- makeSOFRunPUser(10000, 'gt10k', getQuerySO)
 runPUserSOSji5k <- makeSOFRunPUser(5000, 'gt5k', getQuerySO)
@@ -3275,14 +3278,11 @@ curWS <- function() {
 	# FIXME: Methods to import and anlyze coefficient tables
 	# FIXME: Make sure word order low predictiveness is fully justified
 	# FIXME: Def. look at coefficient tables
-	runPUserSOSji100k(regen='useAlreadyLoaded')
-	runPUserTFollowSji1k(regen=F)
+	runPUserSOSji100kTest(regen='useAlreadyLoaded')
+	runPUserTFollowSji1kTest(regen='useAlreadyLoaded')
 	withProf(runContext20g1s1(regen='useAlreadyLoaded'))
-	setLogLevel(2)
 	runContext20g1s6(regen='useAlreadyLoaded')
-	withProf(runContext500g1s2(regen='useAlreadyLoaded'))
-	runContext500g1s2Test(regen='useAlreadyLoaded')
-	withProf(runContext500g1s3(regen='useAlreadyLoaded'))
+	setLogLevel(2)
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelVsPred()))))
 	modelHashtagsTbls = buildModelHashtagsTables(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelHashtags()))))
 	modelHashtagsTbl = modelHashtagsTbls[["TContextPerm-20g1s1r1"]]
