@@ -3272,7 +3272,6 @@ runGenAndSaveCurWorkspaceg4s6 <- function() genAndSaveCurWorkspace(groupConfigG4
 
 curWS <- function() {
 	# FIXME: Fix warnings
-	# FIXME: Up size
 	# FIXME: Run popular-users dataset with sji computation
 	# FIXME: Address low prior predictability for SO
 	# FIXME: Methods to import and anlyze coefficient tables
