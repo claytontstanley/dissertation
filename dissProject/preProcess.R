@@ -520,14 +520,16 @@ genTempPostTokenizedTblUser <- function(owner_user_id, config) {
 			     on tokenized.type = types.type_name
 			     join %s as posts
 			     on posts.id = tokenized.id
-			     where %s = '%s'",
-			     tokenizedTbl, tokenizedChunkTypeTbl, tokenizedTypeTypeTbl, postsTbl, userNameCol, owner_user_id))
+			     where %s = '%s'
+			     and tokenized.id in (select id from %s where %s = '%s')",
+			     tokenizedTbl, tokenizedChunkTypeTbl, tokenizedTypeTypeTbl, postsTbl, userNameCol, owner_user_id,
+			     postsTbl, userNameCol, owner_user_id))
 	genTempPostTokenizedTbl(query)
 }
 
 getSjiTblUserSO <- function(owner_user_id, config) {
 	genTempPostTokenizedTblUser(owner_user_id, config)
-	NcoocTblTitle = getNcoocTbl('tweet', chunkTableQuery, config) 
+	NcoocTblTitle = getNcoocTbl('title', chunkTableQuery, config) 
 	NcoocTblBody = getNcoocTbl('body', chunkTableQuery, config) 
 	sqldf('truncate table temp_tokenized')
 	sjiTbl = initSjiTblSO(NcoocTblTitle, NcoocTblBody)
@@ -542,28 +544,27 @@ getSjiTblUserT <- function(owner_user_id, config) {
 	sjiTbl
 }
 
-# FIXME: This is SO specific
-makeSjiTblUserSO <- function(priorTblUserSubset, config) {
-	sjiTblSOOrderlessUser <<- priorTblUserSubset[, getSjiTblUserSO(user_screen_name, config), by=user_screen_name]
+makeSjiTblUserSO <- function(tokenTbl, config) {
+	sjiTblSOOrderlessUser <<- tokenTbl[, getSjiTblUserSO(user_screen_name, config), by=user_screen_name]
 	setkey(sjiTblSOOrderlessUser, user_screen_name, context, hashtag, posFromTag)
 	permMemMatSOOrderlessUser <<- list()
-	for (user in priorTblUserSubset[, unique(user_screen_name)]) {
+	for (user in tokenTbl[, unique(user_screen_name)]) {
 		sjiTblCur = getSjiTblFromUserTbl(sjiTblSOOrderlessUser, user) 
 		permMemMatSOOrderlessUser[[user]] <<- makeCombinedMemMatPUser(sjiTblCur, permEnvTblSO, defaultSOPermConfig)
 	}
 }
 
-makeSjiTblUserT <- function(priorTblUserSubset, config) {
-	sjiTblTOrderlessUser <<- priorTblUserSubset[, getSjiTblUserT(user_screen_name, config), by=user_screen_name]
+makeSjiTblUserT <- function(tokenTbl, config) {
+	sjiTblTOrderlessUser <<- tokenTbl[, getSjiTblUserT(user_screen_name, config), by=user_screen_name]
 	setkey(sjiTblTOrderlessUser, user_screen_name, context, hashtag, posFromTag)
 	permMemMatTOrderlessUser <<- list()
-	for (user in priorTblUserSubset[, unique(user_screen_name)]) {
+	for (user in tokenTbl[, unique(user_screen_name)]) {
 		sjiTblCur = getSjiTblFromUserTbl(sjiTblTOrderlessUser, user) 
 		permMemMatTOrderlessUser[[user]] <<- makeCombinedMemMatPUser(sjiTblCur, permEnvTblT, defaultTPermConfig)
 	}
 }
 
-makeSjiTblUserDefault <- function(priorTblUserSubset, config) {}
+makeSjiTblUserDefault <- function(tokenTbl, config) {}
 
 filterLastNRetrievals <- function(tokenTbl, config) {
 	tokenTbl[, .N, by=user_screen_name]
@@ -571,22 +572,21 @@ filterLastNRetrievals <- function(tokenTbl, config) {
 	tagTbl
 	dtTbl = tagTbl[, list(dt=unique(tail(dt, n=40))), by=list(user_screen_name)]
 	dtTbl[, N := .N, by=user_screen_name]
-	dtTbl = dtTbl[N == 40]
-	#dtTbl[, .N, by=list(user_screen_name, N)]
+	selectedUsers = dtTbl[, .N, by=user_screen_name][order(N, decreasing=T)][, head(.SD, n=2)][, user_screen_name]
+	dtTbl = dtTbl[user_screen_name %in% selectedUsers]
+	dtTbl
 	setkey(dtTbl, user_screen_name, dt)
-	tokenTbl[dtTbl]
+	resTbl = tokenTbl[dtTbl]
+	#perfectUsers = resTbl[type==getConfig(config, 'tagTypeName'), list(NHashtag=length(unique(chunk))), by=list(user_screen_name)][NHashtag==1, user_screen_name]
+	#resTbl = resTbl[!user_screen_name %in% perfectUsers]
+	resTbl
 }
 
 runPrior <- function(config) {
 	myStopifnot(!any(sapply(config,is.null)))
-	if (getConfig(config, 'regenPriorRun')) {
-		priorTblUserSubset <<- getPriorTblUserSubset(config)
-		get(getConfig(config, 'makeSjiTblUser'))(priorTblUserSubset, config)
-	}
 	if (is.character(getConfig(config, 'dStd')) && getConfig(config, 'dStd') == 'dFull') {
 		config=modConfig(config, list(dStd=getConfig(config, 'dFull')))
 	}
-	config
 	tokenTbl = getTokenizedForUsers(config)
 	tagTbl = tokenTbl[type == getConfig(config, 'tagTypeName')] 
 	tokenTbl = rbind(tokenTbl[type != getConfig(config, 'tagTypeName')], tagTbl)
@@ -595,6 +595,10 @@ runPrior <- function(config) {
 	setkey(tokenTbl, user_screen_name, dt)
 	if (getConfig(config, 'limitRetrievalsP')) {
 		tokenTbl = filterLastNRetrievals(tokenTbl, config)
+	}
+	if (getConfig(config, 'regenPriorRun')) {
+		priorTblUserSubset <<- getPriorTblUserSubset(config)
+		get(getConfig(config, 'makeSjiTblUser'))(tokenTbl, config)
 	}
 	getOutFileForNameFun <- function(name) {
 		getConfig(config, name)
@@ -2909,7 +2913,8 @@ runContextWithConfig <- function(regen, samplesPerRun, numRunsT, numRunsSO, grou
 		addSizeName = function(str) sprintf('%ss%s', str, getConfig(groupConfig, 'sizeNum'))
 		addAll = function(str) addSizeName(addGroupName(addNumSamples(str)))
 		genModelHashtagsP = {if (getConfig(groupConfig, 'groupNum') == 1 &
-					 getConfig(groupConfig, 'sizeNum') %in% c(1,2)) T else F}
+					 getConfig(groupConfig, 'sizeNum') %in% c(1,2) &
+					 getConfig(groupConfig, 'runNum') == 1) T else F}
 		getConfigMods <- function(name, addFun) {
 			list(modelVsPredOutFile=getOutFileModelVsPred(addFun(name)),
 			     modelHashtagsOutFile={if (!genModelHashtagsP) '' else getOutFileModelHashtags(addFun(name))},
@@ -3254,15 +3259,14 @@ runGenAndSaveCurWorkspaceg3s6 <- function() genAndSaveCurWorkspace(groupConfigG3
 runGenAndSaveCurWorkspaceg4s6 <- function() genAndSaveCurWorkspace(groupConfigG4S6)
 
 curWS <- function() {
-	# FIXME: Set parameter for max last N retrievals per user
 	# FIXME: Fix warnings
 	# FIXME: Run popular-users dataset with sji computation
 	# FIXME: Address low prior predictability for SO
 	# FIXME: Methods to import and anlyze coefficient tables
 	# FIXME: Make sure word order low predictiveness is fully justified
 	# FIXME: Def. look at coefficient tables
-	runPUserTFollowSji1k(regen='useAlreadyLoaded', regenPriorRun=F)
 	runPUserSOSji100k(regen='useAlreadyLoaded')
+	runPUserTFollowSji1k(regen='useAlreadyLoaded')
 	withProf(runContext20g1s1(regen='useAlreadyLoaded'))
 	setLogLevel(2)
 	runContext20g1s6(regen='useAlreadyLoaded')
