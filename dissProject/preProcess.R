@@ -532,7 +532,7 @@ getSjiTblUserSO <- function(owner_user_id, config) {
 	NcoocTblTitle = getNcoocTbl('title', chunkTableQuery, config) 
 	NcoocTblBody = getNcoocTbl('body', chunkTableQuery, config) 
 	sqldf('truncate table temp_tokenized')
-	sjiTbl = initSjiTblSO(NcoocTblTitle, NcoocTblBody)
+	sjiTbl = initSjiTblSO(NcoocTblTitle, NcoocTblBody, config)
 	sjiTbl
 }
 
@@ -540,6 +540,7 @@ getSjiTblUserT <- function(owner_user_id, config) {
 	genTempPostTokenizedTblUser(owner_user_id, config)
 	NcoocTblTweet = getNcoocTbl('tweet', chunkTableQuery, config) 
 	sqldf('truncate table temp_tokenized')
+	sjiTbl = initSjiTblT(NcoocTblTweet, config)
 	sjiTbl = initSjiTblTOrderless(NcoocTblTweet, config)
 	sjiTbl
 }
@@ -2095,10 +2096,10 @@ getSjiTblSO <- function(config, startId, endId) {
 	sjiColClasses = c('character', 'character', 'integer', 'integer', 'integer')	
 	sjiTitleTbl = myReadCSV(sprintf('%s/%s', getDirCooc(), sjiTitleName), colClasses=sjiColClasses)
 	sjiBodyTbl = myReadCSV(sprintf('%s/%s', getDirCooc(), sjiBodyName), colClasses=sjiColClasses)
-	initSjiTblSO(sjiTitleTbl, sjiBodyTbl)
+	initSjiTblSO(sjiTitleTbl, sjiBodyTbl, config)
 }
 
-initSjiTblSO <- function(sjiTitleTbl, sjiBodyTbl) {
+initSjiTblSO <- function(sjiTitleTbl, sjiBodyTbl, config) {
 	sjiTitleTbl[, type := 'title']
 	sjiBodyTbl[, type := 'body']
 	sjiTbl = rbind(sjiTitleTbl, sjiBodyTbl)
@@ -2116,7 +2117,7 @@ getSjiTblT <- function(config, startId, endId) {
 	sjiTblName = sprintf('NcoocTblTweet-%s', fileName)
 	sjiColClasses = c('character', 'character', 'integer', 'integer', 'integer')	
 	sjiTbl = myReadCSV(sprintf('%s/%s', getDirCooc(), sjiTblName), colClasses=sjiColClasses)
-	initSjiTblT(sjiTbl)
+	initSjiTblT(sjiTbl, config)
 }
 
 initSjiTblT <- function(sjiTbl, config) {
@@ -2135,7 +2136,6 @@ getSjiTblTOrderless <- function(config, startId, endId) {
 }
 
 initSjiTblTOrderless <- function(sjiTbl, config) {
-	sjiTbl = initSjiTblT(sjiTbl, config)
 	sjiTbl = sjiTbl[, list(posFromTag=0, partialN=sum(partialN)), by=list(context, hashtag)]
 	setkey(sjiTbl, context, hashtag, posFromTag)
 	addSjiAttrs(sjiTbl)
@@ -2148,7 +2148,6 @@ getSjiTblTOrder <- function(config, startId, endId) {
 }
 
 initSjiTblTOrder <- function(sjiTbl, config) {
-	sjiTbl = initSjiTblT(sjiTbl, config)
 	sjiTbl = sjiTbl[, list(partialN), by=list(context, hashtag, posFromTag)]
 	setkey(sjiTbl, context, hashtag, posFromTag)
 	addSjiAttrs(sjiTbl)
@@ -3276,11 +3275,12 @@ curWS <- function() {
 	# FIXME: Methods to import and anlyze coefficient tables
 	# FIXME: Make sure word order low predictiveness is fully justified
 	# FIXME: Def. look at coefficient tables
+	runGenAndSaveCurWorkspaceg1s6()
 	runPUserSOSji100k(regen='useAlreadyLoaded')
 	runPUserTFollowSji1k(regen=F)
 	withProf(runContext20g1s1(regen='useAlreadyLoaded'))
 	setLogLevel(2)
-	runContext20g1s6(regen='useAlreadyLoaded')
+	runContext20g1s6(regen=T)
 	withProf(runContext500g1s2(regen='useAlreadyLoaded'))
 	runContext500g1s2Test(regen='useAlreadyLoaded')
 	withProf(runContext500g1s3(regen='useAlreadyLoaded'))
