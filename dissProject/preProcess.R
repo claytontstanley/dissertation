@@ -565,6 +565,18 @@ makeSjiTblUserT <- function(priorTblUserSubset, config) {
 
 makeSjiTblUserDefault <- function(priorTblUserSubset, config) {}
 
+filterLastNRetrievals <- function(tokenTbl, config) {
+	tokenTbl[, .N, by=user_screen_name]
+	tagTbl = tokenTbl[type == getConfig(config, 'tagTypeName')] 
+	tagTbl
+	dtTbl = tagTbl[, list(dt=unique(tail(dt, n=40))), by=list(user_screen_name)]
+	dtTbl[, N := .N, by=user_screen_name]
+	dtTbl = dtTbl[N == 40]
+	#dtTbl[, .N, by=list(user_screen_name, N)]
+	setkey(dtTbl, user_screen_name, dt)
+	tokenTbl[dtTbl]
+}
+
 runPrior <- function(config) {
 	myStopifnot(!any(sapply(config,is.null)))
 	if (getConfig(config, 'genGlobalsForPriorRun')) {
@@ -579,11 +591,15 @@ runPrior <- function(config) {
 	tagTbl = tokenTbl[type == getConfig(config, 'tagTypeName')] 
 	tokenTbl = rbind(tokenTbl[type != getConfig(config, 'tagTypeName')], tagTbl)
 	tokenTbl = tokenTbl[, setkey(.SD, id)][tagTbl[, list(id=unique(id))][, setkey(.SD, id)]]
+	rm(tagTbl)
 	setkey(tokenTbl, user_screen_name, dt)
+	if (getConfig(config, 'limitRetrievalsP')) {
+		tokenTbl = filterLastNRetrievals(tokenTbl, config)
+	}
 	getOutFileForNameFun <- function(name) {
 		getConfig(config, name)
 	}
-	withLogLevel(0, runForTokenTbl(tokenTbl, config, getOutFileForNameFun))
+	withLogLevel(1, runForTokenTbl(tokenTbl, config, getOutFileForNameFun))
 }
 
 modConfig <- function(config, mods) {
@@ -627,6 +643,7 @@ defaultBaseConfig = list(dFull=c(0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1.0,1.1,1.2,1.3,1.
 			 MCCORESAct = 8,
 			 MCCORESReg = 4,
 			 MCCORESActUser = 1,
+			 limitRetrievalsP = F,
 			 query=NULL)
 
 defaultTConfig = c(defaultBaseConfig,
@@ -691,6 +708,10 @@ makeBestFitsVectTPerm <- function(name) {
 		list(name))
 }
 
+makeBestFitsVectTPermOrderless <- function(name) {
+	do.call(makeBestFitsVectFun(list(c('actPriorStd', 'actTweetOrderless%s'))), list(name))
+}
+
 makeBestFitsVectTSji <- function(name) {
 	do.call(makeBestFitsVectFun(list(c('actPriorStd', 'actTweet%s'))), list(name))
 }
@@ -718,6 +739,10 @@ makeBestFitsStrTPerm <- function(name) {
 	do.call(makeBestFitsStrFun(c('actPriorStd_actTweetOrder%s_actTweetOrderless%s',
 				  'actTweetOrderless%s', 'actTweetOrder%s', 'actTweetOrder%s_actTweetOrderless%s')),
 		list(name))
+}
+
+makeBestFitsStrTPermOrderless <- function(name) {
+	do.call(makeBestFitsStrFun(c('actPriorStd_actTweetOrderless%s', 'actTweetOrderless%s')), list(name))
 }
 
 makeBestFitsStrTSji <- function(name) {
@@ -872,16 +897,19 @@ defaultTPUserConfig = modConfig(defaultTConfig, list(tokenizedTbl = 'tweets_toke
 						     postsTbl = 'tweets',
 						     tokenizedChunkTypeTbl = 'tweets_tokenized_chunk_types',
 						     tokenizedTypeTypeTbl = 'tweets_tokenized_type_types',
-						     restrictHashtagsP = F))
+						     restrictHashtagsP = F,
+						     limitRetrievalsP = T))
 
-defaultSOSjiPUserConfig = modConfig(c(defaultSOConfig, defaultSjiConfig, defaultPUserConfig,
+defaultSOPUserConfig = modConfig(defaultSOConfig, list(limitRetrievalsP = T))
+
+defaultSOSjiPUserConfig = modConfig(c(defaultSOPUserConfig, defaultSjiConfig, defaultPUserConfig,
 				      list(runTbl=makeRunTbl(c(makeBestFitsVectSOSji(''),
 							       makeBestFitsVectSOSji('Usercontext'))),
 					   sjiTblUser='sjiTblSOOrderlessUser')),
 				    list(actDVs=c('actPriorStd',
 						  makeBestFitsStrSOSji(''),
 						  makeBestFitsStrSOSji('Usercontext')),
-					 computeActFromContextTbl='computeActSjiOptFromContextTbl',
+					 computeActFromContextTbl='computeActSjiSOOptFromContextTbl',
 					 makeSjiTblUser='makeSjiTblUserSO',
 					 priorTbl='priorTblUserSubset',
 					 convertTagSynonymsP=T,
@@ -889,19 +917,17 @@ defaultSOSjiPUserConfig = modConfig(c(defaultSOConfig, defaultSjiConfig, default
 					 MCCORESAct=1))
 
 defaultTSjiPUserConfig = modConfig(c(defaultTPUserConfig, defaultSjiConfig, defaultPUserConfig,
-				     list(runTbl=makeRunTbl(c(makeBestFitsVectTSji(''),
-							      makeBestFitsVectTSji('Usercontext'))),
+				     list(runTbl=makeRunTbl(c(makeBestFitsVectTSji('Usercontext'))),
 					  sjiTblUser='sjiTblTOrderlessUser')),
 				   list(actDVs=c('actPriorStd',
-						 makeBestFitsStrTSji(''),
 						 makeBestFitsStrTSji('Usercontext')),
-					computeActFromContextTbl='computeActSjiOptFromContextTbl',
+					computeActFromContextTbl='computeActSjiTOptFromContextTbl',
 					makeSjiTblUser='makeSjiTblUserT',
 					priorTbl='priorTblUserSubset',
 					MCCORESActUser=16,
 					MCCORESAct=1))
 
-defaultSOPermPUserConfig = modConfig(c(defaultSOConfig, defaultPermConfig, defaultPUserConfig,
+defaultSOPermPUserConfig = modConfig(c(defaultSOPUserConfig, defaultPermConfig, defaultPUserConfig,
 				      list(runTbl=makeRunTbl(c(makeBestFitsVectSOPerm('Freqhyman'),
 							       makeBestFitsVectSOPerm('Freqhyser'))),
 					   permEnvTbl='permEnvTblSO',
@@ -920,8 +946,7 @@ defaultSOPermPUserConfig = modConfig(c(defaultSOConfig, defaultPermConfig, defau
 					 MCCORESAct=1))
 
 defaultTPermPUserConfig = modConfig(c(defaultTPUserConfig, defaultPermConfig, defaultPUserConfig,
-				      list(runTbl=makeRunTbl(c(makeBestFitsVectTPerm('Freqhyman'),
-							       makeBestFitsVectTPerm('Freqhyser'))),
+				      list(runTbl=makeRunTbl(c(makeBestFitsVectTPermOrderless('Freqhyser'))),
 					   permEnvTbl='permEnvTblT',
 					   permMemMatOrder='',
 					   permMemMatOrderless='permMemMatTOrderless',
@@ -929,8 +954,7 @@ defaultTPermPUserConfig = modConfig(c(defaultTPUserConfig, defaultPermConfig, de
 					   computeActFromContextTbl='computeActPermTOptFromContextTbl'
 					   )),
 				    list(actDVs=c('actPriorStd',
-						  makeBestFitsStrTPerm('Freqhyman'),
-						  makeBestFitsStrTPerm('Freqhyser')),
+						  makeBestFitsStrTPermOrderless('Freqhyser')),
 					 priorTbl='priorTblUserSubset',
 					 makeSjiTblUser='makeSjiTblUserT',
 					 MCCORESActUser=16,
@@ -1061,6 +1085,7 @@ makeTFollowRunSjiPUser <- function(val, outFileName, queryT) {
 	function (regen=F) {
 		getCurWorkspaceBy(regen, groupConfigPUser)
 		makeTRun(val, sprintf('%s%s', 'TFollowPUserSji', outFileName), modConfig(defaultTSjiPUserConfig, list(includeRetweetsP=F, query=queryT)))()
+		#makeTRun(val, sprintf('%s%s', 'TFollowPUserSji', outFileName), modConfig(defaultTSjiPUserConfig, list(includeRetweetsP=F, query=queryT, genGlobalsForPriorRun=F)))()
 		makeTRun(val, sprintf('%s%s', 'TFollowPUserPerm', outFileName), modConfig(defaultTPermPUserConfig, list(includeRetweetsP=F, query=queryT, genGlobalsForPriorRun=F)))()
 	}
 
@@ -2397,10 +2422,14 @@ computeActSjiFromContextTbl <- function(contextTbl, tagTbl, config) {
 	contextTbl[, get(fun[1])(chunk, get(getConfig(config, 'sjiTbl')), unique(user_screen_name), get(funConfig)(config)), by=type]
 }
 
-computeActSjiOptFromContextTbl <- function(contextTbl, tagTbl, config) {
+computeActSjiSOOptFromContextTbl <- function(contextTbl, tagTbl, config) {
 	contextTbl = rbind(makeComputeActRunTbl(contextTbl, '', 'computeActSji', 'funConfigOrigSji')[, sjiTblName := getConfig(config, 'sjiTbl')],
 			   makeComputeActRunTbl(contextTbl, 'Usercontext', 'computeActSjiUser', 'funConfigOrigSji')[, sjiTblName := getConfig(config, 'sjiTblUser')])
-	contextTbl
+	contextTbl[, get(fun[1])(chunk, get(sjiTblName), unique(user_screen_name), get(funConfig)(config)), by=type]
+}
+
+computeActSjiTOptFromContextTbl <- function(contextTbl, tagTbl, config) {
+	contextTbl = rbind(makeComputeActRunTbl(contextTbl, 'Usercontext', 'computeActSjiUser', 'funConfigOrigSji')[, sjiTblName := getConfig(config, 'sjiTblUser')])
 	contextTbl[, get(fun[1])(chunk, get(sjiTblName), unique(user_screen_name), get(funConfig)(config)), by=type]
 }
 
@@ -2484,7 +2513,11 @@ computeActPermSOOptFromContextTbl <- function(contextTbl, tagTbl, config) {
 }
 
 computeActPermTOptFromContextTbl <- function(contextTbl, tagTbl, config) {
-	computeActPermSOOptFromContextTbl(contextTbl, tagTbl, config)
+	userScreenName = contextTbl[, guardAllEqualP(user_screen_name)[1]]
+	contextTbl = getContextTbl(contextTbl, tagTbl)
+	cTblOrderless = contextTbl[orderType == 'orderless']
+	contextTbl = rbind(makeComputeActRunTbl(cTblOrderless, 'OrderlessFreqhyser', 'computeActPermOrderlessUser', 'funConfigFreqhyman'))
+	contextTbl[, get(fun[1])(chunk, posFromTag, userScreenName, get(funConfig)(config)), by=type]
 }
 
 getContextPredNames <- function(config) {
@@ -3211,6 +3244,7 @@ runGenAndSaveCurWorkspaceg3s6 <- function() genAndSaveCurWorkspace(groupConfigG3
 runGenAndSaveCurWorkspaceg4s6 <- function() genAndSaveCurWorkspace(groupConfigG4S6)
 
 curWS <- function() {
+	# FIXME: Set parameter for max last N retrievals per user
 	# FIXME: Run popular-users dataset with sji computation
 	# FIXME: Address low prior predictability for SO
 	# FIXME: Methods to import and anlyze coefficient tables
