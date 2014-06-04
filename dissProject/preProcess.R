@@ -579,7 +579,7 @@ filterLastNRetrievals <- function(tokenTbl, config) {
 
 runPrior <- function(config) {
 	myStopifnot(!any(sapply(config,is.null)))
-	if (getConfig(config, 'genGlobalsForPriorRun')) {
+	if (getConfig(config, 'regenPriorRun')) {
 		priorTblUserSubset <<- getPriorTblUserSubset(config)
 		get(getConfig(config, 'makeSjiTblUser'))(priorTblUserSubset, config)
 	}
@@ -869,7 +869,7 @@ defaultSOSjiConfig = modConfig(c(defaultSOConfig, defaultSjiConfig,
 				    ))
 
 defaultPConfig = list(makeSjiTblUser='makeSjiTblUserDefault',
-		      genGlobalsForPriorRun=T)
+		      regenPriorRun=T)
 
 defaultSOSjiPConfig = modConfig(c(defaultSOConfig, defaultSjiConfig, defaultPConfig,
 				  list(runTbl=makeRunTbl(list()))),
@@ -1081,37 +1081,41 @@ getSummaryStats <- function() {
 	modelVsPredTbl[, .N, by=d]
 }
 
-makeTFollowRunSjiPUser <- function(val, outFileName, queryT) {
-	function (regen=F) {
+makeTRunPUser <- function(val, outFileNameSji, outFileNamePerm, queryT) {
+	function (regen=F, regenPriorRun=T) {
 		getCurWorkspaceBy(regen, groupConfigPUser)
-		makeTRun(val, sprintf('%s%s', 'TFollowPUserSji', outFileName), modConfig(defaultTSjiPUserConfig, list(includeRetweetsP=F, query=queryT)))()
-		#makeTRun(val, sprintf('%s%s', 'TFollowPUserSji', outFileName), modConfig(defaultTSjiPUserConfig, list(includeRetweetsP=F, query=queryT, genGlobalsForPriorRun=F)))()
-		makeTRun(val, sprintf('%s%s', 'TFollowPUserPerm', outFileName), modConfig(defaultTPermPUserConfig, list(includeRetweetsP=F, query=queryT, genGlobalsForPriorRun=F)))()
-	}
-
-}
-
-makeTTweetsRunSjiPUser <- function(val, outFileName, queryT) {
-	function (regen=F) {
-		getCurWorkspaceBy(regen, groupConfigPUser)
-		makeTRunr2(val, sprintf('%s%s', 'TTweetsPUserSji', outFileName), modConfig(defaultTSjiPUserConfig, list(query=queryT)))()
-		makeTRunr2(val, sprintf('%s%s', 'TTweetsPUserPerm', outFileName), modConfig(defaultTPermPUserConfig, list(query=queryT, genGlobalsForPriorRun=F)))()
+		makeTRun(val, outFileNameSji, modConfig(defaultTSjiPUserConfig, list(includeRetweetsP=F, query=queryT, regenPriorRun=regenPriorRun)))()
+		makeTRun(val, outFileNamePerm, modConfig(defaultTPermPUserConfig, list(includeRetweetsP=F, query=queryT, regenPriorRun=F)))()
 	}
 }
 
-runPUserTFollowSji1k <- makeTFollowRunSjiPUser(1000, 'gt1k', queryRunTFollow1k)
-runPUserTFollowSji5k <- makeTFollowRunSjiPUser(5000, 'gt5k', queryRunTFollow5k)
-runPUserTFollowSji10k <- makeTFollowRunSjiPUser(10000, 'gt10k', queryRunTFollow10k)
-runPUserTFollowSji100k <- makeTFollowRunSjiPUser(100000, 'gt100k', queryRunTFollow100k)
-runPUserTFollowSji1M <- makeTFollowRunSjiPUser(1000000, 'gt1M', queryRunTFollow1M)
-runPUserTFollowSji10M <- makeTFollowRunSjiPUser(10000000, 'gt10M', queryRunTFollow10M)
+makeTFollowRunPUser <- function(val, outFileName, queryT) {
+	makeTRunPUser(val,
+		      sprintf('%s%s', 'TFollowPUserSji', outFileName),
+		      sprintf('%s%s', 'TFollowPUserPerm', outFileName),
+		      queryT)
+}
 
-runPUSerTTweetsSji1e2 <- makeTTweetsRunSjiPUser(100, 'gt1e2', queryRunTTweets1e2)
-runPUSerTTweetsSji5e2 <- makeTTweetsRunSjiPUser(500, 'gt5e2', queryRunTTweets5e2)
-runPUSerTTweetsSji1e3 <- makeTTweetsRunSjiPUser(1000, 'gt1e3', queryRunTTweets1e3)
-runPUSerTTweetsSji5e3 <- makeTTweetsRunSjiPUser(5000, 'gt5e3', queryRunTTweets5e3)
-runPUSerTTweetsSji1e4 <- makeTTweetsRunSjiPUser(10000, 'gt1e4', queryRunTTweets1e4)
-runPUSerTTweetsSji5e4 <- makeTTweetsRunSjiPUser(50000, 'gt5e4', queryRunTTweets5e4)
+makeTTweetsRunPUser <- function(val, outFileName, queryT) {
+	makeTRunPUser(val,
+		      sprintf('%s%s', 'TTweetsPUserSji', outFileName),
+		      sprintf('%s%s', 'TTweetsPUserPerm', outFileName),
+		      queryT)
+}
+
+runPUserTFollowSji1k <- makeTFollowRunPUser(1000, 'gt1k', queryRunTFollow1k)
+runPUserTFollowSji5k <- makeTFollowRunPUser(5000, 'gt5k', queryRunTFollow5k)
+runPUserTFollowSji10k <- makeTFollowRunPUser(10000, 'gt10k', queryRunTFollow10k)
+runPUserTFollowSji100k <- makeTFollowRunPUser(100000, 'gt100k', queryRunTFollow100k)
+runPUserTFollowSji1M <- makeTFollowRunPUser(1000000, 'gt1M', queryRunTFollow1M)
+runPUserTFollowSji10M <- makeTFollowRunPUser(10000000, 'gt10M', queryRunTFollow10M)
+
+runPUSerTTweetsSji1e2 <- makeTTweetsRunPUser(100, 'gt1e2', queryRunTTweets1e2)
+runPUSerTTweetsSji5e2 <- makeTTweetsRunPUser(500, 'gt5e2', queryRunTTweets5e2)
+runPUSerTTweetsSji1e3 <- makeTTweetsRunPUser(1000, 'gt1e3', queryRunTTweets1e3)
+runPUSerTTweetsSji5e3 <- makeTTweetsRunPUser(5000, 'gt5e3', queryRunTTweets5e3)
+runPUSerTTweetsSji1e4 <- makeTTweetsRunPUser(10000, 'gt1e4', queryRunTTweets1e4)
+runPUSerTTweetsSji5e4 <- makeTTweetsRunPUser(50000, 'gt5e4', queryRunTTweets5e4)
 
 runTFollow1k <- makeTRunr1(1000, 'TFollowgt1k', queryRunTFollow1k)
 runTFollow1kr2 <- makeTRunr2(1000, 'TFollowgt1kr2', queryRunTFollow1k)
@@ -1152,34 +1156,40 @@ makeSORunr2 <- function(val, outFileName) makeSORun(val, outFileName, config=get
 makeSORunr3 <- function(val, outFileName) makeSORun(val, outFileName, config=getSOr3Config())
 makeSORunr4 <- function(val, outFileName) makeSORun(val, outFileName, config=getSOr4Config())
 
-makeSORunSjiPUser <- function(val, outFileName) {
-	function (regen=F) {
+makeSORunPUser <- function(val, outFileNameSji, outFileNamePerm, querySO) {
+	function (regen=F, regenPriorRun=T) {
 		getCurWorkspaceBy(regen, groupConfigPUser)
-		makeSORun(val, sprintf('%s%s', 'SOPUserSji', outFileName), modConfig(defaultSOSjiPUserConfig, list(query=getQuerySO)))()
-		makeSORun(val, sprintf('%s%s', 'SOPUserPerm', outFileName), modConfig(defaultSOPermPUserConfig, list(query=getQuerySO, genGlobalsForPriorRun=F)))()
+		makeSORun(val, outFileNameSji, modConfig(defaultSOSjiPUserConfig, list(query=querySO, regenPriorRun=regenPriorRun)))()
+		makeSORun(val, outFileNamePerm, modConfig(defaultSOPermPUserConfig, list(query=querySO, regenPriorRun=F)))()
 	}
 }
 
-makeSOQRunSjiPUser <- function(val, outFileName) {
-	function (regen=F) {
-		getCurWorkspaceBy(regen, groupConfigPUser)
-		makeSOQRun(val, sprintf('%s%s', 'SOQPUserSji', outFileName), modConfig(defaultSOSjiPUserConfig, list(query=getQuerySO)))()
-		makeSOQRun(val, sprintf('%s%s', 'SOQPUserPerm', outFileName), modConfig(defaultSOPermPUserConfig, list(query=getQuerySO, genGlobalsForPriorRun=F)))()
-	}
+makeSOFRunPUser <- function(val, outFileName, querySO) {
+	makeSORunPUser(val,
+		       sprintf('%s%s', 'SOPUserSji', outFileName),
+		       sprintf('%s%s', 'SOPUserPerm', outFileName),
+		       querySO)
 }
 
-runPUserSOSji100k <- makeSORunSjiPUser(100000, 'gt100k')
-runPUserSOSji50k <- makeSORunSjiPUser(50000, 'gt50k')
-runPUserSOSji10k <- makeSORunSjiPUser(10000, 'gt10k')
-runPUserSOSji5k <- makeSORunSjiPUser(5000, 'gt5k')
-runPUserSOSji1k <- makeSORunSjiPUser(1000, 'gt1k')
-runPUserSOSji500 <- makeSORunSjiPUser(500, 'gt500')
-runPUserSOQSji500 <- makeSOQRunSjiPUser(500, 'gt500')
-runPUserSOQSji400 <- makeSOQRunSjiPUser(400, 'gt400')
-runPUserSOQSji300 <- makeSOQRunSjiPUser(300, 'gt300')
-runPUserSOQSji200 <- makeSOQRunSjiPUser(200, 'gt200')
-runPUserSOQSji100 <- makeSOQRunSjiPUser(100, 'gt100')
-runPUserSOQSji050 <- makeSOQRunSjiPUser(050, 'gt050')
+makeSOQRunPUser <- function(val, outFileName, querySO) {
+	makeSORunPUser(val,
+		       sprintf('%s%s', 'SOQPUserSji', outFileName),
+		       sprintf('%s%s', 'SOQPUserPerm', outFileName),
+		       querySO)
+}
+
+runPUserSOSji100k <- makeSOFRunPUser(100000, 'gt100k', getQuerySO)
+runPUserSOSji50k <- makeSOFRunPUser(50000, 'gt50k', getQuerySO)
+runPUserSOSji10k <- makeSOFRunPUser(10000, 'gt10k', getQuerySO)
+runPUserSOSji5k <- makeSOFRunPUser(5000, 'gt5k', getQuerySO)
+runPUserSOSji1k <- makeSOFRunPUser(1000, 'gt1k', getQuerySO)
+runPUserSOSji500 <- makeSOFRunPUser(500, 'gt500', getQuerySO)
+runPUserSOQSji500 <- makeSOQRunPUser(500, 'gt500', getQuerySOQ)
+runPUserSOQSji400 <- makeSOQRunPUser(400, 'gt400', getQuerySOQ)
+runPUserSOQSji300 <- makeSOQRunPUser(300, 'gt300', getQuerySOQ)
+runPUserSOQSji200 <- makeSOQRunPUser(200, 'gt200', getQuerySOQ)
+runPUserSOQSji100 <- makeSOQRunPUser(100, 'gt100', getQuerySOQ)
+runPUserSOQSji050 <- makeSOQRunPUser(050, 'gt050', getQuerySOQ)
 
 runSO100k <- makeSORunr1(100000, 'SOgt100k')
 runSO50k <- makeSORunr1(50000, 'SOgt50k')
@@ -3245,12 +3255,13 @@ runGenAndSaveCurWorkspaceg4s6 <- function() genAndSaveCurWorkspace(groupConfigG4
 
 curWS <- function() {
 	# FIXME: Set parameter for max last N retrievals per user
+	# FIXME: Fix warnings
 	# FIXME: Run popular-users dataset with sji computation
 	# FIXME: Address low prior predictability for SO
 	# FIXME: Methods to import and anlyze coefficient tables
 	# FIXME: Make sure word order low predictiveness is fully justified
 	# FIXME: Def. look at coefficient tables
-	runPUserTFollowSji1k(regen='useAlreadyLoaded')
+	runPUserTFollowSji1k(regen='useAlreadyLoaded', regenPriorRun=F)
 	runPUserSOSji100k(regen='useAlreadyLoaded')
 	withProf(runContext20g1s1(regen='useAlreadyLoaded'))
 	setLogLevel(2)
