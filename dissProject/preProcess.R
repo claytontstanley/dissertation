@@ -2290,9 +2290,8 @@ getWsFile <- function(groupConfig) {
 
 mySaveImage <- function(groupConfig) {
 	file=getWsFile(groupConfig)
-	eval(bquote(save(list=c('sjiTblTOrderless', 'sjiTblTOrder', 'priorTblGlobT', 'sjiTblSOOrderless', 'priorTblUserSO',
-			       'permEnvTblT', 'permEnvTblSO', 'permMemMatTOrder', 'permMemMatTOrderless',
-			       'permMemMatSOOrderless'), file=.(file), compress=F)),
+	globals = getConfig(groupConfig, 'globalVars')
+	eval(bquote(save(list=.(globals), file=.(file), compress=F)),
 	     envir=globalenv())
 }
 
@@ -2882,11 +2881,13 @@ runForTokenTbl <- function(tokenTbl, config, getOutFileForNameFun=identity) {
 	list(modelVsPredTbl=modelVsPredTbl, modelHashtagsTbl=modelHashtagsTbl, hashtagsTbl=hashtagsTbl, logregTbl=logregTbl)
 }
 
-runContext <- function(config, samplesPerRun, numRuns) {
+runContext <- function(baseConfig, samplesPerRun, numRuns) {
 	myLog(sprintf("running context with act/actUser/reg cores: %s/%s/%s",
-		      getCores(config, 'MCCORESAct'), getCores(config, 'MCCORESActUser'), getCores(config, 'MCCORESReg')))
+		      getCores(baseConfig, 'MCCORESAct'), getCores(baseConfig, 'MCCORESActUser'), getCores(baseConfig, 'MCCORESReg')))
 	endId = 3000000
 	for (runNum in seq(numRuns)) {
+		config = baseConfig
+		if (runNum != 1) config = modConfig(config, list(modelHashtagsOutFile=''))
 		getOutFileForNameFun <- function(name) {
 			outFile = getConfig(config, name)
 			outFile = gsub('.csv$', sprintf('r%s%s', runNum, '.csv'), outFile)
@@ -2915,8 +2916,7 @@ runContextWithConfig <- function(regen, samplesPerRun, numRunsT, numRunsSO, grou
 		addSizeName = function(str) sprintf('%ss%s', str, getConfig(groupConfig, 'sizeNum'))
 		addAll = function(str) addSizeName(addGroupName(addNumSamples(str)))
 		genModelHashtagsP = {if (getConfig(groupConfig, 'groupNum') == 1 &
-					 getConfig(groupConfig, 'sizeNum') %in% c(1,2) &
-					 getConfig(groupConfig, 'runNum') == 1) T else F}
+					 getConfig(groupConfig, 'sizeNum') %in% c(1,2)) T else F}
 		getConfigMods <- function(name, addFun) {
 			list(modelVsPredOutFile=getOutFileModelVsPred(addFun(name)),
 			     modelHashtagsOutFile={if (!genModelHashtagsP) '' else getOutFileModelHashtags(addFun(name))},
@@ -2947,9 +2947,15 @@ groupConfigG2 <- list(groupNum=2, groupName = '2014-03-17 11:28:15 trendsmap')
 groupConfigG3 <- list(groupNum=3, groupName = '2014-03-24 13:06:19 trendsmap')
 groupConfigG4 <- list(groupNum=4, groupName = '2014-04-04 15:03:59 trendsmap')
 
-groupConfigContext <- list(genFun=getCurWorkspaceContext, configType='')
-groupConfigPUser <- c(list(genFun=getCurWorkspacePUser, configType='PUser', groupNum=1),
-		      groupConfigS6)
+groupConfigContext <- list(genFun=getCurWorkspaceContext, configType='',
+			   globalVars=c('sjiTblTOrderless', 'sjiTblTOrder', 'priorTblGlobT', 'sjiTblSOOrderless', 'priorTblUserSO',
+					'permEnvTblT', 'permEnvTblSO', 'permMemMatTOrder', 'permMemMatTOrderless',
+					'permMemMatSOOrderless'))
+
+groupConfigPUser <- c(groupConfigS2,
+		      list(genFun=getCurWorkspacePUser, configType='PUser', groupNum=1,
+			   globalVars=c('sjiTblSOOrderless', 'permEnvTblSO', 'permMemMatSOOrderless')
+			   ))
 
 groupConfigG1S1 <- c(groupConfigS1, groupConfigG1, groupConfigContext)
 groupConfigG2S1 <- c(groupConfigS1, groupConfigG2, groupConfigContext)
@@ -3233,6 +3239,8 @@ computeActPermOrderlessUser <- function(context, pos, user, config) {
 	computeActPerm(context, pos, permEnvTbl = envTbl, permMemMat = memMat, config)
 }
 
+runGenAndSaveCurWorkspacePUser <- function() genAndSaveCurWorkspace(groupConfigPUser)
+
 runGenAndSaveCurWorkspaceg1s1 <- function() genAndSaveCurWorkspace(groupConfigG1S1)
 
 runGenAndSaveCurWorkspaceg1s2 <- function() genAndSaveCurWorkspace(groupConfigG1S2)
@@ -3262,13 +3270,14 @@ runGenAndSaveCurWorkspaceg4s6 <- function() genAndSaveCurWorkspace(groupConfigG4
 
 curWS <- function() {
 	# FIXME: Fix warnings
+	# FIXME: Up size
 	# FIXME: Run popular-users dataset with sji computation
 	# FIXME: Address low prior predictability for SO
 	# FIXME: Methods to import and anlyze coefficient tables
 	# FIXME: Make sure word order low predictiveness is fully justified
 	# FIXME: Def. look at coefficient tables
 	runPUserSOSji100k(regen='useAlreadyLoaded')
-	runPUserTFollowSji1k(regen='useAlreadyLoaded')
+	runPUserTFollowSji1k(regen=F)
 	withProf(runContext20g1s1(regen='useAlreadyLoaded'))
 	setLogLevel(2)
 	runContext20g1s6(regen='useAlreadyLoaded')
