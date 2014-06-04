@@ -597,6 +597,7 @@ runPrior <- function(config) {
 		tokenTbl = filterLastNRetrievals(tokenTbl, config)
 	}
 	if (getConfig(config, 'regenPriorRun')) {
+		myLog('Regenerating prior and sji user tables')
 		priorTblUserSubset <<- getPriorTblUserSubset(config)
 		get(getConfig(config, 'makeSjiTblUser'))(tokenTbl, config)
 	}
@@ -2627,6 +2628,7 @@ defaultColsTokenizedSO = "tokenized_tbl.id::text, user_screen_name, creation_epo
 defaultColsTokenizedT = sprintf('%s, %s', defaultColsTokenizedSO, 'posts_tbl.retweeted')
 
 getTokenizedForUsers <- function(config) {
+	myLog('Getting tokenized table for users')
 	resTbl = sqldt(sprintf("select %s from %s as tokenized_tbl
 			       join %s as posts_tbl
 			       on tokenized_tbl.id = posts_tbl.id
