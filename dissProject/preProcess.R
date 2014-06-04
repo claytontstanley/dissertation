@@ -3275,12 +3275,11 @@ curWS <- function() {
 	# FIXME: Methods to import and anlyze coefficient tables
 	# FIXME: Make sure word order low predictiveness is fully justified
 	# FIXME: Def. look at coefficient tables
-	runGenAndSaveCurWorkspaceg1s6()
 	runPUserSOSji100k(regen='useAlreadyLoaded')
 	runPUserTFollowSji1k(regen=F)
 	withProf(runContext20g1s1(regen='useAlreadyLoaded'))
 	setLogLevel(2)
-	runContext20g1s6(regen=T)
+	runContext20g1s6(regen='useAlreadyLoaded')
 	withProf(runContext500g1s2(regen='useAlreadyLoaded'))
 	runContext500g1s2Test(regen='useAlreadyLoaded')
 	withProf(runContext500g1s3(regen='useAlreadyLoaded'))
