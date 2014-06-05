@@ -1088,26 +1088,28 @@ getSummaryStats <- function() {
 	modelVsPredTbl[, .N, by=d]
 }
 
-makeTRunPUser <- function(val, outFileNameSji, outFileNamePerm, queryT) {
+makeTRunPUser <- function(val, outFileNameSji, outFileNamePerm, queryT, groupConfig) {
 	function (regen=F, regenPriorRun=T, numUsers=40) {
-		getCurWorkspaceBy(regen, groupConfigPUser)
+		getCurWorkspaceBy(regen, groupConfig)
 		makeTRun(val, outFileNameSji, c(list(numUsers=numUsers), modConfig(defaultTSjiPUserConfig, list(includeRetweetsP=F, query=queryT, regenPriorRun=regenPriorRun))))()
 		makeTRun(val, outFileNamePerm, c(list(numUsers=numUsers), modConfig(defaultTPermPUserConfig, list(includeRetweetsP=F, query=queryT, regenPriorRun=F))))()
 	}
 }
 
-makeTFollowRunPUser <- function(val, outFileName, queryT) {
+makeTFollowRunPUser <- function(val, outFileName, queryT, groupConfig=groupConfigPUserS2) {
 	makeTRunPUser(val,
 		      sprintf('%s%s', 'TFollowPUserSji', outFileName),
 		      sprintf('%s%s', 'TFollowPUserPerm', outFileName),
-		      queryT)
+		      queryT,
+		      groupConfig)
 }
 
-makeTTweetsRunPUser <- function(val, outFileName, queryT) {
+makeTTweetsRunPUser <- function(val, outFileName, queryT, groupConfig=groupConfigPUserS2) {
 	makeTRunPUser(val,
 		      sprintf('%s%s', 'TTweetsPUserSji', outFileName),
 		      sprintf('%s%s', 'TTweetsPUserPerm', outFileName),
-		      queryT)
+		      queryT,
+		      groupConfig)
 }
 
 runPUserTFollowSji1k <- makeTFollowRunPUser(1000, 'gt1k', queryRunTFollow1k)
@@ -1116,7 +1118,7 @@ runPUserTFollowSji10k <- makeTFollowRunPUser(10000, 'gt10k', queryRunTFollow10k)
 runPUserTFollowSji100k <- makeTFollowRunPUser(100000, 'gt100k', queryRunTFollow100k)
 runPUserTFollowSji1M <- makeTFollowRunPUser(1000000, 'gt1M', queryRunTFollow1M)
 runPUserTFollowSji10M <- makeTFollowRunPUser(10000000, 'gt10M', queryRunTFollow10M)
-runPUserTFollowSji1kTest <- function(numUsers=2, ...) makeTFollowRunPUser(1000, 'gt1kTest', queryRunTFollow1k)(numUsers=numUsers, ...)
+runPUserTFollowSji1kTest <- function(numUsers=2, ...) makeTFollowRunPUser(1000, 'gt1kTest', queryRunTFollow1k, groupConfig=groupConfigPUserS6)(numUsers=numUsers, ...)
 
 runPUserTTweetsSji1e2 <- makeTTweetsRunPUser(100, 'gt1e2', queryRunTTweets1e2)
 runPUserTTweetsSji5e2 <- makeTTweetsRunPUser(500, 'gt5e2', queryRunTTweets5e2)
@@ -1164,30 +1166,32 @@ makeSORunr2 <- function(val, outFileName) makeSORun(val, outFileName, config=get
 makeSORunr3 <- function(val, outFileName) makeSORun(val, outFileName, config=getSOr3Config())
 makeSORunr4 <- function(val, outFileName) makeSORun(val, outFileName, config=getSOr4Config())
 
-makeSORunPUser <- function(val, outFileNameSji, outFileNamePerm, querySO) {
+makeSORunPUser <- function(val, outFileNameSji, outFileNamePerm, querySO, groupConfig) {
 	function (regen=F, regenPriorRun=T, numUsers=40) {
-		getCurWorkspaceBy(regen, groupConfigPUser)
+		getCurWorkspaceBy(regen, groupConfig)
 		makeSORun(val, outFileNameSji, c(list(numUsers=numUsers), modConfig(defaultSOSjiPUserConfig, list(query=querySO, regenPriorRun=regenPriorRun))))()
 		makeSORun(val, outFileNamePerm, c(list(numUsers=numUsers), modConfig(defaultSOPermPUserConfig, list(query=querySO, regenPriorRun=F))))()
 	}
 }
 
-makeSOFRunPUser <- function(val, outFileName, querySO) {
+makeSOFRunPUser <- function(val, outFileName, querySO, groupConfig=groupConfigPUserS2) {
 	makeSORunPUser(val,
 		       sprintf('%s%s', 'SOPUserSji', outFileName),
 		       sprintf('%s%s', 'SOPUserPerm', outFileName),
-		       querySO)
+		       querySO,
+		       groupConfig)
 }
 
-makeSOQRunPUser <- function(val, outFileName, querySO) {
+makeSOQRunPUser <- function(val, outFileName, querySO, groupConfig=groupConfigPUserS2) {
 	makeSORunPUser(val,
 		       sprintf('%s%s', 'SOQPUserSji', outFileName),
 		       sprintf('%s%s', 'SOQPUserPerm', outFileName),
-		       querySO)
+		       querySO,
+		       groupConfig)
 }
 
 runPUserSOSji100k <- makeSOFRunPUser(100000, 'gt100k', getQuerySO)
-runPUserSOSji100kTest <- function(numUsers=2, ...) makeSOFRunPUser(100000, 'gt100kTest', getQuerySO)(numUsers=numUsers, ...)
+runPUserSOSji100kTest <- function(numUsers=2, ...) makeSOFRunPUser(100000, 'gt100kTest', getQuerySO, groupConfig=groupConfigPUserS6)(numUsers=numUsers, ...)
 runPUserSOSji50k <- makeSOFRunPUser(50000, 'gt50k', getQuerySO)
 runPUserSOSji10k <- makeSOFRunPUser(10000, 'gt10k', getQuerySO)
 runPUserSOSji5k <- makeSOFRunPUser(5000, 'gt5k', getQuerySO)
@@ -2205,18 +2209,17 @@ defaultColsPriorUserSO = 'creation_epoch, user_screen_name, chunk'
 defaultColsPriorUserT = sprintf('%s, %s', defaultColsPriorUserSO, 'posts_tbl.retweeted')
 
 getPriorTblUserSubset <- function(config) {
-	tbl = sqldt(sprintf("select %s from %s as tokenized_tbl
-			    join %s as posts_tbl
-			    on posts_tbl.id = tokenized_tbl.id
-			    where type = '%s'
-			    and user_screen_name is not null
-			    and %s
-			    and tokenized_tbl.id in (select id from %s where %s)",
-			    get(getConfig(config, 'defaultColsPriorUser')),
-			    getConfig(config, "tokenizedTbl"), getConfig(config, "postsTbl"),
-			    getConfig(config, "tagTypeName"), getConfig(config, 'query'),
-			    getConfig(config, 'postsTbl'), getConfig(config, 'query')
-			    ))
+	tbl = sqldt(with(config,
+			 sprintf("select %s from %s as tokenized_tbl
+				 join %s as posts_tbl
+				 on posts_tbl.id = tokenized_tbl.id
+				 where type = '%s'
+				 and user_screen_name is not null
+				 and %s
+				 and tokenized_tbl.id in (select id from %s where %s)",
+				 get(defaultColsPriorUser),
+				 tokenizedTbl, postsTbl, tagTypeName, query,
+				 postsTbl, query)))
 	if (getConfig(config, "convertTagSynonymsP")) convertTagSynonyms(tbl)
 	tbl[, hashtag := chunk][, chunk := NULL]
 	if (getConfig(config, 'dsetType') == 'twitter') {
@@ -2910,6 +2913,7 @@ runContext <- function(baseConfig, samplesPerRun, numRuns) {
 }
 
 getCurWorkspaceBy <- function(regen, groupConfig) {
+	myLog(sprintf("Getting current workspace with regen: %s", regen))
 	if (regen == 'useAlreadyLoaded') return()
 	if (regen == T) {
 		eval(bquote(getCurWorkspace(.(groupConfig))), envir=globalenv())
@@ -2961,10 +2965,11 @@ groupConfigContext <- list(genFun=getCurWorkspaceContext, configType='',
 					'permEnvTblT', 'permEnvTblSO', 'permMemMatTOrder', 'permMemMatTOrderless',
 					'permMemMatSOOrderless'))
 
-groupConfigPUser <- c(groupConfigS2,
-		      list(genFun=getCurWorkspacePUser, configType='PUser', groupNum=1,
-			   globalVars=c('sjiTblSOOrderless', 'permEnvTblSO', 'permMemMatSOOrderless', 'sjiTblTOrderless', 'permEnvTblT', 'permMemMatTOrderless')
-			   ))
+groupConfigPUser <- list(genFun=getCurWorkspacePUser, configType='PUser', groupNum=1,
+			 globalVars=c('sjiTblSOOrderless', 'permEnvTblSO', 'permMemMatSOOrderless', 'sjiTblTOrderless', 'permEnvTblT', 'permMemMatTOrderless'))
+
+groupConfigPUserS2 <- c(groupConfigS2, groupConfigPUser)
+groupConfigPUserS6 <- c(groupConfigS6, groupConfigPUser)
 
 groupConfigG1S1 <- c(groupConfigS1, groupConfigG1, groupConfigContext)
 groupConfigG2S1 <- c(groupConfigS1, groupConfigG2, groupConfigContext)
@@ -3248,7 +3253,8 @@ computeActPermOrderlessUser <- function(context, pos, user, config) {
 	computeActPerm(context, pos, permEnvTbl = envTbl, permMemMat = memMat, config)
 }
 
-runGenAndSaveCurWorkspacePUser <- function() genAndSaveCurWorkspace(groupConfigPUser)
+runGenAndSaveCurWorkspacePUserS2 <- function() genAndSaveCurWorkspace(groupConfigPUserS2)
+runGenAndSaveCurWorkspacePUserS6 <- function() genAndSaveCurWorkspace(groupConfigPUserS6)
 
 runGenAndSaveCurWorkspaceg1s1 <- function() genAndSaveCurWorkspace(groupConfigG1S1)
 
@@ -3278,15 +3284,16 @@ runGenAndSaveCurWorkspaceg3s6 <- function() genAndSaveCurWorkspace(groupConfigG3
 runGenAndSaveCurWorkspaceg4s6 <- function() genAndSaveCurWorkspace(groupConfigG4S6)
 
 curWS <- function() {
-	# FIXME: Make the tests s6 if possible
-	# FIXME: Fix warnings
-	# FIXME: Run popular-users dataset with sji computation
+	# FIXME: Vis PUsers dataset
+	# FIXME: Fix warnings?
 	# FIXME: Address low prior predictability for SO
-	# FIXME: Methods to import and anlyze coefficient tables
 	# FIXME: Make sure word order low predictiveness is fully justified
 	# FIXME: Def. look at coefficient tables
 	runPUserSOSji100kTest(regen='useAlreadyLoaded')
+	runPUserSOSji100kTest(regen=F)
 	runPUserTFollowSji1kTest(regen='useAlreadyLoaded')
+	runPUserTFollowSji1kTest(regen=F)
+	runPUserTFollowSji1kTest
 	withProf(runContext20g1s1(regen='useAlreadyLoaded'))
 	runContext20g1s6(regen='useAlreadyLoaded')
 	setLogLevel(2)
