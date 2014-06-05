@@ -571,7 +571,7 @@ filterLastNRetrievals <- function(tokenTbl, config) {
 	tokenTbl[, .N, by=user_screen_name]
 	tagTbl = tokenTbl[type == getConfig(config, 'tagTypeName')] 
 	tagTbl
-	dtTbl = tagTbl[, list(dt=unique(tail(dt, n=40))), by=list(user_screen_name)]
+	dtTbl = tagTbl[, list(dt=unique(tail(dt, n=50))), by=list(user_screen_name)]
 	dtTbl[, N := .N, by=user_screen_name]
 	numUsers = getConfig(config, 'numUsers')
 	selectedUsers = dtTbl[, .N, by=user_screen_name][order(N, decreasing=T)][, head(.SD, n=numUsers)][, user_screen_name]
@@ -920,7 +920,7 @@ defaultSOSjiPUserConfig = modConfig(c(defaultSOPUserConfig, defaultSjiConfig, de
 					 makeSjiTblUser='makeSjiTblUserSO',
 					 priorTbl='priorTblUserSubset',
 					 convertTagSynonymsP=T,
-					 MCCORESActUser=16,
+					 MCCORESActUser=4,
 					 MCCORESAct=1))
 
 defaultTSjiPUserConfig = modConfig(c(defaultTPUserConfig, defaultSjiConfig, defaultPUserConfig,
@@ -1297,7 +1297,11 @@ isContextRun <- function(fname) {
 }
 
 isPriorRun <- function(fname) {
-	grepl('^(SOg)|(SOQ)|(TTweets)|(TFollow)', fname, perl = T)
+	grepl('^(SOgt)|(SOQgt)|(TTweetsgt)|(TFollowgt)', fname, perl = T)
+}
+
+isPUserRun <- function(fname) {
+	grepl('^(SOPUser)|(SOQPUser)|(TTweetsPUser)|(TFollowPUser)', fname, perl = T)
 }
 
 getConfigFile <- function(fname) {
@@ -2421,8 +2425,11 @@ getCurWorkspacePUser <- function(groupConfig) {
 	maxIdTSji = getConfig(groupConfig, 'maxIdTSji')
 	maxIdTPrior = getConfig(groupConfig, 'maxIdTPrior')
 	sjiTblSOOrderless <<- getSjiTblSO(defaultSOConfig, 1, maxIdSOSji)
+	sjiTblTOrderless <<- getSjiTblTOrderless(defaultTConfig, 1, maxIdTSji)
 	permEnvTblSO <<- makeCombinedEnvironmentTbl(sjiTblSOOrderless, modConfig(defaultBaseConfig, list(permNRowsAll=getConfig(defaultBaseConfig, 'permNRows'))))
 	permMemMatSOOrderless <<- makeCombinedMemMatPUser(sjiTblSOOrderless, permEnvTblSO, defaultSOPermConfig)
+	permEnvTblT <<- makeCombinedEnvironmentTbl(sjiTblTOrderless, modConfig(defaultBaseConfig, list(permNRowsAll=getConfig(defaultBaseConfig, 'permNRows'))))
+	permMemMatTOrderless <<- makeCombinedMemMatPUser(sjiTblTOrderless, permEnvTblT, defaultTPermConfig)
 }
 
 genAndSaveCurWorkspace <- function(groupConfig) {
@@ -2956,7 +2963,7 @@ groupConfigContext <- list(genFun=getCurWorkspaceContext, configType='',
 
 groupConfigPUser <- c(groupConfigS2,
 		      list(genFun=getCurWorkspacePUser, configType='PUser', groupNum=1,
-			   globalVars=c('sjiTblSOOrderless', 'permEnvTblSO', 'permMemMatSOOrderless')
+			   globalVars=c('sjiTblSOOrderless', 'permEnvTblSO', 'permMemMatSOOrderless', 'sjiTblTOrderless', 'permEnvTblT', 'permMemMatTOrderless')
 			   ))
 
 groupConfigG1S1 <- c(groupConfigS1, groupConfigG1, groupConfigContext)
@@ -3283,9 +3290,10 @@ curWS <- function() {
 	runContext20g1s6(regen='useAlreadyLoaded')
 	setLogLevel(2)
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelVsPred()))))
+	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isPriorRun, list.files(path=getDirModelVsPred()))))
+	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isPUserRun, list.files(path=getDirModelVsPred()))))
 	modelHashtagsTbls = buildModelHashtagsTables(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelHashtags()))))
 	modelHashtagsTbl = modelHashtagsTbls[["TContextPerm-20g1s1r1"]]
-	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isPriorRun, list.files(path=getDirModelVsPred()))))
 	modelVsPredTbl
 	sjiTblTOrderless
 	sessionInfo()
