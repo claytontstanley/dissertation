@@ -37,7 +37,7 @@ getPriors:
 	egrep '^run((SO)|(SOQ)|(TTweets)|(TFollow)).* <- make' ${rFile} | awk '{print $$1}'
 
 getPUsers:
-	egrep '^runPUser.* <- make' ${rFile} | awk '{print $$1}'
+	egrep '^runPUser.* <- ' ${rFile} | awk '{print $$1}'
 
 getSjisSOAll:
 	egrep '^runGenNcoocTblSO.* <-' ${rFile} | awk '{print $$1}'
