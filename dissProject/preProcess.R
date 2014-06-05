@@ -3286,7 +3286,6 @@ curWS <- function() {
 	# FIXME: Def. look at coefficient tables
 	runPUserSOSji100kTest(regen='useAlreadyLoaded')
 	runPUserTFollowSji1kTest(regen='useAlreadyLoaded')
-	runPUserTFollowSji1kTest(regen=F)
 	withProf(runContext20g1s1(regen='useAlreadyLoaded'))
 	runContext20g1s6(regen='useAlreadyLoaded')
 	setLogLevel(2)
