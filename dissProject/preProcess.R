@@ -3290,10 +3290,7 @@ curWS <- function() {
 	# FIXME: Make sure word order low predictiveness is fully justified
 	# FIXME: Def. look at coefficient tables
 	runPUserSOSji100kTest(regen='useAlreadyLoaded')
-	runPUserSOSji100kTest(regen=F)
 	runPUserTFollowSji1kTest(regen='useAlreadyLoaded')
-	runPUserTFollowSji1kTest(regen=F)
-	runPUserTFollowSji1kTest
 	withProf(runContext20g1s1(regen='useAlreadyLoaded'))
 	runContext20g1s6(regen='useAlreadyLoaded')
 	setLogLevel(2)
