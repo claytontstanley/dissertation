@@ -3313,7 +3313,6 @@ runGenAndSaveCurWorkspaceg4s6 <- function() genAndSaveCurWorkspace(groupConfigG4
 curWS <- function() {
 	# FIXME: Don't add test data into training data for custom user sji
 	# FIXME: Fix warnings?
-	# FIXME: Double user? samples for Twitter
 	# FIXME: Address low prior predictability for SO
 	# FIXME: Make sure word order low predictiveness is fully justified
 	# FIXME: Def. look at coefficient tables
