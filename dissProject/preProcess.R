@@ -3310,7 +3310,6 @@ runGenAndSaveCurWorkspaceg3s6 <- function() genAndSaveCurWorkspace(groupConfigG3
 runGenAndSaveCurWorkspaceg4s6 <- function() genAndSaveCurWorkspace(groupConfigG4S6)
 
 curWS <- function() {
-	# FIXME: Vis PUsers dataset
 	# FIXME: Don't add test data into training data for custom user sji
 	# FIXME: Fix warnings?
 	# FIXME: Double user? samples for Twitter
