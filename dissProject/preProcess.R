@@ -1090,7 +1090,7 @@ getSummaryStats <- function() {
 }
 
 makeTRunPUser <- function(val, outFileNameSji, outFileNamePerm, queryT, groupConfig) {
-	function (regen=F, regenPriorRun=T, numUsers=40, numSamples=50) {
+	function (regen=F, regenPriorRun=T, numUsers=80, numSamples=50) {
 		getCurWorkspaceBy(regen, groupConfig)
 		makeTRun(val, outFileNameSji, c(list(numUsers=numUsers, numSamples=numSamples), modConfig(defaultTSjiPUserConfig, list(includeRetweetsP=F, query=queryT, regenPriorRun=regenPriorRun))))()
 		makeTRun(val, outFileNamePerm, c(list(numUsers=numUsers, numSamples=numSamples), modConfig(defaultTPermPUserConfig, list(includeRetweetsP=F, query=queryT, regenPriorRun=F))))()
