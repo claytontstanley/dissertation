@@ -1507,6 +1507,7 @@ renameColDVName <- function(tbl) {
 		    makeStandardMappingBayes('Freq', 'w/ freq'),
 		    makeStandardMappingBayes('Frentropy', 'w/ entropy and freq'),
 		    makeStandardMappingBayes('Nentropy', ''),
+		    makeStandardMappingBayes('Usercontext', 'w/ entropy and user sji'),
 		    makeStandardMapping('', ''),
 		    makeStandardMapping('Entropy', 'w/ entropy'),
 		    makeStandardMapping('Stoplist', 'w/ stoplist'),
@@ -1519,7 +1520,8 @@ renameColDVName <- function(tbl) {
 		    makeStandardMapping('Lgdim', 'w/ entropy and 10000-row matrix'),
 		    makeStandardMapping('Frenthyman', 'w/ entropy and freq and log odds'),
 		    makeStandardMapping('Nenthyman', 'w/ log odds'),
-		    makeStandardMapping('Freqhyman', 'w/ freq and log odds')
+		    makeStandardMapping('Freqhyman', 'w/ freq and log odds'),
+		    makeStandardMapping('Freqhyser', 'w/ freq, log odds, and user sji')
 		    )
 	mapping = groupN(2, mapping)
 	mapping
@@ -1667,6 +1669,33 @@ asTopHashtagPost <- function(vect) {
 	paste0('topHashtagPost', vect)
 }
 
+compareMeanDVDefault <- function(...) {
+	compareMeanDV(..., extras=list(ylab('Proportion Correct')))
+}
+
+analyzePUser <- function(modelVsPredTbl) {
+	baseTblPost = modelVsPredTbl[grepl('^topHashtagPost', DVName)]
+	baseTbl = modelVsPredTbl[grepl('^topHashtagAcross', DVName)]
+	tbl = baseTbl[predUsedBest == T]
+	tbl
+	tbl[, .N, by=DVName]
+	# RESULT: Adding prior is useful when a lot of data about the user has been collected
+	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleBody', 'TitleBody', 'Body', 'Title',
+				       'TitleOrderlessFreqhymanBodyOrderlessFreqhyman',
+				       'PriorStdTitleOrderlessFreqhymanBodyOrderlessFreqhyman'))
+	compareMeanDVDefault(tbl[dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='foo')
+	# RESULT: User sji is helpful for Twitter, and prior is useful again
+	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweetUsercontext', 'PriorStdTweetOrderlessFreqhyser', 'TweetUsercontext', 'TweetOrderlessFreqhyser'))
+	compareMeanDVDefault(tbl[dsetType == 'twitter' & DVName %in% DVNames], acc, figName='foo')
+	# RESULT: User sji is much more helpful than standard sji for StackOverflow ***
+	DVNames = asTopHashtagAcross(c('TitleOrderlessFreqhyser', 'TitleUsercontext', 'TitleOrderlessFreqhyman', 'TitleOrderlessFreqhyser', 'Title',
+				       'PriorStdTitleOrderlessFreqhyserBodyOrderlessFreqhyser', 'PriorStdTitleBody', 'PriorStdTitleOrderlessFreqhymanBodyOrderlessFreqhyman',
+				       'PriorStdTitleUsercontextBodyUsercontext'))
+	compareMeanDVDefault(tbl[dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='foo')
+
+
+}
+
 analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 	#modelHashtagsTbls = Filter(x = modelHashtagsTbls, f = function(tbl) !grepl('-500', tbl[, datasetName[1]]))
 	ppvTbl = rbindlist(lapply(modelHashtagsTbls, getPPVTblAll))
@@ -1692,9 +1721,6 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'stackoverflow'], acc, figName='ContextMeanDVSO')
 	# T full
 	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'twitter'], acc, figName='foo', groupCol='dsetGroup')
-	compareMeanDVDefault <- function(...) {
-		compareMeanDV(..., extras=list(ylab('Proportion Correct')))
-	}
 	# RESULT: Show base performance for both models
 	# SO standard
 	stdRegex = '(Entropy)|(Direction)|(Hyman)|(Stoplist)|(Freq)|(Window)|(Frentropy)|(Smdim)|(Lgdim)'
@@ -3285,7 +3311,9 @@ runGenAndSaveCurWorkspaceg4s6 <- function() genAndSaveCurWorkspace(groupConfigG4
 
 curWS <- function() {
 	# FIXME: Vis PUsers dataset
+	# FIXME: Don't add test data into training data for custom user sji
 	# FIXME: Fix warnings?
+	# FIXME: Double user? samples for Twitter
 	# FIXME: Address low prior predictability for SO
 	# FIXME: Make sure word order low predictiveness is fully justified
 	# FIXME: Def. look at coefficient tables
