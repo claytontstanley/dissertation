@@ -571,7 +571,8 @@ filterLastNRetrievals <- function(tokenTbl, config) {
 	tokenTbl[, .N, by=user_screen_name]
 	tagTbl = tokenTbl[type == getConfig(config, 'tagTypeName')] 
 	tagTbl
-	dtTbl = tagTbl[, list(dt=unique(tail(dt, n=50))), by=list(user_screen_name)]
+	numSamples = getConfig(config, 'numSamples')
+	dtTbl = tagTbl[, list(dt=unique(tail(dt, n=numSamples))), by=list(user_screen_name)]
 	dtTbl[, N := .N, by=user_screen_name]
 	numUsers = getConfig(config, 'numUsers')
 	selectedUsers = dtTbl[, .N, by=user_screen_name][order(N, decreasing=T)][, head(.SD, n=numUsers)][, user_screen_name]
@@ -1089,10 +1090,10 @@ getSummaryStats <- function() {
 }
 
 makeTRunPUser <- function(val, outFileNameSji, outFileNamePerm, queryT, groupConfig) {
-	function (regen=F, regenPriorRun=T, numUsers=40) {
+	function (regen=F, regenPriorRun=T, numUsers=40, numSamples=50) {
 		getCurWorkspaceBy(regen, groupConfig)
-		makeTRun(val, outFileNameSji, c(list(numUsers=numUsers), modConfig(defaultTSjiPUserConfig, list(includeRetweetsP=F, query=queryT, regenPriorRun=regenPriorRun))))()
-		makeTRun(val, outFileNamePerm, c(list(numUsers=numUsers), modConfig(defaultTPermPUserConfig, list(includeRetweetsP=F, query=queryT, regenPriorRun=F))))()
+		makeTRun(val, outFileNameSji, c(list(numUsers=numUsers, numSamples=numSamples), modConfig(defaultTSjiPUserConfig, list(includeRetweetsP=F, query=queryT, regenPriorRun=regenPriorRun))))()
+		makeTRun(val, outFileNamePerm, c(list(numUsers=numUsers, numSamples=numSamples), modConfig(defaultTPermPUserConfig, list(includeRetweetsP=F, query=queryT, regenPriorRun=F))))()
 	}
 }
 
@@ -1167,10 +1168,10 @@ makeSORunr3 <- function(val, outFileName) makeSORun(val, outFileName, config=get
 makeSORunr4 <- function(val, outFileName) makeSORun(val, outFileName, config=getSOr4Config())
 
 makeSORunPUser <- function(val, outFileNameSji, outFileNamePerm, querySO, groupConfig) {
-	function (regen=F, regenPriorRun=T, numUsers=40) {
+	function (regen=F, regenPriorRun=T, numUsers=40, numSamples=50) {
 		getCurWorkspaceBy(regen, groupConfig)
-		makeSORun(val, outFileNameSji, c(list(numUsers=numUsers), modConfig(defaultSOSjiPUserConfig, list(query=querySO, regenPriorRun=regenPriorRun))))()
-		makeSORun(val, outFileNamePerm, c(list(numUsers=numUsers), modConfig(defaultSOPermPUserConfig, list(query=querySO, regenPriorRun=F))))()
+		makeSORun(val, outFileNameSji, c(list(numUsers=numUsers, numSamples=numSamples), modConfig(defaultSOSjiPUserConfig, list(query=querySO, regenPriorRun=regenPriorRun))))()
+		makeSORun(val, outFileNamePerm, c(list(numUsers=numUsers, numSamples=numSamples), modConfig(defaultSOPermPUserConfig, list(query=querySO, regenPriorRun=F))))()
 	}
 }
 
@@ -3335,6 +3336,7 @@ curWS <- function() {
 	withProf(myLoadImage(groupConfigG1S6))
 	withProf(myLoadImage(groupConfigG1S2))
 	withProf(myLoadImage(groupConfigG1S3))
+	withProf(myLoadImage(groupConfigPUserS6))
 	test_dir(sprintf("%s/%s", PATH, 'tests'), reporter='summary')
 	tables()
 	.ls.objects(order.by='Size')
