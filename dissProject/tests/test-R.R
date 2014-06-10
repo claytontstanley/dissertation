@@ -94,17 +94,17 @@ context("ModelVsPred Full Runs")
 test_that("testModelVsPred", {
 	  expectedTbl = myReadCSV(getOutFileModelVsPred('testing1'))
 	  expectedHashtagsTbl = myReadCSV(getOutFileHashtags('testing1'))
-	  resTbl = runPriorT(config=modConfig(defaultTSjiPConfig, list(query=sprintf("user_screen_name = 'ap'", defaultTCols))))
+	  resTbl = runPriorT(config=modConfig(defaultTSjiPConfig, list(query=sprintf("select user_screen_name from twitter_users where user_screen_name = 'ap'", defaultTCols))))
 	  expect_equivalent(resTbl$modelHashtagsTbl, data.table())
 	  expect_equivalent(expectedTbl, resTbl$modelVsPredTbl)
 	  expect_equivalent(expectedHashtagsTbl, resTbl$hashtagsTbl)
 	  expectedTbl = myReadCSV(getOutFileModelVsPred('testing2'))
 	  expectedHashtagsTbl = myReadCSV(getOutFileHashtags('testing2'))
-	  resTbl = runPriorT(config=modConfig(defaultTSjiPConfig, list(query=sprintf("user_screen_name = 'thebucktlist'"))))
+	  resTbl = runPriorT(config=modConfig(defaultTSjiPConfig, list(query=sprintf("select user_screen_name from twitter_users where user_screen_name = 'thebucktlist'"))))
 	  expect_equivalent(expectedTbl, resTbl$modelVsPredTbl)
 	  expect_equivalent(expectedHashtagsTbl, resTbl$hashtagsTbl)
 	  expectedTbl = myReadCSV(getOutFileModelVsPred('twitter_ru'))
-	  resTbl = runPriorT(config=modConfig(defaultTSjiPConfig, list(query=sprintf("user_screen_name = 'twitter_ru'"))))
+	  resTbl = runPriorT(config=modConfig(defaultTSjiPConfig, list(query=sprintf("select user_screen_name from twitter_users where user_screen_name = 'twitter_ru'"))))
 	  expect_equivalent(expectedTbl, resTbl$modelVsPredTbl)
 })
 
@@ -116,7 +116,7 @@ test_that("testModelVsPredSO", {
 	  expectedHashtagsTbl[, user_screen_name_prior := as.character(user_screen_name_prior)]
 	  expectedHashtagsTbl[, id := as.character(id)]
 	  expectedHashtagsTbl[, pos := as.numeric(pos)]
-	  resTbl = runPriorSO(config=modConfig(defaultSOSjiPConfig, list(query=sprintf("owner_user_id = 20", defaultSOCols))))
+	  resTbl = runPriorSO(config=modConfig(defaultSOSjiPConfig, list(query=sprintf("select id as owner_user_id from users where id = 20", defaultSOCols))))
 	  expect_equivalent(resTbl$modelHashtagsTbl, data.table())
 	  #resTbl$hashtagsTbl[, pos := NULL][, creation_epoch := NULL][, type := NULL][, user_id := as.numeric(user_screen_name)][, user_screen_name_prior := NULL][, id := as.numeric(id)]
 	  #setcolorder(resTbl$hashtagsTbl, colnames(expectedHashtagsTbl))

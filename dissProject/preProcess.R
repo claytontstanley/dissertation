@@ -980,12 +980,12 @@ runPriorSO <- function(config) {
 
 defaultTCols = "id::text, user_id, user_screen_name, created_at, retweeted, in_reply_to_status_id, lang, truncated, text, creation_epoch"
 
-getQueryUsersSubset <- function(val, from) {
-	sprintf('select user_screen_name from twitter_users where %s > %d order by %s asc limit 100', from, val, from)
+getQueryUsersSubset <- function(val, from, filters) {
+	sprintf('select user_screen_name from twitter_users where %s > %d and %s order by %s asc limit 100', from, val, filters, from)
 }
 
 getQueryGeneralT <- function(val, from, filters) {
-	sprintf('%s and user_screen_name in (%s)', filters, getQueryUsersSubset(val, from))
+	getQueryUsersSubset(val, from, filters)
 }
 
 getQueryT <- function(val, filters='1=1') {
@@ -999,11 +999,11 @@ getQueryTStatuses <- function(val, filters='1=1') {
 defaultSOCols = sprintf('id, owner_user_id, user_screen_name, creation_date, creation_epoch, title, tags')
 
 getQuerySO <- function(val) {
-	sprintf('owner_user_id in (select id from users where reputation > %d order by reputation asc limit 500)', val)
+	sprintf('select id as owner_user_id from users where reputation > %d order by reputation asc limit 500', val)
 }
 
 getQuerySOQ <- function(val) {
-	sprintf("owner_user_id in (select id from users where num_questions > %d order by num_questions asc limit 100)", val)
+	sprintf("select id as owner_user_id from users where num_questions > %d order by num_questions asc limit 100", val)
 }
 
 makeTRun <- function(val, outFileName, config) {
@@ -2232,21 +2232,25 @@ getPriorTblGlobT <- function(config, startId, endId) {
 	globPriorTbl
 }
 
-defaultColsPriorUserSO = 'creation_epoch, user_screen_name, chunk'
+defaultColsPriorUserSO = 'creation_epoch, posts_tbl.user_screen_name, chunk'
 defaultColsPriorUserT = sprintf('%s, %s', defaultColsPriorUserSO, 'posts_tbl.retweeted')
 
 getPriorTblUserSubset <- function(config) {
-	tbl = sqldt(with(config,
-			 sprintf("select %s from %s as tokenized_tbl
-				 join %s as posts_tbl
-				 on posts_tbl.id = tokenized_tbl.id
-				 where type = '%s'
-				 and user_screen_name is not null
-				 and %s
-				 and tokenized_tbl.id in (select id from %s where %s)",
-				 get(defaultColsPriorUser),
-				 tokenizedTbl, postsTbl, tagTypeName, query,
-				 postsTbl, query)))
+	q = with(config,
+		 sprintf("SELECT %s 
+			 FROM    (%s) as u
+			 JOIN    %s as posts_tbl on u.%s = posts_tbl.%s
+			 JOIN    %s as tokenized_tbl on tokenized_tbl.id = posts_tbl.id
+			 WHERE   type = '%s'
+			 AND     posts_tbl.%s IS NOT NULL
+			 and tokenized_tbl.id in (select id from %s where %s in (%s))",
+			 get(defaultColsPriorUser),
+			 query, postsTbl, userNameCol, userNameCol,
+			 tokenizedTbl,
+			 tagTypeName,
+			 userNameCol,
+			 postsTbl, userNameCol, query))
+	tbl = sqldt(q)
 	if (getConfig(config, "convertTagSynonymsP")) convertTagSynonyms(tbl)
 	tbl[, hashtag := chunk][, chunk := NULL]
 	if (getConfig(config, 'dsetType') == 'twitter') {
@@ -2662,20 +2666,23 @@ getTokenizedFromSubset <- function(minId, maxId, config) {
 	resTbl
 }
 
-defaultColsTokenizedSO = "tokenized_tbl.id::text, user_screen_name, creation_epoch, chunk, pos, type"
+defaultColsTokenizedSO = "tokenized_tbl.id::text, posts_tbl.user_screen_name, creation_epoch, chunk, pos, type"
 defaultColsTokenizedT = sprintf('%s, %s', defaultColsTokenizedSO, 'posts_tbl.retweeted')
 
 getTokenizedForUsers <- function(config) {
 	myLog('Getting tokenized table for users')
-	resTbl = sqldt(sprintf("select %s from %s as tokenized_tbl
-			       join %s as posts_tbl
-			       on tokenized_tbl.id = posts_tbl.id
-			       where 1=1
-			       and %s
-			       and tokenized_tbl.id in (select id from %s where %s)",
-			       get(getConfig(config, 'defaultColsTokenized')), getConfig(config, "tokenizedTbl"), getConfig(config, "postsTbl"), getConfig(config, 'query'),
-			       getConfig(config, 'postsTbl'), getConfig(config, 'query')
-			       ))
+	q = with(config,
+		 sprintf("SELECT %s 
+			 FROM    (%s) as u
+			 JOIN    %s as posts_tbl on u.%s = posts_tbl.%s
+			 JOIN    %s as tokenized_tbl on tokenized_tbl.id = posts_tbl.id
+			 WHERE   posts_tbl.%s IS NOT NULL
+			 and tokenized_tbl.id in (select id from %s where %s in (%s))",
+			 get(defaultColsTokenized),
+			 query, postsTbl, userNameCol, userNameCol,
+			 tokenizedTbl, userNameCol,
+			 postsTbl, userNameCol, query))
+	resTbl = sqldt(q)
 	if (getConfig(config, "convertTagSynonymsP")) {
 		resTbl = convertTagSynonymsForTokenized(resTbl, config)
 	}
@@ -3329,8 +3336,8 @@ curWS <- function() {
 	modelVsPredTbl
 	sjiTblTOrderless
 	sessionInfo()
-	mySaveImage(groupConfigG1S1)
-	mySaveImage(groupConfigG1S6)
+	#mySaveImage(groupConfigG1S1)
+	#mySaveImage(groupConfigG1S6)
 	withProf(myLoadImage(groupConfigG1S1))
 	withProf(myLoadImage(groupConfigG1S6))
 	withProf(myLoadImage(groupConfigG1S2))
