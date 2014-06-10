@@ -510,7 +510,7 @@ getOutFileModelHashtags <- function(name) getOutFileGen(getDirModelHashtags(), n
 
 getLogregOutFile <- function(name) getOutFileGen(getDirLogreg(), name)
 
-genTempPostTokenizedTblUser <- function(owner_user_id, config) {
+genTempPostTokenizedTblUser <- function(owner_user_id, firstPost, config) {
 	query = with(config,
 		     sprintf("select chunk_types.id as chunk_id, tokenized.id::bigint as post_id, tokenized.pos as pos, types.id as post_type_id
 			     from %s as tokenized
@@ -521,14 +521,16 @@ genTempPostTokenizedTblUser <- function(owner_user_id, config) {
 			     join %s as posts
 			     on posts.id = tokenized.id
 			     where %s = '%s'
-			     and tokenized.id in (select id from %s where %s = '%s')",
+			     and tokenized.id in (select id from %s where %s = '%s')
+			     and creation_epoch < %s",
 			     tokenizedTbl, tokenizedChunkTypeTbl, tokenizedTypeTypeTbl, postsTbl, userNameCol, owner_user_id,
-			     postsTbl, userNameCol, owner_user_id))
+			     postsTbl, userNameCol, owner_user_id,
+			     firstPost))
 	genTempPostTokenizedTbl(query)
 }
 
-getSjiTblUserSO <- function(owner_user_id, config) {
-	genTempPostTokenizedTblUser(owner_user_id, config)
+getSjiTblUserSO <- function(owner_user_id, firstPost, config) {
+	genTempPostTokenizedTblUser(owner_user_id, firstPost, config)
 	NcoocTblTitle = getNcoocTbl('title', chunkTableQuery, config) 
 	NcoocTblBody = getNcoocTbl('body', chunkTableQuery, config) 
 	sqldf('truncate table temp_tokenized')
@@ -536,8 +538,8 @@ getSjiTblUserSO <- function(owner_user_id, config) {
 	sjiTbl
 }
 
-getSjiTblUserT <- function(owner_user_id, config) {
-	genTempPostTokenizedTblUser(owner_user_id, config)
+getSjiTblUserT <- function(owner_user_id, firstPost, config) {
+	genTempPostTokenizedTblUser(owner_user_id, firstPost, config)
 	NcoocTblTweet = getNcoocTbl('tweet', chunkTableQuery, config) 
 	sqldf('truncate table temp_tokenized')
 	sjiTbl = initSjiTblT(NcoocTblTweet, config)
@@ -546,7 +548,8 @@ getSjiTblUserT <- function(owner_user_id, config) {
 }
 
 makeSjiTblUserSO <- function(tokenTbl, config) {
-	sjiTblSOOrderlessUser <<- tokenTbl[, getSjiTblUserSO(user_screen_name, config), by=user_screen_name]
+	timeTbl = tokenTbl[, list(firstPost=min(creation_epoch)), by=user_screen_name]
+	sjiTblSOOrderlessUser <<- timeTbl[, getSjiTblUserSO(user_screen_name, firstPost, config), by=user_screen_name]
 	setkey(sjiTblSOOrderlessUser, user_screen_name, context, hashtag, posFromTag)
 	permMemMatSOOrderlessUser <<- list()
 	for (user in tokenTbl[, unique(user_screen_name)]) {
@@ -556,7 +559,8 @@ makeSjiTblUserSO <- function(tokenTbl, config) {
 }
 
 makeSjiTblUserT <- function(tokenTbl, config) {
-	sjiTblTOrderlessUser <<- tokenTbl[, getSjiTblUserT(user_screen_name, config), by=user_screen_name]
+	timeTbl = tokenTbl[, list(firstPost=min(creation_epoch)), by=user_screen_name]
+	sjiTblTOrderlessUser <<- timeTbl[, getSjiTblUserT(user_screen_name, firstPost, config), by=user_screen_name]
 	setkey(sjiTblTOrderlessUser, user_screen_name, context, hashtag, posFromTag)
 	permMemMatTOrderlessUser <<- list()
 	for (user in tokenTbl[, unique(user_screen_name)]) {
@@ -1960,6 +1964,7 @@ genTempPostTokenizedTbl <- function(chunkTableQuery) {
 	myLog(sprintf("generating temp_tokenized table with query %s", chunkTableQuery))
 	sqldf('truncate table temp_tokenized')
 	sqldf(sprintf("insert into temp_tokenized %s", chunkTableQuery))
+	myLog(sprintf("Used N=%s co-occurrences to generate sji", sqldf('select count(*) from temp_tokenized')))
 	sqldf('vacuum analyze temp_tokenized')
 }
 
@@ -3318,7 +3323,6 @@ runGenAndSaveCurWorkspaceg3s6 <- function() genAndSaveCurWorkspace(groupConfigG3
 runGenAndSaveCurWorkspaceg4s6 <- function() genAndSaveCurWorkspace(groupConfigG4S6)
 
 curWS <- function() {
-	# FIXME: Don't add test data into training data for custom user sji
 	# FIXME: Fix warnings?
 	# FIXME: Address low prior predictability for SO
 	# FIXME: Make sure word order low predictiveness is fully justified
