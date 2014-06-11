@@ -1343,6 +1343,15 @@ addMiscellaneous <- function(modelVsPredTbl) {
 	modelVsPredTbl[hashtagUsedP == T, acc := NCell/totN]
 }
 
+buildTablesLogreg <- function(outFileNames) {
+	buildTable <- function(outFileName) {
+		tbl = myFread(getLogregOutFile(outFileName))
+		tbl
+	}
+	logregTbl = rbindlist(lapply(outFileNames, buildTable))
+	logregTbl
+}
+
 buildTables <- function(outFileNames) {
 	buildTable <- function(outFileName) {
 		colClasses = c('character', 'logical', 'logical', 'numeric', 'integer', 'character', 'logical', 'integer')
@@ -3333,6 +3342,7 @@ curWS <- function() {
 	# FIXME: Fix warnings?
 	# FIXME: Address low prior predictability for SO
 	# FIXME: Make sure word order low predictiveness is fully justified
+	# FIXME: Rerun context over the weekend
 	# FIXME: Def. look at coefficient tables
 	runPUserSOSji100kTest(regen='useAlreadyLoaded')
 	runPUserTFollowSji1kTest(regen='useAlreadyLoaded')
@@ -3342,7 +3352,7 @@ curWS <- function() {
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelVsPred()))))
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isPriorRun, list.files(path=getDirModelVsPred()))))
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isPUserRun, list.files(path=getDirModelVsPred()))))
-	logregTbl = buildTables(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirLogreg()))))
+	logregTbl = buildTablesLogreg(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirLogreg()))))
 	getDirLogreg()
 
 	modelHashtagsTbls = buildModelHashtagsTables(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelHashtags()))))
