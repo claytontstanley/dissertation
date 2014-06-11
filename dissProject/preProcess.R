@@ -1099,8 +1099,10 @@ getSummaryStats <- function() {
 makeTRunPUser <- function(val, outFileNameSji, outFileNamePerm, queryT, groupConfig) {
 	function (regen=F, regenPriorRun=T, numUsers=80, numSamples=50) {
 		getCurWorkspaceBy(regen, groupConfig)
-		makeTRun(val, outFileNameSji, c(list(numUsers=numUsers, numSamples=numSamples), modConfig(defaultTSjiPUserConfig, list(includeRetweetsP=F, query=queryT, regenPriorRun=regenPriorRun))))()
-		makeTRun(val, outFileNamePerm, c(list(numUsers=numUsers, numSamples=numSamples), modConfig(defaultTPermPUserConfig, list(includeRetweetsP=F, query=queryT, regenPriorRun=F))))()
+		makeTRun(val, outFileNameSji, c(list(numUsers=numUsers, numSamples=numSamples),
+						modConfig(defaultTSjiPUserConfig, list(includeRetweetsP=F, query=queryT, regenPriorRun=regenPriorRun, logregOutFile=getLogregOutFile(outFileNameSji)))))()
+		makeTRun(val, outFileNamePerm, c(list(numUsers=numUsers, numSamples=numSamples),
+						 modConfig(defaultTPermPUserConfig, list(includeRetweetsP=F, query=queryT, regenPriorRun=F, logregOutFile=getLogregOutFile(outFileNamePerm)))))()
 	}
 }
 
@@ -1177,8 +1179,10 @@ makeSORunr4 <- function(val, outFileName) makeSORun(val, outFileName, config=get
 makeSORunPUser <- function(val, outFileNameSji, outFileNamePerm, querySO, groupConfig) {
 	function (regen=F, regenPriorRun=T, numUsers=40, numSamples=50) {
 		getCurWorkspaceBy(regen, groupConfig)
-		makeSORun(val, outFileNameSji, c(list(numUsers=numUsers, numSamples=numSamples), modConfig(defaultSOSjiPUserConfig, list(query=querySO, regenPriorRun=regenPriorRun))))()
-		makeSORun(val, outFileNamePerm, c(list(numUsers=numUsers, numSamples=numSamples), modConfig(defaultSOPermPUserConfig, list(query=querySO, regenPriorRun=F))))()
+		makeSORun(val, outFileNameSji, c(list(numUsers=numUsers, numSamples=numSamples),
+						 modConfig(defaultSOSjiPUserConfig, list(query=querySO, regenPriorRun=regenPriorRun, logregOutFile=getLogregOutFile(outFileNameSji)))))()
+		makeSORun(val, outFileNamePerm, c(list(numUsers=numUsers, numSamples=numSamples),
+						  modConfig(defaultSOPermPUserConfig, list(query=querySO, regenPriorRun=F, logregOutFile=getLogregOutFile(outFileNamePerm)))))()
 	}
 }
 
@@ -3338,6 +3342,9 @@ curWS <- function() {
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelVsPred()))))
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isPriorRun, list.files(path=getDirModelVsPred()))))
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isPUserRun, list.files(path=getDirModelVsPred()))))
+	logregTbl = buildTables(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirLogreg()))))
+	getDirLogreg()
+
 	modelHashtagsTbls = buildModelHashtagsTables(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelHashtags()))))
 	modelHashtagsTbl = modelHashtagsTbls[["TContextPerm-20g1s1r1"]]
 	modelVsPredTbl
