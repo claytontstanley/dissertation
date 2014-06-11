@@ -581,8 +581,11 @@ filterLastNRetrievals <- function(tokenTbl, config) {
 	numUsers = getConfig(config, 'numUsers')
 	selectedUsers = dtTbl[, .N, by=user_screen_name][order(N, decreasing=T)][, head(.SD, n=numUsers)][, user_screen_name]
 	dtTbl = dtTbl[user_screen_name %in% selectedUsers]
-	dtTbl
+	dtTbl = dtTbl[N >= 2]
 	setkey(dtTbl, user_screen_name, dt)
+	firstDtTbl = dtTbl[, list(firstDt=min(dt)), by=user_screen_name]
+	setkey(firstDtTbl, user_screen_name, firstDt)
+	dtTbl = dtTbl[!firstDtTbl]
 	resTbl = tokenTbl[dtTbl]
 	#perfectUsers = resTbl[type==getConfig(config, 'tagTypeName'), list(NHashtag=length(unique(chunk))), by=list(user_screen_name)][NHashtag==1, user_screen_name]
 	#resTbl = resTbl[!user_screen_name %in% perfectUsers]
