@@ -3241,11 +3241,15 @@ computeActPerm <- function(context, pos, permEnvTbl, permMemMat, config) {
 	}
 	resTbl = data.table(hashtag=rownames(contextCorVect), act=as.vector(contextCorVect))
 	if (getConfig(config, 'permHymanP')) {
-		resTbl
-		resTbl[, cdf := pnorm(act, mean=mean(act), sd=sd(act))]
-		resTbl[cdf >= .9999, cdf := .9999] # So that log(1/0)'s don't produce Inf's
-		resTbl[, actLog := log(cdf/(1-cdf))]
-		resTbl[, act := actLog][, actLog := NULL][, cdf := NULL]
+		# sd() of a single value throws an error, so just assume no information when only a single value is returned
+		if (nrow(resTbl) == 1) { 
+			resTbl[, act := 0]
+		} else {
+			resTbl[, cdf := pnorm(act, mean=mean(act), sd=sd(act))]
+			resTbl[cdf >= .9999, cdf := .9999] # So that log(1/0)'s don't produce Inf's
+			resTbl[, actLog := log(cdf/(1-cdf))]
+			resTbl[, act := actLog][, actLog := NULL][, cdf := NULL]
+		}
 	}
 	resTbl
 }
