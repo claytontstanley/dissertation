@@ -512,36 +512,44 @@ getLogregOutFile <- function(name) getOutFileGen(getDirLogreg(), name)
 
 genTempPostTokenizedTblUser <- function(owner_user_id, firstPost, config) {
 	query = with(config,
-		     sprintf("select chunk_types.id as chunk_id, tokenized.id::bigint as post_id, tokenized.pos as pos, types.id as post_type_id
+		     sprintf("select chunk, tokenized.id::text as post_id, tokenized.pos as pos, type
 			     from %s as tokenized
-			     join %s as chunk_types
-			     on tokenized.chunk = chunk_types.type_name
-			     join %s as types
-			     on tokenized.type = types.type_name
 			     join %s as posts
 			     on posts.id = tokenized.id
 			     where %s = '%s'
 			     and tokenized.id in (select id from %s where %s = '%s')
 			     and creation_epoch < %s",
-			     tokenizedTbl, tokenizedChunkTypeTbl, tokenizedTypeTypeTbl, postsTbl, userNameCol, owner_user_id,
+			     tokenizedTbl, postsTbl, userNameCol, owner_user_id,
 			     postsTbl, userNameCol, owner_user_id,
 			     firstPost))
-	genTempPostTokenizedTbl(query)
+	fooTbl = sqldt(query)
+	fooTbl
+}
+
+getNcoocTblMem <- function(chunkTypeName, tokenizedTblUser, config) {
+	tagTbl = tokenizedTblUser[type == getConfig(config, 'tagTypeName')]
+	chunkTbl = tokenizedTblUser[type == chunkTypeName]
+	setkey(tagTbl, post_id)
+	setkey(chunkTbl, post_id)
+	crossTbl = chunkTbl[tagTbl, allow.cartesian=T][, list(chunk=chunk, tag=chunk.1, pos, pos.1)]
+	crossTbl[, posFromTag := pos.1 - pos][, pos := NULL][, pos.1 := NULL]
+	setkey(crossTbl, chunk, tag, posFromTag)
+	crossTbl[, NChunkTag := .N, by=list(chunk, tag)]
+	crossTbl = crossTbl[, list(partialN = .N, NChunkTag = NChunkTag[1]), by=list(chunk, tag, posFromTag)] 
+	crossTbl
 }
 
 getSjiTblUserSO <- function(owner_user_id, firstPost, config) {
-	genTempPostTokenizedTblUser(owner_user_id, firstPost, config)
-	NcoocTblTitle = getNcoocTbl('title', chunkTableQuery, config) 
-	NcoocTblBody = getNcoocTbl('body', chunkTableQuery, config) 
-	sqldf('truncate table temp_tokenized')
+	tokenizedTblUser = genTempPostTokenizedTblUser(owner_user_id, firstPost, config)
+	NcoocTblTitle = getNcoocTblMem('title', tokenizedTblUser, config) 
+	NcoocTblBody = getNcoocTblMem('body', tokenizedTblUser, config) 
 	sjiTbl = initSjiTblSO(NcoocTblTitle, NcoocTblBody, config)
 	sjiTbl
 }
 
 getSjiTblUserT <- function(owner_user_id, firstPost, config) {
-	genTempPostTokenizedTblUser(owner_user_id, firstPost, config)
-	NcoocTblTweet = getNcoocTbl('tweet', chunkTableQuery, config) 
-	sqldf('truncate table temp_tokenized')
+	tokenizedTblUser = genTempPostTokenizedTblUser(owner_user_id, firstPost, config)
+	NcoocTblTweet = getNcoocTblMem('tweet', tokenizedTblUser, config) 
 	sjiTbl = initSjiTblT(NcoocTblTweet, config)
 	sjiTbl = initSjiTblTOrderless(NcoocTblTweet, config)
 	sjiTbl
@@ -2638,6 +2646,7 @@ setColOrderWithAtFront <- function(tbl, front) {
 	tbl
 }
 
+# FIXME: Need to reverse posFromTag
 getContextTbl <- function(contextTbl, tagTbl) {
 	resTbl = setkey(contextTbl[, id:=1:nrow(.SD)], user_screen_name)[setkey(copy(tagTbl), user_screen_name), allow.cartesian=T, nomatch=0]
 	resTbl = resTbl[, list(id, chunk, hashtag=chunk.1, pos, hashtagPos=pos.1, type)][, posFromTag := pos - hashtagPos]
@@ -3346,7 +3355,7 @@ curWS <- function() {
 	# FIXME: Fix warnings?
 	# FIXME: Address low prior predictability for SO
 	# FIXME: Make sure word order low predictiveness is fully justified
-	# FIXME: Rerun context over the weekend
+	# FIXME: Rerun context over the weekend (fix posFromTag order first)
 	# FIXME: Def. look at coefficient tables
 	runPUserSOSji100kTest(regen='useAlreadyLoaded')
 	runPUserTFollowSji1kTest(regen='useAlreadyLoaded')
