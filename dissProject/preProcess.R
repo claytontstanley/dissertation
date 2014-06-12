@@ -2646,10 +2646,9 @@ setColOrderWithAtFront <- function(tbl, front) {
 	tbl
 }
 
-# FIXME: Need to reverse posFromTag
 getContextTbl <- function(contextTbl, tagTbl) {
 	resTbl = setkey(contextTbl[, id:=1:nrow(.SD)], user_screen_name)[setkey(copy(tagTbl), user_screen_name), allow.cartesian=T, nomatch=0]
-	resTbl = resTbl[, list(id, chunk, hashtag=chunk.1, pos, hashtagPos=pos.1, type)][, posFromTag := pos - hashtagPos]
+	resTbl = resTbl[, list(id, chunk, hashtag=chunk.1, pos, hashtagPos=pos.1, type)][, posFromTag := hashtagPos - pos]
 	resTbl = resTbl[, list(chunk, posFromTag, type)][, orderType := 'order']
 	resTbl = rbind(resTbl, contextTbl[, list(chunk, posFromTag=rep(0, nrow(.SD)), type, orderType=rep('orderless', nrow(.SD)))])
 	resTbl

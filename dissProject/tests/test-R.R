@@ -241,7 +241,7 @@ test_that('testGetContextTbl', {
 	}
 	contextTbl = data.table(user_screen_name=c('a','a'), chunk=c('b','c'), pos=c(1,3), type=c('t','t'))
 	tagTbl = data.table(user_screen_name=c('a','a'), chunk=c('#a', '#b'), pos=c(2,4), type=c('h','h'))
-	testGetContextTblInner(contextTbl, tagTbl, data.table(chunk=c('b','c','b','c','b','c'), posFromTag=c(-1,1,-3,-1,0,0), type='t', orderType=c(rep('order', 4), rep('orderless', 2))))
+	testGetContextTblInner(contextTbl, tagTbl, data.table(chunk=c('b','c','b','c','b','c'), posFromTag=c(1,-1,3,1,0,0), type='t', orderType=c(rep('order', 4), rep('orderless', 2))))
 	contextTbl = data.table(user_screen_name=character(), chunk=character(), pos=integer(), type=character())
 	tagTbl = data.table(user_screen_name=c('a'), chunk=c('#a'), pos=c(1), type=c('h'))
 	testGetContextTblInner(contextTbl, tagTbl, data.table(chunk=character(), posFromTag=integer(), type=character(), orderType=character()))
