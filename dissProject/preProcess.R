@@ -3247,7 +3247,11 @@ computeActPerm <- function(context, pos, permEnvTbl, permMemMat, config) {
 	} else {
 		contextCorVect = myCor(permMemMat, contextMemVect)
 	}
-	resTbl = data.table(hashtag=rownames(contextCorVect), act=as.vector(contextCorVect))
+	if (length(as.vector(contextCorVect)) == 0) {
+		resTbl = data.table(hashtag=character(), act=numeric())
+	} else {
+		resTbl = data.table(hashtag=rownames(contextCorVect), act=as.vector(contextCorVect))
+	}
 	if (getConfig(config, 'permHymanP')) {
 		# sd() of a single value throws an error, so just assume no information when only a single value is returned
 		if (nrow(resTbl) == 1) { 
@@ -3354,7 +3358,7 @@ curWS <- function() {
 	# FIXME: Fix warnings?
 	# FIXME: Address low prior predictability for SO
 	# FIXME: Make sure word order low predictiveness is fully justified
-	# FIXME: Rerun context over the weekend (fix posFromTag order first)
+	# FIXME: Rerun context over the weekend
 	# FIXME: Def. look at coefficient tables
 	runPUserSOSji100kTest(regen='useAlreadyLoaded')
 	runPUserTFollowSji1kTest(regen='useAlreadyLoaded')
