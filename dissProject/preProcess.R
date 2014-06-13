@@ -531,7 +531,7 @@ getNcoocTblMem <- function(chunkTypeName, tokenizedTblUser, config) {
 	chunkTbl = tokenizedTblUser[type == chunkTypeName]
 	setkey(tagTbl, post_id)
 	setkey(chunkTbl, post_id)
-	crossTbl = chunkTbl[tagTbl, allow.cartesian=T][, list(chunk=chunk, tag=chunk.1, pos, pos.1)]
+	crossTbl = chunkTbl[tagTbl, allow.cartesian=T, nomatch=0][, list(chunk=chunk, tag=chunk.1, pos, pos.1)]
 	crossTbl[, posFromTag := pos.1 - pos][, pos := NULL][, pos.1 := NULL]
 	setkey(crossTbl, chunk, tag, posFromTag)
 	crossTbl[, NChunkTag := .N, by=list(chunk, tag)]
@@ -3356,6 +3356,7 @@ curWS <- function() {
 	# FIXME: Make sure word order low predictiveness is fully justified
 	# FIXME: Rerun context over the weekend (fix posFromTag order first)
 	# FIXME: Def. look at coefficient tables
+	runPUserTTweetsSji5e3(regen='useAlreadyLoaded')
 	runPUserSOSji100kTest(regen='useAlreadyLoaded')
 	runPUserTFollowSji1kTest(regen='useAlreadyLoaded')
 	withProf(runContext20g1s1(regen='useAlreadyLoaded'))
