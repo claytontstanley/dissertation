@@ -3356,7 +3356,6 @@ curWS <- function() {
 	# FIXME: Make sure word order low predictiveness is fully justified
 	# FIXME: Rerun context over the weekend (fix posFromTag order first)
 	# FIXME: Def. look at coefficient tables
-	runPUserTTweetsSji5e3(regen='useAlreadyLoaded')
 	runPUserSOSji100kTest(regen='useAlreadyLoaded')
 	runPUserTFollowSji1kTest(regen='useAlreadyLoaded')
 	withProf(runContext20g1s1(regen='useAlreadyLoaded'))
