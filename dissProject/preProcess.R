@@ -1723,6 +1723,15 @@ analyzePUser <- function(modelVsPredTbl) {
 				       'PriorStdTitleOrderlessFreqhyserBodyOrderlessFreqhyser', 'PriorStdTitleBody', 'PriorStdTitleOrderlessFreqhymanBodyOrderlessFreqhyman',
 				       'PriorStdTitleUsercontextBodyUsercontext'))
 	compareMeanDVDefault(tbl[dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='foo')
+	# RESULT: .7 d is better for T than SO, but effect is small.
+	# Also once additional predictors are added to the model, the effect diminishes.
+	# SO and T compare two d values	
+	dTbl = rbind(baseTblPost, baseTbl)[topHashtag & hashtagUsedP]
+	DVNames = c('topHashtagPostPriorStd', asTopHashtagAcross(c('PriorStd', 'PriorStdTweetUsercontext', 'PriorStdTweetOrderlessFreqhyser',
+								   'PriorStdTitleBody', 'PriorStdTitleOrderlessFreqhymanBodyOrderlessFreqhyman')))
+	dWideTbl = getDWideTbl(dTbl[DVName %in% DVNames])
+	dWideTbl = dWideTbl[!is.na(dDiff)]
+	compareMeanDVDefault(dWideTbl, dDiff, figName='dContext', groupCol='dsetType')
 }
 
 analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
@@ -1877,7 +1886,7 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 				       'PriorStdTweetOrderWindowTweetOrderlessWindow',
 				       'PriorStdTweetOrderlessEntropy'))
 	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='orderT', groupCol='dsetGroup')
-	# RESULT: .7 d is better for SO but not for T, lines up with 'relaxed across posts' finding for Prior dataset. Magnitude of effect is very small, not as important as using prior and weighting
+	# RESULT: .7 d is better for T, but not for SO, lines up with 'relaxed across posts' finding for Prior dataset. Magnitude of effect is very small, not as important as using prior and weighting
 	# SO and T compare two d values	
 	dTbl = rbind(baseTblPost, baseTbl)[topHashtag & hashtagUsedP]
 	DVNames = c('topHashtagPostPriorStd', asTopHashtagAcross(c('PriorStd', 'PriorStdTweet', 'PriorStdTweetOrderHymanTweetOrderlessHyman',
