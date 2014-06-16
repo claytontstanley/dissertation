@@ -1713,16 +1713,14 @@ analyzePUser <- function(modelVsPredTbl) {
 				       'TitleOrderlessFreqhymanBodyOrderlessFreqhyman',
 				       'PriorStdTitleOrderlessFreqhymanBodyOrderlessFreqhyman'))
 	compareMeanDVDefault(tbl[dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='foo')
-	# RESULT: User sji is helpful for Twitter, and prior is useful again
+	# RESULT: User sji is not very helpful for Twitter, and prior is useful again
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweetUsercontext', 'PriorStdTweetOrderlessFreqhyser', 'TweetUsercontext', 'TweetOrderlessFreqhyser'))
 	compareMeanDVDefault(tbl[dsetType == 'twitter' & DVName %in% DVNames], acc, figName='foo')
-	# RESULT: User sji is much more helpful than standard sji for StackOverflow ***
+	# RESULT: User sji is much less helpful than standard sji for StackOverflow
 	DVNames = asTopHashtagAcross(c('TitleOrderlessFreqhyser', 'TitleUsercontext', 'TitleOrderlessFreqhyman', 'TitleOrderlessFreqhyser', 'Title',
 				       'PriorStdTitleOrderlessFreqhyserBodyOrderlessFreqhyser', 'PriorStdTitleBody', 'PriorStdTitleOrderlessFreqhymanBodyOrderlessFreqhyman',
 				       'PriorStdTitleUsercontextBodyUsercontext'))
 	compareMeanDVDefault(tbl[dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='foo')
-
-
 }
 
 analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
