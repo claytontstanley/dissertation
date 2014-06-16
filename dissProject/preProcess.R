@@ -3365,7 +3365,7 @@ runGenAndSaveCurWorkspaceg3s6 <- function() genAndSaveCurWorkspace(groupConfigG3
 runGenAndSaveCurWorkspaceg4s6 <- function() genAndSaveCurWorkspace(groupConfigG4S6)
 
 curWS <- function() {
-	# FIXME: Rerun context over the weekend (check the saved df HEAD^^ command)
+	# FIXME: Rerun context (check the saved df HEAD^^ command)
 	# FIXME: Rerun PUser (should be no changes)
 	# FIXME: Def. look at coefficient tables
 	runPUserSOSji100kTest(regen='useAlreadyLoaded')
