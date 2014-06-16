@@ -3365,9 +3365,6 @@ runGenAndSaveCurWorkspaceg3s6 <- function() genAndSaveCurWorkspace(groupConfigG3
 runGenAndSaveCurWorkspaceg4s6 <- function() genAndSaveCurWorkspace(groupConfigG4S6)
 
 curWS <- function() {
-	# FIXME: Fix warnings?
-	# FIXME: Address low prior predictability for SO
-	# FIXME: Make sure word order low predictiveness is fully justified
 	# FIXME: Rerun context over the weekend
 	# FIXME: Def. look at coefficient tables
 	runPUserSOSji100kTest(regen='useAlreadyLoaded')
