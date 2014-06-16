@@ -727,7 +727,8 @@ makeBestFitsVectFun <- function(res) {
 }
 
 makeBestFitsVectTPerm <- function(name) {
-	do.call(makeBestFitsVectFun(list(c('actPriorStd', 'actTweetOrder%s', 'actTweetOrderless%s'), c('actTweetOrder%s', 'actTweetOrderless%s'))),
+	do.call(makeBestFitsVectFun(list(c('actPriorStd', 'actTweetOrder%s', 'actTweetOrderless%s'), c('actTweetOrder%s', 'actTweetOrderless%s'),
+					 c('actPriorStd', 'actTweetOrder%s'), c('actPriorStd', 'actTweetOrderless%s'))),
 		list(name))
 }
 
@@ -760,7 +761,8 @@ makeBestFitsStrFun <- function(res) {
 
 makeBestFitsStrTPerm <- function(name) {
 	do.call(makeBestFitsStrFun(c('actPriorStd_actTweetOrder%s_actTweetOrderless%s',
-				  'actTweetOrderless%s', 'actTweetOrder%s', 'actTweetOrder%s_actTweetOrderless%s')),
+				  'actTweetOrderless%s', 'actTweetOrder%s', 'actTweetOrder%s_actTweetOrderless%s',
+				  'actPriorStd_actTweetOrder%s', 'actPriorStd_actTweetOrderless%s')),
 		list(name))
 }
 
@@ -1872,7 +1874,8 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 				       'TweetOrderEntropy', 'Tweet', 'TweetOrder', 'TweetOrderDirection', 'TweetOrderWindow',
 				       'TweetOrderlessEntropy', 'TweetOrderless', 'TweetOrderlessDirection', 'TweetOrderlessWindow',
 				       'PriorStdTweetOrderEntropyTweetOrderlessEntropy', 'PriorStdTweetOrderTweetOrderless', 'PriorStdTweetOrderDirectionTweetOrderlessDirection',
-				       'PriorStdTweetOrderWindowTweetOrderlessWindow'))
+				       'PriorStdTweetOrderWindowTweetOrderlessWindow',
+				       'PriorStdTweetOrderlessEntropy'))
 	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='orderT', groupCol='dsetGroup')
 	# RESULT: .7 d is better for SO but not for T, lines up with 'relaxed across posts' finding for Prior dataset. Magnitude of effect is very small, not as important as using prior and weighting
 	# SO and T compare two d values	
