@@ -1,0 +1,43 @@
+\documentclass[english]{article}
+\usepackage{graphicx}
+\usepackage[T1]{fontenc}
+\usepackage{babel}
+\usepackage[group-separator={,}]{siunitx}
+\frenchspacing
+\raggedright
+
+\title{Abstract Submission for Fourth Annual Midwestern Cognitive Science Conference}
+
+\author{Clayton Stanley (clayton.stanley@rice.edu) \\
+  Department of Psychology, 6100 Main Street \\
+  Houston, TX 77005 USA 
+  \and Michael D. Byrne (byrne@rice.edu) \\
+  Departments of Psychology and Computer Science, 6100 Main Street \\
+  Houston, TX 77005 USA \\
+}
+
+\begin{document}
+
+\maketitle
+
+%TC:break Abstract
+\begin{abstract}
+  This research explores how large-scale behavioral datasets can be used to evaluate and improve models in declarative memory.
+  An author's task of choosing hashtags when composing a tweet on Twitter and choosing tags when asking a question on StackOverflow can be framed as a declarative memory retrieval problem.
+  Two state-of-the-art declarative memory models were evaluated on how accurate they predict a user's chosen tags: an ACT-R inspired Bayesian model and a random permutation vector-based model.
+  Experiments were designed to
+  [1] discover the best way to leverage a user's prior hashtag use as a future predictor,
+  [2] improve the models so that each model's strengths are incorporated into the other,
+  and [3] formally evaluate and compare each model's performance when recommending hashtags on Twitter and tags on StackOverflow.
+  The results show that each user's own past behavior is a strong predictor of future behavior, and past behavior can be combined with context in a straightforward way for both the Bayesian and vector-based context models.
+  Also both models improve after dealing with high frequency words in some way, but they differ in how best to handle these stop words.
+  This shows that there is no single best way to deal with stop words when using a co-occurrence model, and the most appropriate method is dependent on the type of co-occurrence model that is used.
+  Overall, since the modifications to the two memory models were aimed at the architectural level, and these modifications improved performance,
+  they may suggest task-independent general modifications that can help improve model fit to human data in a much wider range of domains.
+\end{abstract}
+%TC:break _main_
+
+
+\end{document}
+
+
