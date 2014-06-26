@@ -3499,7 +3499,6 @@ runGenAndSaveCurWorkspaceg3s6 <- function() genAndSaveCurWorkspace(groupConfigG3
 runGenAndSaveCurWorkspaceg4s6 <- function() genAndSaveCurWorkspace(groupConfigG4S6)
 
 curWS <- function() {
-	# FIXME: Rerun context (check the saved df HEAD^^ command)
 	# FIXME: Def. look at coefficient tables
 	# FIXME: Change smdim and lgdim to freq and not entropy
 	# FIXME: Why is hyman not working well for only context? 
