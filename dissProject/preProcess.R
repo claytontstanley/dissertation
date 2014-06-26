@@ -867,7 +867,7 @@ defaultSOPermConfig = modConfig(c(defaultSOConfig, defaultPermConfig,
 					      makeBestFitsStrSOPerm('Nenthyman'),
 					      makeBestFitsStrSOPerm('Freqhyman')
 					      ),
-				     MCCORESAct = 16
+				     MCCORESAct = 8
 				     ))
 
 defaultTSjiConfig = modConfig(c(defaultTConfig, defaultSjiConfig,
