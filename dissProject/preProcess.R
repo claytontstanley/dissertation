@@ -3516,18 +3516,6 @@ curWS <- function() {
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isPUserRun, list.files(path=getDirModelVsPred()))))
 	logregTbl = buildTablesLogreg(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirLogreg()))))
 	modelHashtagsTbls = buildTablesModelHashtags(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelHashtags()))))
-	modelHashtagsTbls.new = copy(modelHashtagsTbls)
-	names(modelHashtagsTbls)
-	names(modelHashtagsTbls[['TContextPerm-500g1s6r1']])
-	modelHashtagsTbl = modelHashtagsTbls.new[['TContextPerm-500g1s6r1']]
-	modelHashtagsTbl[, .N, by=list(id, topHashtagAcrossTweetOrderlessFreqhyman)][topHashtagAcrossTweetOrderlessFreqhyman == T][, hist(N)]
-	modelHashtagsTbl[, .N, by=list(id, topHashtagAcrossTweetOrderlessFreq)][topHashtagAcrossTweetOrderlessFreq == T][, hist(N)]
-	modelHashtagsTbl[, .N, by=list(id, topHashtagPostTweetOrderlessFreqhyman)][topHashtagPostTweetOrderlessFreqhyman == T][, hist(N)]
-	modelHashtagsTbl[, .N, by=list(id, topHashtagPostTweetOrderlessFreq)][topHashtagPostTweetOrderlessFreq == T][, hist(N)]
-	modelHashtagsTbl = modelHashtagsTbls.new[['SOContextPerm-500g1s6r1']]
-	modelHashtagsTbl[, .N, by=list(id, topHashtagAcrossTitleOrderlessHyman)][topHashtagAcrossTitleOrderlessHyman == T][, hist(N)]
-	modelHashtagsTbl[, .N, by=list(id, topHashtagAcrossTitleOrderless)][topHashtagAcrossTitleOrderless == T][, hist(N)]
-	getDirLogreg()
 
 	modelHashtagsTbl = modelHashtagsTbls[["TContextPerm-20g1s1r1"]]
 	modelVsPredTbl
