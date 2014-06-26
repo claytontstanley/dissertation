@@ -19,30 +19,33 @@ computeActPriorByUser <- function(hashtagsTbl, ds) {
 
 test_that("testPriorActivations", {
 	  sortExpectedTbl <- function(tbl) {
-		  cols = c('user_screen_name', 'dt', 'hashtag', 'd', 'N', 'act', 'actOL', 'actOL2')
+		  cols = c('user_screen_name', 'dt', 'hashtag', 'd', 'N', 'act', 'actOffset', 'actOL2')
 		  setcolorder(tbl, cols) 
 		  setkeyv(tbl, cols) 
 		  tbl
 	  }
 	  testHashtagsTbl = data.table(user_screen_name=c(1,1,1,1), dt=c(0,2,3,4), hashtag=c('a', 'b', 'a', 'b'))
 	  expectedActTbl = sortExpectedTbl(data.table(dt=c(2,3,3,4,4), hashtag=c('a','a','b','a','b'), d=c(.5,.5,.5,.5,.5),
-						      user_screen_name=c(1,1,1,1,1), N=c(1,1,1,2,1), act=c(log(2^(-.5)), log(3^(-.5)), log(1), log(4^(-.5)+1), log(2^(-.5))),
-						      actOL=c(log(1/.5)-.5*log(2), log(1/.5)-.5*log(3), log(1/.5)-.5*log(3), log(2/.5)-.5*log(4), log(1/.5)-.5*log(4)),
+						      user_screen_name=c(1,1,1,1,1), N=c(1,1,1,2,1),
+						      act=c(log(2^(-.5)), log(3^(-.5)), log(1), log(4^(-.5)+1), log(2^(-.5))),
+						      actOffset=c(log(2^(-.5)), log(3^(-.5)), log(1), log(4^(-.5)+1), log(2^(-.5))),
 						      actOL2=c(log(1/.5)-.5*log(2), log(1/.5)-.5*log(3), log(1/.5)-.5*log(1), log(2/.5)-.5*log(4), log(1/.5)-.5*log(2))))
 	  actTbl = computeActPriorByUser(testHashtagsTbl, d=.5)
 	  expect_that(actTbl, is_equivalent_to(expectedActTbl))
 
 	  testHashtagsTbl = data.table(user_screen_name=c(1,1,2,2), dt=c(0,2,0,3), hashtag=c('a','b','b','b'))
-	  expectedActTbl = sortExpectedTbl(data.table(dt=c(2,3), hashtag=c('a','b'), d=c(.5, .5), user_screen_name=c(1,2), N=c(1,1), act=c(log(2^(-.5)), log(3^(-.5))),
-						      actOL=c(log(1/.5)-.5*log(2), log(1/.5)-.5*log(3)),
+	  expectedActTbl = sortExpectedTbl(data.table(dt=c(2,3), hashtag=c('a','b'), d=c(.5, .5), user_screen_name=c(1,2), N=c(1,1),
+						      act=c(log(2^(-.5)), log(3^(-.5))),
+						      actOffset=c(log(2^(-.5)), log(3^(-.5))),
 						      actOL2=c(log(1/.5)-.5*log(2), log(1/.5)-.5*log(3))))
 	  actTbl = computeActPriorByUser(testHashtagsTbl, d=.5)
 	  expect_that(actTbl, is_equivalent_to(expectedActTbl))
 
 	  testHashtagsTbl = data.table(user_screen_name=c(1,1), dt=c(0,2), hashtag=c('a','b'))
 	  expectedActTbl = sortExpectedTbl(data.table(dt=c(2,2,2,2), hashtag=c('a','a','a','a'), d=c(.2,.3,.4,.5),
-						      user_screen_name=c(1,1,1,1), N=c(1,1,1,1), act=c(log(2^(-.2)), log(2^(-.3)), log(2^(-.4)), log(2^(-.5))),
-						      actOL=sapply(c(.2,.3,.4,.5), function(d) log(1/(1-d))-d*log(2)),
+						      user_screen_name=c(1,1,1,1), N=c(1,1,1,1),
+						      act=c(log(2^(-.2)), log(2^(-.3)), log(2^(-.4)), log(2^(-.5))),
+						      actOffset=c(log(2^(-.2)), log(2^(-.3)), log(2^(-.4)), log(2^(-.5))),
 						      actOL2=sapply(c(.2,.3,.4,.5), function(d) log(1/(1-d))-d*log(2))))
 	  actTbl = computeActPriorByUser(testHashtagsTbl, d=c(.2,.3,.4,.5))
 	  expect_that(actTbl, is_equivalent_to(expectedActTbl))
@@ -52,8 +55,8 @@ test_that("testPriorActivations", {
 						      user_screen_name=c(1,1,1,1,1,1), N=c(1,1,1,1,1,1),
 						      act=c(log(2^(-.5)), log(3^(-.5)), log(1^(-.5)),
 							    log(2^(-.4)), log(3^(-.4)), log(1^(-.4))),
-						      actOL=c(log(1/.5)-.5*log(2), log(1/.5)-.5*log(3), log(1/.5)-.5*log(3),
-							      log(1/(1-.4))-.4*log(2), log(1/(1-.4))-.4*log(3), log(1/(1-.4))-.4*log(3)),
+						      actOffset=c(log(2^(-.5)), log(3^(-.5)), log(1^(-.5)),
+								  log(2^(-.4)), log(3^(-.4)), log(1^(-.4))),
 						      actOL2=c(log(1/.5)-.5*log(2), log(1/.5)-.5*log(3), log(1/.5)-.5*log(1),
 							       log(1/(1-.4))-.4*log(2), log(1/(1-.4))-.4*log(3), log(1/(1-.4))-.4*log(1))))
 	  actTbl = computeActPriorByUser(testHashtagsTbl, d=c(.5,.4))
@@ -94,17 +97,17 @@ context("ModelVsPred Full Runs")
 test_that("testModelVsPred", {
 	  expectedTbl = myReadCSV(getOutFileModelVsPred('testing1'))
 	  expectedHashtagsTbl = myReadCSV(getOutFileHashtags('testing1'))
-	  resTbl = runPriorT(config=modConfig(defaultTSjiPConfig, list(query=sprintf("select user_screen_name from twitter_users where user_screen_name = 'ap'", defaultTCols))))
+	  resTbl = runPriorT(config=modConfig(defaultTSjiPConfig, list(query=sprintf("select user_screen_name from twitter_users where user_screen_name = 'ap'"), logLevel=0, offsetP=F)))
 	  expect_equivalent(resTbl$modelHashtagsTbl, data.table())
 	  expect_equivalent(expectedTbl, resTbl$modelVsPredTbl)
 	  expect_equivalent(expectedHashtagsTbl, resTbl$hashtagsTbl)
 	  expectedTbl = myReadCSV(getOutFileModelVsPred('testing2'))
 	  expectedHashtagsTbl = myReadCSV(getOutFileHashtags('testing2'))
-	  resTbl = runPriorT(config=modConfig(defaultTSjiPConfig, list(query=sprintf("select user_screen_name from twitter_users where user_screen_name = 'thebucktlist'"))))
+	  resTbl = runPriorT(config=modConfig(defaultTSjiPConfig, list(query=sprintf("select user_screen_name from twitter_users where user_screen_name = 'thebucktlist'"), logLevel=0, offsetP=F)))
 	  expect_equivalent(expectedTbl, resTbl$modelVsPredTbl)
 	  expect_equivalent(expectedHashtagsTbl, resTbl$hashtagsTbl)
 	  expectedTbl = myReadCSV(getOutFileModelVsPred('twitter_ru'))
-	  resTbl = runPriorT(config=modConfig(defaultTSjiPConfig, list(query=sprintf("select user_screen_name from twitter_users where user_screen_name = 'twitter_ru'"))))
+	  resTbl = runPriorT(config=modConfig(defaultTSjiPConfig, list(query=sprintf("select user_screen_name from twitter_users where user_screen_name = 'twitter_ru'"), logLevel=0, offsetP=F)))
 	  expect_equivalent(expectedTbl, resTbl$modelVsPredTbl)
 })
 
@@ -116,7 +119,7 @@ test_that("testModelVsPredSO", {
 	  expectedHashtagsTbl[, user_screen_name_prior := as.character(user_screen_name_prior)]
 	  expectedHashtagsTbl[, id := as.character(id)]
 	  expectedHashtagsTbl[, pos := as.numeric(pos)]
-	  resTbl = runPriorSO(config=modConfig(defaultSOSjiPConfig, list(query=sprintf("select id as owner_user_id from users where id = 20", defaultSOCols))))
+	  resTbl = runPriorSO(config=modConfig(defaultSOSjiPConfig, list(query=sprintf("select id as owner_user_id from users where id = 20"), logLevel=0, offsetP=F)))
 	  expect_equivalent(resTbl$modelHashtagsTbl, data.table())
 	  #resTbl$hashtagsTbl[, pos := NULL][, creation_epoch := NULL][, type := NULL][, user_id := as.numeric(user_screen_name)][, user_screen_name_prior := NULL][, id := as.numeric(id)]
 	  #setcolorder(resTbl$hashtagsTbl, colnames(expectedHashtagsTbl))

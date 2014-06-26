@@ -622,7 +622,7 @@ runPrior <- function(config) {
 	getOutFileForNameFun <- function(name) {
 		getConfig(config, name)
 	}
-	withLogLevel(1, runForTokenTbl(tokenTbl, config, getOutFileForNameFun))
+	withLogLevel(getConfig(config, 'logLevel'), runForTokenTbl(tokenTbl, config, getOutFileForNameFun))
 }
 
 modConfig <- function(config, mods) {
@@ -668,6 +668,7 @@ defaultBaseConfig = list(dFull=c(0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1.0,1.1,1.2,1.3,1.
 			 MCCORESActUser = 1,
 			 limitRetrievalsP = F,
 			 offsetP = T,
+			 logLevel = 1,
 			 query=NULL)
 
 defaultTConfig = c(defaultBaseConfig,
