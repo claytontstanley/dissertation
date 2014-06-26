@@ -273,7 +273,7 @@ getModelHashtagsTbl <- function(partialRes) {
 	#myLog('computing activations across table')
 	res = partialRes[, list(N=.N,
 				actPriorStd=log(sum(partialAct)),
-				actPriorOL=if (is.na(d[1])) numeric(0) else if (d[1]>=1) NaN else log(.N/(1-d))-d*log(dt),
+				actPriorStdNoffset=log(sum(partialAct)),
 				actPriorOL2=if (is.na(d[1])) numeric(0) else if (d[1]>=1) NaN else log(.N/(1-d))-d*log(max(dtP))), keyby=list(user_screen_name, dt, hashtag, d)]
 	with(res, myStopifnot(!is.infinite(actPriorStd)))
 	with(res, myStopifnot(!is.infinite(actPriorOL2)))
@@ -660,13 +660,14 @@ defaultBaseConfig = list(dFull=c(0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1.0,1.1,1.2,1.3,1.
 			 modelVsPredOutFile='/tmp/modelVsPred.csv',
 			 modelHashtagsOutFile='',
 			 logregOutFile='',
-			 actDVs = c('actPriorStd', 'actPriorOL', 'actPriorOL2'),
+			 actDVs = c('actPriorStd', 'actPriorOL2'),
 			 permNRowsAll = c(2048, 10000, permNRowsSm),
 			 permNRows = 2048,
 			 MCCORESAct = 8,
 			 MCCORESReg = 4,
 			 MCCORESActUser = 1,
 			 limitRetrievalsP = F,
+			 offsetP = T,
 			 query=NULL)
 
 defaultTConfig = c(defaultBaseConfig,
@@ -785,8 +786,7 @@ makeBestFitsStrSOSji <- function(name) {
 }
 
 defaultTPermConfig = modConfig(c(defaultTConfig, defaultPermConfig,
-				 list(runTbl=makeRunTbl(c(list(c('actPriorStd', 'actTweetOrder'),
-							       c('actPriorStd', 'actTweetOrderless')),
+				 list(runTbl=makeRunTbl(c(list(c('actPriorStdNoffset', 'actTweetOrderNoffset', 'actTweetOrderlessNoffset')),
 							  makeBestFitsVectTPerm(''),
 							  makeBestFitsVectTPerm('Entropy'),
 							  makeBestFitsVectTPerm('Stoplist'),
@@ -806,7 +806,9 @@ defaultTPermConfig = modConfig(c(defaultTConfig, defaultPermConfig,
 				      permMemMatOrderless='permMemMatTOrderless',
 				      computeActFromContextTbl = 'computeActPermTFromContextTbl')),
 			       list(accumModelHashtagsTbl=T,
-				    actDVs=c('actPriorStd_actTweetOrder', 'actPriorStd_actTweetOrderless', 'actPriorStd',
+				    actDVs=c('actPriorStd', 'actPriorStdNoffset',
+					     'actPriorStdNoffset_actTweetOrderNoffset_actTweetOrderlessNoffset',
+					     'actTweetOrderNoffset', 'actTweetOrderlessNoffset',
 					     makeBestFitsStrTPerm(''),
 					     makeBestFitsStrTPerm('Entropy'),
 					     makeBestFitsStrTPerm('Stoplist'),
@@ -821,12 +823,14 @@ defaultTPermConfig = modConfig(c(defaultTConfig, defaultPermConfig,
 					     makeBestFitsStrTPerm('Nenthyman'),
 					     makeBestFitsStrTPerm('Freqhyman')
 					     ),
-				    MCCORESAct = 16
+				    MCCORESAct = 16,
+				    MCCORESReg = 1
 				    ))
 
 defaultSOPermConfig = modConfig(c(defaultSOConfig, defaultPermConfig,
 				  list(runTbl=makeRunTbl(c(list(c('actPriorStd', 'actTitleOrderless'),
-								c('actPriorStd', 'actBodyOrderless')),
+								c('actPriorStd', 'actBodyOrderless'),
+								c('actPriorStdNoffset', 'actTitleOrderlessNoffset', 'actBodyOrderlessNoffset')),
 							   makeBestFitsVectSOPerm(''),
 							   makeBestFitsVectSOPerm('Entropy'),
 							   makeBestFitsVectSOPerm('Stoplist'),
@@ -846,7 +850,9 @@ defaultSOPermConfig = modConfig(c(defaultSOConfig, defaultPermConfig,
 				       permMemMatOrderless='permMemMatSOOrderless',
 				       computeActFromContextTbl = 'computeActPermSOFromContextTbl')),
 				list(accumModelHashtagsTbl=T,
-				     actDVs=c('actPriorStd_actTitleOrderless', 'actPriorStd_actBodyOrderless', 'actPriorStd',
+				     actDVs=c('actPriorStd_actTitleOrderless', 'actPriorStd_actBodyOrderless', 'actPriorStd', 'actPriorStdNoffset',
+					      'actPriorStdNoffset_actTitleOrderlessNoffset_actBodyOrderlessNoffset',
+					      'actTitleOrderlessNoffset', 'actBodyOrderlessNoffset',
 					      makeBestFitsStrSOPerm(''),
 					      makeBestFitsStrSOPerm('Entropy'),
 					      makeBestFitsStrSOPerm('Stoplist'),
@@ -865,12 +871,15 @@ defaultSOPermConfig = modConfig(c(defaultSOConfig, defaultPermConfig,
 				     ))
 
 defaultTSjiConfig = modConfig(c(defaultTConfig, defaultSjiConfig,
-				list(runTbl=makeRunTbl(c(makeBestFitsVectTSji(''),
+				list(runTbl=makeRunTbl(c(list(c('actPriorStdNoffset', 'actTweetNoffset')),
+							 makeBestFitsVectTSji(''),
 							 makeBestFitsVectTSji('Frentropy'),
 							 makeBestFitsVectTSji('Freq'),
 							 makeBestFitsVectTSji('Nentropy'))))),
 			      list(accumModelHashtagsTbl=T,
-				   actDVs=c('actPriorStd',
+				   actDVs=c('actPriorStd', 'actPriorStdNoffset',
+					    'actPriorStdNoffset_actTweetNoffset',
+					    'actTweetNoffset',
 					    makeBestFitsStrTSji(''),
 					    makeBestFitsStrTSji('Frentropy'),
 					    makeBestFitsStrTSji('Freq'),
@@ -879,13 +888,15 @@ defaultTSjiConfig = modConfig(c(defaultTConfig, defaultSjiConfig,
 				   ))
 
 defaultSOSjiConfig = modConfig(c(defaultSOConfig, defaultSjiConfig,
-				 list(runTbl=makeRunTbl(c(list(c('actTitle', 'actBody')),
+				 list(runTbl=makeRunTbl(c(list(c('actPriorStdNoffset', 'actTitleNoffset', 'actBodyNoffset')),
 							  makeBestFitsVectSOSji(''),
 							  makeBestFitsVectSOSji('Frentropy'),
 							  makeBestFitsVectSOSji('Freq'),
 							  makeBestFitsVectSOSji('Nentropy'))))),
 			       list(accumModelHashtagsTbl=T,
-				    actDVs=c('actPriorStd', 'actTitle_actBody',
+				    actDVs=c('actPriorStd', 'actPriorStdNoffset',
+					     'actPriorStdNoffset_actTitleNoffset_actBodyNoffset',
+					     'actTitleNoffset', 'actBodyNoffset',
 					     makeBestFitsStrSOSji(''),
 					     makeBestFitsStrSOSji('Frentropy'),
 					     makeBestFitsStrSOSji('Freq'),
@@ -898,7 +909,7 @@ defaultPConfig = list(makeSjiTblUser='makeSjiTblUserDefault',
 
 defaultSOSjiPConfig = modConfig(c(defaultSOConfig, defaultSjiConfig, defaultPConfig,
 				  list(runTbl=makeRunTbl(list()))),
-				list(actDVs = c('actPriorStd', 'actPriorOL', 'actPriorOL2'),
+				list(actDVs = c('actPriorStd', 'actPriorOL2'),
 				     computeActFromContextTbl='computeActNullFromContextTbl',
 				     priorTbl = 'priorTblUserSubset',
 				     dStd = 'dFull',
@@ -907,7 +918,7 @@ defaultSOSjiPConfig = modConfig(c(defaultSOConfig, defaultSjiConfig, defaultPCon
 
 defaultTSjiPConfig = modConfig(c(defaultTConfig, defaultSjiConfig, defaultPConfig,
 				 list(runTbl=makeRunTbl(list()))),
-			       list(actDVs=c('actPriorStd', 'actPriorOL', 'actPriorOL2'),
+			       list(actDVs=c('actPriorStd', 'actPriorOL2'),
 				    computeActFromContextTbl='computeActNullFromContextTbl',
 				    tokenizedTbl = 'tweets_tokenized',
 				    priorTbl = 'priorTblUserSubset',
@@ -1297,7 +1308,7 @@ addModelType <- function(modelVsPredTbl) {
 	modelVsPredTbl[grepl('ContextPerm', datasetName), modelType := 'perm']
 }
 
-buildModelHashtagsTables <- function(outFileNames) {
+buildTablesModelHashtags <- function(outFileNames) {
 	buildTable <- function(outFileName) {
 		tbl = myFread(getOutFileModelHashtags(outFileName))
 		tbl[, datasetName := outFileName]
@@ -1926,13 +1937,16 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleBody',
 				       'PriorStdTitleOrderlessFreqBodyOrderlessFreq', 'PriorStdTitleOrderlessBodyOrderless',
 				       'PriorStdTitleOrderlessFreqhymanBodyOrderlessFreqhyman',
-				       'PriorStdTitleOrderlessNenthymanBodyOrderlessNenthyman'))
+				       'PriorStdTitleOrderlessNenthymanBodyOrderlessNenthyman',
+				       'TitleOrderlessFreq', 'TitleOrderlessFreqhyman',
+				       'BodyOrderlessFreq', 'BodyOrderlessFreqhyman'))
 	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='logoddsSO')
 	# T compare entropy w/ loggodds to entropy
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweet',
 				       'PriorStdTweetOrderFreqTweetOrderlessFreq', 'PriorStdTweetOrderTweetOrderless',
 				       'PriorStdTweetOrderFreqhymanTweetOrderlessFreqhyman',
-				       'PriorStdTweetOrderNenthymanTweetOrderlessNenthyman'))
+				       'PriorStdTweetOrderNenthymanTweetOrderlessNenthyman',
+				       'TweetOrderlessFreq', 'TweetOrderlessFreqhyman'))
 	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='logoddsT', groupCol='dsetGroup')
 	# SO compare all additions for RP
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleOrderlessFrenthymanBodyOrderlessFrenthyman',
@@ -1992,7 +2006,8 @@ getDWideTbl <- function(tbl) {
 }
 
 analyzeContextSmall <- function() {
-	tbl = modelVsPredTbl[predUsedBest & dsetSize==20 & grepl('^topHashtagAcross', DVName)]
+	tbl = modelVsPredTbl[predUsedBest & dsetSize==500 & runNum == 1 & groupNum == 1 & grepl('^topHashtagAcross', DVName)]
+	tbl
 	compareMeanDV(tbl[sizeNum == 6 & dsetType == 'stackoverflow'], acc, figName='foo')
 	compareMeanDV(tbl[sizeNum == 6 & dsetType == 'twitter'], acc, figName='foo')
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleBody', 'PriorStdTitleOrderlessBodyOrderless',
@@ -2007,6 +2022,15 @@ analyzeContextSmall <- function() {
 				       'PriorStdTweetOrderLgdimTweetOrderlessLgdim', 'TweetOrderEntropyTweetOrderlessEntropy',
 				       'TweetOrderSmdimTweetOrderlessSmdim', 'TweetOrderLgdimTweetOrderlessLgdim'))
 	compareMeanDV(tbl[sizeNum == 6 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='foo')
+	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweetOrderFreqTweetOrderlessFreq', 'PriorStdTweetOrderFreqhymanTweetOrderlessFreqhyman', 'TweetOrderless', 'TweetOrderlessNenthyman',
+				       'TweetOrder', 'TweetOrderNenthyman', 'TweetOrderlessFreq', 'TweetOrderlessFreqhyman'))
+	compareMeanDV(tbl[sizeNum == 6 & dsetType == 'twitter' & DVName %in% DVNames & modelType == 'perm'], acc, figName='foo')
+	DVNames = asTopHashtagAcross(c('PriorStdTitleOrderlessFreqBodyOrderlessFreq', 'PriorStdTitleOrderlessFreqhymanBodyOrderlessFreqhyman', 'TitleOrderlessNenthyman', 'TitleOrderless',
+				       'TitleOrderlessFreq', 'TitleOrderlessFreqhyman',
+				       'BodyOrderlessFreq', 'BodyOrderlessFreqhyman',
+				       'BodyOrderlessNenthyman', 'BodyOrderless'))
+	compareMeanDV(tbl[sizeNum == 6 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='foo')
+
 }
 
 getNcoocTbl <- function(type, chunkTableQuery, config) {
@@ -2481,6 +2505,10 @@ getFunConfigModsSji <- function(sjiFreqP=F, sjiEntropyP=T) {
 	     sjiEntropyP=sjiEntropyP)
 }
 
+getFunConfigModsBase <- function(offsetP=T) {
+	list(offsetP=offsetP)
+}
+
 funConfigOrig <- function(config) modConfig(config, getFunConfigModsPerm())
 funConfigEntropy <- function(config) modConfig(config, getFunConfigModsPerm(permUseEntropyP=T))
 funConfigStoplist <- function(config) modConfig(config, getFunConfigModsPerm(permUseStoplistP=T))
@@ -2499,6 +2527,9 @@ funConfigOrigSji <- function(config) modConfig(config, getFunConfigModsSji())
 funConfigFrentropySji <- function(config) modConfig(config, getFunConfigModsSji(sjiFreqP=T))
 funConfigNentropySji <- function(config) modConfig(config, getFunConfigModsSji(sjiEntropyP=F))
 funConfigFreqSji <- function(config) modConfig(config, getFunConfigModsSji(sjiFreqP=T, sjiEntropyP=F))
+
+funConfigNoffset <- function(config) modConfig(funConfigOrig(config), getFunConfigModsBase(offsetP=F))
+funConfigNoffsetSji <- function(config) modConfig(funConfigNentropySji(config), getFunConfigModsBase(offsetP=F)) 
 
 makeCombinedMemMat <- function(sjiTbl, envTbl, config) {
 	res = list()
@@ -2599,7 +2630,8 @@ computeActSjiFromContextTbl <- function(contextTbl, tagTbl, config) {
 	contextTbl = rbind(makeComputeActRunTbl(contextTbl, '', 'computeActSji', 'funConfigOrigSji'),
 			   makeComputeActRunTbl(contextTbl, 'Frentropy', 'computeActSji', 'funConfigFrentropySji'),
 			   makeComputeActRunTbl(contextTbl, 'Nentropy', 'computeActSji', 'funConfigNentropySji'),
-			   makeComputeActRunTbl(contextTbl, 'Freq', 'computeActSji', 'funConfigFreqSji'))
+			   makeComputeActRunTbl(contextTbl, 'Freq', 'computeActSji', 'funConfigFreqSji'),
+			   makeComputeActRunTbl(contextTbl, 'Noffset', 'computeActSji', 'funConfigNoffsetSji'))
 	contextTbl[, get(fun[1])(chunk, get(getConfig(config, 'sjiTbl')), unique(user_screen_name), get(funConfig)(config)), by=type]
 }
 
@@ -2665,7 +2697,8 @@ permTypeConfigs = c('', 'funConfigOrig',
 		    'Lgdim', 'funConfigLgdim',
 		    'Frenthyman', 'funConfigFrenthyman',
 		    'Nenthyman', 'funConfigNenthyman',
-		    'Freqhyman', 'funConfigFreqhyman')
+		    'Freqhyman', 'funConfigFreqhyman',
+		    'Noffset', 'funConfigNoffset')
 
 computeActPermTFromContextTbl <- function(contextTbl, tagTbl, config) {
 	userScreenName = contextTbl[, guardAllEqualP(user_screen_name)[1]]
@@ -2926,9 +2959,24 @@ addWeights <- function(postResTbl) {
 	return()
 }
 
-preProcessPostResTbl <- function(postResTbl, runTbl) {
+handleOffset <- function(postResTbl) {
+	myLog('Imputing offset for all applicable predictors')
+	normFun <- function(colName) {
+		c = as.symbol(colName)
+		eval(bquote(postResTbl[, .(c) := .(c) - mean(tail(sort(.(c)), n=5), na.rm=T), by=list(d,id)]))
+	}
+	nms = colnames(postResTbl)
+	nms = nms[grepl('^act', nms) & !grepl('Noffset', nms)]
+	lapply(nms, normFun)
+	postResTbl
+}
+
+preProcessPostResTbl <- function(postResTbl, runTbl, config) {
 	guardAllEqualP(postResTbl[, d])
 	guardAllEqualP(postResTbl[, user_screen_name])
+	if (getConfig(config, 'offsetP')) {
+		handleOffset(postResTbl)
+	}
 	preProcess <- function(predictors) {
 		handleNAs(postResTbl, predictors)
 	}
@@ -2979,7 +3027,7 @@ getFullPostResTbl <- function(tokenTbl, config) {
 analyzePostResTblAcrossDs <- function(postResTbl, runTbl, config) {
 	analyzePostResTblForD <- function(curD) {
 		tbl = postResTbl[d == curD] 
-		preProcessPostResTbl(tbl, runTbl)
+		preProcessPostResTbl(tbl, runTbl, config)
 		tbl
 		runTbl
 		if (nrow(runTbl) > 0) {
@@ -3451,22 +3499,36 @@ runGenAndSaveCurWorkspaceg4s6 <- function() genAndSaveCurWorkspace(groupConfigG4
 
 curWS <- function() {
 	# FIXME: Rerun context (check the saved df HEAD^^ command)
-	# FIXME: Rerun PUser and Prior (should be no changes)
 	# FIXME: Def. look at coefficient tables
 	# FIXME: Change smdim and lgdim to freq and not entropy
 	# FIXME: Why is hyman not working well for only context? 
+	withProf(runContext20g1s6(regen='useAlreadyLoaded'))
+	runContext500g1s6(regen='useAlreadyLoaded', numRunsT=1, numRunsSO=1)
+	runContext500g1s6(regen=F, numRunsT=1, numRunsSO=1)
+	runContext500g1s2(numRunsT=1, regen=F)
 	runPUserSOSji100kTest(regen='useAlreadyLoaded')
 	runPUserTFollowSji1kTest(regen='useAlreadyLoaded')
 	withProf(runContext20g1s1(regen='useAlreadyLoaded'))
-	runContext20g1s6(regen='useAlreadyLoaded')
 	setLogLevel(2)
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelVsPred()))))
+	modelVsPredTbl.new = copy(modelVsPredTbl)
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isPriorRun, list.files(path=getDirModelVsPred()))))
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isPUserRun, list.files(path=getDirModelVsPred()))))
 	logregTbl = buildTablesLogreg(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirLogreg()))))
+	modelHashtagsTbls = buildTablesModelHashtags(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelHashtags()))))
+	modelHashtagsTbls.new = copy(modelHashtagsTbls)
+	names(modelHashtagsTbls)
+	names(modelHashtagsTbls[['TContextPerm-500g1s6r1']])
+	modelHashtagsTbl = modelHashtagsTbls.new[['TContextPerm-500g1s6r1']]
+	modelHashtagsTbl[, .N, by=list(id, topHashtagAcrossTweetOrderlessFreqhyman)][topHashtagAcrossTweetOrderlessFreqhyman == T][, hist(N)]
+	modelHashtagsTbl[, .N, by=list(id, topHashtagAcrossTweetOrderlessFreq)][topHashtagAcrossTweetOrderlessFreq == T][, hist(N)]
+	modelHashtagsTbl[, .N, by=list(id, topHashtagPostTweetOrderlessFreqhyman)][topHashtagPostTweetOrderlessFreqhyman == T][, hist(N)]
+	modelHashtagsTbl[, .N, by=list(id, topHashtagPostTweetOrderlessFreq)][topHashtagPostTweetOrderlessFreq == T][, hist(N)]
+	modelHashtagsTbl = modelHashtagsTbls.new[['SOContextPerm-500g1s6r1']]
+	modelHashtagsTbl[, .N, by=list(id, topHashtagAcrossTitleOrderlessHyman)][topHashtagAcrossTitleOrderlessHyman == T][, hist(N)]
+	modelHashtagsTbl[, .N, by=list(id, topHashtagAcrossTitleOrderless)][topHashtagAcrossTitleOrderless == T][, hist(N)]
 	getDirLogreg()
 
-	modelHashtagsTbls = buildModelHashtagsTables(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelHashtags()))))
 	modelHashtagsTbl = modelHashtagsTbls[["TContextPerm-20g1s1r1"]]
 	modelVsPredTbl
 	sjiTblTOrderless
