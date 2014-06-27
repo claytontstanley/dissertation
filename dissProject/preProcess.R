@@ -1546,11 +1546,13 @@ renameColDVName <- function(tbl) {
 	mapping = c('topHashtagAcrossPriorStd', 'Standard Prior Model Relaxed Across Posts',
 		    'topHashtagPostPriorStd', 'Standard Prior Model',
 		    'topHashtagPostPriorOL2', 'Optimized Learning Model',
+		    'topHashtagAcrossPriorStdNoffset', 'Standard Prior Model Relaxed Across Posts w/o offset',
 		    makeStandardMappingBayes('', 'w/ entropy'),
 		    makeStandardMappingBayes('Freq', 'w/ freq'),
 		    makeStandardMappingBayes('Frentropy', 'w/ entropy and freq'),
 		    makeStandardMappingBayes('Nentropy', ''),
 		    makeStandardMappingBayes('Usercontext', 'w/ entropy and user sji'),
+		    makeStandardMappingBayes('Noffset', 'w/o offset', 'PriorStdNoffset'),
 		    makeStandardMapping('', ''),
 		    makeStandardMapping('Entropy', 'w/ entropy'),
 		    makeStandardMapping('Stoplist', 'w/ stoplist'),
@@ -1564,7 +1566,8 @@ renameColDVName <- function(tbl) {
 		    makeStandardMapping('Frenthyman', 'w/ entropy and freq and log odds'),
 		    makeStandardMapping('Nenthyman', 'w/ log odds'),
 		    makeStandardMapping('Freqhyman', 'w/ freq and log odds'),
-		    makeStandardMapping('Freqhyser', 'w/ freq, log odds, and user sji')
+		    makeStandardMapping('Freqhyser', 'w/ freq, log odds, and user sji'),
+		    makeStandardMapping('Noffset', 'w/o offset', 'PriorStdNoffset')
 		    )
 	mapping = groupN(2, mapping)
 	mapping
@@ -1585,19 +1588,20 @@ makeRemapForMapping <- function(keyword, text) {
 	}
 }
 
-makeStandardMappingBayes <- function(keyword, text) {
+makeStandardMappingBayes <- function(keyword, text, priorStd='PriorStd') {
 	res = c('topHashtagAcrossTitle%sBody%s', 'Bayes combined title and body %s',
 		'topHashtagAcrossTitle%s', 'Bayes only title %s',
 		'topHashtagAcrossBody%s', 'Bayes only body %s',
 		'topHashtagAcrossPriorStdTitle%sBody%s', 'Bayes combined full %s',
 		'topHashtagAcrossTweet%s', 'Bayes only orderless context %s',
 		'topHashtagAcrossPriorStdTweet%s', 'Bayes combined full %s')
+	res = gsub('PriorStd', priorStd, res)
 	res = groupN(2, res)
 	res = lapply(res, makeRemapForMapping(keyword, text))
 	unlist(res)
 }
 
-makeStandardMapping <- function(keyword, text) {
+makeStandardMapping <- function(keyword, text, priorStd='PriorStd') {
 	res = c('topHashtagAcrossTitleOrderless%sBodyOrderless%s', 'RP combined title and body %s',
 		'topHashtagAcrossTitleOrderless%s', 'RP only title %s',
 		'topHashtagAcrossBodyOrderless%s', 'RP only body %s', 
@@ -1610,6 +1614,7 @@ makeStandardMapping <- function(keyword, text) {
 		'topHashtagAcrossPriorStdBodyOrderless%s', 'RP combined prior and body %s',
 		'topHashtagAcrossPriorStdTweetOrderless%s', 'RP combined prior and orderless %s',
 		'topHashtagAcrossPriorStdTweetOrder%s', 'RP combined prior and order %s')
+	res = gsub('PriorStd', priorStd, res)
 	res = groupN(2, res)
 	res = lapply(res, makeRemapForMapping(keyword, text))
 	unlist(res)
@@ -1852,6 +1857,15 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 	baseTbl = modelVsPredTbl[dsetSize==500][grepl('^topHashtagAcross', DVName)]
 	tbl = baseTbl[predUsedBest == T]
 	tbl[, .N, by=DVName]
+	# RESULT: Adding offset is a big deal 
+	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdNoffset', 'TitleNentropy', 'TitleNoffset', 'TitleOrderlessNoffset', 'TitleOrderless',
+				       'PriorStdTitleNentropyBodyNentropy', 'PriorStdNoffsetTitleNoffsetBodyNoffset',
+				       'PriorStdNoffsetTitleOrderlessNoffsetBodyOrderlessNoffset', 'PriorStdTitleOrderlessBodyOrderless'))
+	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='EntropyVsRegSO')
+	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdNoffset', 'TweetNentropy', 'TweetNoffset', 'TweetOrderlessNoffset', 'TweetOrderless',
+				       'PriorStdTweetNentropy', 'PriorStdNoffsetTweetNoffset',
+				       'PriorStdNoffsetTweetOrderNoffsetTweetOrderlessNoffset', 'PriorStdTweetOrderTweetOrderless'))
+	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='EntropyVsRegSO')
 	# SO full
 	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'stackoverflow'], acc, figName='ContextMeanDVSO')
 	# T full
@@ -1939,6 +1953,8 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 				       'PriorStdTitleOrderlessFreqBodyOrderlessFreq', 'PriorStdTitleOrderlessBodyOrderless',
 				       'PriorStdTitleOrderlessFreqhymanBodyOrderlessFreqhyman',
 				       'PriorStdTitleOrderlessNenthymanBodyOrderlessNenthyman',
+				       'TitleOrderless', 'BodyOrderless',
+				       'TitleOrderlessNenthyman', 'BodyOrderlessNenthyman',
 				       'TitleOrderlessFreq', 'TitleOrderlessFreqhyman',
 				       'BodyOrderlessFreq', 'BodyOrderlessFreqhyman'))
 	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='logoddsSO')
