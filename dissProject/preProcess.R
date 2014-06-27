@@ -2002,6 +2002,14 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 				       'PriorStdTweetOrderWindowTweetOrderlessWindow',
 				       'PriorStdTweetOrderlessEntropy'))
 	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='orderT', groupCol='dsetGroup')
+	# RESULT: Adding prior is not useful for SO in this case, but useful for Twitter
+	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleBody', 'TitleBody', 'Body', 'Title',
+				       'TitleOrderlessFreqhymanBodyOrderlessFreqhyman',
+				       'PriorStdTitleOrderlessFreqhymanBodyOrderlessFreqhyman'))
+	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='foo')
+	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweet', 'Tweet',
+				       'TweetOrderlessHyman', 'PriorStdTweetOrderlessHyman'))
+	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='foo')
 	# RESULT: .7 d is better for T, but not for SO, lines up with 'relaxed across posts' finding for Prior dataset. Magnitude of effect is very small, not as important as using prior and weighting
 	# SO and T compare two d values	
 	dTbl = rbind(baseTblPost, baseTbl)[topHashtag & hashtagUsedP]
