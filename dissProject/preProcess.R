@@ -1896,11 +1896,6 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdNoffset', 'TitleNentropy', 'TitleNoffset', 'TitleOrderlessNoffset', 'TitleOrderless',
 				       'PriorStdTitleNentropyBodyNentropy', 'PriorStdNoffsetTitleNoffsetBodyNoffset',
 				       'PriorStdNoffsetTitleOrderlessNoffsetBodyOrderlessNoffset', 'PriorStdTitleOrderlessBodyOrderless'))
-	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='OffsetSO')
-	logregTbl[, .N, by=DVName]
-	bestFitNames = c('actPriorStd_actTitle_actBody', 'actPriorStd_actTitleOrderlessEnthyman_actBodyOrderlessEnthyman', 'actPriorStd_actTitleOrderlessHyman_actBodyOrderlessHyman')
-	compareMeanDVLogreg(logregTbl[(sizeNum == 2 | is.na(sizeNum)) & dsetType == 'stackoverflow' & bestFitName %in% bestFitNames], coeffStd, figName='foo')
-	bestFitNames = c('actPriorStd_actTweet', 'actPriorStd_actTweetUsercontext', 'actPriorStd_actTweetOrderlessHyman', 'actPriorStd_actTweetOrderlessEnthyser')
 	compareMeanDVLogreg(logregTbl[(sizeNum == 2 | is.na(sizeNum)) & dsetType == 'twitter' & bestFitName %in% bestFitNames], coeffStd, figName='foo')
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdNoffset', 'TweetNentropy', 'TweetNoffset', 'TweetOrderlessNoffset', 'TweetOrderless',
 				       'PriorStdTweetNentropy', 'PriorStdNoffsetTweetNoffset',
@@ -2052,6 +2047,13 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 								   'PriorStdTitleBody', 'PriorStdTitleOrderlessHymanBodyOrderlessHyman')))
 	dWideTbl = getDWideTbl(dTbl[sizeNum == 2 & DVName %in% DVNames])
 	compareMeanDVDefault(dWideTbl, dDiff, figName='dContext', groupCol='dsetType')
+}
+
+analyzeLogreg <- function() {
+	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='OffsetSO')
+	bestFitNames = c('actPriorStd_actTitle_actBody', 'actPriorStd_actTitleOrderlessEnthyman_actBodyOrderlessEnthyman', 'actPriorStd_actTitleOrderlessHyman_actBodyOrderlessHyman')
+	compareMeanDVLogreg(logregTbl[(sizeNum == 2 | is.na(sizeNum)) & dsetType == 'stackoverflow' & bestFitName %in% bestFitNames], coeffStd, figName='foo')
+	bestFitNames = c('actPriorStd_actTweet', 'actPriorStd_actTweetUsercontext', 'actPriorStd_actTweetOrderlessHyman', 'actPriorStd_actTweetOrderlessEnthyser')
 }
 
 getDWideTbl <- function(tbl) {
