@@ -1734,7 +1734,7 @@ compareMeanDVDefault <- function(...) {
 }
 
 compareMeanDVLogreg <- function(...) {
-	compareMeanDV(..., groupCol='bestFitName', extras=list(ylab('Coefficient Value')), title='Cofficient Name')
+	compareMeanDV(..., groupCol='dsetGroup', extras=list(ylab('Coefficient Value')), title='Cofficient Name')
 }
 
 analyzePUser <- function(modelVsPredTbl) {
@@ -1878,10 +1878,12 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 				       'PriorStdTitleNentropyBodyNentropy', 'PriorStdNoffsetTitleNoffsetBodyNoffset',
 				       'PriorStdNoffsetTitleOrderlessNoffsetBodyOrderlessNoffset', 'PriorStdTitleOrderlessBodyOrderless'))
 	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='OffsetSO')
-	bestFitNames = c('actPriorStd_actTitle_actBody', 'actPriorStd_actTitleOrderless_actBodyOrderless')
 	logregTbl[, DVName := predName]
 	logregTbl[, coeffStd := logregTbl[['coeff']] / logregTbl[['Std. Error']]]
-	compareMeanDVLogreg(logregTbl[sizeNum == 2 & dsetType == 'stackoverflow' & bestFitName %in% bestFitNames], coeffStd, figName='foo')
+	bestFitNames = c('actPriorStd_actTitle_actBody', 'actPriorStd_actTitleOrderlessEnthyman_actBodyOrderlessEnthyman', 'actPriorStd_actTitleOrderlessHyman_actBodyOrderlessHyman')
+	compareMeanDVLogreg(logregTbl[(sizeNum == 2 | is.na(sizeNum)) & dsetType == 'stackoverflow' & bestFitName %in% bestFitNames], coeffStd, figName='foo')
+	bestFitNames = c('actPriorStd_actTweet', 'actPriorStd_actTweetUsercontext', 'actPriorStd_actTweetOrderlessHyman', 'actPriorStd_actTweetOrderlessEnthyser')
+	compareMeanDVLogreg(logregTbl[(sizeNum == 2 | is.na(sizeNum)) & dsetType == 'twitter' & bestFitName %in% bestFitNames], coeffStd, figName='foo')
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdNoffset', 'TweetNentropy', 'TweetNoffset', 'TweetOrderlessNoffset', 'TweetOrderless',
 				       'PriorStdTweetNentropy', 'PriorStdNoffsetTweetNoffset',
 				       'PriorStdNoffsetTweetOrderNoffsetTweetOrderlessNoffset', 'PriorStdTweetOrderTweetOrderless'))
@@ -3566,7 +3568,7 @@ curWS <- function() {
 	modelVsPredTbl.new = copy(modelVsPredTbl)
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isPriorRun, list.files(path=getDirModelVsPred()))))
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isPUserRun, list.files(path=getDirModelVsPred()))))
-	logregTbl = buildTablesLogreg(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirLogreg()))))
+	logregTbl = buildTablesLogreg(file_path_sans_ext(Filter(function(r) isPUserRun(r) | isContextRun(r), list.files(path=getDirLogreg()))))
 	modelHashtagsTbls = buildTablesModelHashtags(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelHashtags()))))
 
 	modelHashtagsTbl = modelHashtagsTbls[["TContextPerm-20g1s1r1"]]
