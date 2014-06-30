@@ -1380,6 +1380,9 @@ buildTablesLogreg <- function(outFileNames) {
 	addDatasetGroup(logregTbl)
 	addDatasetSize(logregTbl)
 	addModelType(logregTbl)
+	logregTbl[, DVName := predName]
+	# FIXME: Remove once runs generating coeffStd have completed 
+	logregTbl[, coeffStd := logregTbl[['coeff']] / logregTbl[['Std. Error']]]
 	logregTbl
 }
 
@@ -1557,6 +1560,7 @@ renameColDVName <- function(tbl) {
 		    'topHashtagPostPriorStd', 'Standard Prior Model',
 		    'topHashtagPostPriorOL2', 'Optimized Learning Model',
 		    'topHashtagAcrossPriorStdNoffset', 'Standard Prior Model Relaxed Across Posts w/o offset',
+		    makeLogregMapping(),
 		    makeStandardMappingBayes('', 'w/ entropy'),
 		    makeStandardMappingBayes('Freq', 'w/ freq'),
 		    makeStandardMappingBayes('Frentropy', 'w/ entropy and freq'),
@@ -1598,6 +1602,21 @@ makeRemapForMapping <- function(keyword, text) {
 		pair[2] = sprintf(pair[2], text)
 		pair
 	}
+}
+
+makeLogregMapping <- function() {
+	c('actPriorStd', 'Standard prior model',
+	  'actTitle', 'Bayes title w/ entropy',
+	  'actBody', 'Bayes body w/ entropy',
+	  'actTweet', 'Bayes orderless context w/ entropy',
+	  'actTitleOrderlessEnthyman', 'RP title w/ entropy and log odds',
+	  'actBodyOrderlessEnthyman', 'RP body w/ entropy and log odds',
+	  'actTweetOrderlessEnthyman', 'RP orderless context w/ entropy and log odds',
+	  'actTitleOrderlessHyman', 'RP title w/ entropy and log odds',
+	  'actBodyOrderlessHyman', 'RP body w/ entropy and log odds',
+	  'actTweetOrderlessHyman', 'RP orderless context w/ entropy and log odds',
+	  'actTweetUsercontext', 'Bayes orderless context w/ entropy and user sji',
+	  'actTweetOrderlessEnthyser', 'RP orderless context w/ entropy, log odds, and user sji')
 }
 
 makeStandardMappingBayes <- function(keyword, text, priorStd='PriorStd') {
@@ -1878,8 +1897,7 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 				       'PriorStdTitleNentropyBodyNentropy', 'PriorStdNoffsetTitleNoffsetBodyNoffset',
 				       'PriorStdNoffsetTitleOrderlessNoffsetBodyOrderlessNoffset', 'PriorStdTitleOrderlessBodyOrderless'))
 	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='OffsetSO')
-	logregTbl[, DVName := predName]
-	logregTbl[, coeffStd := logregTbl[['coeff']] / logregTbl[['Std. Error']]]
+	logregTbl[, .N, by=DVName]
 	bestFitNames = c('actPriorStd_actTitle_actBody', 'actPriorStd_actTitleOrderlessEnthyman_actBodyOrderlessEnthyman', 'actPriorStd_actTitleOrderlessHyman_actBodyOrderlessHyman')
 	compareMeanDVLogreg(logregTbl[(sizeNum == 2 | is.na(sizeNum)) & dsetType == 'stackoverflow' & bestFitName %in% bestFitNames], coeffStd, figName='foo')
 	bestFitNames = c('actPriorStd_actTweet', 'actPriorStd_actTweetUsercontext', 'actPriorStd_actTweetOrderlessHyman', 'actPriorStd_actTweetOrderlessEnthyser')
