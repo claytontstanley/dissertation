@@ -792,7 +792,7 @@ defaultTPermConfig = modConfig(c(defaultTConfig, defaultPermConfig,
 							  makeBestFitsVectTPerm('Entropy'),
 							  makeBestFitsVectTPerm('Stoplist'),
 							  makeBestFitsVectTPerm('Direction'),
-							  makeBestFitsVectTPerm('Hyman'),
+							  makeBestFitsVectTPerm('Enthyman'),
 							  makeBestFitsVectTPerm('Freq'),
 							  makeBestFitsVectTPerm('Window'),
 							  makeBestFitsVectTPerm('Frentropy'),
@@ -814,7 +814,7 @@ defaultTPermConfig = modConfig(c(defaultTConfig, defaultPermConfig,
 					     makeBestFitsStrTPerm('Entropy'),
 					     makeBestFitsStrTPerm('Stoplist'),
 					     makeBestFitsStrTPerm('Direction'),
-					     makeBestFitsStrTPerm('Hyman'),
+					     makeBestFitsStrTPerm('Enthyman'),
 					     makeBestFitsStrTPerm('Freq'),
 					     makeBestFitsStrTPerm('Window'),
 					     makeBestFitsStrTPerm('Frentropy'),
@@ -836,7 +836,7 @@ defaultSOPermConfig = modConfig(c(defaultSOConfig, defaultPermConfig,
 							   makeBestFitsVectSOPerm('Entropy'),
 							   makeBestFitsVectSOPerm('Stoplist'),
 							   makeBestFitsVectSOPerm('Direction'),
-							   makeBestFitsVectSOPerm('Hyman'),
+							   makeBestFitsVectSOPerm('Enthyman'),
 							   makeBestFitsVectSOPerm('Freq'),
 							   makeBestFitsVectSOPerm('Window'),
 							   makeBestFitsVectSOPerm('Frentropy'),
@@ -858,7 +858,7 @@ defaultSOPermConfig = modConfig(c(defaultSOConfig, defaultPermConfig,
 					      makeBestFitsStrSOPerm('Entropy'),
 					      makeBestFitsStrSOPerm('Stoplist'),
 					      makeBestFitsStrSOPerm('Direction'),
-					      makeBestFitsStrSOPerm('Hyman'),
+					      makeBestFitsStrSOPerm('Enthyman'),
 					      makeBestFitsStrSOPerm('Freq'),
 					      makeBestFitsStrSOPerm('Window'),
 					      makeBestFitsStrSOPerm('Frentropy'),
@@ -965,8 +965,8 @@ defaultTSjiPUserConfig = modConfig(c(defaultTPUserConfig, defaultSjiConfig, defa
 					MCCORESAct=1))
 
 defaultSOPermPUserConfig = modConfig(c(defaultSOPUserConfig, defaultPermConfig, defaultPUserConfig,
-				      list(runTbl=makeRunTbl(c(makeBestFitsVectSOPerm('Freqhyman'),
-							       makeBestFitsVectSOPerm('Freqhyser'))),
+				      list(runTbl=makeRunTbl(c(makeBestFitsVectSOPerm('Enthyman'),
+							       makeBestFitsVectSOPerm('Enthyser'))),
 					   permEnvTbl='permEnvTblSO',
 					   permMemMatOrder='',
 					   permMemMatOrderless='permMemMatSOOrderless',
@@ -974,8 +974,8 @@ defaultSOPermPUserConfig = modConfig(c(defaultSOPUserConfig, defaultPermConfig, 
 					   computeActFromContextTbl='computeActPermSOOptFromContextTbl'
 					   )),
 				    list(actDVs=c('actPriorStd',
-						  makeBestFitsStrSOPerm('Freqhyman'),
-						  makeBestFitsStrSOPerm('Freqhyser')),
+						  makeBestFitsStrSOPerm('Enthyman'),
+						  makeBestFitsStrSOPerm('Enthyser')),
 					 priorTbl='priorTblUserSubset',
 					 makeSjiTblUser='makeSjiTblUserSO',
 					 convertTagSynonymsP=T,
@@ -983,7 +983,7 @@ defaultSOPermPUserConfig = modConfig(c(defaultSOPUserConfig, defaultPermConfig, 
 					 MCCORESAct=1))
 
 defaultTPermPUserConfig = modConfig(c(defaultTPUserConfig, defaultPermConfig, defaultPUserConfig,
-				      list(runTbl=makeRunTbl(c(makeBestFitsVectTPermOrderless('Freqhyser'))),
+				      list(runTbl=makeRunTbl(c(makeBestFitsVectTPermOrderless('Enthyser'))),
 					   permEnvTbl='permEnvTblT',
 					   permMemMatOrder='',
 					   permMemMatOrderless='permMemMatTOrderless',
@@ -991,7 +991,7 @@ defaultTPermPUserConfig = modConfig(c(defaultTPUserConfig, defaultPermConfig, de
 					   computeActFromContextTbl='computeActPermTOptFromContextTbl'
 					   )),
 				    list(actDVs=c('actPriorStd',
-						  makeBestFitsStrTPermOrderless('Freqhyser')),
+						  makeBestFitsStrTPermOrderless('Enthyser')),
 					 priorTbl='priorTblUserSubset',
 					 makeSjiTblUser='makeSjiTblUserT',
 					 MCCORESActUser=16,
@@ -1556,6 +1556,7 @@ renameColDVName <- function(tbl) {
 		    makeStandardMapping('', ''),
 		    makeStandardMapping('Entropy', 'w/ entropy'),
 		    makeStandardMapping('Stoplist', 'w/ stoplist'),
+		    makeStandardMapping('Enthyman', 'w/ entropy and log odds'),
 		    makeStandardMapping('Hyman', 'w/ entropy and log odds'),
 		    makeStandardMapping('Direction', 'w/ entropy and direction'),
 		    makeStandardMapping('Window', 'w/ entropy and window'),
@@ -1566,7 +1567,8 @@ renameColDVName <- function(tbl) {
 		    makeStandardMapping('Frenthyman', 'w/ entropy and freq and log odds'),
 		    makeStandardMapping('Nenthyman', 'w/ log odds'),
 		    makeStandardMapping('Freqhyman', 'w/ freq and log odds'),
-		    makeStandardMapping('Freqhyser', 'w/ freq, log odds, and user sji'),
+		    #makeStandardMapping('Freqhyser', 'w/ freq, log odds, and user sji'),
+		    makeStandardMapping('Enthyser', 'w/ entropy, log odds, and user sji'),
 		    makeStandardMapping('Noffset', 'w/o offset', 'PriorStdNoffset')
 		    )
 	mapping = groupN(2, mapping)
@@ -2539,7 +2541,7 @@ funConfigEntropy <- function(config) modConfig(config, getFunConfigModsPerm(perm
 funConfigStoplist <- function(config) modConfig(config, getFunConfigModsPerm(permUseStoplistP=T))
 funConfigFreq <- function(config) modConfig(config, getFunConfigModsPerm(permUseFreqP=T))
 funConfigDirection <- function(config) modConfig(config, getFunConfigModsPerm(permUseEntropyP=T, permOnlyDirectionP=T))
-funConfigHyman <- function(config) modConfig(config, getFunConfigModsPerm(permUseEntropyP=T, permHymanP=T))
+funConfigEnthyman <- function(config) modConfig(config, getFunConfigModsPerm(permUseEntropyP=T, permHymanP=T))
 funConfigWindow <- function(config) modConfig(config, getFunConfigModsPerm(permUseEntropyP=T, permUseWindowP=T))
 funConfigFrentropy <- function(config) modConfig(config, getFunConfigModsPerm(permUseEntropyP=T, permUseFreqP=T))
 funConfigSmdim <- function(config) modConfig(config, getFunConfigModsPerm(permUseEntropyP=T, permNRows=permNRowsSm))
@@ -2572,7 +2574,7 @@ makeCombinedMemMat <- function(sjiTbl, envTbl, config) {
 
 makeCombinedMemMatPUser <- function(sjiTbl, envTbl, config) {
 	res = list()
-	res[['freq']] = makeMemMat(sjiTbl, envTbl, funConfigFreq(config))
+	res[['entropy']] = makeMemMat(sjiTbl, envTbl, funConfigEntropy(config))
 	res
 }
 
@@ -2714,7 +2716,7 @@ permTypeConfigs = c('', 'funConfigOrig',
 		    'Entropy', 'funConfigEntropy',
 		    'Stoplist', 'funConfigStoplist',
 		    'Direction', 'funConfigDirection',
-		    'Hyman', 'funConfigHyman',
+		    'Enthyman', 'funConfigEnthyman',
 		    'Freq', 'funConfigFreq',
 		    'Window', 'funConfigWindow',
 		    'Frentropy', 'funConfigFrentropy',
@@ -2746,8 +2748,8 @@ computeActPermSOOptFromContextTbl <- function(contextTbl, tagTbl, config) {
 	userScreenName = contextTbl[, guardAllEqualP(user_screen_name)[1]]
 	contextTbl = getContextTbl(contextTbl, tagTbl)
 	cTblOrderless = contextTbl[orderType == 'orderless']
-	contextTbl = rbind(makeComputeActRunTbl(cTblOrderless, 'OrderlessFreqhyman', 'computeActPermOrderless', 'funConfigFreqhyman'),
-			   makeComputeActRunTbl(cTblOrderless, 'OrderlessFreqhyser', 'computeActPermOrderlessUser', 'funConfigFreqhyman'))
+	contextTbl = rbind(makeComputeActRunTbl(cTblOrderless, 'OrderlessEnthyman', 'computeActPermOrderless', 'funConfigEnthyman'),
+			   makeComputeActRunTbl(cTblOrderless, 'OrderlessEnthyser', 'computeActPermOrderlessUser', 'funConfigEnthyman'))
 	contextTbl[, get(fun[1])(chunk, posFromTag, userScreenName, get(funConfig)(config)), by=type]
 }
 
@@ -2755,7 +2757,7 @@ computeActPermTOptFromContextTbl <- function(contextTbl, tagTbl, config) {
 	userScreenName = contextTbl[, guardAllEqualP(user_screen_name)[1]]
 	contextTbl = getContextTbl(contextTbl, tagTbl)
 	cTblOrderless = contextTbl[orderType == 'orderless']
-	contextTbl = rbind(makeComputeActRunTbl(cTblOrderless, 'OrderlessFreqhyser', 'computeActPermOrderlessUser', 'funConfigFreqhyman'))
+	contextTbl = rbind(makeComputeActRunTbl(cTblOrderless, 'OrderlessEnthyser', 'computeActPermOrderlessUser', 'funConfigEnthyman'))
 	contextTbl[, get(fun[1])(chunk, posFromTag, userScreenName, get(funConfig)(config)), by=type]
 }
 
@@ -3526,12 +3528,15 @@ curWS <- function() {
 	# FIXME: Def. look at coefficient tables
 	# FIXME: Change smdim and lgdim to freq and not entropy
 	# FIXME: Why is hyman not working well for only context? 
+	# FIXME: Rerun context (should only name change from Hyman to Enthyman)
+	runGenAndSaveCurWorkspacePUserS6()
 	withProf(runContext20g1s6(regen='useAlreadyLoaded'))
 	runContext500g1s6(regen='useAlreadyLoaded', numRunsT=1, numRunsSO=1)
 	runContext500g1s6(regen=F, numRunsT=1, numRunsSO=1)
 	runContext500g1s2(numRunsT=1, regen=F)
 	runPUserSOSji100kTest(regen='useAlreadyLoaded')
 	runPUserTFollowSji1kTest(regen='useAlreadyLoaded')
+	runPUserTFollowSji1kTest(regen=F)
 	withProf(runContext20g1s1(regen='useAlreadyLoaded'))
 	setLogLevel(2)
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelVsPred()))))
