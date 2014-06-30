@@ -3521,10 +3521,8 @@ runGenAndSaveCurWorkspaceg4s6 <- function() genAndSaveCurWorkspace(groupConfigG4
 
 curWS <- function() {
 	# FIXME: Def. look at coefficient tables
-	# FIXME: Change smdim and lgdim to freq and not entropy
-	# FIXME: Why is hyman not working well for only context? 
 	# FIXME: Rerun prior (small changes due to offset)
-	# FIXME: Rerun context (should only name change from Hyman to Enthyman)
+	# FIXME: Rerun context (s3 change and name change from Hyman to Enthyman)
 	runGenAndSaveCurWorkspacePUserS2()
 	withProf(runContext20g1s6(regen='useAlreadyLoaded'))
 	runContext500g1s6(regen='useAlreadyLoaded', numRunsT=1, numRunsSO=1)
