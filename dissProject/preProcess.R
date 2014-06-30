@@ -3571,7 +3571,6 @@ runGenAndSaveCurWorkspaceg3s6 <- function() genAndSaveCurWorkspace(groupConfigG3
 runGenAndSaveCurWorkspaceg4s6 <- function() genAndSaveCurWorkspace(groupConfigG4S6)
 
 curWS <- function() {
-	# FIXME: Def. look at coefficient tables
 	# FIXME: Rerun prior (small changes due to offset)
 	# FIXME: Rerun context (s3 change, logregTbl change,  and name change from Hyman to Enthyman)
 	# FIXME: Rerun PUser (logregTbl change)
