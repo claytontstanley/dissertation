@@ -1731,23 +1731,23 @@ analyzePUser <- function(modelVsPredTbl) {
 	tbl[, .N, by=DVName]
 	# RESULT: Adding prior is useful when a lot of data about the user has been collected
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleBody', 'TitleBody', 'Body', 'Title',
-				       'TitleOrderlessFreqhymanBodyOrderlessFreqhyman',
-				       'PriorStdTitleOrderlessFreqhymanBodyOrderlessFreqhyman'))
-	compareMeanDVDefault(tbl[dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='foo')
+				       'TitleOrderlessEnthymanBodyOrderlessEnthyman',
+				       'PriorStdTitleOrderlessEnthymanBodyOrderlessEnthyman'))
+	compareMeanDVDefault(tbl[dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='priorAddPUserSO')
 	# RESULT: User sji is not very helpful for Twitter, and prior is useful again
-	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweetUsercontext', 'PriorStdTweetOrderlessFreqhyser', 'TweetUsercontext', 'TweetOrderlessFreqhyser'))
-	compareMeanDVDefault(tbl[dsetType == 'twitter' & DVName %in% DVNames], acc, figName='foo')
+	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweetUsercontext', 'PriorStdTweetOrderlessEnthyser', 'TweetUsercontext', 'TweetOrderlessEnthyser'))
+	compareMeanDVDefault(tbl[dsetType == 'twitter' & DVName %in% DVNames], acc, figName='userSjiSO')
 	# RESULT: User sji is much less helpful than standard sji for StackOverflow
-	DVNames = asTopHashtagAcross(c('TitleOrderlessFreqhyser', 'TitleUsercontext', 'TitleOrderlessFreqhyman', 'TitleOrderlessFreqhyser', 'Title',
-				       'PriorStdTitleOrderlessFreqhyserBodyOrderlessFreqhyser', 'PriorStdTitleBody', 'PriorStdTitleOrderlessFreqhymanBodyOrderlessFreqhyman',
+	DVNames = asTopHashtagAcross(c('TitleOrderlessEnthyser', 'TitleUsercontext', 'TitleOrderlessEnthyman', 'TitleOrderlessEnthyser', 'Title',
+				       'PriorStdTitleOrderlessEnthyserBodyOrderlessEnthyser', 'PriorStdTitleBody', 'PriorStdTitleOrderlessEnthymanBodyOrderlessEnthyman',
 				       'PriorStdTitleUsercontextBodyUsercontext'))
-	compareMeanDVDefault(tbl[dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='foo')
+	compareMeanDVDefault(tbl[dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='userSjiT')
 	# RESULT: .7 d is better for T than SO, but effect is small.
 	# Also once additional predictors are added to the model, the effect diminishes.
 	# SO and T compare two d values	
 	dTbl = rbind(baseTblPost, baseTbl)[topHashtag & hashtagUsedP]
-	DVNames = c('topHashtagPostPriorStd', asTopHashtagAcross(c('PriorStd', 'PriorStdTweetUsercontext', 'PriorStdTweetOrderlessFreqhyser',
-								   'PriorStdTitleBody', 'PriorStdTitleOrderlessFreqhymanBodyOrderlessFreqhyman')))
+	DVNames = c('topHashtagPostPriorStd', asTopHashtagAcross(c('PriorStd', 'PriorStdTweetUsercontext', 'PriorStdTweetOrderlessEnthyser',
+								   'PriorStdTitleBody', 'PriorStdTitleOrderlessEnthymanBodyOrderlessEnthyman')))
 	dWideTbl = getDWideTbl(dTbl[DVName %in% DVNames])
 	dWideTbl = dWideTbl[!is.na(dDiff)]
 	compareMeanDVDefault(dWideTbl, dDiff, figName='dContext', groupCol='dsetType')
@@ -1863,24 +1863,23 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdNoffset', 'TitleNentropy', 'TitleNoffset', 'TitleOrderlessNoffset', 'TitleOrderless',
 				       'PriorStdTitleNentropyBodyNentropy', 'PriorStdNoffsetTitleNoffsetBodyNoffset',
 				       'PriorStdNoffsetTitleOrderlessNoffsetBodyOrderlessNoffset', 'PriorStdTitleOrderlessBodyOrderless'))
-	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='EntropyVsRegSO')
+	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='OffsetSO')
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdNoffset', 'TweetNentropy', 'TweetNoffset', 'TweetOrderlessNoffset', 'TweetOrderless',
 				       'PriorStdTweetNentropy', 'PriorStdNoffsetTweetNoffset',
 				       'PriorStdNoffsetTweetOrderNoffsetTweetOrderlessNoffset', 'PriorStdTweetOrderTweetOrderless'))
-	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='EntropyVsRegSO')
-	# SO full
-	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'stackoverflow'], acc, figName='ContextMeanDVSO')
-	# T full
-	compareMeanDV(tbl[sizeNum == 2 & dsetType == 'twitter'], acc, figName='foo', groupCol='dsetGroup')
+	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='OffsetT')
 	# RESULT: Show base performance for both models
 	# SO standard
-	stdRegex = '(Entropy)|(Direction)|(Hyman)|(Stoplist)|(Freq)|(Window)|(Frentropy)|(Smdim)|(Lgdim)'
-	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & !grepl(stdRegex, DVName)], acc, figName='contextStandardSO')
+	DVNames = asTopHashtagAcross(c('PriorStd', 'TitleNentropy', 'BodyNentropy', 'PriorStdTitleNentropyBodyNentropy',
+				       'TitleOrderless', 'BodyOrderless', 'PriorStdTitleOrderlessBodyOrderless'))
+	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='contextStandardSO')
 	# T standard
-	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & !grepl(stdRegex, DVName)], acc, figName='contextStandardT', groupCol='dsetGroup')
+	DVNames = asTopHashtagAcross(c('PriorStd', 'TweetNentropy', 'PriorStdTweetNentropy',
+				       'TweetOrderless', 'TweetOrder', 'PriorStdTweetOrderTweetOrderless'))
+	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='contextStandardT', groupCol='dsetGroup')
 	# RESULT: 4 different subsets for twitter popular hashtags show same effects
 	# T standard all groups
-	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & !grepl(stdRegex, DVName)], acc, figName='contextStandardByGroupT', groupCol='groupNum')
+	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='contextStandardByGroupT', groupCol='groupNum')
 	# RESULT: Entropy weighting works for RP for SO and Twitter
 	# SO Entropy
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleBody',
@@ -1952,20 +1951,16 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 	# RESULT: Logodds technique works
 	# SO compare entropy w/ logodds to entropy
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleBody',
-				       'PriorStdTitleOrderlessFreqBodyOrderlessFreq', 'PriorStdTitleOrderlessBodyOrderless',
-				       'PriorStdTitleOrderlessFreqhymanBodyOrderlessFreqhyman',
+				       'PriorStdTitleOrderlessBodyOrderless',
 				       'PriorStdTitleOrderlessNenthymanBodyOrderlessNenthyman',
 				       'TitleOrderless', 'BodyOrderless',
-				       'TitleOrderlessNenthyman', 'BodyOrderlessNenthyman',
-				       'TitleOrderlessFreq', 'TitleOrderlessFreqhyman',
-				       'BodyOrderlessFreq', 'BodyOrderlessFreqhyman'))
+				       'TitleOrderlessNenthyman', 'BodyOrderlessNenthyman'))
 	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='logoddsSO')
 	# T compare entropy w/ loggodds to entropy
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweet',
-				       'PriorStdTweetOrderFreqTweetOrderlessFreq', 'PriorStdTweetOrderTweetOrderless',
-				       'PriorStdTweetOrderFreqhymanTweetOrderlessFreqhyman',
+				       'PriorStdTweetOrderTweetOrderless',
 				       'PriorStdTweetOrderNenthymanTweetOrderlessNenthyman',
-				       'TweetOrderlessFreq', 'TweetOrderlessFreqhyman'))
+				       'TweetOrderless', 'TweetOrderlessNenthyman'))
 	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='logoddsT', groupCol='dsetGroup')
 	# SO compare all additions for RP
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleOrderlessFrenthymanBodyOrderlessFrenthyman',
@@ -2006,12 +2001,12 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='orderT', groupCol='dsetGroup')
 	# RESULT: Adding prior is not useful for SO in this case, but useful for Twitter
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleBody', 'TitleBody', 'Body', 'Title',
-				       'TitleOrderlessFreqhymanBodyOrderlessFreqhyman',
-				       'PriorStdTitleOrderlessFreqhymanBodyOrderlessFreqhyman'))
-	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='foo')
+				       'TitleOrderlessHymanBodyOrderlessHyman',
+				       'PriorStdTitleOrderlessHymanBodyOrderlessHyman'))
+	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='priorAddSO')
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweet', 'Tweet',
 				       'TweetOrderlessHyman', 'PriorStdTweetOrderlessHyman'))
-	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='foo')
+	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='priorAddT')
 	# RESULT: .7 d is better for T, but not for SO, lines up with 'relaxed across posts' finding for Prior dataset. Magnitude of effect is very small, not as important as using prior and weighting
 	# SO and T compare two d values	
 	dTbl = rbind(baseTblPost, baseTbl)[topHashtag & hashtagUsedP]
