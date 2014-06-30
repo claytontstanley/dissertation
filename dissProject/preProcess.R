@@ -1368,9 +1368,18 @@ addMiscellaneous <- function(modelVsPredTbl) {
 buildTablesLogreg <- function(outFileNames) {
 	buildTable <- function(outFileName) {
 		tbl = myFread(getLogregOutFile(outFileName))
+		tbl[, datasetName := outFileName]
 		tbl
 	}
 	logregTbl = rbindlist(lapply(outFileNames, buildTable))
+	addRunNum(logregTbl)
+	addGroupNum(logregTbl)
+	addSizeNum(logregTbl)
+	addDatasetNameRoot(logregTbl)
+	addDatasetType(logregTbl)
+	addDatasetGroup(logregTbl)
+	addDatasetSize(logregTbl)
+	addModelType(logregTbl)
 	logregTbl
 }
 
@@ -1451,7 +1460,7 @@ plotBarSumTbl <- function(sumTbl, fillCol, figName, extras=NULL, groupCol='dsetG
 	sumTbl
 }
 
-compareMeanDV <- function(modelVsPredTbl, DV, extras=NULL, figName='', groupCol='dsetGroup', CIFun=CI) {
+compareMeanDV <- function(modelVsPredTbl, DV, extras=NULL, figName='', groupCol='dsetGroup', CIFun=CI, title='Model Name') {
 	DV = substitute(DV)
 	modelVsPredTbl
 	expr = bquote(modelVsPredTbl[, withCI(.(DV), CIFun=CIFun), keyby=list(DVName, .(as.symbol(groupCol)))])
@@ -1461,7 +1470,7 @@ compareMeanDV <- function(modelVsPredTbl, DV, extras=NULL, figName='', groupCol=
 	renameColDVName(sumTbl)
 	plotBarSumTbl(sumTbl, DVName, sprintf('compareMeanDV-%s-%s', deparse(DV), figName), groupCol=groupCol,
 		      extras=c(list(theme(legend.position='top', legend.direction='vertical', axis.title.y=element_blank()),
-				    guides(fill=guide_legend(title='Model Name', reverse=T)),
+				    guides(fill=guide_legend(title=title, reverse=T)),
 				    coord_flip()
 				    ), extras))
 }
@@ -1487,6 +1496,7 @@ renameCols <- function(tbl) {
 	if ('groupNum' %in% cnames) renameColGroupNum(tbl)
 	if ('sizeNum' %in% cnames) renameColSizeNum(tbl)
 	if ('dsetType' %in% cnames) renameColDatasetType(tbl)
+	#if ('bestFitName' %in% cnames) renameColBestFitName(tbl)
 }
 
 renameColGroupNum <- function(tbl) {
@@ -1723,6 +1733,10 @@ compareMeanDVDefault <- function(...) {
 	compareMeanDV(..., extras=list(ylab('Proportion Correct')))
 }
 
+compareMeanDVLogreg <- function(...) {
+	compareMeanDV(..., groupCol='bestFitName', extras=list(ylab('Coefficient Value')), title='Cofficient Name')
+}
+
 analyzePUser <- function(modelVsPredTbl) {
 	baseTblPost = modelVsPredTbl[grepl('^topHashtagPost', DVName)]
 	baseTbl = modelVsPredTbl[grepl('^topHashtagAcross', DVName)]
@@ -1864,6 +1878,10 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 				       'PriorStdTitleNentropyBodyNentropy', 'PriorStdNoffsetTitleNoffsetBodyNoffset',
 				       'PriorStdNoffsetTitleOrderlessNoffsetBodyOrderlessNoffset', 'PriorStdTitleOrderlessBodyOrderless'))
 	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='OffsetSO')
+	bestFitNames = c('actPriorStd_actTitle_actBody', 'actPriorStd_actTitleOrderless_actBodyOrderless')
+	logregTbl[, DVName := predName]
+	logregTbl[, coeffStd := logregTbl[['coeff']] / logregTbl[['Std. Error']]]
+	compareMeanDVLogreg(logregTbl[sizeNum == 2 & dsetType == 'stackoverflow' & bestFitName %in% bestFitNames], coeffStd, figName='foo')
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdNoffset', 'TweetNentropy', 'TweetNoffset', 'TweetOrderlessNoffset', 'TweetOrderless',
 				       'PriorStdTweetNentropy', 'PriorStdNoffsetTweetNoffset',
 				       'PriorStdNoffsetTweetOrderNoffsetTweetOrderlessNoffset', 'PriorStdTweetOrderTweetOrderless'))
@@ -3006,6 +3024,16 @@ preProcessPostResTbl <- function(postResTbl, runTbl, config) {
 	addWeights(postResTbl)
 }
 
+myLm.beta <- function(MOD) {
+	b <- summary(MOD)$coef[-1, 1]
+	weightsCol = -which(colnames(MOD$model) == "(weights)")
+	myStopifnot(length(weightsCol) == 1)
+	sx <- sapply(MOD$model[c(-1,weightsCol)], sd)
+	sy <- sapply(MOD$model[1], sd)
+	beta <- b * sx/sy
+	return(beta)
+}
+
 analyzePostResTbl <- function(postResTbl, predictors, bestFitName) {
 	guardAllEqualP(postResTbl[, d])
 	guardAllEqualP(postResTbl[, user_screen_name])
@@ -3017,13 +3045,14 @@ analyzePostResTbl <- function(postResTbl, predictors, bestFitName) {
 	myLogit = runLogReg(postResTbl, predictors)
 	coeffs = summary(myLogit)$coefficients
 	logregTbl = as.data.table(coeffs)
-	logregTbl[, coeff := Estimate][, Estimate := NULL]
-	logregTbl
 	logregTbl[, predName := rownames(coeffs)][, d := postResTbl[, d[1]]]
 	logregTbl[, user_screen_name := postResTbl[, user_screen_name[1]]]
 	logregTbl[, bestFitName := bestFitName]
-	postResTbl
-	myLogit
+	logregTbl[, coeff := Estimate][, Estimate := NULL]
+	setkey(logregTbl, 'predName')
+	res = myLm.beta(myLogit)
+	coeffTbl = data.table(coeffStd=res, predName=names(res), key='predName')
+	logregTbl[coeffTbl, coeffStd := coeffStd]
 	logregTbl
 }
 
@@ -3522,8 +3551,8 @@ runGenAndSaveCurWorkspaceg4s6 <- function() genAndSaveCurWorkspace(groupConfigG4
 curWS <- function() {
 	# FIXME: Def. look at coefficient tables
 	# FIXME: Rerun prior (small changes due to offset)
-	# FIXME: Rerun context (s3 change and name change from Hyman to Enthyman)
-	runGenAndSaveCurWorkspacePUserS2()
+	# FIXME: Rerun context (s3 change, logregTbl change,  and name change from Hyman to Enthyman)
+	# FIXME: Rerun PUser (logregTbl change)
 	withProf(runContext20g1s6(regen='useAlreadyLoaded'))
 	runContext500g1s6(regen='useAlreadyLoaded', numRunsT=1, numRunsSO=1)
 	runContext500g1s6(regen=F, numRunsT=1, numRunsSO=1)
