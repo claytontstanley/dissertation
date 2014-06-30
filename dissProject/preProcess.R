@@ -3528,8 +3528,9 @@ curWS <- function() {
 	# FIXME: Def. look at coefficient tables
 	# FIXME: Change smdim and lgdim to freq and not entropy
 	# FIXME: Why is hyman not working well for only context? 
+	# FIXME: Rerun prior (small changes due to offset)
 	# FIXME: Rerun context (should only name change from Hyman to Enthyman)
-	runGenAndSaveCurWorkspacePUserS6()
+	runGenAndSaveCurWorkspacePUserS2()
 	withProf(runContext20g1s6(regen='useAlreadyLoaded'))
 	runContext500g1s6(regen='useAlreadyLoaded', numRunsT=1, numRunsSO=1)
 	runContext500g1s6(regen=F, numRunsT=1, numRunsSO=1)
