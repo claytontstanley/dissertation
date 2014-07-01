@@ -3571,9 +3571,10 @@ runGenAndSaveCurWorkspaceg3s6 <- function() genAndSaveCurWorkspace(groupConfigG3
 runGenAndSaveCurWorkspaceg4s6 <- function() genAndSaveCurWorkspace(groupConfigG4S6)
 
 curWS <- function() {
-	# FIXME: Rerun prior (small changes due to offset)
 	# FIXME: Rerun context (s3 change, logregTbl change,  and name change from Hyman to Enthyman)
 	# FIXME: Rerun PUser (logregTbl change)
+	SOPUserSjigt5k.csv
+	runPUserSOSji5k()
 	withProf(runContext20g1s6(regen='useAlreadyLoaded'))
 	runContext500g1s6(regen='useAlreadyLoaded', numRunsT=1, numRunsSO=1)
 	runContext500g1s6(regen=F, numRunsT=1, numRunsSO=1)
