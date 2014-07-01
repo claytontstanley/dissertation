@@ -3071,10 +3071,13 @@ analyzePostResTbl <- function(postResTbl, predictors, bestFitName) {
 	logregTbl[, user_screen_name := postResTbl[, user_screen_name[1]]]
 	logregTbl[, bestFitName := bestFitName]
 	logregTbl[, coeff := Estimate][, Estimate := NULL]
+	logregTbl[, coeffStd := NA_real_]
 	setkey(logregTbl, 'predName')
 	res = myLm.beta(myLogit)
-	coeffTbl = data.table(coeffStd=res, predName=names(res), key='predName')
-	logregTbl[coeffTbl, coeffStd := coeffStd]
+	if (length(res) > 0) {
+		coeffTbl = data.table(coeffStdUp=res, predName=names(res), key='predName')
+		logregTbl[coeffTbl, coeffStd := coeffStdUp]
+	}
 	logregTbl
 }
 
@@ -3573,8 +3576,8 @@ runGenAndSaveCurWorkspaceg4s6 <- function() genAndSaveCurWorkspace(groupConfigG4
 curWS <- function() {
 	# FIXME: Rerun context (s3 change, logregTbl change,  and name change from Hyman to Enthyman)
 	# FIXME: Rerun PUser (logregTbl change)
+	runPUserSOSji5k(regen='useAlreadyLoaded')
 	SOPUserSjigt5k.csv
-	runPUserSOSji5k()
 	withProf(runContext20g1s6(regen='useAlreadyLoaded'))
 	runContext500g1s6(regen='useAlreadyLoaded', numRunsT=1, numRunsSO=1)
 	runContext500g1s6(regen=F, numRunsT=1, numRunsSO=1)
