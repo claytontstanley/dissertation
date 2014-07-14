@@ -936,36 +936,71 @@ Parameters for each model will be calibrated on a large subset of the Twitter an
 Each model will be tested by evaluating the accuracy of model-chosen tags on a fresh test subset of the datasets.
 Accuracy will be assessed by comparing model performance with the human data.
 
-\subsection{StackOverflow Dataset}
+% Started re-reading and re-writing here.
 
-The most recent quarterly-published StackOverflow dataset \parencite{DataDump2013} will be used to test the models on user-chosen tags for posts.
+\subsection{Datasets}
+
+The most recent quarterly published StackOverflow dataset \parencite{DataDump2013} was used to test the models on user chosen tags for posts.
 This dataset contains around \num{5.7} million posts and \num{34377} unique tags.
 
-\subsection{Twitter Dataset}
-
 Unlike StackOverflow, the entire Twitter dataset is not released to the public.
-Due to this and the sheer size of Twitter, subsets of the Twitter dataset must be collected.
-So two Twitter datasets will be collected for model evaluation: a popular-hashtags and popular-users dataset.
-The popular-hashtags dataset will contain approximately 2 million tweets where at least one of the 500 most popular hashtags are used.
-This dataset will be collected in real time until the tweet quota is reached.
-The purpose of this dataset is to test the accuracy of each model's predicted most likely hashtag(s) for a tweet.
+Due to this and the sheer size of Twitter, subsets of the Twitter dataset were collected.
 
-The popular-users dataset will contain all of the tweets from the top \num{2000} users on Twitter.
-This dataset will be collected by fetching all tweet history for each of the top users.
-It will be used to explore the growth and decay characteristics of a hashtag for individual users.
-The temporal dynamics of ACT-R's decay rate model for a chunk will be evaluated against this data.
+\subsubsection{Popular Users}
+
+A popular-users dataset was collected for both StackOverflow and Twitter.
+This dataset consists of all of the tweets from 24 different samples of the top users for each site.
+This dataset was collected by fetching all tweet history for each of the top users.
+It was used to explore the growth and decay characteristics of a hashtag for individual users.
+The temporal dynamics of ACT-R's decay rate model for a chunk were evaluated against this data.
+
+\subsubsection{Popular Hashtags}
+
+A additional popular-hashtags dataset was collected for Twitter.
+The purpose of this dataset is to test the accuracy of each model's predicted most likely hashtag(s) for a tweet.
+The dataset contains approximately three million tweets where at least one of the 400 most popular hashtags are used, and was collected in real time until the tweet quota was reached.
+
+Four popular-hashtags datasets were collected at four different time periods, spanning across one month.
+It took around four days to collect a single dataset, and one collection was done each week.
+Multiple datasets were collected to ensure that the results weren't dependent on a particular sample of hashtags, and would generalize across different popular-hashtag datasets and different time periods.
 
 \subsection{Aquiring Datasets}
 
-%FIXME: Write this
+\subsubsection{StackOverflow}
+
+The entire StackOverflow dataset is packaged and released quarterly to the public.
+So this package was downloaded and the database tables were imported into PostgreSQL using \textcite{so2db} importing tool.
+
+\subsubsection{Twitter}
+
+Twitter provides two types of APIs for aquiring data: A query-based and streaming interface.
+The \textcite{Tweepy} Python package provides a Python functional interface to these APIs, and this package was used to collect data from Twitter.
+The query-based interface was used to collect all tweets for specific popular users.
+At most \num{3000} of the most recent tweets were collected for each user, since Twitter only allows access to this number of tweets for each user.
+
+The streaming interface was used to collect a sample of all of the tweets that included one of the top 400 hashtags at that time.
+Twitter's streaming API only allows at most 400 hashtags to be monitored at a time.
+Otherwise a larger number of hashtags would have been collected.
+Twitter allows the streaming interface to randomly sample about 1\% of all of the real-time data that is generated on Twitter.
+This sampling rate was adequate to collect around three million tweets within a few days.
 
 \subsection{Tokenization}
 
-The text from each dataset will be pre-processed using standard natural language processing techniques.
-The Python Natural Language Processing (NLP) toolkit \parencite{Bird2009} will be used to tokenize (chunk) and lemmatize (convert to root form) each word.
-The standard chunking algorithm will be modified, so that it also ensures that Twitter hashtags and StackOverflow tag words (e.g., the word \emph{PHP} in a post) are not separated into multiple chunks.
-With the StackOverflow dataset, it is possible to convert synonym tags to canonical base tags, since the community maintains a tag-synonym database.
-So tag words in the post and used tags for the post will be converted to their root tag when possible.
+A custom tokenization algorithm created by \textcite{Owoputi2013} was used to chunk the words in the text.
+This algorithm was specifically created for tokenizing Twitter content.
+However during testing it was found to be robust and well suited for StackOverflow content.
+The initial model results with the new tokenizer were qualitatively very similar to the model results found in \textcite{Stanley2013} where the Python Natural Language Processing (NLP) toolkit \parencite{Bird2009} was used.
+This is most likely because the language for the samples taken for both sites is informal English,
+and it seams reasonable to think that tokenizing all of the informal slang, jargon, and characters included in Twitter is a much more difficult task than tokenizing most of the words used on StackOverflow.
+So the same tokenization algorithm was used for both StackOverflow and Twitter, since performance was similar for both algorithms on StackOverflow,
+and it seemed beneficial to use the same algorithm for both datasets to make comparisons across datasets more equitable.
+
+\subsection{Stemming}
+
+\textcite{Owoputi2013}'s algorithm handles basic word stemming (e.g., removing 'ed' and 'ing' endings), but
+with the StackOverflow dataset, it is also possible to convert synonym tags to canonical base tags, since the community maintains a tag-synonym database.
+This can be thought of as semantic stemming, where two words with identical meaning are converted to an agreed-upon canonical word.
+So tag words in the post and used tags for the post were converted to their root tag when possible.
 
 \subsection{Handling Stop Words}
 
