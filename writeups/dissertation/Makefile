@@ -1,4 +1,4 @@
-outFile = proposal
+outFile = dissertation
 mendeleyDB = Library/Application Support/Mendeley Desktop/clayton.stanley@rice.edu@www.mendeley.com.sqlite
 figPdfs = $(shell cat ${outFile}.tex | grep '\.pdf' | perl -pe 's/^.*{(.*)([^}]+)}+$$/$$1$$2/' | perl -pe 's|^|figures/dissertation/|')
 

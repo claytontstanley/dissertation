@@ -76,7 +76,7 @@
 \DeclareRobustCommand{\MakeSentenceCase*}[1]{{#1}}
 
 % If the toc is too detailed, try limiting the depth of printed sections in the TOC:
-%\setcounter{tocdepth}{2}
+\setcounter{tocdepth}{2}
 
 \title{Comparing vector-based and ACT-R memory models of tag retrieval:\protect\\User-customized hashtag/tag prediction on Twitter and StackOverflow}
 \shorttitle{Comparing memory models of tag retrieval}
@@ -936,12 +936,12 @@ Parameters for each model will be calibrated on a large subset of the Twitter an
 Each model will be tested by evaluating the accuracy of model-chosen tags on a fresh test subset of the datasets.
 Accuracy will be assessed by comparing model performance with the human data.
 
-\subsubsection{StackOverflow Dataset}
+\subsection{StackOverflow Dataset}
 
 The most recent quarterly-published StackOverflow dataset \parencite{DataDump2013} will be used to test the models on user-chosen tags for posts.
 This dataset contains around \num{5.7} million posts and \num{34377} unique tags.
 
-\subsubsection{Twitter Dataset}
+\subsection{Twitter Dataset}
 
 Unlike StackOverflow, the entire Twitter dataset is not released to the public.
 Due to this and the sheer size of Twitter, subsets of the Twitter dataset must be collected.
@@ -955,7 +955,9 @@ This dataset will be collected by fetching all tweet history for each of the top
 It will be used to explore the growth and decay characteristics of a hashtag for individual users.
 The temporal dynamics of ACT-R's decay rate model for a chunk will be evaluated against this data.
 
-\subsection{Pre-processing the Text}
+\subsection{Aquiring Datasets}
+
+\subsection{Tokenization}
 
 The text from each dataset will be pre-processed using standard natural language processing techniques.
 The Python Natural Language Processing (NLP) toolkit \parencite{Bird2009} will be used to tokenize (chunk) and lemmatize (convert to root form) each word.
@@ -963,7 +965,7 @@ The standard chunking algorithm will be modified, so that it also ensures that T
 With the StackOverflow dataset, it is possible to convert synonym tags to canonical base tags, since the community maintains a tag-synonym database.
 So tag words in the post and used tags for the post will be converted to their root tag when possible.
 
-\subsection{Stop Words and Entropy Weighting}
+\subsection{Handling Stop Words}
 
 ``Stop words'' are commonly used words that co-occur with all tags (i.e., have little to no discriminating power).
 It is typically recommended \parencite{Bird2009} to remove stop words such as ``the'', ``a'', ``or'' when building the co-occurrence matrix.
@@ -979,45 +981,11 @@ It also seems less arbitrary than explicitly identifying a list of stop words to
 This technique worked well for the StackOverflow model, and will be further explored for Twitter hashtag prediction.
 However, if it becomes computationally infeasible to compute this weighting for Twitter, then the stop words will simply be removed, as was done for previous research.
 
-\subsection{Attenuating Twitter Spam Tweets}
+%FIXME: Add paragraph for freq weighting
 
-Although Twitter has an infrastructure to easily report and remove spam accounts, the spam that does get through can contain tweets with numerous hashtags.
-For example, some spam accounts generate tweets where all words in the tweet are hashtags, or generate multiple tweets with repeating content and hashtags.
-Feeding these spam tweets into statistical models that generate hashtag predictions can bias the models' chosen hashtags.
+\section{Results}
 
-\textcite{Mazzia2009} developed a novel approach to dealing with hashtag spam on Twitter.
-When training his model, it attenuates the importance of multiple tweets from the same user that contain the same hashtags.
-As a user generates more than 10 tweets that contain the same hashtag, all tweets afterwards that contain this hashtag will be attenuated so that the overall weight is no more than that for 10 tweets.
-When testing the model, only at most 1 post from a user is included in the test set, since it is much easier to suggest relevant hashtags to a spammer than it is for an actual user.
-This exact technique may not be used for this analysis, but certainly some form of attenuating or identifying Twitter spam tweets will be explored.
-
-\subsection{Experiments}
-
-Each proposed experiment aims to answer a specific research question in this study.
-The results from Experiment 1 will show how a user's prior hashtag use influences their likelihood of using that hashtag in the future, and test whether the observed data fit the ACT-R frequency/recency decay rate theory.
-The output from Experiment 1 will be a model of how a user's prior hashtag use influences the probability of using that hashtag in the future for both the Twitter and StackOverflow datasets.
-Experiment 2 will use the results from Experiment 1 and develop the best method to incorporate user's past tagging history in the random-permutations model, where user history is currently not being used.
-Experiment 3 will explore various methods for incorporating word order information into the ACT-R Bayesian model, where this information is currently not being used.
-The outputs of Experiment 2 and 3 are improved ACT-R and random-permutation models that have properly incorporated the strengths of each other: word-order strength from random permutations and user history from ACT-R.
-Finally, Experiments 4 and 5 will directly compare model accuracy between the two models and evaluate overall performance.
-Experiment 4 is focused primarily on hashtag prediction when no user prior history is available, while Experiment 5 will test how much performance improves when that history is available.
-
-\subsubsection{Preparation Experiment: StackOverflow Dataset Modifications}
-
-\textcite{Stanley2013} developed a model for the StackOverflow dataset that was based on all posts up to April, 2011.
-This model will be used for this research, but the dataset will be updated to the most recent release.
-When moving from the older dataset to the newest dataset, several performance assessments will be made.
-
-First, model performance will be compared between the newest dataset and the Apr' 11 dataset to ensure that performance is consistent.
-This is also a way to verify that the newest dataset was correctly pre-processed and loaded.
-
-Next, incremental improvements will be made to the pre-processing stages and performance will be compared after each change.
-For example, in \textcite{Stanley2013} the technique used to chunk the words does not ensure that tags appearing in the post remain as a single word unit.
-So a word like \emph{C\#} in a post was chunked as two separate words (\emph{C} and \emph{\#}).
-This reduces predictive power of the model since it muddles the highly-predictive co-occurrence observations where a tag appears in the post.
-So the chunking technique will be changed to take into account tags in the post, and its effect on performance will be evaluated.
-
-\subsubsection{Experiment 1: Analyze Recency for User-Generated Hashtags}
+\subsection{Past User Behavior}
 
 How does a user's prior hashtag use influence their likelihood of choosing that hashtag in the future?
 The ACT-R theory places strong constraints on the lifetime and growth characteristics of chunks in declarative memory.
@@ -1029,7 +997,36 @@ Afterwards, the predicted results from the ACT-R theory will be compared against
 If the ACT-R theory of decay rate and frequency/recency affects fits the data reasonably well, then the prior activation components for the models developed in this research will be based on this theory.
 However, if the theory does not fit hashtag growth and decay for each user, then an alternative model will be proposed that is a better fit, and that model will be used instead.
 
-\subsubsection{Experiment 2: Incorporating Recency Into Random Permutations}
+\subsubsection{Method}
+
+\subsubsection{Results}
+
+\subsection{Adding Offset Term}
+
+\subsubsection{Method}
+\subsubsection{Results}
+
+\subsection{Twitter Subsets}
+
+\subsubsection{Method}
+\subsubsection{Results}
+
+\subsection{Frequency vs Entropy vs Stoplist Weighting}
+
+\subsubsection{Method}
+\subsubsection{Results}
+
+\subsection{Dataset Size}
+
+\subsubsection{Method}
+\subsubsection{Results}
+
+\subsection{Amount of Compression for Random Permutation}
+
+\subsubsection{Method}
+\subsubsection{Results}
+
+\subsection{Method to Combine Prior and Context}
 
 How can prior likelihood of a user choosing a particular tag be incorporated in the random permutations vector-based model?
 Currently vector-based models generate activations for each tag that are based purely on context.
@@ -1045,43 +1042,27 @@ It may be more appropriate to somehow attenuate the memory vectors over time,
 so that an association between a word in a post and a tag (i.e., a memory vector) that has long passed is no longer included in that memory vector's representation.
 I will try these ideas and any others that are discovered during the model development process, and the one that is the most cognitively plausible and accurate will be chosen.
 
-\subsubsection{Experiment 3: Incorporating Word Order Into ACT-R}
+\subsubsection{Method}
+\subsubsection{Results}
 
-How can word-order information be incorporated into the ACT-R Bayesian model?
-Currently ACT-R uses a word co-occurrence matrix that does not include word position.
-A co-occurrence is counted if a word and a tag co-occur anywhere in a tweet or post.
-However, for Twitter in particular, it may be the case that the few words immediately preceding hashtags are highly predictive, and the word position for those words should be included in the model.
-So a method to include word order into a Bayesian model will be developed.
+\subsection{Word Order}
 
-One method to include word order in a Bayesian co-occurrence matrix is to represent word position on a third, orthogonal dimension, and turn the matrix into a 3-dimensional array.
-So a co-occurrence is represented by a triplet: context word by word position relative to tag by tag.
-When a retrieval request for a tag is made, the strength of association between each word in context (and its position) and the tags in the co-occurrence array would be computed.
-That computation could be made tractable by storing only a small set of values on the order axis and binning over that dimension.
+\subsubsection{Method}
+\subsubsection{Results}
 
-For example, one could store only three word order values: near, medium, far, which is equivalent to storing three separate co-occurrence matrices.
-So when a retrieval request is made (e.g., when a user writes the \# character when composing a tweet), the strength of association for each word would be computed using the appropriate matrix.
-That is, the ``far'' matrix would be used for words far away from the cursor position, ``near'' for words just written, and ``medium'' for words mid distance from the current focus point.
-This method seems straightforward to implement, but it is slightly unsatisfying since information is lost when binning is used.
-It also does not scale, since an additional 2-dimensional sparse matrix must be added for every additional value stored on the word order dimension.
-So I will try to discover a better technique to incorporate word order information into the ACT-R Bayesian model than the one just described, but will fall back to this technique if a better method is not found.
+\subsection{Impact of Prior vs Context}
 
-This updated model will then be evaluated on only the Twitter popular-hashtags dataset, since this dataset contains a large (yet not infinite) set of hashtags that occur in various positions throughout the tweet.
-This model will not be evaluated on the StackOverflow dataset since chosen tags for a StackOverflow post are not embedded and mixed within a post, so word-order information is unavailable and most likely unused.
+\subsubsection{Method}
+\subsubsection{Results}
 
-\subsubsection{Experiment 4: Top Hashtag Prediction}
+\subsection{User-customized Co-occurrence Matrix}
 
-After incorporating the relative strengths of each model into the other, the accuracy of the two models will be compared directly.
-First both models will be evaluated on predicting tags based purely on context (i.e., no prior user history), using the popular-hashtags, popular-users, and StackOverflow datasets.
-The results will show the performance differences for the contextual component of each model.
+\subsubsection{Method}
+\subsubsection{Results}
 
-\subsubsection{Experiment 5: User-Customized Hashtag Prediction}
+\section{General Discussion}
 
-Next the full models (prior and context components) will be tested on the Twitter popular-users dataset and the StackOverflow dataset.
-The popular-hashtags dataset will not be included in this analysis, since this subset was collected across the entire Twitter user population, so prior hashtag use is not available.
-This test will directly compare performance differences for each model when generating user-customized tag predictions.
-The main evaluation will be the amount of performance gain achieved when the models generate tags that are based on past user behavior compared to models that generate tags that are based purely on context.
-
-\subsection{Summary}
+\section{Summary}
 
 This research has numerous components that are relevant to improving our understanding of declarative memory.
 It should be emphasized that it has only recently become possible to evaluate psychological theories of declarative memory on large-scale real-world tasks where the theory can be tested on hundreds of millions of data points.
