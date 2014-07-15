@@ -1008,33 +1008,88 @@ So tag words in the post and used tags for the post were converted to their root
 It is typically recommended \parencite{Bird2009} to remove stop words such as ``the'', ``a'', ``or'' when building the co-occurrence matrix.
 Otherwise the matrix may not scale as well since these low-predictor stop words commonly appear in text.
 Also for vector-based systems, memory vectors will become overly saturated with the environment vectors of the commonly-occurring stop words.
-\textcite{Sahlgren2008} removed stop words for the random-permutation vector-based model to handle this issue.
-\textcite{Jones2007} did as well for the circular convolution model, but also mentioned that an entropy weighting technique has also been used previously to attenuate (rather than remove) stop words.
 
-\textcite{Stanley2013} used the entropy weighting technique recommended in \textcite{Dumais1991} for the StackOverflow dataset to reduce the weight of low-predictor stop words instead of removing them.
+Stop words are commonly removed by either filtering based on a pre-determined list or filtering based on the high-frequency words that occur in the dataset.
+\textcite{Sahlgren2008} tried both methods to remove stop words for the random-permutation vector-based model, and found that the data-driven approach
+(i.e., building the list based on the high-frequency words that occurred in the dataset) worked much better than using a pre-determined list.
+
+\textcite{Jones2007} also filtered the stop words for the circular convolution model,
+but also mentioned that an entropy weighting technique \parencite{Dumais1991} has been used previously to attenuate (rather than remove) stop words.
 This data-driven technique identifies stop words by calculating the discriminating power (i.e., entropy) of each word to predict any tag.
+Each word is then weighted (not removed) based on their discriminating power.
+
+\textcite{Stanley2013} used the entropy weighting technique recommended in \textcite{Dumais1991} for the StackOverflow dataset.
 The result maps cleanly to the ACT-R DM theory by modifying each word's attentional weight ($W_{j}$) parameter.
 It also seems less arbitrary than explicitly identifying a list of stop words to remove from the analysis.
-This technique worked well for the StackOverflow model, and will be further explored for Twitter hashtag prediction.
-However, if it becomes computationally infeasible to compute this weighting for Twitter, then the stop words will simply be removed, as was done for previous research.
 
-%FIXME: Add paragraph for freq weighting
+All three stop word techniques (i.e., pre-determined list, high-frequency filtering, and entropy weighting) were explored for this analysis.
 
 \section{Results}
 
 \subsection{Past User Behavior}
 
 How does a user's prior hashtag use influence their likelihood of choosing that hashtag in the future?
-The ACT-R theory places strong constraints on the lifetime and growth characteristics of chunks in declarative memory.
-The more recently and frequently used chunks have higher prior activations, and are more likely to be needed in the future.
-It is an open question if this ACT-R theory of chunk growth and decay accurately reflects hashtag growth and decay for each user on Twitter and StackOverflow.
+This question was tested by examing how well ACT-R's base-level activation component of declarative memory predicts the tags that authors choose, given each author's past tagging behavior.
+The model predicts that the more recently and frequently used chunks have higher prior activations, and are more likely to be needed in the future.
 
-The full StackOverflow dataset and Twitter popular-users dataset will be used to characterize tag growth and decay for a user on each site.
-Afterwards, the predicted results from the ACT-R theory will be compared against the observed data and evaluated.
-If the ACT-R theory of decay rate and frequency/recency affects fits the data reasonably well, then the prior activation components for the models developed in this research will be based on this theory.
-However, if the theory does not fit hashtag growth and decay for each user, then an alternative model will be proposed that is a better fit, and that model will be used instead.
+\subsubsection{Base-level ACT-R model}
+
+The base-level activation component from the full ACT-R declarative memory model in Table \ref{tabACTRModel} is included in Table \ref{tabACTRBLLModel}.
+
+\begin{table}[!ht]
+  \caption{Base-level component of ACT-R declarative memory}
+  \label{tabACTRBLLModel}
+  {\tabulinesep=1.2mm
+    \begin{tabu}{ll}
+      \hline
+      Common Name &  Equation \\
+      \hline
+      Base Level Activation &	$B_{i} = log \sum_{j=1}^{n} {t_{j}}^{-d}$ \\
+      Optimized Learning &	$B_{i} = log \frac{n}{1-d} - d * log L$
+      \hline
+    \end{tabu}
+  }
+\end{table}
+
+Both terms are methods for computing the base-level activation ($B_{i}$) of a chunk in declarative memory.
+The standard form has a time dependence and accounts for the fact that the rate of presentations for a given object can change over time.
+The optimized learning form assumes that this rate is constant.
+
+For both equatons, $i$ represents each chunk type (e.g., a word), $j$ is an observation for a chunk (e.g,. the 2nd time that ``a'' appears), and $n$ is the number of times each chunk type has been observed.
+Since the optimized learning form assumes a constant rate for each chunk type, it only has to keep track of the time since the first presentation of a chunk type $L$ and the total number of chunks observed for that type. 
+It does not have to keep track of the time each specific chunk was observed.
+Consequently, the optimized learning form of $B_{i}$ is computationally much less expensive than the standard form, and is actually set to the default in the ACT-R common-lisp implementation.
+
+The decay rate parameter $d$ represents how fast the activation for an individual presentation of a chunk decays from declarative memory.
+Higher values mean that chunk activation decays faster, which means that the most recently-presented chunks will have the highest activation, and the total number of times that a chunk type has been presented matters less.
+Lower decay rate values flip the importance of frequency and recency: Lower values mean that chunks types that have occured most frequently will have the highest activation,
+and activation depends less on the specific chunk types that have been observed in the recent past.
+
+The base-level ($B_{i}$) component in Table \ref{ACTRBLLModel} is different than the $B_{i}$ used in \textcite{Stanley2013} (Table \ref{ModACTRModel}).
+\authorcite{Stanley2013} assumed no time dependence, no decay rate, and that the $B_{i}$ is simply a log odds computation of the probability that each chunk type is likely to be presented again, given past frequency.
+If a decay rate of 0 is used on the optimized learning form of $B_{i}$, then the equation collapses to $log n_{i}$,
+which is a nonlinear transformation of the $B_{i}$ used by \authorcite{Stanley2013} ($log \frac{p_{i}}{1-p_{i}}$).
+Both forms maintain the same rank ordering, so they should produce similar results.
+So the $B_{i}$ component used by \authorcite{Stanley2013} can be roughly thought of as the standard form of $B_{i}$ when the decay rate is 0 (i.e., a pure frequency model).
+
+
+
 
 \subsubsection{Method}
+
+The full StackOverflow dataset and Twitter popular-users dataset were used to characterize tag growth and decay for a user on each site.
+Each user's tag behavior from the popular-users dataset for each site was analyzed. 
+
+Multiple samples were taken across a broad range of user types for each dataset to ensure that the model results weren't dependent on specific attributes in a single sample.
+For the StackOverflow popular-users dataset, a total of 12 slices of users were taken at different levels of reputation and total number of questions asked.
+500 users were sampled that had a reputation higher than \num{500}, \num{1000}, \num{5000}, \num{10000}, \num{50000}, and \num{100000}.
+100 users were sampled that had asked a total number of questions higher than \num{50}, \num{100}, \num{200}, \num{300}, \num{400}, \num{500}.
+
+For the Twitter popular-users dataset, 12 slices were also taken, this time at different levels of number of followers and total number of tweets.
+100 users were sampled that had a total number of followers higher than \num{1000}, \num{5000}, \num{10000}, \num{100000}, \num{1000000}, and \num{10000000},
+and a total number of tweets higher than \num{100}, \num{500}, \num{1000}, \num{5000}, \num{10000}, and \num{50000}.
+
+
 \subsubsection{Results}
 
 \subsection{Adding Offset Term}
