@@ -1163,7 +1163,7 @@ This will be more formally tested when model accuracy across decay rate values i
 \paragraph{Model Performance Across Decay Rate Values}
 
 Moving up one level of analysis, model accuracy for all users in a single dataset slice was analyzed.
-A plot of the results for one of the 12 slices for both Twitter and StackOverflow are included in Figures \ref{figPriorSOQSliceDs} and \ref{figPriorTwitterSliceDs} respectively.
+A plot of the results for one of the 12 slices, for both Twitter and StackOverflow, and for both forms of $B_{i}$ are included in Figures \ref{figPriorSOQSliceDs} and \ref{figPriorTwitterSliceDs} respectively.
 
 \begin{figure}[!htbp]
   \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{visNormMean-SOQgt500r2-topHashtagPostPriorStd-crop.pdf}}}
@@ -1235,10 +1235,54 @@ First, the best-fit values are close to the 0.5 default value used in ACT-R when
 Comparing across optimized learning and the standard form, the best-fit values for the standard form are slightly higher for both the StackOverflow and Twitter dataset slices.
 Comparing best-fit values will be more thoroughly tested when looking at the values across all dataset slices.
 
-\paragraph{Aggregate Decay Rate and Accuracy}
+\paragraph{Aggregate Model Performance}
 
-jjj
+Finally, model accuraccy was analyzed across all dataset slices for StackOverflow and Twitter.
+Mean accuracy for both sites is included in Figure \ref{figPriorAcc}. 
+The mean was computed by taking the mean of the mean model accuracy for each dataset slice.
+All confidence intervals are 95\% bootstrapped for the mean of the means for each slice.
 
+\begin{figure}[!htbp]
+  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc--crop.pdf}}}
+  \caption{Model accuracy}
+  \label{figPriorAcc}
+\end{figure}
+
+Accuracy for the standard form (0.35) is higher than the optimized learning form (0.30).
+This makes sense given that the standard form does not assume equal presentation rate for each chunk, and hashtags on Twitter in particular show trends of high rate of use and then shift to low rate of use. 
+The standard form of $B_{i}$ is able to more accurately account for these trends.
+
+The best-fit decay rate values were also analyzed across all dataset slices.
+These results are included in Figure \ref{figPriorDecay}.
+
+\begin{figure}[!htbp]
+  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-d--crop.pdf}}}
+  \caption{Best-fit decay rate}
+  \label{figPriorDecay}
+\end{figure}
+
+Decay rate values that produced the most accurate model performance are lower for the optimized learning form (0.43) of $B_{i}$ compared to the standard form (0.80).
+However, the optimal values for optimized learning are near 0.5, which lines up with default value used in ACT-R.
+So the decay rate values for the standard form are slightly higher than the default values used in ACT-R, but the values found when optimized learning is used line up nicely with the ACT-R defaults.
+
+\subsubsection{Discussion}
+
+Given the large tag space used by post authors on StackOverflow and Twitter, it was surprising that model performance is respectable even when only past tag history and no context is used.
+This speaks to the importance of not only taking into account overall past tagging history, but also to ensuring that the prior component of activation for each tag is customized to each user's specific past tagging history.
+
+Also apparent for these datasets is that the optimized learning form of $B_{i}$ is not as accurate as the standard form.
+Further, for the optimized learning form there is not much difference between using a pure frequency-based model and a model where frequency and recency are optimally blended.
+This makes sense given that the optimized learning equation in Table \ref{tabACTRBLLModel} collapses to a pure frequency model as the amount of time since the presentation of the first recorded chunk instance increases,
+and also since the timespan of recorded tag use for StackOverflow and Twitter is large (years).
+
+So it may be worthwhile to use the standard form instead of the optimized learning form when declarative memory is modeled across a broader range of tasks.
+However, this shouldn't be taken as a strong recommendation,
+since the performance benefits seen here could simply be due to the fact that the declarative memory retrievals span across a large period of time, which isn't the case for all tasks.
+Nonetheless, the only real reason not to use the standard form is due to computational resource limitations.
+Since this becomes less of an issue as time progresses, it may be worthwhile to reconsider the default value used in ACT-R.
+It may be the case that the optimized learning form of the equation is no longer computationally necessary.
+And if the standard form is used as the default (or simply tried in another experiment),
+the results from this study suggest that the optimal decay rate value should be set slightly higher (0.8) than the default when optimized learning is used (0.5).
 
 \subsection{Adding Offset Term}
 
