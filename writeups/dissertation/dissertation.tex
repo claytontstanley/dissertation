@@ -1045,7 +1045,7 @@ The base-level activation component from the full ACT-R declarative memory model
       Common Name &  Equation \\
       \hline
       Base Level Activation &	$B_{i} = log \sum_{j=1}^{n} {t_{j}}^{-d}$ \\
-      Optimized Learning &	$B_{i} = log \frac{n}{1-d} - d * log L$
+      Optimized Learning &	$B_{i} = log \frac{n}{1-d} - d * log L$ \\
       \hline
     \end{tabu}
   }
@@ -1067,11 +1067,11 @@ Lower decay rate values flip the importance of frequency and recency: Lower valu
 and activation depends less on the specific chunk that have been observed in the recent past.
 
 The base-level ($B_{i}$) component in Table \ref{ACTRBLLModel} is different than the $B_{i}$ used in \textcite{Stanley2013} (Table \ref{ModACTRModel}).
-\authorcite{Stanley2013} assumed no time dependence, no decay rate, and that the $B_{i}$ is simply a log odds computation of the probability that each chunk is likely to be presented again, given past frequency.
+\citeauthor{Stanley2013} assumed no time dependence, no decay rate, and that the $B_{i}$ is simply a log odds computation of the probability that each chunk is likely to be presented again, given past frequency.
 If a decay rate of 0 is used on the optimized learning form of $B_{i}$, then the equation collapses to $log n_{i}$,
-which is a nonlinear transformation of the $B_{i}$ used by \authorcite{Stanley2013} ($log \frac{p_{i}}{1-p_{i}}$).
+which is a nonlinear transformation of the $B_{i}$ used by \citeauthor{Stanley2013} ($log \frac{p_{i}}{1-p_{i}}$).
 Both forms maintain the same rank ordering, so they should produce similar results.
-So the $B_{i}$ component used by \authorcite{Stanley2013} can be roughly thought of as the standard form of $B_{i}$ when the decay rate is 0 (i.e., a pure frequency model).
+So the $B_{i}$ component used by \citeauthor{Stanley2013} can be roughly thought of as the standard form of $B_{i}$ when the decay rate is 0 (i.e., a pure frequency model).
 
 \subsubsection{Method}
 
