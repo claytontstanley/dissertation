@@ -1700,12 +1700,12 @@ analyzeTemporal <- function(modelVsPredTbl) {
 	user_screen_names = wrapQuotes(c('rickeysmiley','fashionista_com','laurenpope','mtvindia','officialrcti'))
 	user_screen_names = wrapQuotes(c('fashionista_com'))
 	runTbls = runPriorT(config=modConfig(defaultTSjiPConfig, list(accumModelHashtagsTbl=T,
-								      query=sprintf("user_screen_name in (%s)", user_screen_names))))
+								      query=sprintf("select user_screen_name from twitter_users where user_screen_name in (%s)", user_screen_names))))
 	plotTemporal(runTbls)
 	user_screen_names = wrapQuotes(c('520957','238260','413225','807325','521180'))
 	user_screen_names = wrapQuotes(c('520957','238260'))
 	runTbls = runPriorSO(config=modConfig(defaultSOSjiPConfig, list(accumModelHashtagsTbl=T,
-									query=sprintf("user_screen_name in (%s)", user_screen_names))))
+									query=sprintf("select id as owner_user_id from users where id in (%s)", user_screen_names))))
 	plotTemporal(runTbls)
 }
 

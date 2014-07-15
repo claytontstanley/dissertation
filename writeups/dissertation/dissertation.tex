@@ -1055,25 +1055,23 @@ Both terms are methods for computing the base-level activation ($B_{i}$) of a ch
 The standard form has a time dependence and accounts for the fact that the rate of presentations for a given object can change over time.
 The optimized learning form assumes that this rate is constant.
 
-For both equatons, $i$ represents each chunk type (e.g., a word), $j$ is an observation for a chunk (e.g,. the 2nd time that ``a'' appears), and $n$ is the number of times each chunk type has been observed.
-Since the optimized learning form assumes a constant rate for each chunk type, it only has to keep track of the time since the first presentation of a chunk type $L$ and the total number of chunks observed for that type. 
-It does not have to keep track of the time each specific chunk was observed.
+For both equatons, $i$ represents each chunk (e.g., a word), $j$ is a specific observation for a chunk (e.g,. the 2nd time that ``a'' appears), and $n$ is the number of times each chunk has been observed.
+Since the optimized learning form assumes a constant presentation rate for each chunk,
+it only has to keep track of the time since the first presentation of a chunk $L$ and the total number of instances observed for that chunk. 
+It does not have to keep track of the time each specific chunk instance was observed.
 Consequently, the optimized learning form of $B_{i}$ is computationally much less expensive than the standard form, and is actually set to the default in the ACT-R common-lisp implementation.
 
 The decay rate parameter $d$ represents how fast the activation for an individual presentation of a chunk decays from declarative memory.
-Higher values mean that chunk activation decays faster, which means that the most recently-presented chunks will have the highest activation, and the total number of times that a chunk type has been presented matters less.
-Lower decay rate values flip the importance of frequency and recency: Lower values mean that chunks types that have occured most frequently will have the highest activation,
-and activation depends less on the specific chunk types that have been observed in the recent past.
+Higher values mean that chunk activation decays faster, which means that the most recently-presented chunks will have the highest activation, and the total number of times that a chunk has been presented matters less.
+Lower decay rate values flip the importance of frequency and recency: Lower values mean that chunks that have occured most frequently will have the highest activation,
+and activation depends less on the specific chunk that have been observed in the recent past.
 
 The base-level ($B_{i}$) component in Table \ref{ACTRBLLModel} is different than the $B_{i}$ used in \textcite{Stanley2013} (Table \ref{ModACTRModel}).
-\authorcite{Stanley2013} assumed no time dependence, no decay rate, and that the $B_{i}$ is simply a log odds computation of the probability that each chunk type is likely to be presented again, given past frequency.
+\authorcite{Stanley2013} assumed no time dependence, no decay rate, and that the $B_{i}$ is simply a log odds computation of the probability that each chunk is likely to be presented again, given past frequency.
 If a decay rate of 0 is used on the optimized learning form of $B_{i}$, then the equation collapses to $log n_{i}$,
 which is a nonlinear transformation of the $B_{i}$ used by \authorcite{Stanley2013} ($log \frac{p_{i}}{1-p_{i}}$).
 Both forms maintain the same rank ordering, so they should produce similar results.
 So the $B_{i}$ component used by \authorcite{Stanley2013} can be roughly thought of as the standard form of $B_{i}$ when the decay rate is 0 (i.e., a pure frequency model).
-
-
-
 
 \subsubsection{Method}
 
@@ -1089,13 +1087,164 @@ For the Twitter popular-users dataset, 12 slices were also taken, this time at d
 100 users were sampled that had a total number of followers higher than \num{1000}, \num{5000}, \num{10000}, \num{100000}, \num{1000000}, and \num{10000000},
 and a total number of tweets higher than \num{100}, \num{500}, \num{1000}, \num{5000}, \num{10000}, and \num{50000}.
 
+20 different values of the decay rate parameter were explored for each slice
+(0, .1, .2, .3, .4, .5, .6, .7, .8, .9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.8, 2, 5, 10, 20).
+The values were chosen in order to look at how performance changes from a pure frequency model ($d=0$), to a blend of frequency and recency ($d=.5$), to a pure recency model ($d=20$).
+The decay rate value was varied for both the standard form and optimized learning form of $B_{i}$. 
+However, only values equal to or below 1 were examined for the optimized learning form since values above 1 for this form cause a bifurcation and are not psychologically interesting.
+
+Both the standard form and optimized learning form of $B_{i}$ were used to predict each user's specific tag history.
+To do this, a user's tag history was collected, and then each tag instance from oldest to newest was examined.
+For each of these tagging instances, the model generated an activation value for each tag based on that tag's frequency and recency of use. 
+This means, for example, that the model always missed characterizing the first observed tag for each user, since at that point the model does not have any history of tag use for that user.
+This also means that the tag space for each user is constrained and limited to the tags that each user has used in the past.
+
+At each tagging instance, the model has activation values for a set of tags.
+Model accurracy was assessed by rank ordering these activations and choosing the model's highest $N$ tags, where $N$ is the number of tags used for that specific post.
+The model's chosen $N$ tags were compared to the user's chosen $N$ tags, and if a model's chosen tag was in the set of user's chosen tags, then the prediction was marked as correct.
+Otherwise, it was marked as incorrect.
+
+This process was performed across all users in each of the 12 dataset slices for both the Twitter and StackOverflow popular-users datasets.
+It was repeated for each of the decay rate values and the two different forms of $B_{i}$.
 
 \subsubsection{Results}
+
+\paragraph{Visualizing Tag Use}
+
+To better illustrate the dynamics of each user's tagging behavior,
+profile plots for a single user for both StackOverflow and Twitter are included in Figures \ref{figHTByTime-520957} and \ref{figHTByTime-fashionista_com} respectively.
+
+\begin{figure}[!htbp]
+  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{HTByTime-520957-crop.pdf}}}
+  \caption{Tagging profile of a single user on StackOverflow}
+  \label{figHTByTime-520957}
+\end{figure}
+
+\begin{figure}[!htbp]
+  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{HTByTime-fashionista_com-crop.pdf}}}
+  \caption{Tagging profile of a single user on Twitter}
+  \label{figHTByTime-fashionista_com}
+\end{figure}
+
+The specific value of the hashtag used for both plots is nominal and not important for this analysis.
+What is interesting is how large the tagging space is for these users.
+There are bands of commonly-used tags for each user, but there are also instances where new tags are used, and a large percentage of tags used are not in the most-common bands.
+This helps illustrate how challenging modeling this task can be.
+The model's goal is to predict at each instance what tag will be chosen, but since the tag space is so large and varied, this task is quite challenging.
+
+Although the tag space for the Twitter user is smaller than the StackOverflow user in these plots, this is not a consistent trend.
+These plots were chosen from the set to also show that the amount of tag variation for individual users also varies: some use many tags and some use just a few.
+To accurately model human performance in this domain, the model must be able to make accurate predictions across all variations of user tagging behavior. 
+
+\paragraph{Visualizing Model Performance}
+
+As a first method for understanding model performance, profile plots of model's predicted tags for individual users were overlaid on that user's actual tag use.
+These plots for StackOverflow and Twitter are included in Figures \ref{figHTMByTime-520957} and \ref{figHTMByTime-fashionista_com} respectively.
+These are the same plots shown in Figures \ref{figHTByTime-520957} and \ref{figHTByTime-fashionista_com} with model predictions overlaid in red. 
+
+\begin{figure}[!htbp]
+  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{HTMByTime-520957-crop.pdf}}}
+  \caption{Model tagging profile of a single user on StackOverflow}
+  \label{figHTMByTime-520957}
+\end{figure}
+
+\begin{figure}[!htbp]
+  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{HTMByTime-fashionista_com-crop.pdf}}}
+  \caption{Model tagging profile of a single user on Twitter}
+  \label{figHTMByTime-fashionista_com}
+\end{figure}
+
+Also shown in these figures is how model predictions change as the decay rate parameter changes.
+The model changes less from tag to tag with lower decay rate values.
+This makes sense because lower decay rate values lead to the model weighting frequency more than recency in the activation calculation.
+These plots also suggest that model accuracy is best when a blend of frequency and recency is used (i.e., a decay rate between 0 and 20).
+This will be more formally tested when model accuracy across decay rate values is analyzed across all users in each dataset slice and all dataset slices.
+
+\paragraph{Model Performance Across Decay Rate Values}
+
+Moving up one level of analysis, model accuracy for all users in a single dataset slice was analyzed.
+A plot of the results for one of the 12 slices for both Twitter and StackOverflow are included in Figures \ref{figPriorSOQSliceDs} and \ref{figPriorTwitterSliceDs} respectively.
+
+\begin{figure}[!htbp]
+  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{visNormMean-SOQgt500r2-topHashtagPostPriorStd-crop.pdf}}}
+  \caption{Model performance for a single dataset slice for StackOverflow}
+  \label{figPriorSOQSliceDsStd}
+\end{figure}
+
+\begin{figure}[!htbp]
+  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{visNormMean-SOQgt500r2-topHashtagPostPriorOL2-crop.pdf}}}
+  \caption{Model performance for a single dataset slice for StackOverflow}
+  \label{figPriorSOQSliceDsOL}
+\end{figure}
+
+\begin{figure}[!htbp]
+  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{visNormMean-TFollowgt10Mr2-topHashtagPostPriorStd-crop.pdf}}}
+  \caption{Model performance for a single dataset slice for Twitter}
+  \label{figPriorTwitterSliceDsStd}
+\end{figure}
+
+\begin{figure}[!htbp]
+  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{visNormMean-TFollowgt10Mr2-topHashtagPostPriorOL2-crop.pdf}}}
+  \caption{Model performance for a single dataset slice for Twitter}
+  \label{figPriorTwitterSliceDsOL}
+\end{figure}
+
+Model accuracy at each decay rate value for each user in the dataset slice are included in the plots.
+Each user's mean accuracy was subtracted off in order to compute a normalized mean for that user.
+This was done so that the relative accuracy change for different decay rate values could be more easily visualized.
+The technique is a visualization to what is done when testing the main effect in a repeated measures design.
+
+One main effect in all of the plots is that there is an optimal decay rate value between 0 and 20 that produces the highest model accuracy.
+For the standard $B_{i}$ equation, model accuracy for a pure frequency model ($d=0$) is also worse than using a pure recency model ($d=20$), particularly for Twitter.
+It makes sense that a pure recency model for Twitter is relatively more accurate than for StackOverflow, as the hashtag lifetime for Twitter is much less than a programming-language tag on StackOverflow.
+
+When comparing the standard and optimized learning forms of the equation, it is apparent that a pure recency model does not work very well for optimized learning.
+The best-fit decay rate value for the optimized learning form is also not as clear and pronounced as it is for the standard form (less of a peak).
+And the relative accuracy gained from using a pure frequency based model to a blend of frequency and recency is less for the optimized learning form than the standard form of $B_{i}$.
+
+\paragraph{Best-fit Decay Rate Values}
+
+To identify the best decay rate value for the dataset slices,
+each user's best decay rate value was taken and the results are plotted in histogram form in Figures \ref{figPriorSOQHistDs} and \ref{figPriorTwitterSliceDs} respectively.
+
+\begin{figure}[!htbp]
+  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{visHistD-SOQgt500r2-topHashtagPostPriorStd-crop.pdf}}}
+  \caption{Best-fit decay rate for a single dataset slice for StackOverflow}
+  \label{figPriorSOQHistDs}
+\end{figure}
+
+\begin{figure}[!htbp]
+  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{visHistD-SOQgt500r2-topHashtagPostPriorOL2-crop.pdf}}}
+  \caption{Best-fit decay rate for a single dataset slice for StackOverflow}
+  \label{figPriorSOQHistDsOL}
+\end{figure}
+
+\begin{figure}[!htbp]
+  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{visHistD-TFollowgt10Mr2-topHashtagPostPriorStd-crop.pdf}}}
+  \caption{Best-fit decay rate for a single dataset slice for Twitter}
+  \label{figPriorTwitterHistDs}
+\end{figure}
+
+\begin{figure}[!htbp]
+  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{visHistD-TFollowgt10Mr2-topHashtagPostPriorOL2-crop.pdf}}}
+  \caption{Best-fit decay rate for a single dataset slice for Twitter}
+  \label{figPriorTwitterHistDsOL}
+\end{figure}
+
+First, the best-fit values are close to the 0.5 default value used in ACT-R when the optimized learning form is used.
+Comparing across optimized learning and the standard form, the best-fit values for the standard form are slightly higher for both the StackOverflow and Twitter dataset slices.
+Comparing best-fit values will be more thoroughly tested when looking at the values across all dataset slices.
+
+\paragraph{Aggregate Decay Rate and Accuracy}
+
+jjj
+
 
 \subsection{Adding Offset Term}
 
 \subsubsection{Method}
 \subsubsection{Results}
+
 
 \subsection{Twitter Subsets}
 
