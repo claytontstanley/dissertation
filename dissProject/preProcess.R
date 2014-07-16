@@ -1902,9 +1902,9 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 				       'PriorStdTweetNentropy', 'PriorStdNoffsetTweetNoffset',
 				       'PriorStdNoffsetTweetOrderNoffsetTweetOrderlessNoffset', 'PriorStdTweetOrderTweetOrderless'))
 	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='OffsetT')
-	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweetNentroy', 'PriorStdTweetOrderTweetOrderless'))
 	# RESULT: 4 different subsets for twitter popular hashtags show same effects
-	# T standard all groups
+	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweetNentropy', 'PriorStdTweetOrderTweetOrderless',
+				       'TweetNentropy', 'TweetOrderTweetOrderless'))
 	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='contextStandardByGroupT', groupCol='groupNum')
 	# RESULT: Show base performance for both models
 	# SO standard
