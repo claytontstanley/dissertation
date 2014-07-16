@@ -1024,15 +1024,16 @@ It also seems less arbitrary than explicitly identifying a list of stop words to
 
 All three stop word techniques (i.e., pre-determined list, high-frequency filtering, and entropy weighting) were explored for this analysis.
 
-\section{Results}
 
-\subsection{Past User Behavior}
+
+
+\section{Past User Behavior}
 
 How does a user's prior hashtag use influence their likelihood of choosing that hashtag in the future?
 This question was tested by examing how well ACT-R's base-level activation component of declarative memory predicts the tags that authors choose, given each author's past tagging behavior.
 The model predicts that the more recently and frequently used chunks have higher prior activations, and are more likely to be needed in the future.
 
-\subsubsection{Base-level ACT-R model}
+\subsection{Base-level ACT-R model}
 
 The base-level activation component from the full ACT-R declarative memory model in Table \ref{tabACTRModel} is included in Table \ref{tabACTRBLLModel}.
 
@@ -1073,7 +1074,7 @@ which is a nonlinear transformation of the $B_{i}$ used by \citeauthor{Stanley20
 Both forms maintain the same rank ordering, so they should produce similar results.
 So the $B_{i}$ component used by \citeauthor{Stanley2013} can be roughly thought of as the standard form of $B_{i}$ when the decay rate is 0 (i.e., a pure frequency model).
 
-\subsubsection{Method}
+\subsection{Method}
 
 The full StackOverflow dataset and Twitter popular-users dataset were used to characterize tag growth and decay for a user on each site.
 Each user's tag behavior from the popular-users dataset for each site was analyzed. 
@@ -1107,9 +1108,9 @@ Otherwise, it was marked as incorrect.
 This process was performed across all users in each of the 12 dataset slices for both the Twitter and StackOverflow popular-users datasets.
 It was repeated for each of the decay rate values and the two different forms of $B_{i}$.
 
-\subsubsection{Results}
+\subsection{Results}
 
-\paragraph{Visualizing Tag Use}
+\subsubsection{Visualizing Tag Use}
 
 To better illustrate the dynamics of each user's tagging behavior,
 profile plots for a single user for both StackOverflow and Twitter are included in Figures \ref{figHTByTime-520957} and \ref{figHTByTime-fashionista_com} respectively.
@@ -1136,7 +1137,7 @@ Although the tag space for the Twitter user is smaller than the StackOverflow us
 These plots were chosen from the set to also show that the amount of tag variation for individual users also varies: some use many tags and some use just a few.
 To accurately model human performance in this domain, the model must be able to make accurate predictions across all variations of user tagging behavior. 
 
-\paragraph{Visualizing Model Performance}
+\subsubsection{Visualizing Model Performance}
 
 As a first method for understanding model performance, profile plots of model's predicted tags for individual users were overlaid on that user's actual tag use.
 These plots for StackOverflow and Twitter are included in Figures \ref{figHTMByTime-520957} and \ref{figHTMByTime-fashionista_com} respectively.
@@ -1160,7 +1161,7 @@ This makes sense because lower decay rate values lead to the model weighting fre
 These plots also suggest that model accuracy is best when a blend of frequency and recency is used (i.e., a decay rate between 0 and 20).
 This will be more formally tested when model accuracy across decay rate values is analyzed across all users in each dataset slice and all dataset slices.
 
-\paragraph{Model Performance Across Decay Rate Values}
+\subsubsection{Model Performance Across Decay Rate Values}
 
 Moving up one level of analysis, model accuracy for all users in a single dataset slice was analyzed.
 A plot of the results for one of the 12 slices, for both Twitter and StackOverflow, and for both forms of $B_{i}$ are included in Figures \ref{figPriorSOQSliceDs} and \ref{figPriorTwitterSliceDs} respectively.
@@ -1202,7 +1203,7 @@ When comparing the standard and optimized learning forms of the equation, it is 
 The best-fit decay rate value for the optimized learning form is also not as clear and pronounced as it is for the standard form (less of a peak).
 And the relative accuracy gained from using a pure frequency based model to a blend of frequency and recency is less for the optimized learning form than the standard form of $B_{i}$.
 
-\paragraph{Best-fit Decay Rate Values}
+\subsubsection{Best-fit Decay Rate Values}
 
 To identify the best decay rate value for the dataset slices,
 each user's best decay rate value was taken and the results are plotted in histogram form in Figures \ref{figPriorSOQHistDs} and \ref{figPriorTwitterSliceDs} respectively.
@@ -1235,7 +1236,7 @@ First, the best-fit values are close to the 0.5 default value used in ACT-R when
 Comparing across optimized learning and the standard form, the best-fit values for the standard form are slightly higher for both the StackOverflow and Twitter dataset slices.
 Comparing best-fit values will be more thoroughly tested when looking at the values across all dataset slices.
 
-\paragraph{Aggregate Model Performance}
+\subsubsection{Aggregate Model Performance}
 
 Finally, model accuraccy was analyzed across all dataset slices for StackOverflow and Twitter.
 Mean accuracy for both sites is included in Figure \ref{figPriorAcc}. 
@@ -1265,7 +1266,7 @@ Decay rate values that produced the most accurate model performance are lower fo
 However, the optimal values for optimized learning are near 0.5, which lines up with default value used in ACT-R.
 So the decay rate values for the standard form are slightly higher than the default values used in ACT-R, but the values found when optimized learning is used line up nicely with the ACT-R defaults.
 
-\subsubsection{Discussion}
+\subsection{Discussion}
 
 Given the large tag space used by post authors on StackOverflow and Twitter, it was surprising that model performance is respectable even when only past tag history and no context is used.
 This speaks to the importance of not only taking into account overall past tagging history, but also to ensuring that the prior component of activation for each tag is customized to each user's specific past tagging history.
@@ -1284,16 +1285,178 @@ It may be the case that the optimized learning form of the equation is no longer
 And if the standard form is used as the default (or simply tried in another experiment),
 the results from this study suggest that the optimal decay rate value should be set slightly higher (0.8) than the default when optimized learning is used (0.5).
 
-\subsection{Adding Offset Term}
+\section{Combining Predictors}
+
+The declarative memory models analyzed in this study consist of two main components: past behavior and context.
+Past tag use was isolated in the first study to see how well ACT-R's prior component of declarative memory (i.e., base-level learning) fits each user's tag use over time.
+However for the rest of the studies the past behavior and context declarative memory components were combined as well as looked at in isolation.
+
+\subsection{Methods}
+
+\subsubsection{Logistic Regression}
+
+In order to best combine these predictors, a logistic regression statistical technique similar to \textcite{Stanley2013} was used to determine the most optimal weights for each term.
+Logistic regression is used on these datasets in the following way.
+When a user creates a tag for a post, a retrieval request for the model is made.
+For each request, the model returns a set of tags (all tags that have been observed for that user in the past) and activations associated with each tag.
+An activation value is computed for each model component (e.g., prior tag use, context) for each tag.
+These values are recorded, and tag instances that match what the author actually tagged are marked as a 1, while all others are marked with a 0.
+This process is repeated across all posts where a user chooses a tag, and across all users in the dataset.
+Once all of the results are aggregated, a logistic regression is run where the optimal weights for each model component are found that maximize the model's ability to correctly label tags as 0 or 1 based on total activation.
+
+Model accuracy is evaluated by using the optimal weights, rank ordering all recorded tags by model activation using those weights,
+asking the model to tag the top N posts with a 1 (where N is the total number of recorded instances where an author chose a tag),
+and then comparing the model's chosen tags with the used tags for each post (i.e., looking at the ``hits'').
+This is equivalent to throttling the threshold in the logistic regression such that the total number of observations labeled as a 1 match the total number of recorded instances of tagging in the dataset.
+
+For this form of model accuracy, the model labels N posts with a 1 where the labeling is not constrained in any way within each post.
+That is, the labeling is relaxed across all posts, and there are no constraints where the model must label a specific number of 1s for each post based on the number of tags that the author used for that post.
+So model accuracy values found with the relaxed method are actually slightly conservative, since the model may be labeling more 1s for a post than the number of tags the author used for that post.
+
+However, this relaxed metric was used for the rest of the experiments that involve combining terms because the optimal weights found by the regression are based on using the relaxed metric.
+If these weights are then used to compute the constrained form of model accuracy, biases may be introduced since the regression wasn't optimized to the constrained form, and weights may change if that was done.
+The constrained form of model accuracy can not be used for the regression because there is no current logistic regression technique in R that can be constrained to label a specific number of 1s for each observation. 
+The constrained form could be used in a regression if a custom form of the regression was implemented.
+However this was not persued since around \num{2500} total regressions were run on these datasets for two reasons:
+A custom implementation in R would not likely run in compiled C, and even if it was implemented in a compiled language it would be computationally intractible without a closed-form solution. 
+
+\subsubsection{Adding Offset Term}
+
+This logistic regression method is a computationally efficient way to find the optimal weights for the predictors.
+However when the regression can not be constrained to label a specific number of 1s for each observation (as is the case here), to be used properly an offset term must be added as an additional model predictor.
+
+The offset term ensures that the activation for the small number of top tags for each post are equal across posts.
+This ensures that the logistic regression only labels a few 1s for each post.
+\textcite{Stanley2013} did this by subtracting off the mean total activation for the top 5 tags for each post.
+However this method is complicated since computing the toal activation for a tag requires already knowing the weights for each model component that are used to compute that activation.
+\citeauthor{Stanley2013} used an iterative approach to determine the weights used for the offset term, and kept iterating until those weights matched the weights returned after running the logistic regression.
+
+A simplified version of \citeauthor{Stanley2013}'s method was used for the results in this study.
+Instead of subtracting off the mean total activation for the top 5 tags for each post, the process is done in isolation for each model component.
+So for the prior component, the activation value used in the logistic regression is the prior activation with the mean of the top 5 prior activations subtracted off of this value.
+The same process is used for the context component.
+Decoupling the offset term and computing an offset for each model component in isolation means that an iterative approach is no longer necessary,
+since the optimal weights of the terms are no longer needed when computing the offset.
+
+\subsubsection{Datasets}
+
+Model accuracy was computed on the popular-hashtags dataset for Twitter and a random sample of posts across the entire StackOverflow dataset.
+For each of the four Twitter popular-hashtags datasets, model retrievals were done across 15 runs and 500 posts within each run.
+For the StackOverflow dataset, 5 runs of 100 posts were used, since the results for StackOverflow are more stable and retrievals take more wall-clock time for this dataset due to the size of the co-occurrence matrix.
+All runs contained separate posts, and all posts used for runs were not used to generate the co-occurrence matrix used for the two retrieval models.
+
+\subsubsection{Computing Prior}
+
+For each randomly-sampled post for StackOverflow, the prior activation is based on that user's prior tagging history, and not on any global prior of specific tag frequency across users.
+This was done so that the prior component used for StackOverflow for both the popular-users and randomly-sampled subsets was the same.
+
+However, a custom user prior for the Twitter popular-hashtags dataset cannot be used, since the entire Twitter dataset cannot be downloaded.
+This dataset contains samples of a large set of various users that choose a specific set of hashtags being monitored.
+So in order to generate a custom user prior for each sample in the dataset, that user's entire tagging history must be accessed through the API.
+Since access rates are limited across that interface, it is infeasable to do this process for every user that appears in the Twitter popular-users dataset.
+So instead, the global prior tag history for all users in the Twitter popular-users dataset was used to compute prior activation values for each tag.
+
+\subsubsection{Co-occurrence Matrices}
+
+The context component for both the Random Permutation and Bayesian model requires a co-occurrence matrix of words and observed tags.
+Different size matrices were analyzed, ranging from \num{1000}, \num{10000}, \num{100000}, \num{1000000}, and \num{3000000} posts.
+The matrix for \num{3000000} posts was only used for Twitter, since the number of words in a StackOverflow post is much higher than Twitter on average,
+and the space and computational time required when using a co-occurrence matrix of \num{3000000} posts for StackOverflow is too high for a current high-performance desktop, even with highly optimized representations.
+Already FIXME total co-occuring word tag observations are used to build a co-occurrence matrix of \num{1000000} StackOverflow posts.
+It is also the case that \num{1000000} posts for StackOverflow is already around $1/7$ of the total posts created on the site,
+so it is reasonable to assume that the results would not change greatly for StackOverflow if $3/7$ of the total posts created were used to build the co-occurrent matrix instead,
+especially since FIXME co-occurrences are already used with \num{1000000} posts.
+
+\section{Results for Combining Terms}
+
+
+
+\subsection{Adding Offset}
+
+Model accuracy relaxed across posts with and without the offset model component was evaluated for both the Bayesian and random-permutation model.
 
 \subsubsection{Method}
+
+The four Twitter popular-users datasets and the StackOverflow randomly-sampled dataset were used for the analysis.
+Logistic regressions were run both with and without the offset component added to each model.
+The results for each run for each dataset were collected and averaged.
+The results across the four Twitter datasets were collected together, and the average was done across all runs in all four datasets.
+
 \subsubsection{Results}
 
+The impact of adding the offset to each of the models for StackOverflow and Twitter are included in Figures \ref{figContextOffsetSO} and \ref{figContextOffsetTwitter}.
+
+
+\begin{figure}[!htbp]
+  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-OffsetSO-crop.pdf}}}
+  \caption{Impact of adding model offset for StackOverflow}
+  \label{figContextOffsetSO}
+\end{figure}
+
+\begin{figure}[!htbp]
+  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-OffsetT-crop.pdf}}}
+  \caption{Impact of adding model offset for Twitter}
+  \label{figContextOffsetT}
+\end{figure}
+
+In both plots, if the model name includes ``full'' then all model components are included.
+When they are enumerated, then components are left out.
+The random-permutation models are represented as ``RP'', Bayesian models as ``Bayes'', and they are plotted alongside each other so that comparisons across the two model types can be done easily.
+So, for example, the ``standard Prior model relaxed across posts w/o offset'' means that only the prior model component was used, and the offset for that component was not subtracted off when determining activation.
+As another example, the ``Bayes only orderless context'' means that only the context component of the Bayesian model was used (along with the offset), and that no order information was used for that contextual component term.
+
+Looking across the plots, including the offset significantly increases model accuracy, for all models, terms, and sites.
+Accuracy is improved even when only a single term is used.
+Although in this case the weight of the term is irrelevant (only one term, weighting for that term doesn't matter),
+using an offset still improves accuracy since the offset term ensures that only a small number of tags per posts are predicted by the model to be the chosen tags. 
+
+The random-permutation model in particular is greatly affected by the offset term, for both the StackOverflow and Twitter.
+This suggests that the mean activation for the random-permutation model for the top few tags in each post can vary greatly across posts.
+Only if this mean activation is subtracted off will the logistic regression model generate optimal weights and predictions that are comparative to the Bayesian model when model accuracy relaxed across posts is examined.
+
+\subsubsection{Discussion}
+
+It is actually somewhat dissapointing that the offset term is even needed.
+If it were the case that model activation for a tag in a specific post could be interpreted as an exact activation value that did not depend on the specific post,
+then the model would be able to say when, for example, the third top tag in a post is more likely to be a chosen tag than the second top tag in another post.
+That is, the activation values would have meaning more than just rank ordering, and could be used to determine, for example, the number of retrievals to do for a specific post.
+If this were the case, then adding the offset term would actually decrease accuracy, since this absolute value of the activation values would be subtracted off.
+However, since accuracy improves when adding the offset term for both models, it does not seem that activation values have much meaning across posts (and only within a single post) for these datasets.
+
+A likely and simple explaination for this is that possibly there are posts where a large set of tags have high activation,
+but the author is throttling their retrieval threshold for each post such that only a small set of tags are actually used.
+This is probably not the retrieval threshold used in the core declarative memory system that determines if a retrieval for the term actually happens.
+It is unlikely that this retrieval threshold can be directly controlled and manipulated.
+Rather, it could be a high-level task retrieval threshold that the author has control over, where he/she actively sets it based on competing goals of tagging posts an not overly saturating a post with tags.
+Adding the offset term into the model is a way to implement a simple version of this high-level retrieval threshold.
 
 \subsection{Twitter Subsets}
 
+Four subsets of the popular-users dataset were collected for Twitter.
+This was to ensure that model results could be interpreted as effects that were not specific to a certain time period or set of popular hashtags.
+
 \subsubsection{Method}
+
+The four subsets were collected across a period of one month.
+The hashtags used in each subset were chosen by scraping a site that published the current trending hashtags for each city.
+Hashtags for each US city were collected, and then 400 were randomly sampled from this set.
+Only 400 were selected since this is the maximum that the Twitter API can monitor at one time.
+
 \subsubsection{Results}
+
+A plot of model accuracy for components of both the Random Permutation and Bayesian models and isolated by subset are included in Figure \ref{figContextSubsets}.
+
+\begin{figure}[!htbp]
+  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-contextStandardByGroupT-crop.pdf}}}
+  \caption{Model accuracy for each of the four Twitter popular-users subsets}
+  \label{figContextOffsetT}
+\end{figure}
+
+Although there is a main effect of subset, there are no practically significant interactions.
+Relative model performance remains consistent across the four subsets.
+This means that model behavior for the popular-users subset for Twitter can be interpreted as behavior that will persist across different time periods,
+if the same method of choosing popular hashtags is done at a later date.
+It may be more general that model behavior also does not depend on the specific method of choosing the popular hashtags, but since only a single method was used for this analysis, this is still an open question.
 
 \subsection{Stop Words}
 

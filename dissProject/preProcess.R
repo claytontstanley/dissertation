@@ -1703,7 +1703,7 @@ analyzeTemporal <- function(modelVsPredTbl) {
 								      query=sprintf("select user_screen_name from twitter_users where user_screen_name in (%s)", user_screen_names))))
 	plotTemporal(runTbls)
 	user_screen_names = wrapQuotes(c('520957','238260','413225','807325','521180'))
-	user_screen_names = wrapQuotes(c('520957','238260'))
+	user_screen_names = wrapQuotes(c('520957'))
 	runTbls = runPriorSO(config=modConfig(defaultSOSjiPConfig, list(accumModelHashtagsTbl=T,
 									query=sprintf("select id as owner_user_id from users where id in (%s)", user_screen_names))))
 	plotTemporal(runTbls)
@@ -1736,8 +1736,9 @@ analyzePrior <- function(modelVsPredTbl) {
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostPriorStd' & datasetName=='SOQgt500r2'])
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostPriorOL2' & datasetName=='TFollowgt10Mr2' & d < 1])
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostPriorOL2' & datasetName=='SOQgt500r2' & d < 1])
-	compareOptimalDs(bestTbl[DVName %in% c('topHashtagPostPriorStd', 'topHashtagPostPriorOL2') & runNum == 2])
-	compareOptimalAcc(bestTbl[DVName %in% c('topHashtagPostPriorStd', 'topHashtagPostPriorOL2') & runNum == 2])
+	tbl = compareOptimalDs(bestTbl[DVName %in% c('topHashtagPostPriorStd', 'topHashtagPostPriorOL2') & runNum == 2])
+	tbl = compareOptimalAcc(bestTbl[DVName %in% c('topHashtagPostPriorStd', 'topHashtagPostPriorOL2') & runNum == 2])
+	tbl[, mean(meanVal), by=DVName]
 }
 
 asTopHashtagAcross <- function(vect) {
@@ -1901,6 +1902,10 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 				       'PriorStdTweetNentropy', 'PriorStdNoffsetTweetNoffset',
 				       'PriorStdNoffsetTweetOrderNoffsetTweetOrderlessNoffset', 'PriorStdTweetOrderTweetOrderless'))
 	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='OffsetT')
+	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweetNentroy', 'PriorStdTweetOrderTweetOrderless'))
+	# RESULT: 4 different subsets for twitter popular hashtags show same effects
+	# T standard all groups
+	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='contextStandardByGroupT', groupCol='groupNum')
 	# RESULT: Show base performance for both models
 	# SO standard
 	DVNames = asTopHashtagAcross(c('PriorStd', 'TitleNentropy', 'BodyNentropy', 'PriorStdTitleNentropyBodyNentropy',
@@ -1910,9 +1915,6 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 	DVNames = asTopHashtagAcross(c('PriorStd', 'TweetNentropy', 'PriorStdTweetNentropy',
 				       'TweetOrderless', 'TweetOrder', 'PriorStdTweetOrderTweetOrderless'))
 	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='contextStandardT', groupCol='dsetGroup')
-	# RESULT: 4 different subsets for twitter popular hashtags show same effects
-	# T standard all groups
-	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='contextStandardByGroupT', groupCol='groupNum')
 	# RESULT: Entropy weighting works for RP for SO and Twitter
 	# SO Entropy
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleBody',
