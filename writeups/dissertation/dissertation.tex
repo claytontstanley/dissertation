@@ -1844,8 +1844,71 @@ Since it was shown that including word-order information has little to no sigifi
 
 \subsection{Impact of Prior vs Context}
 
+Adding a user's prior tag history as an additional component has been shown to improve performance, but is this always the case?
+If enough context information has been collected, maybe a context-only model can perform just as well as a combined context and prior model.
+If this were the case, then it may be less important that the random-permutation model does not include a prior term by default.
+
 \subsubsection{Method}
+
+Full models were tested against context-only models for both sites and both the Bayesian and random-permutation model types.
+The four Twitter popular-hashtags datasets and the StackOverflow randomly-sampled datasets were tested first. 
+
 \subsubsection{Results}
+
+The results are included in Figures \ref{figContextPriorneededSO} and \ref{figContextPriorneededT}.
+
+\begin{figure}[!htbp]
+  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-priorAddSO-crop.pdf}}}
+  \caption{Model accuracy for various word order methods for the random-permutation model for Twitter}
+  \label{figContextPriorneededSO}
+\end{figure}
+
+\begin{figure}[!htbp]
+  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-priorAddT-crop.pdf}}}
+  \caption{Model accuracy for various word order methods for the random-permutation model for Twitter}
+  \label{figContextPriorneededT}
+\end{figure}
+
+For both the Bayesian and random-permutation models, accuracy remains the same when the prior compoennt is ermoved for StackOverflow.
+Accuracy does dramatically decrease for Twitter when the prior is removed, however.
+
+\subsubsection{Discussion}
+
+These results show that prior informatino is not always needed when a large amount of context is avaialble and not much information has been collected about each user's past history.
+The StackOverflow randomly-sampled dataset selects posts across the entire dataset, regardless of each user's popularity or tag history.
+Across the dataset, each user only asks FIXME questions on average, so there is not a large amount of past tag history available for the prior component to use,
+which is why this component is not a strong predictor in this case.
+
+However, can a context-only model perform just as well as a combined context and prior model when users with the largest amount of StackOverflow history are tested?
+If each user's tagging history is a useful predictor for StackOverflow,
+then this component should at least generate unique predictive variance in the case where users with large amounts of history are tested.
+
+\subsubsection{Method}
+
+The same StackOverflow popular-users datasets used to test the prior component in isolation were used to test the prior component when context was added.
+However, since computing activations for the context component take an order of magnitude more wall-clock time than computing the prior comonent, not all observations could be included for the test.
+To reduce the observations, the last FIXME posts from each user in the datasets were sampled.
+Using the last observations for each user ensures that the observations tested have aquired the greatest amount of past tagging history in the datasets.
+So if a context-only model performs just as well as the full model in this case, it would be surprising.
+
+\subsubsection{Results}
+
+The results comparing the full model to a context-only only model for the StackOverflow popular-users dataset are included in Figure \ref{figPUAddPrior}.
+
+\begin{figure}[!htbp]
+  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-priorAddPUserSO-crop.pdf}}}
+  \caption{Unique variance in prior component for popular StackOverflow users}
+  \label{figPUAddPrior}
+\end{figure}
+
+In this case, past tag history does contain unique variance for accurately predicting tag use.
+Accuracy improves for both the Bayesian and random-permutation models when the prior model component is combined with context compared to context alone.
+
+\subsubsection{Discussion}
+
+This shows that incorporating past tagging history is important for even a site like StackOverflow where a large amount of context information has been collected.
+However, for this type of site it only becomes important when a reasonably large amount of a user's past tagging history has been collected.
+For a randomly-sampled user on StackOverflow, a context-only model captures the majority of the predicitve variance.
 
 \subsection{User-customized Co-occurrence Matrix}
 
