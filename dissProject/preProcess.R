@@ -1571,7 +1571,6 @@ renameColDVName <- function(tbl) {
 		    makeStandardMapping('Entropy', 'w/ entropy'),
 		    makeStandardMapping('Stoplist', 'w/ stoplist'),
 		    makeStandardMapping('Enthyman', 'w/ entropy and log odds'),
-		    makeStandardMapping('Hyman', 'w/ entropy and log odds'),
 		    makeStandardMapping('Direction', 'w/ entropy and direction'),
 		    makeStandardMapping('Window', 'w/ entropy and window'),
 		    makeStandardMapping('Freq', 'w/ freq'),
@@ -1612,9 +1611,9 @@ makeLogregMapping <- function() {
 	  'actTitleOrderlessEnthyman', 'RP title w/ entropy and log odds',
 	  'actBodyOrderlessEnthyman', 'RP body w/ entropy and log odds',
 	  'actTweetOrderlessEnthyman', 'RP orderless context w/ entropy and log odds',
-	  'actTitleOrderlessHyman', 'RP title w/ entropy and log odds',
-	  'actBodyOrderlessHyman', 'RP body w/ entropy and log odds',
-	  'actTweetOrderlessHyman', 'RP orderless context w/ entropy and log odds',
+	  'actTitleOrderlessEnthyman', 'RP title w/ entropy and log odds',
+	  'actBodyOrderlessEnthyman', 'RP body w/ entropy and log odds',
+	  'actTweetOrderlessEnthyman', 'RP orderless context w/ entropy and log odds',
 	  'actTweetUsercontext', 'Bayes orderless context w/ entropy and user sji',
 	  'actTweetOrderlessEnthyser', 'RP orderless context w/ entropy, log odds, and user sji')
 }
@@ -1969,6 +1968,24 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 				       'PriorStdTweetOrderNenthymanTweetOrderlessNenthyman',
 				       'TweetOrderless', 'TweetOrderlessNenthyman'))
 	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='logoddsT', groupCol='dsetGroup')
+	# RESULT: Not much information in order for RP
+	# T compare entropy w/ direction and entropy w/ window to entropy
+	DVNames = asTopHashtagAcross(c('PriorStd',
+				       'TweetOrderEntropy', 'TweetOrder', 'TweetOrderDirection', 'TweetOrderWindow',
+				       'TweetOrderlessEntropy', 'TweetOrderless',
+				       'PriorStdTweetOrderEntropyTweetOrderlessEntropy', 'PriorStdTweetOrderTweetOrderless', 'PriorStdTweetOrderDirectionTweetOrderlessDirection',
+				       'PriorStdTweetOrderWindowTweetOrderlessWindow',
+				       'PriorStdTweetOrderlessEntropy'))
+	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='orderT', groupCol='dsetGroup')
+	# RESULT: Adding prior is not useful for SO in this case, but useful for Twitter
+	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleBody', 'TitleBody', 'Body', 'Title',
+				       'TitleOrderlessEnthymanBodyOrderlessEnthyman',
+				       'PriorStdTitleOrderlessEnthymanBodyOrderlessEnthyman'))
+	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='priorAddSO')
+	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweet', 'Tweet',
+				       'TweetOrderlessEnthyman', 'PriorStdTweetOrderlessEnthyman'))
+	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='priorAddT')
+
 	# RESULT: Show base performance for both models
 	# SO standard
 	DVNames = asTopHashtagAcross(c('PriorStd', 'TitleNentropy', 'BodyNentropy', 'PriorStdTitleNentropyBodyNentropy',
@@ -1995,7 +2012,7 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleOrderlessFrenthymanBodyOrderlessFrenthyman',
 				       'PriorStdTitleOrderlessNenthymanBodyOrderlessNenthyman',
 				       'PriorStdTitleOrderlessFreqhymanBodyOrderlessFreqhyman',
-				       'PriorStdTitleOrderlessHymanBodyOrderlessHyman',
+				       'PriorStdTitleOrderlessEnthymanBodyOrderlessEnthyman',
 				       'PriorStdTitleOrderlessBodyOrderless',
 				       'PriorStdTitleOrderlessFreqBodyOrderlessFreq',
 				       'PriorStdTitleOrderlessEntropyBodyOrderlessEntropy',
@@ -2010,7 +2027,7 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweetOrderFrenthymanTweetOrderlessFrenthyman',
 				       'PriorStdTweetOrderNenthymanTweetOrderlessNenthyman',
 				       'PriorStdTweetOrderFreqhymanTweetOrderlessFreqhyman',
-				       'PriorStdTweetOrderHymanTweetOrderlessHyman',
+				       'PriorStdTweetOrderEnthymanTweetOrderlessEnthyman',
 				       'PriorStdTweetOrderTweetOrderless',
 				       'PriorStdTweetOrderFreqTweetOrderlessFreq',
 				       'PriorStdTweetOrderEntropyTweetOrderlessEntropy',
@@ -2019,36 +2036,19 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 	# T compare all additions for Bayes
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweet', 'PriorStdTweetNentropy', 'PriorStdTweetFreq', 'PriorStdTweetFrentropy', 'Tweet'))
 	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='priorVsContextT')
-	# RESULT: Not much information in order for RP
-	# T compare entropy w/ direction and entropy w/ window to entropy
-	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweet',
-				       'TweetOrderEntropy', 'Tweet', 'TweetOrder', 'TweetOrderDirection', 'TweetOrderWindow',
-				       'TweetOrderlessEntropy', 'TweetOrderless', 'TweetOrderlessDirection', 'TweetOrderlessWindow',
-				       'PriorStdTweetOrderEntropyTweetOrderlessEntropy', 'PriorStdTweetOrderTweetOrderless', 'PriorStdTweetOrderDirectionTweetOrderlessDirection',
-				       'PriorStdTweetOrderWindowTweetOrderlessWindow',
-				       'PriorStdTweetOrderlessEntropy'))
-	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='orderT', groupCol='dsetGroup')
-	# RESULT: Adding prior is not useful for SO in this case, but useful for Twitter
-	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleBody', 'TitleBody', 'Body', 'Title',
-				       'TitleOrderlessHymanBodyOrderlessHyman',
-				       'PriorStdTitleOrderlessHymanBodyOrderlessHyman'))
-	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='priorAddSO')
-	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweet', 'Tweet',
-				       'TweetOrderlessHyman', 'PriorStdTweetOrderlessHyman'))
-	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='priorAddT')
 	# RESULT: .7 d is better for T, but not for SO, lines up with 'relaxed across posts' finding for Prior dataset. Magnitude of effect is very small, not as important as using prior and weighting
 	# SO and T compare two d values	
 	dTbl = rbind(baseTblPost, baseTbl)[topHashtag & hashtagUsedP]
-	DVNames = c('topHashtagPostPriorStd', asTopHashtagAcross(c('PriorStd', 'PriorStdTweet', 'PriorStdTweetOrderHymanTweetOrderlessHyman',
-								   'PriorStdTitleBody', 'PriorStdTitleOrderlessHymanBodyOrderlessHyman')))
+	DVNames = c('topHashtagPostPriorStd', asTopHashtagAcross(c('PriorStd', 'PriorStdTweet', 'PriorStdTweetOrderEnthymanTweetOrderlessEnthyman',
+								   'PriorStdTitleBody', 'PriorStdTitleOrderlessEnthymanBodyOrderlessEnthyman')))
 	dWideTbl = getDWideTbl(dTbl[sizeNum == 2 & DVName %in% DVNames])
 	compareMeanDVDefault(dWideTbl, dDiff, figName='dContext', groupCol='dsetType')
 }
 
 analyzeLogreg <- function() {
-	bestFitNames = c('actPriorStd_actTitle_actBody', 'actPriorStd_actTitleOrderlessEnthyman_actBodyOrderlessEnthyman', 'actPriorStd_actTitleOrderlessHyman_actBodyOrderlessHyman')
+	bestFitNames = c('actPriorStd_actTitle_actBody', 'actPriorStd_actTitleOrderlessEnthyman_actBodyOrderlessEnthyman', 'actPriorStd_actTitleOrderlessEnthyman_actBodyOrderlessEnthyman')
 	compareMeanDVLogreg(logregTbl[(sizeNum == 2 | is.na(sizeNum)) & dsetType == 'stackoverflow' & bestFitName %in% bestFitNames], coeffStd, figName='foo')
-	bestFitNames = c('actPriorStd_actTweet', 'actPriorStd_actTweetUsercontext', 'actPriorStd_actTweetOrderlessHyman', 'actPriorStd_actTweetOrderlessEnthyser')
+	bestFitNames = c('actPriorStd_actTweet', 'actPriorStd_actTweetUsercontext', 'actPriorStd_actTweetOrderlessEnthyman', 'actPriorStd_actTweetOrderlessEnthyser')
 	compareMeanDVLogreg(logregTbl[(sizeNum == 2 | is.na(sizeNum)) & dsetType == 'twitter' & bestFitName %in% bestFitNames], coeffStd, figName='foo')
 }
 

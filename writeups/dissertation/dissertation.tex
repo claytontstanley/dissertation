@@ -1778,11 +1778,69 @@ Future research could explore more improved methods to properly combine the term
 
 \subsection{Word Order}
 
-
-
+Vector-based models like the random-permutation model can easily incorporate word order when making predictions.
+This is one of their primary strenghts that has been discussed \parencites{Jones2007, Sahlgren2008}.
+In order to thouroughly test the impact of adding word order into the model, various methods for incorporating word order were tested on the StackOverflow and Twitter datasets.
 
 \subsubsection{Method}
+
+Three different methods for incorporating word order in the random-permutation model were tested:
+Taking just the sign of the word's position relative to the tag (direction method), using the position (standard method), and using the position but only including words that were used near the tag (window method).
+For the standard method, all words and their respective position are used to build the representation.
+For the direction method, essentially two representations are combined: all co-occurrences with words to the left of the tag, and all co-occurrences with words to the right of the tag.
+The window method is similar to the standard method, where each word's relative position is maintained, but it only includes words near the tag to build the representation.
+\textcite{Sahlgren2008} tested similar methods, and found that accuracy was highest when a narrow window was used for the window method (only including words at most two positions to the left and right of the tag).
+Teh same $+2$ $-2$ range was used to test the window method on the Twitter dataset.
+
+Only the Twitter dataset was tested, since the StackOverflow dataset contains no word order information between words in the title and body of the post and the tags used for hte post.
+The author chooses tags after filling out the title and body forms in the post, so the tags are never intermixed with words in the post like they are for Twitter.
+
+The same Twitter popular-users datasets and StackOverflow popular-hashtags datasets were used for testing.
+Both an ordered and orderless context component were created for the random-permutation models.
+The orderless context component uses the same co-occurrence matrix used by the Bayesian model to create the representation, since the Bayesian model does not contain any order information.
+Models were tested that used only one of the three word-order methods for the ordered context component, used only the orderless context component, used a combination of the two components, and combined context with prior. 
+
 \subsubsection{Results}
+
+Model accuracy results after incorporating word order into the random-permutation model are included in Figure \ref{figContextOrder}
+
+\begin{figure}[!htbp]
+  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-logoddsSO-crop.pdf}}}
+  \caption{Model accuracy for various word order methods for the random-permutation model for Twitter}
+  \label{figContextLogoddsT}
+\end{figure}
+
+All bar plots that include an order component where ``window'' or ``direction'' is not included in the title use the standard ordering method (no direction or windowing, all position information is included) 
+This is the default ordering method used, so the names for these bar plots were kept consistent to the names used in other figures so that comparisons could be made across figures if necessary
+(similar to what was done for the default row-size for the random-permutation model).
+Base models that do not use entropy weighting were also included so that effect sizes could be compared between entropy weighting and adding word-order information.
+
+Looking first at models where no prior is added, the random-permutation model using only orderless context performs similar to the model using only order context with direction.
+All other order-only models perform worse than the direction order model and worse than the orderless model.
+
+Full models were also plotted against the model where only the prior and orderless context was included (i.e., no order).
+This was to test how much of the variance in model accuracy is shared between the orderless and order models.
+The results show that there is very little unique variance in the order-only models, so order information contributes very little to overall model performance.
+This can be seen by comparing the two-component model with only prior and orderless context to the three-component model with prior, orderless, and any of the three methods for the order context term.
+
+\subsubsection{Discussion}
+
+This was a surprising result.
+One of the main benefits discussed for the random-permutation model is that it can easily incorporate word-order information into the representation.
+But including word-order information does not dramatically improve performance. 
+For the random-permutation model, it is much more important to properly handle high-frequency stop words and include a prior component than it is to include word order information,
+at least for the Twitter dataset tested in this study.
+
+The original BEAGLE model \parencite{Jones2007} actually showed only minimal improvement when incorporating word order as well.
+In absolute terms, this model only improved by 2 percentage points in accuracy when trained on the TASA and tested on the TOEFL.
+\textcite{Sahlgren2008}'s results for word order for the random-permutation model are similar.
+At a row size of around \num{2000}, model accuracy improves by less than a percentage point when order information is incorporated.
+The results for larger row sizes are somewhat inconsistent, since the full model (order and orderless) sometimes underperforms the order-only model, which does not make sense.
+\textcite{Sahlgren2008} most likely did not use a regression technique to opimize the weights for each of the order and orderless model terms.
+So although incorporating word order into the random-permutation model does seem to slightly improve performance,
+the strenght of the model is more likely to be in how effeciently it can represent the co-occurrence matrix, than its ability to include word order in the representation.
+
+Since it was shown that including word-order information has little to no sigificant improvement on model accuracy, an attempt to incorporate word order information into the Bayesian model was not made.
 
 \subsection{Impact of Prior vs Context}
 
@@ -1795,6 +1853,8 @@ Future research could explore more improved methods to properly combine the term
 \subsubsection{Results}
 
 \section{General Discussion}
+
+FIXME: Include a paragraph about how the random-permutaiton model works so well due to the compression abilities, and not because of word order.
 
 \section{Summary}
 
