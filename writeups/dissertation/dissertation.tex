@@ -964,7 +964,7 @@ Four popular-hashtags datasets were collected at four different time periods, sp
 It took around four days to collect a single dataset, and one collection was done each week.
 Multiple datasets were collected to ensure that the results weren't dependent on a particular sample of hashtags, and would generalize across different popular-hashtag datasets and different time periods.
 
-\subsection{Aquiring Datasets}
+\subsection{Acquiring Datasets}
 
 \subsubsection{StackOverflow}
 
@@ -973,7 +973,7 @@ So this package was downloaded and the database tables were imported into Postgr
 
 \subsubsection{Twitter}
 
-Twitter provides two types of APIs for aquiring data: A query-based and streaming interface.
+Twitter provides two types of APIs for acquiring data: A query-based and streaming interface.
 The \textcite{Tweepy} Python package provides a Python functional interface to these APIs, and this package was used to collect data from Twitter.
 The query-based interface was used to collect all tweets for specific popular users.
 At most \num{3000} of the most recent tweets were collected for each user, since Twitter only allows access to this number of tweets for each user.
@@ -1030,7 +1030,7 @@ All three stop word techniques (i.e., pre-determined list, high-frequency filter
 \section{Past User Behavior}
 
 How does a user's prior hashtag use influence their likelihood of choosing that hashtag in the future?
-This question was tested by examing how well ACT-R's base-level activation component of declarative memory predicts the tags that authors choose, given each author's past tagging behavior.
+This question was tested by examining how well ACT-R's base-level activation component of declarative memory predicts the tags that authors choose, given each author's past tagging behavior.
 The model predicts that the more recently and frequently used chunks have higher prior activations, and are more likely to be needed in the future.
 
 \subsection{Base-level ACT-R model}
@@ -1056,7 +1056,7 @@ Both terms are methods for computing the base-level activation ($B_{i}$) of a ch
 The standard form has a time dependence and accounts for the fact that the rate of presentations for a given object can change over time.
 The optimized learning form assumes that this rate is constant.
 
-For both equatons, $i$ represents each chunk (e.g., a word), $j$ is a specific observation for a chunk (e.g,. the 2nd time that ``a'' appears), and $n$ is the number of times each chunk has been observed.
+For both equations, $i$ represents each chunk (e.g., a word), $j$ is a specific observation for a chunk (e.g., the 2nd time that ``a'' appears), and $n$ is the number of times each chunk has been observed.
 Since the optimized learning form assumes a constant presentation rate for each chunk,
 it only has to keep track of the time since the first presentation of a chunk $L$ and the total number of instances observed for that chunk. 
 It does not have to keep track of the time each specific chunk instance was observed.
@@ -1064,7 +1064,7 @@ Consequently, the optimized learning form of $B_{i}$ is computationally much les
 
 The decay rate parameter $d$ represents how fast the activation for an individual presentation of a chunk decays from declarative memory.
 Higher values mean that chunk activation decays faster, which means that the most recently-presented chunks will have the highest activation, and the total number of times that a chunk has been presented matters less.
-Lower decay rate values flip the importance of frequency and recency: Lower values mean that chunks that have occured most frequently will have the highest activation,
+Lower decay rate values flip the importance of frequency and recency: Lower values mean that chunks that have occurred most frequently will have the highest activation,
 and activation depends less on the specific chunk that have been observed in the recent past.
 
 The base-level ($B_{i}$) component in Table \ref{ACTRBLLModel} is different than the $B_{i}$ used in \textcite{Stanley2013} (Table \ref{ModACTRModel}).
@@ -1101,7 +1101,7 @@ This means, for example, that the model always missed characterizing the first o
 This also means that the tag space for each user is constrained and limited to the tags that each user has used in the past.
 
 At each tagging instance, the model has activation values for a set of tags.
-Model accurracy was assessed by rank ordering these activations and choosing the model's highest $N$ tags, where $N$ is the number of tags used for that specific post.
+Model accuracy was assessed by rank ordering these activations and choosing the model's highest $N$ tags, where $N$ is the number of tags used for that specific post.
 The model's chosen $N$ tags were compared to the user's chosen $N$ tags, and if a model's chosen tag was in the set of user's chosen tags, then the prediction was marked as correct.
 Otherwise, it was marked as incorrect.
 
@@ -1238,7 +1238,7 @@ Comparing best-fit values will be more thoroughly tested when looking at the val
 
 \subsubsection{Aggregate Model Performance}
 
-Finally, model accuraccy was analyzed across all dataset slices for StackOverflow and Twitter.
+Finally, model accuracy was analyzed across all dataset slices for StackOverflow and Twitter.
 Mean accuracy for both sites is included in Figure \ref{figPriorAcc}. 
 The mean was computed by taking the mean of the mean model accuracy for each dataset slice.
 All confidence intervals are 95\% bootstrapped for the mean of the means for each slice.
@@ -1317,8 +1317,8 @@ However, this relaxed metric was used for the rest of the experiments that invol
 If these weights are then used to compute the constrained form of model accuracy, biases may be introduced since the regression wasn't optimized to the constrained form, and weights may change if that was done.
 The constrained form of model accuracy can not be used for the regression because there is no current logistic regression technique in R that can be constrained to label a specific number of 1s for each observation. 
 The constrained form could be used in a regression if a custom form of the regression was implemented.
-However this was not persued since around \num{2500} total regressions were run on these datasets for two reasons:
-A custom implementation in R would not likely run in compiled C, and even if it was implemented in a compiled language it would be computationally intractible without a closed-form solution. 
+However this was not pursued since around \num{2500} total regressions were run on these datasets for two reasons:
+A custom implementation in R would not likely run in compiled C, and even if it was implemented in a compiled language it would be computationally intractable without a closed-form solution. 
 
 \subsubsection{Adding Offset Term}
 
@@ -1328,7 +1328,7 @@ However when the regression can not be constrained to label a specific number of
 The offset term ensures that the activation for the small number of top tags for each post are equal across posts.
 This ensures that the logistic regression only labels a few 1s for each post.
 \textcite{Stanley2013} did this by subtracting off the mean total activation for the top 5 tags for each post.
-However this method is complicated since computing the toal activation for a tag requires already knowing the weights for each model component that are used to compute that activation.
+However this method is complicated since computing the total activation for a tag requires already knowing the weights for each model component that are used to compute that activation.
 \citeauthor{Stanley2013} used an iterative approach to determine the weights used for the offset term, and kept iterating until those weights matched the weights returned after running the logistic regression.
 
 A simplified version of \citeauthor{Stanley2013}'s method was used for the results in this study.
@@ -1353,7 +1353,7 @@ This was done so that the prior component used for StackOverflow for both the po
 However, a custom user prior for the Twitter popular-hashtags dataset cannot be used, since the entire Twitter dataset cannot be downloaded.
 This dataset contains samples of a large set of various users that choose a specific set of hashtags being monitored.
 So in order to generate a custom user prior for each sample in the dataset, that user's entire tagging history must be accessed through the API.
-Since access rates are limited across that interface, it is infeasable to do this process for every user that appears in the Twitter popular-users dataset.
+Since access rates are limited across that interface, it is infeasible to do this process for every user that appears in the Twitter popular-users dataset.
 So instead, the global prior tag history for all users in the Twitter popular-users dataset was used to compute prior activation values for each tag.
 
 \subsubsection{Co-occurrence Matrices}
@@ -1362,9 +1362,9 @@ The context component for both the Random Permutation and Bayesian model require
 Different size matrices were analyzed, ranging from \num{1000}, \num{10000}, \num{100000}, \num{1000000}, and \num{3000000} posts.
 The matrix for \num{3000000} posts was only used for Twitter, since the number of words in a StackOverflow post is much higher than Twitter on average,
 and the space and computational time required when using a co-occurrence matrix of \num{3000000} posts for StackOverflow is too high for a current high-performance desktop, even with highly optimized representations.
-Already FIXME total co-occuring word tag observations are used to build a co-occurrence matrix of \num{1000000} StackOverflow posts.
+Already FIXME total co-occurring word tag observations are used to build a co-occurrence matrix of \num{1000000} StackOverflow posts.
 It is also the case that \num{1000000} posts for StackOverflow is already around $1/7$ of the total posts created on the site,
-so it is reasonable to assume that the results would not change greatly for StackOverflow if $3/7$ of the total posts created were used to build the co-occurrent matrix instead,
+so it is reasonable to assume that the results would not change greatly for StackOverflow if $3/7$ of the total posts created were used to build the co-occurrence matrix instead,
 especially since FIXME co-occurrences are already used with \num{1000000} posts.
 
 \section{Results for Combining Terms}
@@ -1402,7 +1402,7 @@ The impact of adding the offset to each of the models for StackOverflow and Twit
 In both plots, if the model name includes ``full'' then all model components are included.
 When they are enumerated, then components are left out.
 The random-permutation models are represented as ``RP'', Bayesian models as ``Bayes'', and they are plotted alongside each other so that comparisons across the two model types can be done easily.
-So, for example, the ``standard Prior model relaxed across posts w/o offset'' means that only the prior model component was used, and the offset for that component was not subtracted off when determining activation.
+So, for example, the ``standard Prior model relaxed across posts without offset'' means that only the prior model component was used, and the offset for that component was not subtracted off when determining activation.
 As another example, the ``Bayes only orderless context'' means that only the context component of the Bayesian model was used (along with the offset), and that no order information was used for that contextual component term.
 
 Looking across the plots, including the offset significantly increases model accuracy, for all models, terms, and sites.
@@ -1416,14 +1416,14 @@ Only if this mean activation is subtracted off will the logistic regression mode
 
 \subsubsection{Discussion}
 
-It is actually somewhat dissapointing that the offset term is even needed.
+It is actually somewhat disappointing that the offset term is even needed.
 If it were the case that model activation for a tag in a specific post could be interpreted as an exact activation value that did not depend on the specific post,
 then the model would be able to say when, for example, the third top tag in a post is more likely to be a chosen tag than the second top tag in another post.
 That is, the activation values would have meaning more than just rank ordering, and could be used to determine, for example, the number of retrievals to do for a specific post.
 If this were the case, then adding the offset term would actually decrease accuracy, since this absolute value of the activation values would be subtracted off.
 However, since accuracy improves when adding the offset term for both models, it does not seem that activation values have much meaning across posts (and only within a single post) for these datasets.
 
-A likely and simple explaination for this is that possibly there are posts where a large set of tags have high activation,
+A likely and simple explanation for this is that possibly there are posts where a large set of tags have high activation,
 but the author is throttling their retrieval threshold for each post such that only a small set of tags are actually used.
 This is probably not the retrieval threshold used in the core declarative memory system that determines if a retrieval for the term actually happens.
 It is unlikely that this retrieval threshold can be directly controlled and manipulated.
@@ -1466,9 +1466,9 @@ the results from this study cannot by themselves be used to answer this question
 
 \textcite{Sahlgren2008} looked at several ways to handle the commonly-occurring stop words for the random-permutation model:
 A data-driven frequency-weighted approach was tried, along with using a previously-derived stoplist, and no stop word removal at all.
-Removing the high-frequency words in the dataset showed the highest performance increase compared to no stop word removal, and uing a previously-derived stoplist hardly increased performance.
+Removing the high-frequency words in the dataset showed the highest performance increase compared to no stop word removal, and using a previously-derived stoplist hardly increased performance.
 However, \citeauthor{Sahlgren2008} did not try to weight the stop words, and only tried methods to remove them.
-So alongside looking at frequency weighting, previously derived, and no stop word removal, \textcite{Stanley2013}'s method of attentuating stop words based on Entropy was also explored.
+So alongside looking at frequency weighting, previously derived, and no stop word removal, \textcite{Stanley2013}'s method of attenuating stop words based on Entropy was also explored.
 
 \subsubsection{Method}
 
@@ -1476,7 +1476,7 @@ The runs from the Twitter popular-hashtags and StackOverflow randomly-sampled da
 Both the random permutation and Bayesian models were tested.
 Activations for context were computed by using the two methods for stop word removal, the entropy weighting method, and no method (i.e., no stop word processing).
 
-\paragraph{Determing Frequency Cutoff}
+\paragraph{Determining Frequency Cutoff}
 
 The same previously-derived stoplist from FIXME that \textcite{Sahlgren2008} used was used for this analysis,
 The same entropy weighting method using by \textcite{Stanley2013} was examined,
@@ -1497,7 +1497,7 @@ The no-removal plot shows the size of the spikes when high-frequency words are r
 The entropy plot shows how the size decreases by more than an order of magnitude when the entropy weighting measure is used.
 The cutoff was chosen such that the frequency plot looks similar to the entropy plot, with spikes around the same size.
 Note that using a previously-defined stoplist does not remove some of the remaining high-frequency words in these datasets, which hints that this method may not be ideal when model accuracy is examined.
-The cuttoff that produced the frequency plot is where a word represents more than \num{.0004} occurrences in the dataset.
+The cutoff that produced the frequency plot is where a word represents more than \num{.0004} occurrences in the dataset.
 This may or may not be equal to the value for \textcite{Sahlgren2008}, since that number was expressed in total observations (not as a percentage), and the total number of words in the dataset were not given.
 
 Also, no strong claims are being made that the cutoff identified is the ideal frequency percentage cutoff for all datasets when a frequency cutoff is used.
@@ -1514,7 +1514,7 @@ Plots for the three methods of handling stop words for the random-permutation mo
 \end{figure}
 
 The results show that model accuracy improves if stop words are handled in any of the three ways (pre-defined stoplist filtering, entropy weighting, and frequency filtering).
-Using a pre-defined stoplist makes the smallest improvment, while the entropy and frequency techniques improve performance the most, and frequency shows a slight edge over entropy.
+Using a pre-defined stoplist makes the smallest improvement, while the entropy and frequency techniques improve performance the most, and frequency shows a slight edge over entropy.
 However, using the frequency-weighting technique produces more noise in accuracy measurements compared to the other techniques, at least when tested on words in the title of StackOverflow posts.
 
 The three stop word techniques were then tested for the random-permutation model on the Twitter dataset, and the results are included in Figure \ref{figContextStopRPT}.
@@ -1534,11 +1534,11 @@ Comparing across Figures \ref{figContextStopRPSO} and \ref{figContextStopRPT}, e
 However it is more difficult to choose the best approach when comparing entropy weighting and frequency filtering.
 Frequency filtering is slightly better for StackOverflow, while entropy weighting is slightly better for Twitter.
 However frequency filtering does have a few drawbacks compared to entropy weighting:
-It produces accuracy measurments that have higher levels of noise (see Figure \ref{figContextStopRPSO} and frequency models for the title component in StackOverflow).
+It produces accuracy measurements that have higher levels of noise (see Figure \ref{figContextStopRPSO} and frequency models for the title component in StackOverflow).
 Also, the ideal cutoff threshold must be identified in order to filter based on frequency,
 and identifying this cutoff requires a search, and this search must be done for each dataset that frequency filtering is used on.
 This threshold is a free parameter in frequency filtering that is not required when weighting stop words by entropy.
-Therefore, favoring parsimony, for the random-permutation model, attentuating stop words based on entropy produces more accurate results when compared to filtering the stop words based on frequency of use.
+Therefore, favoring parsimony, for the random-permutation model, attenuating stop words based on entropy produces more accurate results when compared to filtering the stop words based on frequency of use.
 This result is interesting since filtering stop words based on frequency is the default method for random permutation models \parencite{Sahlgren2008}.
 This suggests that a simpler method (entropy weighting) can be used instead of the more common frequency-filtering technique to achieve the same (or better) accuracy measurements.
 
@@ -1575,13 +1575,13 @@ This is most likely because the StackOverflow and Twitter datasets are large and
 Another interesting result was how the Bayesian model actually performed worse when stop words were removed based on frequency.
 This was not the case for the random-permutation model, was not the case when \textcite{Sahlgren2008} used frequency filtering on the random-permutation model, and is most likely never the case for the random-permutation model.
 Model accuracy most likely decreases for the Bayesian model because this model already has a normalization component built in that the random-permutation model does not have.
-When computing activaiton for the random-permutation model, the corrollation is calculated directly on a matrix of counts of co-occurrences for words and tags.
+When computing activation for the random-permutation model, the correlation is calculated directly on a matrix of counts of co-occurrences for words and tags.
 However for the Bayesian model this count matrix is converted to a log odds ($S_{ji}$) matrix,
 where both the number of observations for the word and the tag are normalized when computing the value for each cell (see the $S_{ji}$ computation in Table \ref{tabModACTRModel}).
-So it is likely the case that a form of frequency \emph{attentuation} is already built into the Bayesian model.
+So it is likely the case that a form of frequency \emph{attenuation} is already built into the Bayesian model.
 And therefore adding a frequency filter on top of this does nothing to improve accuracy, and only removes predictive information.
 
-\textcite{Stanley2013} found that the entropy-weighting technique to attentuate stop words for the Bayesian model improved model accuracy.
+\textcite{Stanley2013} found that the entropy-weighting technique to attenuate stop words for the Bayesian model improved model accuracy.
 The same effect is found for the StackOverflow and Twitter datasets in this study.
 Further, when this entropy-weighting technique is compared directly to the more common frequency-filtering technique, weighting by entropy produces more accurate results.
 This was clearly the case for the Bayesian model.
@@ -1598,7 +1598,7 @@ However, one conclusion that can be made from this research is that the entropy-
 
 The default number of documents used to build the co-occurrence matrix was \num{1000000} for StackOverflow and \num{3000000} for Twitter.
 In order to see how accuracy changed as function of document size, 
-co-occurence matrices for a range of smaller document sizes were built.
+co-occurrence matrices for a range of smaller document sizes were built.
 Both the random-permutation and Bayesian models were tested on all document sizes.
 
 \subsubsection{Method}
@@ -1619,15 +1619,15 @@ Model accuracy as a function of co-occurrence matrix size for StackOverflow is i
 
 Accuracy improves for both the Bayesian and random-permutation models as the size of the documents used to generate the co-occurrence matrix increases.
 However model accuracy using the entropy weighting technique plateaus and slightly decreases for the largest document size for the random-permutation model, while the frequency technique only begins to plateau. 
-The Bayesian model does not plateau and accuracy continues to improveas document size increases.
+The Bayesian model does not plateau and accuracy continues to improves document size increases.
 
 \subsubsection{Discussion}
 
 It is likely that the random-permutation model is saturating when entropy weighting is used for the largest document size for StackOverflow.
 Even if the non-predictive words based on entropy are attenuated,
-when the high-frequency words are included random-permutatoin model,
-this attentuation is not enough to overcome the range effects that grow with document size.
-These effects end up saturating all of the correlations near one, and consequently decrease discriminability and accuracy.
+when the high-frequency words are included random-permutation model,
+this attenuation is not enough to overcome the range effects that grow with document size.
+These effects end up saturating all of the correlations near one, and consequently decrease discrimination and accuracy.
 However, the effect of saturation is small compared to the large effect from using either frequency filtering or entropy weighting to handle the stop words.
 The Bayesian model does not saturate when using entropy weighting because each cell in the co-occurrence matrix is normalized by word frequency and tag frequency.
 
@@ -1641,17 +1641,17 @@ The overall trend of increasing accuracy with document size is present for Twitt
   \label{figContextDSizeSO}
 \end{figure}
 
-Both entropy weighting and frequency filtering in Figure \ref{figContextDSizeSO} plateu for the random-permutation model with increasing document size.
+Both entropy weighting and frequency filtering in Figure \ref{figContextDSizeSO} plateau for the random-permutation model with increasing document size.
 Once again, the Bayesian model continues to improve with document size.
 
 \subsubsection{Discussion}
 
-It is interesting to compare model accuracy betwen the Bayesian and random-permutation model at different document sizes for both StackOverflow and Twitter.
+It is interesting to compare model accuracy between the Bayesian and random-permutation model at different document sizes for both StackOverflow and Twitter.
 At smaller document sizes, the random-permutation model outperforms the Bayesian model (slightly for Twitter, dramatically for StackOverflow), and this performance difference deteriorates as document size increases.
 In other words, the Bayesian model needs larger co-occurrence matrices than the random-permutation model to work properly.
 As the size of the dataset increases, the compression may start to lose crucial information, and the uncompressed Bayesian model should be used.
 As the size of the dataset decreases, the noise and crosstalk introduced by the compression for the random-permutation model is actually beneficial, and the compressed random-permutation model should be used. 
-This crosstalk and noise is beneficial because it helps soften spurious $S_{ji}$ values when the values for each individual cell in the co-occurrence matrix are still volitle, which happens at smaller document sizes.
+This crosstalk and noise is beneficial because it helps soften spurious $S_{ji}$ values when the values for each individual cell in the co-occurrence matrix are still volatile, which happens at smaller document sizes.
 
 This result has important implications.
 The document size is rarely chosen, and more likely constrained by the number of documents in the dataset being studied.
@@ -1672,7 +1672,7 @@ Three different row-size values were tested for the random-permutation model to 
 A low value (\num{100}), a more standard value (\num{2048}), and a high value (\num{10000}) of rows were tested.
 A separate co-occurrence representation was built for each of these row values.
 Each representation was tested on the four Twitter popular-hashtags datasets and the StackOverflow randomly-sampled dataset.
-Accuracy measurments were the same as were used for previous runs of these datasets: mean of the mean accuracy for each of the 5 StackOverflow and 15 Twitter runs.
+Accuracy measurements were the same as were used for previous runs of these datasets: mean of the mean accuracy for each of the 5 StackOverflow and 15 Twitter runs.
 
 \subsubsection{Results}
 
@@ -1688,7 +1688,7 @@ In the figure, the full random permutation model that does not have the number o
 This was done so that names in all of the plots would remain consistent across all plots, and the \num{2048}-row matrix is the size used for the random-permutation model for all other results.
 The plot is also broken out for different size datasets used to build the co-occurrence matrix.
 Reducing compression to only 100 rows in the representation has a strong negative effect on accuracy.
-However \num{2048} rows is sufficient for these dataests, as increasing the number of rows to almost an order of magnitude higher (\num{10000}) has little to no positive impact on accuracy.
+However \num{2048} rows is sufficient for these datasets, as increasing the number of rows to almost an order of magnitude higher (\num{10000}) has little to no positive impact on accuracy.
 
 Results are similar for Twitter.
 
@@ -1710,9 +1710,9 @@ So it is impressive that only \num{2048} rows are needed to represent most of th
 This is likely because word use frequency drops off sharply, and there are many words in both datasets which are used only once or a few times.
 Since these words have little to no ability to influence predictions, it makes sense that they can be safely removed from the dataset.
 
-However it should be pointed out that the way the random-permutation model compresses the words is completly random.
+However it should be pointed out that the way the random-permutation model compresses the words is completely random.
 It is not an LSA approach where the few ones and negative ones for each word are chosen such to maximize the ability for the compressed matrix to represent the full matrix.
-Everything is randomly chosen with the random-permutaton model.
+Everything is randomly chosen with the random-permutation model.
 The environment vector for each word is randomly selected, and no SVD is performed to choose these in a more discriminating manner.
 So it is that more impressive that even with a randomly-chosen form of compression, only \num{2048} rows are needed to represent all of the words in these datasets.
 
@@ -1739,7 +1739,7 @@ For example, if the conversion is performed one the mean correlation value in th
 This makes sense given that log odds can be interpreted as the amount of odds information (positive or negative) that should be adjusted to the prior log odds.
 Since the mean correlation value contains no information regarding if it is better or worse than the other correlation values, it is appropriate to assign this correlation value a zero log odds adjustment value.
 
-The log-odds transformation technique was tested for the random-permutaiton model on the Twitter popular-hashtags and StackOverflow randomly-sampled datasets.
+The log-odds transformation technique was tested for the random-permutation model on the Twitter popular-hashtags and StackOverflow randomly-sampled datasets.
 
 \subsubsection{Results}
 
@@ -1747,13 +1747,13 @@ Model accuracy results after using the log-odds transformation are included in F
 
 \begin{figure}[!htbp]
   \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-logoddsSO-crop.pdf}}}
-  \caption{Random-permutation model accuracy when using log-odds trasformation on context for StackOverflow}
+  \caption{Random-permutation model accuracy when using log-odds transformation on context for StackOverflow}
   \label{figContextLogoddsSO}
 \end{figure}
 
 \begin{figure}[!htbp]
   \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-logoddsSO-crop.pdf}}}
-  \caption{Random-permutation model accuracy when using log-odds trasformation on context for Twitter}
+  \caption{Random-permutation model accuracy when using log-odds transformation on context for Twitter}
   \label{figContextLogoddsT}
 \end{figure}
 
@@ -1779,8 +1779,8 @@ Future research could explore more improved methods to properly combine the term
 \subsection{Word Order}
 
 Vector-based models like the random-permutation model can easily incorporate word order when making predictions.
-This is one of their primary strenghts that has been discussed \parencites{Jones2007, Sahlgren2008}.
-In order to thouroughly test the impact of adding word order into the model, various methods for incorporating word order were tested on the StackOverflow and Twitter datasets.
+This is one of their primary strengths that has been discussed \parencites{Jones2007, Sahlgren2008}.
+In order to thoroughly test the impact of adding word order into the model, various methods for incorporating word order were tested on the StackOverflow and Twitter datasets.
 
 \subsubsection{Method}
 
@@ -1790,9 +1790,9 @@ For the standard method, all words and their respective position are used to bui
 For the direction method, essentially two representations are combined: all co-occurrences with words to the left of the tag, and all co-occurrences with words to the right of the tag.
 The window method is similar to the standard method, where each word's relative position is maintained, but it only includes words near the tag to build the representation.
 \textcite{Sahlgren2008} tested similar methods, and found that accuracy was highest when a narrow window was used for the window method (only including words at most two positions to the left and right of the tag).
-Teh same $+2$ $-2$ range was used to test the window method on the Twitter dataset.
+The same $+2$ $-2$ range was used to test the window method on the Twitter dataset.
 
-Only the Twitter dataset was tested, since the StackOverflow dataset contains no word order information between words in the title and body of the post and the tags used for hte post.
+Only the Twitter dataset was tested, since the StackOverflow dataset contains no word order information between words in the title and body of the post and the tags used for the post.
 The author chooses tags after filling out the title and body forms in the post, so the tags are never intermixed with words in the post like they are for Twitter.
 
 The same Twitter popular-users datasets and StackOverflow popular-hashtags datasets were used for testing.
@@ -1836,11 +1836,11 @@ In absolute terms, this model only improved by 2 percentage points in accuracy w
 \textcite{Sahlgren2008}'s results for word order for the random-permutation model are similar.
 At a row size of around \num{2000}, model accuracy improves by less than a percentage point when order information is incorporated.
 The results for larger row sizes are somewhat inconsistent, since the full model (order and orderless) sometimes underperforms the order-only model, which does not make sense.
-\textcite{Sahlgren2008} most likely did not use a regression technique to opimize the weights for each of the order and orderless model terms.
+\textcite{Sahlgren2008} most likely did not use a regression technique to optimize the weights for each of the order and orderless model terms.
 So although incorporating word order into the random-permutation model does seem to slightly improve performance,
-the strenght of the model is more likely to be in how effeciently it can represent the co-occurrence matrix, than its ability to include word order in the representation.
+the strength of the model is more likely to be in how efficiently it can represent the co-occurrence matrix, than its ability to include word order in the representation.
 
-Since it was shown that including word-order information has little to no sigificant improvement on model accuracy, an attempt to incorporate word order information into the Bayesian model was not made.
+Since it was shown that including word-order information has little to no significant improvement on model accuracy, an attempt to incorporate word order information into the Bayesian model was not made.
 
 \subsection{Impact of Prior vs Context}
 
@@ -1869,12 +1869,12 @@ The results are included in Figures \ref{figContextPriorneededSO} and \ref{figCo
   \label{figContextPriorneededT}
 \end{figure}
 
-For both the Bayesian and random-permutation models, accuracy remains the same when the prior compoennt is ermoved for StackOverflow.
+For both the Bayesian and random-permutation models, accuracy remains the same when the prior component is removed for StackOverflow.
 Accuracy does dramatically decrease for Twitter when the prior is removed, however.
 
 \subsubsection{Discussion}
 
-These results show that prior informatino is not always needed when a large amount of context is avaialble and not much information has been collected about each user's past history.
+These results show that prior information is not always needed when a large amount of context is available and not much information has been collected about each user's past history.
 The StackOverflow randomly-sampled dataset selects posts across the entire dataset, regardless of each user's popularity or tag history.
 Across the dataset, each user only asks FIXME questions on average, so there is not a large amount of past tag history available for the prior component to use,
 which is why this component is not a strong predictor in this case.
@@ -1886,9 +1886,9 @@ then this component should at least generate unique predictive variance in the c
 \subsubsection{Method}
 
 The same StackOverflow popular-users datasets used to test the prior component in isolation were used to test the prior component when context was added.
-However, since computing activations for the context component take an order of magnitude more wall-clock time than computing the prior comonent, not all observations could be included for the test.
+However, since computing activations for the context component take an order of magnitude more wall-clock time than computing the prior component, not all observations could be included for the test.
 To reduce the observations, the most recent FIXME posts from each user in the datasets were sampled.
-Using the most recent observations for each user ensures that the observations tested have aquired the greatest amount of past tagging history in the datasets.
+Using the most recent observations for each user ensures that the observations tested have acquired the greatest amount of past tagging history in the datasets.
 So if a context-only model performs just as well as the full model in this case, it would be surprising.
 
 \subsubsection{Results}
@@ -1908,15 +1908,15 @@ Accuracy improves for both the Bayesian and random-permutation models when the p
 
 This shows that incorporating past tagging history is important for even a site like StackOverflow where a large amount of context information has been collected.
 However, for this type of site it only becomes important when a reasonably large amount of a user's past tagging history has been collected.
-For a randomly-sampled user on StackOverflow, a context-only model captures the majority of the predicitve variance.
+For a randomly-sampled user on StackOverflow, a context-only model captures the majority of the predictive variance.
 
 \subsection{User-customized Co-occurrence Matrix}
 
 The co-occurrence matrix for the context component of both models has been built by aggregating across users and collecting all instances of context words and associated tags.
 That is, the default co-occurrence matrix is not customized to each user, so the same matrix is used for all users.
 This is commonly done mainly because there is never enough context by tag co-occurrences for a single user to generate a stable co-occurrence matrix.
-If there was enough information, acuracy would most likely improve since it is not likely that every user's word by tag co-occurrence profile is exactly the same.
-However, since several hundred posts for each user in the popular-users datasets are available, an analysis was tried where user-custom co-occurence matrices were used.
+If there was enough information, accuracy would most likely improve since it is not likely that every user's word by tag co-occurrence profile is exactly the same.
+However, since several hundred posts for each user in the popular-users datasets are available, an analysis was tried where user-custom co-occurrence matrices were used.
 
 \subsubsection{Method}
 
@@ -1931,7 +1931,7 @@ Model accuracy when using a user-customized co-occurrence matrix for StackOverfl
 
 \begin{figure}[!htbp]
   \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-userSjiSO-crop.pdf}}}
-  \caption{Model accuracy with user-customized context compoenent for StackOverflow}
+  \caption{Model accuracy with user-customized context component for StackOverflow}
   \label{figPUCustomSO}
 \end{figure}
 
@@ -1941,41 +1941,41 @@ Model accuracy when using a user-customized co-occurrence matrix for StackOverfl
   \label{figPUCustomT}
 \end{figure}
 
-The results compare accuracy for models that use a global co-occurrence and user-specific co-occurence matrix.
+The results compare accuracy for models that use a global co-occurrence and user-specific co-occurrence matrix.
 For StackOverflow, model accuracy for the user-specific (labeled as ``user sji'') can be compared against the default global co-occurrence matrix.
 Accuracy decreases dramatically when a user-specific co-occurrence matrix is used.
 
 The results are similar for Twitter.
 However since the entire dataset is not available for Twitter, a global co-occurrence matrix condition can not be tested,
-since the popular-users dataset samples across a wide range of hashtags, and due to Twitter's API restrictions it would be infeasable to collect all posts for each of the hashtags that are used in the dataset.
-But user-specific co-occurence matrices can be built, since the popular-users dataset does contain all context and hashtag observations for each user.
+since the popular-users dataset samples across a wide range of hashtags, and due to Twitter's API restrictions it would be infeasible to collect all posts for each of the hashtags that are used in the dataset.
+But user-specific co-occurrence matrices can be built, since the popular-users dataset does contain all context and hashtag observations for each user.
 
 Model accuracy when only the single user-customized context predictor is used is relatively poor, and the prior term is a much better predictor.
 Further, when this component is combined with the prior component, model performance improves only slightly over performance when only the prior is used.
 
 \subsubsection{Discussion}
 
-Both models require large numbers of context co-occurrence observations to make stable predictinos from context information.
+Both models require large numbers of context co-occurrence observations to make stable predictions from context information.
 Otherwise, the co-occurrence matrices do not have enough data to properly stabilize.
 Millions of posts were used to generate the global co-occurrence matrices for Twitter and StackOverflow.
 If this number of posts had been collected for a single user, then the user-customized co-occurrence matrix for that user should lead to more accurate predictions compared to using the global matrix.
 However, only around 100 posts were used to build the user-specific matrices for each user.
 
-This is most likly why model accuracy was so poor when user-specific matrices were used:
+This is most likely why model accuracy was so poor when user-specific matrices were used:
 Even for the large datasets analyzed in this study, there is still not enough history collected for each user to build customized co-occurrence matrices.
-The prior model component can be customized for each user, since the prior is only concerned with tag use, and there are a reasonbly small set of tags that the model is choosing from.
-However, the context component is built from the the set of all of the prior tags crossed with all of the possible words, which is a much larger space than just the set of tags.
+The prior model component can be customized for each user, since the prior is only concerned with tag use, and there are a reasonably small set of tags that the model is choosing from.
+However, the context component is built from the set of all of the prior tags crossed with all of the possible words, which is a much larger space than just the set of tags.
 So building a stable context component requires a much larger set of data than the prior component.
 
-That said, if a user only chooses a small set of tags (so the tag space is small), and computing a global co-occurrence matrix is infeasable (e.g., with the Twitter popular-users dataset), 
-then it may be worthwhiel to add the user-custom context model compoennt as an additional predictor.
+That said, if a user only chooses a small set of tags (so the tag space is small), and computing a global co-occurrence matrix is infeasible (e.g., with the Twitter popular-users dataset), 
+then it may be worthwhile to add the user-custom context model component as an additional predictor.
 As was shown for Twitter, model accuracy can slightly improve over a model that just uses a custom prior, even when the co-occurrence matrix only contains around 100 posts.
 
 \section{General Discussion}
 
 \subsubsection{Representation}
 
-Overall, both the random-permutaiton and Bayesian models fit the observed tagging behavior in StackOverflow and Twitter relatively well.
+Overall, both the random-permutation and Bayesian models fit the observed tagging behavior in StackOverflow and Twitter relatively well.
 Given that the storage space required to represent the co-occurrences for the random-permutation is dramatically smaller than the uncompressed Bayesian model,
 and that the compression is lossy and essentially random (i.e., no SVD),
 it is quite interesting that the random-permutation model performs nearly as well as the full Bayesian model for this task.
@@ -2003,26 +2003,26 @@ Also, the relatively strong performance of the random-permutation model is not d
 Performance is similar for the random-permutation and Bayesian models when the co-occurrence matrix for both models is the same, and not based on word order.
 The random-permutation model seems to work so well primarily due to the way that the full co-occurrence representation is compressed.
 
-Compression for the random-permutation model is essentiallly random.
+Compression for the random-permutation model is essentially random.
 That is, no SVD is done to identify the most predictive components,
 so the compressed representation used by the random-permutation model does not contain nearly as much of the variance from the original co-occurrence matrix that it could have.
-However, performing a full SVD on a co-occurrence matrix as large as the ones generated for StackOverflow and Twitter is computationally infeasable.
-So, it also seems plausible that this SVD computation is infeasable at the neural level.
+However, performing a full SVD on a co-occurrence matrix as large as the ones generated for StackOverflow and Twitter is computationally infeasible.
+So, it also seems plausible that this SVD computation is infeasible at the neural level.
 \textcite{Landauer1997} explicitly state that they make no claims that the brain is computing an SVD at the neural level;
 only that the neural machinery is set up so that the representation makes predictions that are similar to what would have been generated if the matrix decomposition for an SVD would have been computed.
-Perhaps the randomly-compressed representation used for the random-permutaiton model is the way in which the brain tries to achive the full LSA- and SVD-like approach that \citeauthor{Landauer1997} propose.
+Perhaps the randomly-compressed representation used for the random-permutation model is the way in which the brain tries to achieve the full LSA- and SVD-like approach that \citeauthor{Landauer1997} propose.
 
 \subsubsection{Attentional Weight}
 
 The declarative memory model for ACT-R has an attentional weight term $W_{j}$ that can be used to implement how stop words are handled.
-The random-permutaiton model was also easily modified to have an attentional weight term by attentuating each word's set of ones and negative ones values by that word's attentional weight.
-Both a method for stop-word removal (frequency filtering) and stop-word attentuating (entropy weighting) performed well for both models.
+The random-permutation model was also easily modified to have an attentional weight term by attenuating each word's set of ones and negative ones values by that word's attentional weight.
+Both a method for stop-word removal (frequency filtering) and stop-word attenuating (entropy weighting) performed well for both models.
 Also, using a proper method for handling the low-predictor words produced some of the largest improvements in model accuracy compared to the other explorations
 (e.g., compared to word order, properly adding terms, compression amount for random-permutation representation).
-Since the ACT-R declarative memory theory already has a component for attentional weight, it may be the case that the neural system performs some form of stop-word weighting when cmoputing activations,
+Since the ACT-R declarative memory theory already has a component for attentional weight, it may be the case that the neural system performs some form of stop-word weighting when computing activations,
 and this is reflected in the attentional weight term.
 That is, $W_{j}$ can be defined mathematically, has the same general form across tasks, and both the frequency-filtering and entropy-weighting methods for stop-word removal are likely first candidates for the definition.
-This claim, however, would require that no top-down activatino is used to compute the attentional weight, which would mean that the $W_{j}$ is not under conscious control, which is not likely to be correct.
+This claim, however, would require that no top-down activation is used to compute the attentional weight, which would mean that the $W_{j}$ is not under conscious control, which is not likely to be correct.
 Perhaps it is a combination of top-down and bottom-up systems that determine $W_{j}$, and the entropy-weighting and frequency-filtering techniques are methods of formalizing the bottom-up component.
 
 \subsubsection{Generalizing Results}
@@ -2031,12 +2031,12 @@ It seems likely that the entropy method for computing the attentional weight ter
 The entropy method is parameter free (unlike the frequency-filtering method), so it completely data driven (much like the co-occurrence matrix) and does not require tuning.
 It is common to handle stop words in some manner when working with NLP and large text documents.
 So, if these large natural-language documents are used to test declarative memory, then the entropy method may be a more cognitively plausible way of dealing with stop words rather than 
-filtering based on a pre-determined list or based on the frequency count in the dataset, particulary since the entropy method substantially increases model accuracy for these datasets and since it is parameter free.
+filtering based on a pre-determined list or based on the frequency count in the dataset, particularly since the entropy method substantially increases model accuracy for these datasets and since it is parameter free.
 
-Adding a prior component to the random-permutatino model also increased model accuracy for both StackOverflow and Twitter.
+Adding a prior component to the random-permutation model also increased model accuracy for both StackOverflow and Twitter.
 It is unsurprising that this occurred.
 However, it is quite surprising that this is the first time that the prior component has been included in a random-permutation model.
-If the random-permutatino model is explored as a declarative memory theory for other datasets, it should be worthwhile to include the prior component for those explorations.
+If the random-permutation model is explored as a declarative memory theory for other datasets, it should be worthwhile to include the prior component for those explorations.
 Although it did not seem to matter much how the prior component is combined with the context component in this study, 
 there may be better ways than the log-odds transformation to combine the terms.
 Further research could focus on exploring a larger set of methods for combining the context component of the random-permutation model with the prior component from the ACT-R theory.
