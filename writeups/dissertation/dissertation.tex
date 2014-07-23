@@ -1113,7 +1113,7 @@ It was repeated for each of the decay rate values and the two different forms of
 \subsubsection{Visualizing Tag Use}
 
 To better illustrate the dynamics of each user's tagging behavior,
-profile plots for a single user for both StackOverflow and Twitter are included in Figure \ref{figHTByTime}.
+profile plots for a single user for both StackOverflow and Twitter are included in Figure \ref{figPriorHTByTime}.
 
 \begin{figure}[!htbp]
   {%
@@ -1124,7 +1124,7 @@ profile plots for a single user for both StackOverflow and Twitter are included 
     \hfill
     \subfigure[][Twitter]{\includegraphics[width=8cm]{HTByTime-fashionista_com-crop.pdf}}
     \caption{Tagging profile for a single user}
-    \label{figHTByTime}
+    \label{figPriorHTByTime}
   }%
 \end{figure}
 
@@ -1141,19 +1141,19 @@ To accurately model human performance in this domain, the model must be able to 
 \subsubsection{Visualizing Model Performance}
 
 As a first method for understanding model performance, profile plots of model's predicted tags for individual users were overlaid on that user's actual tag use.
-These plots for StackOverflow and Twitter are included in Figures \ref{figHTMByTime-520957} and \ref{figHTMByTime-fashionista_com} respectively.
-These are the same plots shown in Figure \ref{figHTByTime} with model predictions overlaid in red. 
+These plots for StackOverflow and Twitter are included in Figures \ref{figPriorHTMByTimeSO} and \ref{figPriorHTMByTimeT} respectively.
+These are the same plots shown in Figure \ref{figPriorHTByTime} with model predictions overlaid in red. 
 
 \begin{figure}[!htbp]
   \scalebox{.6}{\resizebox{\linewidth}{!}{\includegraphics{HTMByTime-520957-crop.pdf}}}
   \caption{Model tagging profile of a single user on StackOverflow}
-  \label{figHTMByTime-520957}
+  \label{figPriorHTMByTimeSO}
 \end{figure}
 
 \begin{figure}[!htbp]
   \scalebox{.6}{\resizebox{\linewidth}{!}{\includegraphics{HTMByTime-fashionista_com-crop.pdf}}}
   \caption{Model tagging profile of a single user on Twitter}
-  \label{figHTMByTime-fashionista_com}
+  \label{figPriorHTMByTimeT}
 \end{figure}
 
 Also shown in these figures is how model predictions change as the decay rate parameter changes.
@@ -1481,7 +1481,7 @@ Activations for context were computed by using the two methods for stop word rem
 
 \paragraph{Determining Frequency Cutoff}
 
-The same previously-derived stoplist from FIXME that \textcite{Sahlgren2008} used was used for this analysis,
+The same previously-derived stoplist from \textcite{Salton2014} that \textcite{Sahlgren2008} used was used for this analysis,
 The same entropy weighting method using by \textcite{Stanley2013} was examined,
 and the same method of removing the high-frequency words from \citeauthor{Sahlgren2008} was used.
 
@@ -1492,16 +1492,26 @@ The ideal cutoff was determined by choosing the value where the standard deviati
 That is, the spikes were suppressed for standard deviations for particular tags that still contained words with a very large number of observations.
 The cutoff was also chosen such that the size of the spikes was about as large as the spikes generated when the entropy method was used.
 
-The plots for the standard deviations across tags that was used to identify the cutoff for StackOverflow and Twitter are included in Figures \ref{figContextCutoffSO} and \ref{figContextCuttoffT}.
+The plots for the standard deviations across tags that were used to identify the cutoff for StackOverflow and Twitter are included in Figures \ref{figContextCutoffSO} and \ref{figContextCutoffT}.
 
-FIXME:
+\begin{figure}[!htbp]
+  \scalebox{.6}{\resizebox{\linewidth}{!}{\includegraphics{memMatSO-crop.pdf}}}
+  \caption{Variance in observation counts of words for each tag for StackOverflow}
+  \label{figContextCutoffSO}
+\end{figure}
 
-The no-removal plot shows the size of the spikes when high-frequency words are removed.
+\begin{figure}[!htbp]
+  \scalebox{.6}{\resizebox{\linewidth}{!}{\includegraphics{memMatT-crop.pdf}}}
+  \caption{Variance in observation counts of words for each tag for Twitter}
+  \label{figContextCutoffT}
+\end{figure}
+
+The original plot shows the size of the spikes when high-frequency words are removed.
 The entropy plot shows how the size decreases by more than an order of magnitude when the entropy weighting measure is used.
 The cutoff was chosen such that the frequency plot looks similar to the entropy plot, with spikes around the same size.
 Note that using a previously-defined stoplist does not remove some of the remaining high-frequency words in these datasets, which hints that this method may not be ideal when model accuracy is examined.
-The cutoff that produced the frequency plot is where a word represents more than \num{.0004} occurrences in the dataset.
-This may or may not be equal to the value for \textcite{Sahlgren2008}, since that number was expressed in total observations (not as a percentage), and the total number of words in the dataset were not given.
+The cutoff that produced the frequency plot is where a word represents more than \num{.04}\% of total occurrences in the dataset.
+This may or may not be equal to the value for \textcite{Sahlgren2008}, since that number was expressed in total observations (not as a percentage), and the total number of words in the dataset was not given.
 
 Also, no strong claims are being made that the cutoff identified is the ideal frequency percentage cutoff for all datasets when a frequency cutoff is used.
 The method used to identify this cutoff was simply aimed to find a reasonable value where comparisons between a frequency cutoff and entropy weighting techniques would be equitable.
@@ -1612,12 +1622,12 @@ The four Twitter popular-hashtags datasets and the randomly-sampled StackOverflo
 
 \subsubsection{Results for StackOverflow}
 
-Model accuracy as a function of co-occurrence matrix size for StackOverflow is included in Figure \ref{figContextDSizeSO}.
+Model accuracy as a function of co-occurrence matrix size for StackOverflow is included in Figure \ref{figContextDocumentSizeSO}.
 
 \begin{figure}[!htbp]
-  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-dimBySizeSO-crop.pdf}}}
+  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-freqVsEntropyBySizeSO-crop.pdf}}}
   \caption{Effect of size of co-occurrence matrix for StackOverflow}
-  \label{figContextDSizeSO}
+  \label{figContextDocumentSizeSO}
 \end{figure}
 
 Accuracy improves for both the Bayesian and random-permutation models as the size of the documents used to generate the co-occurrence matrix increases.
@@ -1639,12 +1649,12 @@ The Bayesian model does not saturate when using entropy weighting because each c
 The overall trend of increasing accuracy with document size is present for Twitter as well.
 
 \begin{figure}[!htbp]
-  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-dimBySizeSO-crop.pdf}}}
+  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-freqVsEntropyBySizeT-crop.pdf}}}
   \caption{Effect of size of co-occurrence matrix for Twitter}
-  \label{figContextDSizeSO}
+  \label{figContextDocumentSizeT}
 \end{figure}
 
-Both entropy weighting and frequency filtering in Figure \ref{figContextDSizeSO} plateau for the random-permutation model with increasing document size.
+Both entropy weighting and frequency filtering in Figure \ref{figContextDocumentSizeT} plateau for the random-permutation model with increasing document size.
 Once again, the Bayesian model continues to improve with document size.
 
 \subsubsection{Discussion}
@@ -1755,7 +1765,7 @@ Model accuracy results after using the log-odds transformation are included in F
 \end{figure}
 
 \begin{figure}[!htbp]
-  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-logoddsSO-crop.pdf}}}
+  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-logoddsT-crop.pdf}}}
   \caption{Random-permutation model accuracy when using log-odds transformation on context for Twitter}
   \label{figContextLogoddsT}
 \end{figure}

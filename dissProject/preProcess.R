@@ -2619,27 +2619,31 @@ makeCombinedEnvironmentTbl <- function(sjiTbl, config) {
 }
 
 plotMemMat <- function() {
+	plotTbl <- function(tbl, name) {
+		tbl[, id := 1:nrow(.SD)]
+		tbl = melt(tbl,
+			   measure=c('sdStoplist', 'sdFreq', 'sdEntropy', 'sdOrig'),
+			   variable.name='type',
+			   value.name='sd')
+		assign('p1', ggplot(tbl, aes(id, sd)) +
+		       geom_point() +
+		       defaultGGPlotOpts + 
+		       facet_grid(.~type) + 
+		       theme(axis.text.x = element_blank()))
+		myPlotPrint(p1, name)
+	}
 	sdStoplist = apply(permMemMatSOOrderless$stoplist, 2, sd)
 	sdFreq = apply(permMemMatSOOrderless$freq, 2, sd)
 	sdEntropy = apply(permMemMatSOOrderless$entropy, 2, sd)
 	sdOrig = apply(permMemMatSOOrderless$orig, 2, sd)
+	tbl = data.table(sdStoplist, sdFreq, sdEntropy, sdOrig)
+	plotTbl(tbl, 'memMatSO')
 	sdStoplist = apply(permMemMatTOrderless$stoplist, 2, sd)
 	sdFreq = apply(permMemMatTOrderless$freq, 2, sd)
 	sdEntropy = apply(permMemMatTOrderless$entropy, 2, sd)
 	sdOrig = apply(permMemMatTOrderless$orig, 2, sd)
-	permEnvTblSO[, .N, by=stopWordWeight]
-	permEnvTblSO[, .N, by=freqWeight]
-	permEnvTblT[, .N, by=stopWordWeight]
-	permEnvTblT[, .N, by=freqWeight]
-	permEnvTblSO
-	sd(sdOrig)
-	sd(sdEntropy)
-	sd(sdFreq)
-	sd(sdStoplist)
-	plot(sdOrig)
-	plot(sdStoplist)
-	plot(sdEntropy)
-	plot(sdFreq)
+	tbl = data.table(sdStoplist, sdFreq, sdEntropy, sdOrig)
+	plotTbl(tbl, 'memMatT')
 }
 
 getCurWorkspace <- function(groupConfig) {
@@ -3570,6 +3574,9 @@ runGenAndSaveCurWorkspaceg3s6 <- function() genAndSaveCurWorkspace(groupConfigG3
 runGenAndSaveCurWorkspaceg4s6 <- function() genAndSaveCurWorkspace(groupConfigG4S6)
 
 curWS <- function() {
+	sqldf('select owner_user_id, count(id) from posts where post_type_id = 1 group by owner_user_id')
+	tbl = sqldt('select id, num_questions from users')
+	tbl[!is.na(num_questions)][, median(num_questions)]
 	withProf(runContext20g1s6(regen='useAlreadyLoaded'))
 	runContext500g1s6(regen='useAlreadyLoaded', numRunsT=1, numRunsSO=1)
 	runContext500g1s6(regen=F, numRunsT=1, numRunsSO=1)
