@@ -969,12 +969,12 @@ Multiple datasets were collected to ensure that the results weren't dependent on
 \subsubsection{StackOverflow}
 
 The entire StackOverflow dataset is packaged and released quarterly to the public.
-So this package was downloaded and the database tables were imported into PostgreSQL using \textcite{so2db} importing tool.
+So this package was downloaded and the database tables were imported into PostgreSQL.
 
 \subsubsection{Twitter}
 
 Twitter provides two types of APIs for acquiring data: A query-based and streaming interface.
-The \textcite{Tweepy} Python package provides a Python functional interface to these APIs, and this package was used to collect data from Twitter.
+The Tweepy Python package provides a Python functional interface to these APIs, and this package was used to collect data from Twitter.
 The query-based interface was used to collect all tweets for specific popular users.
 At most \num{3000} of the most recent tweets were collected for each user, since Twitter only allows access to this number of tweets for each user.
 
@@ -1067,7 +1067,7 @@ Higher values mean that chunk activation decays faster, which means that the mos
 Lower decay rate values flip the importance of frequency and recency: Lower values mean that chunks that have occurred most frequently will have the highest activation,
 and activation depends less on the specific chunk that have been observed in the recent past.
 
-The base-level ($B_{i}$) component in Table \ref{ACTRBLLModel} is different than the $B_{i}$ used in \textcite{Stanley2013} (Table \ref{ModACTRModel}).
+The base-level ($B_{i}$) component in Table \ref{tabACTRBLLModel} is different than the $B_{i}$ used in \textcite{Stanley2013} (Table \ref{tabModACTRModel}).
 \citeauthor{Stanley2013} assumed no time dependence, no decay rate, and that the $B_{i}$ is simply a log odds computation of the probability that each chunk is likely to be presented again, given past frequency.
 If a decay rate of 0 is used on the optimized learning form of $B_{i}$, then the equation collapses to $log n_{i}$,
 which is a nonlinear transformation of the $B_{i}$ used by \citeauthor{Stanley2013} ($log \frac{p_{i}}{1-p_{i}}$).
@@ -1113,18 +1113,19 @@ It was repeated for each of the decay rate values and the two different forms of
 \subsubsection{Visualizing Tag Use}
 
 To better illustrate the dynamics of each user's tagging behavior,
-profile plots for a single user for both StackOverflow and Twitter are included in Figures \ref{figHTByTime-520957} and \ref{figHTByTime-fashionista_com} respectively.
+profile plots for a single user for both StackOverflow and Twitter are included in Figure \ref{figHTByTime}.
 
 \begin{figure}[!htbp]
-  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{HTByTime-520957-crop.pdf}}}
-  \caption{Tagging profile of a single user on StackOverflow}
-  \label{figHTByTime-520957}
-\end{figure}
-
-\begin{figure}[!htbp]
-  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{HTByTime-fashionista_com-crop.pdf}}}
-  \caption{Tagging profile of a single user on Twitter}
-  \label{figHTByTime-fashionista_com}
+  {%
+    \setlength{\fboxsep}{0pt}%
+    \setlength{\fboxrule}{1pt}%
+    \hfill
+    \subfigure[][StackOverflow]{\includegraphics[width=8cm]{HTByTime-520957-crop.pdf}}
+    \hfill
+    \subfigure[][Twitter]{\includegraphics[width=8cm]{HTByTime-fashionista_com-crop.pdf}}
+    \caption{Tagging profile for a single user}
+    \label{figHTByTime}
+  }%
 \end{figure}
 
 The specific value of the hashtag used for both plots is nominal and not important for this analysis.
@@ -1141,16 +1142,16 @@ To accurately model human performance in this domain, the model must be able to 
 
 As a first method for understanding model performance, profile plots of model's predicted tags for individual users were overlaid on that user's actual tag use.
 These plots for StackOverflow and Twitter are included in Figures \ref{figHTMByTime-520957} and \ref{figHTMByTime-fashionista_com} respectively.
-These are the same plots shown in Figures \ref{figHTByTime-520957} and \ref{figHTByTime-fashionista_com} with model predictions overlaid in red. 
+These are the same plots shown in Figure \ref{figHTByTime} with model predictions overlaid in red. 
 
 \begin{figure}[!htbp]
-  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{HTMByTime-520957-crop.pdf}}}
+  \scalebox{.6}{\resizebox{\linewidth}{!}{\includegraphics{HTMByTime-520957-crop.pdf}}}
   \caption{Model tagging profile of a single user on StackOverflow}
   \label{figHTMByTime-520957}
 \end{figure}
 
 \begin{figure}[!htbp]
-  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{HTMByTime-fashionista_com-crop.pdf}}}
+  \scalebox{.6}{\resizebox{\linewidth}{!}{\includegraphics{HTMByTime-fashionista_com-crop.pdf}}}
   \caption{Model tagging profile of a single user on Twitter}
   \label{figHTMByTime-fashionista_com}
 \end{figure}
@@ -1164,30 +1165,32 @@ This will be more formally tested when model accuracy across decay rate values i
 \subsubsection{Model Performance Across Decay Rate Values}
 
 Moving up one level of analysis, model accuracy for all users in a single dataset slice was analyzed.
-A plot of the results for one of the 12 slices, for both Twitter and StackOverflow, and for both forms of $B_{i}$ are included in Figures \ref{figPriorSOQSliceDs} and \ref{figPriorTwitterSliceDs} respectively.
+A plot of the results for one of the 12 slices, for both Twitter and StackOverflow, and for both forms of $B_{i}$ are included in Figures \ref{figPriorSOQSliceDsStd} and \ref{figPriorTwitterSliceDsStd} respectively.
 
 \begin{figure}[!htbp]
-  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{visNormMean-SOQgt500r2-topHashtagPostPriorStd-crop.pdf}}}
-  \caption{Model performance for a single dataset slice for StackOverflow}
-  \label{figPriorSOQSliceDsStd}
+  {%
+    \setlength{\fboxsep}{0pt}%
+    \setlength{\fboxrule}{1pt}%
+    \hfill
+    \subfigure[][Standard form]{\includegraphics[width=8cm]{visNormMean-SOQgt500r2-topHashtagPostPriorStd-crop.pdf}}
+    \hfill
+    \subfigure[][Optimized learning form]{\includegraphics[width=8cm]{visNormMean-SOQgt500r2-topHashtagPostPriorOL2-crop.pdf}}
+    \caption{Model performance for a single dataset slice for StackOverflow}
+    \label{figPriorSOQSliceDsStd}
+  }%
 \end{figure}
 
 \begin{figure}[!htbp]
-  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{visNormMean-SOQgt500r2-topHashtagPostPriorOL2-crop.pdf}}}
-  \caption{Model performance for a single dataset slice for StackOverflow}
-  \label{figPriorSOQSliceDsOL}
-\end{figure}
-
-\begin{figure}[!htbp]
-  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{visNormMean-TFollowgt10Mr2-topHashtagPostPriorStd-crop.pdf}}}
-  \caption{Model performance for a single dataset slice for Twitter}
-  \label{figPriorTwitterSliceDsStd}
-\end{figure}
-
-\begin{figure}[!htbp]
-  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{visNormMean-TFollowgt10Mr2-topHashtagPostPriorOL2-crop.pdf}}}
-  \caption{Model performance for a single dataset slice for Twitter}
-  \label{figPriorTwitterSliceDsOL}
+  {%
+    \setlength{\fboxsep}{0pt}%
+    \setlength{\fboxrule}{1pt}%
+    \hfill
+    \subfigure[][Standard form]{\includegraphics[width=8cm]{visNormMean-TFollowgt10Mr2-topHashtagPostPriorStd-crop.pdf}}
+    \hfill
+    \subfigure[][Optmized learning form]{\includegraphics[width=8cm]{visNormMean-TFollowgt10Mr2-topHashtagPostPriorOL2-crop.pdf}}
+    \caption{Model performance for a single dataset slice for Twitter}
+    \label{figPriorTwitterSliceDsStd}
+  }%
 \end{figure}
 
 Model accuracy at each decay rate value for each user in the dataset slice are included in the plots.
@@ -1206,30 +1209,32 @@ And the relative accuracy gained from using a pure frequency based model to a bl
 \subsubsection{Best-fit Decay Rate Values}
 
 To identify the best decay rate value for the dataset slices,
-each user's best decay rate value was taken and the results are plotted in histogram form in Figures \ref{figPriorSOQHistDs} and \ref{figPriorTwitterSliceDs} respectively.
+each user's best decay rate value was taken and the results are plotted in histogram form in Figures \ref{figPriorSOQHistDsOL} and \ref{figPriorTwitterHistDsOL} respectively.
 
 \begin{figure}[!htbp]
-  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{visHistD-SOQgt500r2-topHashtagPostPriorStd-crop.pdf}}}
-  \caption{Best-fit decay rate for a single dataset slice for StackOverflow}
-  \label{figPriorSOQHistDs}
+  {%
+    \setlength{\fboxsep}{0pt}%
+    \setlength{\fboxrule}{1pt}%
+    \hfill
+    \subfigure[][Standard form]{\includegraphics[width=8cm]{visHistD-SOQgt500r2-topHashtagPostPriorStd-crop.pdf}}
+    \hfill
+    \subfigure[][Optimized learning form]{\includegraphics[width=8cm]{visHistD-SOQgt500r2-topHashtagPostPriorOL2-crop.pdf}}
+    \caption{Best-fit decay rate for a single dataset slice for StackOverflow}
+    \label{figPriorSOQHistDsOL}
+  }%
 \end{figure}
 
 \begin{figure}[!htbp]
-  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{visHistD-SOQgt500r2-topHashtagPostPriorOL2-crop.pdf}}}
-  \caption{Best-fit decay rate for a single dataset slice for StackOverflow}
-  \label{figPriorSOQHistDsOL}
-\end{figure}
-
-\begin{figure}[!htbp]
-  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{visHistD-TFollowgt10Mr2-topHashtagPostPriorStd-crop.pdf}}}
-  \caption{Best-fit decay rate for a single dataset slice for Twitter}
-  \label{figPriorTwitterHistDs}
-\end{figure}
-
-\begin{figure}[!htbp]
-  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{visHistD-TFollowgt10Mr2-topHashtagPostPriorOL2-crop.pdf}}}
-  \caption{Best-fit decay rate for a single dataset slice for Twitter}
-  \label{figPriorTwitterHistDsOL}
+  {%
+    \setlength{\fboxsep}{0pt}%
+    \setlength{\fboxrule}{1pt}%
+    \hfill
+    \subfigure[][Standard form]{\includegraphics[width=8cm]{visHistD-TFollowgt10Mr2-topHashtagPostPriorStd-crop.pdf}}
+    \hfill
+    \subfigure[][Optimized learning form]{\includegraphics[width=8cm]{visHistD-TFollowgt10Mr2-topHashtagPostPriorOL2-crop.pdf}}
+    \caption{Best-fit decay rate for a single dataset slice for Twitter}
+    \label{figPriorTwitterHistDsOL}
+  }%
 \end{figure}
 
 First, the best-fit values are close to the 0.5 default value used in ACT-R when the optimized learning form is used.
@@ -1384,7 +1389,7 @@ The results across the four Twitter datasets were collected together, and the av
 
 \subsubsection{Results}
 
-The impact of adding the offset to each of the models for StackOverflow and Twitter are included in Figures \ref{figContextOffsetSO} and \ref{figContextOffsetTwitter}.
+The impact of adding the offset to each of the models for StackOverflow and Twitter are included in Figures \ref{figContextOffsetSO} and \ref{figContextOffsetT}.
 
 
 \begin{figure}[!htbp]
@@ -1522,7 +1527,7 @@ The three stop word techniques were then tested for the random-permutation model
 \begin{figure}[!htbp]
   \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-allWeightingsTPerm-crop.pdf}}}
   \caption{Stop-word techniques for the random-permutation model for Twitter}
-  \label{figContextStopRPSO}
+  \label{figContextStopRPT}
 \end{figure}
 
 For the random-permutation model for Twitter, the entropy weighting technique is the best method for handling stop words.
@@ -1562,7 +1567,7 @@ Similar results are found when the Bayesian model is tested on the Twitter datas
 \begin{figure}[!htbp]
   \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-allWeightingsTSji-crop.pdf}}}
   \caption{Stop-word techniques for the Bayesian model for Twitter}
-  \label{figContextStopBSO}
+  \label{figContextStopBT}
 \end{figure}
 
 Figure \ref{figContextStopBT} shows that entropy weighting is again the best performer, and frequency filtering decreases performance relative to no filtering.
@@ -1805,9 +1810,9 @@ Models were tested that used only one of the three word-order methods for the or
 Model accuracy results after incorporating word order into the random-permutation model are included in Figure \ref{figContextOrder}
 
 \begin{figure}[!htbp]
-  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-logoddsSO-crop.pdf}}}
+  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-orderT-crop.pdf}}}
   \caption{Model accuracy for various word order methods for the random-permutation model for Twitter}
-  \label{figContextLogoddsT}
+  \label{figContextOrder}
 \end{figure}
 
 All bar plots that include an order component where ``window'' or ``direction'' is not included in the title use the standard ordering method (no direction or windowing, all position information is included) 
@@ -1927,7 +1932,7 @@ So for each user, the co-occurrence matrix was created from their oldest posts, 
 
 \subsubsection{Result}
 
-Model accuracy when using a user-customized co-occurrence matrix for StackOverflow and Twitter is shown in Figures \ref{figPUserCustomSO} and \ref{figPUserCustomT}.
+Model accuracy when using a user-customized co-occurrence matrix for StackOverflow and Twitter is shown in Figures \ref{figPUCustomSO} and \ref{figPUCustomT}.
 
 \begin{figure}[!htbp]
   \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-userSjiSO-crop.pdf}}}
