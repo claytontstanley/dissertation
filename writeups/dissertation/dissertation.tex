@@ -1367,14 +1367,12 @@ The context component for both the Random Permutation and Bayesian model require
 Different size matrices were analyzed, ranging from \num{1000}, \num{10000}, \num{100000}, \num{1000000}, and \num{3000000} posts.
 The matrix for \num{3000000} posts was only used for Twitter, since the number of words in a StackOverflow post is much higher than Twitter on average,
 and the space and computational time required when using a co-occurrence matrix of \num{3000000} posts for StackOverflow is too high for a current high-performance desktop, even with highly optimized representations.
-Already FIXME total co-occurring word tag observations are used to build a co-occurrence matrix of \num{1000000} StackOverflow posts.
+Already \num{835500000} total co-occurring word tag observations are used to build a co-occurrence matrix of \num{1000000} StackOverflow posts.
 It is also the case that \num{1000000} posts for StackOverflow is already around $1/7$ of the total posts created on the site,
 so it is reasonable to assume that the results would not change greatly for StackOverflow if $3/7$ of the total posts created were used to build the co-occurrence matrix instead,
-especially since FIXME co-occurrences are already used with \num{1000000} posts.
+especially since \num{835500000} co-occurrences are already used with \num{1000000} posts.
 
 \section{Results for Combining Terms}
-
-
 
 \subsection{Adding Offset}
 
@@ -1709,8 +1707,8 @@ This result is consistent across all document sizes used to build the co-occurre
 \subsubsection{Discussion}
 
 The fact that the random-permutation model only needs around \num{2048} rows to represent all of the words in the Twitter and StackOverflow datasets is impressive.
-Twitter has around FIXME unique words for the \num{3000000} tweets in each of the popular-users datasets.
-Stackoverflow has FIXME unique words for the \num{1000000} posts used to generate the co-occurrence matrix.
+Twitter has around \num{2383000} unique words for the \num{3000000} tweets in each of the popular-users datasets.
+Stackoverflow has \num{5848000} unique words for the \num{1000000} posts used to generate the co-occurrence matrix.
 So it is impressive that only \num{2048} rows are needed to represent most of the variance from all of the words in these co-occurrence matrices.
 This is likely because word use frequency drops off sharply, and there are many words in both datasets which are used only once or a few times.
 Since these words have little to no ability to influence predictions, it makes sense that they can be safely removed from the dataset.
@@ -1881,7 +1879,7 @@ Accuracy does dramatically decrease for Twitter when the prior is removed, howev
 
 These results show that prior information is not always needed when a large amount of context is available and not much information has been collected about each user's past history.
 The StackOverflow randomly-sampled dataset selects posts across the entire dataset, regardless of each user's popularity or tag history.
-Across the dataset, each user only asks FIXME questions on average, so there is not a large amount of past tag history available for the prior component to use,
+Across the dataset, each user only asks around five questions on average, so there is not a large amount of past tag history available for the prior component to use,
 which is why this component is not a strong predictor in this case.
 
 However, can a context-only model perform just as well as a combined context and prior model when users with the largest amount of StackOverflow history are tested?
@@ -1892,7 +1890,8 @@ then this component should at least generate unique predictive variance in the c
 
 The same StackOverflow popular-users datasets used to test the prior component in isolation were used to test the prior component when context was added.
 However, since computing activations for the context component take an order of magnitude more wall-clock time than computing the prior component, not all observations could be included for the test.
-To reduce the observations, the most recent FIXME posts from each user in the datasets were sampled.
+To reduce the observations, the most recent 50 posts from each user in the datasets were sampled.
+The total number of users sampled was also reduced to 40 users for StackOverflow and 80 users for Twitter.
 Using the most recent observations for each user ensures that the observations tested have acquired the greatest amount of past tagging history in the datasets.
 So if a context-only model performs just as well as the full model in this case, it would be surprising.
 
@@ -1928,7 +1927,7 @@ However, since several hundred posts for each user in the popular-users datasets
 Separate co-occurrence matrices were built for each user in the sampled StackOverflow and Twitter popular-users dataset.
 The same sampling method used to test the impact of the prior component compared to the context component for the popular-users datasets was used,
 but the oldest posts that were not included in the testing set were used to build the co-occurrence matrices.
-So for each user, the co-occurrence matrix was created from their oldest posts, up to (and not including) their FIXME newer posts that were used to test model accuracy. 
+So for each user, the co-occurrence matrix was created from their oldest posts, up to (and not including) their 50 newer posts that were used to test model accuracy. 
 
 \subsubsection{Result}
 
