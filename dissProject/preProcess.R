@@ -3572,9 +3572,6 @@ runGenAndSaveCurWorkspaceg3s6 <- function() genAndSaveCurWorkspace(groupConfigG3
 runGenAndSaveCurWorkspaceg4s6 <- function() genAndSaveCurWorkspace(groupConfigG4S6)
 
 curWS <- function() {
-	sqldf('select owner_user_id, count(id) from posts where post_type_id = 1 group by owner_user_id')
-	tbl = sqldt('select id, num_questions from users')
-	tbl[!is.na(num_questions)][, median(num_questions)]
 	withProf(runContext20g1s6(regen='useAlreadyLoaded'))
 	runContext500g1s6(regen='useAlreadyLoaded', numRunsT=1, numRunsSO=1)
 	runContext500g1s6(regen=F, numRunsT=1, numRunsSO=1)
