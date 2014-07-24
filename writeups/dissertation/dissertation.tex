@@ -93,14 +93,17 @@
 \begin{document}
 
 \abstract{
-  This research aims to develop and compare tag-recommendation models for users choosing hashtags when composing a tweet on Twitter and choosing tags when asking a question on the StackOverflow site.
-  Two state-of-the-art cognitively-plausible memory models will be evaluated on how accurate they predict a user's chosen tags: an ACT-R inspired Bayesian model and a random-permutation vector-based model.
-  Experiments are designed to [1] discover the best way to leverage a user's prior hashtag use as a future predictor, [2] improve the models so that each model's strengths are incorporated into the other,
-  and [3] formally evaluate and compare each model's performance when recommending hashtags on Twitter and tags on StackOverflow.
-  The user-customized tag-recommendation models developed with this research should be immediately useful as foundations for tag-recommendation systems on the popular Twitter and StackOverflow social media sites.
-  Further, the planned performance modifications to the two memory models are aimed at the architectural level of each model.
-  If these architectural modifications to two cognitively-plausible memory models significantly improve performance,
-  they may suggest task-independent general modifications that can help improve model fit to human data in a much wider range of domains.
+  The growth of social media and user-created content on online sites provides unique opportunities to study models of declarative memory.
+  The task of choosing a hashtag for a tweet and tagging a post on StackOverflow was framed as a declarative memory retrieval problem.
+  Millions of posts and tweets were collected, and two declarative memory models were used to predict hashtags and tags that users choose on Twitter and StackOverflow.
+  Two state-of-the-art cognitively-plausible memory models were evaluated on how accurate they predict a user's chosen tags: an ACT-R inspired Bayesian model and a random-permutation vector-based model.
+  The results show that past user behavior of tag use is a strong predictor of future performance, and this past behavior was successfully incorporated into the random-permutation model that previously used only context.
+  Also, the common natural-language processing method to attenuate low-predictor words in the dataset was linked to ACT-R's attentional weight term,
+  and an entropy-weighting technique was developed that improved model accuracy by more efficiently allocating limited attentional resources to the predictive words in the posts and tweets.
+  Word order was not found to be strong predictor of tag use, and the random-permutation model performed comparable to the Bayesian model without including word order,
+  which shows that the strength of the random-permutation model is not in the ability to represent word order, but rather in the way in which context information is successfully compressed.
+  The results of the large-scale exploration show how the architecture of the two memory models can be modified to significantly improve accuracy,
+  and may suggest task-independent general modifications that can help improve model fit to human data in a much wider range of domains.
 }
 
 \note{\today}
