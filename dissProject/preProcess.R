@@ -3582,7 +3582,6 @@ curWS <- function() {
 	withProf(runContext20g1s1(regen='useAlreadyLoaded'))
 	setLogLevel(2)
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelVsPred()))))
-	modelVsPredTbl.new = copy(modelVsPredTbl)
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isPriorRun, list.files(path=getDirModelVsPred()))))
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isPUserRun, list.files(path=getDirModelVsPred()))))
 	logregTbl = buildTablesLogreg(file_path_sans_ext(Filter(function(r) isPUserRun(r) | isContextRun(r), list.files(path=getDirLogreg()))))
@@ -3600,10 +3599,7 @@ curWS <- function() {
 	withProf(myLoadImage(groupConfigG1S3))
 	withProf(myLoadImage(groupConfigPUserS6))
 	test_dir(sprintf("%s/%s", PATH, 'tests'), reporter='summary')
-	tables()
 	.ls.objects(order.by='Size')
-	lapply(permMemMatSOOrderless, dim)
-	as.sparseMatrix(permMemMatSOOrderless[['orig']])
 	# Checking that tweets for twitter users from each followers_count,statuses_count scale are being collected properly
 	usersWithTweetsTbl = sqldt("select distinct on (t.user_screen_name) t.user_screen_name,u.followers_count,u.statuses_count
 				   from tweets as t join twitter_users as u on t.user_screen_name = u.user_screen_name"
