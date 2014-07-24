@@ -2632,18 +2632,16 @@ plotMemMat <- function() {
 		       theme(axis.text.x = element_blank()))
 		myPlotPrint(p1, name)
 	}
-	sdStoplist = apply(permMemMatSOOrderless$stoplist, 2, sd)
-	sdFreq = apply(permMemMatSOOrderless$freq, 2, sd)
-	sdEntropy = apply(permMemMatSOOrderless$entropy, 2, sd)
-	sdOrig = apply(permMemMatSOOrderless$orig, 2, sd)
-	tbl = data.table(sdStoplist, sdFreq, sdEntropy, sdOrig)
-	plotTbl(tbl, 'memMatSO')
-	sdStoplist = apply(permMemMatTOrderless$stoplist, 2, sd)
-	sdFreq = apply(permMemMatTOrderless$freq, 2, sd)
-	sdEntropy = apply(permMemMatTOrderless$entropy, 2, sd)
-	sdOrig = apply(permMemMatTOrderless$orig, 2, sd)
-	tbl = data.table(sdStoplist, sdFreq, sdEntropy, sdOrig)
-	plotTbl(tbl, 'memMatT')
+	buildTbl <- function(mat) {
+		sdStoplist = apply(mat$stoplist, 2, sd)
+		sdFreq = apply(mat$freq, 2, sd)
+		sdEntropy = apply(mat$entropy, 2, sd)
+		sdOrig = apply(mat$orig, 2, sd)
+		tbl = data.table(sdStoplist, sdFreq, sdEntropy, sdOrig)
+		tbl
+	}
+	plotTbl(buildTbl(permMemMatSOOrderless), 'memMatSO')
+	plotTbl(buildTbl(permMemMatTOrderless), 'memMatT')
 }
 
 getCurWorkspace <- function(groupConfig) {
