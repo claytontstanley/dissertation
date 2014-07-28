@@ -1660,7 +1660,7 @@ If that dataset is relatively small, it may be better to use the compressed rand
 
 \subsection{Amount of Compression for Random Permutation}
 
-Another parameter in the random permutation model is the number of rows used to represent the all of the words.
+Another parameter in the random permutation model is the number of rows used to represent the all of the different words.
 Each word is represented by two randomly placed ones and two negative ones across the rows.
 All that is required is that the four positions and signs of each of these environment vectors is unique.
 But this means multiple environment vectors can overlap when looking at a single row.
@@ -1713,16 +1713,14 @@ Since these words have little to no ability to influence predictions, it makes s
 
 However it should be pointed out that the way the random permutation model compresses the words is completely random.
 It is not an LSA approach where the few ones and negative ones for each word are chosen such to maximize the ability for the compressed matrix to represent the full matrix.
-Everything is randomly chosen with the random permutation model.
 The environment vector for each word is randomly selected, and no SVD is performed to choose these in a more discriminating manner.
 So it is that more impressive that even with a randomly-chosen form of compression, only \num{2048} rows are needed to represent all of the words in these datasets.
-
 
 \subsection{Method to Combine Prior and Context}
 
 The activation value for the context component of the vector-based model is a correlation, ranging from zero to one.
 This is not a log-odds value.
-Currently, prior and context for the random permutation model are combined by simply adding the terms.
+For the previous results, prior and context for the random permutation model are combined by simply adding the terms.
 However, this means that ACT-R's prior base-level learning component (which is a log-odds value) is added to a correlation value, which may not be mathematically appropriate.
 It would be more appropriate to convert the correlation value to a log-odds value, and then add this context term to the log-odds prior term.
 
@@ -1737,7 +1735,7 @@ This technique has a few nice mathematical properties:
 The conversion technique is simple and computationally cheap.
 Also, it behaves properly at specific points in the distribution.
 For example, if the conversion is performed one the mean correlation value in the set, the result is a log-odds value of zero.
-This makes sense given that log odds can be interpreted as the amount of odds information (positive or negative) that should be adjusted to the prior log odds.
+This makes sense given that log odds can be interpreted as the amount of odds information (positive or negative) that should be adjusted to the prior log odds, given that new piece of information.
 Since the mean correlation value contains no information regarding if it is better or worse than the other correlation values, it is appropriate to assign this correlation value a zero log-odds adjustment value.
 
 The log-odds transformation technique was tested for the random permutation model on the Twitter popular-hashtags and StackOverflow randomly-sampled datasets.
@@ -1788,7 +1786,7 @@ In order to thoroughly test the impact of adding word order into the model, vari
 Three different methods for incorporating word order in the random permutation model were tested:
 Taking just the sign of the word's position relative to the tag (direction method), using the position (standard method), and using the position but only including words that were used near the tag (window method).
 For the standard method, all words and their respective position are used to build the representation.
-For the direction method, essentially two representations are combined: all co-occurrences with words to the left of the tag, and all co-occurrences with words to the right of the tag.
+For the direction method, essentially two representations are created: all co-occurrences with words to the left of the tag, and all co-occurrences with words to the right of the tag.
 The window method is similar to the standard method, where each word's relative position is maintained, but it only includes words near the tag to build the representation.
 \textcite{Sahlgren2008} tested similar methods, and found that accuracy was highest when a narrow window was used for the window method (only including words at most two positions to the left and right of the tag).
 The same $+2$ $-2$ range was used to test the window method on the Twitter dataset.
@@ -1796,7 +1794,7 @@ The same $+2$ $-2$ range was used to test the window method on the Twitter datas
 Only the Twitter dataset was tested, since the StackOverflow dataset contains no word order information between words in the title and body of the post and the tags used for the post.
 The author chooses tags after filling out the title and body forms in the post, so the tags are never intermixed with words in the post like they are for Twitter.
 
-The same Twitter popular-users datasets and StackOverflow popular-hashtags datasets were used for testing.
+The same Twitter popular-users datasets and StackOverflow randomly-sampled datasets were used for testing.
 Both an ordered and orderless context component were created for the random permutation models.
 The orderless context component uses the same co-occurrence matrix used by the Bayesian model to create the representation, since the Bayesian model does not contain any order information.
 Models were tested that used only one of the three word order methods for the ordered context component, used only the orderless context component, used a combination of the two components, and combined context with prior. 
@@ -1813,11 +1811,11 @@ Model accuracy results after incorporating word order into the random permutatio
 
 All bar plots that include an order component where ``window'' or ``direction'' is not included in the title use the standard ordering method (no direction or windowing, all position information is included) 
 This is the default ordering method used, so the names for these bar plots were kept consistent to the names used in other figures so that comparisons could be made across figures if necessary
-(similar to what was done for the default row-size for the random permutation model).
+(similar to what was done for the default row size for the random permutation model).
 Base models that do not use entropy weighting were also included so that effect sizes could be compared between entropy weighting and adding word order information.
 
 Looking first at models where no prior is added, the random permutation model using only orderless context performs similar to the model using only order context with direction.
-All other order-only models perform worse than the direction order model and worse than the orderless model.
+All other order-only models perform worse than the order model using direction and worse than the orderless model.
 
 Full models were also plotted against the model where only the prior and orderless context was included (i.e., no order).
 This was to test how much of the variance in model accuracy is shared between the orderless and order models.
@@ -1851,8 +1849,8 @@ If this were the case, then it may be less important that the random permutation
 
 \subsubsection{Method}
 
-Full models were tested against context-only models for both sites and both the Bayesian and random permutation model types.
-The four Twitter popular-hashtags datasets and the StackOverflow randomly-sampled datasets were tested first. 
+Full models were tested against context-only models for both sites. 
+The four Twitter popular-hashtags datasets and the StackOverflow randomly-sampled dataset were used for the test. 
 
 \subsubsection{Results}
 
@@ -1944,12 +1942,12 @@ Model accuracy when using a user-customized co-occurrence matrix for StackOverfl
 \end{figure}
 
 The results compare accuracy for models that use a global co-occurrence and user-specific co-occurrence matrix.
-For StackOverflow, model accuracy for the user-specific (labeled as ``user sji'') can be compared against the default global co-occurrence matrix.
+For StackOverflow, model accuracy for the user-specific co-occurrence matrix (labeled as ``user sji'') can be compared against the default global co-occurrence matrix.
 Accuracy decreases dramatically when a user-specific co-occurrence matrix is used.
 
 The results are similar for Twitter.
-However since the entire dataset is not available for Twitter, a global co-occurrence matrix condition can not be tested,
-since the popular-users dataset samples across a wide range of hashtags, and due to Twitter's API restrictions it would be infeasible to collect all posts for each of the hashtags that are used in the dataset.
+However, the entire dataset is not available for Twitter, so a global co-occurrence matrix condition can not be tested,
+since the popular-users dataset samples across a wide range of hashtags, and due to Twitter's API restrictions it would be infeasible to collect all posts that use each of the hashtags in the dataset.
 But user-specific co-occurrence matrices can be built, since the popular-users dataset does contain all context and hashtag observations for each user.
 
 Model accuracy when only the single user-customized context predictor is used is relatively poor, and the prior term is a much better predictor.
@@ -1957,7 +1955,7 @@ Further, when this component is combined with the prior component, model perform
 
 \subsubsection{Discussion}
 
-Both models require large numbers of context co-occurrence observations to make stable predictions from context information.
+Both models require large numbers of context co-occurrence observations to make accurate predictions from context information.
 Otherwise, the co-occurrence matrices do not have enough data to properly stabilize.
 Millions of posts were used to generate the global co-occurrence matrices for Twitter and StackOverflow.
 If this number of posts had been collected for a single user, then the user-customized co-occurrence matrix for that user should lead to more accurate predictions compared to using the global matrix.
@@ -2008,10 +2006,11 @@ it is quite interesting that the random permutation model performs nearly as wel
 
 These results pose an interesting and important fundamental question about declarative memory:
 How, precisely, is the neural system configured to represent co-occurrences for long-term memory?
-Since, at the behavioral level, both models perform similarly, it is possible that the neural system is using some sort of vector-based compressed storage (e.g., random permutations) to store co-occurrences.
+Since at the behavioral level both models perform similarly, it is possible that the neural system is using either representation to store co-occurrences.
 Vector-based models are simple enough that they can easily be implemented in a neural network.
 Perhaps a form of vector-based compressed storage is being used at the neural level,
-since it can be implemented in neurons and it is a way for the machinery to generate predictions that closely match the statistical structure of the environment (i.e., that closely match the Bayesian representation).
+since it can be implemented in neurons and is an efficient way for the machinery to generate predictions that closely match the statistical structure of the environment
+(i.e., that closely match the uncompressed Bayesian representation).
 
 As neural imaging systems improve, this question of neural representation can be best answered by looking directly at the neural activity.
 However, there are possible behavioral studies that could be done to provide evidence that may favor one representation over the other:
@@ -2027,16 +2026,17 @@ For instance, the online site Duolingo might contain enough collective data abou
 
 Also, the relatively strong performance of the random permutation model is not due to the model's ability to represent word order.
 Performance is similar for the random permutation and Bayesian models when the co-occurrence matrix for both models is the same, and not based on word order.
+Performance also does not improve by much when word order is added as the last predictor in the random permutation model.
 The random permutation model seems to work so well primarily due to the way that the full co-occurrence representation is compressed.
 
-Compression for the random permutation model is essentially random.
+And compression for the random permutation model is essentially random.
 That is, no SVD is done to identify the most predictive components,
 so the compressed representation used by the random permutation model does not contain nearly as much of the variance from the original co-occurrence matrix that it could have.
 However, performing a full SVD on a co-occurrence matrix as large as the ones generated for StackOverflow and Twitter is computationally infeasible.
 So, it also seems plausible that this SVD computation is infeasible at the neural level.
-\textcite{Landauer1997} explicitly state that they make no claims that the brain is computing an SVD at the neural level;
+When deriving the LSA approach, \textcite{Landauer1997} explicitly state that they make no claims that the brain is computing an SVD at the neural level;
 only that the neural machinery is set up so that the representation makes predictions that are similar to what would have been generated if the matrix decomposition for an SVD would have been computed.
-Perhaps the randomly-compressed representation used for the random permutation model is the way in which the brain tries to achieve the full LSA- and SVD-like approach that \citeauthor{Landauer1997} propose.
+Perhaps the randomly-compressed representation used for the random permutation model is the way in which the brain tries to efficiently achieve the full LSA- and SVD-like approach that \citeauthor{Landauer1997} propose.
 
 \subsubsection{Attentional Weight}
 
@@ -2054,14 +2054,14 @@ Perhaps it is a combination of top-down and bottom-up systems that determine $W_
 \subsubsection{Generalizing Results}
 
 It seems likely that the entropy method for computing the attentional weight term $W_{j}$ may be applicable to other declarative memory tasks.
-The entropy method is parameter free (unlike the frequency-filtering method), so it completely data driven (much like the co-occurrence matrix) and does not require tuning.
+The entropy method is parameter free (unlike the frequency-filtering method), completely data driven (much like the co-occurrence matrix), and does not require tuning.
 It is common to handle stop words in some manner when working with NLP and large text documents.
 So, if these large natural language documents are used to test declarative memory, then the entropy method may be a more cognitively plausible way of dealing with stop words rather than 
 filtering based on a predetermined list or based on the frequency count in the dataset, particularly since the entropy method substantially increases model accuracy for these datasets and since it is parameter free.
 
 Adding a prior component to the random permutation model also increased model accuracy for both StackOverflow and Twitter.
 It is unsurprising that this occurred.
-However, it is quite surprising that this is the first time that the prior component has been included in a random permutation model.
+However, it is quite surprising that this is the first time that the prior component has been included and tested in a random permutation model.
 If the random permutation model is explored as a declarative memory theory for other datasets, it should be worthwhile to include the prior component for those explorations.
 Although it did not seem to matter much how the prior component is combined with the context component in this study, 
 there may be better ways than the log-odds transformation to combine the terms.
