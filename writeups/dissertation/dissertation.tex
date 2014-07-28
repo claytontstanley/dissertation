@@ -969,7 +969,7 @@ This sampling rate was adequate to collect around three million tweets within a 
 
 A custom tokenization algorithm created by \textcite{Owoputi2013} was used to chunk the words in the text.
 This algorithm was specifically created for tokenizing Twitter content.
-However during testing it was found to be robust and well suited for StackOverflow content.
+However, during testing it was also found to be robust and well suited for StackOverflow content.
 The initial model results with the new tokenizer were qualitatively very similar to the model results found in \textcite{Stanley2013} where the Python Natural Language Processing (NLP) toolkit \parencite{Bird2009} was used.
 This is most likely because the language for the samples taken for both sites is informal English,
 and it seams reasonable to think that tokenizing all of the informal language and characters included in Twitter is a much more difficult task than tokenizing most of the words used on StackOverflow.
@@ -1318,12 +1318,12 @@ and even if it was implemented in a compiled language it would be computationall
 \subsubsection{Adding Offset Term}
 
 This logistic regression method is a computationally efficient way to find the optimal weights for the predictors.
-However when the regression can not be constrained to label a specific number of 1s for each observation (as is the case here), to be used properly an offset term must be added as an additional model predictor.
+However, when the regression can not be constrained to label a specific number of 1s for each observation (as is the case here), to be used properly an offset term must be added as an additional model predictor.
 
 The offset term keeps the activation for the small number of top tags for each post equal across posts.
 This ensures that the logistic regression only labels a few 1s for each post.
 \textcite{Stanley2013} did this by subtracting off the mean total activation for the top 5 tags for each post.
-However this method is complicated since computing the total activation for a tag requires already knowing the weights for each model component that are used to compute that activation.
+However, this method is complicated since computing the total activation for a tag requires already knowing the weights for each model component that are used to compute that activation.
 \citeauthor{Stanley2013} used an iterative approach to determine the weights used for the offset term, and kept iterating until those weights matched the weights returned after running the logistic regression.
 
 A simplified version of \citeauthor{Stanley2013}'s method was used for the results in this study.
@@ -1531,7 +1531,7 @@ Removing stop-words based on a predetermined list actually decreases accuracy, a
 \subsubsection{Discussion}
 
 Comparing across Figures \ref{figContextStopRPSO} and \ref{figContextStopRPT}, entropy and frequency techniques are superior to filtering based on a predetermined list.
-However it is more difficult to choose the best approach when comparing entropy weighting and frequency filtering.
+However, it is more difficult to choose the best approach when comparing entropy weighting and frequency filtering.
 Frequency filtering is slightly better for StackOverflow, while entropy weighting is slightly better for Twitter.
 However, frequency filtering does have a few drawbacks compared to entropy weighting:
 It produces accuracy measurements that have higher levels of noise (see Figure \ref{figContextStopRPSO} and frequency models for the title component in StackOverflow).
@@ -1577,7 +1577,7 @@ This was not the case for the random permutation model in this study, was not th
 and is most likely never the case for the random permutation model.
 Model accuracy most likely decreases for the Bayesian model because this model already has a normalization component built in that the random permutation model does not have.
 When computing activation for the random permutation model, the correlation is calculated directly on a matrix of counts of co-occurrences for words and tags.
-However for the Bayesian model this count matrix is converted to a log-odds ($S_{ji}$) matrix,
+For the Bayesian model this count matrix is converted to a log-odds ($S_{ji}$) matrix,
 where both the number of observations for the word and the tag are normalized when computing the value for each cell (see the $S_{ji}$ computation in Table \ref{tabModACTRModel}).
 So it is likely the case that a form of frequency \emph{attenuation} is already built into the Bayesian model.
 And therefore adding a frequency filter on top of this does nothing to improve accuracy, and only removes predictive information.
@@ -1619,7 +1619,7 @@ Model accuracy as a function of co-occurrence matrix size for StackOverflow is i
 \end{figure}
 
 Accuracy improves for both the Bayesian and random permutation models as the size of the documents used to generate the co-occurrence matrix increases.
-However model accuracy using the entropy weighting technique plateaus and slightly decreases for the largest document size for the random permutation model, while the frequency technique only begins to plateau. 
+However, model accuracy using the entropy weighting technique plateaus and slightly decreases for the largest document size for the random permutation model, while the frequency technique only begins to plateau. 
 The Bayesian model does not plateau and accuracy continues to improves document size increases.
 
 \subsubsection{Discussion}
@@ -1689,7 +1689,7 @@ In the figure, the full random permutation model that does not have the number o
 This was done so that names in all of the plots would remain consistent across all plots, and the \num{2048}-row matrix is the size used for the random permutation model for all other results.
 The plot is also broken out for different size datasets used to build the co-occurrence matrix.
 Reducing compression to only 100 rows in the representation has a strong negative effect on accuracy.
-However \num{2048} rows is sufficient for these datasets, as increasing the number of rows to almost an order of magnitude higher (\num{10000}) has little to no positive impact on accuracy.
+But \num{2048} rows is sufficient for these datasets, as increasing the number of rows to almost an order of magnitude higher (\num{10000}) has little to no positive impact on accuracy.
 
 Results are similar for Twitter.
 
@@ -1711,7 +1711,7 @@ So it is impressive that only \num{2048} rows are needed to represent most of th
 This is likely because word use frequency drops off sharply, and there are many words in both datasets which are used only once or a few times.
 Since these words have little to no ability to influence predictions, it makes sense that they can be safely removed from the dataset.
 
-However it should be pointed out that the way the random permutation model compresses the words is completely random.
+However, it should be pointed out that the way the random permutation model compresses the words is completely random.
 It is not an LSA approach where the few ones and negative ones for each word are chosen such to maximize the ability for the compressed matrix to represent the full matrix.
 The environment vector for each word is randomly selected, and no SVD is performed to choose these in a more discriminating manner.
 So it is that more impressive that even with a randomly-chosen form of compression, only \num{2048} rows are needed to represent all of the words in these datasets.
@@ -1759,7 +1759,7 @@ Model accuracy results after using the log-odds transformation are included in F
 Using the log-odds transformation technique has little to no effect on model accuracy for both StackOverflow and Twitter.
 When the technique is used and accuracy is examined for a model with only a single predictor, the transformation does not change accuracy.
 When predictors are combined and the full model is examined, the transformation is in the direction of slightly increasing accuracy, at least for the StackOverflow dataset.
-However any improvement when using the transformation is minimal.
+However, any improvement when using the transformation is minimal.
 
 \subsubsection{Discussion}
 
