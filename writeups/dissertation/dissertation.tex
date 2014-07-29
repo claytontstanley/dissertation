@@ -72,7 +72,7 @@
   }
 }
 
-% Don't let biblatex change any of the casing in the bibliography file
+% Do not let biblatex change any of the casing in the bibliography file
 \DeclareRobustCommand{\MakeSentenceCase*}[1]{{#1}}
 
 % If the toc is too detailed, try limiting the depth of printed sections in the TOC:
@@ -910,7 +910,7 @@ A vector-based model and Bayesian retrieval model.
 The random permutation model \parencite{Sahlgren2008} in Table \ref{tabRandPermModel} was used for the vector-based model, since it has shown to perform better than the BEAGLE model \parencite{Recchia2010}.
 The modified ACT-R Bayesian model \parencite{Stanley2013} in Table \ref{tabModACTRModel} was used for the Bayesian model, since it has already been applied to tag use on StackOverflow posts.
 
-\section{Methods}
+\section{Method}
 
 The two memory models were evaluated on predicting user-chosen tags for Twitter tweets and StackOverflow posts.
 The co-occurrence matrices used for the context component of each model were generated from a large subset of the Twitter and StackOverflow datasets.
@@ -942,7 +942,7 @@ The purpose of this dataset is to test the accuracy of each model's predicted mo
 The dataset contains approximately three million tweets where at least one of the 400 most popular hashtags are used, and was collected in real time until the tweet quota was reached.
 
 Four popular-hashtags datasets were collected at four different time periods, spanning across one month.
-Multiple datasets were collected to ensure that the results weren't dependent on a particular sample of hashtags, and would generalize across different popular-hashtag datasets and different time periods.
+Multiple datasets were collected to ensure that the results were not dependent on a particular sample of hashtags, and would generalize across different popular-hashtag datasets and different time periods.
 Each dataset required around four days to collect enough tweets to reach the quota, and one collection was done each week.
 
 \subsection{Acquiring Datasets}
@@ -1057,7 +1057,7 @@ So the $B_{i}$ component used by \citeauthor{Stanley2013} can be roughly thought
 The StackOverflow and Twitter popular-users datasets were used to characterize tag growth and decay for a user on each site.
 Each user's tag behavior from the popular-users dataset for each site was analyzed. 
 
-Multiple samples were taken across a broad range of user types for each dataset to ensure that the model results weren't dependent on specific attributes in a single sample.
+Multiple samples were taken across a broad range of user types for each dataset to ensure that the model results were not dependent on specific attributes in a single sample.
 For the StackOverflow popular-users dataset, a total of 12 slices of users were taken at different levels of reputation and total number of questions asked.
 500 users were sampled that had a reputation higher than \num{500}, \num{1000}, \num{5000}, \num{10000}, \num{50000}, and \num{100000}.
 100 users were sampled that had asked a total number of questions higher than \num{50}, \num{100}, \num{200}, \num{300}, \num{400}, \num{500}.
@@ -1265,8 +1265,8 @@ This makes sense given that the optimized learning equation in Table \ref{tabACT
 and also since the timespan of recorded tag use for StackOverflow and Twitter is large (years).
 
 So it may be worthwhile to use the standard form instead of the optimized learning form when declarative memory is modeled across a broader range of tasks.
-However, this shouldn't be taken as a strong recommendation,
-since the performance benefits seen here could simply be due to the fact that the declarative memory retrievals span across a large period of time, which isn't the case for all tasks.
+However, this should not be taken as a strong recommendation,
+since the performance benefits seen here could simply be due to the fact that the declarative memory retrievals span across a large period of time, which is not the case for all tasks.
 Nonetheless, the only real reason not to use the standard form is due to computational resource limitations.
 Since this becomes less of an issue as time progresses, it may be worthwhile to reconsider the default value used in ACT-R.
 It may be the case that the optimized learning form of the equation is no longer computationally necessary.
@@ -1283,7 +1283,7 @@ The declarative memory models analyzed in this study consist of two main compone
 Past tag use was isolated in the first study to see how well ACT-R's prior component of declarative memory (i.e., base-level learning) fits each user's tag use over time.
 However, for the rest of the studies the past behavior and context declarative memory components were combined as well as looked at in isolation.
 
-\subsection{Methods}
+\subsection{Method}
 
 \subsubsection{Logistic Regression}
 
@@ -1306,7 +1306,7 @@ That is, the labeling is relaxed across all posts, and there are no constraints 
 So model accuracy values found with the relaxed method are actually slightly conservative, since the model may be labeling more 1s for a post than the number of tags the author used for that post.
 
 However, this relaxed metric was used for the rest of the experiments that involve combining terms because the optimal weights found by the regression are based on using the relaxed metric.
-If these weights are then used to compute the constrained form of model accuracy, biases may be introduced since the regression wasn't optimized to the constrained form, and weights may change if that was done.
+If these weights are then used to compute the constrained form of model accuracy, biases may be introduced since the regression was not optimized to the constrained form, and weights may change if that was done.
 Also, there is no current logistic regression technique in R that can be constrained to label a specific number of 1s for each observation. 
 To optimize parameters based on the constrained form,
 a full-enumeration numerical approach would have to be developed that systematically searches the space of coefficient weights and uses a custom objective fitting function to find the best fit.
@@ -1362,7 +1362,7 @@ It is also the case that \num{1000000} posts for StackOverflow is already around
 so it is reasonable to assume that the results would not change greatly for StackOverflow if $3/7$ of the total posts created were used to build the co-occurrence matrix instead,
 especially since \num{835500000} co-occurrences are already used with \num{1000000} posts.
 
-\section{Results for Combining Terms}
+\section{Results for Combining Predictors}
 
 \subsection{Adding Offset}
 
@@ -1399,7 +1399,7 @@ As another example, the ``Bayes only orderless context'' means that only the con
 
 Looking across the plots, including the offset significantly increases model accuracy, for all models, terms, and sites.
 Accuracy is improved even when only a single term is used.
-Although in this case the weight of the term is irrelevant (only one term, weighting for that term doesn't matter),
+Although in this case the weight of the term is irrelevant (only one term, weighting for that term does not matter),
 using an offset still improves accuracy since the offset term ensures that only a small number of tags per posts are predicted by the model to be the chosen tags. 
 
 The random permutation model in particular is greatly affected by the offset term, for both the StackOverflow and Twitter.
@@ -2066,6 +2066,19 @@ If the random permutation model is explored as a declarative memory theory for o
 Although it did not seem to matter much how the prior component is combined with the context component in this study, 
 there may be better ways than the log-odds transformation to combine the terms.
 Further research could focus on exploring a larger set of methods for combining the context component of the random permutation model with the prior component from the ACT-R theory.
+
+\subsubsection{Activation Calculation}
+
+The Bayesian and vector-based memory models differ in how the co-occurrence matrix is represented (lossy compression for vector-based models).
+They also differ in how the activation of each tag is calculated, given the different representations.
+The vector-based memory models, like LSA, compute a correlation between the context and each tag, while the Bayesian models sum the log likelihoods that each word in the context occurs with each tag.
+These two methods for computing the activation are correlated but not identical.
+Further research could try to tease apart how model accuracy is independently influenced by the representation (compressed or not) and the activation calculation (correlation or log likelihood).
+To do this, four models could be constructed (uncompressed and compressed representation crossed with correlation and log likelihood activation) compared to the two in this study,
+so that the effects of representation and activation calculation could be partialed out.
+This would allow, for example, the method of compression for the random permutation vector-based model to be analyzed independent of activation calculation.
+The results would provide additional evidence to help determine the specific representation that the declarative memory system uses to represent co-occurrences,
+and also the specific activation calculation that is carried out by the system.
 
 \subsubsection{Future Applications}
 
