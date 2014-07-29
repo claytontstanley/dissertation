@@ -1382,7 +1382,7 @@ buildTablesLogreg <- function(outFileNames) {
 	addModelType(logregTbl)
 	logregTbl[, DVName := predName]
 	# FIXME: Remove once runs generating coeffStd have completed 
-	logregTbl[, coeffStd := logregTbl[['coeff']] / logregTbl[['Std. Error']]]
+	#logregTbl[, coeffStd := logregTbl[['coeff']] / logregTbl[['Std. Error']]]
 	logregTbl
 }
 
@@ -1604,7 +1604,9 @@ makeRemapForMapping <- function(keyword, text) {
 }
 
 makeLogregMapping <- function() {
-	c('actPriorStd', 'Standard prior model',
+	c('actPriorStd', 'Standard prior model relaxed across posts',
+	  'actPriorStdBayes', 'Bayes prior relaxed across posts',
+	  'actPriorStdRP', 'RP prior relaxed across posts',
 	  'actTitle', 'Bayes title w/ entropy',
 	  'actBody', 'Bayes body w/ entropy',
 	  'actTweet', 'Bayes orderless context w/ entropy',
@@ -2046,10 +2048,16 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 }
 
 analyzeLogreg <- function() {
-	bestFitNames = c('actPriorStd_actTitle_actBody', 'actPriorStd_actTitleOrderlessEnthyman_actBodyOrderlessEnthyman', 'actPriorStd_actTitleOrderlessEnthyman_actBodyOrderlessEnthyman')
-	compareMeanDVLogreg(logregTbl[(sizeNum == 2 | is.na(sizeNum)) & dsetType == 'stackoverflow' & bestFitName %in% bestFitNames], coeffStd, figName='foo')
+	dTbl = modelVsPredTbl[predUsedBest == T][, list(d,  DVName)]
+	dTbl
+	logregTbl
+	bestFitNames = c('actPriorStd_actTitle_actBody', 'actPriorStd_actTitleOrderlessEnthyman_actBodyOrderlessEnthyman')
+	logregTbl
+	logregTbl[modelType == 'perm' & DVName == 'actPriorStd', DVName := 'actPriorStdRP']
+	logregTbl[modelType == 'sji' & DVName == 'actPriorStd', DVName := 'actPriorStdBayes']
+	compareMeanDVLogreg(logregTbl[(sizeNum == 2) & dsetType == 'stackoverflow' & DVName != '(Intercept)' & bestFitName %in% bestFitNames], coeffStd, figName='coeffSO')
 	bestFitNames = c('actPriorStd_actTweet', 'actPriorStd_actTweetUsercontext', 'actPriorStd_actTweetOrderlessEnthyman', 'actPriorStd_actTweetOrderlessEnthyser')
-	compareMeanDVLogreg(logregTbl[(sizeNum == 2 | is.na(sizeNum)) & dsetType == 'twitter' & bestFitName %in% bestFitNames], coeffStd, figName='foo')
+	compareMeanDVLogreg(logregTbl[(sizeNum == 2) & dsetType == 'twitter' & predName != '(Intercept)' & bestFitName %in% bestFitNames], coeffStd, figName='coeffT')
 }
 
 getDWideTbl <- function(tbl) {
@@ -3584,7 +3592,7 @@ curWS <- function() {
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelVsPred()))))
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isPriorRun, list.files(path=getDirModelVsPred()))))
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isPUserRun, list.files(path=getDirModelVsPred()))))
-	logregTbl = buildTablesLogreg(file_path_sans_ext(Filter(function(r) isPUserRun(r) | isContextRun(r), list.files(path=getDirLogreg()))))
+	logregTbl = buildTablesLogreg(file_path_sans_ext(Filter(function(r) isContextRun(r), list.files(path=getDirLogreg()))))
 	modelHashtagsTbls = buildTablesModelHashtags(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelHashtags()))))
 
 	modelHashtagsTbl = modelHashtagsTbls[["TContextPerm-20g1s1r1"]]

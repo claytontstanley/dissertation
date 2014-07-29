@@ -1841,7 +1841,52 @@ the strength of the model is more likely to be in how efficiently it can represe
 
 Since it was shown that including word order information has little to no significant improvement on model accuracy, an attempt to incorporate word order information into the Bayesian model was not made.
 
-\subsection{Impact of Prior vs Context}
+\subsection{Coefficients for Predictors}
+
+The logistic regression is used to determine the optimal weight for each model component.
+A regression is done for each run in the dataset, and since multiple runs were used for the StackOverflow and Twitter datasets, multiple samples of coefficient weights for each model component were computed.
+The variance of the weights for each component show how likely it is that the regression is overfitting the model,
+and the mean shows the best estimate weight of each component relative to the other.
+
+\subsubsection{Method}
+
+Coefficients for all of the runs for the Twitter popular-hashtags and StackOverflow randomly-sampled datasets were collected.
+This totaled 5 sets of coefficient weights for StackOverflow (5 runs) and 60 for Twitter (15 runs for each of the 4 dataset samples).
+
+\subsubsection{Results}
+
+Coefficients for each model component of the full models are included in Figures \ref{figContextCoeffSO} and \ref{figContextCoeffT}
+
+\begin{figure}[!htbp]
+  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-priorAddSO-crop.pdf}}}
+  \caption{Coefficient values for full models for StackOverflow}
+  \label{figContextCoeffSO}
+\end{figure}
+
+\begin{figure}[!htbp]
+  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-priorAddSO-crop.pdf}}}
+  \caption{Coefficient values for full models for Twitter}
+  \label{figContextCoeffT}
+\end{figure}
+
+The range of the confidence intervals is much more narrow than the range of the coefficient values between the components of each model.
+This shows that the model is not being overfit, as the weights for each component are relatively stable across the different runs.
+The weight of the prior relative to the context terms is also fairly consistent across models and across the two sites.
+Across the sites, context is a much stronger predictor than past behavior for StackOverflow, but past behavior is more important for Twitter. 
+Within a site, both models are consistent in how they favor context or past behavior.
+Also, looking at StackOverflow, both models are consistent in weighting the body more than the title, and the title more than the prior term.
+
+\subsubsection{Discussion}
+
+It was not surprising that the model was not overfit in this scenario, since the number of observed tags is much greater than the number of coefficients being fit.
+Each model has at most three terms, those weights are being fit to 500 posts within each run for Twitter and 100 for StackOverflow, and multiple tags are used for each post (particularly for StackOverflow).
+It is interesting that although the values of the weights are stable within a site (StackOverflow or Twitter), the weights change dramatically when looking across the sites.
+This illustrates that the impact of a user's past history relative to the current context can be domain specific, which means that for best results the weights for each of the terms should be recalibrated in new scenarios.
+However, the underlying reason that the weights change between the sites cannot be answered from this study alone.
+This relative impact may be changing from either a true alteration in the underlying weight of the prior compared to context for different domains,
+or simply due to the fact that not enough information on one of the two terms is available.
+
+\subsection{Impact of Prior vs. Context}
 
 Adding a user's prior tag history as an additional component has been shown to improve performance, but is this always the case?
 If enough context information has been collected, maybe a context-only model can perform just as well as a combined context and prior model.
