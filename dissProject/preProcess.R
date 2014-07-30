@@ -2047,17 +2047,37 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 	compareMeanDVDefault(dWideTbl, dDiff, figName='dContext', groupCol='dsetType')
 }
 
+bestFitNameToDVName <- function(vect, pre) {
+	vect = gsub('^act', pre, vect)	
+	vect = gsub('_act', '', vect)
+}
+
 analyzeLogreg <- function() {
-	dTbl = modelVsPredTbl[predUsedBest == T][, list(d,  DVName)]
+	dTbl = modelVsPredTbl[predUsedBest == T][, list(d,  runNum, groupNum, sizeNum, DVName)][grepl('^topHashtagAcross', DVName)]
+	setkey(dTbl, DVName, runNum, groupNum, sizeNum, d)
+	logregTbl
 	dTbl
-	logregTbl
-	bestFitNames = c('actPriorStd_actTitle_actBody', 'actPriorStd_actTitleOrderlessEnthyman_actBodyOrderlessEnthyman')
-	logregTbl
+	logregTbl[, bestFitNameAsDVName := bestFitNameToDVName(bestFitName, 'topHashtagAcross')]
+	setkey(logregTbl, bestFitNameAsDVName, runNum, groupNum, sizeNum, d)
+	logregTbl[, predUsedBest := F]
+	logregTbl[dTbl, predUsedBest := T, nomatch=0]
 	logregTbl[modelType == 'perm' & DVName == 'actPriorStd', DVName := 'actPriorStdRP']
 	logregTbl[modelType == 'sji' & DVName == 'actPriorStd', DVName := 'actPriorStdBayes']
-	compareMeanDVLogreg(logregTbl[(sizeNum == 2) & dsetType == 'stackoverflow' & DVName != '(Intercept)' & bestFitName %in% bestFitNames], coeffStd, figName='coeffSO')
+	bestFitNames = c('actPriorStd_actTitle_actBody', 'actPriorStd_actTitleOrderlessEnthyman_actBodyOrderlessEnthyman')
+	assign('p1', ggplot(
+			    logregTbl[predUsedBest & (sizeNum == 2) & dsetType == 'stackoverflow' & DVName != '(Intercept)' & bestFitName %in% bestFitNames],
+			    aes(x=dsetGroup, y=coeffStd, fill=DVName)) +
+	       #stat_summary(fun.y=mean, geom="bar", width=0.7, position=position_dodge()) +
+	       geom_point(aes(x=dsetGroup, y=coeffStd, group=DVName), width=0.7, position=position_dodge()) 
+	       #theme(legend.position='top', legend.direction='vertical', axis.title.y=element_blank()) +
+	       #guides(fill=guide_legend(title='foo', reverse=T)) + 
+	       #coord_flip()
+	       )
+	print(p1)
+
+	compareMeanDVLogreg(logregTbl[predUsedBest & (sizeNum == 2) & dsetType == 'stackoverflow' & DVName != '(Intercept)' & bestFitName %in% bestFitNames], coeffStd, figName='coeffSO')
 	bestFitNames = c('actPriorStd_actTweet', 'actPriorStd_actTweetUsercontext', 'actPriorStd_actTweetOrderlessEnthyman', 'actPriorStd_actTweetOrderlessEnthyser')
-	compareMeanDVLogreg(logregTbl[(sizeNum == 2) & dsetType == 'twitter' & predName != '(Intercept)' & bestFitName %in% bestFitNames], coeffStd, figName='coeffT')
+	compareMeanDVLogreg(logregTbl[predUsedBest & (sizeNum == 2) & dsetType == 'twitter' & predName != '(Intercept)' & bestFitName %in% bestFitNames], coeffStd, figName='coeffT')
 }
 
 getDWideTbl <- function(tbl) {

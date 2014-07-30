@@ -1858,18 +1858,18 @@ This totaled 5 sets of coefficient weights for StackOverflow (5 runs) and 60 for
 Coefficients for each model component of the full models are included in Figures \ref{figContextCoeffSO} and \ref{figContextCoeffT}
 
 \begin{figure}[!htbp]
-  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-priorAddSO-crop.pdf}}}
+  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-coeffStd-coeffSO-crop.pdf}}}
   \caption{Coefficient values for full models for StackOverflow}
   \label{figContextCoeffSO}
 \end{figure}
 
 \begin{figure}[!htbp]
-  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-priorAddSO-crop.pdf}}}
+  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-coeffStd-coeffT-crop.pdf}}}
   \caption{Coefficient values for full models for Twitter}
   \label{figContextCoeffT}
 \end{figure}
 
-The range of the confidence intervals is much more narrow than the range of the coefficient values between the components of each model.
+Even at these small sample sizes, the range of the confidence intervals is much more narrow than the range of the coefficient values between the components of each model.
 This shows that the model is not being overfit, as the weights for each component are relatively stable across the different runs.
 The weight of the prior relative to the context terms is also fairly consistent across models and across the two sites.
 Across the sites, context is a much stronger predictor than past behavior for StackOverflow, but past behavior is more important for Twitter. 
