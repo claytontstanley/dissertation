@@ -1222,9 +1222,9 @@ Comparing best-fit values will be more thoroughly tested when looking at the val
 \subsubsection{Aggregate Model Performance}
 
 Finally, model accuracy was analyzed across all dataset slices for StackOverflow and Twitter.
-Mean accuracy for both sites is included in Figure \ref{figPriorAcc}. 
-The mean was computed by taking the mean of the mean model accuracy for each dataset slice.
-All confidence intervals are 95\% bootstrapped for the mean of the means for each slice.
+Accuracy for both sites is included in Figure \ref{figPriorAcc}. 
+Aggregate accuracy was computed by taking the mean of every user's model accuracy across all users in all dataset slices.
+All confidence intervals are 95\% bootstrapped for the mean. 
 
 \begin{figure}[!htbp]
   \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc--crop.pdf}}}
@@ -1237,18 +1237,18 @@ This makes sense given that the standard form does not assume equal presentation
 The standard form of $B_{i}$ is able to more accurately account for these trends.
 
 The best-fit decay rate values were also analyzed across all dataset slices.
+Aggregate best-fit decay rates were computed by taking the median of all user's best-fit decay rate value across all dataset slices.
+The median was used since there were users in the popular-users dataset that did not have enough observations to generate stable predictions, and best-fit decay rate values for these users could be as high as 20.
+Using the median effectively trims these unstable values from the sample, without having to define a cut point and go through an outlier removal process.
+
 These results are included in Figure \ref{figPriorDecay}.
+Error bars represent the 95\% bootstrapped confidence interval of the median.
 
 \begin{figure}[!htbp]
   \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-d--crop.pdf}}}
   \caption{Best-fit decay rate}
   \label{figPriorDecay}
 \end{figure}
-
-The mean was computed by taking the mean of the median best-fit decay rate value for each dataset slice.
-The median was used since the distribution of best-fit decay rate values for each dataset slice is somewhat positively skewed (e.g., the histograms in Figures \ref{figPriorSOQHistDsOL} and \ref{figPriorTwitterHistDsOL}).
-Also, there were users in the popular-users dataset that did not have enough observations to generate stable predictions, and best-fit decay rate values for these users could be as high as 20.
-Using the median effectively trims these unstable values from the sample, without having to define a cut point and go through an outlier removal process.
 
 Decay rate values that produced the most accurate model performance are lower for the optimized learning form (0.43) of $B_{i}$ compared to the standard form (0.80).
 However, the optimal values for optimized learning are near 0.5, which lines up with default value used in ACT-R.
@@ -1378,6 +1378,7 @@ The results across the four Twitter datasets were collected together, and the av
 \subsubsection{Results}
 
 The impact of adding the offset to each of the models for StackOverflow and Twitter are included in Figures \ref{figContextOffsetSO} and \ref{figContextOffsetT}.
+The error bars represent the 95\% bootstrapped confidence interval of the mean model accuracy across all runs in dataset.
 
 \begin{figure}[!htbp]
   \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-OffsetSO-crop.pdf}}}

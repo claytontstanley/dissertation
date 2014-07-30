@@ -160,17 +160,21 @@ sqldt <- function(...) {
 
 # Computing CIs around statistics
 
-CIMedian <- function(x) {
-	res = boot(x,function(x,i) median(x[i]), R=1000)
+CIBoot <- function(x, fun) {
+	res = boot(x,function(x,i) fun(x[i]), R=1000)
 	res
 	res = boot.ci(res, type="norm")
 	lower = unlist(res)[['normal2']]
 	upper = unlist(res)[['normal3']]
-	mid = median(x)
+	mid = fun(x)
 	if (is.null(lower)) lower=mid
 	if (is.null(upper)) upper=mid
 	c(upper, mid, lower)
 }
+
+CIMedian <- function(x) CIBoot(x, median)
+
+CIMean <- function(x) CIBoot(x, mean)
 
 getTokenizedTbl <- function(tweetsTbl, from, regex) {
 	matches = regmatches(tweetsTbl[[from]], gregexpr(regex, tweetsTbl[[from]], perl=T))
@@ -1408,7 +1412,7 @@ buildTables <- function(outFileNames) {
 	modelVsPredTbl
 }
 
-withCI <- function(dat, CIFun=CI) {
+withCI <- function(dat, CIFun=CIMean) {
 	res = CIFun(dat)
 	list(N=length(dat), meanVal=res[2], minCI=res[3], maxCI=res[1])
 }
@@ -1463,7 +1467,7 @@ plotBarSumTbl <- function(sumTbl, fillCol, figName, extras=NULL, groupCol='dsetG
 	sumTbl
 }
 
-compareMeanDV <- function(modelVsPredTbl, DV, extras=NULL, figName='', groupCol='dsetGroup', CIFun=CI, title='Model Name') {
+compareMeanDV <- function(modelVsPredTbl, DV, extras=NULL, figName='', groupCol='dsetGroup', CIFun=CIMean, title='Model Name') {
 	DV = substitute(DV)
 	modelVsPredTbl
 	expr = bquote(modelVsPredTbl[, withCI(.(DV), CIFun=CIFun), keyby=list(DVName, .(as.symbol(groupCol)))])
@@ -1739,7 +1743,7 @@ analyzePrior <- function(modelVsPredTbl) {
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostPriorOL2' & datasetName=='SOQgt500r2' & d < 1])
 	tbl = compareOptimalDs(bestTbl[DVName %in% c('topHashtagPostPriorStd', 'topHashtagPostPriorOL2') & runNum == 2])
 	tbl = compareOptimalAcc(bestTbl[DVName %in% c('topHashtagPostPriorStd', 'topHashtagPostPriorOL2') & runNum == 2])
-	tbl[, mean(meanVal), by=DVName]
+	tbl
 }
 
 asTopHashtagAcross <- function(vect) {
@@ -1873,23 +1877,23 @@ analyzeFB <- function() {
 	compareMeanDVDefault(tbl[dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='foo')
 }
 
-analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
+analyzeContext <- function(modelVsPredTbl) {
 	#modelHashtagsTbls = Filter(x = modelHashtagsTbls, f = function(tbl) !grepl('-500', tbl[, datasetName[1]]))
-	ppvTbl = rbindlist(lapply(modelHashtagsTbls, getPPVTblAll))
-	ppvTbl
-	modelHashtagsTbls
-	modelHashtagsTbl = modelHashtagsTbls[['TContextSji-500g1r5']]
-	modelHashtagsTbl
-	logit = runLogReg(modelHashtagsTbl, c('actPriorStd', 'actTweet'))
-	summary(logit)
-	tables()
-	myLog(ClassLog(logit, modelHashtagsTbl$hashtagUsedP))
-	modelVsPredTbl
+	#ppvTbl = rbindlist(lapply(modelHashtagsTbls, getPPVTblAll))
+	#ppvTbl
+	#modelHashtagsTbls
+	#modelHashtagsTbl = modelHashtagsTbls[['TContextSji-500g1r5']]
+	#modelHashtagsTbl
+	#logit = runLogReg(modelHashtagsTbl, c('actPriorStd', 'actTweet'))
+	#summary(logit)
+	#tables()
+	#myLog(ClassLog(logit, modelHashtagsTbl$hashtagUsedP))
+	#modelVsPredTbl
 	
 	modelVsPredTbl[dsetSize==500, list(N=.N, Ndsets=length(unique(datasetName))), keyby=list(runNum, groupNum, sizeNum, dsetSize, dsetType)]
 	modelVsPredTbl[, list(N=.N, Ndsets=length(unique(datasetName))), keyby=list(sizeNum, dsetSize, dsetType)]
-	plotPPVTbl(ppvTbl[dsetType=='stackoverflow' & runNum==1 & dsetSize==500], 'contextPpvSO')
-	plotPPVTbl(ppvTbl[dsetType=='twitter' & runNum==1 & dsetSize==500], 'contextPpvT')
+	#plotPPVTbl(ppvTbl[dsetType=='stackoverflow' & runNum==1 & dsetSize==500], 'contextPpvSO')
+	#plotPPVTbl(ppvTbl[dsetType=='twitter' & runNum==1 & dsetSize==500], 'contextPpvT')
 	baseTblPost = modelVsPredTbl[dsetSize==500][grepl('^topHashtagPost', DVName)]
 	baseTbl = modelVsPredTbl[dsetSize==500][grepl('^topHashtagAcross', DVName)]
 	tbl = baseTbl[predUsedBest == T]
@@ -1987,7 +1991,9 @@ analyzeContext <- function(modelHashtagTbls, modelVsPredTbl) {
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweet', 'Tweet',
 				       'TweetOrderlessEnthyman', 'PriorStdTweetOrderlessEnthyman'))
 	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='priorAddT')
+}
 
+analyzeContextNotUsed <- function(modelVsPredTbl) {
 	# RESULT: Show base performance for both models
 	# SO standard
 	DVNames = asTopHashtagAcross(c('PriorStd', 'TitleNentropy', 'BodyNentropy', 'PriorStdTitleNentropyBodyNentropy',
@@ -2052,7 +2058,7 @@ bestFitNameToDVName <- function(vect, pre) {
 	vect = gsub('_act', '', vect)
 }
 
-analyzeLogreg <- function() {
+analyzeLogreg <- function(logregTbl, modelVsPredTbl) {
 	dTbl = modelVsPredTbl[predUsedBest == T][, list(d,  runNum, groupNum, sizeNum, DVName)][grepl('^topHashtagAcross', DVName)]
 	setkey(dTbl, DVName, runNum, groupNum, sizeNum, d)
 	logregTbl
@@ -2064,17 +2070,6 @@ analyzeLogreg <- function() {
 	logregTbl[modelType == 'perm' & DVName == 'actPriorStd', DVName := 'actPriorStdRP']
 	logregTbl[modelType == 'sji' & DVName == 'actPriorStd', DVName := 'actPriorStdBayes']
 	bestFitNames = c('actPriorStd_actTitle_actBody', 'actPriorStd_actTitleOrderlessEnthyman_actBodyOrderlessEnthyman')
-	assign('p1', ggplot(
-			    logregTbl[predUsedBest & (sizeNum == 2) & dsetType == 'stackoverflow' & DVName != '(Intercept)' & bestFitName %in% bestFitNames],
-			    aes(x=dsetGroup, y=coeffStd, fill=DVName)) +
-	       #stat_summary(fun.y=mean, geom="bar", width=0.7, position=position_dodge()) +
-	       geom_point(aes(x=dsetGroup, y=coeffStd, group=DVName), width=0.7, position=position_dodge()) 
-	       #theme(legend.position='top', legend.direction='vertical', axis.title.y=element_blank()) +
-	       #guides(fill=guide_legend(title='foo', reverse=T)) + 
-	       #coord_flip()
-	       )
-	print(p1)
-
 	compareMeanDVLogreg(logregTbl[predUsedBest & (sizeNum == 2) & dsetType == 'stackoverflow' & DVName != '(Intercept)' & bestFitName %in% bestFitNames], coeffStd, figName='coeffSO')
 	bestFitNames = c('actPriorStd_actTweet', 'actPriorStd_actTweetUsercontext', 'actPriorStd_actTweetOrderlessEnthyman', 'actPriorStd_actTweetOrderlessEnthyser')
 	compareMeanDVLogreg(logregTbl[predUsedBest & (sizeNum == 2) & dsetType == 'twitter' & predName != '(Intercept)' & bestFitName %in% bestFitNames], coeffStd, figName='coeffT')
@@ -3600,6 +3595,8 @@ runGenAndSaveCurWorkspaceg3s6 <- function() genAndSaveCurWorkspace(groupConfigG3
 runGenAndSaveCurWorkspaceg4s6 <- function() genAndSaveCurWorkspace(groupConfigG4S6)
 
 curWS <- function() {
+	analyzePUser(modelVsPredTbl)
+	plotMemMat()
 	withProf(runContext20g1s6(regen='useAlreadyLoaded'))
 	runContext500g1s6(regen='useAlreadyLoaded', numRunsT=1, numRunsSO=1)
 	runContext500g1s6(regen=F, numRunsT=1, numRunsSO=1)
