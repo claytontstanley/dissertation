@@ -176,6 +176,10 @@ CIMedian <- function(x) CIBoot(x, median)
 
 CIMean <- function(x) CIBoot(x, mean)
 
+CIsd <- function(x) {
+	c(mean(x) + sd(x), mean(x), mean(x) - sd(x))
+}
+
 getTokenizedTbl <- function(tweetsTbl, from, regex) {
 	matches = regmatches(tweetsTbl[[from]], gregexpr(regex, tweetsTbl[[from]], perl=T))
 	wideTbl = data.table(id=tweetsTbl$id, matches=matches)
@@ -1759,7 +1763,7 @@ compareMeanDVDefault <- function(...) {
 }
 
 compareMeanDVLogreg <- function(...) {
-	compareMeanDV(..., groupCol='dsetGroup', extras=list(ylab('Coefficient Value')), title='Cofficient Name')
+	compareMeanDV(..., groupCol='dsetGroup', extras=list(ylab('Coefficient Value')), title='Cofficient Name', CIFun=CIsd)
 }
 
 analyzePUser <- function(modelVsPredTbl) {

@@ -1857,6 +1857,7 @@ This totaled 5 sets of coefficient weights for StackOverflow (5 runs) and 60 for
 \subsubsection{Results}
 
 Coefficients for each model component of the full models are included in Figures \ref{figContextCoeffSO} and \ref{figContextCoeffT}
+Error bars represent the standard deviation of coefficient values for each component.
 
 \begin{figure}[!htbp]
   \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-coeffStd-coeffSO-crop.pdf}}}
@@ -1870,8 +1871,10 @@ Coefficients for each model component of the full models are included in Figures
   \label{figContextCoeffT}
 \end{figure}
 
-Even at these small sample sizes, the range of the confidence intervals is much more narrow than the range of the coefficient values between the components of each model.
+The standard deviation is used instead of the confidence interval of the mean so that the plots show the overall stability of each coefficient across the different runs.
+The range of the distribution of coefficient values is much more narrow than the range of the mean coefficient values between the components of each model.
 This shows that the model is not being overfit, as the weights for each component are relatively stable across the different runs.
+
 The weight of the prior relative to the context terms is also fairly consistent across models and across the two sites.
 Across the sites, context is a much stronger predictor than past behavior for StackOverflow, but past behavior is more important for Twitter. 
 Within a site, both models are consistent in how they favor context or past behavior.
