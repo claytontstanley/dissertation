@@ -388,7 +388,7 @@ That is, the PMI equation \emph{is} the simplified form of ACT-R's strength of a
 \subsubsection{Scaling the Equations}
 
 The majority of tag-recommendation systems use some measure of word pair associations to compute the likelihood of a tag, given current context.
-It is important that this measure scales well enough to handle the sheer volume of information present in online social media datasets.
+It is important that this measure scales well enough to handle the large volume of information present in online social media datasets.
 Large social media datasets such as StackOverflow and Twitter contain on the order of millions to hundreds of millions of unique word pair associations between terms and tags.
 If one wants to capitalize on all of the information present in the database to build the most accurate measure of relatedness between words and tags, then the association measure used must scale to this large size.
 
@@ -923,7 +923,7 @@ The most recent quarterly published StackOverflow dataset \parencite{DataDump201
 This dataset contains around \num{5.7} million posts and \num{34377} unique tags.
 
 Unlike StackOverflow, the entire Twitter dataset is not released to the public.
-Due to this and the sheer size of Twitter, subsets of the Twitter dataset were collected.
+Due to this and the scale of Twitter, subsets of the Twitter dataset were collected.
 
 \subsubsection{Popular Users Subset}
 
@@ -940,7 +940,7 @@ The purpose of this dataset is to test the accuracy of each model's predicted mo
 The dataset contains approximately three million tweets where at least one of the 400 most popular hashtags are used, and was collected in real time until the tweet quota was reached.
 
 Four popular-hashtags datasets were collected at four different time periods, spanning across one month.
-Multiple datasets were collected to ensure that the results were not dependent on a particular sample of hashtags, and would generalize across different popular-hashtag datasets and different time periods.
+Multiple datasets were collected to ensure that the results were not dependent on a particular sample of hashtags and would generalize across different popular-hashtag datasets and different time periods.
 Each dataset required around four days to collect enough tweets to reach the quota, and one collection was done each week.
 
 \subsubsection{Randomly Sampled Subset}
@@ -983,7 +983,7 @@ and it seemed beneficial to use the same algorithm for both datasets to make com
 
 \subsection{Stemming}
 
-\textcite{Owoputi2013}'s algorithm handles basic word stemming (e.g., removing 'ed' and 'ing' endings), but
+\textcite{Owoputi2013}'s algorithm handles basic word stemming (e.g., removing ``ed'' and ``ing'' endings), but
 with the StackOverflow dataset, it is also possible to convert synonym tags to canonical base tags, since the community maintains a tag-synonym database.
 This can be thought of as semantic stemming, where two words with identical meaning are converted to the same canonical word.
 So tags used for the post were converted to their root tag when possible.
@@ -1012,9 +1012,9 @@ All three stop word techniques (i.e., predetermined list, high-frequency filteri
 
 \section{Past User Behavior}
 
-How does a user's prior hashtag use influence their likelihood of choosing that hashtag in the future?
+How does a user's prior tag use influence their likelihood of choosing that tag in the future?
 This question was tested by examining how well ACT-R's base-level activation component of declarative memory predicts the tags that authors choose, given each author's past tagging behavior.
-The model predicts that the more recently and frequently used chunks have higher prior activations, and are more likely to be needed in the future.
+The model predicts that the more recently and frequently used tags have higher prior activations, and are more likely to be needed in the future.
 
 \subsection{Base-level ACT-R model}
 
@@ -1071,9 +1071,9 @@ For the Twitter popular-users dataset, 12 slices were also taken, this time at d
 100 users were sampled that had a total number of followers higher than \num{1000}, \num{5000}, \num{10000}, \num{100000}, \num{1000000}, and \num{10000000},
 and a total number of tweets higher than \num{100}, \num{500}, \num{1000}, \num{5000}, \num{10000}, and \num{50000}.
 
-20 different values of the decay rate parameter were explored for each slice
+22 different values of the decay rate parameter were explored for each slice
 (0, .1, .2, .3, .4, .5, .6, .7, .8, .9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.8, 2, 5, 10, 20).
-The values were chosen to look at how performance changes from a pure frequency model ($d=0$), to a blend of frequency and recency ($d=.5$), to a pure recency model ($d=20$).
+The values were chosen to look at how performance changes from a pure frequency model ($d=0$), to a blend of frequency and recency ($d \approx .5$), to a pure recency model ($d=20$).
 The decay rate value was varied for both the standard form and optimized learning form of $B_{i}$. 
 Only values equal to or below 1 were examined for the optimized learning form, since values above 1 for this form cause a bifurcation and are not psychologically interesting.
 
@@ -1226,7 +1226,6 @@ Comparing best-fit values will be more thoroughly tested when looking at the val
 
 \subsubsection{Aggregate Model Performance}
 
-The best-fit decay rate values were analyzed across all dataset slices.
 Aggregate best-fit decay rates were computed by taking the median of all user's best-fit decay rate values across all dataset slices.
 The median was used since there were users in the popular-users dataset that did not have enough observations to generate stable predictions, and best-fit decay rate values for these users could be as high as 20.
 Using the median effectively trims these unstable values from the sample, without having to define a cut point for an outlier removal process.
@@ -1278,7 +1277,7 @@ So it may be worthwhile to use the standard form instead of the optimized learni
 However, this should not be taken as a strong recommendation,
 since the performance benefits seen in this study could simply be due to the fact that the declarative memory retrievals span across a large period of time, which is not the case for all tasks.
 Nonetheless, the only real reason not to use the standard form is due to computational resource limitations.
-Since this becomes less of an issue as time progresses and hardware speed increases, it may be time to reconsider the default value used in ACT-R.
+Since this is becoming less of an issue as time progresses and hardware speed increases, it may be time to reconsider the default form of base-level learning used in ACT-R.
 It may be the case that the optimized learning form of the equation is no longer computationally necessary.
 And if the standard form is used as the default (or simply tried in another experiment),
 the results from this study suggest that the optimal decay rate value should be set slightly higher (0.8) than the default when optimized learning is used (0.5).
@@ -1312,7 +1311,7 @@ That is, the labeling is relaxed across all posts, and there are no constraints 
 So model accuracy values found with the relaxed method are actually slightly conservative, since the model may be labeling more 1s for a post than the number of tags the author used for that post.
 
 However, this relaxed metric was used for the rest of the experiments that involve combining terms because the optimal weights found by the regression are based on using the relaxed metric.
-If these weights are then used to compute the constrained form of model accuracy, biases may be introduced since the regression was not optimized to the constrained form, and weights may change if that was done.
+If these weights are then used to compute the constrained form of model accuracy, biases may be introduced since the regression was not optimized to the constrained form, and weights may change as a consequence.
 Also, there is no current logistic regression technique in R that can be constrained to label a specific number of 1s for each observation where a small set of 1s occurred. 
 To optimize parameters based on the constrained form,
 a full-enumeration numerical approach would have to be developed that systematically searches the space of coefficient weights and uses a custom objective fitting function to find the best fit.
@@ -1341,7 +1340,7 @@ since the optimal weights of the terms are no longer needed when computing the o
 
 \subsubsection{Datasets}
 
-Model accuracy was computed on the popular-hashtags dataset for Twitter and a random sample of posts across the entire StackOverflow dataset.
+Model accuracy was tested on the popular-hashtags dataset for Twitter and a random sample of posts across the entire StackOverflow dataset.
 For each of the four Twitter popular-hashtags datasets, model retrievals were done across 15 runs and 500 posts within each run.
 For the StackOverflow dataset, 5 runs of 100 posts were used, since the results for StackOverflow are more stable and retrievals take more wall-clock time for this dataset due to the size of the co-occurrence matrix.
 All runs contained different posts, and all posts used for runs were not used to generate the co-occurrence matrix for the two retrieval models.
@@ -1359,7 +1358,7 @@ So instead, the global prior tag history for all users in the Twitter popular-ha
 
 \subsubsection{Co-occurrence Matrices}
 
-The context component for both the random permutation and Bayesian model requires the same co-occurrence matrix of words and observed tags.
+The context component for both the random permutation and Bayesian model is based on the same co-occurrence matrix of words and observed tags.
 Different size matrices were analyzed, ranging from \num{1000}, \num{10000}, \num{100000}, \num{1000000}, and \num{3000000} posts.
 The matrix for \num{3000000} posts was only used for Twitter, since the number of words in a StackOverflow post is much higher than Twitter on average,
 and the space and computational time required when using a co-occurrence matrix of \num{3000000} posts for StackOverflow is too high for a current high performance desktop, even with highly optimized representations.
@@ -1387,13 +1386,13 @@ The impact of adding the offset to each of the models for StackOverflow and Twit
 The error bars represent the 95\% bootstrapped confidence interval of the mean model accuracy across all runs in dataset.
 
 \begin{figure}[!htbp]
-  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-OffsetSO-crop.pdf}}}
+  \scalebox{.6}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-OffsetSO-crop.pdf}}}
   \caption{Impact of adding model offset for StackOverflow}
   \label{figContextOffsetSO}
 \end{figure}
 
 \begin{figure}[!htbp]
-  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-OffsetT-crop.pdf}}}
+  \scalebox{.6}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-OffsetT-crop.pdf}}}
   \caption{Impact of adding model offset for Twitter}
   \label{figContextOffsetT}
 \end{figure}
@@ -1401,7 +1400,7 @@ The error bars represent the 95\% bootstrapped confidence interval of the mean m
 In both plots, if the model name includes ``full'' then all model components are included.
 When they are enumerated, then at least one of the components is left out.
 The random permutation models are represented as ``RP'', Bayesian models as ``Bayes'', and they are plotted alongside each other so that comparisons across the two model types can be done easily.
-So, for example, the ``standard Prior model relaxed across posts without offset'' means that only the prior model component was used, and the offset for that component was not subtracted off when determining activation.
+So, for example, the ``standard prior model relaxed across posts without offset'' means that only the prior model component was used, and the offset for that component was not subtracted off when determining activation.
 As another example, the ``Bayes only orderless context'' means that only the context component of the Bayesian model was used (along with the offset), and that no order information was used for that contextual component term.
 
 Looking across the plots, including the offset significantly increases model accuracy, for all models, terms, and sites.
@@ -1467,7 +1466,7 @@ the results from this study cannot by themselves be used to answer this question
 A data-driven frequency-weighted approach was tried, along with using a previously-derived stoplist, and no stop word removal at all.
 Removing the high-frequency words in the dataset showed the highest performance increase compared to no stop word removal, and using a previously-derived stoplist hardly increased performance.
 However, \citeauthor{Sahlgren2008} did not try to weight the stop words, and only tried methods to remove them.
-So alongside looking at frequency weighting, previously derived, and no stop word removal, \textcite{Stanley2013}'s method of attenuating stop words based on Entropy was also explored.
+So alongside looking at frequency weighting, previously derived, and no stop word removal, \textcite{Stanley2013}'s method of attenuating stop words based on entropy was also explored.
 
 \subsubsection{Method}
 
@@ -1477,6 +1476,7 @@ Activations for context were computed by using the two methods for stop word rem
 
 \paragraph{Determining Frequency Cutoff}
 
+% FIXME: Cite is too recent
 The same previously-derived stoplist from \textcite{Salton2014} that \textcite{Sahlgren2008} used was used for this analysis,
 The same entropy weighting method using by \textcite{Stanley2013} was examined,
 and the same method of removing the high-frequency words from \citeauthor{Sahlgren2008} was used.
@@ -1500,7 +1500,7 @@ The plots for the standard deviations across tags that were used to identify the
   \label{figContextCutoffT}
 \end{figure}
 
-The original plot shows the size of the spikes when high-frequency words are removed.
+The original plot shows the size of the spikes when high-frequency words are not removed.
 The entropy plot shows how the size decreases by more than an order of magnitude when the entropy weighting measure is used.
 The cutoff for the frequency plot was chosen such that the plot looks similar to the entropy plot, with spikes around the same size.
 Note that using a predefined stoplist does not remove some of the remaining high-frequency words in these datasets, which hints that this method may not be ideal when model accuracy is examined.
@@ -1552,7 +1552,7 @@ This suggests that a simpler method (entropy weighting) can be used instead of t
 \subsubsection{Results for the Bayesian Model}
 
 Since accuracy measurements when using a predetermined list to remove stop words for the random permutation model were much lower than the frequency and entropy methods, this method was not examined for the Bayesian model.
-The results for the frequency and entropy techniques for the Bayesian model on the StackOverflow dataset are include in Figure \ref{figContextStopBSO}.
+The results for the frequency and entropy techniques for the Bayesian model on the StackOverflow dataset are included in Figure \ref{figContextStopBSO}.
 
 \begin{figure}[!htbp]
   \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-allWeightingsSOSji-crop.pdf}}}
@@ -1660,7 +1660,7 @@ At smaller document sizes, the random permutation model outperforms the Bayesian
 In other words, the Bayesian model needs larger co-occurrence matrices than the random permutation model to work properly.
 As the size of the dataset increases, the compression may start to lose crucial information, and the uncompressed Bayesian model should be used.
 As the size of the dataset decreases, the noise and crosstalk introduced by the compression for the random permutation model is actually beneficial, and the compressed random permutation model should be used. 
-This noise is beneficial because it helps soften spurious $S_{ji}$ values when the values for each individual cell in the co-occurrence matrix are still volatile, which happens at smaller document sizes.
+This noise is beneficial because it helps soften spurious $S_{ji}$ values when the counts for each individual cell in the co-occurrence matrix are still volatile, which happens at smaller document sizes.
 
 This result has important implications.
 The document size is rarely chosen, and more likely constrained by the number of documents in the dataset being studied.
@@ -1696,19 +1696,19 @@ Results for using different levels of compression for the random permutation mod
 In the figure, the full random permutation model that does not have the number of rows in the matrix specified is the \num{2048}-row matrix.
 This was done so that names in all of the plots would remain consistent across all plots, and the \num{2048}-row matrix is the size used for the random permutation model for all other results.
 The plot is also broken out for different size datasets used to build the co-occurrence matrix.
+
 Reducing compression to only 100 rows in the representation has a strong negative effect on accuracy.
 But \num{2048} rows is sufficient for these datasets, as increasing the number of rows to almost an order of magnitude higher (\num{10000}) has little to no positive impact on accuracy.
 
 Results are similar for Twitter.
+Figure \ref{figContextDimT} shows the same negative impact when reducing from \num{2048} to \num{100}, and little to no impact when increasing from \num{2048} to \num{10000}.
+This result is consistent across all document sizes used to build the co-occurrence matrix.
 
 \begin{figure}[!htbp]
   \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-dimBySizeT-crop.pdf}}}
   \caption{Effect of compression on random permutation model for Twitter}
   \label{figContextDimT}
 \end{figure}
-
-Figure \ref{figContextDimT} shows the same negative impact when reducing from \num{2048} to \num{100}, and little to no impact when increasing from \num{2048} to \num{10000}.
-This result is consistent across all document sizes used to build the co-occurrence matrix.
 
 \subsubsection{Discussion}
 
@@ -1753,13 +1753,13 @@ The log-odds transformation technique was tested for the random permutation mode
 Model accuracy results after using the log-odds transformation are included in Figures \ref{figContextLogoddsSO} and \ref{figContextLogoddsT}.
 
 \begin{figure}[!htbp]
-  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-logoddsSO-crop.pdf}}}
+  \scalebox{.6}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-logoddsSO-crop.pdf}}}
   \caption{Random permutation model accuracy when using log-odds transformation on context for StackOverflow}
   \label{figContextLogoddsSO}
 \end{figure}
 
 \begin{figure}[!htbp]
-  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-logoddsT-crop.pdf}}}
+  \scalebox{.6}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-logoddsT-crop.pdf}}}
   \caption{Random permutation model accuracy when using log-odds transformation on context for Twitter}
   \label{figContextLogoddsT}
 \end{figure}
@@ -1802,7 +1802,7 @@ The same $+2$ $-2$ range was used to test the window method on the Twitter datas
 Only the Twitter dataset was tested, since the StackOverflow dataset contains no word order information between words in the title and body of the post and the tags used for the post.
 The author chooses tags after filling out the title and body forms in the post, so the tags are never intermixed with words in the post like they are for Twitter.
 
-The same Twitter popular-users datasets and StackOverflow randomly-sampled datasets were used for testing.
+The same four Twitter popular-users datasets were used for testing.
 Both an ordered and orderless context component were created for the random permutation models.
 The orderless context component uses the same co-occurrence matrix used by the Bayesian model to create the representation, since the Bayesian model does not contain any order information.
 Models were tested that used only one of the three word order methods for the ordered context component, used only the orderless context component, used a combination of the two components, and combined context with prior. 
@@ -1835,7 +1835,7 @@ This can be seen by comparing the two-component model with only prior and orderl
 This was a surprising result.
 One of the main benefits discussed for the random permutation model is that it can easily incorporate word order information into the representation.
 But including word order information does not dramatically improve performance. 
-For the random permutation model, it is much more important to properly handle high-frequency stop words and include a prior component than it is to include word order information,
+For the random permutation model, it is much more important to properly handle low-predictor stop words and include a prior component than it is to include word order information,
 at least for the Twitter dataset tested in this study.
 
 The original BEAGLE model \parencite{Jones2007} actually showed only minimal improvement when incorporating word order as well.
@@ -1873,13 +1873,13 @@ Coefficients for each model component of the full models are included in Figures
 Error bars represent the standard deviation of coefficient values for each component.
 
 \begin{figure}[!htbp]
-  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-coeffStd-coeffSO-crop.pdf}}}
+  \scalebox{.6}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-coeffStd-coeffSO-crop.pdf}}}
   \caption{Coefficient values for full models for StackOverflow}
   \label{figContextCoeffSO}
 \end{figure}
 
 \begin{figure}[!htbp]
-  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-coeffStd-coeffT-crop.pdf}}}
+  \scalebox{.6}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-coeffStd-coeffT-crop.pdf}}}
   \caption{Coefficient values for full models for Twitter}
   \label{figContextCoeffT}
 \end{figure}
@@ -1919,13 +1919,13 @@ The four Twitter popular-hashtags datasets and the StackOverflow randomly-sample
 The results are included in Figures \ref{figContextPriorneededSO} and \ref{figContextPriorneededT}.
 
 \begin{figure}[!htbp]
-  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-priorAddSO-crop.pdf}}}
+  \scalebox{.6}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-priorAddSO-crop.pdf}}}
   \caption{Model accuracy for various word order methods for the random permutation model for Twitter}
   \label{figContextPriorneededSO}
 \end{figure}
 
 \begin{figure}[!htbp]
-  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-priorAddT-crop.pdf}}}
+  \scalebox{.6}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-priorAddT-crop.pdf}}}
   \caption{Model accuracy for various word order methods for the random permutation model for Twitter}
   \label{figContextPriorneededT}
 \end{figure}
@@ -1948,7 +1948,7 @@ then the prior component should at least generate unique predictive variance in 
 
 The same StackOverflow popular-users datasets used to test the prior component in isolation were used to test the prior component when context was added.
 However, since computing activations for the context component take an order of magnitude more wall-clock time than computing the prior component, not all observations could be included for the test.
-To reduce the observations, the most recent 50 posts from each user in the datasets were sampled.
+To reduce the observations, the most recent 50 posts from each user in the datasets were selected.
 The total number of users sampled was also reduced to 40 users for StackOverflow and 80 users for Twitter.
 Using the most recent observations for each user ensures that the observations tested have acquired the greatest amount of past tagging history in the datasets.
 So if a context-only model performs just as well as the full model in this case, it would be surprising.
@@ -1992,13 +1992,13 @@ So for each user, the co-occurrence matrix was created from their oldest posts, 
 Model accuracy when using a user-customized co-occurrence matrix for StackOverflow and Twitter is shown in Figures \ref{figPUCustomSO} and \ref{figPUCustomT}.
 
 \begin{figure}[!htbp]
-  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-userSjiSO-crop.pdf}}}
+  \scalebox{.6}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-userSjiSO-crop.pdf}}}
   \caption{Model accuracy with user-customized context component for StackOverflow}
   \label{figPUCustomSO}
 \end{figure}
 
 \begin{figure}[!htbp]
-  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-userSjiT-crop.pdf}}}
+  \scalebox{.6}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-userSjiT-crop.pdf}}}
   \caption{Model accuracy with user-customized context component for Twitter}
   \label{figPUCustomT}
 \end{figure}
@@ -2079,7 +2079,7 @@ However, there are possible behavioral studies that could be done to provide evi
 The largest differences between the Bayesian and vector-based models happen with small numbers of co-occurrence observations.
 The vector-based model begins to generate more accurate predictions sooner than the Bayesian models,
 since the noise introduced from the compression helps smooth out activation values until a larger number of co-occurrences are observed and the co-occurrence values stabilize.
-For a behavioral study, novel words could be introduced alongside the corpus of known words, and the participant could be asked to make retrievals of the novel words and known words as more novel words are introduced.
+For a behavioral study, novel words could be introduced alongside a corpus of known words, and the participant could be asked to make retrievals of the novel words and known words as more novel words are introduced.
 Both models would make different predictions about the rate at which activation values for the novel words stabilize relative to the known words, and such make different predictions about retrieval error rates over time.
 Learning a new language might be a domain where large amounts of these sorts of retrievals could be collected.
 For instance, the online site Duolingo might contain enough collective data about language learning and word translation to better tease apart the two context models.
