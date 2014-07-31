@@ -1564,11 +1564,11 @@ groupN <- function(n, d) {
 
 renameColDVName <- function(tbl) {
 	setkey(tbl, DVName)
-	mapping = c('topHashtagAcrossPriorStd', 'Standard Prior Model Relaxed Across Posts',
-		    'topHashtagPostPriorStd', 'Standard Prior Model',
-		    'topHashtagPostPriorStdDefaultD', 'Standard Prior Model at Default d=0.5',
-		    'topHashtagPostPriorOL2', 'Optimized Learning Model',
-		    'topHashtagAcrossPriorStdNoffset', 'Standard Prior Model Relaxed Across Posts w/o offset',
+	mapping = c('topHashtagAcrossPriorStd', 'Standard prior model relaxed across posts',
+		    'topHashtagPostPriorStd', 'Standard prior model',
+		    'topHashtagPostPriorStdDefaultD', 'Standard prior model at default d=0.5',
+		    'topHashtagPostPriorOL2', 'Optimized learning model',
+		    'topHashtagAcrossPriorStdNoffset', 'Standard prior model relaxed across posts w/o offset',
 		    makeLogregMapping(),
 		    makeStandardMappingBayes('', 'w/ entropy'),
 		    makeStandardMappingBayes('Freq', 'w/ freq'),
@@ -1751,7 +1751,8 @@ analyzePrior <- function(modelVsPredTbl) {
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostPriorOL2' & datasetName=='TFollowgt10Mr2' & d < 1])
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostPriorOL2' & datasetName=='SOQgt500r2' & d < 1])
 	resTbl = compareOptimalDs(tbl[DVName %in% c(paste0('topHashtagPostPriorStd', c('')), paste0('topHashtagPostPriorOL2', c(''))) & runNum == 2])
-	resTbl = compareOptimalAcc(tbl[DVName %in% c(paste0('topHashtagPostPriorStd', c('', 'DefaultD')), paste0('topHashtagPostPriorOL2', c(''))) & runNum == 2])
+	DVNames = c(paste0('topHashtagPostPriorStd', c('', 'DefaultD')), paste0('topHashtagPostPriorOL2', c('')))
+	resTbl = compareOptimalAcc(tbl[DVName %in% DVNames & runNum == 2])
 	resTbl[, mean(meanVal), by=list(DVName)]
 	resTbl
 	tbl
@@ -3618,9 +3619,9 @@ curWS <- function() {
 	withProf(runContext20g1s1(regen='useAlreadyLoaded'))
 	setLogLevel(2)
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelVsPred()))))
+	logregTbl = buildTablesLogreg(file_path_sans_ext(Filter(function(r) isContextRun(r), list.files(path=getDirLogreg()))))
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isPriorRun, list.files(path=getDirModelVsPred()))))
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isPUserRun, list.files(path=getDirModelVsPred()))))
-	logregTbl = buildTablesLogreg(file_path_sans_ext(Filter(function(r) isContextRun(r), list.files(path=getDirLogreg()))))
 	modelHashtagsTbls = buildTablesModelHashtags(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelHashtags()))))
 
 	modelHashtagsTbl = modelHashtagsTbls[["TContextPerm-20g1s1r1"]]
