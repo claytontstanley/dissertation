@@ -1226,6 +1226,24 @@ Comparing best-fit values will be more thoroughly tested when looking at the val
 
 \subsubsection{Aggregate Model Performance}
 
+The best-fit decay rate values were analyzed across all dataset slices.
+Aggregate best-fit decay rates were computed by taking the median of all user's best-fit decay rate values across all dataset slices.
+The median was used since there were users in the popular-users dataset that did not have enough observations to generate stable predictions, and best-fit decay rate values for these users could be as high as 20.
+Using the median effectively trims these unstable values from the sample, without having to define a cut point for an outlier removal process.
+
+Aggregate best-fit decay rate values for each model are included in Figure \ref{figPriorDecay}.
+Error bars represent the 95\% bootstrapped confidence interval of the median.
+
+\begin{figure}[!htbp]
+  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-d--crop.pdf}}}
+  \caption{Best-fit decay rate}
+  \label{figPriorDecay}
+\end{figure}
+
+Decay rate values that produced the most accurate model performance are lower for the optimized learning form (0.43) of $B_{i}$ compared to the standard form (0.80).
+The optimal values for optimized learning are near 0.5, which lines up with default value used in ACT-R.
+So the decay rate values for the standard form are slightly higher than the default values used in ACT-R, but the values found when optimized learning is used line up nicely with the ACT-R defaults.
+
 Finally, model accuracy was analyzed across all dataset slices for StackOverflow and Twitter.
 Accuracy for both sites is included in Figure \ref{figPriorAcc}. 
 Aggregate accuracy was computed by taking the mean of every user's model accuracy across all users in all dataset slices.
@@ -1241,23 +1259,10 @@ Accuracy for the standard form (0.35) is higher than the optimized learning form
 This makes sense given that the standard form does not assume equal presentation rate for each chunk, and hashtags on Twitter in particular show trends of high rate of use and then shift to low rate of use. 
 The standard form of $B_{i}$ is able to more accurately account for these trends.
 
-The best-fit decay rate values were also analyzed across all dataset slices.
-Aggregate best-fit decay rates were computed by taking the median of all user's best-fit decay rate value across all dataset slices.
-The median was used since there were users in the popular-users dataset that did not have enough observations to generate stable predictions, and best-fit decay rate values for these users could be as high as 20.
-Using the median effectively trims these unstable values from the sample, without having to define a cut point and go through an outlier removal process.
-
-Aggregate best-fit decay rate values for each model are included in Figure \ref{figPriorDecay}.
-Error bars represent the 95\% bootstrapped confidence interval of the median.
-
-\begin{figure}[!htbp]
-  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-d--crop.pdf}}}
-  \caption{Best-fit decay rate}
-  \label{figPriorDecay}
-\end{figure}
-
-Decay rate values that produced the most accurate model performance are lower for the optimized learning form (0.43) of $B_{i}$ compared to the standard form (0.80).
-The optimal values for optimized learning are near 0.5, which lines up with default value used in ACT-R.
-So the decay rate values for the standard form are slightly higher than the default values used in ACT-R, but the values found when optimized learning is used line up nicely with the ACT-R defaults.
+ACT-R sets the default decay rate value to 0.5, and the best-fit value for the standard form is higher (0.8) for these datasets.
+The figure shows that although model accuracy does improve for the standard form when increasing the decay rate parameter from 0.5 to the optimal value,
+that percentage improvement is not as large as the improvement gained from using the standard form compared to the optimized learning form.
+Nonetheless, model accuracy is highest when both the standard form is used and the decay rate value is increased. 
 
 \subsection{Discussion}
 
@@ -1277,10 +1282,6 @@ Since this becomes less of an issue as time progresses and hardware speed increa
 It may be the case that the optimized learning form of the equation is no longer computationally necessary.
 And if the standard form is used as the default (or simply tried in another experiment),
 the results from this study suggest that the optimal decay rate value should be set slightly higher (0.8) than the default when optimized learning is used (0.5).
-
-That said, comparing the effect size between changing the decay rate value and using the standard form,
-model accuracy improves much more when the standard form replaces the optimized learning form than when the decay rate value is increased from 0.5 to 0.8.
-For these datasets, it is much more important to use the standard form of the equation than it is to adjust the decay rate, although model accuracy does slightly improve if a higher decay rate is chosen with the standard form.
 
 \section{Combining Predictors}
 
