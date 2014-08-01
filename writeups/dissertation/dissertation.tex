@@ -5,6 +5,9 @@
 \usepackage[american]{babel}
 \usepackage[utf8]{inputenc}
 
+% Default apa6 formatting for a CI
+\newcommand{\CI}[2]{95\% CI [#1, #2]}
+
 % Single space after period (Mike prefers)
 \frenchspacing
 
@@ -414,7 +417,7 @@ The strength of association between two words is measured by the cosine of the t
 Usually information is lost when the data are restructured into a smaller set of latent dimensions.
 However, it was shown that this process actually improves prediction and reduces noise by allowing the frequency count of highly similar concepts (words) to be pooled together and represented by a single dimension.
 \textcite{Landauer1997} tested the LSA model on the Test of English as a Foreign Language (TOEFL) task of choosing the best of four possible synonyms to a target word.
-Model results were on par with a large sample of applicants to american universities from non-English speaking countries (64.4\% compared to 64.5\%).
+Model results were on par with a large sample of applicants to american universities from non-English speaking countries (\num{64.4}\% compared to \num{64.5}\%).
 Model performance also improved when the original dimensionality of the data was reduced, but only up to a point.
 Afterwards further reductions in the dimensionality of the data began to degrade performance.
 
@@ -432,8 +435,8 @@ Although the LSA model has been shown to perform well as a way to measure simila
 This means that the model does not account for or pay attention to word order when building the base word by document matrix or consequently, when performing the SVD dimension reduction.
 Other models that can account for word order have been shown to perform better than ``bag of words'' models on tasks that do not even appear to require grammatical structure such as word order to do well.
 For example, \textcite{Jones2007} compared a vector-based model called BEAGLE directly to LSA, training and testing both models on the same corpus used in \textcite{Landauer1997}.
-The context-only BEAGLE model (no word order) performed nearly equivalent to the LSA model at the task (55.6\% vs. 55.3\%).
-However, even in a multiple-choice domain where the task is to identify synonyms (very little grammatical structure in the task), adding word order when training the model improved task performance to 57.5\%.
+The context-only BEAGLE model (no word order) performed nearly equivalent to the LSA model at the task (\num{55.6}\% vs. \num{55.3}\%).
+However, even in a multiple-choice domain where the task is to identify synonyms (very little grammatical structure in the task), adding word order when training the model improved task performance to \num{57.5}\%.
 It seems reasonable to expect that task performance will improve much more on tasks where word order is used (e.g., generating a hashtag in the middle of a sentence when composing a tweet).
 
 \subsubsection{Scaling Issues}
@@ -451,7 +454,7 @@ This was one of the primary motivating reasons that LSA was developed in the fir
 However, once the dataset surpasses in size what is computationally feasible with LSA, the much simpler PMI measure can still be computed, and the performance for PMI becomes on par and even surpasses that of LSA.
 \textcite{Budiu2007} also trained the PMI measure on the much larger Stanford WebBase corpus and tested the measure on the TOEFL.
 This PMI model increased accuracy from 23\% to 51\% when training the dataset on the smaller TASA compared to the larger Stanford dataset.
-Further, when \textcite{Turney2001} trained the PMI measure on the even larger AltaVista index of 350 million webpages, the accuracy on the TOEFL increased to 73.75\%, which is 10\% higher than the TASA-trained LSA.
+Further, when \textcite{Turney2001} trained the PMI measure on the even larger AltaVista index of 350 million webpages, the accuracy on the TOEFL increased to \num{73.75}\%, which is 10\% higher than the TASA-trained LSA.
 This suggests that simpler models may be preferred to more complex (yet more accurate) models in large-scale domains, since the simpler models scale and can utilize all available information to generate predictions.
 
 \subsubsection{Cost of Incremental Updating}
@@ -531,8 +534,8 @@ Since Bayesian representations have been shown to scale to over hundreds of mill
 \textcite{Jones2007} created the BEAGLE vector-based memory representation.
 Each memory vector ($m_{i}$) is a summed representation of unordered and ordered word co-occurrences ($c_{i} + o_{i}$).
 This model uses circular convolution and circular correlation as a way to encode and decode word order.
-BEAGLE performed similar to LSA when trained on the TASA and tested on the TOEFL (55.6\% compared to 55.3\%).
-Also, BEAGLE with unordered context and word order was more correlated to the WordNet synonym database than LSA (-.311 compared to -.165).
+BEAGLE performed similar to LSA when trained on the TASA and tested on the TOEFL (\num{55.6}\% compared to \num{55.3}\%).
+Also, BEAGLE with unordered context and word order was more correlated to the WordNet synonym database than LSA (\num{-.311} compared to \num{-.165}).
 Further, it was shown that incorporating word order information into the same representation resulted in minimal data loss (less than 1 percent of total predictive variance).
 This model provided an efficient algorithm for using a single representation for unordered and ordered information that showed performance similar to if not better than LSA.
 
@@ -1220,7 +1223,7 @@ each user's best decay rate value was taken and the results are plotted in histo
   }%
 \end{figure}
 
-The best-fit values are close to the 0.5 default value used in ACT-R when the optimized learning form is used.
+The best-fit values are close to the \num{0.5} default value used in ACT-R when the optimized learning form is used.
 Comparing across optimized learning and the standard form, the best-fit values for the standard form are slightly higher for both the StackOverflow and Twitter dataset slices.
 Comparing best-fit values will be more thoroughly tested when looking at the values across all dataset slices.
 
@@ -1239,8 +1242,8 @@ Error bars represent the 95\% bootstrapped confidence interval of the median.
   \label{figPriorDecay}
 \end{figure}
 
-Decay rate values that produced the most accurate model performance are lower for the optimized learning form (0.43) of $B_{i}$ compared to the standard form (0.80).
-The optimal values for optimized learning are near 0.5, which lines up with default value used in ACT-R.
+Decay rate values that produced the most accurate model performance are lower for the optimized learning form (\num{0.43}) of $B_{i}$ compared to the standard form (\num{0.80}).
+The optimal values for optimized learning are near \num{0.5}, which lines up with default value used in ACT-R.
 So the decay rate values for the standard form are slightly higher than the default values used in ACT-R, but the values found when optimized learning is used line up nicely with the ACT-R defaults.
 
 Finally, model accuracy was analyzed across all dataset slices for StackOverflow and Twitter.
@@ -1254,12 +1257,12 @@ All confidence intervals are 95\% bootstrapped for the mean.
   \label{figPriorAcc}
 \end{figure}
 
-Accuracy for the standard form (0.35) is higher than the optimized learning form (0.30).
+Accuracy for the standard form (\num{0.35}) is higher than the optimized learning form (\num{0.30}).
 This makes sense given that the standard form does not assume equal presentation rate for each chunk, and hashtags on Twitter in particular show trends of high rate of use and then shift to low rate of use. 
 The standard form of $B_{i}$ is able to more accurately account for these trends.
 
-ACT-R sets the default decay rate value to 0.5, and the best-fit value for the standard form is higher (0.8) for these datasets.
-The figure shows that although model accuracy does improve for the standard form when increasing the decay rate parameter from 0.5 to the optimal value,
+ACT-R sets the default decay rate value to \num{0.5}, and the best-fit value for the standard form is higher (\num{0.8}) for these datasets.
+The figure shows that although model accuracy does improve for the standard form when increasing the decay rate parameter from \num{0.5} to the optimal value,
 that percentage improvement is not as large as the improvement gained from using the standard form compared to the optimized learning form.
 Nonetheless, model accuracy is highest when both the standard form is used and the decay rate value is increased. 
 
@@ -1280,7 +1283,7 @@ Nonetheless, the only real reason not to use the standard form is due to computa
 Since this is becoming less of an issue as time progresses and hardware speed increases, it may be time to reconsider the default form of base-level learning used in ACT-R.
 It may be the case that the optimized learning form of the equation is no longer computationally necessary.
 And if the standard form is used as the default (or simply tried in another experiment),
-the results from this study suggest that the optimal decay rate value should be set slightly higher (0.8) than the default when optimized learning is used (0.5).
+the results from this study suggest that the optimal decay rate value should be set slightly higher (\num{0.8}) than the default when optimized learning is used (\num{0.5}).
 
 \section{Combining Predictors}
 
@@ -1521,7 +1524,8 @@ Plots for the three methods of handling stop words for the random permutation mo
 \end{figure}
 
 The results show that model accuracy improves if stop words are handled in any of the three ways (predefined stoplist filtering, entropy weighting, and frequency filtering).
-Using a predefined stoplist makes the smallest improvement, while the entropy and frequency techniques improve performance the most, and frequency shows a slight edge over entropy.
+Using a predefined stoplist makes the smallest improvement (\num{.45} to \num{.49}), while the entropy (\num{.60}) and frequency (\num{.63}) techniques improve performance the most,
+and frequency shows a slight edge over entropy.
 However, using the frequency-weighting technique produces more noise in accuracy measurements compared to the other techniques, at least when tested on words in the title of StackOverflow posts.
 
 The three stop word techniques were then tested for the random permutation model on the Twitter dataset, and the results are included in Figure \ref{figContextStopRPT}.
@@ -1532,8 +1536,8 @@ The three stop word techniques were then tested for the random permutation model
   \label{figContextStopRPT}
 \end{figure}
 
-For the random permutation model for Twitter, the entropy weighting technique is the best method for handling stop words.
-Removing stop-words based on a predetermined list actually decreases accuracy, and using data-driven frequency filtering has only a small to no effect.
+For the random permutation model for Twitter, the entropy weighting technique is the best method for handling stop words (\num{.25} to \num{.26}).
+Removing stop-words based on a predetermined list actually decreases accuracy (\num{.25} to \num{.23}), and using data-driven frequency filtering has only a small to no effect.
 
 \subsubsection{Discussion}
 
@@ -1560,8 +1564,8 @@ The results for the frequency and entropy techniques for the Bayesian model on t
   \label{figContextStopBSO}
 \end{figure}
 
-The results show that entropy weighting produces the most accurate results.
-Also, accuracy actually decreases when using frequency filtering (compared to no filtering) for the Bayesian model.
+The results show that entropy weighting produces the most accurate results (\num{.61} to \num{.63}).
+Also, accuracy actually decreases when using frequency filtering (compared to no filtering) (\num{.61} to \num{.56}) for the Bayesian model.
 So entropy weighting is the clear winner in this case.
 
 Similar results are found when the Bayesian model is tested on the Twitter dataset.
@@ -1572,7 +1576,7 @@ Similar results are found when the Bayesian model is tested on the Twitter datas
   \label{figContextStopBT}
 \end{figure}
 
-Figure \ref{figContextStopBT} shows that entropy weighting is again the best performer, and frequency filtering decreases performance relative to no filtering.
+Figure \ref{figContextStopBT} shows that entropy weighting is again the best performer (\num{.29} to \num{.32}), and frequency filtering decreases performance relative to no filtering (\num{.29} to \num{.28}).
 
 \subsubsection{Discussion}
 
@@ -1697,12 +1701,14 @@ In the figure, the full random permutation model that does not have the number o
 This was done so that names in all of the plots would remain consistent across all plots, and the \num{2048}-row matrix is the size used for the random permutation model for all other results.
 The plot is also broken out for different size datasets used to build the co-occurrence matrix.
 
-Reducing compression to only 100 rows in the representation has a strong negative effect on accuracy.
-But \num{2048} rows is sufficient for these datasets, as increasing the number of rows to almost an order of magnitude higher (\num{10000}) has little to no positive impact on accuracy.
+Reducing compression to only 100 rows in the representation has a strong negative effect on accuracy (\num{.60} to \num{.55} for the \num{1000000} document dataset size).
+But \num{2048} rows is sufficient for these datasets,
+as increasing the number of rows to almost an order of magnitude higher (\num{10000}) has little to no positive impact on accuracy (\num{.60} to \num{.60} for the \num{1000000} document size). 
 
 Results are similar for Twitter.
-Figure \ref{figContextDimT} shows the same negative impact when reducing from \num{2048} to \num{100}, and little to no impact when increasing from \num{2048} to \num{10000}.
-This result is consistent across all document sizes used to build the co-occurrence matrix.
+Figure \ref{figContextDimT} shows the same negative impact when reducing from \num{2048} to \num{100} (\num{.26} to \num{.24} for the \num{3000000} document size),
+and little to no impact when increasing from \num{2048} to \num{10000} (\num{.26} to \num{.26} at \num{3000000}).
+This results are consistent across all document sizes used to build the co-occurrence matrix.
 
 \begin{figure}[!htbp]
   \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-dimBySizeT-crop.pdf}}}
@@ -1764,7 +1770,7 @@ Model accuracy results after using the log-odds transformation are included in F
   \label{figContextLogoddsT}
 \end{figure}
 
-Using the log-odds transformation technique has little to no effect on model accuracy for both StackOverflow and Twitter.
+Using the log-odds transformation technique has a small effect on model accuracy for StackOverflow (\num{.45} to \num{.47}) and minimal to no effect on Twitter (\num{.25} to \num{.25}).
 When the technique is used and accuracy is examined for a model with only a single predictor, the transformation does not change accuracy.
 When predictors are combined and the full model is examined, the transformation is in the direction of slightly increasing accuracy, at least for the StackOverflow dataset.
 However, any improvement when using the transformation is minimal.
@@ -1930,8 +1936,8 @@ The results are included in Figures \ref{figContextPriorneededSO} and \ref{figCo
   \label{figContextPriorneededT}
 \end{figure}
 
-For both the Bayesian and random permutation models, accuracy remains the same when the prior component is removed for StackOverflow.
-Accuracy does dramatically decrease for Twitter when the prior is removed, however.
+For StackOverflow, accuracy remains the same when the prior component is removed for both the Bayesian (\num{.63} to \num{.63}) and random permutation (\num{.63} to \num{.63}) models.
+Accuracy does dramatically decrease for Twitter when the prior is removed, however (\num{.32} to \num{.14} for Bayesian, \num{.25} to \num{.12} for random permutation).
 
 \subsubsection{Discussion}
 
@@ -1964,7 +1970,7 @@ The results comparing the full model to a context-only only model for the StackO
 \end{figure}
 
 In this case, past tag history does contain unique variance for accurately predicting tag use.
-Accuracy improves for both the Bayesian and random permutation models when the prior model component is combined with context compared to context alone.
+Accuracy improves for both the Bayesian (\num{.51} to \num{.63}) and random permutation (\num{.47} to \num{.58}) models when the prior model component is combined with context compared to context alone.
 
 \subsubsection{Discussion}
 

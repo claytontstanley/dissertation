@@ -1947,6 +1947,18 @@ analyzeContext <- function(modelVsPredTbl) {
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweet', 'PriorStdTweetFrentropy', 'Tweet',
 				       'TweetNentropy', 'TweetFreq', 'TweetFrentropy', 'PriorStdTweetNentropy', 'PriorStdTweetFreq'))
 	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='allWeightingsTSji', groupCol='dsetGroup')
+	# RESULT: Bayes and RP with frequency cutoff scales; RP with entropy saturates for SO
+	# SO Entropy all sizes
+	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleBody', 
+				       'PriorStdTitleOrderlessBodyOrderless',
+				       'PriorStdTitleOrderlessEntropyBodyOrderlessEntropy',
+				       'PriorStdTitleOrderlessFreqBodyOrderlessFreq'))
+	compareMeanDVDefault(tbl[dsetType == 'stackoverflow' & DVName %in% DVNames & sizeNum != 2], acc, figName='freqVsEntropyBySizeSO', groupCol='sizeNum')
+	# T Entropy all sizes
+	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweet',
+				       'PriorStdTweetOrderEntropyTweetOrderlessEntropy',
+				       'PriorStdTweetOrderFreqTweetOrderlessFreq'))
+	compareMeanDVDefault(tbl[dsetType == 'twitter' & DVName %in% DVNames], acc, figName='freqVsEntropyBySizeT', groupCol='sizeNum')
 	# RESULT: Increasing rows in matrix does not dramatically improve performance, even at different size datasets; entropy and freq cutoff is much more important for RP
 	# SO Entropy all sizes
 	DVNames = asTopHashtagAcross(c('PriorStd',
@@ -1960,18 +1972,6 @@ analyzeContext <- function(modelVsPredTbl) {
 				       'PriorStdTweetOrderSmdimTweetOrderlessSmdim',
 				       'PriorStdTweetOrderLgdimTweetOrderlessLgdim'))
 	compareMeanDVDefault(tbl[dsetType == 'twitter' & DVName %in% DVNames], acc, figName='dimBySizeT', groupCol='sizeNum')
-	# RESULT: Bayes and RP with frequency cutoff scales; RP with entropy saturates for SO
-	# SO Entropy all sizes
-	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleBody', 
-				       'PriorStdTitleOrderlessBodyOrderless',
-				       'PriorStdTitleOrderlessEntropyBodyOrderlessEntropy',
-				       'PriorStdTitleOrderlessFreqBodyOrderlessFreq'))
-	compareMeanDVDefault(tbl[dsetType == 'stackoverflow' & DVName %in% DVNames & sizeNum != 2], acc, figName='freqVsEntropyBySizeSO', groupCol='sizeNum')
-	# T Entropy all sizes
-	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweet',
-				       'PriorStdTweetOrderEntropyTweetOrderlessEntropy',
-				       'PriorStdTweetOrderFreqTweetOrderlessFreq'))
-	compareMeanDVDefault(tbl[dsetType == 'twitter' & DVName %in% DVNames], acc, figName='freqVsEntropyBySizeT', groupCol='sizeNum')
 	# RESULT: Logodds technique works
 	# SO compare entropy w/ logodds to entropy
 	DVNames = asTopHashtagAcross(c('PriorStd',
