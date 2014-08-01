@@ -1784,15 +1784,16 @@ analyzePUser <- function(modelVsPredTbl) {
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleBody', 'TitleBody', 'Body', 'Title',
 				       'TitleOrderlessEnthymanBodyOrderlessEnthyman',
 				       'PriorStdTitleOrderlessEnthymanBodyOrderlessEnthyman'))
-	compareMeanDVDefault(tbl[dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='priorAddPUserSO')
-	# RESULT: User sji is not very helpful for Twitter, and prior is useful again
-	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweetUsercontext', 'PriorStdTweetOrderlessEnthyser', 'TweetUsercontext', 'TweetOrderlessEnthyser'))
-	compareMeanDVDefault(tbl[dsetType == 'twitter' & DVName %in% DVNames], acc, figName='userSjiSO')
+	resTbl = compareMeanDVDefault(tbl[dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='priorAddPUserSO')
+	resTbl[, mean(meanVal), by=DVName]
 	# RESULT: User sji is much less helpful than standard sji for StackOverflow
 	DVNames = asTopHashtagAcross(c('TitleOrderlessEnthyser', 'TitleUsercontext', 'TitleOrderlessEnthyman', 'TitleOrderlessEnthyser', 'Title',
 				       'PriorStdTitleOrderlessEnthyserBodyOrderlessEnthyser', 'PriorStdTitleBody', 'PriorStdTitleOrderlessEnthymanBodyOrderlessEnthyman',
 				       'PriorStdTitleUsercontextBodyUsercontext'))
-	compareMeanDVDefault(tbl[dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='userSjiT')
+	resTbl = compareMeanDVDefault(tbl[dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='userSjiT')
+	# RESULT: User sji is not very helpful for Twitter, and prior is useful again
+	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweetUsercontext', 'PriorStdTweetOrderlessEnthyser', 'TweetUsercontext', 'TweetOrderlessEnthyser'))
+	resTbl = compareMeanDVDefault(tbl[dsetType == 'twitter' & DVName %in% DVNames], acc, figName='userSjiSO')
 	# RESULT: .7 d is better for T than SO, but effect is small.
 	# Also once additional predictors are added to the model, the effect diminishes.
 	# SO and T compare two d values	
