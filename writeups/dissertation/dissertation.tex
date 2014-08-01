@@ -1,5 +1,7 @@
 \documentclass[man,floatsintext,donotrepeattitle]{apa6}
 
+
+\usepackage[nodayofweek]{datetime}% http://ctan.org/pkg/datetime
 \usepackage{xfrac}
 \usepackage{textcomp}
 \usepackage[american]{babel}
@@ -90,6 +92,67 @@
 
 \leftheader{Beitzel}
 
+\def\committee{
+  Joseph R. Cavallaro, Chair \\
+  Professor of Electrical and Computer Engineering and Computer Science \and
+  Behnaam Aazhang \\
+  J.S. Abercrombie Professor of Electrical and Computer Engineering \and
+  Scott Rixner\\
+  Associate Professor of Electrical and Computer Engineering and Computer Science \and
+  Ashutosh Sabharwal\\
+  Assistant Professor of Electrical and Computer Engineering \\
+}
+
+% Replace the title page in the apa6 style sheet with the title page from the Rice template
+% The title page style was taken from Rice University LaTeX PhD template: http://scholarship.rice.edu/handle/1911/21747
+% The following code for the abstract page was taken from the apa6 \maketitle command.
+\makeatletter
+\def\maketitle{
+  \begin{titlepage}
+    \singlespacing
+    \null
+    \setcounter{page}{1}
+    \vfill
+    \vbox to 0pt{\vss\vbox to 8.75in{\parskip 0pt \parindent 0pt\centering
+      {\large \uppercase\expandafter{Rice University} \par} \vskip 0pt plus 3fil
+      {\Large \bf \@title \par} \vskip 0pt plus 1.3fil
+      {\large by \par} \vskip 0pt plus 1fil
+      {\large \bf \@author \par} \vskip 0pt plus 3fil
+      {\large \sc A Thesis Submitted \\
+	in Partial Fulfillment of the \\
+      Requirements for the Degree \par} \vskip 0pt plus 1.1fil
+      {\large \bf Doctor of Philosophy \par} \vskip 0pt plus 4.5fil
+      \begingroup
+      \leftskip .5\textwidth \rightskip 0pt plus 1fil
+      {\sc Approved, Thesis Committee: \par} \vskip 2.5em
+      \moveright\leftskip\vbox{\hrule width \leftskip}
+      \def\and{\par \vskip 2.25em minus 1em\moveright\leftskip\vbox{\hrule width \leftskip}}
+      \committee
+      \par \endgroup
+      \vskip 0pt plus 2fil
+    {\large Houston, TX \par} \vskip 0pt plus .8fil
+    {\large \monthnameenglish, \number\year \par}
+  }}
+  \doublespacing
+  \newpage
+  %BDB\hyphenpenalty 10000
+  \fussy
+  \@ifundefined{@abstract}{}{%
+    \section{\normalfont\normalsize\abstractname}% BDB
+    \noindent\@abstract\par% BDB
+    \@ifundefined{@keywords}{}{%
+      \setlength{\parindent}{0.4in}% BDB
+      \indent\textit{\keywordname:} \@keywords%
+    }%
+    \newpage
+  }
+  \@ifundefined{def@donotrepeattitle}{
+    \section{\protect\normalfont{\@title}}
+  }{}%
+  \raggedright%
+  \setlength{\parindent}{0.4in}%
+\end{titlepage}}
+\makeatother
 
 %\keywords{}
 
