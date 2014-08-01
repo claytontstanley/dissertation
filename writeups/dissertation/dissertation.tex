@@ -1406,7 +1406,8 @@ The random permutation models are represented as ``RP'', Bayesian models as ``Ba
 So, for example, the ``standard prior model relaxed across posts without offset'' means that only the prior model component was used, and the offset for that component was not subtracted off when determining activation.
 As another example, the ``Bayes only orderless context'' means that only the context component of the Bayesian model was used (along with the offset), and that no order information was used for that contextual component term.
 
-Looking across the plots, including the offset significantly increases model accuracy, for all models, terms, and sites.
+Looking across the plots, including the offset significantly increases model accuracy, for all models, terms, and sites, except that the full Bayesian model without an offset was slightly more accurate on Twitter
+(\num{.53} to \num{.60} and \num{.22} to \num{.45} for Bayesian and random permutation for StackOverflow, \num{.31} to \num{.29} and \num{.24} to \num{.25} for Bayesian and random permutation for Twitter).
 Accuracy is improved even when only a single term is used.
 Although in this case the weight of the term is irrelevant (only one term, weighting for that term does not matter),
 using an offset still improves accuracy since the offset term ensures that only a small number of tags per posts are predicted by the model to be the chosen tags. 
@@ -2011,15 +2012,16 @@ Model accuracy when using a user-customized co-occurrence matrix for StackOverfl
 
 The results compare accuracy for models that use a global co-occurrence and user-specific co-occurrence matrix.
 For StackOverflow, model accuracy for the user-specific co-occurrence matrix (labeled as ``user sji'') can be compared against the default global co-occurrence matrix.
-Accuracy decreases dramatically when a user-specific co-occurrence matrix is used.
+Accuracy decreases dramatically when a user-specific co-occurrence matrix is used for both the Bayesian (\num{.64} to \num{.35}) and random permutation (\num{.58} to \num{.36}) models.
 
 The results are similar for Twitter.
 However, the entire dataset is not available for Twitter, so a global co-occurrence matrix condition can not be tested,
 since the popular-users dataset samples across a wide range of hashtags, and due to Twitter's API restrictions it would be infeasible to collect all posts that use each of the hashtags in the dataset.
 But user-specific co-occurrence matrices can be built, since the popular-users dataset does contain all context and hashtag observations for each user.
 
-Model accuracy when only the single user-customized context predictor is used is relatively poor, and the prior term is a much better predictor.
-Further, when this component is combined with the prior component, model performance improves only slightly over performance when only the prior is used.
+Model accuracy when only the single user-customized context predictor is used is relatively poor (\num{.17} and \num{.21} for Bayesian and random permutation),
+and the prior term is a much better predictor (\num{.37}).
+Further, when this component is combined with the prior component, model performance improves only slightly over performance when only the prior is used (\num{.37} to \num{.39} for both the Bayesian and random permutation).
 
 \subsubsection{Discussion}
 
@@ -2038,6 +2040,13 @@ So building a stable context component requires a much larger set of data than t
 That said, if a user only chooses a small set of tags (so the tag space is small), and computing a global co-occurrence matrix is infeasible (e.g., with the Twitter popular-users dataset), 
 then it may be worthwhile to add the user-custom context model component as an additional predictor.
 As was shown for Twitter, model accuracy can slightly improve over a model that just uses a custom prior, even when the co-occurrence matrix only contains around 100 posts.
+
+Further, if the number of co-occurrences is small, and a user-custom co-occurrence matrix is used, it may be advantageous to use the compressed random permutation model instead of the uncompressed Bayesian model.
+For the Twitter popular-users dataset, only a user-custom co-occurrence matrix could be built, and when this matrix is used the compressed random permutation model performed better than the uncompressed Bayesian model.
+When the global co-occurrence matrix was removed from the StackOverflow dataset, and a user-custom matrix was used instead, the accuracy for the random permutation model decreased less than the Bayesian model. 
+This provides further evidence showing that there is an interaction between dataset size and optimal model:
+At lower numbers of co-occurrences the compressed random permutation model is able to perform better than the Bayesian model,
+and the Bayesian model surpasses the compressed model at higher co-occurrence counts once the cells in the full co-occurrence matrix stabilize. 
 
 \section{General Discussion}
 
