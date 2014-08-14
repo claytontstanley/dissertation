@@ -1346,7 +1346,7 @@ So it may be worthwhile to use the standard form instead of the optimized learni
 However, this should not be taken as a strong recommendation,
 since the performance benefits seen in this study could simply be due to the fact that the declarative memory retrievals span across a large period of time, which is not the case for all tasks.
 Nonetheless, the only real reason not to use the standard form is due to computational resource limitations.
-Since this is becoming less of an issue as time progresses and hardware speed increases, it may be time to reconsider the default form of base-level learning used in ACT-R.
+Since this is becoming less of an issue as hardware speed increases, it may be time to reconsider the default form of base-level learning used in ACT-R.
 It may be the case that the optimized learning form of the equation is no longer computationally necessary.
 And if the standard form is used as the default (or simply tried in another experiment),
 the results from this study suggest that the optimal decay rate value should be set slightly higher (\num{0.8}) than the default when optimized learning is used (\num{0.5}).
@@ -1411,7 +1411,8 @@ since the optimal weights of the terms are no longer needed when computing the o
 
 Model accuracy was tested on the popular-hashtags dataset for Twitter and a random sample of posts across the entire StackOverflow dataset.
 For each of the four Twitter popular-hashtags datasets, model retrievals were done across 15 runs and 500 posts within each run.
-For the StackOverflow dataset, 5 runs of 100 posts were used, since the results for StackOverflow are more stable and retrievals take more wall-clock time for this dataset due to the size of the co-occurrence matrix.
+For the StackOverflow randomly-sampled dataset, 5 runs of 100 posts were used,
+since the results for StackOverflow are more stable and retrievals take more wall-clock time for this dataset due to the size of the co-occurrence matrix.
 All runs contained different posts, and all posts used for runs were not used to generate the co-occurrence matrix for the two retrieval models.
 
 \subsubsection{Computing Prior}
@@ -1451,7 +1452,7 @@ The results across the four Twitter datasets were collected together, and the av
 
 \subsubsection{Results}
 
-The impact of adding the offset to each of the models for StackOverflow and Twitter are included in Figures \ref{figContextOffsetSO} and \ref{figContextOffsetT}.
+The impact of adding the offset to each of the models for StackOverflow and Twitter is shown in Figures \ref{figContextOffsetSO} and \ref{figContextOffsetT}.
 The error bars represent the 95\% bootstrapped confidence interval of the mean model accuracy across all runs in dataset.
 
 \begin{figure}[!htbp]
@@ -1469,11 +1470,12 @@ The error bars represent the 95\% bootstrapped confidence interval of the mean m
 In both plots, if the model name includes ``full'' then all model components are included.
 When they are enumerated, then at least one of the components is left out.
 The random permutation models are represented as ``RP'', Bayesian models as ``Bayes'', and they are plotted alongside each other so that comparisons across the two model types can be done easily.
-So, for example, the ``standard prior model relaxed across posts without offset'' means that only the prior model component was used, and the offset for that component was not subtracted off when determining activation.
+So, for example, the ``standard prior model relaxed across posts without offset'' means that only the prior model component was used and the offset for that component was not subtracted off when determining activation.
 As another example, the ``Bayes only orderless context'' means that only the context component of the Bayesian model was used (along with the offset), and that no order information was used for that contextual component term.
 
-Looking across the plots, including the offset significantly increases model accuracy, for all models, terms, and sites, except that the full Bayesian model without an offset was slightly more accurate on Twitter
-(\num{.53} to \num{.60} and \num{.22} to \num{.45} for Bayesian and random permutation for StackOverflow, \num{.31} to \num{.29} and \num{.24} to \num{.25} for Bayesian and random permutation for Twitter).
+Looking across the plots, including the offset significantly increases model accuracy, for all models, terms, and sites
+(\num{.53} to \num{.60} and \num{.22} to \num{.45} for Bayesian and random permutation for StackOverflow, \num{.31} to \num{.29} and \num{.24} to \num{.25} for Bayesian and random permutation for Twitter),
+except that the full Bayesian model without an offset was slightly more accurate on Twitter.
 Accuracy is improved even when only a single term is used.
 Although in this case the weight of the term is irrelevant (only one term, weighting for that term does not matter),
 using an offset still improves accuracy since the offset term ensures that only a small number of tags per posts are predicted by the model to be the chosen tags. 
@@ -1506,8 +1508,9 @@ This was to ensure that model results could be interpreted as effects that were 
 \subsubsection{Method}
 
 The four subsets were collected across a period of one month.
+Each was collected sequentially, and about one subset was collected per week.
 The hashtags used in each subset were chosen by scraping a site that published the current trending hashtags for each city.
-Hashtags for each US city were collected, and then 400 were randomly sampled from this set.
+Before starting to collect for each subset, the current trending popular hashtags for each US city were collected, and then 400 were randomly sampled from this set.
 Only 400 were selected since this is the maximum that the Twitter API can monitor at one time.
 
 \subsubsection{Results}
@@ -1535,7 +1538,7 @@ the results from this study cannot by themselves be used to answer this question
 \textcite{Sahlgren2008} looked at several ways to handle the commonly-occurring stop words for the random permutation model:
 A data-driven frequency-weighted approach was tried, along with using a previously-derived stoplist, and no stop word removal at all.
 Removing the high-frequency words in the dataset showed the highest performance increase compared to no stop word removal, and using a previously-derived stoplist hardly increased performance.
-However, \citeauthor{Sahlgren2008} did not try to weight the stop words, and only tried methods to remove them.
+However, \citeauthor{Sahlgren2008} did not try to weight the stop words and only tried methods to remove them.
 So alongside looking at frequency weighting, previously derived, and no stop word removal, \textcite{Stanley2013}'s method of attenuating stop words based on entropy was also explored.
 
 \subsubsection{Method}
@@ -1544,11 +1547,11 @@ The runs from the Twitter popular-hashtags and StackOverflow randomly-sampled da
 Both the random permutation and Bayesian models were tested.
 Activations for context were computed by using the two methods for stop word removal, the entropy weighting method, and no method (i.e., no stop word processing).
 
-\paragraph{Determining Frequency Cutoff}
-
 The same 571-word Cornell SMART stoplist used by \textcite{Sahlgren2008} was also used for this analysis,
 The same entropy weighting method using by \textcite{Stanley2013} was examined,
 and the same method of removing the high-frequency words from \citeauthor{Sahlgren2008} was used.
+
+\paragraph{Determining Frequency Cutoff}
 
 However, a cutoff point must be identified and used in order to remove the high-frequency words.
 \textcite{Sahlgren2008} used a cutoff where words that occurred more than \num{15000} times were removed.
@@ -1573,7 +1576,7 @@ The original plot shows the size of the spikes when high-frequency words are not
 The entropy plot shows how the size decreases by more than an order of magnitude when the entropy weighting measure is used.
 The cutoff for the frequency plot was chosen such that the plot looks similar to the entropy plot, with spikes around the same size.
 Note that using a predefined stoplist does not remove some of the remaining high-frequency words in these datasets, which hints that this method may not be ideal when model accuracy is examined.
-The cutoff that produced the frequency plot in Figure \ref{figContextCutoffT} is where a word represents more than \num{.04}\% of total occurrences in the dataset.
+The cutoff that produced the frequency plots in Figures \ref{figContextCutoffSO} and \ref{figContextCutoffT} is where a word represents more than \num{.04}\% of total occurrences in the dataset.
 This may or may not be equal to the value for \textcite{Sahlgren2008}, since that number was expressed in total observations (not as a percentage), and the total number of words in the dataset was not given.
 
 Also, no strong claims are being made that the cutoff identified is the ideal frequency percentage cutoff for all datasets when a frequency cutoff is used.
@@ -1615,7 +1618,7 @@ It produces accuracy measurements that have higher levels of noise (see Figure \
 Also, the ideal cutoff threshold must be identified in order to filter based on frequency,
 and identifying this cutoff requires a search, and this search must be done for each dataset that frequency filtering is used on.
 This cutoff value is a free parameter in frequency filtering that is not required when weighting stop words by entropy.
-Therefore, favoring parsimony, for the random permutation model, attenuating stop words based on entropy produces more accurate results when compared to filtering the stop words based on frequency of use.
+Therefore, favoring parsimony, for the random permutation model, attenuating stop words based on entropy is a slightly superior method compared to removing stop words based on frequency of use.
 This result is interesting since filtering stop words based on frequency is the more common default method for random permutation models \parencite{Sahlgren2008}.
 This suggests that a simpler method (entropy weighting) can be used instead of the more common frequency-filtering technique to achieve the same (or better) accuracy measurements.
 
@@ -1650,7 +1653,7 @@ One result that should not be overlooked is how poorly using a predetermined sto
 This is most likely because the StackOverflow and Twitter datasets are large and contain high-frequency words that are domain specific (e.g., emoticons) and are not included in the predetermined list.
 This shows that data-driven techniques to identify stop words can be much more effective than using a predetermined list.
 
-Another interesting result was how the Bayesian model actually performed worse when stop words were removed based on frequency.
+Another interesting result was how the Bayesian model actually performed worse when stop words were removed based on frequency compared to no stop word removal.
 This was not the case for the random permutation model in this study, was not the case when \textcite{Sahlgren2008} used frequency filtering on the random permutation model,
 and is most likely never the case for the random permutation model.
 Model accuracy most likely decreases for the Bayesian model because this model already has a normalization component built in that the random permutation model does not have.
@@ -1739,7 +1742,7 @@ If that dataset is relatively small, it may be better to use the compressed rand
 \subsection{Amount of Compression for Random Permutation}
 
 Another parameter in the random permutation model is the number of rows used to represent the all of the different words.
-Each word is represented by two randomly placed ones and two negative ones across the rows.
+Each word's environment vector is represented by two randomly placed ones and two negative ones across the rows.
 All that is required is that the four positions and signs of each of these environment vectors is unique.
 But this means multiple environment vectors can overlap when looking at a single row.
 This is a lossy form of compression, and allows the number of rows to represent the words to be much less than the total number of words.
@@ -1763,7 +1766,7 @@ Results for using different levels of compression for the random permutation mod
   \label{figContextDimSO}
 \end{figure}
 
-In the figure, the full random permutation model that does not have the number of rows in the matrix specified is the \num{2048}-row matrix.
+In the figure, the model name that does not have the number of rows in the matrix specified is the \num{2048}-row matrix.
 This was done so that names in all of the plots would remain consistent across all plots, and the \num{2048}-row matrix is the size used for the random permutation model for all other results.
 The plot is also broken out for different size datasets used to build the co-occurrence matrix.
 
@@ -1800,7 +1803,7 @@ So it is that more impressive that even with a randomly-chosen form of compressi
 
 The activation value for the context component of the vector-based model is a correlation, ranging from zero to one.
 This is not a log-odds value.
-For the previous results, prior and context for the random permutation model are combined by simply adding the terms.
+For the previous results, prior and context for the random permutation model were combined by simply adding the terms.
 However, this means that ACT-R's prior base-level learning component (which is a log-odds value) is added to a correlation value, which may not be mathematically appropriate.
 It would be more appropriate to convert the correlation value to a log-odds value, and then add this context term to the log-odds prior term.
 
@@ -1917,7 +1920,7 @@ At a row size of around \num{2000}, model accuracy improves by less than a perce
 The results for larger row sizes are somewhat inconsistent, since the full model (order and orderless) sometimes underperforms the order-only model, which does not make sense.
 \textcite{Sahlgren2008} most likely did not use a regression technique to optimize the weights for each of the order and orderless model terms.
 So although incorporating word order into the random permutation model does seem to slightly improve performance,
-the strength of the model is more likely to be in how efficiently it can represent the co-occurrence matrix, than its ability to include word order in the representation.
+the strength of the model is more likely to be in how efficiently it can represent the co-occurrence matrix rather than its ability to include word order in the representation.
 
 Also, the reason why the direction version of ordering is the best predictor of the three ordered components is most likely because order information does not have a large effect,
 so the two representations for words to the left and right of a tag are highly correlated.
@@ -2056,7 +2059,7 @@ However, since several hundred posts for each user in the popular-users datasets
 
 Separate co-occurrence matrices were built for each user in the sampled StackOverflow and Twitter popular-users dataset.
 The same sampling method used to test the impact of the prior component compared to the context component for the popular-users datasets was used,
-but the oldest posts that were not included in the testing set were used to build the co-occurrence matrices.
+and the co-occurrence matrices were built from the oldest posts that were not included in the testing set.
 So for each user, the co-occurrence matrix was created from their oldest posts, up to (and not including) their 50 newer posts that were used to test model accuracy. 
 
 \subsubsection{Results}
@@ -2213,7 +2216,7 @@ Perhaps the randomly-compressed representation used for the random permutation m
 
 \subsubsection{Attentional Weight}
 
-The declarative memory model for ACT-R has an attentional weight term $W_{j}$ that can be used to implement how stop words are handled.
+The Bayesian declarative memory model for ACT-R has an attentional weight term $W_{j}$ that can be used to implement how stop words are handled.
 The random permutation model was also easily modified to have an attentional weight term by attenuating each word's set of ones and negative ones values by that word's attentional weight.
 Both a method for stop-word removal (frequency filtering) and stop-word attenuating (entropy weighting) performed well for both models.
 Also, using a proper method for handling the low-predictor words produced some of the largest improvements in model accuracy compared to the other explorations
