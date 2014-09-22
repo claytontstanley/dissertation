@@ -56,6 +56,10 @@
 % Needed to ensure periods are placed at the end of every bibliography entry in the references section
 \AtEveryBibitem{\clearfield{doi}}
 
+% http://tex.stackexchange.com/questions/55780/disable-month-in-biblatex-bibliography
+\AtEveryBibitem{\clearfield{month}}
+\AtEveryCitekey{\clearfield{month}}
+
 % Make sure only urls that are printed in references section are for webpages
 \AtEveryBibitem{
   \ifentrytype{misc}{}{
@@ -175,6 +179,22 @@
 \note{\today}
 
 \maketitle
+
+\section{Acknowledgements}
+
+I would first like to thank my advisor, Mike Byrne, for all of his feedback and suggestions for this dissertation research
+and also his excellent guidance throughout my time as a graduate student.
+I would also like to thank my parents, Mike and Patsy, for the positive influence that they have provided me for my entire life.
+Finally, I would like to thank my brothers Brendan and Justin, sister Kellen, extended family, and friends, for all of their support during my time in the Rice Psychology graduate program.
+
+This work was supported in part by the Gertrude Maurin Fund.
+The resources were used to purchase high-performance computing hardware and the research would not have been possible without this crucial equipment.
+
+I would also like to mention a few open-sourced software packages that were heavily leveraged to do this research:
+The majority of the modeling and analysis was done with the R statistical computing environment \parencite{RCoreTeam2014} and two important R packages:
+data.table \parencite{Dowle2014} was leveraged to implement the models efficiently, and ggplot2 \parencite{Wickham2009} was used to produce the visualizations.
+
+\newpage
 
 \tableofcontents
 \newpage
@@ -2404,21 +2424,17 @@ Several different formalisms for ACT-R's attentional weighting term were also ex
 Finally, this work has helped raise the question about how co-occurrence observations are represented at the neural level, since two models with very different representations performed similarly well.
 The results from the study and the new research questions raised will help to better understand how imposing specific architectural constraints on memory models influence what information is retrieved.
 
-\subsubsection{Acknowledgements}
-
-The majority of the modeling and analysis was done with the R statistical computing environment \parencite{RCoreTeam2014} and two important R packages:
-data.table \parencite{Dowle2014} was leveraged to implement the models efficiently, and ggplot2 \parencite{Wickham2009} was used to produce the visualizations.
-
-\subsubsection{Software Repository}
-
-All software code created for this research is publicly available on GitHub \parencite{StanleyRepo2014}.
-
 \begingroup
 \setstretch{1}
 \setlength\bibitemsep{12pt}
 \clearpage
 \printbibliography[heading=bibintoc]
 \endgroup
+
+\clearpage
+\section{Appendix 1: Support Code}
+
+All software code created for this research is publicly available on GitHub \parencite{StanleyRepo2014}.
 
 \end{document}
 
