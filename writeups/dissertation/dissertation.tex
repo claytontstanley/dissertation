@@ -363,7 +363,7 @@ Further, modeling a hashtag's life within users is much more applicable to hasht
 The end goal of this work is to identify a memory retrieval model that can suggest relevant hashtags to users when they wish to retrieve one.
 These hashtags should be customized to their specific interests and relevant to the content of the post that they are currently creating.
 This will undoubtedly require a combination of two primary model components:
-[1] A user's prior likelihood of choosing a particular hashtag, given their previous hashtag use, and [2] the likelihood that a particular hashtag is related to the context of the post being created. 
+[1] a user's prior likelihood of choosing a particular hashtag, given their previous hashtag use, and [2] the likelihood that a particular hashtag is related to the context of the post being created. 
 
 A user's prior hashtag use will be an essential model component for domains such as Twitter, where the number of possible hashtags is effectively infinite.
 In these domains, the model can utilize a user's hashtag history as a way to prune the infinite space of possible hashtags, and generate a much smaller and more manageable set for prediction.
@@ -433,7 +433,7 @@ Strength of association ($S_{ji}$) reflects the amount of log-odds adjustment to
 Context for the StackOverflow domain for example is represented as each word in the title and body of a post.
 Context for the Twitter domain are the words in a tweet.
 Association strength between a chunk in memory and a single contextual element can be computed directly by calculating its context-adjusted odds ratio:
-The likelihood a chunk occurred with the current context ($p(i|j)$) over the likelihood that the chunk occurred in any of the other contexts ($p(i|\overline{j})$).
+the likelihood a chunk occurred with the current context ($p(i|j)$) over the likelihood that the chunk occurred in any of the other contexts ($p(i|\overline{j})$).
 For large datasets, the likelihood that a chunk occurs in any particular context reaches near-zero values ($p(j) \Rightarrow 0$).
 So it can be assumed that the likelihood that a chunk occurs in any context but one ($p(i|\overline{j})$) is equivalent to the likelihood that a chunk occurs in any context ($p(i)$).
 This assumption was described when deriving the $S_{ji}$ equation \parencite{Anderson1989}, and used in recent research working with large-scale datasets \parencites{Stanley2013,Farahat2004,Douglass2010}.
@@ -1022,8 +1022,7 @@ but should also improve performance for more constrained sites like StackOverflo
 
 \section{Models}
 
-Two models were evaluated for hashtag prediction on both the Twitter and StackOverflow datasets:
-A vector-based model and Bayesian retrieval model.
+Two models were evaluated for hashtag prediction on both the Twitter and StackOverflow datasets: a vector-based model and Bayesian retrieval model.
 The random permutation model \parencite{Sahlgren2008} in Table \ref{tabRandPermModel} was used for the vector-based model, since it has shown to perform better than the BEAGLE model \parencite{Recchia2010}.
 The modified ACT-R Bayesian model \parencite{Stanley2013} in Table \ref{tabModACTRModel} was used for the Bayesian model, since it has already been applied to tag use on StackOverflow posts.
 
@@ -1079,7 +1078,7 @@ So the most recent packaged dataset was downloaded and the database tables were 
 
 \subsubsection{Twitter}
 
-Twitter provides two types of APIs for acquiring data: A query-based and streaming interface.
+Twitter provides two types of APIs for acquiring data: a query-based and streaming interface.
 The Tweepy Python package provides a Python functional interface to these APIs, and this package was used to collect data from Twitter.
 The query-based interface was used to collect all tweets for specific popular users.
 At most \num{3000} of the most recent tweets were collected for each user, since Twitter only allows access to this number of tweets for each user.
@@ -1167,7 +1166,8 @@ Consequently, the optimized learning form of $B_{i}$ is computationally much les
 
 The decay rate parameter ($d$) represents how fast the activation for an individual presentation of a chunk decays from declarative memory.
 Higher values mean that chunk activation decays faster, which means that the most recently presented chunks will have the highest activation, and the total number of times that a chunk has been presented matters less.
-Lower decay rate values flip the importance of frequency and recency: Lower values mean that chunks that have occurred most frequently will have the highest activation,
+Lower decay rate values flip the importance of frequency and recency:
+Lower values mean that chunks that have occurred most frequently will have the highest activation,
 and activation depends less on the specific chunks that have been observed in the recent past.
 
 The base-level ($B_{i}$) component in Table \ref{tabACTRBLLModel} is different than the $B_{i}$ used in \textcite{Stanley2013} (Table \ref{tabModACTRModel}).
@@ -1423,7 +1423,7 @@ the results from this study suggest that the optimal decay rate value should be 
 The decay rate parameter in $B_{i}$ determines how fast a presentation of a chunk in the past decays over time.
 Higher values of $d$ mean that activation decays more quickly, which means that the chunks used more recently are the most active and the total frequency count of a chunk matters less.
 Looking back at Figure \ref{figPriorDecay}, the optimal decay rate parameter when the standard form of $B_{i}$ is used is higher for Twitter than StackOverflow.
-It makes sense that the lifetime of a specific hashtag on Twitter is shorter overall than the lifetime of a tag (e.g., \emph{C#}) on StackOverflow.
+It makes sense that the lifetime of a specific hashtag on Twitter is shorter overall than the lifetime of a tag (e.g., \emph{C\#}) on StackOverflow.
 This means that the decay rate for Twitter should be higher than StackOverflow, which is what is observed.
 
 \section{Combining Predictors}
@@ -1832,6 +1832,33 @@ This result has important implications.
 The document size is rarely chosen, and more likely constrained by the number of documents in the dataset being studied.
 If that dataset is relatively small, it may be better to use the compressed random permutation model than the Bayesian model, and vice-versa if the dataset is large.
 
+However, document size is not the only factor that determines whether the Bayesian model or random permutation model will perform better.
+For example, the document size where the Bayesian model begins to outperform the random permutation model is quite different for StackOverflow and Twitter.
+This is because the number of observations used to generate the co-occurrence matrix is a function of four components:
+document size, number of words in each document, total number of unique tags, and number of tags used per document.
+The average number of tags used per post for StackOverflow and Twitter were the same order of magnitude (around 3 for StackOverflow, slightly less for Twitter).
+
+However, the average number of words in a StackOverflow post is much greater than the 140 character limit used for tweets.
+More words per post means that the number of observations per cell in the co-occurrence matrix grows more quickly with document size.
+The Bayesian model is more likely to perform better with datasets like StackOverflow that have these larger document sizes.
+
+Also, the popular-hashtags Twitter dataset only contains 400 unique tags while the randomly-sampled StackOverflow dataset has \num{34377} unique tags.
+More unique tags means that the co-occurrence counts are spread across a wider range of tag columns,
+which means that it takes a larger number of total documents before the Bayesian model performs better than the random permutation model.
+
+The transition point where accuracy for the Bayesian model outperformed the random permutation model was much higher for StackOverflow than Twitter.
+This is most likely because StackOverflow has a almost \num{100} times more unique tags than the Twitter popular-hashtags dataset.
+The number of words in a StackOverflow post is also much higher than Twitter, which should have lowered the transition point.
+However, the effect of words in a post must be less than the effect of number of unique tags, as the transition point was still much higher for StackOverflow given that it should have lowered due to post size.
+
+The compressed random permutation model should perform better with smaller document sizes, less words per document, more unique tags, and fewer number of tags per post.
+However, since there are so many factors that determine whether the Bayesian or random permutation model will perform better,
+and only two different datasets were examined in this research,
+it is difficult to make any specific recommendations as far as exact transition cut points (e.g., document size, words per document) where either the Bayesian or random permutation model should be used.
+Also, it is likely that the specific domain being studied interacts with the factors already mentioned to determine which model is better for that domain.
+Nevertheless, if a researcher is working in a domain with limited data (e.g., small document size, large tag space) that produces a sparse co-occurrence matrix,
+then it may be worthwhile to experiment with using a compressed random permutation model instead of the full Bayesian model.
+
 \subsection{Amount of Compression for Random Permutation}
 
 Another parameter in the random permutation model is the number of rows used to represent the all of the different words.
@@ -1884,7 +1911,8 @@ The fact that the random permutation model only needs around \num{2048} rows to 
 Twitter has around \num{2383000} unique words for the \num{3000000} tweets in each of the popular-users datasets.
 StackOverflow has \num{5848000} unique words for the \num{1000000} posts used to generate the co-occurrence matrix.
 So it is impressive that only \num{2048} rows are needed to represent most of the variance from all of the words in these co-occurrence matrices.
-This is likely because word use frequency drops off sharply, and there are many words in both datasets which are used only once or a few times.
+This is likely because word use frequency approximately follows Zipf's law \parencite{Stanley2013}.
+This means that if the words are rank sorted by number of times they are used, the frequency of word use drops off sharply when moving to words that are used fewer times. 
 Since these words have little to no ability to influence predictions, it makes sense that they can be safely removed from the dataset.
 
 However, it should be pointed out that the way the random permutation model compresses the words is completely random.
@@ -1904,10 +1932,10 @@ It would be more appropriate to convert the correlation value to a log-odds valu
 
 For a given retrieval, the random permutation model returns a set of activations that are correlation values for each of the tags.
 So a method was created to convert a distribution of correlations to a distribution of log-odds values.
-To do this, the one-tailed cumulative distribution function value for each correlation in the distribution is computed.
-That probability is then converted to a log-odds value in the usual way. 
+To do this, the one-tailed cumulative distribution function value for each correlation in the distribution was computed.
+That probability was then converted to a log-odds value in the usual way. 
 
-This technique has a few nice mathematical properties:
+This technique has a few advantages: 
 It is simple and computationally cheap.
 Also, it behaves properly at specific points in the distribution.
 For example, if the conversion is performed on the mean correlation value in the set, the result is a log-odds value of zero.
@@ -1944,8 +1972,9 @@ When the prior component is included for the random permutation model, accuracy 
 However, it is somewhat surprising that it does not matter much how the context and prior terms are added for the random permutation model.
 Model performance is similar when the context component used for the model is based on a correlation compared to a log-odds value.
 
-Although there may be a slight edge in increased accuracy when a log-odds transformation is used for the StackOverflow dataset.
-But that result is not statistically reliable for the sample size used in this analysis, and even if present the effect size is small.
+There may be a slight edge in increased accuracy when a log-odds transformation is used for the StackOverflow dataset.
+However, that result is not statistically reliable for the sample size used in this analysis (confidence intervals overlap in Figure \ref{figContextLogoddsSO}),
+and even if present the overall change in accuracy is small (\num{.45} to \num{.47}).
 Nonetheless, it does seem appropriate to convert the context to a log-odds adjustment value when context is added as an additional term to the random permutation model.
 Since performance does not decrease when the transformation is made, may slightly increase,
 and leads to a more natural interpretation of each model term as a log-odds value, it is reasonable to include this step for the random permutation model.
@@ -1960,7 +1989,7 @@ In order to thoroughly test the impact of adding word order into the model, vari
 \subsubsection{Method}
 
 Three different methods for incorporating word order in the random permutation model were tested:
-Taking just the sign of the word's position relative to the tag (direction method), using the position (standard method), and using the position but only including words that were used near the tag (window method).
+taking just the sign of the word's position relative to the tag (direction method), using the position (standard method), and using the position but only including words that were used near the tag (window method).
 For the standard method, all words and their respective position are used to build the representation.
 For the direction method, essentially two representations are created: all co-occurrences with words to the left of the tag, and all co-occurrences with words to the right of the tag.
 The window method is similar to the standard method, where each word's relative position is maintained, but it only includes words near the tag to build the representation.
@@ -1977,7 +2006,7 @@ Models were tested that used only one of the three word order methods for the or
 
 \subsubsection{Results}
 
-Model accuracy results after incorporating word order into the random permutation model are included in Figure \ref{figContextOrder}
+Model accuracy results after incorporating word order into the random permutation model are included in Figure \ref{figContextOrder}.
 
 \begin{figure}[!htbp]
   \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-orderT-crop.pdf}}}
@@ -2010,7 +2039,8 @@ The original BEAGLE model \parencite{Jones2007} actually showed only minimal imp
 In absolute terms, this model only improved by 2 percentage points in accuracy when trained on the TASA and tested on the TOEFL.
 \textcite{Sahlgren2008}'s results for word order for the random permutation model are similar.
 At a row size of around \num{2000}, model accuracy improves by less than a percentage point when order information is incorporated.
-The results for larger row sizes are somewhat inconsistent, since the full model (order and orderless) sometimes underperforms the order-only model, which does not make sense.
+The results for larger row sizes are somewhat inconsistent, since the full model (order and orderless) sometimes underperforms the order-only model,
+which should never happen since the order-only model is a subset of the full model.
 \textcite{Sahlgren2008} most likely did not use a regression technique to optimize the weights for each of the order and orderless model terms.
 So although incorporating word order into the random permutation model does seem to slightly improve performance,
 the strength of the model is more likely to be in how efficiently it can represent the co-occurrence matrix rather than its ability to include word order in the representation.
@@ -2021,13 +2051,13 @@ This means that this ordered component is essentially composed of the all co-occ
 The co-occurrences in these representations are highly correlated with each other, and highly correlated with the orderless component,
 which is why model accuracy is similar for the orderless component and direction ordered component, and why accuracy does not improve when adding the direction ordered component to the orderless component.
 
-Since it was shown that including word order information has little to no significant improvement on model accuracy, an attempt to incorporate word order information into the Bayesian model was not made.
+Since it was shown that including word order information has little to no significant improvement on model accuracy, no attempt to incorporate word order information into the Bayesian model was made.
 
 \subsection{Coefficients for Predictors}
 
 The logistic regression is used to determine the optimal weight for each model component.
 A regression is done for each run in the dataset, and since multiple runs were used for the StackOverflow and Twitter datasets, multiple samples of coefficient weights for each model component were computed.
-The variance of the weights for each component show how likely it is that the regression is overfitting the model,
+The variance of the weights for each component show how likely it is that the regression is overfitting the data,
 and the mean shows the best estimate weight of each component relative to the other.
 
 \subsubsection{Method}
@@ -2042,13 +2072,17 @@ Error bars represent the standard deviation of coefficient values for each compo
 
 \begin{figure}[!htbp]
   \scalebox{.6}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-coeffStd-coeffSO-crop.pdf}}}
-  \caption{Coefficient values for full models for StackOverflow}
+  \caption{
+  Coefficient values for each component of the full models for StackOverflow.
+  Models used are the best-performing Bayesian and random permutation models
+  (i.e., Bayesian and RP have entropy weighting, RP converts context activation from correlation to log odds).
+}
   \label{figContextCoeffSO}
 \end{figure}
 
 \begin{figure}[!htbp]
   \scalebox{.6}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-coeffStd-coeffT-crop.pdf}}}
-  \caption{Coefficient values for full models for Twitter}
+  \caption{Coefficient values for each component of the full models for Twitter}
   \label{figContextCoeffT}
 \end{figure}
 
@@ -2136,7 +2170,7 @@ Accuracy improves for both the Bayesian (\num{.51} to \num{.63}) and random perm
 
 \subsubsection{Discussion}
 
-This shows that incorporating past tagging history is important for even a site like StackOverflow where a large amount of context information has been collected.
+This shows that incorporating past tagging history is important even for a site like StackOverflow where a large amount of context information has been collected.
 However, for this type of site it only becomes important when a reasonably large amount of a user's past tagging history has been collected.
 For a randomly sampled user on StackOverflow, a context-only model captures the majority of the predictive variance.
 
@@ -2160,13 +2194,13 @@ So for each user, the co-occurrence matrix was created from their oldest posts, 
 Model accuracy when using a user-customized co-occurrence matrix for StackOverflow and Twitter is shown in Figures \ref{figPUCustomSO} and \ref{figPUCustomT}.
 
 \begin{figure}[!htbp]
-  \scalebox{.6}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-userSjiSO-crop.pdf}}}
+  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-userSjiSO-crop.pdf}}}
   \caption{Model accuracy with user-customized context component for StackOverflow}
   \label{figPUCustomSO}
 \end{figure}
 
 \begin{figure}[!htbp]
-  \scalebox{.6}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-userSjiT-crop.pdf}}}
+  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-userSjiT-crop.pdf}}}
   \caption{Model accuracy with user-customized context component for Twitter}
   \label{figPUCustomT}
 \end{figure}
@@ -2244,13 +2278,13 @@ and both models were much more accurate when tested on StackOverflow compared to
 
 Overall, both the random permutation and Bayesian declarative memory models fit the observed tagging behavior in StackOverflow and Twitter relatively well.
 The fits for StackOverflow in particular are quite high, especially given the large tag space on the site.
-These results provide support that choosing a hashtag when composing a tweet and tagging a StackOverflow post is a long-term memory retrieval process.
+These results provide support for the idea that choosing a hashtag when composing a tweet and tagging a StackOverflow post is a long-term memory retrieval process.
 However, both models were not 100 percent accurate, and the amount of variance left to predict was much larger than what would be observed if retrieval noise was included in the model.
 So it is most likely the case that the task is not done solely with declarative memory processes.
 
-Or, perhaps authors are taking advantage of context information that is not currently represented in the model.
-For example, time of day might be a useful predictor of tag use.
-\textcite{Cohn2012} built a tag-prediction model that was based primarily on temporal cycles of tag use.
+Alternatively, perhaps authors are taking advantage of context information that is not currently represented in the model.
+For example, time of day might be a useful predictor of tag use on Twitter.
+\textcite{Cohn2012} built a tag-prediction model for Twitter that was based primarily on temporal cycles of hashtag use.
 This technique could be naturally incorporated into a co-occurrence framework by including time of day as an additional context by tag co-occurrence for each post.
 This would allow time of day information to be used alongside the rest of the context information in the words of the post.
 A similar technique could be used to add additional context predictors to the model.
@@ -2259,7 +2293,7 @@ or a separate co-occurrence matrix could be used for each additional context com
 Including additional context predictors such as time of day may help improve model accuracy,
 and perhaps it is the case that the rest of the variance left to predict is from these context components that the author is using but are not yet included in the model.
 
-\textcite{Anderson1991} also looked at tasks similar to tag use on StackOverflow and Twitter when deriving the prior component of the declarative memory theory.
+\textcite{Anderson1991} also looked at similar tagging tasks with large datasets when deriving the prior component of the declarative memory theory.
 \citeauthor{Anderson1991} examined, for example, the frequency of word choice over time used for the title of articles for the New York Times,
 and used the results to derive the power law equation for the prior term in the declarative memory model.
 ACT-R's declarative memory theory claims that the system has evolved to make predictions that closely match the statistical structure of the environment.
@@ -2353,7 +2387,7 @@ and also the specific activation calculation that is carried out by the system.
 
 The tag-recommendation models developed through this research should be immediately relevant to real-world tasks.
 Model accuracy is high enough (particularly for StackOverflow) for the developed models to be used as a foundation for tag recommendation systems that are deployed on Twitter or StackOverflow.
-Also since the developed models are task agnostic, they can potentially be used as tag recommendation systems for other domains.
+Also, since the developed models are task agnostic, they can potentially be used as tag recommendation systems for other domains.
 Examples of similar tagging tasks are hashtag use on Facebook, flagging (i.e., tagging) Wikipedia articles for content issues or overly opinionated material,
 auto labeling incoming mail and placing it into appropriate folders, and spam filtering.
 Having an accurate and efficient co-occurrence memory model that correctly retrieves relevant tags can be applied to a wide variety of tasks.
