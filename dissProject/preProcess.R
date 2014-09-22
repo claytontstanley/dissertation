@@ -468,7 +468,7 @@ visModelVsPredTbl <- function(modelVsPredTbl) {
 	       geom_line(aes(log(d), meanRelPC, group=user_screen_name[1])) +
 	       defaultGGPlotOpts + 
 	       xlab('log(d)') +
-	       ylab('Normalized Mean'))
+	       ylab('Normalized Mean Model Accuracy'))
 	assign('p3', ggplot(modelVsPredTbl[topHashtag & hashtagUsedP & user_screen_name %in% sample(unique(user_screen_name), size=min(20, length(unique(user_screen_name))))],
 			    aes(log(d),acc, group=as.factor(user_screen_name))) +
 	       geom_line() +
@@ -478,7 +478,7 @@ visModelVsPredTbl <- function(modelVsPredTbl) {
 	modelVsPredTbl[predUsedBest == T & d <= .4]
 	assign('p4', ggplot(modelVsPredTbl[predUsedBest == T & d <= 2], aes(d)) +
 	       geom_histogram(breaks=defaultBaseConfig$ds[defaultBaseConfig$ds <= min(2, max(modelVsPredTbl[,d+.1]))], aes(y = ..density..)) +
-	       geom_density() +
+	       #geom_density() +
 	       defaultGGPlotOpts + 
 	       xlab('Best Fit Decay Rate Parameter (d) by Subject') +
 	       ylab('Density'))
@@ -1520,7 +1520,7 @@ renameColGroupNum <- function(tbl) {
 
 renameColSizeNum <- function(tbl) {
 	mapTbl = data.table(sizeNum=as.character(c(1,6,5,4,3,2)),
-			    newName=c('Testing 1e5 SO, 3e6 Twitter', '1e3 Documents', '1e4 Documents', '1e5 Documents', '1e6 Documents', '3e6 Documents'))
+			    newName=c('Testing 1e5 SO, 3e6 Twitter', '1*10^3 Documents', '1*10^4 Documents', '1*10^5 Documents', '1*10^6 Documents', '3*10^6 Documents'))
 	tbl[, sizeNum := as.character(sizeNum)]
 	setkey(tbl, sizeNum)
 	tbl[mapTbl, sizeNum := newName]
@@ -1613,20 +1613,20 @@ makeRemapForMapping <- function(keyword, text) {
 }
 
 makeLogregMapping <- function() {
-	c('actPriorStd', 'Standard prior model relaxed across posts',
-	  'actPriorStdBayes', 'Bayes prior relaxed across posts',
-	  'actPriorStdRP', 'RP prior relaxed across posts',
-	  'actTitle', 'Bayes title w/ entropy',
-	  'actBody', 'Bayes body w/ entropy',
-	  'actTweet', 'Bayes orderless context w/ entropy',
-	  'actTitleOrderlessEnthyman', 'RP title w/ entropy and log odds',
-	  'actBodyOrderlessEnthyman', 'RP body w/ entropy and log odds',
-	  'actTweetOrderlessEnthyman', 'RP orderless context w/ entropy and log odds',
-	  'actTitleOrderlessEnthyman', 'RP title w/ entropy and log odds',
-	  'actBodyOrderlessEnthyman', 'RP body w/ entropy and log odds',
-	  'actTweetOrderlessEnthyman', 'RP orderless context w/ entropy and log odds',
-	  'actTweetUsercontext', 'Bayes orderless context w/ entropy and user sji',
-	  'actTweetOrderlessEnthyser', 'RP orderless context w/ entropy, log odds, and user sji')
+	c('actPriorStd', 'Standard prior model component relaxed across posts',
+	  'actPriorStdBayes', 'Bayes prior component relaxed across posts',
+	  'actPriorStdRP', 'RP prior component relaxed across posts',
+	  'actTitle', 'Bayes title component w/ entropy',
+	  'actBody', 'Bayes body component w/ entropy',
+	  'actTweet', 'Bayes orderless context component w/ entropy',
+	  'actTitleOrderlessEnthyman', 'RP title component w/ entropy and log odds',
+	  'actBodyOrderlessEnthyman', 'RP body component w/ entropy and log odds',
+	  'actTweetOrderlessEnthyman', 'RP orderless context component w/ entropy and log odds',
+	  'actTitleOrderlessEnthyman', 'RP title component w/ entropy and log odds',
+	  'actBodyOrderlessEnthyman', 'RP body component w/ entropy and log odds',
+	  'actTweetOrderlessEnthyman', 'RP orderless context component w/ entropy and log odds',
+	  'actTweetUsercontext', 'Bayes orderless context component w/ entropy and user sji',
+	  'actTweetOrderlessEnthyser', 'RP orderless context component w/ entropy, log odds, and user sji')
 }
 
 makeStandardMappingBayes <- function(keyword, text, priorStd='PriorStd') {
@@ -2655,15 +2655,19 @@ makeCombinedEnvironmentTbl <- function(sjiTbl, config) {
 }
 
 plotMemMat <- function() {
-	plotTbl <- function(tbl, name) {
+	plotTbl <- function(tbl, name, xlab) {
 		tbl[, id := 1:nrow(.SD)]
 		tbl = melt(tbl,
 			   measure=c('sdStoplist', 'sdFreq', 'sdEntropy', 'sdOrig'),
 			   variable.name='type',
 			   value.name='sd')
+		tbl[, type := as.character(type)]
+		renameColStopwordType(tbl)
 		assign('p1', ggplot(tbl, aes(id, sd)) +
 		       geom_point() +
 		       defaultGGPlotOpts + 
+		       ylab('Standard Deviation of Frequency Counts Across All Words') +
+		       xlab(xlab) + 
 		       facet_grid(.~type) + 
 		       theme(axis.text.x = element_blank()))
 		myPlotPrint(p1, name)
@@ -2676,9 +2680,18 @@ plotMemMat <- function() {
 		tbl = data.table(sdStoplist, sdFreq, sdEntropy, sdOrig)
 		tbl
 	}
-	plotTbl(buildTbl(permMemMatSOOrderless), 'memMatSO')
-	plotTbl(buildTbl(permMemMatTOrderless), 'memMatT')
+	plotTbl(buildTbl(permMemMatSOOrderless), 'memMatSO', 'Tag')
+	plotTbl(buildTbl(permMemMatTOrderless), 'memMatT', 'Hashtag')
+	invisible()
 }
+
+renameColStopwordType <- function(tbl) {
+	mapTbl = data.table(type=as.character(c('sdStoplist', 'sdFreq', 'sdEntropy', 'sdOrig')),
+			    newName=c('Stoplist Filtering', 'Frequency Filtering', 'Entropy Weighting', 'No Processing'), key='type')
+	setkey(tbl, type)
+	tbl[mapTbl, type := newName]
+}
+
 
 getCurWorkspace <- function(groupConfig) {
 	getConfig(groupConfig, 'genFun')(groupConfig)
@@ -3608,6 +3621,7 @@ runGenAndSaveCurWorkspaceg3s6 <- function() genAndSaveCurWorkspace(groupConfigG3
 runGenAndSaveCurWorkspaceg4s6 <- function() genAndSaveCurWorkspace(groupConfigG4S6)
 
 curWS <- function() {
+	analyzePrior(modelVsPredTbl)
 	analyzePUser(modelVsPredTbl)
 	plotMemMat()
 	withProf(runContext20g1s6(regen='useAlreadyLoaded'))
