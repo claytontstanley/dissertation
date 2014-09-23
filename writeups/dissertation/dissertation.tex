@@ -480,9 +480,15 @@ That is, the PMI equation \emph{is} the simplified form of ACT-R's strength of a
 \subsubsection{Scaling the Equations}
 
 The majority of tag-recommendation systems use some measure of word pair associations to compute the likelihood of a tag, given current context.
-It is important that this measure scales well enough to handle the large volume of information present in online social media datasets.
+As a applied concern, it is important that this measure scales well enough to handle the large volume of information present in online social media datasets.
 Large social media datasets such as StackOverflow and Twitter contain on the order of millions to hundreds of millions of unique word pair associations between terms and tags.
 If one wants to capitalize on all of the information present in the database to build the most accurate measure of relatedness between words and tags, then the association measure used must scale to this large size.
+
+However, scale is also a theoretical concern.
+The declarative memory system is tasked to quickly return a single chunk of information that is stored alongside millions to billions of other unique chunks given only the current context and past history of use.
+To do this task, it seems plausible that a model of declarative memory must use a representation that produces accurate retrievals even when large amounts of observations are included.
+Further, it seems plausible that the time to compute an activation value by a computer is correlated with the time to compute an activation value by the brain.
+So any model of declarative memory should also be reasonably computationally efficient even with large co-occurrence datasets.
 
 ACT-R's strength of association ($S_{ji}$) and the equivalent pointwise mutual information index ($\mathit{PMI}_{ji}$) have been shown to scale well for large corpora.
 \textcite{Douglass2010} implemented the large-scale version of $S_{ji}$ in Erlang.
@@ -492,7 +498,7 @@ Retrieval times were around one second with the largest declarative memory that 
 The SNIF-ACT framework \parencites{Fu2007,Pirolli2003} is also based on the large-scale version of $S_{ji}$, and scaled well when working with a large-scale search query database for internet search.
 
 As one of the largest tests, \textcite{Farahat2004} used the PMI index based on a 118GB local database of 10 million pages of the Stanford WebBase Project.
-So this implementation did not fit completely in RAM, but a spinning-disk database implementation still scaled well enough for reasonably fast retrieval times for $\mathit{PMI}_{ji}$ values.
+Even at this large dataset size, the ACT-R declarative memory theory still scaled well enough for reasonably fast retrieval times for $\mathit{PMI}_{ji}$ values.
 
 \subsection{Latent Semantic Analysis Memory Theory}
 
@@ -1059,9 +1065,9 @@ The most recent quarterly published StackOverflow dataset \parencite{DataDump201
 This dataset contains around \num{5.7} million posts and \num{34377} unique tags.
 
 Unlike StackOverflow, the entire Twitter dataset is not released to the public.
-Due to this and the scale of Twitter, subsets of the Twitter dataset were collected.
+Due to this and the scale of Twitter, only the part of the Twitter dataset relevant to this research was collected.
 
-\subsubsection{Popular Users Subset}
+\subsubsection{Popular Users Dataset}
 
 A popular-users dataset was collected for both StackOverflow and Twitter.
 This dataset consists of all of the tweets and posts from various samples of the top users for each site.
@@ -1069,7 +1075,7 @@ This dataset was collected by fetching all past tagging history for each of the 
 It was used to explore the growth and decay characteristics of a hashtag for individual users.
 The temporal dynamics of ACT-R's decay rate model for a chunk were evaluated against this data.
 
-\subsubsection{Popular Hashtags Subset}
+\subsubsection{Popular Hashtags Dataset}
 
 A additional popular-hashtags dataset was collected for Twitter.
 The purpose of this dataset is to test the accuracy of each model's predicted most likely hashtag(s) for a tweet.
@@ -1082,11 +1088,11 @@ Four popular-hashtags datasets were collected at four different time periods, sp
 Multiple datasets were collected to ensure that the results were not dependent on a particular sample of hashtags and would generalize across different popular-hashtag datasets and different time periods.
 Each dataset required around four days to collect enough tweets to reach the quota, and one collection was done each week.
 
-\subsubsection{Randomly Sampled Subset}
+\subsubsection{Randomly Sampled Dataset}
 
-Since the entire dataset is available for StackOverflow, randomly-sampled posts were used to test the context models rather than subsetting and creating a popular-tags dataset (analogous to Twitter).
+Since the entire dataset is available for StackOverflow, randomly-sampled posts were used to test the context models rather than creating a popular-tags dataset (analogous to Twitter).
 If all Twitter data were available, then the models would have been tested on a randomly-sampled dataset for Twitter as well.
-However, since this is not the case for Twitter, the popular-hashtags subset was used instead of a randomly-sampled subset for that site,
+However, since this is not the case for Twitter, the popular-hashtags dataset was used instead of a randomly-sampled dataset for that site,
 while models for StackOverflow were tested on the more challenging dataset where posts were randomly sampled across all posts created on the site.
 
 \subsection{Acquiring Datasets}
@@ -1516,7 +1522,7 @@ All runs contained different posts, and all posts used for runs were not used to
 \subsubsection{Computing Priors}
 
 For each randomly-sampled post for StackOverflow, the prior activation is based on that user's prior tagging history, and not on any global prior of specific tag frequency across users.
-This was done so that the prior component used for StackOverflow for both the popular-users and randomly-sampled subsets was the same.
+This was done so that the prior component used for StackOverflow for both the popular-users and randomly-sampled datasets was the same.
 
 However, a custom user prior for the Twitter popular-hashtags dataset cannot be used, since the entire Twitter dataset cannot be downloaded.
 The popular-hashtags dataset contains samples of a large set of various users that happened to use one of a specific set of hashtags being monitored.
