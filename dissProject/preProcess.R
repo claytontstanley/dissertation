@@ -1456,18 +1456,39 @@ compareDBestVsMax <- function(modelVsPredTbl) {
 	sumTbl[, list(diff=acc[2]-acc[1], direction=paste('best d', '-', 'max d')), by=list(datasetName, user_screen_name, DVName)][, getComparisonTbl(.SD)]
 }
 
+plotTbl <- function(plot, extras, figName) {
+	lapply(extras, function(extra) plot <<- plot + extra)
+	myPlotPrint(plot, figName)
+}
+
 plotBarSumTbl <- function(sumTbl, fillCol, figName, extras=NULL, groupCol='dsetGroup') {
 	groupCol = as.symbol(groupCol)
 	fillCol = substitute(fillCol)
 	renameCols(sumTbl)
-	sumTbl
 	expr = bquote(ggplot(sumTbl, aes(x=factor(.(groupCol)), y=meanVal, fill=.(fillCol))) +
 		      geom_bar(aes(y=meanVal), width=0.7, position=position_dodge(), stat='identity') +
 		      geom_errorbar(aes(ymin=minCI, ymax=maxCI), position=position_dodge(width=0.7), width=0.1, size=0.3) + 
 		      defaultGGPlotOpts)
 	plot = eval(expr)
-	lapply(extras, function(extra) plot <<- plot + extra)
-	myPlotPrint(plot, figName)
+	plotTbl(plot, extras, figName)
+	sumTbl
+}
+
+plotLineSumTbl <- function(sumTbl, fillCol, figName, extras=NULL, groupCol) {
+	groupCol = as.symbol(groupCol)
+	fillCol = substitute(fillCol)
+	renameCols(sumTbl)
+	eval(bquote(setkey(sumTbl, .(groupCol), .(fillCol))))
+	sizeNums = eval(bquote(sumTbl[!duplicated(.(groupCol))][, .(groupCol)]))
+	sizeNums = parse(text=sizeNums)
+	expr = bquote(ggplot(sumTbl, aes(x=factor(.(groupCol)), y=meanVal, colour=.(fillCol))) + 
+		      geom_line(aes(group=.(fillCol))) + 
+		      geom_point() + 
+		      scale_x_discrete(breaks = unique(sumTbl[, .(groupCol)]), labels = sizeNums) +
+		      geom_errorbar(aes(ymin=minCI, ymax=maxCI), width=0.1, size=0.3) + 
+		      defaultGGPlotOpts)
+	plot = eval(expr)
+	plotTbl(plot, extras, figName)
 	sumTbl
 }
 
@@ -1484,6 +1505,18 @@ compareMeanDV <- function(modelVsPredTbl, DV, extras=NULL, figName='', groupCol=
 				    guides(fill=guide_legend(title=title, reverse=T)),
 				    coord_flip()
 				    ), extras))
+}
+
+compareMeanDVBySize <- function(modelVsPredTbl, DV, extras=NULL, figName='', groupCol, CIFun=CIMean) {
+	DV = substitute(DV)
+	expr = bquote(modelVsPredTbl[, withCI(.(DV), CIFun=CIFun), keyby=list(DVName, .(as.symbol(groupCol)))])
+	sumTbl = eval(expr)
+	renameColDVName(sumTbl)
+	plotLineSumTbl(sumTbl, DVName, sprintf('compareMeanDV-%s-%s', deparse(DV), figName), groupCol=groupCol,
+		       extras=c(list(theme(legend.position='top', legend.direction='vertical'),
+				     ylab('Proportion Correct'),
+				     xlab('Dataset Size')),
+				extras))
 }
 
 plotDatasetDescriptives <- function(modelVsPredTbl) {
@@ -1520,7 +1553,7 @@ renameColGroupNum <- function(tbl) {
 
 renameColSizeNum <- function(tbl) {
 	mapTbl = data.table(sizeNum=as.character(c(1,6,5,4,3,2)),
-			    newName=c('Testing 1e5 SO, 3e6 Twitter', '1*10^3 Documents', '1*10^4 Documents', '1*10^5 Documents', '1*10^6 Documents', '3*10^6 Documents'))
+			    newName=c('Testing 1e5 SO, 3e6 Twitter', '1 %*% 10^3', '1 %*% 10^4', '1 %*% 10^5', '1 %*% 10^6', '3 %*% 10^6'))
 	tbl[, sizeNum := as.character(sizeNum)]
 	setkey(tbl, sizeNum)
 	tbl[mapTbl, sizeNum := newName]
@@ -1954,25 +1987,25 @@ analyzeContext <- function(modelVsPredTbl) {
 				       'PriorStdTitleOrderlessBodyOrderless',
 				       'PriorStdTitleOrderlessEntropyBodyOrderlessEntropy',
 				       'PriorStdTitleOrderlessFreqBodyOrderlessFreq'))
-	compareMeanDVDefault(tbl[dsetType == 'stackoverflow' & DVName %in% DVNames & sizeNum != 2], acc, figName='freqVsEntropyBySizeSO', groupCol='sizeNum')
+	compareMeanDVBySize(tbl[dsetType == 'stackoverflow' & DVName %in% DVNames & sizeNum != 2], acc, figName='freqVsEntropyBySizeSO', groupCol='sizeNum')
 	# T Entropy all sizes
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweet',
 				       'PriorStdTweetOrderEntropyTweetOrderlessEntropy',
 				       'PriorStdTweetOrderFreqTweetOrderlessFreq'))
-	compareMeanDVDefault(tbl[dsetType == 'twitter' & DVName %in% DVNames], acc, figName='freqVsEntropyBySizeT', groupCol='sizeNum')
+	compareMeanDVBySize(tbl[dsetType == 'twitter' & DVName %in% DVNames], acc, figName='freqVsEntropyBySizeT', groupCol='sizeNum')
 	# RESULT: Increasing rows in matrix does not dramatically improve performance, even at different size datasets; entropy and freq cutoff is much more important for RP
 	# SO Entropy all sizes
 	DVNames = asTopHashtagAcross(c('PriorStd',
 				       'PriorStdTitleOrderlessEntropyBodyOrderlessEntropy', 
 				       'PriorStdTitleOrderlessSmdimBodyOrderlessSmdim',
 				       'PriorStdTitleOrderlessLgdimBodyOrderlessLgdim'))
-	compareMeanDVDefault(tbl[dsetType == 'stackoverflow' & DVName %in% DVNames & sizeNum != 2], acc, figName='dimBySizeSO', groupCol='sizeNum')
+	compareMeanDVBySize(tbl[dsetType == 'stackoverflow' & DVName %in% DVNames & sizeNum != 2], acc, figName='dimBySizeSO', groupCol='sizeNum')
 	# T Entropy all sizes
 	DVNames = asTopHashtagAcross(c('PriorStd',
 				       'PriorStdTweetOrderEntropyTweetOrderlessEntropy',
 				       'PriorStdTweetOrderSmdimTweetOrderlessSmdim',
 				       'PriorStdTweetOrderLgdimTweetOrderlessLgdim'))
-	compareMeanDVDefault(tbl[dsetType == 'twitter' & DVName %in% DVNames], acc, figName='dimBySizeT', groupCol='sizeNum')
+	compareMeanDVBySize(tbl[dsetType == 'twitter' & DVName %in% DVNames], acc, figName='dimBySizeT', groupCol='sizeNum')
 	# RESULT: Logodds technique works
 	# SO compare entropy w/ logodds to entropy
 	DVNames = asTopHashtagAcross(c('PriorStd',
