@@ -1,6 +1,5 @@
 \documentclass[man,floatsintext,donotrepeattitle]{apa6}
 
-
 \usepackage[nodayofweek]{datetime}% http://ctan.org/pkg/datetime
 \usepackage{xfrac}
 \usepackage{textcomp}
@@ -205,7 +204,7 @@ data.table \parencite{Dowle2014} was leveraged to implement the models efficient
 \listoffigures
 \newpage
 
-\section{Introduction}
+\section{Chapter 1: Introduction}
 
 The ACT-R cognitive architecture \parencite{Anderson2007} contains one of the leading theories of human cognitive processing.
 The declarative memory component in ACT-R is a Bayesian statistical model.
@@ -390,7 +389,8 @@ In these domains, the model can utilize a user's hashtag history as a way to pru
 However, not only should the model properly take into account a user's prior hashtag use, but it should also generate new hashtag predictions when a user is most likely choosing a hashtag they have never used before.
 The end goal is to have a model that can properly balance the user's tag history with the contextual cues in the post in order to generate an accurate prediction.
 
-\section{Theoretical Background}
+\clearpage
+\section{Chapter 2: Theoretical Background}
 
 \subsection{ACT-R Declarative Memory Theory}
 
@@ -1046,13 +1046,14 @@ One of the main purposes of this research is to improve on these user-agnostic s
 Using customized priors that are tailored to a user's specific tagging history should be crucial for sites like Twitter where the possible tag space is infinite,
 but should also improve performance for more constrained sites like StackOverflow since each user is not interested in all of the possible tags on the site. 
 
-\section{Models}
+\clearpage
+\section{Chapter 3: Overall Method}
+
+\subsection{Models}
 
 Two models were evaluated for hashtag prediction on both the Twitter and StackOverflow datasets: a vector-based model and Bayesian retrieval model.
 The random permutation model \parencite{Sahlgren2008} in Table \ref{tabRandPermModel} was used for the vector-based model, since it has shown to perform better than the BEAGLE model \parencite{Recchia2010}.
 The modified ACT-R Bayesian model \parencite{Stanley2013} in Table \ref{tabModACTRModel} was used for the Bayesian model, since it has already been applied to tag use on StackOverflow posts.
-
-\section{Method}
 
 The two memory models were evaluated on predicting user-chosen tags for Twitter tweets and StackOverflow posts.
 The co-occurrence matrices used for the context component of each model were generated from a large subset of the Twitter and StackOverflow datasets.
@@ -1155,7 +1156,8 @@ It also seems less arbitrary than explicitly identifying a list of stop words to
 
 All three stop word techniques (i.e., predetermined list, high-frequency filtering, and entropy weighting) were explored for this analysis.
 
-\section{Past User Behavior}
+\clearpage
+\section{Chapter 4: Past User Behavior}
 
 How does a user's prior tag use influence their likelihood of choosing that tag in the future?
 This question was tested by examining how well ACT-R's base-level activation component of declarative memory predicts the tags that authors choose, given each author's past tagging behavior.
@@ -1449,7 +1451,8 @@ Looking back at Figure \ref{figPriorDecay}, the optimal decay rate parameter whe
 It makes sense that the lifetime of a specific hashtag on Twitter is shorter overall than the lifetime of a tag (e.g., \emph{C\#}) on StackOverflow.
 This means that the decay rate for Twitter should be higher than StackOverflow, which is what is observed.
 
-\section{Combining Predictors}
+\clearpage
+\section{Chapter 5: Combining Predictors}
 
 The declarative memory models analyzed for this research consist of two main components: past behavior and context.
 Past tag use was isolated in the first study to see how well ACT-R's prior component of declarative memory (i.e., base-level learning) fits each user's tag use over time.
@@ -1537,8 +1540,6 @@ Already \num{835500000} total co-occurring word tag observations were used to bu
 It was also the case that \num{1000000} posts for StackOverflow was already around $1/7$ of the total posts created on the site,
 so it is reasonable to assume that the results would not change greatly for StackOverflow if $3/7$ of the total posts created were used to build the co-occurrence matrix instead,
 especially since \num{835500000} co-occurrences were already used with \num{1000000} posts.
-
-\section{Results for Combining Predictors}
 
 \subsection{Adding Offset}
 
@@ -2128,6 +2129,9 @@ However, the underlying reason that the weights change between the sites cannot 
 This relative impact may be changing from either a true alteration in the underlying weight of the prior compared to context for different domains,
 or simply due to the fact that the amount of information collected for each of the terms changes between the domains (less information leads to lower weighting in general). 
 
+\clearpage
+\section{Chapter 6: Combining Predictors on the Popular-Users Dataset}
+
 \subsection{Impact of Prior vs. Context}
 
 Adding a user's prior tag history as an additional component has been shown to improve performance, but is this always the case?
@@ -2263,9 +2267,17 @@ This provides further evidence showing that there is an interaction between data
 At lower numbers of co-occurrences the compressed random permutation model is able to perform better than the Bayesian model,
 and the Bayesian model surpasses the compressed model at higher co-occurrence counts once the cells in the full co-occurrence matrix stabilize. 
 
-\subsection{General Results}
+\clearpage
+\section{Chapter 7: General Discussion}
+
+\subsection{Overall Results}
 
 Table \ref{tabOverallResults} summarizes model accuracies for full models (all components) on all of the datasets tested in the study.
+After modifying the models by adding an entropy weighting mechanism to both models and a prior term to the random permutation model,
+accuracy for the compressed random permutation model was nearly equal to the Bayesian model.
+The largest difference between the two models was on the Twitter popular-hashtags dataset (7 percent).
+Both models performed nearly equal for the StackOverflow datasets tested,
+and both models were much more accurate when tested on StackOverflow compared to Twitter.
 
 \begin{table}[!ht]
   \caption{Summary of accuracy for each model and dataset}
@@ -2287,14 +2299,6 @@ Table \ref{tabOverallResults} summarizes model accuracies for full models (all c
     \end{tabu}
   }
 \end{table}
-
-After modifying the models by adding an entropy weighting mechanism to both models and a prior term to the random permutation model,
-accuracy for the compressed random permutation model was nearly equal to the Bayesian model.
-The largest difference between the two models was on the Twitter popular-hashtags dataset (7 percent).
-Both models performed nearly equal for the StackOverflow datasets tested,
-and both models were much more accurate when tested on StackOverflow compared to Twitter.
-
-\section{General Discussion}
 
 Overall, both the random permutation and Bayesian declarative memory models fit the observed tagging behavior in StackOverflow and Twitter relatively well.
 The fits for StackOverflow in particular are quite high, especially given the large tag space on the site.
@@ -2373,6 +2377,8 @@ and this is reflected in the attentional weight term.
 That is, $W_{j}$ can be defined mathematically, has the same general form across tasks, and both the frequency-filtering and entropy-weighting methods for stop-word removal are likely first candidates for the definition.
 This claim, however, would require that no top-down activation is used to compute the attentional weight, which would mean that the $W_{j}$ is not under conscious control, which is not likely to be correct.
 Perhaps it is a combination of top-down and bottom-up systems that determine $W_{j}$, and the entropy-weighting and frequency-filtering techniques are methods of formalizing the bottom-up component.
+
+\subsection{Implications and Future Directions}
 
 \subsubsection{Generalizing Results}
 
