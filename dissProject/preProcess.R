@@ -27,6 +27,7 @@ library(reshape2)
 library(boot)
 library(digest)
 library(parallel)
+library(heplots)
 
 PATH = getPathToThisFile()
 FILE = getNameOfThisFile()
@@ -1957,6 +1958,13 @@ analyzeContext <- function(modelVsPredTbl) {
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweetNentropy', 'PriorStdTweetOrderTweetOrderless',
 				       'TweetNentropy', 'TweetOrderTweetOrderless'))
 	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='contextStandardByGroupT', groupCol='groupNum')
+	
+	fooTbl = copy(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames])
+	fooTbl[, groupNum := factor(groupNum)]
+	fit = aov(acc ~ DVName * groupNum, data=fooTbl)
+	summary(fit)
+	etasq(fit, anova=T, partial=F)
+	
 	# RESULT: Freq weighting is better than entropy weighting for RP, and standard stoplist doesn't work well at all
 	# SO compare entropy to stoplist to freq to frentropy
 	DVNames = asTopHashtagAcross(c('PriorStd', 'TitleOrderlessEntropy', 'TitleOrderless', 'TitleOrderlessStoplist', 'TitleOrderlessFreq', 'TitleOrderlessFrentropy',

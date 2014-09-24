@@ -1621,11 +1621,21 @@ The hashtags used in each subset were chosen by scraping a site that published t
 Before starting to collect for each subset, the current trending popular hashtags for each US city were collected, and then 400 were randomly sampled from this set.
 Only 400 were selected since this is the maximum that the Twitter API can monitor at one time.
 
+In order to ensure that model results are not dependent on the specific Twitter subset collected,
+it is important that the overall accuracy differences between the different models do not drastically shift from subset to subset.
+That is, it is important that the effect size of model is much greater than the effect size of the interaction between Twitter subset and model.
+A small interaction relative to the main effect means that the rank ordering of the different models remains consistent across the different Twitter subsets.
+Further, a small effect size of subset relative to the effect of model means that the exact accuracy for each model remains consistent across the subsets.
+To measure the effect sizes of subset, model type, and the interaction, a two-way between-subjects ANOVA was performed.
+
 \subsubsection{Results}
 
 Model accuracy results for components of both the random permutation and Bayesian models grouped by Twitter popular-users subset are included in Figure \ref{figContextSubsets}.
-Although there is a main effect of subset, there are minimal to no practically significant interactions.
-Relative model performance remains consistent across the four subsets.
+Accuracy is affected significantly by subset ($F(3, 340) = 764, p < .01$)), model ($F(4, 340) = 3617, p < .01$), and the interaction between model and subset ($F(12, 340) = 142, p < .01$).
+However, the effect size of model type on accuracy is \num{8.6} times larger than the interaction term ($\eta ^ {2} = 0.770$ versus $\eta ^ {2} = 0.090$).
+This shows that the performance of a model relative to the other models remains consistent across the four subsets.
+Further, the effect size of model type is \num{6.3} times larger than the effect of Twitter subset ($\eta ^ {2} = 0.770$ versus $\eta ^ {2} = 0.122$).
+This shows that not only is relative model performance maintained across Twitter subsets, but the exact value of model accuracy for each model remains reasonably consistent across subsets.
 
 \begin{figure}[!htbp]
   \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-contextStandardByGroupT-crop.pdf}}}
@@ -1635,7 +1645,8 @@ Relative model performance remains consistent across the four subsets.
 
 \subsubsection{Discussion}
 
-Since the interactions across popular-users datasets are minimal, model behavior for the popular-users subset for Twitter can be interpreted as behavior that will persist across different time periods,
+Since the effect sizes of subset and the interaction between model type and subset are minimal relative to the effect size of model,
+model behavior for the popular-users subset for Twitter can be interpreted as behavior that will persist across different time periods,
 if the same method of choosing popular hashtags is conducted at a later date.
 It may also be the case that that model behavior does not depend on the specific method of choosing the popular hashtags, but since only a single method was used for this analysis,
 the results from this study cannot by themselves be used to answer this question.
