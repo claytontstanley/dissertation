@@ -2180,6 +2180,13 @@ or simply due to the fact that the amount of information collected for each of t
 \clearpage
 \section{Chapter 6: Combining Predictors on the Popular-Users Dataset}
 
+Chapter 4 isolated the prior component of the model and analyzed accuracy on the popular-users dataset.
+Chapter 5 added the context components to the models and analyzed accuracy on the Twitter popular-hashtags and StackOverflow randomly-sampled datasets.
+Chapter 6 shows the results when the combined prior and context models are tested across all of the datasets.
+Looking at model behavior across the datasets provides a way to show how the importance of the prior component relative to the context component can change depending on specific properties in the dataset that is studied.
+Also, an experiment to a user-custom context co-occurrence matrix was attempted on the popular-users dataset.
+This was tried because it seemed theoretically interesting to see if model performance improves when the context co-occurrence matrix is customized to each user.
+
 \subsection{Impact of Prior vs. Context}
 
 Adding a user's prior tag history as an additional component has been shown to improve performance, but is this always the case?
@@ -2317,6 +2324,10 @@ and the Bayesian model surpasses the compressed model at higher co-occurrence co
 
 \clearpage
 \section{Chapter 7: General Discussion}
+
+The general discussion is separated into two parts.
+The first section will describe the overall results and reemphasize key findings.
+The final section will discuss general theoretical implications of the results and describe future applications and directions. 
 
 \subsection{Overall Results}
 
