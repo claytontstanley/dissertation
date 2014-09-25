@@ -1489,16 +1489,20 @@ The two methodological concerns were examined to ensure that the technique to ca
 
 The five architectural concerns were examined for the following reasons:
 During exploratory evaluation, model accuracy seemed to be highly sensitive to the method of dealing with the commonly-used stop words, so several different methods were examined in more detail.
+
 Due to research from \textcite{Budiu2007}, model accuracy for both the Bayesian and LSA models is influenced by the number of documents in the dataset,
 so the effect of dataset size on accuracy was examined in more detail.
 Specifically,
 since both the Bayesian and random-permutation models are being evaluated, analyzing the effect of dataset size on accuracy in this research will allow direct comparisons between the two models on a common dataset.
 This has not yet been possible since the two models have never been compared on the same dataset within the same study.
+
 \textcite{Sahlgren2008} showed how different levels of compression in the random-permutation model influence accuracy, so this was examined for three reasons:
 to replicate the findings,
 as an additional check to ensure that the random-permutation model was implemented correctly, and also to see if the same levels of compression are valid for the much larger datasets used in this research.
+
 One of the primary goals of this research is to identify the best method to combine the model term for past user behavior with the context term for the random-permutation model,
 so two different ways to add the model terms were tested.
+
 Finally, previous research has shown that including word order in the vector-based models improves performance \parencites{Jones2007, Sahlgren2008},
 so word order was also examined to see if the effect could be replicated and also to measure the overall importance of word order on model accuracy relative to other architectural manipulations.
 
