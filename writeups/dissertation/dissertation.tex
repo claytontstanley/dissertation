@@ -1947,13 +1947,13 @@ then it may be worthwhile to experiment with using a compressed random permutati
 
 \subsection{Amount of Compression for Random Permutation}
 
-As a third architectural concern, the effect of compression for the random permutation model was examined for Twitter and StackOverflow.
 Another parameter in the random permutation model is the number of rows used to represent the all of the different words.
 Each word's environment vector is represented by two randomly placed ones and two negative ones across the rows.
 All that is required is that the four positions and signs of each of these environment vectors is unique.
 But this means multiple environment vectors can overlap when looking at a single row.
 This is a lossy form of compression, and allows the number of rows to represent the words to be much less than the total number of words.
 As the number of rows decreases, the amount of cross talk between the environment vectors increases, compression increases, and the amount of information stored decreases.
+As a third architectural concern, the effect of compression for the random permutation model was examined for Twitter and StackOverflow.
 
 \subsubsection{Method}
 
@@ -2008,16 +2008,16 @@ So it is that more impressive that even with a randomly-chosen form of compressi
 
 \subsection{Method to Combine Prior and Context}
 
-As a fourth architectural concern, two different methods to combine the prior and context components for the random-permutation model were explored.
 The activation value for the context component of the vector-based model is a correlation, ranging from zero to one.
 This is not a log-odds value.
 For the previous results, prior and context for the random permutation model were combined by simply adding the terms.
 However, this means that ACT-R's prior base-level learning component (which is a log-odds value) is added to a correlation value, which may not be mathematically appropriate.
-It would be more appropriate to convert the correlation value to a log-odds value, and then add this context term to the log-odds prior term.
+As a fourth architectural concern, another method to combine the prior and context components for the random-permutation model was explored.
 
 \subsubsection{Method}
 
 For a given retrieval, the random permutation model returns a set of activations that are correlation values for each of the tags.
+Instead of simply adding this correlation value to the prior model term, it may be more appropriate to convert the correlation value to a log-odds value first, and then add this context term to the log-odds prior term.
 So a method was created to convert a distribution of correlations to a distribution of log-odds values.
 To do this, the one-tailed cumulative distribution function value for each correlation in the distribution was computed.
 That probability was then converted to a log-odds value in the usual way. 
@@ -2142,7 +2142,7 @@ Since it was shown that including word order information has little to no signif
 \subsection{Coefficients for Predictors}
 
 All of the methodological and architectural tests were done on the Twitter popular-hashtags dataset and the StackOverflow randomly-sampled dataset.
-For these tests, the logistic regression is used to determine the optimal weight for each model component.
+For these tests, a logistic regression statistical technique is used to determine the optimal weight for each model component.
 A regression is done for each run in the dataset, and since multiple runs were used for the StackOverflow and Twitter datasets, multiple samples of coefficient weights for each model component were computed.
 The variance of the weights for each component show how likely it is that the regression is overfitting the data,
 and the mean shows the best estimate weight of each component relative to the other.
