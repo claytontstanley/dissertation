@@ -23,3 +23,5 @@ ${figPdfs}: %-crop.pdf: %.pdf
 	pdfcrop --verbose $*
 	#R -q -e 'embedFonts("$*-crop.pdf", format="pdfwrite", options="-dSubsetFonts=true -dEmbedAllFonts=true -dPDFSETTINGS=/printer")'
 
+static:
+	! grep 'NoZero.*0\.' dissertation.tex

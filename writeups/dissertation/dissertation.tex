@@ -45,7 +45,10 @@
 %\usepackage{breakurl}
 \usepackage{subfigure}
 \usepackage{graphicx}
+
 \usepackage[group-separator={,}]{siunitx}
+\newcommand{\numNoZero}[1]{{\sisetup{add-integer-zero=false}\num{#1}}}
+
 \RequirePackage[l2tabu, orthodox]{nag}
 \graphicspath{{./figures/dissertation/}} % Specifies the directory where pictures are stored
 
@@ -1416,7 +1419,7 @@ The median was used since there were users in the popular-users dataset that did
 Using the median effectively trims these unstable values from the sample, without having to define a cut point for an outlier removal process.
 
 Aggregate best-fit decay rate values for each model are included in Figure \ref{figPriorDecay}.
-Decay rate values that produced the most accurate model performance are lower for the optimized learning form (\num{0.43}) of $B_{i}$ compared to the standard form (\num{0.80}).
+Decay rate values that produced the most accurate model performance are lower for the optimized learning form (\num{.43}) of $B_{i}$ compared to the standard form (\num{.80}).
 The optimal values for optimized learning are near \num{0.5}, which lines up with default value used in ACT-R.
 So the decay rate values for the standard form are slightly higher than the default values used in ACT-R, but the values found when optimized learning is used line up nicely with the ACT-R defaults.
 
@@ -1446,7 +1449,7 @@ Aggregate accuracy was computed by taking the mean of every user's model accurac
   \label{figPriorAcc}
 \end{figure}
 
-Accuracy for the standard form (\num{0.35}) is higher than the optimized learning form (\num{0.30}).
+Accuracy for the standard form (\numNoZero{.35}) is higher than the optimized learning form (\numNoZero{.30}).
 This makes sense given that the standard form does not assume equal presentation rate for each chunk, and hashtags on Twitter in particular show trends of high rate of use and then shift to low rate of use. 
 The standard form of $B_{i}$ is able to more accurately account for these trends.
 
@@ -1636,7 +1639,8 @@ As another example, the ``Bayes only orderless context'' means that only the con
 \end{figure}
 
 Looking across the plots, including the offset significantly increases model accuracy, for all models, terms, and sites
-(\num{.53} to \num{.60} and \num{.22} to \num{.45} for Bayesian and random permutation for StackOverflow, \num{.31} to \num{.29} and \num{.24} to \num{.25} for Bayesian and random permutation for Twitter),
+(\numNoZero{.53} to \numNoZero{.60} and \numNoZero{.22} to \numNoZero{.45} for Bayesian and random permutation for StackOverflow,
+\numNoZero{.31} to \numNoZero{.29} and \numNoZero{.24} to \numNoZero{.25} for Bayesian and random permutation for Twitter),
 except that the full Bayesian model without an offset was slightly more accurate on Twitter.
 Accuracy is improved even when only a single term is used.
 Although in this case the term is not weighted,
@@ -1688,7 +1692,7 @@ To measure the effect sizes of subset, model type, and the interaction, a two-wa
 \subsubsection{Results}
 
 Model accuracy results for components of both the random permutation and Bayesian models grouped by Twitter popular-hashtags subset are included in Figure \ref{figContextSubsets}.
-Accuracy is affected significantly by subset ($F(3, 340) = 764, p < .01$)), model ($F(4, 340) = 3617, p < .01$), and the interaction between model and subset ($F(12, 340) = 142, p < .01$).
+Accuracy is affected significantly by subset ($F(3, 340) = 764, p < .001$)), model ($F(4, 340) = 3617, p < .001$), and the interaction between model and subset ($F(12, 340) = 142, p < .001$).
 However, the effect size of model type on accuracy is \num{8.6} times larger than the interaction term ($\eta ^ {2} = 0.77$ versus $\eta ^ {2} = 0.090$).
 This shows that the performance of a model relative to the other models remains consistent across the four subsets.
 Further, the effect size of model type is \num{6.3} times larger than the effect of Twitter subset ($\eta ^ {2} = 0.770$ versus $\eta ^ {2} = 0.122$).
@@ -1762,7 +1766,7 @@ The method used to identify this cutoff was simply intended to find a reasonable
 
 Plots for the three methods of handling stop words for the random permutation model on the StackOverflow dataset are included in Figure \ref{figContextStopRPSO}.
 The results show that model accuracy improves if stop words are handled in any of the three ways (predefined stoplist filtering, entropy weighting, and frequency filtering).
-Using a predefined stoplist makes the smallest improvement (\num{.45} to \num{.49}), while the entropy (\num{.60}) and frequency (\num{.63}) techniques improve performance the most,
+Using a predefined stoplist makes the smallest improvement (\numNoZero{.45} to \numNoZero{.49}), while the entropy (\numNoZero{.60}) and frequency (\numNoZero{.63}) techniques improve performance the most,
 and frequency shows a slight edge over entropy.
 However, using the frequency-weighting technique produces more noise in accuracy measurements compared to the other techniques, at least when tested on words in the title of StackOverflow posts.
 
@@ -1777,8 +1781,8 @@ However, using the frequency-weighting technique produces more noise in accuracy
 \end{figure}
 
 The three stop word techniques were then tested for the random permutation model on the Twitter dataset, and the results are included in Figure \ref{figContextStopRPT}.
-For the random permutation model for Twitter, the entropy weighting technique is the best method for handling stop words (\num{.25} to \num{.26}).
-Removing stop-words based on a predetermined list actually decreases accuracy (\num{.25} to \num{.23}), and using data-driven frequency filtering has only a small to no effect (\num{.25} to \num{.25}).
+For the random permutation model for Twitter, the entropy weighting technique is the best method for handling stop words (\numNoZero{.25} to \numNoZero{.26}).
+Removing stop-words based on a predetermined list actually decreases accuracy (\numNoZero{.25} to \numNoZero{.23}), and using data-driven frequency filtering has only a small to no effect (\numNoZero{.25} to \numNoZero{.25}).
 
 \begin{figure}[!htbp]
   \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-allWeightingsTPerm-crop.pdf}}}
@@ -1814,12 +1818,13 @@ The results for the frequency and entropy techniques for the Bayesian model on t
   \label{figContextStopBSO}
 \end{figure}
 
-The results show that entropy weighting produces the most accurate results (\num{.61} to \num{.63}).
-Also, accuracy actually decreases when using frequency filtering (compared to no filtering) (\num{.61} to \num{.56}) for the Bayesian model.
+The results show that entropy weighting produces the most accurate results (\numNoZero{.61} to \numNoZero{.63}).
+Also, accuracy actually decreases when using frequency filtering (compared to no filtering) (\numNoZero{.61} to \numNoZero{.56}) for the Bayesian model.
 So entropy weighting is the clear winner in this case.
 
 Similar results are found when the Bayesian model is tested on the Twitter dataset.
-Figure \ref{figContextStopBT} shows that entropy weighting is again the best performer (\num{.29} to \num{.32}), and frequency filtering decreases performance relative to no filtering (\num{.29} to \num{.28}).
+Figure \ref{figContextStopBT} shows that entropy weighting is again the best performer (\numNoZero{.29} to \numNoZero{.32}),
+and frequency filtering decreases performance relative to no filtering (\numNoZero{.29} to \numNoZero{.28}).
 
 \begin{figure}[!htbp]
   \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-allWeightingsTSji-crop.pdf}}}
@@ -1976,13 +1981,13 @@ The plot is also broken out for different size datasets used to build the co-occ
   \label{figContextDimSO}
 \end{figure}
 
-Reducing compression to only 100 rows in the representation has a strong negative effect on accuracy (\num{.60} to \num{.55} for the \num{1000000} document dataset size).
+Reducing compression to only 100 rows in the representation has a strong negative effect on accuracy (\numNoZero{.60} to \numNoZero{.55} for the \num{1000000} document dataset size).
 But \num{2048} rows is sufficient for these datasets,
-as increasing the number of rows to almost an order of magnitude higher (\num{10000}) has little to no positive impact on accuracy (\num{.60} to \num{.60} for the \num{1000000} document size). 
+as increasing the number of rows to almost an order of magnitude higher (\num{10000}) has little to no positive impact on accuracy (\numNoZero{.60} to \numNoZero{.60} for the \num{1000000} document size). 
 
 Results are similar for Twitter.
-Figure \ref{figContextDimT} shows the same negative impact when reducing from \num{2048} to \num{100} (\num{.26} to \num{.24} for the \num{3000000} document size),
-and little to no impact when increasing from \num{2048} to \num{10000} (\num{.26} to \num{.26} at \num{3000000}).
+Figure \ref{figContextDimT} shows the same negative impact when reducing from \num{2048} to \num{100} (\numNoZero{.26} to \numNoZero{.24} for the \num{3000000} document size),
+and little to no impact when increasing from \num{2048} to \num{10000} (\numNoZero{.26} to \numNoZero{.26} at \num{3000000}).
 This results are consistent across all document sizes used to build the co-occurrence matrix.
 
 \begin{figure}[!htbp]
@@ -2034,7 +2039,7 @@ The log-odds transformation technique was tested for the random permutation mode
 \subsubsection{Results}
 
 Model accuracy results after using the log-odds transformation are included in Figures \ref{figContextLogoddsSO} and \ref{figContextLogoddsT}.
-Using the log-odds transformation technique has a small effect on model accuracy for StackOverflow (\num{.45} to \num{.47}) and minimal to no effect on Twitter (\num{.25} to \num{.25}).
+Using the log-odds transformation technique has a small effect on model accuracy for StackOverflow (\numNoZero{.45} to \numNoZero{.47}) and minimal to no effect on Twitter (\numNoZero{.25} to \numNoZero{.25}).
 When the technique is used and accuracy is examined for a model with only a single predictor, the transformation does not change accuracy.
 When predictors are combined and the full model is examined, the transformation is in the direction of slightly increasing accuracy, at least for the StackOverflow dataset.
 However, any improvement when using the transformation is minimal.
@@ -2060,7 +2065,7 @@ Model performance is similar when the context component used for the model is ba
 
 There may be a slight edge in increased accuracy when a log-odds transformation is used for the StackOverflow dataset.
 However, that result is not statistically reliable for the sample size used in this analysis (confidence intervals overlap in Figure \ref{figContextLogoddsSO}),
-and even if present the overall change in accuracy is small (\num{.45} to \num{.47}).
+and even if present the overall change in accuracy is small (\numNoZero{.45} to \numNoZero{.47}).
 Nonetheless, it does seem appropriate to convert the context to a log-odds adjustment value when context is added as an additional term to the random permutation model.
 Since performance does not decrease when the transformation is made, may slightly increase,
 and leads to a more natural interpretation of each model term as a log-odds value, it is reasonable to include this step for the random permutation model.
@@ -2215,8 +2220,8 @@ The four Twitter popular-hashtags datasets and the StackOverflow randomly-sample
 \subsubsection{Results}
 
 The results are included in Figures \ref{figContextPriorneededSO} and \ref{figContextPriorneededT}.
-For StackOverflow, accuracy remains the same when the prior component is removed for both the Bayesian (\num{.63} to \num{.63}) and random permutation (\num{.63} to \num{.63}) models.
-Accuracy does dramatically decrease for Twitter when the prior is removed, however (\num{.32} to \num{.14} for Bayesian, \num{.25} to \num{.12} for random permutation).
+For StackOverflow, accuracy remains the same when the prior component is removed for both the Bayesian (\numNoZero{.63} to \numNoZero{.63}) and random permutation (\numNoZero{.63} to \numNoZero{.63}) models.
+Accuracy does dramatically decrease for Twitter when the prior is removed, however (\numNoZero{.32} to \numNoZero{.14} for Bayesian, \numNoZero{.25} to \numNoZero{.12} for random permutation).
 
 \begin{figure}[!htbp]
   \scalebox{.6}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-priorAddSO-crop.pdf}}}
@@ -2254,7 +2259,8 @@ So if a context-only model performs just as well as the full model in this case,
 
 The results comparing the full model to a context-only only model for the StackOverflow popular-users dataset are included in Figure \ref{figPUAddPrior}.
 In this case, past tag history does contain unique variance for accurately predicting tag use.
-Accuracy improves for both the Bayesian (\num{.51} to \num{.63}) and random permutation (\num{.47} to \num{.58}) models when the prior model component is combined with context compared to context alone.
+Accuracy improves for both the Bayesian (\numNoZero{.51} to \numNoZero{.63}) and random permutation (\numNoZero{.47} to \numNoZero{.58}) models
+when the prior model component is combined with context compared to context alone.
 
 \begin{figure}[!htbp]
   \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-priorAddPUserSO-crop.pdf}}}
@@ -2288,7 +2294,7 @@ So for each user, the co-occurrence matrix was created from their oldest posts, 
 Model accuracy when using a user-customized co-occurrence matrix for StackOverflow and Twitter is shown in Figures \ref{figPUCustomSO} and \ref{figPUCustomT}.
 The results compare accuracy for models that use a global co-occurrence and user-specific co-occurrence matrix.
 For StackOverflow, model accuracy for the user-specific co-occurrence matrix (labeled as ``user sji'') can be compared against the default global co-occurrence matrix.
-Accuracy decreases dramatically when a user-specific co-occurrence matrix is used for both the Bayesian (\num{.64} to \num{.35}) and random permutation (\num{.58} to \num{.36}) models.
+Accuracy decreases dramatically when a user-specific co-occurrence matrix is used for both the Bayesian (\numNoZero{.64} to \numNoZero{.35}) and random permutation (\numNoZero{.58} to \numNoZero{.36}) models.
 
 \begin{figure}[!htbp]
   \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-userSjiSO-crop.pdf}}}
@@ -2307,9 +2313,10 @@ However, the entire dataset is not available for Twitter, so a global co-occurre
 since the popular-users dataset samples across a wide range of hashtags, and due to Twitter's API restrictions it would be infeasible to collect all posts that use each of the hashtags in the dataset.
 But user-specific co-occurrence matrices can be built, since the popular-users dataset does contain all context and hashtag observations for each user.
 
-Model accuracy when only the single user-customized context predictor is used is relatively poor (\num{.17} and \num{.21} for Bayesian and random permutation),
-and the prior term is a much better predictor (\num{.37}).
-Further, when this component is combined with the prior component, model performance improves only slightly over performance when only the prior is used (\num{.37} to \num{.39} for both the Bayesian and random permutation).
+Model accuracy when only the single user-customized context predictor is used is relatively poor (\numNoZero{.17} and \numNoZero{.21} for Bayesian and random permutation),
+and the prior term is a much better predictor (\numNoZero{.37}).
+Further, when this component is combined with the prior component,
+model performance improves only slightly over performance when only the prior is used (\numNoZero{.37} to \numNoZero{.39} for both the Bayesian and random permutation).
 
 \subsubsection{Discussion}
 
@@ -2360,14 +2367,14 @@ and both models were much more accurate when tested on StackOverflow compared to
       \hline
 	Site 		& Dataset		& Model						& Accuracy \\
 	\hline
-	StackOverflow	& popular-users		& Bayesian with entropy				& \num{.63} \\
-			& 			& RP with entropy and log odds 			& \num{.58} \\
-			& randomly-sampled	& Bayesian with entropy 			& \num{.63} \\
-			& 			& RP with entropy and log odds			& \num{.63} \\
-	Twitter		& popular-users		& Bayesian with entropy and user sji		& \num{.39} \\
-			& 			& RP with entropy, log odds, and user sji	& \num{.39} \\
-			& popular-hashtags	& Bayesian with entropy				& \num{.32} \\
-			& 			& RP with entropy and log odds			& \num{.25} \\
+	StackOverflow	& popular-users		& Bayesian with entropy				& \numNoZero{.63} \\
+			& 			& RP with entropy and log odds 			& \numNoZero{.58} \\
+			& randomly-sampled	& Bayesian with entropy 			& \numNoZero{.63} \\
+			& 			& RP with entropy and log odds			& \numNoZero{.63} \\
+	Twitter		& popular-users		& Bayesian with entropy and user sji		& \numNoZero{.39} \\
+			& 			& RP with entropy, log odds, and user sji	& \numNoZero{.39} \\
+			& popular-hashtags	& Bayesian with entropy				& \numNoZero{.32} \\
+			& 			& RP with entropy and log odds			& \numNoZero{.25} \\
 	\hline
     \end{tabu}
   }
