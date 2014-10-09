@@ -1,3 +1,4 @@
+*.swp
 *.dx64fsl
 .DS_Store
 *.aux
