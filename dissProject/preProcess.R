@@ -1601,6 +1601,8 @@ renameColDVName <- function(tbl) {
 	mapping = c('topHashtagAcrossPriorStd', 'Standard prior model relaxed across posts',
 		    'topHashtagPostPriorStd', 'Standard prior model',
 		    'topHashtagPostPriorStdDefaultD', 'Standard prior model at default d=0.5',
+		    'topHashtagPostPriorStdBestDStd', 'Standard prior model at best-fit d=0.8',
+		    'topHashtagPostPriorOL2BestDOL', 'Optimized learning model at best-fit d=0.4',
 		    'topHashtagPostPriorOL2', 'Optimized learning model',
 		    'topHashtagAcrossPriorStdNoffset', 'Standard prior model relaxed across posts w/o offset',
 		    makeLogregMapping(),
@@ -1774,9 +1776,6 @@ analyzePrior <- function(modelVsPredTbl) {
 	modelVsPredTbl[, list(N=.N, names=list(unique(datasetName))), by=list(dsetType, dsetGroup, runNum,datasetNameRoot)]
 	bestTbl = modelVsPredTbl[predUsedBest == T]
 	tbl = modelVsPredTbl[topHashtag & hashtagUsedP] 
-	tbl[d == 0.5 & !maxNP, DVName := paste0(DVName, 'DefaultD')]
-	tbl = rbind(tbl, tbl[d == 0.5 & maxNP][, DVName := paste0(DVName, 'DefaultD')])
-	tbl = tbl[maxNP | d == 0.5]
 	#dvDiffsTbl = plotDVDiffs(rbind(bestTbl[runNum==2, compare2DVs(.SD, c('topHashtagPostPriorStd', 'topHashtagPostPriorOL2'), sortedOrder=c(1,2)), by=list(dsetType, dsetGroup), .SDcols=colnames(bestTbl)],
 	#			       bestTbl[runNum==2, compare2DVs(.SD, c('topHashtagPostPriorStd', 'topHashtagAcrossPriorStd')), by=list(dsetType, dsetGroup), .SDcols=colnames(bestTbl)]
 	#			       ))
@@ -1785,8 +1784,15 @@ analyzePrior <- function(modelVsPredTbl) {
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostPriorOL2' & datasetName=='TFollowgt10Mr2' & d < 1])
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostPriorOL2' & datasetName=='SOQgt500r2' & d < 1])
 	resTbl = compareOptimalDs(tbl[DVName %in% c(paste0('topHashtagPostPriorStd', c('')), paste0('topHashtagPostPriorOL2', c(''))) & runNum == 2])
-	DVNames = c(paste0('topHashtagPostPriorStd', c('', 'DefaultD')), paste0('topHashtagPostPriorOL2', c('')))
-	resTbl = compareOptimalAcc(tbl[DVName %in% DVNames & runNum == 2])
+	#tbl[d == 0.5 & !maxNP, DVName := paste0(DVName, 'DefaultD')]
+	#tbl = rbind(tbl, tbl[d == 0.5 & maxNP][, DVName := paste0(DVName, 'DefaultD')])
+	#tbl = tbl[maxNP | d == 0.5]
+	tbl2 = copy(tbl)
+	tbl2[d == .5, DVName := paste0(DVName, 'DefaultD')]
+	tbl2[d == .4, DVName := paste0(DVName, 'BestDOL')]
+	tbl2[d == .8, DVName := paste0(DVName, 'BestDStd')]
+	DVNames = c('topHashtagPostPriorStdDefaultD', 'topHashtagPostPriorOL2BestDOL', 'topHashtagPostPriorStdBestDStd')
+	resTbl = compareOptimalAcc(tbl2[DVName %in% DVNames & runNum == 2])
 	resTbl[, mean(meanVal), by=list(DVName)]
 	resTbl
 	tbl
