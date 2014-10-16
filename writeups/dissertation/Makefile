@@ -2,6 +2,8 @@ outFile = dissertation
 mendeleyDB = Library/Application Support/Mendeley Desktop/clayton.stanley@rice.edu@www.mendeley.com.sqlite
 figPdfs = $(shell cat ${outFile}.tex | grep '\.pdf' | perl -pe 's/^.*{(.*)([^}]+)}+$$/$$1$$2/' | perl -pe 's|^|figures/dissertation/|')
 
+SHELL := /bin/bash
+
 all: ${outFile}.pdf
 
 ${outFile}.pdf: %.pdf: pdfs alwaysRemake
@@ -25,3 +27,6 @@ ${figPdfs}: %-crop.pdf: %.pdf
 
 static:
 	! grep 'NoZero.*0\.' dissertation.tex
+
+showFigModDates:
+	git gp includegraphics dissertation.tex | egrep -o '{[^{]*}+$$' | sed 's/{//g' | sed 's/}//g' | perl -pe 's|^|figures/dissertation/|' | xargs ls -lt 
