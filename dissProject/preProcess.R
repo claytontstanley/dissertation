@@ -1516,7 +1516,7 @@ compareMeanDVBySize <- function(modelVsPredTbl, DV, extras=NULL, figName='', gro
 	plotLineSumTbl(sumTbl, DVName, sprintf('compareMeanDV-%s-%s', deparse(DV), figName), groupCol=groupCol,
 		       extras=c(list(theme(legend.position='top', legend.direction='vertical'),
 				     ylab('Proportion Correct'),
-				     xlab('Dataset Size')),
+				     xlab('Corpus Size')),
 				extras))
 }
 
@@ -1604,30 +1604,30 @@ renameColDVName <- function(tbl) {
 		    'topHashtagPostPriorStdBestDStd', 'Standard prior model at best-fit d=0.8',
 		    'topHashtagPostPriorOL2BestDOL', 'Optimized learning model at best-fit d=0.4',
 		    'topHashtagPostPriorOL2', 'Optimized learning model',
-		    'topHashtagAcrossPriorStdNoffset', 'Standard prior model relaxed across posts w/o offset',
+		    'topHashtagAcrossPriorStdNoffset', 'Standard prior model relaxed across posts without offset',
 		    makeLogregMapping(),
-		    makeStandardMappingBayes('', 'w/ entropy'),
-		    makeStandardMappingBayes('Freq', 'w/ freq'),
-		    makeStandardMappingBayes('Frentropy', 'w/ entropy and freq'),
+		    makeStandardMappingBayes('', 'with entropy'),
+		    makeStandardMappingBayes('Freq', 'with freq'),
+		    makeStandardMappingBayes('Frentropy', 'with entropy and freq'),
 		    makeStandardMappingBayes('Nentropy', ''),
-		    makeStandardMappingBayes('Usercontext', 'w/ entropy and user sji'),
-		    makeStandardMappingBayes('Noffset', 'w/o offset', 'PriorStdNoffset'),
+		    makeStandardMappingBayes('Usercontext', 'with entropy and user sji'),
+		    makeStandardMappingBayes('Noffset', 'without offset', 'PriorStdNoffset'),
 		    makeStandardMapping('', ''),
-		    makeStandardMapping('Entropy', 'w/ entropy'),
-		    makeStandardMapping('Stoplist', 'w/ stoplist'),
-		    makeStandardMapping('Enthyman', 'w/ entropy and log odds'),
-		    makeStandardMapping('Direction', 'w/ entropy and direction'),
-		    makeStandardMapping('Window', 'w/ entropy and window'),
-		    makeStandardMapping('Freq', 'w/ freq'),
-		    makeStandardMapping('Frentropy', 'w/ entropy and freq'),
-		    makeStandardMapping('Smdim', sprintf('w/ entropy and %s-row matrix', permNRowsSm)),
-		    makeStandardMapping('Lgdim', 'w/ entropy and 10000-row matrix'),
-		    makeStandardMapping('Frenthyman', 'w/ entropy and freq and log odds'),
-		    makeStandardMapping('Nenthyman', 'w/ log odds'),
-		    makeStandardMapping('Freqhyman', 'w/ freq and log odds'),
-		    #makeStandardMapping('Freqhyser', 'w/ freq, log odds, and user sji'),
-		    makeStandardMapping('Enthyser', 'w/ entropy, log odds, and user sji'),
-		    makeStandardMapping('Noffset', 'w/o offset', 'PriorStdNoffset')
+		    makeStandardMapping('Entropy', 'with entropy'),
+		    makeStandardMapping('Stoplist', 'with stoplist'),
+		    makeStandardMapping('Enthyman', 'with entropy and log odds'),
+		    makeStandardMapping('Direction', 'with entropy and direction'),
+		    makeStandardMapping('Window', 'with entropy and window'),
+		    makeStandardMapping('Freq', 'with freq'),
+		    makeStandardMapping('Frentropy', 'with entropy and freq'),
+		    makeStandardMapping('Smdim', sprintf('with entropy and %s-row matrix', permNRowsSm)),
+		    makeStandardMapping('Lgdim', 'with entropy and 10000-row matrix'),
+		    makeStandardMapping('Frenthyman', 'with entropy and freq and log odds'),
+		    makeStandardMapping('Nenthyman', 'with log odds'),
+		    makeStandardMapping('Freqhyman', 'with freq and log odds'),
+		    #makeStandardMapping('Freqhyser', 'with freq, log odds, and user sji'),
+		    makeStandardMapping('Enthyser', 'with entropy, log odds, and user sji'),
+		    makeStandardMapping('Noffset', 'without offset', 'PriorStdNoffset')
 		    )
 	mapping = groupN(2, mapping)
 	mapping
@@ -1652,17 +1652,17 @@ makeLogregMapping <- function() {
 	c('actPriorStd', 'Standard prior model component relaxed across posts',
 	  'actPriorStdBayes', 'Bayes prior component relaxed across posts',
 	  'actPriorStdRP', 'RP prior component relaxed across posts',
-	  'actTitle', 'Bayes title component w/ entropy',
-	  'actBody', 'Bayes body component w/ entropy',
-	  'actTweet', 'Bayes orderless context component w/ entropy',
-	  'actTitleOrderlessEnthyman', 'RP title component w/ entropy and log odds',
-	  'actBodyOrderlessEnthyman', 'RP body component w/ entropy and log odds',
-	  'actTweetOrderlessEnthyman', 'RP orderless context component w/ entropy and log odds',
-	  'actTitleOrderlessEnthyman', 'RP title component w/ entropy and log odds',
-	  'actBodyOrderlessEnthyman', 'RP body component w/ entropy and log odds',
-	  'actTweetOrderlessEnthyman', 'RP orderless context component w/ entropy and log odds',
-	  'actTweetUsercontext', 'Bayes orderless context component w/ entropy and user sji',
-	  'actTweetOrderlessEnthyser', 'RP orderless context component w/ entropy, log odds, and user sji')
+	  'actTitle', 'Bayes title component with entropy',
+	  'actBody', 'Bayes body component with entropy',
+	  'actTweet', 'Bayes orderless context component with entropy',
+	  'actTitleOrderlessEnthyman', 'RP title component with entropy and log odds',
+	  'actBodyOrderlessEnthyman', 'RP body component with entropy and log odds',
+	  'actTweetOrderlessEnthyman', 'RP orderless context component with entropy and log odds',
+	  'actTitleOrderlessEnthyman', 'RP title component with entropy and log odds',
+	  'actBodyOrderlessEnthyman', 'RP body component with entropy and log odds',
+	  'actTweetOrderlessEnthyman', 'RP orderless context component with entropy and log odds',
+	  'actTweetUsercontext', 'Bayes orderless context component with entropy and user sji',
+	  'actTweetOrderlessEnthyser', 'RP orderless context component with entropy, log odds, and user sji')
 }
 
 makeStandardMappingBayes <- function(keyword, text, priorStd='PriorStd') {
@@ -1884,12 +1884,12 @@ analyzeFB <- function() {
 				       ))
 	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='allWeightingsTPerm', groupCol='dsetGroup')
 	# RESULT: Logodds technique works
-	# SO compare entropy w/ logodds to entropy
+	# SO compare entropy with logodds to entropy
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleBody',
 				       'PriorStdTitleOrderlessFreqBodyOrderlessFreq', 'PriorStdTitleOrderlessBodyOrderless',
 				       'PriorStdTitleOrderlessNenthymanBodyOrderlessNenthyman'))
 	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='logoddsSO')
-	# T compare entropy w/ loggodds to entropy
+	# T compare entropy with loggodds to entropy
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweet',
 				       'PriorStdTweetOrderFreqTweetOrderlessFreq', 'PriorStdTweetOrderTweetOrderless',
 				       'PriorStdTweetOrderNenthymanTweetOrderlessNenthyman'))
@@ -1997,45 +1997,43 @@ analyzeContext <- function(modelVsPredTbl) {
 	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='allWeightingsTSji', groupCol='dsetGroup')
 	# RESULT: Bayes and RP with frequency cutoff scales; RP with entropy saturates for SO
 	# SO Entropy all sizes
-	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleBody', 
+	DVNames = asTopHashtagAcross(c('PriorStdTitleBody', 
 				       'PriorStdTitleOrderlessBodyOrderless',
 				       'PriorStdTitleOrderlessEntropyBodyOrderlessEntropy',
 				       'PriorStdTitleOrderlessFreqBodyOrderlessFreq'))
 	compareMeanDVBySize(tbl[dsetType == 'stackoverflow' & DVName %in% DVNames & sizeNum != 2], acc, figName='freqVsEntropyBySizeSO', groupCol='sizeNum')
 	# T Entropy all sizes
-	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweet',
+	DVNames = asTopHashtagAcross(c('PriorStdTweet',
 				       'PriorStdTweetOrderEntropyTweetOrderlessEntropy',
 				       'PriorStdTweetOrderFreqTweetOrderlessFreq'))
 	compareMeanDVBySize(tbl[dsetType == 'twitter' & DVName %in% DVNames], acc, figName='freqVsEntropyBySizeT', groupCol='sizeNum')
 	# RESULT: Increasing rows in matrix does not dramatically improve performance, even at different size datasets; entropy and freq cutoff is much more important for RP
 	# SO Entropy all sizes
-	DVNames = asTopHashtagAcross(c('PriorStd',
-				       'PriorStdTitleOrderlessEntropyBodyOrderlessEntropy', 
+	DVNames = asTopHashtagAcross(c('PriorStdTitleOrderlessEntropyBodyOrderlessEntropy', 
 				       'PriorStdTitleOrderlessSmdimBodyOrderlessSmdim',
 				       'PriorStdTitleOrderlessLgdimBodyOrderlessLgdim'))
 	compareMeanDVBySize(tbl[dsetType == 'stackoverflow' & DVName %in% DVNames & sizeNum != 2], acc, figName='dimBySizeSO', groupCol='sizeNum')
 	# T Entropy all sizes
-	DVNames = asTopHashtagAcross(c('PriorStd',
-				       'PriorStdTweetOrderEntropyTweetOrderlessEntropy',
+	DVNames = asTopHashtagAcross(c('PriorStdTweetOrderEntropyTweetOrderlessEntropy',
 				       'PriorStdTweetOrderSmdimTweetOrderlessSmdim',
 				       'PriorStdTweetOrderLgdimTweetOrderlessLgdim'))
 	compareMeanDVBySize(tbl[dsetType == 'twitter' & DVName %in% DVNames], acc, figName='dimBySizeT', groupCol='sizeNum')
 	# RESULT: Logodds technique works
-	# SO compare entropy w/ logodds to entropy
+	# SO compare entropy with logodds to entropy
 	DVNames = asTopHashtagAcross(c('PriorStd',
 				       'PriorStdTitleOrderlessBodyOrderless',
 				       'PriorStdTitleOrderlessNenthymanBodyOrderlessNenthyman',
 				       'TitleOrderless', 'BodyOrderless',
 				       'TitleOrderlessNenthyman', 'BodyOrderlessNenthyman'))
 	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='logoddsSO')
-	# T compare entropy w/ loggodds to entropy
+	# T compare entropy with loggodds to entropy
 	DVNames = asTopHashtagAcross(c('PriorStd',
 				       'PriorStdTweetOrderTweetOrderless',
 				       'PriorStdTweetOrderNenthymanTweetOrderlessNenthyman',
 				       'TweetOrderless', 'TweetOrderlessNenthyman'))
 	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='logoddsT', groupCol='dsetGroup')
 	# RESULT: Not much information in order for RP
-	# T compare entropy w/ direction and entropy w/ window to entropy
+	# T compare entropy with direction and entropy with window to entropy
 	DVNames = asTopHashtagAcross(c('PriorStd',
 				       'TweetOrderEntropy', 'TweetOrder', 'TweetOrderDirection', 'TweetOrderWindow',
 				       'TweetOrderlessEntropy', 'TweetOrderless',
@@ -3667,9 +3665,22 @@ runGenAndSaveCurWorkspaceg2s6 <- function() genAndSaveCurWorkspace(groupConfigG2
 runGenAndSaveCurWorkspaceg3s6 <- function() genAndSaveCurWorkspace(groupConfigG3S6)
 runGenAndSaveCurWorkspaceg4s6 <- function() genAndSaveCurWorkspace(groupConfigG4S6)
 
+countNumQuestionsPUsers <- function() {
+	sqldf('select avg(num_questions) from users where num_questions is not null')
+	sqldf("select avg(count) from (select count(chunk) from (select * from post_tokenized where type = 'tag' limit 10000000) as foo group by id) as foo2;")
+	foo2Tbl = modelVsPredTbl[, .N, by=list(user_screen_name, dsetType)][dsetType == 'stackoverflow']
+	foo2Tbl[, user_screen_name := as.integer(user_screen_name)]
+	setkey(foo2Tbl, user_screen_name)
+	fooTbl = sqldt('select id, num_questions from users')
+	setkey(fooTbl, id)
+	fooTbl[foo2Tbl][, mean(num_questions)]
+}
+
 curWS <- function() {
 	analyzePrior(modelVsPredTbl)
+	analyzeContext(modelVsPredTbl)
 	analyzePUser(modelVsPredTbl)
+	analyzeLogreg(logregTbl, modelVsPredTbl)
 	plotMemMat()
 	withProf(runContext20g1s6(regen='useAlreadyLoaded'))
 	runContext500g1s6(regen='useAlreadyLoaded', numRunsT=1, numRunsSO=1)
