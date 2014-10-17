@@ -6,7 +6,7 @@ SHELL := /bin/bash
 
 all: ${outFile}.pdf
 
-${outFile}.pdf: %.pdf: pdfs alwaysRemake
+${outFile}.pdf: %.pdf: static pdfs alwaysRemake
 	latexmk -pdf $*.tex
 
 alwaysRemake:
@@ -27,6 +27,7 @@ ${figPdfs}: %-crop.pdf: %.pdf
 
 static:
 	! grep 'NoZero.*0\.' dissertation.tex
+	! grep -i ' very ' dissertation.tex
 
 showFigModDates:
 	git gp includegraphics dissertation.tex | egrep -o '{[^{]*}+$$' | sed 's/{//g' | sed 's/}//g' | perl -pe 's|^|figures/dissertation/|' | xargs ls -lt 

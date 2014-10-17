@@ -15,6 +15,31 @@
 % http://tex.stackexchange.com/questions/36423/random-unwanted-space-between-paragraphs
 \raggedbottom
 
+% Changing horizontal space between subsubsection title and text, without loading titlesec package.
+% Not loading titlesec because it clashes with apa6 package.
+% Took base \@startsection command from apa6 .cls file, and tweaked horizontal spacing. 
+% http://tex.stackexchange.com/questions/22576/redefining-sectioning-commands
+% http://www.tex.ac.uk/cgi-bin/texfaq2html?label=atsigns
+% http://tex.stackexchange.com/questions/60127/subsubsection-description-and-title-not-separated
+\makeatletter
+\renewcommand{\subsubsection}{%
+  \@startsection
+  {subsubsection}%
+  {3}%
+  {\parindent}%
+  {0\baselineskip \@plus 0.2ex \@minus 0.2ex}%
+  {-.4em}%
+  {\normalfont\normalsize\bfseries\addperi}}
+\renewcommand{\paragraph}{%
+  \@startsection
+  {paragraph}%
+  {4}%
+  {\parindent}%
+  {0\baselineskip \@plus 0.2ex \@minus 0.2ex}%
+  {-.4em}%
+  {\normalfont\normalsize\bfseries\itshape\addperi}}
+\makeatother
+
 % ref: http://tex.stackexchange.com/questions/28516/how-to-change-the-title-of-toc
 \addto\captionsamerican{% Replace ``english'' with the language you use
   \renewcommand{\contentsname}%
@@ -760,7 +785,7 @@ Vector-based models can be thought of as a compressed representation of the full
 Each model computes an activation for each word to retrieve, given context and (for ACT-R's Bayesian model) prior knowledge.
 Since both models produce activations for each chunk, one can be swapped out for another and used as the declarative memory component of the ACT-R infrastructure.
 For example, \textcite{Rutledge2007} used a variant of the BEAGLE vector-based model as the DM component of ACT-R.
-\citeAuthor{Rutledge2008} showed that an ACT-R theory with a vector-based memory system can successfully model the fan effect.
+\citeauthor{Rutledge2008} showed that an ACT-R theory with a vector-based memory system can successfully model the fan effect.
 
 The fan effect describes a behavior of human memory where memory items are more difficult to retrieve if they have occurred in a larger number of different contexts.
 \textcite{Rutledge2008} used \textcite{Anderson1974}'s classic experimental paradigm to test the fan effect.
@@ -999,7 +1024,7 @@ The model presented by \textcite{Mazzia2009} is quite similar to an ACT-R declar
 The main potential difference is that --- like \textcite{Kuo2011} and \textcite{Stanley2013} --- the global prior likelihood of a hashtag is computed without taking into account the specific user's past history.
 Instead, the global prior is an overall average frequency of hashtag use across all users.
 Further, no recency information was used to compute the global prior, so hashtags used in the recent past were not weighted more heavily. 
-This was most likely not much of an issue for \citeAuthor{Mazzia2009}'s study, since all hashtags were collected within a relatively short period of time (about 3 months).
+This was most likely not much of an issue for \citeauthor{Mazzia2009}'s study, since all hashtags were collected within a relatively short period of time (about 3 months).
 
 Several other models have taken a tweet-centered approach to hashtag prediction, where suggested hashtags are collected from hashtags used from similar tweets.
 \textcites{Li2011, Zangerle2011, Kywe2012} all store a content vector for each tweet, and then compute a word co-occurrence-based similarity score between a composed tweet and the rest of the tweets in the database.
@@ -1553,7 +1578,7 @@ so word order was also examined to see if the effect could be replicated and als
 
 In order to best combine these predictors, a logistic regression statistical technique similar to \textcite{Stanley2013} was used to determine the most optimal weights for each term.
 \textcite{Stanley2013} weighted each term in the total activation equation Table \ref{tabModACTRModel}) to maximize model accuracy.
-\citeAuthor{Stanley2013} found that the optimal weights for the StackOverflow model for the prior term, title context term, and body context term were \num{.62}, \num{.93}, and \num{1.75} respectively.
+\citeauthor{Stanley2013} found that the optimal weights for the StackOverflow model for the prior term, title context term, and body context term were \num{.62}, \num{.93}, and \num{1.75} respectively.
 
 The optimal weights for each model component are computed in the same manner as \textcite{Stanley2013}:
 When a user creates a tag for a post, a retrieval request for the model is made.
@@ -1760,7 +1785,8 @@ So alongside looking at frequency weighting, previously generated, and no stop w
 The runs from the Twitter popular-hashtags and StackOverflow randomly-sampled datasets were used for the analysis.
 Both the random permutation and Bayesian models were tested.
 Activations for context were computed by using five different methods to handle stop words:
-The two removal methods used in \textcite{Sahlgren2008} (i.e., removal based on frequency, removal based on the pre-determined 571-word Cornell SMART stoplist),
+The two removal methods used in \textcite{Sahlgren2008}
+(i.e., removal based on frequency, removal based on the pre-determined 571-word Cornell SMART stoplist \parencite{Salton1988}),
 the entropy-weighting method used in \textcite{Stanley2013},
 combining the entropy-weighting and frequency-filtering methods,
 and no removal or weighting of stop words.
@@ -1772,7 +1798,7 @@ A cutoff point must be identified and used in order to remove the high-frequency
 Since the StackOverflow and Twitter datasets are much larger than the datasets used by \citeauthor{Sahlgren2008}, the same cutoff could not be used.
 
 The ideal cutoff was determined by choosing the value where the standard deviation of the counts for each word for each of the tags were all relatively small.
-The plots for the standard deviations across tags that were used to identify the cutoff for StackOverflow and Twitter are included in Figures \ref{figContextCutoffSO} and \ref{figContextCutoffT}.
+The plots for the standard deviations across tags that were used to identify the cutoff for StackOverflow and Twitter are shown in Figures \ref{figContextCutoffSO} and \ref{figContextCutoffT}.
 
 \begin{figure}[!htbp]
   \scalebox{.6}{\resizebox{\linewidth}{!}{\includegraphics{memMatSO-crop.pdf}}}
@@ -1805,7 +1831,7 @@ The method used to identify this cutoff was simply intended to find a reasonable
 
 \subsubsection{Results for the Random Permutation Model}
 
-Plots for the three methods of handling stop words for the random permutation model on the StackOverflow dataset are included in Figure \ref{figContextStopRPSO}.
+Plots for the three methods of handling stop words for the random permutation model on the StackOverflow dataset are shown in Figure \ref{figContextStopRPSO}.
 The results show that model accuracy improves if stop words are handled in any of the three ways (predefined stoplist filtering, entropy weighting, and frequency filtering).
 Using a predefined stoplist makes the smallest improvement (\numNoZero{.45} to \numNoZero{.49}), while the entropy (\numNoZero{.60}) and frequency (\numNoZero{.63}) techniques improve performance the most,
 and frequency shows a slight edge over entropy.
@@ -2311,7 +2337,7 @@ So if a context-only model performs just as well as the full model in this case,
 
 \subsubsection{Results}
 
-The results comparing the full model to a context-only only model for the StackOverflow popular-users dataset are included in Figure \ref{figPUAddPrior}.
+The results comparing the full model to a context-only only model for the StackOverflow popular-users dataset are depicted in Figure \ref{figPUAddPrior}.
 In this case, past tag history does contain unique variance for accurately predicting tag use.
 Accuracy improves for both the Bayesian (\numNoZero{.51} to \numNoZero{.63}) and random permutation (\numNoZero{.47} to \numNoZero{.58}) models
 when the prior model component is combined with context compared to context alone.
@@ -2328,11 +2354,11 @@ This shows that incorporating past tagging history is important even for a site 
 However, for this type of site it only becomes important when a reasonably large amount of a user's past tagging history has been collected.
 For a randomly sampled user on StackOverflow, a context-only model captures the majority of the predictive variance.
 
-This raises the question about how much past user behavior is enough for a site like StackOverflow to benefit from adding past user behavior as an additional predictor.
+This raises an important applied question: Exactly how much past user behavior is enough for a site like StackOverflow to benefit from adding past user behavior as an additional predictor.
 When the model predicts tags from a random sample of StackOverflow users, adding the prior component to the model does not significantly increase model accuracy compared to using context alone.
 However, when the model predicts tags from a set of users that ask the most questions on the site, adding the prior does significantly increase accuracy.
-For the StackOverflow dataset, a user asks on average 5 questions, and adds 3 tags to a post.
-So the model uses approximately 15 prior observations when computing the prior component from a randomly-sampled on the site.
+For the StackOverflow dataset, a user asks on average 5 questions and adds 3 tags to a post.
+So the model uses approximately 15 prior observations when computing the prior component for a randomly-sampled user on the site.
 For the popular-users dataset used to generate the results in Figure \ref{figPUAddPrior}, a user asked 180 questions on average.
 So for this dataset, the model uses approximately 540 prior observations when computing the prior activation.
 So for the StackOverflow site, the prior component begins to generate unique predictive variance above and beyond the context component somewhere between when a user has generated 15 and 540 prior observations.
@@ -2364,7 +2390,10 @@ Accuracy decreases dramatically when a user-specific co-occurrence matrix is use
 
 \begin{figure}[!htbp]
   \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-userSjiSO-crop.pdf}}}
-  \caption{Model accuracy with user-customized context component for StackOverflow}
+  \caption{
+    Model accuracy with user-customized context component for StackOverflow.
+    A model name with ``user sji'' uses a co-occurrence matrix customized for each user instead of a single global co-occurrence matrix.
+  }
   \label{figPUCustomSO}
 \end{figure}
 
@@ -2426,7 +2455,13 @@ Both models performed nearly equal for the StackOverflow datasets tested,
 and both models were much more accurate when tested on StackOverflow compared to Twitter.
 
 \begin{table}[!ht]
-  \caption{Summary of accuracy for each model and dataset}
+  \caption{
+    Summary of accuracy for each model and dataset.
+    The Bayesian model includes entropy weighting for the context words,
+    the RP model includes entropy weighting and log odds transformation when combining the context and prior components.
+    Both models use a user-customized co-occurrence matrix for the Twitter popular-users dataset, since a global co-occurrence
+    matrix is not available for this dataset.
+  }
   \label{tabOverallResults}
   {\tabulinesep=1.2mm
     \begin{tabu}{llll}
@@ -2448,11 +2483,11 @@ and both models were much more accurate when tested on StackOverflow compared to
 
 Overall, both the random permutation and Bayesian declarative memory models fit the observed tagging behavior in StackOverflow and Twitter relatively well.
 The fits for StackOverflow in particular are quite high, especially given the large tag space on the site.
-These results provide support for the idea that choosing a hashtag when composing a tweet and tagging a StackOverflow post is a declarative memory retrieval process.
+These results provide support for the idea that choosing a hashtag when composing a tweet and tagging a StackOverflow post is akin to a declarative memory retrieval process.
 However, both models were not 100 percent accurate, and the amount of variance left to predict was much larger than what would be observed if retrieval noise was included in the model.
 So it is most likely the case that the task is not done solely with declarative memory processes.
 
-Alternatively, perhaps authors are taking advantage of context information that is not currently represented in the model.
+Alternatively, perhaps authors of posts are taking advantage of context information that is not currently represented in the model.
 For example, time of day might be a useful predictor of tag use on Twitter.
 \textcite{Cohn2012} built a tag-prediction model for Twitter that was based primarily on temporal cycles of hashtag use.
 This technique could be naturally incorporated into a co-occurrence framework by including time of day as an additional context by tag co-occurrence for each post.
@@ -2502,18 +2537,17 @@ Performance is similar for the random permutation and Bayesian models when the c
 Performance also does not improve by much when word order is added as the last predictor in the random permutation model.
 The random permutation model seems to work so well primarily due to the way that the full co-occurrence representation is compressed.
 
-And compression for the random permutation model is essentially random.
+As previously noted, compression for the random permutation model is essentially random.
 That is, no SVD is done to identify the most predictive components,
 so the compressed representation used by the random permutation model does not contain nearly as much of the variance from the original co-occurrence matrix that it could have.
 However, performing a full SVD on a co-occurrence matrix as large as the ones generated for StackOverflow and Twitter is computationally infeasible.
-So, it also seems plausible that this SVD computation is infeasible at the neural level.
-When deriving the LSA approach, \textcite{Landauer1997} explicitly state that they make no claims that the brain is computing an SVD at the neural level;
+Also, when deriving the LSA approach, \textcite{Landauer1997} explicitly state that they make no claims that the brain is computing an SVD at the neural level;
 only that the neural machinery is set up such that the representation makes predictions that are similar to what would have been generated if the matrix decomposition for an SVD would have been computed.
 Perhaps the randomly-compressed representation used for the random permutation model is the way in which the brain tries to efficiently achieve the full LSA- and SVD-like approach that \citeauthor{Landauer1997} propose.
 
 \subsubsection{Attentional Weight}
 
-The Bayesian declarative memory model for ACT-R has an attentional weight term $W_{j}$ that can be used to implement how stop words are handled.
+The Bayesian declarative memory model for ACT-R has an attentional weight term $W_{j}$ that can be used to attenuate or remove stop words.
 The random permutation model was also easily modified to have an attentional weight term by attenuating each word's set of ones and negative ones values by that word's attentional weight.
 Both a method for stop-word removal (frequency filtering) and stop-word attenuating (entropy weighting) performed well for both models.
 Also, using a proper method for handling the low-predictor words produced some of the largest improvements in model accuracy compared to the other explorations
@@ -2552,17 +2586,16 @@ Further research could try to tease apart how model accuracy is independently in
 To do this, four models could be constructed (uncompressed and compressed representation crossed with correlation and log likelihood activation) compared to the two in this study,
 so that the effects of representation and activation calculation could be partialed out.
 This would allow, for example, the method of compression for the random permutation vector-based model to be analyzed independent of activation calculation.
-The results would provide additional evidence to help determine the specific representation that the declarative memory system uses to represent co-occurrences,
+The results would help determine the specific representation that the declarative memory system uses to represent co-occurrences,
 and also the specific activation calculation that is carried out by the system.
 
 \subsubsection{Future Applications}
 
-The tag-recommendation models developed through this research should be immediately relevant to real-world tasks.
+The tag-recommendation models developed through this research should be relevant to real-world tasks.
 Model accuracy is high enough (particularly for StackOverflow) for the developed models to be used as a foundation for tag recommendation systems that are deployed on Twitter or StackOverflow.
-Also, since the developed models are task agnostic, they can potentially be used as tag recommendation systems for other domains.
-Examples of similar tagging tasks are hashtag use on Facebook, flagging (i.e., tagging), Wikipedia articles for content issues or overly opinionated material,
-auto labeling incoming mail and placing it into appropriate folders, and spam filtering.
-Having an accurate and efficient co-occurrence memory model that correctly retrieves relevant tags can be applied to a wide variety of tasks.
+However, the focus for this research was to evaluate the accuracy of two cognitively-plausible declarative memory models, so the models were more constrained than general machine learning models of tagging.
+So it is unlikely that these general models of declarative memory will outperform specific machine learning models that have been optimized for a specific tagging task. 
+Nevertheless, one of the advantages of the general declarative memory models is that they are task agnostic, so it would take minimal time to deploy these models on a new tagging task.
 
 \subsubsection{Summary}
 
