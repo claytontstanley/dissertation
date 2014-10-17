@@ -3691,9 +3691,9 @@ curWS <- function() {
 	runPUserTFollowSji1kTest(regen=F)
 	withProf(runContext20g1s1(regen='useAlreadyLoaded'))
 	setLogLevel(2)
+	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isPriorRun, list.files(path=getDirModelVsPred()))))
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelVsPred()))))
 	logregTbl = buildTablesLogreg(file_path_sans_ext(Filter(function(r) isContextRun(r), list.files(path=getDirLogreg()))))
-	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isPriorRun, list.files(path=getDirModelVsPred()))))
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isPUserRun, list.files(path=getDirModelVsPred()))))
 	modelHashtagsTbls = buildTablesModelHashtags(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelHashtags()))))
 
