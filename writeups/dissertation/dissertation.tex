@@ -221,7 +221,7 @@ Finally, I would like to thank my brothers Brendan and Justin, sister Kellen, ex
 This work was supported in part by the Gertrude Maurin Fund.
 The resources were used to purchase high-performance computing hardware and the research would not have been possible without this crucial equipment.
 
-I would also like to the creators of a few open-sourced software packages that were heavily leveraged to do this research:
+I would also like to thank the creators of a few open-sourced software packages that were heavily leveraged to do this research:
 The majority of the modeling and analysis was done with the R statistical computing environment \parencite{RCoreTeam2014} and two important R packages:
 data.table \parencite{Dowle2014} was leveraged to implement the models efficiently, and ggplot2 \parencite{Wickham2009} was used to produce the visualizations.
 
@@ -381,8 +381,8 @@ and the user data from the datasets are publicly available for analysis.
 Also, studying user-based tag generation on these sites has relevant real-world application.
 Models that can accurately predict the tags that users will generate on Twitter and StackOverflow can be used as the foundation for recommendations systems on these popular sites.
 These systems can also help newer users by recommending proper tags for their newest content.
-On the StackOverflow site, for example, experts often subscribe to specific hashtags that interest them, and receive a daily digest of posts that are tagged with those hashtags.
-Helping the user properly tag posts on StackOverflow ensures that right community sees the post, which greatly increases the chance that the question on the post will be answered quickly and correctly.
+On the StackOverflow site, for example, experts often subscribe to specific tags that interest them, and receive a daily digest of posts that tagged with those tags.
+Helping the user properly tag posts on StackOverflow ensures that right community sees the post, which greatly increases the chance that the question on the site will be answered quickly and correctly.
 For Twitter, hashtags represent streams of information that are possibly interesting to the user.
 Having a recommendation system that can suggest relevant hashtags to the user provides a way for the user to connect to and discover new information streams that interest them.
 Also, by suggesting relevant hashtags the system can help make sure a user's content is seen by other users who are interested in the same type of information.
@@ -794,7 +794,7 @@ They are later asked to recall if a particular person and place pair was present
 The main manipulation is the ``fan'' of the person and place for each pair.
 The fan is defined as the number of different contexts that each item in the pair is presented in.
 For example, if items were presented to the participant where the ``hippie'' was both in the ``park'' and in the ``store,'' then ``hippie'' would have a fan of two.
-Recall accuracy decrease and time to recall increase as the sum total fan of the person and pair increases.
+Recall accuracy decrease and time to recall increase as the sum total fan of the person and place increases.
 
 Both the ACT-R declarative memory theory and vector-based models produce the fan effect due to the effect that fan has on the co-occurrence matrix.
 As a particular word (e.g., ``hippie'') is seen in more and more contexts, the co-occurrence count of the word across all contexts is spread across multiple contexts.
@@ -1320,13 +1320,6 @@ profile plots for a single user for both StackOverflow and Twitter are included 
 The specific value of the hashtag used for both plots is a nominal variable and not important for this analysis.
 What is interesting is the large tag space for these users.
 There are bands of commonly-used tags for each user, but there are also many instances where new tags are used, and a large percentage of tags used are not in the most common bands.
-For example, the StackOverflow user in Figure \ref{figPriorHTByTime} has a pronounced band where the same hashtag is chosen repeatedly over time. 
-However there are many instances of other tags being used in parallel to the tag that is producing the band (that is repeatedly being used). 
-The Twitter user has a few clusters where the same hashtag is chosen repeatedly but only for a brief period of time.
-As time progresses, a band of choosing another hashtag is observed, and then the user switches to a new hashtag after that.
-More recent posts for the Twitter user are more varied, and there is no longer a single hashtag that the user chooses repeatedly.
-This helps illustrate how challenging modeling this task can be.
-The model's goal is to predict at each instance what tag will be chosen, but to do so the model must predict the correct few tags from a much larger set of tags whose frequency of occurrence is changing over time.
 
 \begin{figure}[!htbp]
   {%
@@ -1346,6 +1339,15 @@ The model's goal is to predict at each instance what tag will be chosen, but to 
   }%
 \end{figure}
 
+For example, the StackOverflow user in Figure \ref{figPriorHTByTime} has a pronounced band where the same hashtag is chosen repeatedly over time. 
+However there are many instances of other tags being used in parallel to the tag that is producing the band (that is repeatedly being used). 
+The Twitter user has a few clusters where the same hashtag is chosen repeatedly but only for a brief period of time.
+As time progresses, a band of choosing another hashtag is observed, and then the user switches to a new hashtag after that.
+More recent posts for the Twitter user are more varied, and there is no longer a single hashtag that the user chooses repeatedly.
+This helps illustrate how challenging modeling this task can be.
+The model's goal is to predict at each instance what tag will be chosen, but to do so the model must predict the correct few tags from a much larger set of tags whose frequency of occurrence is changing over time.
+
+
 Although the tag space for the Twitter user is smaller than the StackOverflow user in these plots, this is not a consistent trend.
 These plots were chosen from the set to also show that the amount of tag variation for individual users also varies: some use many tags and some use just a few.
 To accurately model human performance in this domain, the model must be able to make correct predictions across all variations of user tagging behavior. 
@@ -1357,13 +1359,13 @@ These plots for StackOverflow and Twitter are included in Figures \ref{figPriorH
 These are the same plots shown in Figure \ref{figPriorHTByTime} with model predictions overlaid in red. 
 
 \begin{figure}[!htbp]
-  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{HTMByTime-520957-crop.pdf}}}
+  \scalebox{.7}{\resizebox{\linewidth}{!}{\includegraphics{HTMByTime-520957-crop.pdf}}}
   \caption{Model tagging profile of a single user on StackOverflow}
   \label{figPriorHTMByTimeSO}
 \end{figure}
 
 \begin{figure}[!htbp]
-  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{HTMByTime-fashionista_com-crop.pdf}}}
+  \scalebox{.7}{\resizebox{\linewidth}{!}{\includegraphics{HTMByTime-fashionista_com-crop.pdf}}}
   \caption{Model tagging profile of a single user on Twitter}
   \label{figPriorHTMByTimeT}
 \end{figure}
@@ -1491,7 +1493,7 @@ So the decay rate values for the standard form are slightly higher than the defa
 
 Finally, model accuracy was analyzed across all dataset slices for StackOverflow and Twitter.
 This was done by examining model accuracy at a specific decay rate value for each model.
-Accuracy was assessed at each model's previously-determined best-fit values (\num{.43} and \num{.80} for the optimized learning and standard form), and the standard form's default value (\num{0.5}).
+Accuracy was assessed at each model's previously-determined best-fit values (\num{.43} and \num{.80} for the optimized learning and standard form) and the standard form's default value (\num{0.5}).
 Since decay rate values were explored at \num{0.1} increments between the 0 and 1 range, the decay rate values used to examine model accuracy were rounded to the nearest decay rate value that was included in the run.
 So a best-fit value of \num{.4} was used for the optimized learning model instead of the \num{.43} average found from the dataset slices.
 Accuracy for both sites is included in Figure \ref{figPriorAcc}. 
@@ -1511,7 +1513,7 @@ This makes sense given that the standard form does not assume equal presentation
 The standard form of $B_{i}$ is able to more accurately account for these trends.
 
 ACT-R sets the default decay rate value to \num{0.5}, and the best-fit value for the standard form is higher (\num{0.8}) for these datasets.
-The figure shows that although model accuracy does improve for the standard form when increasing the decay rate parameter from \num{0.5} to the optimal value,
+The figure shows that although model accuracy does slightly improve for the standard form when increasing the decay rate parameter from \num{0.5} to the optimal value,
 that percentage improvement is not as large as the improvement gained from using the standard form compared to the optimized learning form.
 Nonetheless, model accuracy is highest when both the standard form is used and the decay rate value is increased. 
 
@@ -1577,10 +1579,10 @@ so word order was also examined to see if the effect could be replicated and als
 \subsubsection{Logistic Regression}
 
 In order to best combine these predictors, a logistic regression statistical technique similar to \textcite{Stanley2013} was used to determine the most optimal weights for each term.
-\textcite{Stanley2013} weighted each term in the total activation equation Table \ref{tabModACTRModel}) to maximize model accuracy.
+\textcite{Stanley2013} weighted each term in the total activation equation (Table \ref{tabModACTRModel}) to maximize model accuracy.
 \citeauthor{Stanley2013} found that the optimal weights for the StackOverflow model for the prior term, title context term, and body context term were \num{.62}, \num{.93}, and \num{1.75} respectively.
 
-The optimal weights for each model component are computed in the same manner as \textcite{Stanley2013}:
+The optimal weights for each model component were computed in the same manner as \textcite{Stanley2013}:
 When a user creates a tag for a post, a retrieval request for the model is made.
 For each request, the model returns a set of tags (all tags that have been observed for that user in the past) and activations associated with each tag.
 An activation value is computed for each model component (e.g., prior tag use, context) for each tag.
@@ -1588,7 +1590,7 @@ These values are recorded, and tag instances that match what the author actually
 This process is repeated across all posts where a user chooses a tag, and across all users in the dataset.
 Once all of the results are aggregated, a logistic regression is run where the optimal weights for each model component are found that maximize the model's ability to correctly label tags as 0 or 1 based on total activation.
 
-Model accuracy is evaluated by rank ordering all recorded tags by model activation using the optimal weights,
+Model accuracy was evaluated by rank ordering all recorded tags by model activation using the optimal weights,
 asking the model to tag the top N posts with a 1 (where N is the total number of recorded tagging instances in the dataset sample),
 and then comparing the model's chosen tags with the used tags for each post (i.e., looking at the ``hits'').
 This is equivalent to throttling the threshold in the logistic regression such that the total number of observations labeled as a 1 match the total number of recorded instances of tagging in the dataset.
@@ -1719,7 +1721,7 @@ and that the relative activation values for each tag within a post is what is im
 
 One simple and likely explanation is that there are posts where a large set of tags have high activation,
 but the author is choosing to use only a fixed small set of the top tags for each post, regardless of the activation values of the top tags.
-The author determines the number of tags to use for a post based on competing goals of tagging posts an not overly saturating a post with tags.
+The author determines the number of tags to use for a post based on competing goals of tagging posts and not overly saturating a post with tags.
 For example, the author may be writing a question on StackOverflow about \emph{javascript}, and a large set of related tags are retrieved from declarative memory that are all above the retrieval threshold
 (e.g., \emph{javascript}, \emph{dom}, \emph{svg}, \emph{html}, \emph{jquery}, \emph{css}),
 but the author only chooses to use the tags \emph{javascript}, \emph{dom}, and \emph{svg}, since he has decided to tag this post with three tags, and those are the three tags with the highest activation.
@@ -1905,7 +1907,7 @@ One result that should not be overlooked is how poorly using a predetermined sto
 This is most likely because the StackOverflow and Twitter datasets are large and contain high-frequency words that are domain specific (e.g., emoticons) and are not included in the predetermined list.
 This shows that data-driven techniques to identify stop words can be much more effective than using a predetermined list.
 
-Another interesting result was how the Bayesian model actually performed worse when stop words were removed based on frequency compared to no stop word removal.
+Another interesting result is how the Bayesian model actually performed worse when stop words were removed based on frequency compared to no stop word removal.
 This was not the case for the random permutation model in this study, was not the case when \textcite{Sahlgren2008} used frequency filtering on the random permutation model,
 and is most likely never the case for the random permutation model.
 Model accuracy most likely decreases for the Bayesian model because this model already has a normalization component built in that the random permutation model does not have.
@@ -2011,7 +2013,7 @@ More unique tags means that the co-occurrence counts are spread across a wider r
 which means that it takes a larger number of total documents before the Bayesian model performs better than the random permutation model.
 
 The transition point where accuracy for the Bayesian model outperformed the random permutation model was much higher for StackOverflow than Twitter.
-This is most likely because StackOverflow has a almost \num{100} times more unique tags than the Twitter popular-hashtags dataset.
+This is most likely because StackOverflow has almost \num{100} times more unique tags than the Twitter popular-hashtags dataset.
 The number of words in a StackOverflow post is also much higher than Twitter, which should have lowered the transition point.
 However, the effect of words in a post must be less than the effect of number of unique tags, as the transition point was still much higher for StackOverflow given that it should have lowered due to post size.
 
@@ -2025,7 +2027,7 @@ then it may be worthwhile to experiment with using a compressed random permutati
 
 \subsection{Amount of Compression for Random Permutation}
 
-Another parameter in the random permutation model is the number of rows used to represent the all of the different words.
+Another parameter in the random permutation model is the number of rows used to represent all of the different words.
 Each word's environment vector is represented by two randomly placed ones and two negative ones across the rows.
 All that is required is that the four positions and signs of each of these environment vectors is unique.
 But this means multiple environment vectors can overlap when looking at a single row.
@@ -2050,7 +2052,10 @@ The plot is also broken out for different size datasets used to build the co-occ
 
 \begin{figure}[!htbp]
   \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-dimBySizeSO-crop.pdf}}}
-  \caption{Effect of compression on random permutation model for StackOverflow}
+  \caption{
+    Effect of compression on random permutation model for StackOverflow.
+    Error bars represent the 95\% bootstrapped confidence interval for the mean.
+  }
   \label{figContextDimSO}
 \end{figure}
 
@@ -2065,7 +2070,10 @@ This results are consistent across all corpus sizes used to build the co-occurre
 
 \begin{figure}[!htbp]
   \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-dimBySizeT-crop.pdf}}}
-  \caption{Effect of compression on random permutation model for Twitter}
+  \caption{
+    Effect of compression on random permutation model for Twitter.
+    Error bars represent the 95\% bootstrapped confidence interval for the mean.
+  }
   \label{figContextDimT}
 \end{figure}
 
@@ -2215,6 +2223,7 @@ which should never happen since the order-only model is a subset of the full mod
 \textcite{Sahlgren2008} most likely did not use a regression technique to optimize the weights for each of the order and orderless model terms.
 So although incorporating word order into the random permutation model does seem to slightly improve performance,
 the strength of the model is more likely to be in how efficiently it can represent the co-occurrence matrix rather than its ability to include word order in the representation.
+That is, the strength of the model is in its compressed unordered context component term and not the ordered component, at least for the Twitter dataset studied.
 
 Also, the reason why the directional version of ordering is the best predictor of the three ordered components is most likely because order information does not have a large effect,
 so the two representations for words to the left and right of a tag are highly correlated.
@@ -2354,7 +2363,7 @@ This shows that incorporating past tagging history is important even for a site 
 However, for this type of site it only becomes important when a reasonably large amount of a user's past tagging history has been collected.
 For a randomly sampled user on StackOverflow, a context-only model captures the majority of the predictive variance.
 
-This raises an important applied question: Exactly how much past user behavior is enough for a site like StackOverflow to benefit from adding past user behavior as an additional predictor.
+This raises an important applied question: Exactly how much past user behavior is enough for a site like StackOverflow to benefit from adding past user behavior as an additional predictor?
 When the model predicts tags from a random sample of StackOverflow users, adding the prior component to the model does not significantly increase model accuracy compared to using context alone.
 However, when the model predicts tags from a set of users that ask the most questions on the site, adding the prior does significantly increase accuracy.
 For the StackOverflow dataset, a user asks on average 5 questions and adds 3 tags to a post.
@@ -2412,6 +2421,8 @@ Model accuracy when only the single user-customized context predictor is used is
 and the prior term is a much better predictor (\numNoZero{.37}).
 Further, when this component is combined with the prior component,
 model performance improves only slightly over performance when only the prior is used (\numNoZero{.37} to \numNoZero{.39} for both the Bayesian and random permutation).
+
+\FloatBarrier
 
 \subsubsection{Discussion}
 
@@ -2508,7 +2519,7 @@ and as is supported in the results from this study.
 
 \subsubsection{Representation}
 
-Given that the storage space required to represent the co-occurrences for the random permutation is dramatically smaller than the uncompressed Bayesian model,
+Given that the storage space required to represent the co-occurrences for the random permutation model is dramatically smaller than the uncompressed Bayesian model,
 and that the compression is lossy and essentially random (i.e., no SVD),
 it is quite interesting that the random permutation model performs nearly as well as the full Bayesian model for this task.
 
