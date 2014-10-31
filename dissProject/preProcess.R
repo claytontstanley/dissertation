@@ -2004,6 +2004,7 @@ analyzeContext <- function(modelVsPredTbl) {
 	compareMeanDVBySize(tbl[dsetType == 'stackoverflow' & DVName %in% DVNames & sizeNum != 2], acc, figName='freqVsEntropyBySizeSO', groupCol='sizeNum')
 	# T Entropy all sizes
 	DVNames = asTopHashtagAcross(c('PriorStdTweet',
+				       'PriorStdTweetOrderTweetOrderless',
 				       'PriorStdTweetOrderEntropyTweetOrderlessEntropy',
 				       'PriorStdTweetOrderFreqTweetOrderlessFreq'))
 	compareMeanDVBySize(tbl[dsetType == 'twitter' & DVName %in% DVNames], acc, figName='freqVsEntropyBySizeT', groupCol='sizeNum')
