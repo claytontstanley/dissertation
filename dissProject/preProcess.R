@@ -96,10 +96,11 @@ myStopifnot <- function(...) {
 
 savePlotsP = T
 
+plotWidth = 1
 myPlotPrint <- function(fig, name) {
 	dev.new()
 	myLog(fig)
-	if (savePlotsP) ggsave(filename=sprintf('%s/figures/%s.pdf', PATH, name), plot=fig)
+	if (savePlotsP) ggsave(filename=sprintf('%s/figures/%s.pdf', PATH, name), width=par("din")[1]*plotWidth, plot=fig)
 	fig
 }
 
@@ -1483,7 +1484,7 @@ plotLineSumTbl <- function(sumTbl, fillCol, figName, extras=NULL, groupCol) {
 	sizeNums = eval(bquote(sumTbl[!duplicated(.(groupCol))][, .(groupCol)]))
 	sizeNums = parse(text=sizeNums)
 	expr = bquote(ggplot(sumTbl, aes(x=factor(.(groupCol)), y=meanVal, colour=.(fillCol))) + 
-		      geom_line(aes(group=.(fillCol))) + 
+		      geom_line(aes(group=.(fillCol)), size=1.4) + 
 		      geom_point() + 
 		      scale_x_discrete(breaks = unique(sumTbl[, .(groupCol)]), labels = sizeNums) +
 		      geom_errorbar(aes(ymin=minCI, ymax=maxCI), width=0.1, size=0.3) + 
