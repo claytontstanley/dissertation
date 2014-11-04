@@ -97,6 +97,7 @@ myStopifnot <- function(...) {
 savePlotsP = T
 
 plotWidth = 1
+#plotWidth = 2
 myPlotPrint <- function(fig, name) {
 	dev.new()
 	myLog(fig)
@@ -1007,7 +1008,7 @@ defaultTPermPUserConfig = modConfig(c(defaultTPUserConfig, defaultPermConfig, de
 					 MCCORESActUser=16,
 					 MCCORESAct=1))
 
-defaultGGPlotOpts <- theme_bw() + theme_classic()
+defaultGGPlotOpts <- theme_bw() + theme_classic() + theme(text=element_text(size=15))
 
 runPriorT <- function(config) {
 	runPrior(config)
@@ -1468,8 +1469,10 @@ plotBarSumTbl <- function(sumTbl, fillCol, figName, extras=NULL, groupCol='dsetG
 	fillCol = substitute(fillCol)
 	renameCols(sumTbl)
 	expr = bquote(ggplot(sumTbl, aes(x=factor(.(groupCol)), y=meanVal, fill=.(fillCol))) +
-		      geom_bar(aes(y=meanVal), width=0.7, position=position_dodge(), stat='identity') +
-		      geom_errorbar(aes(ymin=minCI, ymax=maxCI), position=position_dodge(width=0.7), width=0.1, size=0.3) + 
+		      geom_bar(aes(y=meanVal), width=0.7, position=position_dodge(width=.8), stat='identity') +
+		      #geom_text(aes(y=0, label=.(fillCol), hjust=0, vjust=-1.25), position=position_dodge(width=1.4)) +
+		      geom_errorbar(aes(ymin=minCI, ymax=maxCI), position=position_dodge(width=.8), width=0.1, size=0.3) + 
+		      #scale_x_discrete(expand=c(.04,0)) + 
 		      defaultGGPlotOpts)
 	plot = eval(expr)
 	plotTbl(plot, extras, figName)
@@ -1503,7 +1506,8 @@ compareMeanDV <- function(modelVsPredTbl, DV, extras=NULL, figName='', groupCol=
 	sumTbl
 	renameColDVName(sumTbl)
 	plotBarSumTbl(sumTbl, DVName, sprintf('compareMeanDV-%s-%s', deparse(DV), figName), groupCol=groupCol,
-		      extras=c(list(theme(legend.position='top', legend.direction='vertical', axis.title.y=element_blank()),
+		      extras=c(list(theme(legend.position='top', legend.direction='vertical', axis.title.y=element_blank()
+					  ),
 				    guides(fill=guide_legend(title=title, reverse=T)),
 				    coord_flip()
 				    ), extras))
