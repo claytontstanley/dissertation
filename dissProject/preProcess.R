@@ -3692,6 +3692,16 @@ countNumUniqueTHashtags <- function() {
 	583/2267
 }
 
+countHashtagsAtEnd <- function() {
+	fooTbl = setDT(sqldf("select id, chunk, pos, type from top_hashtag_tokenized limit 50000000"))
+	tables()
+	fooTbl[, max(pos), by=id][, mean(V1)] # Average words per tweet
+	fooTbl
+	fooTbl[, endP := type == 'hashtag' & pos == max(pos), by=id]
+	fooTbl[type == 'hashtag'][, .N, by=endP][, sumN := sum(N)][, propN := N/sumN, by=endP][, print(.SD)]
+	fooTbl
+}
+
 curWS <- function() {
 	analyzePrior(modelVsPredTbl)
 	analyzeContext(modelVsPredTbl)
