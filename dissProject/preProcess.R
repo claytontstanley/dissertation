@@ -3682,6 +3682,16 @@ countNumQuestionsPUsers <- function() {
 	fooTbl[foo2Tbl][, mean(num_questions)]
 }
 
+countNumUniqueTHashtags <- function() {
+	fooTbl = setDT(sqldf('select * from top_hashtag_hashtags'))
+	fooTbl[rank < 400][, .N, by=hashtag]
+	fooTbl[rank < 400][, .N, by=hashtag][N>1]
+	307/1565
+	fooTbl[, .N, by=hashtag]
+	fooTbl[, .N, by=hashtag][N>1]
+	583/2267
+}
+
 curWS <- function() {
 	analyzePrior(modelVsPredTbl)
 	analyzeContext(modelVsPredTbl)
