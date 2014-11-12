@@ -162,31 +162,45 @@
 	\par \endgroup
 	\vskip 0pt plus 2fil
 	{Houston, TEXAS \par} \vskip 0pt 
-	{\monthnameenglish{} \number\year \par}
+	{December \number\year \par}
       }}
       \doublespacing
       \newpage
   %BDB\hyphenpenalty 10000
       \fussy
       \@ifundefined{@abstract}{}{%
-	\section{\normalfont\normalsize\abstractname}% BDB
-	\noindent\@abstract\par% BDB
-	\@ifundefined{@keywords}{}{%
-	  \setlength{\parindent}{0.4in}% BDB
-	  \indent\textit{\keywordname:} \@keywords%
-	}%
-	\newpage
-      }
-      \@ifundefined{def@donotrepeattitle}{
-	\section{\protect\normalfont{\@title}}
-      }{}%
-      \raggedright%
-      \setlength{\parindent}{0.4in}%
-    \end{titlepage}}
-  }
+	\section{\normalfont\normalsize \abstractname}% BDB
+	\begingroup
+	\def \baselinestretch{1} \parskip \z@ \parindent \z@ \par
+	\null \vskip .1in \centering
+	\@title
+	\vskip .3in
+
+	by
+
+	\@author \par
+	\vskip .5in
+      \endgroup
+      \@abstract\par% BDB
+      \@ifundefined{@keywords}{}{%
+	\setlength{\parindent}{0.4in}% BDB
+	\indent\textit{\keywordname:} \@keywords%
+      }%
+      \newpage
+    }
+    \@ifundefined{def@donotrepeattitle}{
+      \section{\protect\normalfont{\@title}}
+    }{}%
+    \raggedright%
+    \setlength{\parindent}{0.4in}%
+  \end{titlepage}}
+}
 \makeatother
 
-%\makeDisCover
+
+
+\makeDisCover
+
 
 %\keywords{}
 
