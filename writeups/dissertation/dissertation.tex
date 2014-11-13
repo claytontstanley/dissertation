@@ -115,8 +115,8 @@
 \setcounter{tocdepth}{2}
 
 \title{Comparing vector-based and ACT-R memory models using large-scale datasets:\protect\\User-customized hashtag and tag prediction on Twitter and StackOverflow}
-\shorttitle{Comparing memory models of tag retrieval}
-%\shorttitle{}
+%\shorttitle{Comparing memory models of tag retrieval}
+\shorttitle{}
 
 \author{Clayton Stanley}
 \affiliation{Rice University}
@@ -169,6 +169,7 @@
   %BDB\hyphenpenalty 10000
       \fussy
       \@ifundefined{@abstract}{}{%
+	\thispagestyle{empty}
 	\section{\normalfont\normalsize \abstractname}% BDB
 	\begingroup
 	\parskip \z@ \parindent \z@ \par
@@ -204,6 +205,8 @@
 
 \begin{document}
 
+\pagenumbering{roman}
+
 \abstract{
   The growth of social media and user-created content on online sites provides unique opportunities to study models of declarative memory.
   The tasks of choosing a hashtag for a tweet and tagging a post on StackOverflow were framed as declarative memory retrieval problems.
@@ -223,6 +226,7 @@
 
 \maketitle
 
+\thispagestyle{empty}
 \section{Acknowledgements}
 
 I would first like to thank my advisor, Mike Byrne, for all of his feedback and suggestions for this dissertation research
@@ -239,14 +243,19 @@ data.table \parencite{Dowle2014} was leveraged to implement the models efficient
 
 \newpage
 
+\thispagestyle{empty}
 \tableofcontents
 \newpage
 
+\thispagestyle{empty}
 \listoftables
 \newpage
 
+\thispagestyle{empty}
 \listoffigures
 \newpage
+
+\pagenumbering{arabic}
 
 \section{Chapter 1: Introduction}
 
