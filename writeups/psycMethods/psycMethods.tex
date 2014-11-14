@@ -266,42 +266,6 @@ For example, it is currently unexplored how a vector-based model can be modified
 Large-scale datasets were used throughout the model development and evaluation process.
 This provides an ideal testing environment for constraints and assumptions for each theory to be rapidly tested and new model components to be hypothesized and quickly evaluated.
 
-\subsection{The Task: Predicting User-Generated Tags}
-
-Social media sites such as Twitter, Facebook, StackOverflow, Google+, and Yelp are composed almost entirely of human-created content.
-The amount of user content on these sites is quite large, and continues to grow.
-Users of Twitter's microblogging service, for example, generate half a billion tweets per day \parencite{TwitterReport2012}.
-However, a single user of a social media site is most likely interested in only a small fragment of this large amount of information.
-One general question to support the user in this domain is:
-How can we quickly and effectively connect users to the content that they care about?
-
-A growing number of users on social media sites are focusing on and looking for recently-created information when performing a search \parencite{Jansen2011}.
-In other words, users on social media sites want the fresh \emph{stream} of information about a particular topic.
-This can certainly be seen in the main user interface views that these social media sites provide:
-Twitter's homepage showing followees' tweets, Facebook's homepage showing friends' posts, and StackOverflow's daily digest of posts for particular tags.
-
-So how can we ensure that users are connected to the information streams that they care most about?
-One promising approach is to model and predict the user's goals when using and searching these social media sites \parencite{Rose2004}.
-If we have a better understanding of a user's goals, then we can tailor the information streams to the content that is most in line with these goals.
-For example, Twitter might suggest other users and hashtags for the user to follow, Facebook could suggest pages to like, Yelp could recommend businesses to check out.
-Researchers are currently looking for ways to automate the goal-identification task for more general search queries like those generated for Google \parencites{Jansen2008}{Lee2005}.
-
-However, social media sites have an advantage over traditional search engines for identifying user goals: human-created content.
-Twitter has more than just the tweet that a user is currently composing to try and identify that user's goals.
-The site also has all of the user's previous content, and can use that information to provide a much better prediction of a user's goals.
-Further, sites like Twitter, StackOverflow, Google+, and Facebook support ways for the user to explicitly identify their precise goals when creating content: hashtags.
-These user-created hashtags are a key indicator of a user's goals on a social media site. 
-
-These hashtags relate to a user's goals and interests because they are a form of human-based document tagging \parencite{Chang2010}.
-Further, people are using hashtags as a way to create information streams on social media sites \parencite{Kwak2010}.
-Twitter users, for example, commonly create and use hashtags for upcoming political events that interest them, such as debates and races \parencite{Diakopoulos2010}.
-So if we can predict what hashtags a user is interested in, we have a better understanding of the information streams that they care about.
-We can use that information to correctly suggest hashtags that they have previously used when they are generating new content.
-
-Further, if a particular information stream has multiple hashtags associated with it (common for Twitter), these semantically similar hashtags can also be recommended to users.
-So we can tailor the system to suggest hashtags that the user may not yet know about but are of likely interest to them and growing in popularity across the site.
-We can help aid in their discovery of fresh and relevant information that matches their goals on the site.
-
 \subsection{Research Questions}
 
 The core question motivating this research is:
@@ -311,7 +275,7 @@ This process can be framed as a memory retrieval problem.
 The process of suggesting a relevant hashtag to a user can be thought of as a memory retrieval request for a hashtag, given prior hashtag use and current context.
 That is, each user on a social media site has created content that contains a set of tags within the context of each post.
 
-Co-occurrence-based modeling has been shown as a potentially useful approach when predicting Twitter hashtag use \parencite{Efron2010}.
+Co-occurrence-based modeling has been shown as a potentially useful approach when predicting Twitter hashtag use \parencite{Efron2010} and StackOverflow tag use \parencites{Kuo2011,Stanley2013}.
 Several memory retrieval models are based on this broad methodology, where a count is maintained of the times each contextual element (such as a word in a post) co-occur with a tag.
 At least two of the current memory retrieval models are based on a co-occurrence methodology:
 ACT-R's declarative memory (DM) retrieval theory and random permutation vector-based memory systems.
@@ -322,7 +286,6 @@ These two memory systems were compared across two domains where users generate t
 Twitter is a microblogging service where users create 140 character ``tweets'' and broadcast those messages out to the users who follow their posts.
 A user is free to annotate important concepts or words in the tweet by preceding words with ``\#,'' thereby making the word into a hashtag.
 After the tweet is created the hashtags become hyperlinks, and if clicked on will take a user to a summary feed of all of the tweets across Twitter that have used that hashtag.
-So these user-created hashtags on Twitter help connect the tweet to other tweets about the same topic through common hashtag use.
 Some recent and often used hashtags for Twitter are \emph{\#photography}, \emph{\#startup}, \emph{\#4change}, \emph{\#android}, and \emph{\#solar}.
 
 The two memory retrieval models were also tested on tag use for StackOverflow posts.
@@ -335,15 +298,6 @@ The StackOverflow and Twitter datasets were chosen because the human-created con
 However, they are also similar on several accounts:
 Both domains have amassed large amounts of user-created content, users generate tags for posts when creating content on the site (hashtags for Twitter and tags for StackOverflow),
 and the user data from the datasets are publicly available for analysis.
-
-Also, studying user-based tag generation on these sites has relevant real-world application.
-Models that can accurately predict the tags that users will generate on Twitter and StackOverflow can be used as the foundation for recommendations systems on these popular sites.
-These systems can also help newer users by recommending proper tags for their newest content.
-On the StackOverflow site, for example, experts often subscribe to specific tags that interest them, and receive a daily digest of posts that tagged with those tags.
-Helping the user properly tag posts on StackOverflow ensures that right community sees the post, which greatly increases the chance that the question on the site will be answered quickly and correctly.
-For Twitter, hashtags represent streams of information that are possibly interesting to the user.
-Having a recommendation system that can suggest relevant hashtags to the user provides a way for the user to connect to and discover new information streams that interest them.
-Also, by suggesting relevant hashtags the system can help make sure a user's content is seen by other users who are interested in the same type of information.
 
 \subsubsection{Comparison Between ACT-R and Vector-Based Memory Systems}
 
@@ -373,7 +327,6 @@ Chapter 5 adds the context component to the models, and shows how model accuracy
 Chapter 6 describes model results when prior and context are combined and tested on both of the dataset subsets used for Chapter 4 and Chapter 5.
 Finally, Chapter 7 provides a general discussion of the overall findings.
 
-\clearpage
 \section{Chapter 2: Theoretical Background}
 
 The ACT-R declarative memory theory and the vector-based retrieval models will be described.
@@ -394,84 +347,6 @@ what is the optimal behavior (i.e., the optimal chunk to retrieve from memory)?
 Using Bayesian reasoning, each chunk of information in declarative memory can be assigned a prior likelihood of needing retrieval again, given the prior history of exposure to the chunk.
 These chunk prior probabilities are then adjusted for the current context, so that the posterior probabilities represent the likelihood that a chunk is needed, given prior odds and adjusted by current environment state.
 
-\subsubsection{ACT-R DM Model}
-
-A formal description of the ACT-R Declarative Memory model is included in Table \ref{tabACTRModel}.
-
-\begin{table}[!ht]
-  \caption{ACT-R declarative memory model}
-  \label{tabACTRModel}
-  {\tabulinesep=1.2mm
-    \begin{tabu}{ll}
-      \hline
-      Common Name &  Equation \\
-      \hline
-      Activation &	 	$A_{i} = B_{i} + \sum_{j \in c}^{} W_{j} S_{ji}$ \\
-      Attentional Weight &	$W_{j} = \frac{W}{n}$ \\
-      Base Level & 		$B_{i} = log \sum_{j=1}^{n} {t_{j}}^{-d}$ \\
-      Constant Base Level &	$B_{i} = \frac{p_{i}}{1-p_{i}}$ \\
-      Strength of Association &	$S_{ji} = log \frac{p(i|j)}{p(i|\overline{j})} \approx log \frac{p(i|j)}{p(i)} = log \frac{NN_{ji}}{N_{Row}(j)N_{Col}(i)}$ \\
-      Recall Probability &	$P_{i} = \left( 1 + e^{\frac{\tau - A_{i}}{s}} \right )^{-1}$ \\
-      \hline
-    \end{tabu}
-  }
-\end{table}
-
-The total activation ($A_{i}$) for a chunk in declarative memory is a function of two components: base-level activation ($B_{i}$) and strength of association ($S_{ji}$).
-The recall probability ($P_{i})$ that a chunk will be retrieved from memory increases with total activation ($A_{i}$).
-Each term in Table \ref{tabACTRModel} will be discussed in greater detail to follow.
-
-\subsubsection{Base-Level Activation}
-
-Base-level activation reflects the log prior odds of needing an observed chunk again.
-The default way to calculate these log prior odds is to use the standard base-level equation in Table \ref{tabACTRModel}.
-This equation formalizes how log prior odds are a function of both frequency and recency of prior exposure to a particular chunk.
-Chunks used more frequently (either through exposure or from a retrieval) are more likely to be needed for retrieval again.
-However, as time progresses and a particular chunk is no longer used, the activation for that chunk decays.
-In this way the standard base-level equation formalizes the time dynamics of the retrieval system, where a chunk's base-level activation evolves over time, depending on its frequency and recency of use.
-
-For some domains it is reasonable to assume that the base-level activations of each chunk within a particular time window of interest are stable and do not change within that window.
-Programming language popularity over the past few years is a reasonable example of this.
-Although the popularity of various programming languages has certainly changed slightly over the past few years (e.g., Clojure's growth), it is not the case that the changes have been drastic.
-C\#, Python, and Java are still a few of the most popular languages, Common Lisp has not gained or lost much ground in popularity over the past few years.
-
-Further, if this is a reasonable assumption to make, it greatly simplifies the computation of the base-level activation for chunks, and can turn the computation into a tractable problem for large datasets.
-In these time-constant domains, one can compute the log prior odds of needing each chunk directly as the log-odds ratio of exposure to that chunk compared to exposure to all other chunks.
-For example, if the StackOverflow tag \emph{PHP} has been used four times as often as the tag \emph{Common Lisp}, then the prior odds of needing \emph{PHP} again is $\frac{.8}{.2}=4$ times that of \emph{Common Lisp}.
-
-\subsubsection{Strength of Association}
-
-Strength of association ($S_{ji}$) reflects the amount of log-odds adjustment to the activation of a chunk, given the current context (i.e., external environment and internal state).
-Context for the StackOverflow domain for example is represented as each word in the title and body of a post.
-Context for the Twitter domain are the words in a tweet.
-Association strength between a chunk in memory and a single contextual element can be computed directly by calculating its context-adjusted odds ratio:
-the likelihood a chunk occurred with the current context ($p(i|j)$) over the likelihood that the chunk occurred in any of the other contexts ($p(i|\overline{j})$).
-For large datasets, the likelihood that a chunk occurs in any particular context reaches near-zero values ($p(j) \Rightarrow 0$).
-So it can be assumed that the likelihood that a chunk occurs in any context but one ($p(i|\overline{j})$) is equivalent to the likelihood that a chunk occurs in any context ($p(i)$).
-This assumption was described when deriving the $S_{ji}$ equation \parencite{Anderson1989}, and used in recent research working with large-scale datasets \parencites{Stanley2013,Farahat2004,Douglass2010}.
-
-\subsubsection{Connection to Pointwise Mutual Information}
-
-Pointwise Mutual Information (PMI) is another co-occurrence index that measures strength of association between two terms \parencite{Farahat2004}.
-It is based on the co-occurrence count between pair-wise observations of terms, similar to ACT-R's strength of association.
-The index has been used to accurately and efficiently measure strength of association information for large-scale datasets \parencite{Budiu2007,Farahat2004}.
-The PMI index is presented as Equation \eqref{eqPMI}.
-
-\begin{equation}
-  \label{eqPMI}
-  \mathit{PMI}(y,x) = log \frac{p(y|x)}{p(y)}
-\end{equation}
-
-Further, this PMI equation is identical to ACT-R's strength of association ($S_{ji}$) equation for large datasets.
-Once the number of occurrences is large enough such that the probability of observing any particular contextual element ($p(x)$) is near zero, then ACT-R's strength of association index simplifies to the PMI equation.
-That is, the PMI equation \emph{is} the simplified form of ACT-R's strength of association index ($S_{ji}$).
-
-\subsubsection{Attentional Weight}
-
-The attentional weight term allows for some contextual components to be weighted more than others when the total $S_{ji}$ activation is computed.
-This reflects the fact that the declarative memory system has limited attentional resources ($W$) that must be spread across all of the items in context.
-Most ACT-R models simply weight each contextual element equally (e.g., all words in a StackOverflow post have equal weight), so each word's attentional weight is simply normalized by the number of items in context.
-
 \subsection{Latent Semantic Analysis Memory Theory}
 
 Latent Semantic Analysis \parencite{Landauer1997} (LSA) is an alternative representation of declarative memory.
@@ -480,57 +355,8 @@ However, LSA performs further processing on that matrix in order to collapse wor
 The process starts with a set of N documents.
 A word by document co-occurrence matrix is built by counting the number of times each word appears in each document.
 The dimensionality of the full word frequency co-occurrence matrix is then reduced, while maintaining as much of the variance in the original full matrix as possible.
-This process, described in more detail to follow, is similar to how factor analysis takes a data table and finds the most efficient way to represent that data with as few dimensions as possible.
-The strength of association between two words is measured by the cosine of the two word vectors across the reduced dimension space.
-
-Usually information is lost when the data are restructured into a smaller set of latent dimensions.
-However, it was shown that this process actually improves prediction and reduces noise by allowing the frequency count of highly similar concepts (words) to be pooled together and represented by a single dimension.
-\textcite{Landauer1997} tested the LSA model on the Test of English as a Foreign Language (TOEFL) task of choosing the best of four possible synonyms to a target word.
-Model results were on par with a large sample of applicants to American universities from non-English speaking countries (\num{64.4}\% compared to \num{64.5}\%).
-Model performance also improved when the original dimensionality of the data was reduced, but only up to a point.
-Afterwards further reductions in the dimensionality of the data began to degrade performance.
-
-\subsubsection{Singular Value Decomposition}
-
 LSA uses the Singular Value Decomposition process to reduce the dimensionality of the word by document co-occurrence matrix.
-The technique attempts to maximize the amount of variability in the data left after forcing the original dimensionality of the data to be reduced.
-The best way to remove a dimension while maintaining the most variability is to look for words with highly similar co-occurrence patterns and deduce that these words represent the same concept.
-For example, synonyms such as \emph{\#photograph} and \emph{\#photo} would appear interchangeably across documents, so these terms would be collapsed to a single dimension and frequency counts would be pooled.
-By pooling co-occurrence counts the model is able to generate better predictions with less data.
-
-\subsubsection{Word Order}
-
-Although the LSA model has been shown to perform well as a way to measure similarity between two terms, one of the main criticisms is that it is a ``bag of words'' model.
-This means that the model does not account for or pay attention to word order when building the base word by document matrix or consequently, when performing the SVD dimension reduction.
-Other models that can account for word order have been shown to perform better than ``bag of words'' models on tasks that do not even appear to require grammatical structure such as word order to do well.
-For example, \textcite{Jones2007} compared a vector-based model called BEAGLE directly to LSA, training and testing both models on the same corpus used in \textcite{Landauer1997}.
-The context-only BEAGLE model (no word order) performed nearly equivalent to the LSA model at the TOEFL task (\num{55.6}\% vs. \num{55.3}\%).
-However, even in a multiple-choice domain where the task is to identify synonyms (very little grammatical structure in the task), adding word order when training the model improved task performance to \num{57.5}\%.
-It seems reasonable to expect that task performance will improve much more on tasks where word order is used (e.g., generating a hashtag in the middle of a sentence when composing a tweet).
-
-\subsubsection{Scaling Issues}
-
-Another issue with LSA is that the SVD matrix decomposition technique is computationally expensive.
-As the size of the original word by document matrix increases, the SVD computation becomes more and more time consuming.
-If the domains where LSA is applied contained small enough datasets where SVD computation could be computed in a reasonable amount of time, then this would not be much of a concern.
-However, with large human-created datasets such as Twitter, StackOverflow, and Wikipedia, the total size of the dataset far exceeds the maximum size that can even be computed by an LSA approach.
-\textcite{Budiu2007} used the first six million pages of the Stanford WebBase corpus to compare performance between LSA and PMI on the TOEFL, and the LSA model could not be implemented with this size training dataset.
-Instead, they compared the measures on the TOEFL by training on the smaller Touchstone Applied Science Associates (TASA) corpus created from \num{60527} samples of text from high school to early college textbooks.
-This is one of the available corpora on the LSA website and is intended to summarize the general reading up to the 1st year of college \parencite{Budiu2007}.
-
-When \textcite{Budiu2007} compared the simpler PMI (i.e., $S_{ji}$) measure to LSA on smaller TASA-sized datasets, LSA performed much better (23\% vs. 60\%).
-This was one of the primary motivating reasons that LSA was developed in the first place, since reduced dimensionality model outperformed the full dimensionality model on TASA-sized datasets.
-However, once the dataset surpasses in size what is computationally feasible with LSA, the much simpler PMI measure can still be computed, and the performance for PMI becomes on par and even surpasses that of LSA.
-\textcite{Budiu2007} also trained the PMI measure on the much larger Stanford WebBase corpus and tested the measure on the TOEFL.
-This PMI model increased accuracy from 23\% to 51\% when training the dataset on the smaller TASA compared to the larger Stanford dataset.
-Further, when \textcite{Turney2001} trained the PMI measure on the even larger AltaVista index of 350 million webpages, the accuracy on the TOEFL increased to \num{73.8}\%, which is 10\% higher than the TASA-trained LSA.
-This suggests that simpler models may be preferred to more complex (yet more accurate) models in large-scale domains, since the simpler models scale and can utilize all available information to generate predictions.
-
-\subsubsection{Cost of Incremental Updating}
-
-Another issue with LSA is that adding additional observations to a previously-computed reduced representation requires rerunning the SVD \parencite{Farahat2004}.
-Since computing the SVD is the most computationally expensive operation with LSA, it is difficult to see how LSA could be implemented in incremental domains where information is periodically added.
-For Twitter and StackOverflow, it might certainly be useful to update the strength of association representation when new information arrives, especially for Twitter, where hashtag use and news content change rapidly.
+The strength of association between two words is measured by the cosine of the two word vectors across the reduced dimension space.
 
 \subsection{Vector-Based Memory Systems}
 
@@ -558,13 +384,6 @@ With vector-based systems, order information is included by creating an environm
 This function has the useful property that the resulting environment vector and the location vector can be inverted to return the original word's environment vector.
 Circular convolution and inverse circular convolution (i.e., circular correlation) are used by \textcite{Plate1995} and \textcite{Jones2007} to implement these operations.
 This allows for retrieval requests such as ``playing \#$\Phi$,'' ``just read \#$\Phi$,'' and ``vector-based $\Phi$ systems.''
-
-\subsubsection{Addressing Scalability}
-
-Vector-based representations compute chunk likelihoods by performing a correlation operation directly on the memory vectors.
-Each memory vector can be thought of as a column on a context word by tag co-occurrence matrix used for a Bayesian representation.
-Further, the number of rows for a vector-based representation are fixed and set much smaller than the number of rows in the full word by tag co-occurrence matrix.
-Since Bayesian representations have been shown to scale to over hundreds of millions of word by tag co-occurrences \parencite{Stanley2013}, the compressed vector-based representations should scale as well or better.
 
 \subsubsection{BEAGLE}
 
@@ -623,77 +442,19 @@ Further, even though random permutations is a simpler representation than BEAGLE
 
 \textcite{Recchia2010} found that random permutations could use smaller vectors than circular convolution approaches (e.g., BEAGLE) to produce equivalent performance (better compression),
 and also scale to larger datasets (better computational efficiency).
-The vector length by performance tradeoff was tested on a simple paired associative retrieval task. 
-Retrieval accuracy for the random permutation vector-based models remained high relative to the circular convolution model even after reducing each environment vector's length from \num{2048} to \num{1024}.
-This indicates that vector-based representations using random permutations compress better than those using circular convolution.
-
-To test computational efficiency, each model was trained on a subset of the Wikipedia corpus, and tested on the Test of English as a Foreign Language (TOEFL) assessment (among other tasks).
-The random permutation model was trained on \num{2.33} GB corpus.
-The BEAGLE model was unable to train on a corpus this large, so both models were also trained on an additional \num{35} MB subset of the Wikipedia corpus.
-The random permutation model performed as well or slightly better than the BEAGLE model when trained on the smaller corpus.
-The model's performance also significantly improved when trained on the much larger corpus that was computationally intractable for the BEAGLE model.
 These results make a strong case to favor random permutations over circular convolution when implementing vector-based memory representations.
 
 \subsubsection{Connection to LSA}
 
 Both random permutations and LSA calculate word similarity on a reduced matrix.
 For LSA, the original word by document matrix is compressed to a factor by document matrix and the number of factors is much less than the number of words.
-For the StackOverflow and Twitter datasets, the number of documents are the number of different tags.
-
 For random permutations, each tag is represented by a compressed vector with a length much less than the number of words.
-Note that if the length of a word's environment vector was the number of unique words, then each word could be represented by associating it with a particular row in the column vector.
-If done in this way, building a matrix of all words' environment vectors by tags would recover the original word by document matrix \parencite{Kanerva2000}.
-However, each word's environment vector is compressed using a length much less than the number of unique words and represented by using a combination of a few one and negative one values at a unique combination of positions. 
 
 Information is lost with this compression in both cases: by starting with a compressed representation with random permutations or by reducing to a compressed representation with LSA.
 However, the way that the compression works in these two cases is not the same.
 LSA uses SVD to find words that have highly correlated tag occurrence distributions (i.e., latent concepts), and then pools those co-occurrence counts into a single dimension.
 A vector-based approach like BEAGLE or random permutations essentially randomizes the mapping of the words on the reduced set of dimensions, and does not take into account word similarity when generating the mapping.
 Nonetheless, random permutations have been shown to perform similar to if not better than LSA when trained on the TASA and tested on the TOEFL \parencites{Sahlgren2008,Jones2007}.
-
-\subsection{Comparison of Vector-Based Models and ACT-R}
-
-Vector-based models can be thought of as a compressed representation of the full co-occurrence matrix used for the ACT-R declarative memory system.
-Each model computes an activation for each word to retrieve, given context and (for ACT-R's Bayesian model) prior knowledge.
-Since both models produce activations for each chunk, one can be swapped out for another and used as the declarative memory component of the ACT-R infrastructure.
-For example, \textcite{Rutledge2007} used a variant of the BEAGLE vector-based model as the DM component of ACT-R.
-
-\subsubsection{Base-Level Activation}
-
-Vector-based models and ACT-R's current Bayesian DM model are not identical however, and these differences need to be addressed in order to better evaluate the relative benefits of the two models. 
-In particular, the frequency and recency of retrievals for each chunk are not currently used for vector-based models when calculating activation.
-
-The frequency and recency of how content has been used in the past can be a strong predictor of the future importance of that information. 
-The recent content in tweets on a news site like Twitter should be more relevant, for example.
-\textcite{Efron2011} tested this claim by evaluating a set of query likelihood models on returning relevant Twitter tweets from search queries.
-They showed that a model incorporating recency information of the tweet produced more relevant results than models that did not pay attention to this information.
-
-ACT-R's Bayesian model has a strong theory with respect to recency and frequency information.
-It uses this information to calculate a chunk's prior activation (i.e., prior likelihood of being needed again, independent of current context).
-Vector-based models compute activation based entirely on context, so chunks that resonate with context will be retrieved, irrespective to the frequency and recency of use of that chunk.
-ACT-R's prior activation can also be computed for each user, so that hashtags that have been used frequently and recently for a particular user are rated with higher activation.
-Vector-based models have focused on computing the associative strength of a chunk and specific contextual elements.
-It is unexplored how accuracy changes for these models once the information about a user's prior behavior (e.g., ACT-R's base-level activation component) is added.
-
-\subsubsection{Word Order}
-
-One strength of a vector-based approach over ACT-R's Bayesian DM model is that word order can be naturally represented alongside unordered co-occurrence information.
-With the ACT-R model, for example, it is unclear how to represent that a particular word appeared just before a hashtag. 
-To represent word order in a Bayesian model, an additional dimension could be added to the co-occurrence matrix that represents word position.
-However, adding word-order information to ACT-R's default Bayesian declarative memory model is not common.
-Instead, when word order information is used to model reading for example, production rules are defined so that words are read from left to right (e.g., \textcite{Lewis2006}).
-
-\subsubsection{Activation Calculation}
-
-Vector-based and LSA retrieval models calculate chunk activation by correlating a representation of the current context with each memory item.
-Bayesian retrieval models like ACT-R calculate activation by computing each chunk's posterior odd adjustment likelihood, given the context.
-These two computations are certainly not equivalent, even though they are most likely correlated with one another.
-
-Using a correlation can be problematic due to range effects in observed co-occurrences.
-If there are particular words for a tag that co-occur much more often than all of the other words with that tag, that single large value diminishes the power of all other words to contribute to the correlation calculation.
-This does not happen with Bayesian retrieval models because each pair of word and tag values is normalized by the total number of words that appeared with that tag and total number of tags that appeared with that word
-(see the strength of association equation in Table \ref{tabACTRModel}).
-The high-frequency words are often removed from co-occurrence matrix for vector-based models to reduce this effect.
 
 \subsection{Hashtag Prediction}
 
@@ -717,7 +478,7 @@ This Bayesian model can accurately predict a user-chosen tag at 47\% accuracy.
 \paragraph{\texorpdfstring{\textcite{Stanley2013}}{Stanley2013}'s ACT-R DM Model for StackOverflow}
 
 \textcite{Stanley2013} also modeled a user's chosen tags for a post on the StackOverflow site.
-They modified the standard ACT-R model in Table \ref{tabACTRModel} in order to more accurately predict tag use on StackOverflow.
+They modified the standard ACT-R model in order to more accurately predict tag use on StackOverflow.
 A formal description of the modified ACT-R Bayesian model is included in Table \ref{tabModACTRModel}.
 
 \begin{table}[!ht]
@@ -744,7 +505,8 @@ A formal description of the modified ACT-R Bayesian model is included in Table \
 
 The activation of each tag ($A_{i}$) is a function of four components:
 That tag's base-level activation ($B_{i}$), contextual activation for the words in the title, activation for words in the body, and an offset term ($O$).
-This model has been modified from the standard ACT-R model (Table \ref{tabACTRModel}) in three ways:
+This model has been modified from the standard ACT-R model in three ways:
+% FIXME: four ways; also base level term
 Two separate contextual components were used (words in title and body of post), an offset term was added, and an entropy measure was used to compute the attentional weight ($W_{j}$).
 
 The offset term was added to normalize the mean activation across retrievals.
@@ -758,15 +520,6 @@ So the scaled entropy ($E_{j}$) of a context word can be thought of as the amoun
 This means that a stop word like ``the'' will have a scaled entropy measure close to 0, while a highly-predictive word like \emph{macro} will have a scaled entropy measure close to 1.
 Looking at $W_{j}$, if $E_{j}$ is low then $W_{j}$ is low, meaning that the scaled entropy measure helps allocate limited attentional resources to predictive contextual elements.
 
-\paragraph{Comparison Between \citeauthor{Kuo2011}'s and \citeauthor{Stanley2013}'s Models}
-
-Since \textcite{Stanley2013} made several modifications to standard ACT-R model, it was more sophisticated than both the standard ACT-R model and the Bayesian model used by \textcite{Kuo2011}.
-Also, it was unclear if \citeauthor{Kuo2011} used both the words in the title and the body of the post as separate components for his models, or if only the words in the title were used.
-
-\citeauthor{Stanley2013}'s model also scaled much better than \citeauthor{Kuo2011}'s Bayesian co-occurrence model. 
-Because of this, 100 times more posts were used to build the co-occurrence matrix (\num{1000000} versus \num{10000}), which significantly increased the model's performance.
-After including the modifications and scaling up the model, the model can successfully predict a user's tag for a post at 65\% accuracy.
-
 \subsubsection{Twitter}
 
 Several hashtag recommendation models for Twitter have been developed recently.
@@ -779,23 +532,7 @@ This was most likely not much of an issue for \citeauthor{Mazzia2009}'s study, s
 
 Several other models have taken a tweet-centered approach to hashtag prediction, where suggested hashtags are collected from hashtags used from similar tweets.
 \textcites{Li2011, Zangerle2011, Kywe2012} all store a content vector for each tweet, and then compute a word co-occurrence-based similarity score between a composed tweet and the rest of the tweets in the database.
-\textcites{Zangerle2011, Kywe2012} used the Apache Lucene infrastructure to compute the similarity score, while \textcite{Li2011} used a custom similarity score to compute similarities.
-Regardless of the method to compute the similarity between tweets,
-each method collects the hashtags used from a set of the most similar tweets, then ranks the hashtags in the set, and presents the top 5-10 hashtags to the user.
-
-This tweet-centered approach is quite different than the hashtag-centered approach presented in \textcite{Mazzia2009}.
-With a hashtag-centered approach, a direct association is built between the words in a tweet and hashtags that occur in tweets.
-With a tweet-centered approach, that association between words and hashtags is indirect:
-The relationship is built between a tweet and its content, and then similar tweets are assumed to use similar hashtags.
-One problem with the tweet-centered approach is that the storage size grows with the number of tweets, as a representation of the content in each tweet has to be maintained to later compute tweet similarity.
-The storage size for a hashtag-centered approach grows with the number of hashtags, but it seems reasonable that this will grow slower than the number of tweets and asymptote after collecting a large sample of tweets.
-So from the perspective of efficient information storage and retrieval, it seems more likely that the hashtag-centered approach used in \textcite{Mazzia2009} will scale as Twitter grows in size and use.
-
-\textcite{Kywe2012} also customized their tag prediction model to the user's past hashtag use, and was one of the first to do so when developing a hashtag-prediction model for Twitter.
-The set of recommended hashtags was the union of hashtags used in similar tweets and hashtags used by similar users.
-This was done by storing a content vector of hashtag use for each user (user-centered approach) alongside the content vectors of hashtag use for each tweet (tweet-centered approach).
-To generate recommended hashtags, the model would return the top-ranked hashtags from the hashtags used in 0-50 similar tweets and 0-4 similar users.
-Prediction accuracy improved when the model combined recommendations based on hashtags in both similar tweets and the top few similar users compared to basing recommendations on similar tweets alone. 
+Each method collects the hashtags used from a set of the most similar tweets, then ranks the hashtags in the set, and presents the top 5-10 hashtags to the user.
 
 \subsubsection{State of Research on StackOverflow and Twitter}
 
@@ -814,16 +551,11 @@ However, there has been little research on how a specific user's past hashtag us
 The ACT-R declarative memory retrieval theory shows how past user behavior and current context combine to produce the most likely retrieval.
 Each component is summed together to generate a total activation, and then the likelihood of chunks are ranked by that summed activation.
 This technique is compensatory and allows for a more natural combination of the two components, where weights can be assigned to each component depending on how strongly each term predicts performance.
-This type of weighted additive model that combines past user behavior and current tweet context to predict the most likely hashtags has not yet been explored for Twitter.
-
-Both StackOverflow models \parencites{Stanley2013,Kuo2011} did not take into account the specific user's prior history when generating tag predictions.
-Rather their models, much like \textcite{Mazzia2009}'s Twitter model, uses the aggregate tag history across all users as the model's prior activation for each tag.
 
 One of the main purposes of this research is to improve on these user-agnostic statistical models and include each specific user's past tagging history as a model component.
 Using customized priors that are tailored to a user's specific tagging history should be crucial for sites like Twitter where the possible tag space is infinite,
 but should also improve performance for more constrained sites like StackOverflow since each user is not interested in all of the possible tags on the site. 
 
-\clearpage
 \section{Chapter 3: General Methodology}
 
 Each specific result of the research (to be presented in Chapters 4-6) requires a sightly different method to study.
@@ -928,7 +660,6 @@ with the StackOverflow dataset, it is also possible to convert synonym tags to c
 This can be thought of as semantic stemming, where two words with identical meaning are converted to the same canonical word.
 So tags used for the post were converted to their root tag when possible.
 
-\clearpage
 \section{Chapter 4: Past User Behavior}
 
 How does a user's prior tag use influence their likelihood of choosing that tag in the future?
@@ -937,7 +668,7 @@ The model predicts that the more recently and frequently used tags have higher p
 
 \subsection{Base-level ACT-R model}
 
-The base-level activation component from the full ACT-R declarative memory model in Table \ref{tabACTRModel} is included in Table \ref{tabACTRBLLModel}.
+The base-level activation component from the full ACT-R declarative memory model is included in Table \ref{tabACTRBLLModel}.
 
 \begin{table}[!ht]
   \caption{Base-level component of ACT-R declarative memory}
@@ -1174,7 +905,6 @@ It makes sense that the lifetime of a specific hashtag on Twitter is shorter ove
 since hashtag topics are generally more transient on Twitter than StackOverflow (e.g., hashtags for specific political events or upcoming conferences).
 This means that the decay rate for Twitter should be higher than StackOverflow, which is what is observed.
 
-\clearpage
 \section{Chapter 5: Combining Predictors}
 
 The declarative memory models analyzed for this research consist of two main components: past behavior and context.
@@ -1667,7 +1397,7 @@ Also, it is likely that the specific domain being studied interacts with the fac
 Nevertheless, if a researcher is working in a domain with limited data (e.g., small corpus size, large tag space) that produces a sparse co-occurrence matrix,
 then it may be worthwhile to experiment with using a compressed random permutation model instead of the full Bayesian model.
 
-\subsection{Method to Combine Prior and Context}
+\subsection{Combining Prior and Context}
 
 The activation value for the context component of the vector-based model is a correlation, ranging from zero to one.
 This is not a log-odds value.
@@ -1862,7 +1592,6 @@ However, the underlying reason that the weights change between the sites cannot 
 This relative impact may be changing from either a true alteration in the underlying weight of the prior compared to context for different domains,
 or simply due to the fact that the amount of information collected for each of the terms changes between the domains (less information leads to lower weighting in general). 
 
-\clearpage
 \section{Chapter 7: General Discussion}
 
 The general discussion is separated into two parts.
