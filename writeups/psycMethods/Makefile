@@ -1,4 +1,4 @@
-outFile = dissertation
+outFile = psycMethods
 mendeleyDB = Library/Application Support/Mendeley Desktop/clayton.stanley@rice.edu@www.mendeley.com.sqlite
 figPdfs = $(shell cat ${outFile}.tex | grep '\.pdf' | perl -pe 's/^.*{(.*)([^}]+)}+$$/$$1$$2/' | perl -pe 's|^|figures/dissertation/|')
 
@@ -26,8 +26,8 @@ ${figPdfs}: %-crop.pdf: %.pdf
 	#R -q -e 'embedFonts("$*-crop.pdf", format="pdfwrite", options="-dSubsetFonts=true -dEmbedAllFonts=true -dPDFSETTINGS=/printer")'
 
 static:
-	! grep 'NoZero.*0\.' dissertation.tex
-	! grep -i ' very ' dissertation.tex
+	! grep 'NoZero.*0\.' ${outFile}.tex
+	! grep -i ' very ' ${outFile}.tex
 
 showFigModDates:
-	git gp includegraphics dissertation.tex | egrep -o '{[^{]*}+$$' | sed 's/{//g' | sed 's/}//g' | perl -pe 's|^|figures/dissertation/|' | xargs ls -lt 
+	git gp includegraphics ${outFile}.tex | egrep -o '{[^{]*}+$$' | sed 's/{//g' | sed 's/}//g' | perl -pe 's|^|figures/dissertation/|' | xargs ls -lt 

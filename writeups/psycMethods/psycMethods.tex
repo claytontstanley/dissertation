@@ -224,33 +224,6 @@
 
 \maketitle
 
-\thispagestyle{empty}
-\section{Acknowledgements}
-
-I would first like to thank my advisor, Mike Byrne, for all of his feedback and suggestions for this dissertation research
-and also his excellent guidance throughout my time as a graduate student.
-I would also like to thank my parents, Mike and Patsy, for the positive influence that they have provided me throughout my life.
-Finally, I would like to thank my brothers Brendan and Justin, sister Kellen, extended family, and friends, for all of their support during my time in the Rice Psychology graduate program.
-
-This work was supported in part by the Gertrude Maurin Fund.
-The resources were used to purchase high-performance computing hardware and the research would not have been possible without this crucial equipment.
-
-I would also like to thank the creators of a few open-sourced software packages that were heavily leveraged to do this research:
-The majority of the modeling and analysis was done with the R statistical computing environment \parencite{RCoreTeam2014} and two important R packages:
-data.table \parencite{Dowle2014} was leveraged to implement the models efficiently, and ggplot2 \parencite{Wickham2009} was used to produce the visualizations.
-
-\newpage
-
-\thispagestyle{empty}
-\tableofcontents
-\newpage
-
-\thispagestyle{empty}
-\listoftables
-\newpage
-
-\thispagestyle{empty}
-\listoffigures
 \newpage
 
 \pagenumbering{arabic}
@@ -331,7 +304,7 @@ We can help aid in their discovery of fresh and relevant information that matche
 
 \subsection{Research Questions}
 
-The core research question motivating this proposal is:
+The core question motivating this research is:
 What kinds of cognitively-plausible models can best predict the tags that a user on a social media site uses?
 This question can be tested by generating a prediction for the most likely used hashtag whenever a user is about to generate a hashtag, and then comparing the user's chosen hashtag to the model's prediction.
 This process can be framed as a memory retrieval problem.
@@ -352,45 +325,11 @@ After the tweet is created the hashtags become hyperlinks, and if clicked on wil
 So these user-created hashtags on Twitter help connect the tweet to other tweets about the same topic through common hashtag use.
 Some recent and often used hashtags for Twitter are \emph{\#photography}, \emph{\#startup}, \emph{\#4change}, \emph{\#android}, and \emph{\#solar}.
 
-\begin{figure}[!htbp]
-  {%
-    \setlength{\fboxsep}{0pt}%
-    \setlength{\fboxrule}{1pt}%
-    \hfill
-    \subfigure[]{\fbox{\includegraphics[width=8cm]{twitterTweetExample1-crop.pdf}}}
-    \hfill
-    \subfigure[]{\fbox{\includegraphics[width=8cm]{twitterTweetExample3-crop.pdf}}}
-    \hfill
-    \vfill
-    \hfill
-    \subfigure[]{\fbox{\includegraphics[width=8cm]{twitterTweetExample4-crop.pdf}}}
-    \hfill
-    \subfigure[]{\fbox{\includegraphics[width=8cm]{twitterTweetExample5-crop.pdf}}}
-    \hfill
-    \caption{Example tweets on twitter.com}
-    \label{figTweetExample}
-  }%
-\end{figure}
-
-Some example tweets on Twitter are included in Figure \ref{figTweetExample}.
-Note how users both add hashtags to the end of a tweet as a summary of the message and emphasize important concepts words in the tweet by turning them into hashtags.
-That is, hashtags can be both intermixed within the words of the tweet and added to the end of the message.
-
 The two memory retrieval models were also tested on tag use for StackOverflow posts.
 StackOverflow is a question and answer site for computer programming where users ask programming-related questions and fellow members of the community provide answers.
 A user with a programming-related question creates a post with their question and tags the post with a few specific programming-related tags. 
 The tags chosen by a user on the StackOverflow site represent the primary topic of the question, such as a specific programming language, tool, software package, or framework.
 Some example tags for StackOverflow are \emph{PHP}, \emph{Arrays}, \emph{MVC}, \emph{C\#}, and \emph{Common Lisp}.
-
-\begin{figure}[!htbp]
-  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{stackoverflowPostExample1-crop.pdf}}}
-  \caption{Example post on stackoverflow.com}
-  \label{figSOExample}
-\end{figure}
-
-An example StackOverflow post is included in Figure \ref{figSOExample}.
-The site requires that for each post the user must associate at least one tag with the post, and the average number of tags per post is around 3.
-The author used 4 tags for this post: \emph{javascript}, \emph{html}, \emph{internet-explorer}, and \emph{xhtml}.
 
 The StackOverflow and Twitter datasets were chosen because the human-created content between them is quite different, and I am interested in retrieval models that generalize across tasks.
 However, they are also similar on several accounts:
@@ -421,25 +360,6 @@ However, it is unexplored if some of the process of sentence construction and wo
 ACT-R's declarative memory system places strong constraints on how a user's prior knowledge and experience influences the likelihood that a particular memory item is retrieved \parencite{Anderson2007}.
 This decay rate equation formalizes how recency and frequency of memory use relate to the prior probability that a memory will be retrieved.
 However, it is unexplored how a user's prior knowledge should influence retrieval for vector-based models.
-
-\subsubsection{Lifetime of a Hashtag for a Specific User}
-
-Prior research has examined the growth and decay cycle of hashtag use across users \parencite{Tsur2012}.
-However, much less is known about hashtag lifetime for individual users.
-It may not necessarily follow that a hashtag's life cycle for individual users matches the life cycle across users.
-Further, modeling a hashtag's life within users is much more applicable to hashtag prediction, since that model can be directly incorporated into a specific user's prior likelihood of hashtag use.
-
-\subsubsection{User-Customized Hashtag Prediction}
-
-The end goal of this work is to identify a memory retrieval model that can suggest relevant hashtags to users when they wish to retrieve one.
-These hashtags should be customized to their specific interests and relevant to the content of the post that they are currently creating.
-This will undoubtedly require a combination of two primary model components:
-[1] a user's prior likelihood of choosing a particular hashtag, given their previous hashtag use, and [2] the likelihood that a particular hashtag is related to the context of the post being created. 
-
-A user's prior hashtag use will be an essential model component for domains such as Twitter, where the number of possible hashtags is effectively infinite.
-In these domains, the model can utilize a user's hashtag history as a way to prune the infinite space of possible hashtags, and generate a much smaller and more manageable set for prediction.
-However, not only should the model properly take into account a user's prior hashtag use, but it should also generate new hashtag predictions when a user is most likely choosing a hashtag they have never used before.
-The end goal is to have a model that can properly balance the user's tag history with the contextual cues in the post in order to generate an accurate prediction.
 
 \subsection{Roadmap}
 
@@ -530,10 +450,6 @@ For large datasets, the likelihood that a chunk occurs in any particular context
 So it can be assumed that the likelihood that a chunk occurs in any context but one ($p(i|\overline{j})$) is equivalent to the likelihood that a chunk occurs in any context ($p(i)$).
 This assumption was described when deriving the $S_{ji}$ equation \parencite{Anderson1989}, and used in recent research working with large-scale datasets \parencites{Stanley2013,Farahat2004,Douglass2010}.
 
-Using this assumption for large datasets ($S_{ji} = log \frac{p(i|j)}{p(i)}$), the interpretation of the context-adjusted odds ratio becomes much simpler.
-If this ratio for a particular tag and context chunk is greater than one, then the log is positive, which means that this context has been observed more often with this tag than in general.
-If this ratio is less than one, then the log is negative, which provides a negative adjustment of total activation since this context has been observed more often in general than with this particular tag.
-
 \subsubsection{Connection to Pointwise Mutual Information}
 
 Pointwise Mutual Information (PMI) is another co-occurrence index that measures strength of association between two terms \parencite{Farahat2004}.
@@ -555,32 +471,6 @@ That is, the PMI equation \emph{is} the simplified form of ACT-R's strength of a
 The attentional weight term allows for some contextual components to be weighted more than others when the total $S_{ji}$ activation is computed.
 This reflects the fact that the declarative memory system has limited attentional resources ($W$) that must be spread across all of the items in context.
 Most ACT-R models simply weight each contextual element equally (e.g., all words in a StackOverflow post have equal weight), so each word's attentional weight is simply normalized by the number of items in context.
-
-\subsubsection{Scaling the Equations}
-
-The majority of tag-recommendation systems use some measure of word pair associations to compute the likelihood of a tag, given current context.
-As an applied concern, it is important that this measure scales well enough to handle the large volume of information present in online social media datasets.
-Large social media datasets such as StackOverflow and Twitter contain on the order of millions to hundreds of millions of unique word pair associations between terms and tags.
-If one wants to capitalize on all of the information present in the database to build the most accurate measure of relatedness between words and tags, then the association measure used must scale to this large size.
-
-However, scale is also a theoretical concern.
-The declarative memory system is tasked to quickly return a single chunk of information that is stored alongside millions to billions of other unique chunks given only the current context and past history of use.
-To do this task, it seems plausible that a model of declarative memory must use a representation that produces accurate retrievals even when large amounts of observations are included.
-Further, it seems plausible that the time to compute an activation value by a computer is correlated with the time to compute an activation value by the brain.
-So any model of declarative memory should also be reasonably computationally efficient even with large co-occurrence datasets.
-
-ACT-R's strength of association ($S_{ji}$) and the equivalent pointwise mutual information index ($\mathit{PMI}_{ji}$) have been shown to scale well for large corpora.
-\textcite{Douglass2010} implemented the large-scale version of $S_{ji}$ in Erlang.
-The wall-clock time required for a declarative memory retrieval request scaled linearly with the size of declarative memory with this implementation.
-Retrieval times were around one second with the largest declarative memory that contained over one million associations (co-occurrence pairs).
-
-The SNIF-ACT framework \parencites{Fu2007,Pirolli2003} was developed to predict user navigation of web-based hyperlinks (e.g., choosing between a set of results from a search query).
-The theory uses the large-scale version of $S_{ji}$ to measure the relatedness between a user's current goals and the current context.
-It was shown to scale well when working with a large-scale search query database for internet search.
-
-As one of the largest tests for the PMI index, \textcite{Farahat2004} generated the co-occurrence matrix from a 118GB local database of 10 million pages of the Stanford WebBase Project.
-\citeauthor{Farahat2004} compared strength of association values using the PMI index and similarity ratings derived from human raters.
-Even at this large dataset size, the ACT-R declarative memory theory still scaled well enough for reasonably fast retrieval times for $\mathit{PMI}_{ji}$ values.
 
 \subsection{Latent Semantic Analysis Memory Theory}
 
@@ -655,23 +545,6 @@ Paired with each environment vector ($e_{i}$) is a memory vector ($m_{i}$) that 
 These memory vectors can contain environment vectors from position-independent word co-occurrence information ($c_{i}$) and word order information ($o_{i}$), which can be combined into a single representation ($m_{i}$).
 Over time, memory vectors accumulate a distributed representation of the most common environment vectors that co-occurred with them.
 
-\subsubsection{Retrieval Process}
-
-Retrieving the most likely chunk given context can be done in two ways: decoding and resonance \parencite{Jones2007}.
-Decoding takes the memory vector for context and decodes it back into an environment vector.
-The cosine between that decoded environment vector and all other environment vectors is computed and ranked, and the chunk with the environment vector with the highest cosine is retrieved.
-
-Resonance is the opposite retrieval process, where a memory vector is created from the context, and then that context memory vector is compared to all memory vectors.
-For example, assume that a user has written the word ``zend'' in a post, and she wants to assign a tag for the post.
-``zend'' has co-occurred with the tag \emph{PHP} many times previously, so the unordered memory vector for ``PHP'' ($c_{\mathit{PHP}}$) contains the unordered environment vector for \emph{zend} ($e_{zend}$).
-To determine the most correlated memory vector with context, a memory vector is created from the current context ($e_{zend}$).
-The cosine between that context memory vector and the memory vector for \emph{PHP} will be high, since the \emph{PHP} memory vector ($c_{\mathit{PHP}}$) often contains the context environment vector ($e_{zend}$).
-Since the cosine is high, the tag \emph{PHP} will most likely be returned as the vector that resonates highest with the current context.
-
-The resonance and decoding processes are inversions of each other.
-Usually both resonance and decoding will return similar rank orderings of most likely chunks given context.
-\textcite{Jones2007} recommends averaging the cosine values returned from each process for each chunk, and then rank ordering those averages to determine the chunk to retrieve.
-
 \subsubsection{Addressing Word Order}
 
 One of the strengths of vector-based systems is that word order can naturally be represented alongside word co-occurrence in these distributed representations.
@@ -685,20 +558,6 @@ With vector-based systems, order information is included by creating an environm
 This function has the useful property that the resulting environment vector and the location vector can be inverted to return the original word's environment vector.
 Circular convolution and inverse circular convolution (i.e., circular correlation) are used by \textcite{Plate1995} and \textcite{Jones2007} to implement these operations.
 This allows for retrieval requests such as ``playing \#$\Phi$,'' ``just read \#$\Phi$,'' and ``vector-based $\Phi$ systems.''
-
-For example, suppose that a retrieval request is made for ``martin $\Phi$'' given that the model was trained on the TASA corpus.
-Within this corpus, the phrase ``martin luther'' often occurred.
-When this occurs, the word-order memory vector for martin ($o_{martin}$) will be updated by convolving a 1-back location vector with luther ($o_{martin} = o_{martin'} + \Phi * e_{luther}$).
-Also, the word-order memory vector for luther ($o_{luther}$) will be updated by convolving martin with and a 1-forward location vector ($o_{luther} = o_{luther'} + e_{martin} * \Phi$).
-The retrieval request for ``martin $\Phi$'' can be done in two ways: through decoding or resonance.
-
-Using decoding, the word-order memory vector for martin is deconvolved to the right ($o_{martin} \circledast \Phi$) which returns the environment vector for luther ($e_{luther}$).
-Using resonance, a memory vector for ``martin $\Phi$'' is constructed ($e_{martin} * \Phi$), which correlates highest with the word-order memory vector for luther ($o_{luther}$).
-Either way, luther is returned as the most likely term to match the phrase ``martin $\Phi$.''
-
-New vectors generated by circular convolution are uncorrelated with all other environment vectors and have the same length.
-This allows the word order information and unordered context information for a chunk to be aggregated and represented in the same memory vector.
-Quite simply, the different types of memory vectors can be summed to create a single memory vector representation for each chunk (i.e., $m_{i} = c_{i} + o_{i}$).
 
 \subsubsection{Addressing Scalability}
 
@@ -792,38 +651,12 @@ LSA uses SVD to find words that have highly correlated tag occurrence distributi
 A vector-based approach like BEAGLE or random permutations essentially randomizes the mapping of the words on the reduced set of dimensions, and does not take into account word similarity when generating the mapping.
 Nonetheless, random permutations have been shown to perform similar to if not better than LSA when trained on the TASA and tested on the TOEFL \parencites{Sahlgren2008,Jones2007}.
 
-This is a counterintuitive result.
-It seems plausible that an SVD technique that takes into account word similarity when reducing the matrix should generate a reduced matrix that has more information than a randomly-compressed matrix.
-This does not seem to be the case in testing however \parencites{Sahlgren2008,Jones2007}.
-Nonetheless, \textcite{Kanerva2000} suggested to perform an SVD reduction technique on a compressed random permutation vector.
-This approach might be worth investigating, as it would reduce computational requirements even further, and possibly improve performance by pooling co-occurrence counts from latent topics together.
-
 \subsection{Comparison of Vector-Based Models and ACT-R}
 
 Vector-based models can be thought of as a compressed representation of the full co-occurrence matrix used for the ACT-R declarative memory system.
 Each model computes an activation for each word to retrieve, given context and (for ACT-R's Bayesian model) prior knowledge.
 Since both models produce activations for each chunk, one can be swapped out for another and used as the declarative memory component of the ACT-R infrastructure.
 For example, \textcite{Rutledge2007} used a variant of the BEAGLE vector-based model as the DM component of ACT-R.
-\citeauthor{Rutledge2008} showed that an ACT-R theory with a vector-based memory system can successfully model the fan effect.
-
-The fan effect describes a behavior of human memory where memory items are more difficult to retrieve if they have occurred in a larger number of different contexts.
-\textcite{Rutledge2008} used \textcite{Anderson1974}'s classic experimental paradigm to test the fan effect.
-In the task, participants are exposed to a set of person and place pairs (e.g., ``the hippie is in the park'').
-They are later asked to recall if a particular person and place pair was presented to them before.
-The main manipulation is the ``fan'' of the person and place for each pair.
-The fan is defined as the number of different contexts that each item in the pair is presented in.
-For example, if items were presented to the participant where the ``hippie'' was both in the ``park'' and in the ``store,'' then ``hippie'' would have a fan of two.
-Recall accuracy decrease and time to recall increase as the sum total fan of the person and place increases.
-
-Both the ACT-R declarative memory theory and vector-based models produce the fan effect due to the effect that fan has on the co-occurrence matrix.
-As a particular word (e.g., ``hippie'') is seen in more and more contexts, the co-occurrence count of the word across all contexts is spread across multiple contexts.
-This means that when a retrieval for a context given the word occurs, multiple contexts have relatively high activation.
-This makes it more difficult to test if a signal (e.g., if a word appears in a specific context) is higher than the background noise (e.g., all other contexts that the word has appeared in),
-which makes the retrieval more uncertain.
-
-Both vector-based and Bayesian models produce the fan effect since they both are based on co-occurrences.
-However, vector-based models do further processing on that matrix, reduce its dimensionality, and use a correlation instead of a log odds value to compute the activation.
-Nonetheless, vector-based models still produce the fan effect because at their core they are still computing activations based on co-occurrences.
 
 \subsubsection{Base-Level Activation}
 
@@ -862,60 +695,13 @@ This does not happen with Bayesian retrieval models because each pair of word an
 (see the strength of association equation in Table \ref{tabACTRModel}).
 The high-frequency words are often removed from co-occurrence matrix for vector-based models to reduce this effect.
 
-\subsection{Recommendation Systems}
-
-A model that predicts a user-chosen hashtag is a specific type of a recommendation system.
-General recommendation systems have grown in need with the growth of the web.
-Users on a site need quick access to specific pieces of information, and the site contains much more information than they can process or care about.
-Recommendation systems are used to tailor the information presented to what is most relevant to the user \parencite{Pazzani2007}.
-
-\subsubsection{The Netflix Prize}
-
-The Netflix Prize \parencite{Bennett2007} is an example of a recommendation system where prior user behavior and current context was used to present the most relevant information to the user.
-Netflix is an online subscription service where users can stream television episodes and movies.
-Each user of the site is only interested in a small portion of the entire library of content that Netflix provides.
-In order to provide a high quality user experience on the site, Netflix created a content recommendation service.
-This tool recommends to the user movies and television episodes that most likely match their specific interests.
-
-Netflix wanted to improve the accuracy of their recommendation system, so they held a competition where teams could try to improve on the accuracy of the service.
-The winning team utilized a statistical model that performed a type of factor analysis to identify important dimensions in the data (e.g., drama, action, cult classic) and place values for each user along each dimension. 
-This method used prior user behavior to classify a user along the dimensions of the reduced space, and current user behavior (e.g., just watched) to understand what they were interested in watching at that moment.
-By using a factor analysis technique and combining these indicators, the model improved on Netflix's original recommendation system by 10\%.
-
-\subsubsection{Recommending Followers on Twitter}
-
-Recommendation systems based on the content of user-created posts have been successful in recommending people on Twitter for a user to follow.
-\textcite{Hannon2010} built a Twitter follower recommendation system by creating a profile of each user based on the words they used in previous posts.
-The recommendation system would then suggest other Twitter users to follow that had similar profiles to a particular user.
-The profiles were created by generating a word frequency matrix of words by (user + followers + followees), and then providing that matrix as input into the Lucene text search engine framework.
-
-Lucene \parencite{McCandless2010} is a commonly-used open source software tool that measures the similarity between a query and candidate documents in a database.
-It uses the term frequency-inverse document frequency co-occurrence measure to quantify the similarity between a word in the query and a possible document to retrieve.
-This measure is the product of two terms: the frequency count of the word in the document and the log inverse of the ratio of the number of documents that the word appeared in to the total number of documents.
-The term frequency component measures the strength of association between a word and a document.
-The inverse document frequency component measures how much information is contained within a specific word, independent of document.
-
-When \citeauthor{Hannon2010}'s system recommended a set of individuals for a user to follow, it collected all of the words used in posts from that user, constructed a search query, and provided that query to Lucene.
-Lucene then returned the most likely users that share similar words in posts within their Twitter network with the words provided in the query.
-Using this simple technique based on a standard text search engine allowed the recommendation system to accurately predict the people that a particular user follows at 25\% accuracy.
-
-\subsubsection{Hashtags for Recommendation Systems}
-
-\textcite{Efron2010} showed how hashtags might be used as a type of recommendation system for Twitter.
-Users constructed a query of text that represented a search for a topic that they were interested in.
-The system then retrieved the most likely hashtags that were associated with that search query.
-The model is based on building a word co-occurrence matrix of words by hashtags, and then uses that matrix to assign a similarity score for each hashtag when provided with a search query.
-Participants graded how relevant the hashtags returned were to each search query.
-The results suggest that hashtags contain useful information that help classify the gist of a post. 
-Although this model does not predict the specific hashtags used when composing a tweet, a model like this could certainly be tailored for that purpose.
-
 \subsection{Hashtag Prediction}
 
-Recommendation models that attempt to predict a user's chosen hashtag have recently been created and tested for a few social media sites.
+Models that attempt to predict a user's chosen hashtag have recently been created and tested for a few social media sites.
 Google has even deployed a hashtag recommendation model to help users properly tag posts on their Google+ social media site \parencite{GoogleKeynote2013}.
 A tag-suggestion tool has also been deployed for the \url{tex.stackexchange.org} and \url{superuser.com} StackExchange sites.
 Models for Twitter and StackOverflow have been proposed and tested, but none have yet been deployed.
-Recommendation models for StackOverflow, Google+, and Twitter will be described in more detail to follow.
+Recommendation models for StackOverflow and Twitter will be described in more detail to follow.
 
 \subsubsection{StackOverflow}
 
@@ -981,60 +767,6 @@ Also, it was unclear if \citeauthor{Kuo2011} used both the words in the title an
 Because of this, 100 times more posts were used to build the co-occurrence matrix (\num{1000000} versus \num{10000}), which significantly increased the model's performance.
 After including the modifications and scaling up the model, the model can successfully predict a user's tag for a post at 65\% accuracy.
 
-It is interesting that in both studies the best performing model was based on a Bayesian co-occurrence framework, since that is precisely the framework from which ACT-R's declarative memory system is based.
-This suggests that more cognitively-plausible memory retrieval models may outperform more general machine learning approaches in this particular environment
-(i.e., when predicting the user-chosen tags for human-created content on social media sites).
-
-\subsubsection{StackExchange}
-
-A tag suggestion tool has been deployed for the \url{tex.stackexchange.org} \parencite{LatexTags2013} and \url{superuser.com} \parencite{SuperUserTags2013} StackExchange sites.
-Latex, SuperUser, and StackOverflow are all part of the broader StackExchange network of question and answer sites, and they provide the same user interface and workflow when asking questions.
-For the two sites where a tag suggestion tool has been deployed, once a user has created a question, suggested tags appear just below the text field where the user types the tags to associate with the question.
-The post author is not forced to use the suggested tags, and is free to choose tags from them or tags not represented in the suggested set.
-An example of the interface for a created post on the SuperUser site is included in Figure \ref{figSuperUserSuggestion}.
-
-\begin{figure}[!htbp]
-  \scalebox{.9}{\resizebox{\linewidth}{!}{\includegraphics{superUserTagSuggestion-crop.pdf}}}
-  \caption{Example of tag suggestions when creating a post on the SuperUser site}
-  \label{figSuperUserSuggestion}
-\end{figure}
-
-The exact tag-recommendation algorithm used for the Latex and SuperUser sites is not public.
-After exploratory testing, StackExchange appears to be using something more sophisticated than simply looking for words in the title and body of the post that are tags.
-The Latex and SuperUser sites are not nearly as popular as StackOverflow currently.
-The sites have roughly \num{50000} and \num{189000} questions respectively compared to \num{5000000} questions on StackOverflow.
-
-So it stands to reason that the algorithm is relatively complex, and there could be possible scaling and efficiency concerns with the algorithm's implementation, so it has not yet been deployed to StackOverflow.
-Alternatively, it is also possible that StackExchange decided to try out a tag recommendation system on a few of their smaller sites first, before deploying this type of system on their most popular StackOverflow site.
-Nonetheless, it is encouraging that StackExchange finds tag recommendation models beneficial to the user and has started to add them to their question and answer sites. 
-
-\subsubsection{Google+}
-
-The hashtag recommendation system deployed for the Google+ social media site is probably the most ambitious model of user-created hashtags to date \parencite{GoogleKeynote2013}.
-The user interface for this recommendation system for an example Google+ post is shown in Figure \ref{figGoogle+Hashtags}.
-
-\begin{figure}[!htbp]
-  \scalebox{.4}{\resizebox{\linewidth}{!}{\includegraphics{google+HashtagExample-crop.pdf}}}
-  \caption{Example post on Google+}
-  \label{figGoogle+Hashtags}
-\end{figure}
-
-The workflow and user interface provided for recommending hashtags for Google+ is similar to how a hashtag recommendation system for Twitter might look.
-When generating content on Google+, the system automatically associates the most likely relevant hashtags with that post.
-For the example in Figure \ref{figGoogle+Hashtags}, the system recommended \emph{\#SFGiants} and \emph{\#BusterPosey} as hashtags for the user-created post.
-The user is free to remove any or all of the tags that the system has associated with the post, and can also use tags that were not included in the recommended set.
-
-Google+'s tag-recommendation algorithm is not public, but it appears to be rather sophisticated.
-Looking at the example post in Figure \ref{figGoogle+Hashtags}, \emph{\#BusterPosey} is suggested without having that specific word in the post.
-Also \textcite{GoogleKeynote2013} mentioned that the algorithm uses Google's sophisticated image recognition software to suggest hashtags for images that are included in the post (e.g., \emph{\#EiffelTower}),
-even when the post does not have any keywords to provide additional context.
-
-Google is apparently highly confident in the accuracy of their system.
-On the Latex site, the user interface provides subdued suggestions to the user, but requires the user to explicitly choose each tag he/she wants to associated with the post.
-For Google+, the user interface automatically tags a user's post, and then requires the user to explicitly change those tags if he/she wants to use a different set.
-If tag accuracy is high enough, the Google+ technique is certainly favorable since the user does not have to spend time figuring out which tags best represent this post.
-However, if the model makes even just a few errors, users may become annoyed and frustrated with the recommendation system since they will have to explicitly correct it every time they generate a post.
-
 \subsubsection{Twitter}
 
 Several hashtag recommendation models for Twitter have been developed recently.
@@ -1065,22 +797,6 @@ This was done by storing a content vector of hashtag use for each user (user-cen
 To generate recommended hashtags, the model would return the top-ranked hashtags from the hashtags used in 0-50 similar tweets and 0-4 similar users.
 Prediction accuracy improved when the model combined recommendations based on hashtags in both similar tweets and the top few similar users compared to basing recommendations on similar tweets alone. 
 
-A topics-based approach was used by \textcite{Godin2013}, where the model predicted the most likely set of topics that were associated with a tweet, and tested if these topics matched the tweet by using human raters.
-The latent topics for the collection of tweets were generated using a Latent Dirichlet Allocation (LDA) statistical methodology.
-This is similar to a factor analysis approach in that the most likely hidden dimensions (i.e., topics) of the data are discovered by searching for reduced representations of the data that cover most of the variance. 
-Human graders rated how well the models generated topics for a tweet related to the content in the tweet.
-The LDA model performed well, and generated relevant topics.
-When the model produced five most-likely hashtags for each tweet, 80\% of the time at least one of those hashtags was suitable (as determined by human raters).
-
-However, a topic-generating model is not performing the same task as a hashtag-prediction model.
-The authors argued that these general topics could be used to categorize the post, in addition to the hashtags already used by the author in the post.
-It is unclear though if a user would want to label their tweet with these general topics.
-Perhaps they would rather use more specific hashtags to be more precise in how they label the tweet and how that tweet is associated with tweets within the rest of the community.
-In fact, they have already chosen to be more precise in the specific labels that they use for the tweet, since they chose to label the tweet with specific hashtags instead of general topics.
-Now it is certainly the case that the topics generated by an LDA model may be similar to the hashtags used in the post.
-However, it seems a bit indirect to build a model that predicts general topics, since embedded in the data are the exact ``topics'' (i.e., hashtags) that each user chose to use for each tweet.
-On the other hand, a topics-based approach is more general than a hashtags-based approach, since topics can be suggested for posts that do not use hashtags (which is quite common across Twitter).
-
 \subsubsection{State of Research on StackOverflow and Twitter}
 
 \textcite{Stanley2013} used an ACT-R based Bayesian memory model to predict human tagging on the StackOverflow site, but to our knowledge no vector-based memory model has been tested on the site.
@@ -1102,26 +818,6 @@ This type of weighted additive model that combines past user behavior and curren
 
 Both StackOverflow models \parencites{Stanley2013,Kuo2011} did not take into account the specific user's prior history when generating tag predictions.
 Rather their models, much like \textcite{Mazzia2009}'s Twitter model, uses the aggregate tag history across all users as the model's prior activation for each tag.
-
-As some initial research, I have developed and tested a user-customized model for StackOverflow by modifying the model in \textcite{Stanley2013}.
-To incorporate the user's prior tag history into the model, the base-level activation term ($B_{i}$) was modified from the original equation in ACT-R.
-$B_{i}$ is based on log-odds occurrence, which in turn is based on frequency of tag use, or probability of tag use $p_{i}$.
-To incorporate a user's prior, a weighted average for $p_{i}$ was used,
-where the probability of using tag $i$ ranges from the global probability ($pGlobal_{i}$) to the user's specific probability ($pUser_{i}$) as the user's total tag count increases.
-
-The global probability is the same $p_{i}$ used in \textcite{Stanley2013}'s study.
-The user's specific probability is computed the same way that the global probability is computed (i.e., the log odds that the tag occurred relative to the occurrence of all other tags).
-However, each user's probability is constrained to the set of tags that the specific user has used in the past. 
-When a user has no past tag history, the global prior probability is used.
-Once a user has provided at least five tags, that user's specific prior probability is used.
-Between zero and five tags, both terms are used but the weight of the global prior relative to the user prior decreases as the number of tags increases.
-
-Both linear decay and exponential decay transition functions were tried.
-Using either transition function, overall model accuracy improved by 5\% after incorporating the user's prior tag history into the model.
-
-This research suggests that model fit can improve when tag predictions are customized to the specific user's past tagging history.
-It also seems plausible that model accuracy can improve an even greater amount by using the time-dependent form of the base-level component in Table \ref{tabACTRModel},
-in order to account for the fact that a user's tagging preferences change over time.
 
 One of the main purposes of this research is to improve on these user-agnostic statistical models and include each specific user's past tagging history as a model component.
 Using customized priors that are tailored to a user's specific tagging history should be crucial for sites like Twitter where the possible tag space is infinite,
@@ -1232,28 +928,6 @@ with the StackOverflow dataset, it is also possible to convert synonym tags to c
 This can be thought of as semantic stemming, where two words with identical meaning are converted to the same canonical word.
 So tags used for the post were converted to their root tag when possible.
 
-\subsection{Handling Stop Words}
-
-``Stop words'' (e.g., ``the,'' ``a,'' ``or'') are commonly used words that co-occur with all tags (i.e., have little to no discriminating power).
-It is typically recommended \parencite{Bird2009} to remove stop words when building the co-occurrence matrix.
-Otherwise the matrix may not scale as well since these low-predictor stop words commonly appear in the text.
-Also for vector-based systems, memory vectors will become overly saturated with the environment vectors of the commonly-occurring stop words.
-
-Stop words are usually removed by either filtering based on a predetermined list or filtering based on the high-frequency words that occur in the dataset.
-\textcite{Sahlgren2008} tried both methods to remove stop words for the random permutation vector-based model, and found that the data-driven approach
-(i.e., building the list based on the high-frequency words that occurred in the dataset) worked much better than using a predetermined list.
-
-\textcite{Jones2007} also filtered the stop words for the circular convolution model,
-but also mentioned that an entropy weighting technique \parencite{Dumais1991} has been used previously to attenuate (rather than remove) stop words.
-This data-driven technique identifies stop words by calculating the discriminating power (i.e., entropy) of each word to predict any tag.
-Each word is then weighted (not removed) based on their discriminating power.
-
-\textcite{Stanley2013} used the entropy weighting technique recommended in \textcite{Dumais1991} for the StackOverflow dataset.
-The result maps cleanly to the ACT-R DM theory by modifying each word's attentional weight ($W_{j}$) parameter.
-It also seems less arbitrary than explicitly identifying a list of stop words to remove from the analysis.
-
-All three stop word techniques (i.e., predetermined list, high-frequency filtering, and entropy weighting) were explored for this analysis.
-
 \clearpage
 \section{Chapter 4: Past User Behavior}
 
@@ -1332,72 +1006,9 @@ It was repeated for each of the decay rate values and the two different forms of
 
 \subsection{Results}
 
-\subsubsection{Visualizing Tag Use}
-
-To better illustrate the dynamics of each user's tagging behavior,
-profile plots for a single user for both StackOverflow and Twitter are included in Figure \ref{figPriorHTByTime}.
-The specific value of the hashtag used for both plots is a nominal variable and not important for this analysis.
-What is interesting is the large tag space for these users.
-There are bands of commonly-used tags for each user, but there are also many instances where new tags are used, and a large percentage of tags used are not in the most common bands.
-
-\begin{figure}[!htbp]
-  {%
-    \setlength{\fboxsep}{0pt}%
-    \setlength{\fboxrule}{1pt}%
-    \hfill
-    \subfigure[][StackOverflow]{\includegraphics[width=8cm]{HTByTime-520957-crop.pdf}}
-    \hfill
-    \subfigure[][Twitter]{\includegraphics[width=8cm]{HTByTime-fashionista_com-crop.pdf}}
-    \caption{
-      Tagging profile for a single user.
-      The x-axis represents the specific hashtag a user chooses for a post and time progresses vertically.
-      A point in the plot represents when a user chooses a specific hashtag for a specific post.
-      A user's chosen hashtag for their oldest post that contains a hashtag is the lowest point on the plot.
-    }
-    \label{figPriorHTByTime}
-  }%
-\end{figure}
-
-For example, the StackOverflow user in Figure \ref{figPriorHTByTime} has a pronounced band where the same hashtag is chosen repeatedly over time. 
-However there are many instances of other tags being used in parallel to the tag that is producing the band (that is repeatedly being used). 
-The Twitter user has a few clusters where the same hashtag is chosen repeatedly but only for a brief period of time.
-As time progresses, a band of choosing another hashtag is observed, and then the user switches to a new hashtag after that.
-More recent posts for the Twitter user are more varied, and there is no longer a single hashtag that the user chooses repeatedly.
-This helps illustrate how challenging modeling this task can be.
-The model's goal is to predict at each instance what tag will be chosen, but to do so the model must predict the correct few tags from a much larger set of tags whose frequency of occurrence is changing over time.
-
-
-Although the tag space for the Twitter user is smaller than the StackOverflow user in these plots, this is not a consistent trend.
-These plots were chosen from the set to also show that the amount of tag variation for individual users also varies: some use many tags and some use just a few.
-To accurately model human performance in this domain, the model must be able to make correct predictions across all variations of user tagging behavior. 
-
-\subsubsection{Visualizing Model Performance}
-
-As a first method for understanding model performance, profile plots of model's predicted tags for individual users were overlaid on that user's actual tag use.
-These plots for StackOverflow and Twitter are included in Figures \ref{figPriorHTMByTimeSO} and \ref{figPriorHTMByTimeT} respectively.
-These are the same plots shown in Figure \ref{figPriorHTByTime} with model predictions overlaid in red. 
-
-\begin{figure}[!htbp]
-  \scalebox{.7}{\resizebox{\linewidth}{!}{\includegraphics{HTMByTime-520957-crop.pdf}}}
-  \caption{Model tagging profile of a single user on StackOverflow}
-  \label{figPriorHTMByTimeSO}
-\end{figure}
-
-\begin{figure}[!htbp]
-  \scalebox{.7}{\resizebox{\linewidth}{!}{\includegraphics{HTMByTime-fashionista_com-crop.pdf}}}
-  \caption{Model tagging profile of a single user on Twitter}
-  \label{figPriorHTMByTimeT}
-\end{figure}
-
-Also shown in these figures is how model predictions change as the decay rate parameter changes.
-With lower decay rate values, the model is less likely to switch from tag to tag for each post.
-This makes sense because lower decay rate values lead to the model weighting frequency more than recency in the activation calculation.
-These plots also suggest that model accuracy is best when a blend of frequency and recency is used (i.e., a decay rate between 0 and 20).
-This will be more formally tested when model accuracy across decay rate values is analyzed across all users in each dataset slice and all dataset slices.
-
 \subsubsection{Model Performance Across Decay Rate Values}
 
-Moving up one level of analysis, model accuracy for all users in a single dataset slice was analyzed.
+Looking first at only a single dataset slice, model accuracy for all users in that slice was analyzed.
 A plot of the results for one of the 12 slices, for both Twitter and StackOverflow, and for both forms of $B_{i}$ are included in Figures \ref{figPriorSOQSliceDsStd} and \ref{figPriorTwitterSliceDsStd} respectively.
 
 \begin{figure}[!htbp]
@@ -1415,6 +1026,7 @@ A plot of the results for one of the 12 slices, for both Twitter and StackOverfl
   }
     \label{figPriorSOQSliceDsStd}
   }%
+
 \end{figure}
 
 \begin{figure}[!htbp]
@@ -1570,11 +1182,11 @@ Past tag use was isolated in the first study to see how well ACT-R's prior compo
 For the rest of the studies the past behavior and context declarative memory components were combined as well as looked at in isolation.
 
 Chapter 5 will examine how model accuracy is influenced by two methodological concerns (adding an offset term and examining the effect of dataset subset for Twitter)
-and five architectural concerns
-(method of handling stop words, influence of dataset size, amount of compression used for the vector-based models, method to combine the prior and context for the vector-based models, and word order).
+and four architectural concerns
+(method of handling stop words, influence of dataset size, method to combine prior and context, and word order).
 The two methodological concerns were examined to ensure that the technique to calibrate model parameters was accurate and also that results for Twitter were not specific to the subset of data collected. 
 
-The five architectural concerns were examined for the following reasons:
+The four architectural concerns were examined for the following reasons:
 During exploratory evaluation, model accuracy seemed to be highly sensitive to the method of dealing with the commonly-used stop words, so several different methods were examined in more detail.
 
 Due to research from \textcite{Budiu2007} and \textcite{Recchia2010}, model accuracy for the Bayesian and vector-based models is influenced by the number of documents in the dataset,
@@ -1582,10 +1194,6 @@ so the effect of dataset size on accuracy was examined in more detail.
 Specifically,
 since both the Bayesian and random-permutation models are being evaluated, analyzing the effect of dataset size on accuracy in this research will allow direct comparisons between the two models on a common dataset.
 This has not yet been possible since the two models have never been compared on the same dataset within the same study.
-
-\textcite{Sahlgren2008} showed how different levels of compression in the random-permutation model influence accuracy, so this was examined for three reasons:
-to replicate the findings,
-as an additional check to ensure that the random-permutation model was implemented correctly, and also to see if the same levels of compression are valid for the much larger datasets used in this research.
 
 One of the primary goals of this research is to identify the best method to combine the model term for past user behavior with the context term for the random-permutation model,
 so two different ways to add the model terms were tested.
@@ -1794,12 +1402,27 @@ the results from this study cannot by themselves be used to answer this question
 
 \subsection{Stop Words}
 
-The method of handling stop words has been shown to influence model accuracy \parencite{Sahlgren2008,Stanley2013}, so this was the first architectural concern that was examined.
+``Stop words'' (e.g., ``the,'' ``a,'' ``or'') are commonly used words that co-occur with all tags (i.e., have little to no discriminating power).
+It is typically recommended \parencite{Bird2009} to remove stop words when building the co-occurrence matrix.
+Otherwise the matrix may not scale as well since these low-predictor stop words commonly appear in the text.
+Also for vector-based systems, memory vectors will become overly saturated with the environment vectors of the commonly-occurring stop words.
+
+The method of handling stop words has been shown to influence model accuracy \parencite{Sahlgren2008,Stanley2013,Jones2007}, so this was the first architectural concern that was examined.
 \textcite{Sahlgren2008} looked at several ways to handle the commonly-occurring stop words for the random permutation model:
 A data-driven frequency-weighted approach was tried, along with using a previously-generated stoplist, and no stop word removal at all.
 Removing the high-frequency words in the dataset showed the highest performance increase compared to no stop word removal, and using a previously-generated stoplist hardly increased performance.
 However, \citeauthor{Sahlgren2008} did not try to weight the stop words and only tried methods to remove them.
-So alongside looking at frequency weighting, previously generated, and no stop word removal, \textcite{Stanley2013}'s method of attenuating stop words based on entropy was also explored.
+
+\textcite{Jones2007} also filtered the stop words for the circular convolution model,
+but also mentioned that an entropy weighting technique \parencite{Dumais1991} has been used previously to attenuate (rather than remove) stop words.
+This data-driven technique identifies stop words by calculating the discriminating power (i.e., entropy) of each word to predict any tag.
+Each word is then weighted (not removed) based on their discriminating power.
+
+\textcite{Stanley2013} used the entropy weighting technique recommended in \textcite{Dumais1991} for the StackOverflow dataset.
+The result maps cleanly to the ACT-R DM theory by modifying each word's attentional weight ($W_{j}$) parameter.
+It also seems less arbitrary than explicitly identifying a list of stop words to remove from the analysis.
+
+All three stop word techniques (i.e., predetermined list, high-frequency filtering, and \textcite{Stanley2013}'s entropy weighting) were explored for this analysis.
 
 \subsubsection{Method}
 
@@ -2044,74 +1667,6 @@ Also, it is likely that the specific domain being studied interacts with the fac
 Nevertheless, if a researcher is working in a domain with limited data (e.g., small corpus size, large tag space) that produces a sparse co-occurrence matrix,
 then it may be worthwhile to experiment with using a compressed random permutation model instead of the full Bayesian model.
 
-\subsection{Amount of Compression for Random Permutation}
-
-Another parameter in the random permutation model is the number of rows used to represent all of the different words.
-Each word's environment vector is represented by two randomly placed ones and two negative ones across the rows.
-All that is required is that the four positions and signs of each of these environment vectors is unique.
-But this means multiple environment vectors can overlap when looking at a single row.
-This is a lossy form of compression, and allows the number of rows to represent the words to be much less than the total number of words.
-As the number of rows decreases, the amount of cross talk between the environment vectors increases, compression increases, and the amount of information stored decreases.
-As a third architectural concern, the effect of compression for the random permutation model was examined for Twitter and StackOverflow.
-
-\subsubsection{Method}
-
-Three different row-size values were tested for the random permutation model to see how accuracy changed as a function of space required to represent the co-occurrence matrix.
-A low value (\num{100}), a more standard value (\num{2048}), and a high value (\num{10000}) of rows were tested.
-A separate co-occurrence representation was built for each of these row values.
-Each representation was tested on the four Twitter popular-hashtags datasets and the StackOverflow randomly-sampled dataset.
-Accuracy measurements were the same as were used for previous runs of these datasets: mean accuracy for each of the 5 StackOverflow and 15 Twitter runs.
-
-\subsubsection{Results}
-
-Results for using different levels of compression for the random permutation model for the StackOverflow dataset are depicted in Figure \ref{figContextDimSO}.
-In the figure, the model name that does not have the number of rows in the matrix specified is the \num{2048}-row matrix.
-This was done so that names in all of the plots would remain consistent across all plots, and the \num{2048}-row matrix is the size used for the random permutation model for all other results.
-The plot is also broken out for different size datasets used to build the co-occurrence matrix.
-
-\begin{figure}[!htbp]
-  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-dimBySizeSO-crop.pdf}}}
-  \caption{
-    Effect of compression on random permutation model for StackOverflow.
-    Error bars represent the 95\% bootstrapped confidence interval for the mean.
-  }
-  \label{figContextDimSO}
-\end{figure}
-
-Reducing compression to only 100 rows in the representation has a strong negative effect on accuracy (\numNoZero{.60} to \numNoZero{.55} for the \num{1000000} document corpus size).
-But \num{2048} rows is sufficient for these datasets,
-as increasing the number of rows to almost an order of magnitude higher (\num{10000}) has little to no positive impact on accuracy (\numNoZero{.60} to \numNoZero{.60} for the \num{1000000} corpus size). 
-
-Results are similar for Twitter.
-Figure \ref{figContextDimT} shows the same negative impact when reducing from \num{2048} to \num{100} (\numNoZero{.26} to \numNoZero{.24} for the \num{3000000} corpus size),
-and little to no impact when increasing from \num{2048} to \num{10000} (\numNoZero{.26} to \numNoZero{.26} at \num{3000000}).
-This results are consistent across all corpus sizes used to build the co-occurrence matrix.
-
-\begin{figure}[!htbp]
-  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-dimBySizeT-crop.pdf}}}
-  \caption{
-    Effect of compression on random permutation model for Twitter.
-    Error bars represent the 95\% bootstrapped confidence interval for the mean.
-  }
-  \label{figContextDimT}
-\end{figure}
-
-\subsubsection{Discussion}
-
-The fact that the random permutation model only needs around \num{2048} rows to represent all of the words in the Twitter and StackOverflow datasets is impressive.
-Twitter has around \num{2383000} unique words for the \num{3000000} tweets in each of the popular-users datasets.
-StackOverflow has \num{5848000} unique words for the \num{1000000} posts used to generate the co-occurrence matrix.
-So it is impressive that only \num{2048} rows are needed to represent most of the variance from all of the words in these co-occurrence matrices.
-This is likely because word use frequency for StackOverflow and Twitter approximately follows Zipf's law.
-\textcite{Stanley2013} showed that frequency of tag use for StackOverflow approximately follows a Zipf's law distribution.
-This means that if the words are rank sorted by number of times they are used, the frequency of word use drops off sharply when moving to words that are used fewer times. 
-Since these words have little to no ability to influence predictions, it makes sense that they can be safely removed from the dataset.
-
-However, it should be pointed out that the way the random permutation model compresses the words is completely random.
-It is not an LSA approach where the few ones and negative ones (i.e., the factors) for each word are chosen such to maximize the ability for the compressed matrix to represent the full matrix.
-The environment vector for each word is randomly selected, and no SVD is performed to choose these in a more discriminating manner.
-So it is that more impressive that even with a randomly-chosen form of compression, only \num{2048} rows are needed to represent all of the words in these datasets.
-
 \subsection{Method to Combine Prior and Context}
 
 The activation value for the context component of the vector-based model is a correlation, ranging from zero to one.
@@ -2177,6 +1732,9 @@ Nonetheless, it does seem appropriate to convert the context to a log-odds adjus
 Since performance does not decrease when the transformation is made, may slightly increase,
 and leads to a more natural interpretation of each model term as a log-odds value, it is reasonable to include this step for the random permutation model.
 Future research could explore additional methods to properly combine the terms.
+
+
+
 
 \subsection{Word Order}
 
@@ -2303,170 +1861,6 @@ This illustrates that the impact of a user's past history relative to the curren
 However, the underlying reason that the weights change between the sites cannot be answered from this study alone.
 This relative impact may be changing from either a true alteration in the underlying weight of the prior compared to context for different domains,
 or simply due to the fact that the amount of information collected for each of the terms changes between the domains (less information leads to lower weighting in general). 
-
-\clearpage
-\section{Chapter 6: Combining Predictors on the Popular-Users Dataset}
-
-Chapter 4 isolated the prior component of the model and analyzed accuracy on the popular-users dataset.
-Chapter 5 added the context components to the models and analyzed accuracy on the Twitter popular-hashtags and StackOverflow randomly-sampled datasets.
-Chapter 6 shows the results when the combined prior and context models are tested across all of the datasets.
-Looking at model behavior across the datasets provides a way to show how the importance of the prior component relative to the context component can change depending on specific properties in the dataset that is studied.
-Also, an experiment to a user-custom context co-occurrence matrix was attempted on the popular-users dataset.
-This was tried because it could be theoretically interesting to see if model performance improves when the context co-occurrence matrix is customized to each user.
-
-\subsection{Impact of Prior vs. Context}
-
-Adding a user's prior tag history as an additional component has been shown to improve performance, but is this always the case?
-If enough context information has been collected, maybe a context-only model can perform just as well as a combined context and prior model.
-If this were the case, then it may be less important that the random permutation model does not include a prior term by default.
-
-\subsubsection{Method}
-
-Full models were tested against context-only models for both sites. 
-The four Twitter popular-hashtags datasets and the StackOverflow randomly-sampled dataset were used for the test. 
-
-\subsubsection{Results}
-
-The results are depicted in Figures \ref{figContextPriorneededSO} and \ref{figContextPriorneededT}.
-For StackOverflow, accuracy remains the same when the prior component is removed for both the Bayesian (\numNoZero{.63} to \numNoZero{.63}) and random permutation (\numNoZero{.63} to \numNoZero{.63}) models.
-Accuracy does dramatically decrease for Twitter when the prior is removed, however (\numNoZero{.32} to \numNoZero{.14} for Bayesian, \numNoZero{.25} to \numNoZero{.12} for random permutation).
-
-\begin{figure}[!htbp]
-  \scalebox{.6}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-priorAddSO-crop.pdf}}}
-  \caption{Model accuracy when prior is removed for StackOverflow randomly-sampled dataset}
-  \label{figContextPriorneededSO}
-\end{figure}
-
-\begin{figure}[!htbp]
-  \scalebox{.6}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-priorAddT-crop.pdf}}}
-  \caption{Model accuracy when prior is removed for Twitter popular-hashtags dataset}
-  \label{figContextPriorneededT}
-\end{figure}
-
-\subsubsection{Discussion}
-
-These results show that prior information is not always needed when a large amount of context is available and not much information has been collected about each user's past history.
-The StackOverflow randomly-sampled dataset selects posts across the entire dataset, regardless of each user's popularity or tag history.
-Across the dataset, each user only asks around five questions on average, so there is not a large amount of past tag history available for the prior component to use,
-which is why this component is not a strong predictor in this case.
-
-However, can a context-only model perform just as well as a combined context and prior model when users with the largest amount of StackOverflow history are tested?
-If each user's tagging history is a useful predictor for StackOverflow,
-then the prior component should at least generate unique predictive variance in the case where users with large amounts of history are tested.
-
-\subsubsection{Method}
-
-The same StackOverflow popular-users dataset used to test the prior component in isolation was used to test the prior component when context was added.
-However, since computing activations for the context component take an order of magnitude more wall-clock time than computing the prior component, not all observations could be included for the test.
-To reduce the observations, the most recent 50 posts from each user in the datasets were selected.
-The total number of users sampled was also reduced to 40 users for StackOverflow and 80 users for Twitter.
-Using the most recent observations for each user ensures that the observations tested have acquired the greatest amount of past tagging history in the datasets.
-So if a context-only model performs just as well as the full model in this case, it would be surprising.
-
-\subsubsection{Results}
-
-The results comparing the full model to a context-only only model for the StackOverflow popular-users dataset are depicted in Figure \ref{figPUAddPrior}.
-In this case, past tag history does contain unique variance for accurately predicting tag use.
-Accuracy improves for both the Bayesian (\numNoZero{.51} to \numNoZero{.63}) and random permutation (\numNoZero{.47} to \numNoZero{.58}) models
-when the prior model component is combined with context compared to context alone.
-
-\begin{figure}[!htbp]
-  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-priorAddPUserSO-crop.pdf}}}
-  \caption{Model accuracy when prior is removed for StackOverflow popular-users dataset}
-  \label{figPUAddPrior}
-\end{figure}
-
-\subsubsection{Discussion}
-
-This shows that incorporating past tagging history is important even for a site like StackOverflow where a large amount of context information has been collected.
-However, for this type of site it only becomes important when a reasonably large amount of a user's past tagging history has been collected.
-For a randomly sampled user on StackOverflow, a context-only model captures the majority of the predictive variance.
-
-This raises an important applied question: Exactly how much past user behavior is enough for a site like StackOverflow to benefit from adding past user behavior as an additional predictor?
-When the model predicts tags from a random sample of StackOverflow users, adding the prior component to the model does not significantly increase model accuracy compared to using context alone.
-However, when the model predicts tags from a set of users that ask the most questions on the site, adding the prior does significantly increase accuracy.
-For the StackOverflow dataset, a user asks on average 5 questions and adds 3 tags to a post.
-So the model uses approximately 15 prior observations when computing the prior component for a randomly-sampled user on the site.
-For the popular-users dataset used to generate the results in Figure \ref{figPUAddPrior}, a user asked 180 questions on average.
-So for this dataset, the model uses approximately 540 prior observations when computing the prior activation.
-So for the StackOverflow site, the prior component begins to generate unique predictive variance above and beyond the context component somewhere between when a user has generated 15 and 540 prior observations.
-This result will be different for other sites that have collected a different amount of contextual information.
-For sites like StackOverflow where the contextual component is already a strong predictor, it will take a larger number of prior observations before adding the prior component becomes beneficial.
-Alternatively for sites like Twitter where contextual information is much more noisy and not as strong of a predictor, it will take fewer observations before adding the prior becomes beneficial.
-
-\subsection{User-customized Co-occurrence Matrix}
-
-The co-occurrence matrix for the context component of both models has been built by aggregating across users and collecting all instances of context words and associated tags.
-That is, the default co-occurrence matrix is not customized to each user, so the same matrix is used for all users.
-This is commonly done because there is usually not enough context by tag co-occurrences for a single user to generate a stable co-occurrence matrix.
-If there was enough information, accuracy would most likely improve since it is not likely that every user's word by tag co-occurrence profile is exactly the same.
-However, since several hundred posts for each user in the popular-users datasets are available, an analysis was tried where user-custom co-occurrence matrices were used.
-
-\subsubsection{Method}
-
-Separate co-occurrence matrices were built for each user in the sampled StackOverflow and Twitter popular-users dataset.
-The same sampling method used to test the impact of the prior component compared to the context component for the popular-users datasets was used,
-and the co-occurrence matrices were built from the oldest posts that were not included in the testing set.
-So for each user, the co-occurrence matrix was created from their oldest posts, up to (and not including) their 50 newer posts that were used to test model accuracy. 
-
-\subsubsection{Results}
-
-Model accuracy when using a user-customized co-occurrence matrix for StackOverflow and Twitter is shown in Figures \ref{figPUCustomSO} and \ref{figPUCustomT}.
-The results compare accuracy for models that use a global co-occurrence and user-specific co-occurrence matrix.
-For StackOverflow, model accuracy for the user-specific co-occurrence matrix (labeled as ``user sji'') can be compared against the default global co-occurrence matrix.
-Accuracy decreases dramatically when a user-specific co-occurrence matrix is used for both the Bayesian (\numNoZero{.64} to \numNoZero{.35}) and random permutation (\numNoZero{.58} to \numNoZero{.36}) models.
-
-\begin{figure}[!htbp]
-  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-userSjiSO-crop.pdf}}}
-  \caption{
-    Model accuracy with user-customized context component for StackOverflow.
-    A model name with ``user sji'' uses a co-occurrence matrix customized for each user instead of a single global co-occurrence matrix.
-  }
-  \label{figPUCustomSO}
-\end{figure}
-
-\begin{figure}[!htbp]
-  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-userSjiT-crop.pdf}}}
-  \caption{Model accuracy with user-customized context component for Twitter}
-  \label{figPUCustomT}
-\end{figure}
-
-The results are similar for Twitter.
-However, the entire dataset is not available for Twitter, so a global co-occurrence matrix condition can not be tested,
-since the popular-users dataset samples across a wide range of hashtags, and due to Twitter's API restrictions it would be infeasible to collect all posts that use each of the hashtags in the dataset.
-But user-specific co-occurrence matrices can be built, since the popular-users dataset does contain all context and hashtag observations for each user.
-
-Model accuracy when only the single user-customized context predictor is used is relatively poor (\numNoZero{.17} and \numNoZero{.21} for Bayesian and random permutation),
-and the prior term is a much better predictor (\numNoZero{.37}).
-Further, when this component is combined with the prior component,
-model performance improves only slightly over performance when only the prior is used (\numNoZero{.37} to \numNoZero{.39} for both the Bayesian and random permutation).
-
-\FloatBarrier
-
-\subsubsection{Discussion}
-
-Both models require large numbers of context co-occurrence observations to make accurate predictions from context information.
-Otherwise, the co-occurrence matrices do not have enough data to properly stabilize.
-Millions of posts were used to generate the global co-occurrence matrices for Twitter and StackOverflow.
-If this number of posts had been collected for a single user, then the user-customized co-occurrence matrix for that user should lead to more accurate predictions compared to using the global matrix.
-However, in this study only around 100 posts were used to build the user-specific matrices for each user.
-
-This is most likely why model accuracy was so poor when user-specific matrices were used:
-Even for the large datasets analyzed in this study, there is still not enough history collected for each user to build customized co-occurrence matrices.
-The prior model component can be customized for each user, since the prior is only concerned with tag use, and there are a reasonably small set of tags that the model is choosing from.
-However, the context component is built from the set of all of the prior tags crossed with all of the possible words, which is a much larger space than just the set of tags.
-So building a stable context component requires a much larger set of data than the prior component.
-
-That said, if a user only chooses a small set of tags (so the tag space is small), and computing a global co-occurrence matrix is infeasible (e.g., with the Twitter popular-users dataset), 
-then it may be worthwhile to add the user-custom context model component as an additional predictor.
-As was shown for Twitter, model accuracy can slightly improve over a model that just uses a custom prior, even when the co-occurrence matrix only contains around 100 posts.
-
-Further, if the number of co-occurrences is small, and a user-custom co-occurrence matrix is used, it may be advantageous to use the compressed random permutation model instead of the uncompressed Bayesian model.
-For the Twitter popular-users dataset, only a user-custom co-occurrence matrix could be built, and when this matrix is used the compressed random permutation model performed better than the uncompressed Bayesian model.
-When the global co-occurrence matrix was removed from the StackOverflow dataset, and a user-custom matrix was used instead, the accuracy for the random permutation model decreased less than the Bayesian model. 
-This provides further evidence showing that there is an interaction between dataset size and optimal model:
-At lower numbers of co-occurrences the compressed random permutation model is able to perform better than the Bayesian model,
-and the Bayesian model surpasses the compressed model at higher co-occurrence counts once the cells in the full co-occurrence matrix stabilize. 
 
 \clearpage
 \section{Chapter 7: General Discussion}
@@ -2647,86 +2041,6 @@ The results from the study and the new research questions raised will help to be
 \clearpage
 \printbibliography[heading=bibintoc]
 \endgroup
-
-\clearpage
-\section{Appendix 1: Support Code}
-
-All software code created for this research is publicly available on GitHub \parencite{StanleyRepo2014}.
-
-\subsubsection{Directory Structure}
-
-The repository is separated into three main folders:
-dissProject, firstSOProject, and writeups.
-The firstSOProject folder contains the support code for the \textcite{Stanley2013} research.
-The dissProject folder contains support code for this dissertation research.
-The writeups folder contains all writeup projects created during the dissertation process (e.g., the LaTeX for this dissertation, Keynote presentations).
-
-Within the dissProject folder, there are two main files that contain the majority of the code for the dissertation research: scrapeUsers.py and preProcess.R.
-The python file contains the necessary code to scrape the Twitter site for tweets, import results into the Postgres database, and perform various cleanup functions that were easiest to do in Python.
-The preProcess.R file contains all modeling and analysis code for the project.
-Within the file, there are implementations for the Bayesian and random permutation models.
-Also there is code to test the models by running each model through the various StackOverflow and Twitter test datasets.
-
-\subsubsection{Model Implementations}
-
-The Bayesian model is implemented using the data.table package, so that fast joins can be performed on the table when computing the strength of association values.
-The random permutation model is represented as a matrix, so that correlations between the model and context vectors are fast.
-The matrix is not sparse, since there are currently no sparse matrix packages for R that have a vectorized function to compute correlations between a vector and a matrix.
-
-The Bayesian model requires slightly more time to compute activation values and also more memory space to store the representation.
-This is because the random permutation model is compressed and only needs to store around \num{2048} rows in the co-occurrence matrix.
-However, both models are implemented efficiently enough so that all analysis runs and activation computations can be kept in memory.
-64 GB of memory was required to perform the analysis, particularly on the largest Twitter (3 million) and StackOverflow (1 million) corpus sizes.
-
-\subsubsection{Design Decisions}
-
-All model manipulations (e.g., using an entropy weighting metric, using a model with only the prior term) were expressed as part of a configuration object.
-That object is a list of configuration name, value pairs.
-The configuration object is passed to the analysis code, which determines the specific type of run that is performed.
-
-This configuration design enables a large amount of code reuse and overlap.
-This helps minimize the likelihood of a programming mistake, since functions are reused multiple times and overall static code length is kept to a minimum.
-
-\subsubsection{Testing}
-
-Each analysis run produced a set of result files.
-Those result files were checked into the repository so that changes could be tracked.
-Code changes were tested by looking at differences between previously checked in output files and the output files produced after a code change was made.
-
-A small amount of unit testing was also performed.
-The core behavior of each model implementation (Bayesian and random permutation) was tested in isolation to ensure that the activation values returned by the models were mathematically correct.
-Unit test code is located within dissProject/test.
-
-\subsubsection{Parallelization}
-
-None of the analysis code is finely parallelized.
-Most of the inner loop in R ends up running in compiled C, and execution within those function calls occurs on a single core.
-However, since multiple models were explored, each different model configuration was executed in parallel.
-This type of course-grained parallelization was achieved using R's built-in Parralel package.
-Also some parallelization was done at the OS level when various make targets would run in parallel.
-
-\subsubsection{Database}
-
-All raw Tweet and post data were stored in Postgres tables.
-Also, after the documents were tokenized, the tokenized versions of the raw data were stored in Postgres tables.
-When R ran an analysis, it would query the tables to retrieve the correct set of tokenized words and tags.
-So there is a lot of R code that uses the RPostgreSQL package to communicate with Postgres as the analysis is running.
-
-\subsubsection{Running the Analysis}
-
-All analysis runs were scripted and can be run by using the appropriate target in dissProject/Makefile.
-The three main targets to run the models through the prior-only runs on the popular users dataset,
-the full models on the randomly-sampled and popular-hashtags datasets,
-and the full models on the popular users dataset are ``parrunPriors'', ``parrunContext'', and ``parrunPUsers'' respectively.
-Each of these targets takes tens of hours to complete.
-``parrunContext'' is the longest and takes around 72 hours on a desktop machine with 64 GB of memory and 24 virtual cores.
-
-Smaller test runs were also created so that model changes could be more rapidly developed.
-These typically use smaller Twitter and StackOverflow corpus sizes (e.g., only \num{10000} StackOverflow posts) to create the co-occurrence matrix
-and a smaller number of posts to test the models on (e.g., 20 instead of 500).
-Running these functions takes around a minute to complete.
-To run these, the R function is called directly (i.e., not a make target) within an already-running R session.
-As an example, the ``runContext20g1s6'' function takes only a few minutes to complete, runs the models on a corpus size of \num{1000}, with only a single run per model, and only 20 sampled posts for each run.
 
 \end{document}
 
