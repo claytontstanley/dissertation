@@ -1798,7 +1798,10 @@ analyzePrior <- function(modelVsPredTbl) {
 	tbl2[d == .8, DVName := paste0(DVName, 'BestDStd')]
 	DVNames = c('topHashtagPostPriorStdDefaultD', 'topHashtagPostPriorOL2BestDOL', 'topHashtagPostPriorStdBestDStd')
 	resTbl = compareOptimalAcc(tbl2[DVName %in% DVNames & runNum == 2])
-	resTbl[, mean(meanVal), by=list(DVName)]
+	resTbl[, dsetType := 'twitter']
+	resTbl
+	resTbl[grepl('^SO', dsetGroup), dsetType := 'stackoverflow']
+	resTbl[, mean(meanVal), by=list(DVName, dsetType)]
 	resTbl
 	tbl
 }
