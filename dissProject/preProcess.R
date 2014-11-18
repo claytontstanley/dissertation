@@ -1468,16 +1468,23 @@ plotBarSumTbl <- function(sumTbl, fillCol, figName, extras=NULL, groupCol='dsetG
 	groupCol = as.symbol(groupCol)
 	fillCol = substitute(fillCol)
 	renameCols(sumTbl)
-	expr = bquote(ggplot(sumTbl, aes(x=factor(.(groupCol)), y=meanVal, fill=.(fillCol))) +
-		      geom_bar(aes(y=meanVal), width=0.7, position=position_dodge(width=.8), stat='identity') +
-		      #geom_text(aes(y=0, label=.(fillCol), hjust=0, vjust=-1.25), position=position_dodge(width=1.4)) +
-		      geom_errorbar(aes(ymin=minCI, ymax=maxCI), position=position_dodge(width=.8), width=0.1, size=0.3) + 
-		      #scale_x_discrete(expand=c(.04,0)) + 
-		      defaultGGPlotOpts)
-	plot = eval(expr)
-	plotTbl(plot, extras, figName)
+        if (eval(bquote(nrow(sumTbl[, .N, by=.(groupCol)]))) == 1) {
+		eval(bquote(sumTbl[, .(fillCol) := paste(strwrap(.(fillCol), width=25), collapse='\n'), by=.(fillCol)]))
+		plot = eval(bquote(ggplot(sumTbl, aes(x=factor(.(fillCol)), y=meanVal)) +
+				   geom_bar(aes(y=meanVal), width=0.7, fill='white', colour='black', position=position_dodge(width=.8), stat='identity')))
+	} else {
+		plot = eval(bquote(ggplot(sumTbl, aes(x=factor(.(groupCol)), y=meanVal, fill=.(fillCol))) + 
+				   geom_bar(aes(y=meanVal), width=0.7, position=position_dodge(width=.8), stat='identity')))
+	}
+	args = list(#geom_text(aes(y=0, label=.(fillCol), hjust=0, vjust=-1.25), position=position_dodge(width=1.4)),
+		    geom_errorbar(aes(ymin=minCI, ymax=maxCI), position=position_dodge(width=.8), width=0.2, size=0.6),
+		    #scale_x_discrete(expand=c(.04,0)),
+		    defaultGGPlotOpts)
+	plotTbl(plot, c(args, extras), figName)
 	sumTbl
 }
+
+
 
 plotLineSumTbl <- function(sumTbl, fillCol, figName, extras=NULL, groupCol) {
 	groupCol = as.symbol(groupCol)
@@ -3708,8 +3715,8 @@ countHashtagsAtEnd <- function() {
 curWS <- function() {
 	analyzePrior(modelVsPredTbl)
 	analyzeContext(modelVsPredTbl)
-	analyzePUser(modelVsPredTbl)
 	analyzeLogreg(logregTbl, modelVsPredTbl)
+	analyzePUser(modelVsPredTbl)
 	plotMemMat()
 	withProf(runContext20g1s6(regen='useAlreadyLoaded'))
 	runContext500g1s6(regen='useAlreadyLoaded', numRunsT=1, numRunsSO=1)
