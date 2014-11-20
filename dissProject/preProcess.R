@@ -1471,10 +1471,12 @@ plotBarSumTbl <- function(sumTbl, fillCol, figName, extras=NULL, groupCol='dsetG
         if (eval(bquote(nrow(sumTbl[, .N, by=.(groupCol)]))) == 1) {
 		eval(bquote(sumTbl[, .(fillCol) := paste(strwrap(.(fillCol), width=25), collapse='\n'), by=.(fillCol)]))
 		plot = eval(bquote(ggplot(sumTbl, aes(x=factor(.(fillCol)), y=meanVal)) +
-				   geom_bar(aes(y=meanVal), width=0.7, fill='white', colour='black', position=position_dodge(width=.8), stat='identity')))
+				   geom_bar(aes(y=meanVal), width=0.7, fill='gray84', colour='black', position=position_dodge(width=.8), stat='identity')))
 	} else {
 		plot = eval(bquote(ggplot(sumTbl, aes(x=factor(.(groupCol)), y=meanVal, fill=.(fillCol))) + 
-				   geom_bar(aes(y=meanVal), width=0.7, position=position_dodge(width=.8), stat='identity')))
+				   geom_bar(aes(y=meanVal), width=0.7, position=position_dodge(width=.8), stat='identity') +
+				   scale_fill_grey(start=.3, end=.9)))
+
 	}
 	args = list(#geom_text(aes(y=0, label=.(fillCol), hjust=0, vjust=-1.25), position=position_dodge(width=1.4)),
 		    geom_errorbar(aes(ymin=minCI, ymax=maxCI), position=position_dodge(width=.8), width=0.2, size=0.6),
@@ -1484,8 +1486,6 @@ plotBarSumTbl <- function(sumTbl, fillCol, figName, extras=NULL, groupCol='dsetG
 	sumTbl
 }
 
-
-
 plotLineSumTbl <- function(sumTbl, fillCol, figName, extras=NULL, groupCol) {
 	groupCol = as.symbol(groupCol)
 	fillCol = substitute(fillCol)
@@ -1493,11 +1493,18 @@ plotLineSumTbl <- function(sumTbl, fillCol, figName, extras=NULL, groupCol) {
 	eval(bquote(setkey(sumTbl, .(groupCol), .(fillCol))))
 	sizeNums = eval(bquote(sumTbl[!duplicated(.(groupCol))][, .(groupCol)]))
 	sizeNums = parse(text=sizeNums)
+	lineTypes = c(1,2,3,5)
+	lineTypes = lineTypes[1:length(sumTbl[, unique(DVName)])]
+	lineTypes
 	expr = bquote(ggplot(sumTbl, aes(x=factor(.(groupCol)), y=meanVal, colour=.(fillCol))) + 
-		      geom_line(aes(group=.(fillCol)), size=1.4) + 
-		      geom_point() + 
+		      geom_line(aes(group=.(fillCol), linetype=.(fillCol)), size=1.4) + 
+		      geom_point() +
 		      scale_x_discrete(breaks = unique(sumTbl[, .(groupCol)]), labels = sizeNums) +
 		      geom_errorbar(aes(ymin=minCI, ymax=maxCI), width=0.1, size=0.3) + 
+		      scale_linetype_manual(values=lineTypes) + 
+		      guides(fill = guide_legend(keywidth = 1, keyheight = 1),
+			     linetype=guide_legend(keywidth = 5, keyheight = 1),
+			     colour=guide_legend(keywidth = 5, keyheight = 1)) +
 		      defaultGGPlotOpts)
 	plot = eval(expr)
 	plotTbl(plot, extras, figName)
