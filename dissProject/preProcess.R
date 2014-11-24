@@ -3741,10 +3741,10 @@ fooDesc <- function() {
 	sjiTblTOrderless[, sum(partialN)]
 
 	fooTbl = setDT(sqldf('select user_screen_name, count(id) from posts where post_type_id = 1 group by user_screen_name'))
-	fooTbl[, list(mean(count), median(count), max(count))]
+	fooTbl[, list(mean(count), median(count), max(count), trMean=mean(count, trim=.1))]
 
 	fooTbl = setDT(sqldf('select user_screen_name, id from top_hashtag_tweets limit 1000000'))
-	fooTbl[, .N, by=user_screen_name][, list(mean(N), median(N), max(N))]
+	fooTbl[, .N, by=user_screen_name][, list(mean(N), median(N), max(N), trMean=mean(N, trim=.1))]
 
 	fooTbl = setDT(sqldf("select id, chunk from top_hashtag_tokenized where type = 'hashtag' limit 1000000"))
 	curplotTbl = fooTbl[, .N, by=chunk][, type := 'Twitter Popular Hashtags']

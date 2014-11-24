@@ -2582,6 +2582,31 @@ Using a power-law equation to model future tag use based on past tag use is a re
 It is also the case that this same equation is an accurate model for the prior component of declarative memory, as was shown by \citeauthor{Anderson1991} in the original derivation, 
 and as is supported in the results from this study.
 
+\subsubsection{Model Accuracy Differences Across Sites}
+
+Model accuracy for StackOverflow was much higher overall than for Twitter.
+The Twitter popular-hashtags dataset contained 400 unique hashtags for each of the four dataset subsets.
+The StackOverflow randomly-sampled dataset contained \num{34377} unique tags, since it sampled posts across the entire site.
+As the model is tasked to predict fewer and fewer hashtags, it should become more accurate (less chance of making an incorrect prediction).
+However, even with a much smaller tag set to predict, model accuracy for Twitter was still not nearly as high as StackOverflow.
+This is likely due to the fact that tag frequency use drops off sharply for both StackOverflow and Twitter.
+This means that the models on both sites are generally switching between the top few hundred tags when making predictions.
+So, increasing the total unique number of tags past that point makes only a small negative impact on model accuracy.
+
+However, there was a large difference in total number of users for StackOverflow and Twitter.
+A user on StackOverflow contributed 2.5 times more posts to the StackOverflow randomly-sampled dataset than the Twitter popular-hashtags dataset.
+Also note that the large co-occurrence matrices for StackOverflow and Twitter that contained millions of documents were not user specific.
+This means that the co-occurrence matrix for Twitter was built from a much larger set of unique users compared to StackOverflow.
+It is likely that co-occurrence matrices for individual users are correlated but not equivalent.
+So, as the co-occurrence matrix is built from a larger number of unique users, a greater amount of cross-user noise is introduced into the matrix.
+This noise would decrease model accuracy since the contextual component of the model would lose predictive information by having a noisier co-occurrence matrix.
+This is most likely one of the main reasons that model accuracy for Twitter is much lower than StackOverflow:
+Tag prediction becomes much more challenging as the number of users on a site increases.
+
+The second most-likely reason that model accuracy is much higher for StackOverflow is that the co-occurrence matrix for this site contains much more data due to the large document size for the site.
+The co-occurrence matrix for the StackOverflow randomly-sampled dataset contained 20 times more observations than the matrix for one of the Twitter popular-hashtags datasets.
+Model accuracy generally increases as more observations are used to generate the co-occurrence matrices, since this allows each cell in the matrix to stabilize to its true value.
+
 \subsubsection{Representation}
 
 Given that the storage space required to represent the co-occurrences for the random permutation model is dramatically smaller than the uncompressed Bayesian model,
