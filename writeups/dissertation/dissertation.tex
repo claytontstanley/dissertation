@@ -2631,12 +2631,14 @@ Both models would make different predictions about the rate at which activation 
 Learning a new language might be a domain where large amounts of these sorts of retrievals could be collected.
 For instance, the online site Duolingo might contain enough collective data about language learning and word translation to better tease apart the two context models.
 
-\subsubsection{Compression}
+\subsubsection{Word Order}
 
 Also, the relatively strong performance of the random permutation model is not due to the model's ability to represent word order.
 Performance is similar for the random permutation and Bayesian models when the co-occurrence matrix for both models is the same, and not based on word order.
 Performance also does not improve by much when word order is added as the last predictor in the random permutation model.
 The random permutation model seems to work so well primarily due to the way that the full co-occurrence representation is compressed.
+
+\subsubsection{Compression}
 
 As previously noted, compression for the random permutation model is essentially random.
 That is, no SVD is done to identify the most predictive components,
@@ -2645,6 +2647,28 @@ However, performing a full SVD on a co-occurrence matrix as large as the ones ge
 Also, when deriving the LSA approach, \textcite{Landauer1997} explicitly state that they make no claims that the brain is computing an SVD at the neural level;
 only that the neural machinery is set up such that the representation makes predictions that are similar to what would have been generated if the matrix decomposition for an SVD would have been computed.
 Perhaps the randomly-compressed representation used for the random permutation model is the way in which the brain tries to efficiently achieve the full LSA- and SVD-like approach that \citeauthor{Landauer1997} propose.
+
+\subsubsection{Corpus Size}
+
+The random permutation model was more accurate than the Bayesian model at smaller corpus sizes, while the results were flipped for larger document sizes.
+This is interesting from a practical standpoint because the corpus size is rarely chosen in declarative memory research, and is constrained primarily by the amount of data available in the domain being studied.
+If a researcher is working within a domain that has a relatively small corpus size (generally near or less than \num{1000} documents),
+it may be worthwhile to test the random permutation model in this domain, as this compressed model may be more accurate than the uncompressed Bayesian model.
+
+Further, it is interesting to study the effect of model accuracy on corpus size because people require exposure to only a small number of documents before tagging documents appropriately.
+A user asked around five questions on average for StackOverflow, model accuracy was high for StackOverflow, but the model required training on 1 million documents before achieving that accuracy.
+The user only needed to ``train'' on five questions and the model needed to train on 1 million questions.
+
+This is a large discrepancy, but this does not necessarily invalidate the declarative memory models used for this research.
+First, the random permutation model was still accurate at smaller document sizes, so perhaps this result provides evidence to favor the random permutation model over the Bayesian model.
+However, the smallest corpus size tested for these models was \num{1000} documents, which is much greater than the average number of questions or tweets that a user contributes to the site.
+
+Second, the models may require large amounts of training because the co-occurrence matrices are being built from scratch.
+That is, the models are being trained on the StackOverflow and Twitter domains without any prior general co-occurrence information to start with.
+Presumably, when a person starts using a site, they can leverage all of their past exposure to different word co-occurrences and then simply add on top of that base the domain-specific co-occurrences.
+In that since, one could argue that the models are undertrained on generic co-occurrences (people are exposed to many more than one million documents in their lifetime) and overtrained on specific co-occurrences.
+It may be interesting to test these memory models on a hybrid co-occurrence matrix,
+where the majority of the observations are taken from a generic domain (e.g., american literature) and a minority are domain-specific (e.g., StackOverflow word, tag pairs).
 
 \subsubsection{Attentional Weight}
 
