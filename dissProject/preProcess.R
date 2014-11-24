@@ -1486,7 +1486,7 @@ plotBarSumTbl <- function(sumTbl, fillCol, figName, extras=NULL, groupCol='dsetG
 	sumTbl
 }
 
-plotLineSumTbl <- function(sumTbl, fillCol, figName, extras=NULL, groupCol) {
+plotLineSumTbl <- function(sumTbl, fillCol, figName, extras=NULL, groupCol, title='Model Name') {
 	groupCol = as.symbol(groupCol)
 	fillCol = substitute(fillCol)
 	renameCols(sumTbl)
@@ -1500,8 +1500,9 @@ plotLineSumTbl <- function(sumTbl, fillCol, figName, extras=NULL, groupCol) {
 		      geom_line(aes(group=.(fillCol), linetype=.(fillCol)), size=1.4) + 
 		      geom_point() +
 		      scale_x_discrete(breaks = unique(sumTbl[, .(groupCol)]), labels = sizeNums) +
+		      scale_colour_discrete(name=title) +
 		      geom_errorbar(aes(ymin=minCI, ymax=maxCI), width=0.1, size=0.3) + 
-		      scale_linetype_manual(values=lineTypes) + 
+		      scale_linetype_manual(name=title, values=lineTypes) + 
 		      guides(fill = guide_legend(keywidth = 1, keyheight = 1),
 			     linetype=guide_legend(keywidth = 5, keyheight = 1),
 			     colour=guide_legend(keywidth = 5, keyheight = 1)) +
