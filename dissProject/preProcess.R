@@ -3762,8 +3762,8 @@ fooDesc <- function() {
 	       xlab('Log Rank') + 
 	       ylab('Log Frequency Count') + 
 	       defaultGGPlotOpts + 
-	       scale_colour_discrete(name='Dataset Type') +
-	       scale_shape_discrete(name='Dataset Type') +
+	       guides(shape=guide_legend(title='Dataset Type')) +
+	       guides(colour=guide_legend(title='Dataset Type')) +
 	       theme(legend.position='top', legend.direction='vertical'))
 	plotTbl(p1, list(), 'descr-tagFrequencyCount')
 }
