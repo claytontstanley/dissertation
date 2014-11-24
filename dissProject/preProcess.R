@@ -1843,14 +1843,13 @@ analyzePUser <- function(modelVsPredTbl) {
 	tbl
 	tbl[, .N, by=DVName]
 	# RESULT: Adding prior is useful when a lot of data about the user has been collected
-	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleBody', 'TitleBody', 'Body', 'Title',
+	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleBody', 'TitleBody',
 				       'TitleOrderlessEnthymanBodyOrderlessEnthyman',
 				       'PriorStdTitleOrderlessEnthymanBodyOrderlessEnthyman'))
 	resTbl = compareMeanDVDefault(tbl[dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='priorAddPUserSO')
 	resTbl[, mean(meanVal), by=DVName]
 	# RESULT: User sji is much less helpful than standard sji for StackOverflow
-	DVNames = asTopHashtagAcross(c('TitleOrderlessEnthyser', 'TitleUsercontext', 'TitleOrderlessEnthyman', 'TitleOrderlessEnthyser', 'Title',
-				       'PriorStdTitleOrderlessEnthyserBodyOrderlessEnthyser', 'PriorStdTitleBody', 'PriorStdTitleOrderlessEnthymanBodyOrderlessEnthyman',
+	DVNames = asTopHashtagAcross(c('PriorStdTitleOrderlessEnthyserBodyOrderlessEnthyser', 'PriorStdTitleBody', 'PriorStdTitleOrderlessEnthymanBodyOrderlessEnthyman',
 				       'PriorStdTitleUsercontextBodyUsercontext'))
 	resTbl = compareMeanDVDefault(tbl[dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='userSjiSO')
 	# RESULT: User sji is not very helpful for Twitter, and prior is useful again
@@ -3703,14 +3702,17 @@ countNumUniqueTHashtags <- function() {
 	fooTbl = setDT(sqldf('select * from top_hashtag_hashtags'))
 	fooTbl[rank < 400][, .N, by=hashtag]
 	fooTbl[rank < 400][, .N, by=hashtag][N>1]
+	fooTbl[rank < 400][, .N, by=hashtag][N==2]
 	307/1565
+	203/307
 	fooTbl[, .N, by=hashtag]
 	fooTbl[, .N, by=hashtag][N>1]
 	583/2267
 }
 
 countHashtagsAtEnd <- function() {
-	fooTbl = setDT(sqldf("select id, chunk, pos, type from top_hashtag_tokenized limit 50000000"))
+	sqldf('select id from top_hashtag_tokenized group by id order by id asc limit 10000')
+	fooTbl = setDT(sqldf("select id, chunk, pos, type from top_hashtag_tokenized where id < 439178441682726912"))
 	tables()
 	fooTbl[, max(pos), by=id][, mean(V1)] # Average words per tweet
 	fooTbl
@@ -3719,11 +3721,56 @@ countHashtagsAtEnd <- function() {
 	fooTbl
 }
 
+fooDesc <- function() {
+	fooTbl = setDT(sqldf('select id, count(chunk) from top_hashtag_tokenized group by id limit 50000'))
+	fooTbl[, mean(count)]
+	fooTbl = setDT(sqldf('select id, count(chunk) from tweets_tokenized group by id limit 5000'))
+	fooTbl[, mean(count)]
+	fooTbl = setDT(sqldf('select * from post_tokenized where id < 84147'))
+	fooTbl[, .N, by=list(id,type)][, mean(N), by=type]
+
+	fooTbl = setDT(sqldf("select id, count(chunk) from top_hashtag_tokenized where type = 'hashtag' group by id limit 5000"))
+	fooTbl[, mean(count)]
+	fooTbl = setDT(sqldf("select id, count(chunk) from tweets_tokenized where type = 'hashtag' group by id limit 900"))
+	fooTbl[, mean(count)]
+
+	nrow(sjiTblSOOrderless)
+	nrow(sjiTblTOrderless)
+	sjiTblSOOrderless[, sum(partialN)]
+	sjiTblTOrderless[, sum(partialN)]
+
+	fooTbl = setDT(sqldf('select user_screen_name, count(id) from posts where post_type_id = 1 group by user_screen_name'))
+	fooTbl[, list(mean(count), median(count), max(count))]
+
+	fooTbl = setDT(sqldf('select user_screen_name, id from top_hashtag_tweets limit 1000000'))
+	fooTbl[, .N, by=user_screen_name][, list(mean(N), median(N), max(N))]
+
+	fooTbl = setDT(sqldf("select id, chunk from top_hashtag_tokenized where type = 'hashtag' limit 1000000"))
+	curplotTbl = fooTbl[, .N, by=chunk][, type := 'Twitter Popular Hashtags']
+	fooTbl = setDT(sqldf("select id, chunk from tweets_tokenized where type = 'hashtag' limit 1000000"))
+	curplotTbl = rbind(curplotTbl, fooTbl[, .N, by=chunk][, type := 'Twitter Popular Users'])
+	fooTbl = setDT(sqldf("select id, chunk from post_tokenized where type = 'tag' limit 1000000"))
+	curplotTbl = rbind(curplotTbl, fooTbl[, .N, by=chunk][, type := 'StackOverflow Randomly Sampled'])
+	setkey(curplotTbl, type, N) 
+	curplotTbl[, rank := nrow(.SD):1, by=type]
+	curplotTbl[, logN := log(N)][, logRank := log(rank)]
+	curplotTbl[, DatasetType := type]
+	curplotTbl[, summary(lm(logN ~ logRank, data=.SD))[['r.squared']], by=DatasetType][, mean(V1)]
+	assign('p1', ggplot(curplotTbl, aes(x=logRank, y=logN)) + 
+	       geom_point(aes(shape=DatasetType, colour=DatasetType)) +
+	       xlab('Log Rank') + 
+	       ylab('Log Frequency Count') + 
+	       defaultGGPlotOpts + 
+	       theme(legend.position='top', legend.direction='vertical'))
+	plotTbl(p1, list(), 'descr-tagFrequencyCount')
+}
+
 curWS <- function() {
 	analyzePrior(modelVsPredTbl)
 	analyzeContext(modelVsPredTbl)
 	analyzeLogreg(logregTbl, modelVsPredTbl)
 	analyzePUser(modelVsPredTbl)
+	tables()
 	plotMemMat()
 	withProf(runContext20g1s6(regen='useAlreadyLoaded'))
 	runContext500g1s6(regen='useAlreadyLoaded', numRunsT=1, numRunsSO=1)

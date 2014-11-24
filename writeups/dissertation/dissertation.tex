@@ -1192,6 +1192,53 @@ If all Twitter data were available, then the models would have been tested on a 
 However, since this is not the case for Twitter, the popular-hashtags dataset was used instead of a randomly-sampled dataset for that site,
 while models for StackOverflow were tested on the more challenging dataset where posts were randomly sampled across all posts created on the site.
 
+\subsubsection{Dataset Descriptives}
+
+The StackOverflow datasets had a much larger document size than the Twitter datasets overall.
+There were on average 9 and 158 words in the title and body of a post for StackOverflow when sampled across the entire site. 
+For Twitter, there were 13 words per tweet for the popular-users dataset and 18 for the popular-hashtags dataset.
+
+The average number of tags per dataset was lower overall for Twitter.
+For Twitter, authors used on average 1.1 hashtags per post for the popular-users dataset and 2.6 for the popular-hashtags dataset.
+For StackOverflow, 2.8 tags were used on average across all posts on the site.
+
+Since the document size and tags per document were higher for StackOverflow, the co-occurrence matrix for StackOverflow contained many more observations compared to Twitter.
+Taking 1 million posts across the site, the StackOverflow co-occurrence matrix contained \num{835000000} total observations and \num{55000000} unique combinations of context words and tags.
+For Twitter, when building a co-occurrence matrix for the popular-hashtags dataset from 3 million posts, the matrix contained \num{39000000} total observations and \num{4000000} unique combinations.
+
+Hashtags for Twitter were both placed at the very end of the Tweet and embedded within the middle of the tweet.
+For the popular-hashtags dataset, 11\% of hashtags were the last word in the Tweet and the rest were embedded within the tweet (not at the end).
+Tags for StackOverflow were always placed at the very end of the post, since the author chose tags by placing them in a separate text field before submitting the post.
+
+Each of the four Twitter popular-hashtags datasets contained the 400 most-popular hashtags at that time.
+There was only a small amount of overlap between the hashtags chosen for each of the datasets.
+Only 20\% of hashtags occurred two or more times across the four popular-hashtags datasets and the majority of those (66\%) occurred in only two of the four datasets.
+
+The StackOverflow dataset contains many orders of magnitude fewer unique users than Twitter.
+This means that the odds that the same user is sampled multiple times is less for the Twitter popular-hashtags dataset compared to all posts across the StackOverflow site.
+For Twitter, an author contributed an average of 2 tweets to the popular-hashtags dataset.
+Across the StackOverflow site, an author contributed 5 posts on average.
+
+\paragraph{Tag Frequency Distribution}
+
+\textcite{Stanley2013} found that the tag frequency for StackOverflow drops off sharply and approximately follows Zipf's Law.
+The same effect was found for the 2014 StackOverflow dataset in this research and the two Twitter dataset subsets.
+The results are depicted in Figure \ref{figDescTagFreq}.
+
+\begin{figure}[!htbp]
+  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{descr-tagFrequencyCount.pdf}}}
+  \caption{
+    Log-log plot of tag frequency versus rank for the StackOverflow dataset and Twitter popular-users and popular-hashtags dataset subsets.
+    Rank was assigned to each unique tag after ordering by tag frequency (most frequent given smallest rank).
+}
+  \label{figDescTagFreq}
+\end{figure}
+
+Tag frequency for StackOverflow and Twitter follow a similar Zipf's Law pattern, where tag use drops off sharply after moving away from the most popular tags.
+However, none of the three distributions follow Zipf's Law perfectly, since none of the plots show perfectly linear lines.
+Nonetheless, using three separate linear models to fit the data for the three distributions captures 96\% of the variance.
+So these log-log plots are mostly linear, and both StackOverflow and Twitter closely follow Zipf's Law for tag use frequency.
+
 \subsection{Acquiring Datasets}
 
 \subsubsection{StackOverflow}
