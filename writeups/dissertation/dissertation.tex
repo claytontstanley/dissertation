@@ -1,4 +1,5 @@
-\documentclass[man,floatsintext,donotrepeattitle]{apa6}
+%\documentclass[man,floatsintext,donotrepeattitle]{apa6}
+\documentclass[man,donotrepeattitle]{apa6}
 
 % http://tex.stackexchange.com/questions/279/how-do-i-ensure-that-figures-appear-in-the-section-theyre-associated-with
 \usepackage{placeins}
@@ -1206,9 +1207,9 @@ Since the document size and tags per document were higher for StackOverflow, the
 Taking 1 million posts across the site, the StackOverflow co-occurrence matrix contained \num{835000000} total observations and \num{55000000} unique combinations of context words and tags.
 For Twitter, when building a co-occurrence matrix for the popular-hashtags dataset from 3 million posts, the matrix contained \num{39000000} total observations and \num{4000000} unique combinations.
 
-Hashtags for Twitter were both placed at the very end of the Tweet and embedded within the middle of the tweet.
+Hashtags for Twitter were both placed at the end of the Tweet and embedded within the middle of the tweet.
 For the popular-hashtags dataset, 11\% of hashtags were the last word in the Tweet and the rest were embedded within the tweet (not at the end).
-Tags for StackOverflow were always placed at the very end of the post, since the author chose tags by placing them in a separate text field before submitting the post.
+Tags for StackOverflow were always placed at the end of the post, since the author chose tags by placing them in a separate text field before submitting the post.
 
 Each of the four Twitter popular-hashtags datasets contained the 400 most-popular hashtags at that time.
 There was only a small amount of overlap between the hashtags chosen for each of the datasets.
