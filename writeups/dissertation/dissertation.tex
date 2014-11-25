@@ -1626,14 +1626,14 @@ During exploratory evaluation, model accuracy seemed to be highly sensitive to t
 Due to research from \textcite{Budiu2007} and \textcite{Recchia2010}, model accuracy for the Bayesian and vector-based models is influenced by the number of documents in the dataset,
 so the effect of dataset size on accuracy was examined in more detail.
 Specifically,
-since both the Bayesian and random-permutation models are being evaluated, analyzing the effect of dataset size on accuracy in this research will allow direct comparisons between the two models on a common dataset.
+since both the Bayesian and random permutation models are being evaluated, analyzing the effect of dataset size on accuracy in this research will allow direct comparisons between the two models on a common dataset.
 This has not yet been possible since the two models have never been compared on the same dataset within the same study.
 
-\textcite{Sahlgren2008} showed how different levels of compression in the random-permutation model influence accuracy, so this was examined for three reasons:
+\textcite{Sahlgren2008} showed how different levels of compression in the random permutation model influence accuracy, so this was examined for three reasons:
 to replicate the findings,
-as an additional check to ensure that the random-permutation model was implemented correctly, and also to see if the same levels of compression are valid for the much larger datasets used in this research.
+as an additional check to ensure that the random permutation model was implemented correctly, and also to see if the same levels of compression are valid for the much larger datasets used in this research.
 
-One of the primary goals of this research is to identify the best method to combine the model term for past user behavior with the context term for the random-permutation model,
+One of the primary goals of this research is to identify the best method to combine the model term for past user behavior with the context term for the random permutation model,
 so two different ways to add the model terms were tested.
 
 Finally, previous research has shown that including word order in the vector-based models improves performance \parencites{Jones2007, Sahlgren2008},
@@ -2164,7 +2164,7 @@ The activation value for the context component of the vector-based model is a co
 This is not a log-odds value.
 For the previous results, prior and context for the random permutation model were combined by simply adding the terms.
 However, this means that ACT-R's prior base-level learning component (which is a log-odds value) is added to a correlation value, which may not be mathematically appropriate.
-As a fourth architectural concern, another method to combine the prior and context components for the random-permutation model was explored.
+As a fourth architectural concern, another method to combine the prior and context components for the random permutation model was explored.
 
 \subsubsection{Method}
 
