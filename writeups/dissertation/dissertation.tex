@@ -332,12 +332,12 @@ We can help aid in their discovery of fresh and relevant information that matche
 
 The core research question motivating this proposal is:
 What kinds of cognitively-plausible models can best predict the tags that a user on a social media site uses?
-This question can be tested by generating a prediction for the most likely used hashtag whenever a user is about to generate a hashtag, and then comparing the user's chosen hashtag to the model's prediction.
+This question can be tested by generating a prediction for the most likely used tag whenever a user is about to generate a tag, and then comparing the user's chosen tag to the model's prediction.
 This process can be framed as a memory retrieval problem.
-The process of suggesting a relevant hashtag to a user can be thought of as a memory retrieval request for a hashtag, given prior hashtag use and current context.
+The process of suggesting a relevant tag to a user can be thought of as a memory retrieval request for a tag, given prior tag use and current context.
 That is, each user on a social media site has created content that contains a set of tags within the context of each post.
 
-Co-occurrence-based modeling has been shown as a potentially useful approach when predicting Twitter hashtag use \parencite{Efron2010}.
+Co-occurrence-based modeling has been shown as a potentially useful approach when predicting Twitter hashtag use \parencite{Efron2010} and StackOverflow tag use \parencites{Stanley2013}
 Several memory retrieval models are based on this broad methodology, where a count is maintained of the times each contextual element (such as a word in a post) co-occur with a tag.
 At least two of the current memory retrieval models are based on a co-occurrence methodology:
 ACT-R's declarative memory (DM) retrieval theory and random permutation vector-based memory systems.
@@ -720,7 +720,7 @@ This model provided an efficient algorithm for using a single representation for
 In order to represent word order information, a function must be used that converts an environment vector for a set of words and positions (e.g., ``stack $\Phi$'') into a new uncorrelated environment vector.
 The BEAGLE model uses circular convolution and circular correlation as the encoding and decoding operations.
 However, that is certainly not the only operation that can generate new uncorrelated vectors from a set of memory vectors and positions.
-\textcite{Sahlgren2008} used a much simpler random permutation method for this operation.
+\textcite{Sahlgren2008} used a simple random permutation method for this operation.
 
 A formal description of the random permutation model in \textcite{Sahlgren2008} is included in Table \ref{tabRandPermModel}.
 With random permutations, each word environment vector ($e_{i}$) is a large sparse vector of zeros with a few one and negative one values in random locations. 
@@ -776,7 +776,7 @@ These results make a strong case to favor random permutations over circular conv
 
 \subsubsection{Connection to LSA}
 
-Both random permutations and LSA calculate word similarity on a reduced matrix.
+Both vector-based models and LSA calculate word similarity on a reduced matrix.
 For LSA, the original word by document matrix is compressed to a factor by document matrix and the number of factors is much less than the number of words.
 For the StackOverflow and Twitter datasets, the number of documents are the number of different tags.
 
@@ -785,7 +785,7 @@ Note that if the length of a word's environment vector was the number of unique 
 If done in this way, building a matrix of all words' environment vectors by tags would recover the original word by document matrix \parencite{Kanerva2000}.
 However, each word's environment vector is compressed using a length much less than the number of unique words and represented by using a combination of a few one and negative one values at a unique combination of positions. 
 
-Information is lost with this compression in both cases: by starting with a compressed representation with random permutations or by reducing to a compressed representation with LSA.
+Information is lost with this compression in both cases: by starting with a compressed representation with vector-based models or by reducing to a compressed representation with LSA.
 However, the way that the compression works in these two cases is not the same.
 LSA uses SVD to find words that have highly correlated tag occurrence distributions (i.e., latent concepts), and then pools those co-occurrence counts into a single dimension.
 A vector-based approach like BEAGLE or random permutations essentially randomizes the mapping of the words on the reduced set of dimensions, and does not take into account word similarity when generating the mapping.
@@ -957,15 +957,16 @@ A formal description of the modified ACT-R Bayesian model is included in Table \
 
 The activation of each tag ($A_{i}$) is a function of four components:
 That tag's base-level activation ($B_{i}$), contextual activation for the words in the title, activation for words in the body, and an offset term ($O$).
-This model has been modified from the standard ACT-R model (Table \ref{tabACTRModel}) in three ways:
-Two separate contextual components were used (words in title and body of post), an offset term was added, and an entropy measure was used to compute the attentional weight ($W_{j}$).
+This model has been modified from the standard ACT-R model (Table \ref{tabACTRModel}) in four ways:
+Two separate contextual components were used (words in title and body of post), an offset term was added, an entropy measure was used to compute the attentional weight ($W_{j}$),
+and the base-level activation of a tag was based on global past tag use and not customized to a user's past tagging history.
 
 The offset term was added to normalize the mean activation across retrievals.
 This allowed the use of a logistic regression statistical technique to calibrate the weights for each of the terms.
 The title and body contextual components were separated since it seemed plausible that the words in the title would be better predictors of the tag used than the words in the body.
 It turned out that the words in the body were a better predictor of tag use \parencite{Stanley2013}, most likely because there are many more words in the body than the title of the post.
 
-The scaled entropy measure $E_{j}$ was chosen for the attentional weight ($W_{j}$) term because it has a strong theoretical foundation and it predicts well \parencite{Dumais1991}.
+The scaled entropy measure $E_{j}$ was chosen for the attentional weight ($W_{j}$) term because it has a strong theoretical foundation \parencite{Dumais1991} and is parameter free.
 It is based on Shannon's Information Theory, which measures the amount of information content (predictiveness) of a word.
 So the scaled entropy ($E_{j}$) of a context word can be thought of as the amount of predictiveness that that word has to \emph{any} tag.
 This means that a stop word like ``the'' will have a scaled entropy measure close to 0, while a highly-predictive word like \emph{macro} will have a scaled entropy measure close to 1.
@@ -1138,7 +1139,8 @@ Also, the general methods used to tokenize and stem the words in all of the data
 \subsection{Models}
 
 Two models were evaluated for hashtag prediction on both the Twitter and StackOverflow datasets: a vector-based model and Bayesian retrieval model.
-The random permutation model \parencite{Sahlgren2008} in Table \ref{tabRandPermModel} was used for the vector-based model, since it has shown to perform better than the BEAGLE model \parencite{Recchia2010}.
+The random permutation model \parencite{Sahlgren2008} in Table \ref{tabRandPermModel} was used for the vector-based model,
+since it has shown to perform better than the original BEAGLE vector-based model \parencite{Recchia2010}.
 The modified ACT-R Bayesian model \parencite{Stanley2013} in Table \ref{tabModACTRModel} was used for the Bayesian model, since it has already been applied to tag use on StackOverflow posts.
 
 The two memory models were evaluated on predicting user-chosen tags for Twitter tweets and StackOverflow posts.
@@ -1166,7 +1168,7 @@ Multiple samples were taken across a broad range of user types for each dataset 
 For StackOverflow, top users were identified by their reputation score on the site (based on their upvoted questions and answers) and the total number of questions asked on the site.
 To create the StackOverflow popular-users dataset, a total of 12 slices of users were taken at different levels of reputation and total number of questions asked.
 500 users were sampled that had a reputation higher than \num{500}, \num{1000}, \num{5000}, \num{10000}, \num{50000}, and \num{100000}.
-100 users were sampled that had asked a total number of questions higher than \num{50}, \num{100}, \num{200}, \num{300}, \num{400}, \num{500}.
+100 users were sampled that had asked a total number of questions higher than \num{50}, \num{100}, \num{200}, \num{300}, \num{400}, and \num{500}.
 
 For Twitter, top users were those that had the largest number of followers and had authored the largest number of tweets.
 To create the Twitter popular-users dataset, 12 slices were also taken, this time at different levels of number of followers and total number of tweets.
@@ -1176,7 +1178,7 @@ and a total number of tweets higher than \num{100}, \num{500}, \num{1000}, \num{
 \subsubsection{Popular Hashtags Dataset}
 
 An additional popular-hashtags dataset was collected for Twitter.
-The purpose of this dataset is to test the accuracy of each model's predicted most likely hashtag(s) for a tweet.
+The purpose of this dataset was to test the accuracy of each model's predicted most likely hashtag(s) for a tweet.
 The dataset contains approximately three million tweets where at least one of the 400 most popular hashtags are used.
 A quota of three million tweets was selected because previously research testing Bayesian co-occurrence models on large-scale datasets has used on the order of one million documents
 \parencites{Stanley2013,Douglass2010,Budiu2007,Kuo2011}.
@@ -1268,7 +1270,7 @@ However, during testing it was also found to be robust and well suited for Stack
 The initial model results with the new tokenizer were qualitatively similar to the model results found in \textcite{Stanley2013} where the Python Natural Language Processing (NLP) toolkit \parencite{Bird2009} was used.
 This is most likely because the language for the samples taken for both sites is informal English,
 and it seams reasonable to think that tokenizing all of the informal language and characters included in Twitter is a much more difficult task than tokenizing most of the words used on StackOverflow.
-So the same tokenization algorithm was used for both StackOverflow and Twitter, since performance was similar to \textcite{Stanley2013} for StackOverflow,
+So the same tokenization algorithm from \textcite{Owoputi2013} was used for both StackOverflow and Twitter, since performance was similar to \textcite{Stanley2013} for StackOverflow,
 and it seemed beneficial to use the same algorithm for both datasets to make comparisons across datasets more equitable.
 
 \subsection{Stemming}
@@ -1685,7 +1687,7 @@ This ensures that the logistic regression only labels a few 1s for each post.
 However, this method is complicated since computing the total activation for a tag requires already knowing the weights for each model component that are used to compute that activation.
 \citeauthor{Stanley2013} used an iterative approach to determine the weights used for the offset term, and kept iterating until those weights matched the weights returned after running the logistic regression.
 
-A simplified version of \citeauthor{Stanley2013}'s method was used for the results for this research.
+A simplified version of \textcite{Stanley2013}'s method was used for the results for this research.
 Instead of subtracting off the mean total activation for the top 5 tags for each post, the process is done in isolation for each model component.
 So for the prior component, the activation value used in the logistic regression is the prior activation with the mean of the top 5 prior activations subtracted from this value.
 The same process is used for the context component.
@@ -1842,10 +1844,10 @@ the results from this study cannot by themselves be used to answer this question
 
 The method of handling stop words has been shown to influence model accuracy \parencite{Sahlgren2008,Stanley2013}, so this was the first architectural concern that was examined.
 \textcite{Sahlgren2008} looked at several ways to handle the commonly-occurring stop words for the random permutation model:
-A data-driven frequency-weighted approach was tried, along with using a previously-generated stoplist, and no stop word removal at all.
+A data-driven frequency-filtering approach was tried, along with using a previously-generated stoplist, and no stop word removal at all.
 Removing the high-frequency words in the dataset showed the highest performance increase compared to no stop word removal, and using a previously-generated stoplist hardly increased performance.
 However, \citeauthor{Sahlgren2008} did not try to weight the stop words and only tried methods to remove them.
-So alongside looking at frequency weighting, previously generated, and no stop word removal, \textcite{Stanley2013}'s method of attenuating stop words based on entropy was also explored.
+So alongside looking at frequency filtering, previously generated, and no stop word removal, \textcite{Stanley2013}'s method of attenuating stop words based on entropy was also explored.
 
 \subsubsection{Method}
 
@@ -1902,7 +1904,7 @@ Plots for the three methods of handling stop words for the random permutation mo
 The results show that model accuracy improves if stop words are handled in any of the three ways (predefined stoplist filtering, entropy weighting, and frequency filtering).
 Using a predefined stoplist makes the smallest improvement (\numNoZero{.45} to \numNoZero{.49}), while the entropy (\numNoZero{.60}) and frequency (\numNoZero{.63}) techniques improve performance the most,
 and frequency shows a slight edge over entropy.
-However, using the frequency-weighting technique produces more noise in accuracy measurements compared to the other techniques, at least when tested on words in the title of StackOverflow posts.
+However, using the frequency-filtering technique produces more noise in accuracy measurements compared to the other techniques, at least when tested on words in the title of StackOverflow posts.
 
 \begin{figure}[!htbp]
   \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-allWeightingsSOPerm-crop.pdf}}}
@@ -2158,7 +2160,7 @@ It is not an LSA approach where the few ones and negative ones (i.e., the factor
 The environment vector for each word is randomly selected, and no SVD is performed to choose these in a more discriminating manner.
 So it is that more impressive that even with a randomly-chosen form of compression, only \num{2048} rows are needed to represent all of the words in these datasets.
 
-\subsection{Method to Combine Prior and Context}
+\subsection{Combining Prior and Context}
 
 The activation value for the context component of the vector-based model is a correlation, ranging from zero to one.
 This is not a log-odds value.
@@ -2252,7 +2254,7 @@ Models were tested that used only one of the three word order methods for the or
 \subsubsection{Results}
 
 Model accuracy results after incorporating word order into the random permutation model are depicted in Figure \ref{figContextOrder}.
-All bar plots that include an order component where ``window'' or ``direction'' is not included in the title use the standard ordering method (no direction or windowing, all position information is included) 
+All bar plots that include an order component where ``window'' or ``direction'' is not included in the title use the standard ordering method (no direction or windowing, all position information is included).
 This is the default ordering method used, so the names for these bar plots were kept consistent to the names used in other figures so that comparisons could be made across figures if necessary
 (similar to what was done for the default row size for the random permutation model).
 Base models that do not use entropy weighting were also included so that effect sizes could be compared between entropy weighting and adding word order information.

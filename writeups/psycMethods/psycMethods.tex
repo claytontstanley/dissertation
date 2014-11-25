@@ -1173,12 +1173,14 @@ Both models would make different predictions about the rate at which activation 
 Learning a new language might be a domain where large amounts of these sorts of retrievals could be collected.
 For instance, the online site Duolingo might contain enough collective data about language learning and word translation to better tease apart the two context models.
 
-\subsubsection{Compression}
+\subsubsection{Word Order}
 
 Also, the relatively strong performance of the random permutation model is not due to the model's ability to represent word order.
 Performance is similar for the random permutation and Bayesian models when the co-occurrence matrix for both models is the same, and not based on word order.
 Performance also does not improve by much when word order is added as the last predictor in the random permutation model.
 The random permutation model seems to work so well primarily due to the way that the full co-occurrence representation is compressed.
+
+\subsubsection{Compression}
 
 As previously noted, compression for the random permutation model is essentially random.
 That is, no SVD is done to identify the most predictive components,
