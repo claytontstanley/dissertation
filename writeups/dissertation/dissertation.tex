@@ -1207,8 +1207,8 @@ Since the document size and tags per document were higher for StackOverflow, the
 Taking 1 million posts across the site, the StackOverflow co-occurrence matrix contained \num{835000000} total observations and \num{55000000} unique combinations of context words and tags.
 For Twitter, when building a co-occurrence matrix for the popular-hashtags dataset from 3 million posts, the matrix contained \num{39000000} total observations and \num{4000000} unique combinations.
 
-Hashtags for Twitter were both placed at the end of the Tweet and embedded within the middle of the tweet.
-For the popular-hashtags dataset, 11\% of hashtags were the last word in the Tweet and the rest were embedded within the tweet (not at the end).
+Hashtags for Twitter were both placed at the end of the tweet and embedded within the middle of the tweet.
+For the popular-hashtags dataset, 11\% of hashtags were the last word in the tweet and the rest were embedded within the tweet (not at the end).
 Tags for StackOverflow were always placed at the end of the post, since the author chose tags by placing them in a separate text field before submitting the post.
 
 Each of the four Twitter popular-hashtags datasets contained the 400 most-popular hashtags at that time.
@@ -2802,7 +2802,7 @@ Also some parallelization was done at the OS level when various make targets wou
 
 \subsubsection{Database}
 
-All raw Tweet and post data were stored in Postgres tables.
+All raw tweet and post data were stored in Postgres tables.
 Also, after the documents were tokenized, the tokenized versions of the raw data were stored in Postgres tables.
 When R ran an analysis, it would query the tables to retrieve the correct set of tokenized words and tags.
 So there is a lot of R code that uses the RPostgreSQL package to communicate with Postgres as the analysis is running.
