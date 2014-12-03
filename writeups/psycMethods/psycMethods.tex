@@ -1099,8 +1099,8 @@ which is why model accuracy is similar for the orderless component and direction
 \section{General Discussion}
 
 The general discussion is separated into two parts.
-The first section will describe the overall results and reemphasize key findings.
-The final section will discuss general theoretical implications of the results and describe future applications and directions. 
+The first section will describe the overall results, reemphasize key findings, and discuss the theoretical implications of each key finding.
+The final section will describe future applications and directions for the research. 
 
 \subsection{Overall Results}
 
@@ -1141,14 +1141,6 @@ These results provide support for the idea that choosing a hashtag when composin
 However, both models were not 100 percent accurate, and the amount of variance left to predict was much larger than what would be observed if retrieval noise was included in the model.
 So it is most likely the case that the task is not done solely with declarative memory processes.
 
-\textcite{Anderson1991} also looked at similar tagging tasks with large datasets when deriving the prior component of the declarative memory theory.
-\citeauthor{Anderson1991} examined, for example, the frequency of word choice over time used for the title of articles for the New York Times,
-and used the results to derive the power law equation for the prior term in the declarative memory model.
-ACT-R's declarative memory theory claims that the system has evolved to make predictions that closely match the statistical structure of the environment.
-Using a power-law equation to model future tag use based on past tag use is a reasonable statistical approach to the problem.
-It is also the case that this same equation is an accurate model for the prior component of declarative memory, as was shown by \citeauthor{Anderson1991} in the original derivation, 
-and as is supported in the results from this study.
-
 \subsubsection{Representation}
 
 Given that the storage space required to represent the co-occurrences for the random permutation model is dramatically smaller than the uncompressed Bayesian model,
@@ -1163,23 +1155,6 @@ Perhaps a form of vector-based compressed storage is being used at the neural le
 since it can be implemented in neurons and is an efficient way for the machinery to generate predictions that closely match the statistical structure of the environment
 (i.e., that closely match the uncompressed Bayesian representation).
 
-As neural imaging systems improve, this question of neural representation can be best answered by looking directly at the neural activity.
-However, there are possible behavioral studies that could be done to provide evidence that may favor one representation over the other:
-The largest differences between the Bayesian and vector-based models happen with small numbers of co-occurrence observations.
-The vector-based model begins to generate more accurate predictions sooner than the Bayesian models,
-since the noise introduced from the compression helps smooth out activation values until a larger number of co-occurrences are observed and the co-occurrence values stabilize.
-For a behavioral study, novel words could be introduced alongside a corpus of known words, and the participant could be asked to make retrievals of the novel words and known words as more novel words are introduced.
-Both models would make different predictions about the rate at which activation values for the novel words stabilize relative to the known words, and such make different predictions about retrieval error rates over time.
-Learning a new language might be a domain where large amounts of these sorts of retrievals could be collected.
-For instance, the online site Duolingo might contain enough collective data about language learning and word translation to better tease apart the two context models.
-
-\subsubsection{Word Order}
-
-Also, the relatively strong performance of the random permutation model is not due to the model's ability to represent word order.
-Performance is similar for the random permutation and Bayesian models when the co-occurrence matrix for both models is the same, and not based on word order.
-Performance also does not improve by much when word order is added as the last predictor in the random permutation model.
-The random permutation model seems to work so well primarily due to the way that the full co-occurrence representation is compressed.
-
 \subsubsection{Compression}
 
 As previously noted, compression for the random permutation model is essentially random.
@@ -1189,6 +1164,35 @@ However, performing a full SVD on a co-occurrence matrix as large as the ones ge
 Also, when deriving the LSA approach, \textcite{Landauer1997} explicitly state that they make no claims that the brain is computing an SVD at the neural level;
 only that the neural machinery is set up such that the representation makes predictions that are similar to what would have been generated if the matrix decomposition for an SVD would have been computed.
 Perhaps the randomly-compressed representation used for the random permutation model is the way in which the brain tries to efficiently achieve the full LSA- and SVD-like approach that \citeauthor{Landauer1997} propose.
+
+\subsubsection{Word Order}
+
+The relatively strong performance of the random permutation model is not due to the model's ability to represent word order.
+Performance is similar for the random permutation and Bayesian models when the co-occurrence matrix for both models is the same, and not based on word order.
+Performance also does not improve by much when word order is added as the last predictor in the random permutation model.
+The random permutation model seems to work so well primarily due to the way that the full co-occurrence representation is compressed.
+
+\subsubsection{Corpus Size}
+
+The random permutation model was more accurate than the Bayesian model at smaller corpus sizes, while the results were flipped for larger document sizes.
+This is interesting from a practical standpoint because the corpus size is rarely chosen in declarative memory research, and is constrained primarily by the amount of data available in the domain being studied.
+If a researcher is working within a domain that has a relatively small corpus size (generally near or less than \num{1000} documents),
+it may be worthwhile to test the random permutation model in this domain, as this compressed model may be more accurate than the uncompressed Bayesian model.
+
+Further, it is interesting to study the effect of model accuracy on corpus size because people require exposure to only a small number of documents before tagging documents appropriately.
+A user asked around five questions on average for StackOverflow, model accuracy was high for StackOverflow, but the model required training on 1 million documents before achieving that accuracy.
+The user only needed to ``train'' on five questions and the model needed to train on 1 million questions.
+
+This is a large discrepancy, but this does not necessarily invalidate the declarative memory models used for this research.
+First, the random permutation model was still accurate at smaller document sizes, so perhaps this result provides evidence to favor the random permutation model over the Bayesian model.
+However, the smallest corpus size tested for these models was \num{1000} documents, which is much greater than the average number of questions or tweets that a user contributes to the site.
+
+Second, the models may require large amounts of training because the co-occurrence matrices are being built from scratch.
+That is, the models are being trained on the StackOverflow and Twitter domains without any prior general co-occurrence information to start with.
+Presumably, when a person starts using a site, they can leverage all of their past exposure to different word co-occurrences and then simply add on top of that base the domain-specific co-occurrences.
+In that since, one could argue that the models are undertrained on generic co-occurrences (people are exposed to many more than one million documents in their lifetime) and overtrained on specific co-occurrences.
+It may be interesting to test these memory models on a hybrid co-occurrence matrix,
+where the majority of the observations are taken from a generic domain (e.g., american literature) and a minority are domain-specific (e.g., StackOverflow word, tag pairs).
 
 \subsubsection{Attentional Weight}
 
@@ -1241,20 +1245,6 @@ Model accuracy is high enough (particularly for StackOverflow) for the developed
 However, the focus for this research was to evaluate the accuracy of two cognitively-plausible declarative memory models, so the models were more constrained than general machine learning models of tagging.
 So it is unlikely that these general models of declarative memory will outperform specific machine learning models that have been optimized for a specific tagging task. 
 Nevertheless, one of the advantages of the general declarative memory models is that they are task agnostic, so it would take minimal time to deploy these models on a new tagging task.
-
-\subsubsection{Summary}
-
-The end result of this research is [1] a better understanding of how a user's past tagging history influences future tag use,
-[2] a more thorough evaluation of the strengths, weaknesses, and differences between two cognitively-plausible memory models on large-scale real-world retrieval tasks,
-and [3] two efficient implementations of the models for making user-customized tag predictions for StackOverflow posts and Twitter tweets. 
-This work has shown how past user history is important, and how a context-only model like the random permutation model can be modified to include the prior component.
-The work has also shown how the strength of the random permutation model may not be in its ability to represent word order,
-and rather in its ability to efficiently compress the full co-occurrence representation used for the Bayesian model.
-Also from a methodological perspective,
-this work has shown how large collections of publicly-available behavioral datasets can be used to explore and test different theories of declarative memory and their individual architectural components.
-Several different formalisms for ACT-R's attentional weighting term were also explored, and an entropy-weighting technique was found to perform well without requiring any parameter tuning.
-Finally, this work has helped raise the question about how co-occurrence observations are represented at the neural level, since two models with quite different representations performed similarly well.
-The results from the study and the new research questions raised will help to better understand how imposing specific architectural constraints on memory models influence what information is retrieved.
 
 \clearpage
 \printbibliography[heading=bibintoc]
