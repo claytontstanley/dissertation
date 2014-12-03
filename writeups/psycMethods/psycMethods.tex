@@ -226,7 +226,7 @@ This rest of this document is separated into 5 sections.
 and shows how these models are related to the other common declarative memory models that are studied.
 ``General Methodology'' presents the overall method for testing the models on the StackOverflow and Twitter datasets.
 ``Past User Behavior'' shows the results for the first test of the models, where the model term for past user behavior is examined in isolation, and tags are predicted based purely on a user's past tagging history.
-Combining Predictors`` adds the context component to the models, and shows how model accuracy is influenced by changing various architectural components of each model.
+``Combining Predictors'' adds the context component to the models, and shows how model accuracy is influenced by changing various architectural components of each model.
 The final section provides a general discussion of the overall findings.
 
 \section{Theoretical Background}
@@ -361,12 +361,11 @@ and the base-level activation of a tag was based on global past tag use and not 
 The offset term was added to normalize the mean activation across retrievals.
 This allowed the use of a logistic regression statistical technique to calibrate the weights for each of the terms.
 The scaled entropy measure $E_{j}$ was chosen for the attentional weight ($W_{j}$) term because it has a strong theoretical foundation \parencite{Dumais1991} and is parameter free.
-Looking at $W_{j}$, if $E_{j}$ is low then $W_{j}$ is low, meaning that the scaled entropy measure helps allocate limited attentional resources to predictive contextual elements.
 
 \subsubsection{Twitter}
 
 Several hashtag recommendation models for Twitter have been developed recently.
-One of the first models used a Bayesian co-occurrence statistical technique to predict the most likely hashtag associated with a post as a function of prior hashtag use and context \parencite{Mazzia2009}.
+One of the first models used a Bayesian co-occurrence statistical technique to predict the most likely hashtag associated with a tweet as a function of prior hashtag use and context \parencite{Mazzia2009}.
 The model presented by \textcite{Mazzia2009} is quite similar to an ACT-R declarative retrieval model.
 The main potential difference is that --- like \textcite{Stanley2013} --- the global prior likelihood of a hashtag is computed without taking into account the specific user's past history.
 
@@ -430,7 +429,7 @@ and a total number of tweets higher than \num{100}, \num{500}, \num{1000}, \num{
 \subsubsection{Popular Hashtags Dataset}
 
 An additional popular-hashtags dataset was collected for Twitter.
-The purpose of this dataset was to test the accuracy of each model's predicted most likely hashtag(s) for a tweet.
+This dataset was used to test the context component of the models for Twitter.
 The dataset contains approximately three million tweets where at least one of the 400 most popular hashtags are used.
 A quota of three million tweets was selected because previously research testing Bayesian co-occurrence models on large-scale datasets has used on the order of one million documents
 \parencites{Stanley2013,Douglass2010,Budiu2007}.
@@ -464,7 +463,7 @@ At most \num{3000} of the most recent tweets were collected for each user, since
 The streaming interface was used to collect a sample of all of the tweets that included one of the top 400 hashtags at that time.
 Twitter's streaming API only allows at most 400 hashtags to be monitored at a time.
 Otherwise a larger number of hashtags would have been collected.
-Twitter allows the streaming interface to randomly sample about 1\% of all of the real-time data that is generated on Twitter.
+Twitter limits the streaming interface to randomly sample about 1\% of all of the real-time data that is generated on Twitter.
 This sampling rate was adequate to collect around three million tweets within a few days.
 
 \subsection{Tokenization}
@@ -558,7 +557,6 @@ It was repeated for each of the decay rate values and the two different forms of
 
 \subsubsection{Model Performance Across Decay Rate Values}
 
-Looking first at only a single dataset slice, model accuracy for all users in that slice was analyzed.
 A plot of the results for one of the 12 slices, for both Twitter and StackOverflow, and for both forms of $B_{i}$ are included in Figures \ref{figPriorSOQSliceDsStd} and \ref{figPriorTwitterSliceDsStd} respectively.
 
 \begin{figure}[!htbp]
@@ -635,8 +633,12 @@ This was done by examining model accuracy at a specific decay rate value for eac
 Accuracy was assessed at each model's previously-determined best-fit values (\num{.43} and \num{.80} for the optimized learning and standard form) and the standard form's default value (\num{0.5}).
 Since decay rate values were explored at \num{0.1} increments between the 0 and 1 range, the decay rate values used to examine model accuracy were rounded to the nearest decay rate value that was included in the run.
 So a best-fit value of \num{.4} was used for the optimized learning model instead of the \num{.43} average found from the dataset slices.
-Accuracy for both sites is included in Figure \ref{figPriorAcc}. 
 Aggregate accuracy was computed by taking the mean of every user's model accuracy across all users in all dataset slices.
+
+Accuracy for both sites is included in Figure \ref{figPriorAcc}. 
+Accuracy for the standard form (\numNoZero{.33}) is higher than the optimized learning form (\numNoZero{.28}).
+This makes sense given that the standard form does not assume equal presentation rate for each chunk, and hashtags on Twitter in particular show trends of high rate of use and then shift to low rate of use. 
+The standard form of $B_{i}$ is able to more accurately account for these trends.
 
 \begin{figure}[!htbp]
   \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc--crop.pdf}}}
@@ -647,13 +649,9 @@ Aggregate accuracy was computed by taking the mean of every user's model accurac
   \label{figPriorAcc}
 \end{figure}
 
-Accuracy for the standard form (\numNoZero{.33}) is higher than the optimized learning form (\numNoZero{.28}).
-This makes sense given that the standard form does not assume equal presentation rate for each chunk, and hashtags on Twitter in particular show trends of high rate of use and then shift to low rate of use. 
-The standard form of $B_{i}$ is able to more accurately account for these trends.
-
 ACT-R sets the default decay rate value to \num{0.5}, and the best-fit value for the standard form is higher (\num{0.8}) for these datasets.
-The figure shows that although model accuracy does slightly improve for the standard form when increasing the decay rate parameter from \num{0.5} to the optimal value,
-that percentage improvement is not as large as the improvement gained from using the standard form compared to the optimized learning form.
+The figure shows that although model accuracy does slightly improve (\num{0.325} to \num{0.335}) for the standard form when increasing the decay rate parameter from \num{0.5} to the optimal value,
+that percentage improvement is not as large (\num{0.28} to \num{0.33}) as the improvement gained from using the standard form compared to the optimized learning form.
 Nonetheless, model accuracy is highest when both the standard form is used and the decay rate value is increased. 
 
 \subsection{Discussion}
@@ -728,7 +726,7 @@ since the optimal weights of the terms are no longer needed when computing the o
 Model accuracy was tested on the popular-hashtags dataset for Twitter and a random sample of posts across the entire StackOverflow dataset.
 For each of the four Twitter popular-hashtags datasets, model retrievals were done across 15 runs and 500 posts within each run.
 For the StackOverflow randomly-sampled dataset, 5 runs of 100 posts were used,
-since the results for StackOverflow are more stable and retrievals take more wall-clock time for this dataset due to the size of the co-occurrence matrix.
+since the results for StackOverflow were more stable and retrievals took more wall-clock time for this dataset due to the size of the co-occurrence matrix.
 All runs contained different posts, and all posts used for runs were not used to generate the co-occurrence matrix for the two retrieval models.
 
 \subsubsection{Computing Priors}
@@ -748,8 +746,8 @@ and the space and computational time required when using a co-occurrence matrix 
 
 \subsection{Stop Words}
 
-``Stop words'' (e.g., ``the,'' ``a,'' ``or'') are commonly used words that co-occur with all tags (i.e., have little to no discriminating power).
 The method of handling stop words has been shown to influence model accuracy \parencite{Sahlgren2008,Stanley2013,Jones2007}, so this was the first architectural concern that was examined.
+``Stop words'' (e.g., ``the,'' ``a,'' ``or'') are commonly used words that co-occur with all tags (i.e., have little to no discriminating power).
 \textcite{Sahlgren2008} looked at several ways to handle the commonly-occurring stop words for the random permutation model:
 A data-driven frequency-filtering approach was tried, along with using a previously-generated stoplist, and no stop word removal at all.
 However, \citeauthor{Sahlgren2008} did not try to weight the stop words and only tried methods to remove them.
@@ -889,7 +887,7 @@ This was clearly the case for the Bayesian model.
 Both frequency and entropy techniques performed equally for the random permutation model.
 However, since the entropy-weighting technique is parameter free and does not require a cutoff to tune, it is also a better choice for the random permutation model for these datasets.
 
-The effect sizes when comparing no stop-word removal technique to either the entropy or frequency techniques are quite large.
+There is a large improvement in model accuracy when either an entropy or frequency technique is used to handle stop words.
 This shows the importance of correctly identifying and handling stop words when building co-occurrence matrices for large-scale natural language datasets.
 For further research, it may be worthwhile to explore an even larger range of stop-word handling techniques,
 since model accuracy seems to be quite sensitive to the specific method used. 
@@ -901,7 +899,6 @@ The number of documents used to build the co-occurrence matrix has been shown to
 The default number of documents used to build the co-occurrence matrix was \num{1000000} for StackOverflow and \num{3000000} for Twitter.
 In order to see how accuracy changed as function of corpus size, 
 co-occurrence matrices for a range of smaller corpus sizes were built.
-Both the random permutation and Bayesian models were tested on all corpus sizes.
 
 \subsubsection{Method}
 
@@ -976,7 +973,7 @@ The activation value for the context component of the vector-based model is a co
 This is not a log-odds value.
 For the previous results, prior and context for the random permutation model were combined by simply adding the terms.
 However, this means that ACT-R's prior base-level learning component (which is a log-odds value) is added to a correlation value, which may not be mathematically appropriate.
-As a fourth architectural concern, another method to combine the prior and context components for the random permutation model was explored.
+As a third architectural concern, another method to combine the prior and context components for the random permutation model was explored.
 
 \subsubsection{Method}
 
