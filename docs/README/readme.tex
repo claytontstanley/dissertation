@@ -60,7 +60,7 @@ Then, cd to the top level of the repository and run the following commands to co
   \item \emph{./check-dev-env.sh}:
     Ensures that ssh keys, hostname alias, binary dependencies, etc. are all configured properly.
     If this isn't run first, none of the following commands will work.
-  \item \emph{git submodule update --init --recursive}:
+  \item \emph{git submodule update -{}-init -{}-recursive}:
     Initialize and update all submodules.
     This will pull in the source data submodule.
   \item \emph{make -C submodules/dissertationData pull}:
