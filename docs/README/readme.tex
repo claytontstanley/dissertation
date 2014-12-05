@@ -76,6 +76,19 @@ If you want this done all in one go, run the \emph{make post-clone} command at t
 You'll need a version of make installed to do this.
 \emph{check-dev-env} checks for this binary dependency and includes a suggestion on how to install make if you don't have it.
 
+\subsubection{Manual Environment Setup}
+
+Setting up the postgres tables is currently not automated.
+This involves creating the tables, all indexes, importing the .csv tables from the source data repository, and then updating the tables with a few additional columns.
+This process \emph{was} documented in the form of a script, but that script hasn't been tested.
+It contains code for both creating the tables and updating columns in the tables.
+Those steps must be done separately, and the tables should be imported into postgres before the updates are called.
+Currently that script is located in ``dissProject/createTables.sql''.
+I figure that no one other than myself will want to get the database configured,
+since the results of all the model runs are saved in separate .csv files and the db is not required to analyze or visualize them.
+If I ever have to confiure the database on another machine for this research, I'll separate the ``createTables.sql'' file into two separate files, 
+automate and test the whole process, and create an additional make target to configure the db.
+
 \printbibliography[heading=bibintoc]
 
 \end{document}
