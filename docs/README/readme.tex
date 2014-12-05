@@ -1,0 +1,57 @@
+\documentclass[man,floatsintext,donotrepeattitle]{apa6}
+\frenchspacing
+\raggedbottom
+\title{README for Clayton Stanley's dissertation}
+%\shorttitle{Comparing memory models of tag retrieval}
+\shorttitle{README}
+\author{Clayton Stanley}
+\affiliation{Rice University}
+\usepackage[group-separator={,}]{siunitx}
+\usepackage{csquotes}
+\usepackage[style=apa,sortcites=true,sorting=nyt,backend=biber,doi=false,uniquename=false]{biblatex}
+\DeclareLanguageMapping{american}{american-apa}
+\addbibresource{bibliography.bib}
+
+
+\begin{document}
+\maketitle
+
+\section{Description}
+
+\input{../src/public.tex}
+
+\section{Configuring environment}
+
+\subsubsection{Git Repositories}
+
+There are two main git repositories for this work.
+The main repository contains all of the source code but very little source data.
+This repo is located on chil under ``srv/git/stanley-dissertation.git''.
+The source data was separated from the source code for two reasons:
+First, the size of the source data is much larger than the code, so if someone wants to look at just the source, it takes much less time to clone the source repo with this method.
+Second, the source data for Twitter should not be made public, due to Twitter's terms of service,
+and to encourage replication and transparency of research, the source code is publicized and available on GitHub.
+So the source data cannot be included in this public repository.
+
+The source repo is included as a submodule of the main repository, but in order to access it, you have to have credentials on the chil server.
+This way access to the repository can be limited, but the repo is still properly linked to the main repository.
+
+\subsubsection{Setting Up Environment}
+
+Run the following commands to configure the environment:
+
+\begin{itemize}
+  \item ``git clone ssh://[chil uname]@chil.rice.edu/srv/git/stanley-dissertation'':
+    Clone the main repository.
+  \item ``git submodule update --init --recursive'':
+    Initialize and update all submodules.
+    This will pull in the source data submodule.
+  \item ``make -C submodules/dissertationData pull'':
+    Get additional compressed source data for the source data repo.
+    This includes large .csv text data extracted from the postgres tables.
+    These .csv files are too large to be tracked with git.
+  \item ``make -C submodules/dissertationData extract'':
+    Uncompress the compressed source data.
+\end{itemize}
+
+\end{document}
