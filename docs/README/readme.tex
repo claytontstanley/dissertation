@@ -11,7 +11,10 @@
 \usepackage[style=apa,sortcites=true,sorting=nyt,backend=biber,doi=false,uniquename=false]{biblatex}
 \DeclareLanguageMapping{american}{american-apa}
 \addbibresource{bibliography.bib}
-
+%\usepackage{enumitem}
+\usepackage{paralist}
+\usepackage[doublespacing]{setspace}
+\usepackage{tocloft}
 
 \begin{document}
 \maketitle
@@ -38,20 +41,36 @@ This way access to the repository can be limited, but the repo is still properly
 
 \subsubsection{Setting Up Environment}
 
-Run the following commands to configure the environment:
+First, clone the main repository:
 
-\begin{itemize}
-  \item ``git clone ssh://[chil uname]@chil.rice.edu/srv/git/stanley-dissertation'':
+\begin{singlespace}
+\begin{compactitem}
+  \item \emph{git clone ssh://[chil uname]@chil.rice.edu/srv/git/stanley-dissertation}:
     Clone the main repository.
-  \item ``git submodule update --init --recursive'':
+\end{compactitem}
+\end{singlespace}
+
+Then, cd to the top level of the repository and run the following commands to configure the environment:
+
+\begin{singlespace}
+\begin{compactitem} 
+  \item \emph{./check-dev-env.sh}:
+    Ensures that ssh keys, hostname alias, binary dependencies, etc. are all configured properly.
+    If this isn't run first, none of the following commands will work.
+  \item \emph{git submodule update --init --recursive}:
     Initialize and update all submodules.
     This will pull in the source data submodule.
-  \item ``make -C submodules/dissertationData pull'':
+  \item \emph{make -C submodules/dissertationData pull}:
     Get additional compressed source data for the source data repo.
     This includes large .csv text data extracted from the postgres tables.
     These .csv files are too large to be tracked with git.
-  \item ``make -C submodules/dissertationData extract'':
+  \item \emph{make -C submodules/dissertationData extract}:
     Uncompress the compressed source data.
-\end{itemize}
+\end{compactitem}
+\end{singlespace}
+
+If you want this done all in one go, run the \emph{make post-clone} command at the top level of the repository:
+You'll need a version of make installed to do this.
+\emph{check-dev-env} checks for this binary dependency and includes a suggestion on how to install make if you don't have it.
 
 \end{document}
