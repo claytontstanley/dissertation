@@ -1,4 +1,4 @@
-
+SHELL := /bin/bash
 
 push:
 	git push
@@ -9,6 +9,6 @@ push:
 
 post-clone:
 	./check-dev-env.sh
-	git submodule update –init –recursive
+	git submodule update --recursive --init
 	make -C submodules/dissertationData pull
 	make -C submodules/dissertationData extract
