@@ -18,3 +18,4 @@
 *.fdb_latexmk
 *(Autosaved).R
 *.RData
+!/README.pdf
