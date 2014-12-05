@@ -10,6 +10,7 @@
 \usepackage{csquotes}
 \usepackage[style=apa,sortcites=true,sorting=nyt,backend=biber,doi=false,uniquename=false]{biblatex}
 \DeclareLanguageMapping{american}{american-apa}
+\usepackage[american]{babel}
 \addbibresource{bibliography.bib}
 %\usepackage{enumitem}
 \usepackage{paralist}
@@ -72,5 +73,7 @@ Then, cd to the top level of the repository and run the following commands to co
 If you want this done all in one go, run the \emph{make post-clone} command at the top level of the repository:
 You'll need a version of make installed to do this.
 \emph{check-dev-env} checks for this binary dependency and includes a suggestion on how to install make if you don't have it.
+
+\printbibliography[heading=bibintoc]
 
 \end{document}
