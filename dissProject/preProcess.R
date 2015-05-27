@@ -1496,17 +1496,18 @@ plotLineSumTbl <- function(sumTbl, fillCol, figName, extras=NULL, groupCol, titl
 	lineTypes = c(1,2,3,5)
 	lineTypes = lineTypes[1:length(sumTbl[, unique(DVName)])]
 	lineTypes
-	expr = bquote(ggplot(sumTbl, aes(x=factor(.(groupCol)), y=meanVal, colour=.(fillCol))) + 
-		      geom_line(aes(group=.(fillCol), linetype=.(fillCol)), size=1.4) + 
-		      geom_point() +
+	shapeTypes = c(15, 16, 17, 18, 12)
+	shapeTypes = shapeTypes[1:length(sumTbl[, unique(DVName)])]
+	expr = bquote(ggplot(sumTbl, aes(x=factor(.(groupCol)), y=meanVal)) +
+		      geom_line(aes(group=.(fillCol), linetype=.(fillCol), colour=.(fillCol)), size=.6) + 
+		      geom_point(aes(shape=.(fillCol)), size=3) +
 		      scale_x_discrete(breaks = unique(sumTbl[, .(groupCol)]), labels = sizeNums) +
 		      scale_colour_discrete(name=title) +
+		      scale_shape_manual(name=title, values=shapeTypes) +
 		      geom_errorbar(aes(ymin=minCI, ymax=maxCI), width=0.1, size=0.3) + 
 		      scale_linetype_manual(name=title, values=lineTypes) + 
-		      guides(fill = guide_legend(keywidth = 1, keyheight = 1),
-			     linetype=guide_legend(keywidth = 5, keyheight = 1),
-			     colour=guide_legend(keywidth = 5, keyheight = 1)) +
-		      defaultGGPlotOpts)
+		      defaultGGPlotOpts +
+		      theme(legend.key.width=unit(3, 'cm'), legend.key.height=unit(.5, 'cm')))
 	plot = eval(expr)
 	plotTbl(plot, extras, figName)
 	sumTbl
@@ -1569,7 +1570,7 @@ renameColGroupNum <- function(tbl) {
 			    newName=c('Dataset 1', 'Dataset 2', 'Dataset 3', 'Dataset 4'), key='groupNum')
 	tbl[, groupNum := as.character(groupNum)]
 	setkey(tbl, groupNum)
-	tbl[mapTbl, groupNum := newName]
+	tbl[mapTbl, groupNum := newName, nomatch=0]
 }
 
 renameColSizeNum <- function(tbl) {
@@ -1577,7 +1578,7 @@ renameColSizeNum <- function(tbl) {
 			    newName=c('Testing 1e5 SO, 3e6 Twitter', '1 %*% 10^3', '1 %*% 10^4', '1 %*% 10^5', '1 %*% 10^6', '3 %*% 10^6'))
 	tbl[, sizeNum := as.character(sizeNum)]
 	setkey(tbl, sizeNum)
-	tbl[mapTbl, sizeNum := newName]
+	tbl[mapTbl, sizeNum := newName, nomatch=0]
 }
 
 renameColDatasetGroup <- function(tbl) {
@@ -1586,7 +1587,7 @@ renameColDatasetGroup <- function(tbl) {
 			    newName = c('SO Top Reputation', 'SO Top Questions', 'Twitter Top Followers', 'Twitter Top Tweets',
 					'SO Sample Across', 'Twitter Popular Hashtags'))
 	setkey(mapTbl, dsetGroup)
-	tbl[mapTbl, dsetGroup := newName]
+	tbl[mapTbl, dsetGroup := newName, nomatch=0]
 	tbl
 }
 
@@ -1595,7 +1596,7 @@ renameColDatasetType <- function(tbl) {
 	mapTbl = data.table(dsetType = c('twitter', 'stackoverflow'),
 			    newName = c('Twitter', 'Stack Overflow'),
 			    key = 'dsetType')
-	tbl[mapTbl, dsetType := newName]
+	tbl[mapTbl, dsetType := newName, nomatch=0]
 	tbl
 }
 
@@ -1654,7 +1655,7 @@ renameColDVName <- function(tbl) {
 	mapTbl = data.table(DVName=sapply(mapping, `[`, 1), newName=sapply(mapping, `[`, 2))
 	mapTbl
 	setkey(mapTbl, DVName)
-	tbl[mapTbl, DVName := newName]
+	tbl[mapTbl, DVName := newName, nomatch=0]
 	tbl
 }
 
@@ -1678,9 +1679,9 @@ makeLogregMapping <- function() {
 	  'actTitleOrderlessEnthyman', 'RP title component with entropy and log odds',
 	  'actBodyOrderlessEnthyman', 'RP body component with entropy and log odds',
 	  'actTweetOrderlessEnthyman', 'RP orderless context component with entropy and log odds',
-	  'actTitleOrderlessEnthyman', 'RP title component with entropy and log odds',
-	  'actBodyOrderlessEnthyman', 'RP body component with entropy and log odds',
-	  'actTweetOrderlessEnthyman', 'RP orderless context component with entropy and log odds',
+#	  'actTitleOrderlessEnthyman', 'RP title component with entropy and log odds',
+#	  'actBodyOrderlessEnthyman', 'RP body component with entropy and log odds',
+#	  'actTweetOrderlessEnthyman', 'RP orderless context component with entropy and log odds',
 	  'actTweetUsercontext', 'Bayes orderless context component with entropy and user sji',
 	  'actTweetOrderlessEnthyser', 'RP orderless context component with entropy, log odds, and user sji')
 }
@@ -2757,7 +2758,7 @@ renameColStopwordType <- function(tbl) {
 	mapTbl = data.table(type=as.character(c('sdStoplist', 'sdFreq', 'sdEntropy', 'sdOrig')),
 			    newName=c('Stoplist Filtering', 'Frequency Filtering', 'Entropy Weighting', 'No Processing'), key='type')
 	setkey(tbl, type)
-	tbl[mapTbl, type := newName]
+	tbl[mapTbl, type := newName, nomatch=0]
 }
 
 

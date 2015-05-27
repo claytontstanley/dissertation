@@ -19,3 +19,4 @@
 *(Autosaved).R
 *.RData
 !/README.pdf
+.Rapp.history
