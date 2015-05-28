@@ -351,7 +351,7 @@ This technique is compensatory and allows for a more natural combination of the 
 
 \section{General Methodology}
 
-Different subsets of the StackOverflow and Twitter datasets were used evaluate past user behavior in isolation and to test the context component of each memory model.
+Different subsets of the StackOverflow and Twitter datasets were used to evaluate past user behavior in isolation and to test the context component of each memory model.
 These datasets will be named and described in general terms.
 Also, the general methods used to tokenize and stem the words in all of the datasets will be described.
 
@@ -360,7 +360,6 @@ Also, the general methods used to tokenize and stem the words in all of the data
 Two models were evaluated for hashtag prediction on both the Twitter and StackOverflow datasets:
 the random permutation vector-based model \parencite{Sahlgren2008} in Table \ref{tabRandPermModel} and 
 the modified ACT-R Bayesian model \parencite{Stanley2013} in Table \ref{tabModACTRModel}. 
-The two memory models were evaluated on predicting user-chosen tags for Twitter tweets and StackOverflow posts.
 The co-occurrence matrices used for the context component of each model were generated from a large subset of the Twitter and StackOverflow datasets.
 Each model was tested by evaluating the accuracy of model-chosen tags on a fresh test subset of the datasets.
 Accuracy was assessed by comparing model performance with the human data.
@@ -721,7 +720,6 @@ However, \citeauthor{Sahlgren2008} did not try to weight the stop words and only
 The technique is formally described in Table \ref{tabModACTRModel} and uses information theory to determine the amount of predictive information contained in each word.
 Words that are often used with a small number of tags have high information content while words used often across all tags carry low information content.
 This method maps cleanly to the ACT-R DM theory by modifying each word's attentional weight ($W_{j}$) parameter.
-All three stop word techniques (i.e., predetermined list, high-frequency filtering, and \textcite{Stanley2013}'s entropy weighting) were explored for this analysis.
 
 \subsubsection{Method}
 
@@ -1116,7 +1114,7 @@ since it can be implemented in neurons and is an efficient way for the machinery
 
 As previously noted, compression for the random permutation model is essentially random.
 That is, no SVD is done to identify the most predictive components,
-so the compressed representation used by the random permutation model does not contain nearly as much of the variance from the original co-occurrence matrix that it could have.
+so the compressed representation used by the random permutation model does not contain nearly as much of the variance from the original co-occurrence matrix than it could have.
 However, performing a full SVD on a co-occurrence matrix as large as the ones generated for StackOverflow and Twitter is computationally infeasible.
 Also, when deriving the LSA approach, \textcite{Landauer1997} explicitly state that they make no claims that the brain is computing an SVD at the neural level;
 only that the neural machinery is set up such that the representation makes predictions that are similar to what would have been generated if the matrix decomposition for an SVD would have been computed.
