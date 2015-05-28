@@ -115,7 +115,7 @@
 % If the toc is too detailed, try limiting the depth of printed sections in the TOC:
 \setcounter{tocdepth}{2}
 
-\title{Comparing vector-based and ACT-R memory models using large-scale datasets:\protect\\User-customized hashtag and tag prediction on Twitter and StackOverflow}
+\title{Comparing vector-based and Bayesian memory models using large-scale datasets:\protect\\User-generated hashtag and tag prediction on Twitter and StackOverflow}
 \shorttitle{Comparing memory models of tag retrieval}
 %\shorttitle{}
 
@@ -130,15 +130,14 @@
 
 \abstract{
   The growth of social media and user-created content on online sites provides unique opportunities to study models of human declarative memory.
-  The tasks of choosing a hashtag for a tweet and tagging a post on StackOverflow were framed as declarative memory retrieval problems.
-  Two state-of-the-art cognitively-plausible declarative memory models were evaluated on how accurately they predict a user's chosen tags: an ACT-R based Bayesian model and a random permutation vector-based model.
-  Millions of posts and tweets were collected, and both declarative memory models were used to predict Twitter hashtags and StackOverflow tags.
+  By framing the task of choosing a hashtag for a tweet and tagging a post on StackOverflow as a declarative memory retrieval problem,
+  two cognitively-plausible declarative memory models were applied to millions of posts and tweets and evaluated on how accurately they predict a user's chosen tags.
+  An ACT-R based Bayesian model and a random permutation vector-based model were tested on the large datasets. 
   The results show that past user behavior of tag use is a strong predictor of future behavior.
   Furthermore, past behavior was successfully incorporated into the random permutation model that previously used only context.
   Also, ACT-R's attentional weight term was linked to an entropy-weighting natural language processing method used to attenuate high-frequency words (e.g., articles and prepositions).
-  Word order was not found to be strong predictor of tag use, and the random permutation model performed comparably to the Bayesian model without including word order.
+  Word order was not found to be a strong predictor of tag use, and the random permutation model performed comparably to the Bayesian model without including word order.
   This shows that the strength of the random permutation model is not in the ability to represent word order, but rather in the way in which context information is successfully compressed.
-  Finally, model accuracy was moderate to high for the tasks, which supports the hypothesis that choosing tags on StackOverflow and Twitter is essentially a declarative memory retrieval process. 
   The results of the large-scale exploration show how the architecture of the two memory models can be modified to significantly improve accuracy,
   and may suggest task-independent general modifications that can help improve model fit to human data in a much wider range of domains.
 }
@@ -151,37 +150,16 @@
 
 \section{Introduction}
 
-The ACT-R cognitive architecture \parencite{Anderson2007} contains one of the leading theories of human cognitive processing.
-The declarative memory component in ACT-R is a Bayesian statistical model.
-This is the same type of co-occurrence-based Naive Bayes statistical model that is prominent in the field of machine learning.
-When these Bayesian models are used for machine learning, it is common to use a large number of observations to construct the co-occurrence matrix that is the foundation for the model.
-The primary reason for this is that the stability of statistical models increase as sample size increases.
-
-However, it is much less common in the cognitive modeling community to use a large number of observations to build up declarative memory when creating ACT-R models.
-If a cognitive modeler is using the declarative memory component of ACT-R,
-it is common to either construct the co-occurrences by hand, or use a small training set of data to initially parameterize the declarative memory system.
-This approach can and has worked well.
-Essentially, the modeler is only including the observations in declarative memory that are relevant to the specific task that they are studying.
-
-However, this approach is problematic for two main reasons:
-First, it means that the declarative memory system for every developed model must be hand crafted and customized for that model, which takes enormous time and effort.
-Second, it means that modelers are continuing to use small sample sizes for the declarative memory components in their models.
-
-This has important implications for understanding declarative memory:
-First, it is difficult to verify and explore modifications to the declarative memory architecture because the datasets are not large enough or rich enough to rigorously test modifications to the theory.
-It also means that we do yet fully understand how well the ACT-R declarative memory theory scales when the number of chunks begins to approach the number of chunks that are actually stored in human declarative memory.
-
-There is, however, an opportunity to change this approach.
-With the massive growth of human-created content on social media sites (e.g., Twitter, StackOverflow, Wikipedia), and public access to many of those databases,
+With the massive growth of human-created content on social media sites (e.g., Twitter, StackOverflow, Wikipedia) and public access to many of those databases,
 it is now possible to evaluate psychological theories of declarative memory on large-scale real-world tasks where the theory can be tested on hundreds of millions to billions of data points.
-This will provide a way to test if these models scale, and evaluate the psychological validity of these models as the number of observations used increases by orders of magnitude.
+Without using large datasets it is difficult to verify and explore modifications to the declarative memory architecture because the datasets are not large enough or rich enough to rigorously test modifications to the theory.
 
 A few researchers have started to use large-scale databases to evaluate how well declarative memory models scale,
 for both ACT-R Bayesian models \parencites{Fu2007,Pirolli2003,Stanley2013,Douglass2010} and vector-based memory models \parencites{Jones2007,Rutledge2008,Recchia2010,Sahlgren2008}.
 
 The work in this study expands on previous work that has tested retrieval models on large-scale datasets.
 It focuses specifically on how two state-of-the-art declarative memory retrieval models (ACT-R Bayesian and vector-based) can be improved by testing these models on two real-world tagging tasks.
-One primary objective is to compare the random permutation vector-based model to ACT-R's declarative memory theory when large datasets are used for each model. 
+One primary objective is to compare the random permutation vector-based model to ACT-R's Bayesian declarative memory theory when large datasets are used for each model. 
 Another objective is to improve each model, and measure how incorporating the strengths of each model into the other (i.e., modifying model components) influences accuracy.
 For example, it is currently unexplored how a vector-based model can be modified to retrieve results that are based not only on context, but also on the prior odds that a particular item in memory will be needed again.
 Large-scale datasets were used throughout the model development and evaluation process.
@@ -222,7 +200,8 @@ and the user data from the datasets are publicly available for analysis.
 
 This rest of this document is separated into 5 sections.
 ``Theoretical Background'' describes the vector-based and Bayesian declarative memory models that will be evaluated in this research,
-and shows how these models are related to the other common declarative memory models that are studied.
+shows how these models are related to the other common declarative memory models,
+and identifies examples of similar tagging models that have already been applied to various tag recommendation systems.
 ``General Methodology'' presents the overall method for testing the models on the StackOverflow and Twitter datasets.
 ``Past User Behavior'' shows the results for the first test of the models, where the model term for past user behavior is examined in isolation, and tags are predicted based purely on a user's past tagging history.
 ``Combining Predictors'' adds the context component to the models, and shows how model accuracy is influenced by changing various architectural components of each model.
@@ -230,31 +209,16 @@ The final section provides a general discussion of the overall findings.
 
 \section{Theoretical Background}
 
-The ACT-R declarative memory model and vector-based retrieval model will be described.
-Latent Semantic Analysis (LSA) is closely related to vector-based retrieval models, so an overview of LSA will also be included.
-The theories underlying the ACT-R and vector-based models will be compared.
-Also, different tagging models have already been applied to various recommendation systems to tag user-generated content.
-Many of these models are based on the same Bayesian statistical framework that is the foundation of the ACT-R declarative memory theory.
-So these systems will be described and the models used will be discussed within the context of Bayesian statistical models, LSA approaches, and the ACT-R declarative memory theory. 
-
 \subsection{ACT-R Declarative Memory Theory}
 
 ACT-R \parencite{Anderson2007} is a cognitive architecture that formalizes how each cognitive process of the mind (e.g., memory, learning, visual and motor) interacts to produce behavior.
 The declarative memory system is a component of the architecture that models the timing, learning, and forgetting processes that make up declarative memory storage and retrieval.
-The equations that make up this system were derived from a rational analysis of declarative memory retrieval.
+The equations that make up this system were derived from a rational analysis of declarative memory retrieval \parencite{Anderson1989}.
 That is, given the task of retrieving a chunk of information from declarative memory,
 the current context (i.e., external and internal environment state), and past experience (i.e., prior memories and exposure), 
 what is the optimal behavior (i.e., the optimal chunk to retrieve from memory)?
 Using Bayesian reasoning, each chunk of information in declarative memory can be assigned a prior likelihood of needing retrieval again, given the prior history of exposure to the chunk.
 These chunk prior probabilities are then adjusted for the current context, so that the posterior probabilities represent the likelihood that a chunk is needed, given prior odds and adjusted by current environment state.
-
-\subsection{Latent Semantic Analysis Memory Theory}
-
-Latent Semantic Analysis \parencite{Landauer1997} (LSA) is an alternative representation of declarative memory.
-Both ACT-R's Bayesian declarative memory model and LSA compute activations based on a co-occurrence matrix.
-However, LSA performs further processing on that matrix in order to collapse words that have similar meaning.
-LSA uses the Singular Value Decomposition (SVD) process to reduce the dimensionality of the word by document co-occurrence matrix, while maintaining as much of the variance in the original full matrix as possible.
-The strength of association between two words is measured by the cosine of the two word vectors across the reduced dimension space.
 
 \subsection{Vector-Based Memory Systems}
 
@@ -307,6 +271,12 @@ This produces a new environment vector ($e_{i^{-1}}$) for the combination of the
 \end{table}
 
 \subsubsection{Connection to LSA}
+
+Latent Semantic Analysis \parencite{Landauer1997} (LSA) is an alternative representation of declarative memory.
+Both ACT-R's Bayesian declarative memory model and LSA compute activations based on a co-occurrence matrix.
+However, LSA performs further processing on that matrix in order to collapse words that have similar meaning.
+LSA uses the Singular Value Decomposition (SVD) process to reduce the dimensionality of the word by document co-occurrence matrix, while maintaining as much of the variance in the original full matrix as possible.
+The strength of association between two words is measured by the cosine of the two word vectors across the reduced dimension space.
 
 Both vector-based models and LSA calculate word similarity on a reduced matrix.
 For LSA, the original word by document matrix is compressed to a factor by document matrix and the number of factors is much less than the number of words.
@@ -381,19 +351,15 @@ This technique is compensatory and allows for a more natural combination of the 
 
 \section{General Methodology}
 
-Each specific result of the research requires a sightly different method to study.
-However, there is a common general methodology that applies across all results that will be described first.
 Different subsets of the StackOverflow and Twitter datasets were used evaluate past user behavior in isolation and to test the context component of each memory model.
 These datasets will be named and described in general terms.
 Also, the general methods used to tokenize and stem the words in all of the datasets will be described.
 
 \subsection{Models}
 
-Two models were evaluated for hashtag prediction on both the Twitter and StackOverflow datasets: a vector-based model and Bayesian retrieval model.
-The random permutation model \parencite{Sahlgren2008} in Table \ref{tabRandPermModel} was used for the vector-based model,
-since it has shown to perform better than the original BEAGLE vector-based model \parencite{Recchia2010}.
-The modified ACT-R Bayesian model \parencite{Stanley2013} in Table \ref{tabModACTRModel} was used for the Bayesian model, since it has already been applied to tag use on StackOverflow posts.
-
+Two models were evaluated for hashtag prediction on both the Twitter and StackOverflow datasets:
+the random permutation vector-based model \parencite{Sahlgren2008} in Table \ref{tabRandPermModel} and 
+the modified ACT-R Bayesian model \parencite{Stanley2013} in Table \ref{tabModACTRModel}. 
 The two memory models were evaluated on predicting user-chosen tags for Twitter tweets and StackOverflow posts.
 The co-occurrence matrices used for the context component of each model were generated from a large subset of the Twitter and StackOverflow datasets.
 Each model was tested by evaluating the accuracy of model-chosen tags on a fresh test subset of the datasets.
@@ -751,9 +717,9 @@ A data-driven frequency-filtering approach was tried, along with using a previou
 However, \citeauthor{Sahlgren2008} did not try to weight the stop words and only tried methods to remove them.
 
 \textcite{Stanley2013} used the entropy weighting technique recommended in \textcite{Dumais1991} for the StackOverflow dataset.
+The technique is formally described in Table \ref{tabModACTRModel} and uses information theory to determine the amount of predictive information contained in each word.
+Words that are often used with a small number of tags have high information content while words used often across all tags carry low information content.
 This method maps cleanly to the ACT-R DM theory by modifying each word's attentional weight ($W_{j}$) parameter.
-It also seems less arbitrary than explicitly identifying a list of stop words to remove from the analysis.
-
 All three stop word techniques (i.e., predetermined list, high-frequency filtering, and \textcite{Stanley2013}'s entropy weighting) were explored for this analysis.
 
 \subsubsection{Method}
@@ -884,12 +850,6 @@ Further, when this entropy-weighting technique is compared directly to the more 
 This was clearly the case for the Bayesian model.
 Both frequency and entropy techniques performed equally for the random permutation model.
 However, since the entropy-weighting technique is parameter-free and does not require a cutoff to tune, it is also a better choice for the random permutation model for these datasets.
-
-There is a large improvement in model accuracy when either an entropy or frequency technique is used to handle stop words.
-This shows the importance of correctly identifying and handling stop words when building co-occurrence matrices for large-scale natural language datasets.
-For further research, it may be worthwhile to explore an even larger range of stop-word handling techniques,
-since model accuracy seems to be quite sensitive to the specific method used. 
-However, one conclusion that can be made from this research is that the entropy-weighting method is a contender, and should be considered much more often than it has been previously.
 
 \subsection{Corpus Size}
 
@@ -1095,7 +1055,7 @@ which is why model accuracy is similar for the orderless component and direction
 
 The general discussion is separated into two parts.
 The first section will describe the overall results, reemphasize key findings, and discuss the theoretical implications of each key finding.
-The final section will describe potential applications and directions for the research. 
+The final section will describe future directions for the research. 
 
 \subsection{Overall Results}
 
@@ -1234,13 +1194,22 @@ This would allow, for example, the method of compression for the random permutat
 The results would help determine the specific representation that the declarative memory system uses to represent co-occurrences,
 and also the specific activation calculation that is carried out by the system.
 
-\subsubsection{Potential Applications}
+\subsection{Summary}
 
-The tag-recommendation models developed through this research should be relevant to real-world tasks.
-Model accuracy is high enough (particularly for StackOverflow) for the developed models to be used as a foundation for tag recommendation systems that are deployed on Twitter or StackOverflow.
-However, the focus for this research was to evaluate the accuracy of two cognitively-plausible declarative memory models, so the models were more constrained than general machine learning models of tagging.
-So it is unlikely that these general models of declarative memory will outperform specific machine learning models that have been optimized for a specific tagging task. 
-Nevertheless, one of the advantages of the general declarative memory models is that they are task agnostic, so it would take minimal time to deploy these models on a new tagging task.
+This work has shown how large collections of publicly-available behavioral datasets can be used to explore and test different theories of declarative memory and their individual architectural components.
+The end result of this research is [1] a better understanding of how a user's past tagging history influences future tag use,
+[2] a more thorough evaluation of the strengths, weaknesses, and differences between two cognitively-plausible memory models on large-scale real-world retrieval tasks,
+and [3] two efficient implementations of the models for making user-customized tag predictions for StackOverflow posts and Twitter tweets. 
+
+This work has shown how past user history is important, and how a context-only model like the random permutation model can be modified to include the prior component.
+The work has also shown how the strength of the random permutation model may not be in its ability to represent word order,
+but rather in its ability to efficiently compress the full co-occurrence representation used for the Bayesian model.
+Several different formalisms for ACT-R's attentional weighting term were also explored, and an entropy-weighting technique was found to perform well without requiring any parameter tuning.
+Finally, this work has helped raise the question about how co-occurrence observations are represented at the neural level, since two models with quite different representations performed similarly well.
+The results from the study and the new research questions raised will help to better understand how imposing specific architectural constraints on memory models influence what information is retrieved.
+
+
+
 
 \clearpage
 \printbibliography[heading=bibintoc]
