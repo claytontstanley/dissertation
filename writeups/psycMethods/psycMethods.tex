@@ -157,7 +157,7 @@ Without using large datasets it is difficult to verify and explore modifications
 A few researchers have started to use large-scale databases to evaluate how well declarative memory models scale,
 for both ACT-R Bayesian models \parencites{Fu2007,Pirolli2003,Stanley2013,Douglass2010} and vector-based memory models \parencites{Jones2007,Rutledge2008,Recchia2010,Sahlgren2008}.
 
-The work in this study expands on previous work that has tested retrieval models on large-scale datasets.
+This study expands on previous work that has tested retrieval models on large-scale datasets.
 It focuses specifically on how two state-of-the-art declarative memory retrieval models (ACT-R Bayesian and vector-based) can be improved by testing these models on two real-world tagging tasks.
 One primary objective is to compare the random permutation vector-based model to ACT-R's Bayesian declarative memory theory when large datasets are used for each model. 
 Another objective is to improve each model, and measure how incorporating the strengths of each model into the other (i.e., modifying model components) influences accuracy.
@@ -680,7 +680,7 @@ The offset term keeps the activation for the small number of top tags for each p
 This ensures that the logistic regression only labels a few 1s for each post.
 
 A simplified version of \textcite{Stanley2013}'s method was used for the results for this research.
-Instead of subtracting off the mean total activation for the top 5 tags for each post, the process is done in isolation for each model component.
+Instead of subtracting the mean total activation for the top 5 tags for each post, the process is done in isolation for each model component.
 So for the prior component, the activation value used in the logistic regression is the prior activation with the mean of the top 5 prior activations subtracted from this value.
 The same process is used for the context component.
 Decoupling the offset term and computing an offset for each model component in isolation means that an iterative approach is no longer necessary,
@@ -939,7 +939,7 @@ As a third architectural concern, another method to combine the prior and contex
 For a given retrieval, the random permutation model returns a set of activations that are correlation values for each of the tags.
 Instead of simply adding this correlation value to the prior model term, it may be more appropriate to convert the correlation value to a log-odds value first, and then add this context term to the log-odds prior term.
 So a method was created to convert a distribution of correlations to a distribution of log-odds values.
-To do this, the one-tailed cumulative distribution function value for each correlation in the distribution was computed.
+To do this, the one-tailed cumulative distribution function value for each correlation was computed.
 That probability was then converted to a log-odds value in the usual way. 
 
 This technique has a few advantages: 
@@ -1012,7 +1012,7 @@ Models were tested that used only one of the three word order methods for the or
 
 Model accuracy results after incorporating word order into the random permutation model are depicted in Figure \ref{figContextOrder}.
 All bar plots that include an order component where ``window'' or ``direction'' is not included in the title use the standard ordering method (no direction or windowing, all position information is included).
-This is the default ordering method used, so the names for these bar plots were kept consistent to the names used in other figures so that comparisons could be made across figures if necessary.
+This is the default ordering method used, so the names for these bar plots were kept consistent to the names used in other figures so that comparisons could be made across figures.
 Base models that do not use entropy weighting were also included so that effect sizes could be compared between entropy weighting and adding word order information.
 
 \begin{figure}[!htbp]
