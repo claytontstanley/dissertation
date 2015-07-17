@@ -1788,6 +1788,16 @@ getBestFitNames <- function(modelHashtagsTbl) {
 	bestFitNameTbl
 }
 
+toClip <- function(str) {
+	sink('/tmp/foo.txt')
+	if (!is.null(str)) {
+		cat(str)
+	}
+	sink()
+	system('cat /tmp/foo.txt | pbcopy')
+	str
+}
+
 analyzePrior <- function(modelVsPredTbl) {
 	analyzeTemporal(modelVsPredTbl)
 	plotDatasetDescriptives(modelVsPredTbl)[, list(meanNUsers=mean(NUsers),totNUsers=sum(NUsers),meanNHO=mean(NHashtagObs),totNHO=sum(NHashtagObs)), by=list(dsetType)]
