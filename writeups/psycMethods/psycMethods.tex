@@ -601,6 +601,18 @@ with the StackOverflow dataset, it is also possible to convert synonym tags to c
 This can be thought of as semantic stemming, where two words with identical meaning are converted to the same canonical word.
 So tags used for the post were converted to their root tag when possible.
 
+\subsection{Testing for Reliable Differences}
+
+Confidence intervals were used throughout for statistical inference instead of explicit p-values.
+This was done because it is the most straightforward way to visualize all of the mean differences in accuracy (i.e., bar and line plots with a visual indication of the error) for each of the models, which eases interpretation
+(similar to the argument made by FIXME:textcite).
+It is also a conservative estimate of reliability, as using confidence intervals on the means essentially ignores the fact that this is a within-subjects design, where accuracy for each model is measured for each subject.
+However, we would rather err on the side of making the results easier to interpret at the cost of using conservative estimates for reliability
+(i.e., use error bars overlaid on a visualization of the means instead of statistical tests on the difference scores).
+In fact, using large datasets for analysis is what empowers us to do this:
+With this much data, we can use straightforward (although more conservative) inferentials and still see reliable results.
+This allows us to concentrate on proper data visualization of the main findings.
+
 \section{Past User Behavior}
 
 How does a user's prior tag use influence their likelihood of choosing that tag in the future?
@@ -1022,8 +1034,8 @@ All runs from the four Twitter popular-hashtags datasets and the randomly-sample
 
 Model accuracy as a function of co-occurrence matrix size for StackOverflow is depicted in Figure \ref{figContextDocumentSizeSO}.
 Accuracy improves for both the Bayesian and random permutation models as the size of the documents used to generate the co-occurrence matrix increases.
-However, model accuracy using the entropy weighting technique plateaus and slightly decreases for the largest corpus size for the random permutation model, while the frequency technique only begins to plateau. 
-The Bayesian model does not plateau and accuracy continues to improve as corpus size increases.
+However for the random permutation model, accuracy begins to plateau for the largest corpus size for all three tested versions. 
+The Bayesian model does not plateau nearly as much and accuracy continues to improve even at the largest measured corpus size. 
 
 \begin{figure}[!htbp]
   \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-freqVsEntropyBySizeSO-crop.pdf}}}
