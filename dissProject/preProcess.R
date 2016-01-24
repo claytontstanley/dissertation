@@ -1806,7 +1806,11 @@ analyzePrior <- function(modelVsPredTbl) {
 	# Check that the Ns for each dataset look right	
 	modelVsPredTbl[, list(N=.N, names=list(unique(datasetName))), by=list(dsetType, dsetGroup, runNum,datasetNameRoot)]
 	bestTbl = modelVsPredTbl[predUsedBest == T]
+	bestTbl[runNum == 2, median(d), .(DVName, dsetGroup)]
 	tbl = modelVsPredTbl[topHashtag & hashtagUsedP] 
+	tbl
+	bestTbl[runNum == 2, .(.N, uniqueN(user_screen_name)), .(DVName, dsetGroup)]
+	bestTbl
 	#dvDiffsTbl = plotDVDiffs(rbind(bestTbl[runNum==2, compare2DVs(.SD, c('topHashtagPostPriorStd', 'topHashtagPostPriorOL2'), sortedOrder=c(1,2)), by=list(dsetType, dsetGroup), .SDcols=colnames(bestTbl)],
 	#			       bestTbl[runNum==2, compare2DVs(.SD, c('topHashtagPostPriorStd', 'topHashtagAcrossPriorStd')), by=list(dsetType, dsetGroup), .SDcols=colnames(bestTbl)]
 	#			       ))
@@ -1814,7 +1818,8 @@ analyzePrior <- function(modelVsPredTbl) {
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostPriorStd' & datasetName=='SOQgt500r2'])
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostPriorOL2' & datasetName=='TFollowgt10Mr2' & d < 1])
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostPriorOL2' & datasetName=='SOQgt500r2' & d < 1])
-	resTbl = compareOptimalDs(tbl[DVName %in% c(paste0('topHashtagPostPriorStd', c('')), paste0('topHashtagPostPriorOL2', c(''))) & runNum == 2])
+	resTbl = compareOptimalDs(tbl[DVName %in% c(paste0('topHashtagPostPriorStd', c('')), paste0('topHashtagPostPriorOL2', c(''))) & runNum == 2 & predUsedBest == T])
+	resTbl[, mean(meanVal), DVName]
 	#tbl[d == 0.5 & !maxNP, DVName := paste0(DVName, 'DefaultD')]
 	#tbl = rbind(tbl, tbl[d == 0.5 & maxNP][, DVName := paste0(DVName, 'DefaultD')])
 	#tbl = tbl[maxNP | d == 0.5]
