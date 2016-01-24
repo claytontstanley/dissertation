@@ -165,6 +165,12 @@ For example, it is currently unexplored how a vector-based model can be modified
 Large-scale datasets were used throughout the model development and evaluation process.
 This provides an ideal testing environment for constraints and assumptions for each theory to be rapidly tested and new model components to be hypothesized and quickly evaluated.
 
+As a general methodology for this research, we are using a cognitively-constrained exploratory model development process.
+Since we are working with large-scale datasets, we have enough data to explore many different modifications simultaneously without the risk of overfitting.
+However, we are not interested in bringing to bear the entire collection of machine learning algorithms to this prediction task in order to completely optimize a model.
+Rather, we are interested in evaluating how well two cognitive models can explain the results, and then making selective modifications to them to see how performance changes.
+The modifications that we explored were picked such that they influenced model accuracy, could be easily added to (or removed from) the cognitive models without massive modifications, and could be considered cognitively plausible.
+
 \subsection{Research Questions}
 
 The core question motivating this research is:
@@ -318,7 +324,7 @@ The resonance and decoding processes are inversions of each other.
 Usually both resonance and decoding will return similar rank orderings of most likely chunks given context.
 \textcite{Jones2007} recommends averaging the cosine values returned from each process for each chunk, and then rank ordering those averages to determine the chunk to retrieve.
 
-\subsubsection{Addressing Word Order}
+\subsubsection{Word Order for Vector-Based Systems}
 
 One of the strengths of vector-based systems is that word order can naturally be represented alongside word co-occurrence in these distributed representations.
 With vector-based systems, order information is included by creating an environment vector ($e_{bind(i,\Phi)}$) that is a function of environment vectors for both the word ($e_{i}$) and location ($\Phi$).
