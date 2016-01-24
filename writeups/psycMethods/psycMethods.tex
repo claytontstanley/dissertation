@@ -220,6 +220,74 @@ what is the optimal behavior (i.e., the optimal chunk to retrieve from memory)?
 Using Bayesian reasoning, each chunk of information in declarative memory can be assigned a prior likelihood of needing retrieval again, given the prior history of exposure to the chunk.
 These chunk prior probabilities are then adjusted for the current context, so that the posterior probabilities represent the likelihood that a chunk is needed, given prior odds and adjusted by current environment state.
 
+\subsubsection{ACT-R DM Model}
+
+A formal description of the ACT-R Declarative Memory model is included in Table \ref{tabACTRModel}.
+
+\begin{table}[!ht]
+  \caption{ACT-R declarative memory model}
+  \label{tabACTRModel}
+  {\tabulinesep=1.2mm
+    \begin{tabu}{ll}
+      \hline
+      Common Name &  Equation \\
+      \hline
+      Activation &	 	$A_{i} = B_{i} + \sum_{j \in c}^{} W_{j} S_{ji}$ \\
+      Attentional Weight &	$W_{j} = \frac{W}{n}$ \\
+      Base Level & 		$B_{i} = log \sum_{j=1}^{n} {t_{j}}^{-d}$ \\
+      Constant Base Level &	$B_{i} = \frac{p_{i}}{1-p_{i}}$ \\
+      Strength of Association &	$S_{ji} = log \frac{p(i|j)}{p(i|\overline{j})} \approx log \frac{p(i|j)}{p(i)} = log \frac{NN_{ji}}{N_{Row}(j)N_{Col}(i)}$ \\
+      Recall Probability &	$P_{i} = \left( 1 + e^{\frac{\tau - A_{i}}{s}} \right )^{-1}$ \\
+      \hline
+    \end{tabu}
+  }
+\end{table}
+
+The total activation ($A_{i}$) for a chunk in declarative memory is a function of two components: base-level activation ($B_{i}$) and strength of association ($S_{ji}$).
+The recall probability ($P_{i})$ that a chunk will be retrieved from memory increases with total activation ($A_{i}$).
+Each term in Table \ref{tabACTRModel} will be discussed in greater detail to follow.
+
+\subsubsection{Base-Level Activation}
+
+Base-level activation reflects the log prior odds of needing an observed chunk again.
+The default way to calculate these log prior odds is to use the standard base-level equation in Table \ref{tabACTRModel}.
+This equation formalizes how log prior odds are a function of both frequency and recency of prior exposure to a particular chunk.
+Chunks used more frequently (either through exposure or from a retrieval) are more likely to be needed for retrieval again.
+However, as time progresses and a particular chunk is no longer used, the activation for that chunk decays.
+In this way the standard base-level equation formalizes the time dynamics of the retrieval system, where a chunk's base-level activation evolves over time, depending on its frequency and recency of use.
+
+\subsubsection{Strength of Association}
+
+Strength of association ($S_{ji}$) reflects the amount of log-odds adjustment to the activation of a chunk, given the current context (i.e., external environment and internal state).
+Context for the StackOverflow domain for example is represented as each word in the title and body of a post.
+Context for the Twitter domain are the words in a tweet.
+Association strength between a chunk in memory and a single contextual element can be computed directly by calculating its context-adjusted odds ratio:
+the likelihood a chunk occurred with the current context ($p(i|j)$) over the likelihood that the chunk occurred in any of the other contexts ($p(i|\overline{j})$).
+For large datasets, the likelihood that a chunk occurs in any particular context reaches near-zero values ($p(j) \Rightarrow 0$).
+So it can be assumed that the likelihood that a chunk occurs in any context but one ($p(i|\overline{j})$) is equivalent to the likelihood that a chunk occurs in any context ($p(i)$).
+This assumption was described when deriving the $S_{ji}$ equation \parencite{Anderson1989}, and used in recent research working with large-scale datasets \parencites{Stanley2013,Farahat2004,Douglass2010}.
+
+\subsubsection{Connection to Pointwise Mutual Information}
+
+Pointwise Mutual Information (PMI) is another co-occurrence index that measures strength of association between two terms \parencite{Farahat2004}.
+It is based on the co-occurrence count between pair-wise observations of terms, similar to ACT-R's strength of association.
+The index has been used to accurately and efficiently measure strength of association information for large-scale datasets \parencite{Budiu2007,Farahat2004}.
+The PMI index is presented as Equation \eqref{eqPMI}.
+
+\begin{equation}
+  \label{eqPMI}
+  \mathit{PMI}(y,x) = log \frac{p(y|x)}{p(y)}
+\end{equation}
+
+Further, this PMI equation is identical to ACT-R's strength of association ($S_{ji}$) equation for large datasets.
+Once the number of occurrences is large enough such that the probability of observing any particular contextual element ($p(x)$) is near zero, then ACT-R's strength of association index simplifies to the PMI equation.
+
+\subsubsection{Attentional Weight}
+
+The attentional weight term allows for some contextual components to be weighted more than others when the total $S_{ji}$ activation is computed.
+This reflects the fact that the declarative memory system has limited attentional resources ($W$) that must be spread across all of the items in context.
+Most ACT-R models simply weight each contextual element equally (e.g., all words in a StackOverflow post have equal weight), so each word's attentional weight is simply normalized by the number of items in context.
+
 \subsection{Vector-Based Memory Systems}
 
 ``Holographic'' memory systems \parencite{Plate1995} or vector-based memory systems represent a concept (i.e., a chunk) as a vector.
@@ -232,6 +300,23 @@ The number of dimensions for these vectors is much less than the number of rows 
 Paired with each environment vector ($e_{i}$) is a memory vector ($m_{i}$) that contains the summed representation of all other environment vectors that have co-occurred with that $e_{i}$ environment vector.
 These memory vectors can contain environment vectors from position-independent word co-occurrence information ($c_{i}$) and word order information ($o_{i}$), which can be combined into a single representation ($m_{i}$).
 Over time, memory vectors accumulate a distributed representation of the most common environment vectors that co-occurred with them.
+
+\subsubsection{Retrieval Process}
+
+Retrieving the most likely chunk given context can be done in two ways: decoding and resonance \parencite{Jones2007}.
+Decoding takes the memory vector for context and decodes it back into an environment vector.
+The cosine between that decoded environment vector and all other environment vectors is computed and ranked, and the chunk with the environment vector with the highest cosine is retrieved.
+
+Resonance is the opposite retrieval process, where a memory vector is created from the context, and then that context memory vector is compared to all memory vectors.
+For example, assume that a user has written the word ``zend'' in a post, and she wants to assign a tag for the post.
+``zend'' has co-occurred with the tag \emph{PHP} many times previously, so the unordered memory vector for ``PHP'' ($c_{\mathit{PHP}}$) contains the unordered environment vector for \emph{zend} ($e_{zend}$).
+To determine the most correlated memory vector with context, a memory vector is created from the current context ($e_{zend}$).
+The cosine between that context memory vector and the memory vector for \emph{PHP} will be high, since the \emph{PHP} memory vector ($c_{\mathit{PHP}}$) often contains the context environment vector ($e_{zend}$).
+Since the cosine is high, the tag \emph{PHP} will most likely be returned as the vector that resonates highest with the current context.
+
+The resonance and decoding processes are inversions of each other.
+Usually both resonance and decoding will return similar rank orderings of most likely chunks given context.
+\textcite{Jones2007} recommends averaging the cosine values returned from each process for each chunk, and then rank ordering those averages to determine the chunk to retrieve.
 
 \subsubsection{Addressing Word Order}
 
@@ -287,6 +372,70 @@ However, the way that the compression works in these two cases is not the same.
 LSA uses SVD to find words that have highly correlated tag occurrence distributions (i.e., latent concepts), and then pools those co-occurrence counts into a single dimension.
 A vector-based approach like random permutations essentially randomizes the mapping of the words on the reduced set of dimensions, and does not take into account word similarity when generating the mapping.
 Nonetheless, vector-based models have been shown to perform similar to if not better than LSA \parencites{Sahlgren2008,Jones2007}.
+
+\subsection{Comparison of Vector-Based Models and ACT-R}
+
+Vector-based models can be thought of as a compressed representation of the full co-occurrence matrix used for the ACT-R declarative memory system.
+Each model computes an activation for each word to retrieve, given context and (for ACT-R's Bayesian model) prior knowledge.
+Since both models produce activations for each chunk, one can be swapped out for another and used as the declarative memory component of the ACT-R infrastructure.
+For example, \textcite{Rutledge2007} used a variant of the BEAGLE vector-based model as the DM component of ACT-R.
+\citeauthor{Rutledge2008} showed that an ACT-R theory with a vector-based memory system can successfully model the fan effect.
+
+The fan effect describes a behavior of human memory where memory items are more difficult to retrieve if they have occurred in a larger number of different contexts.
+\textcite{Rutledge2008} used \textcite{Anderson1974}'s classic experimental paradigm to test the fan effect.
+In the task, participants are exposed to a set of person and place pairs (e.g., ``the hippie is in the park'').
+They are later asked to recall if a particular person and place pair was presented to them before.
+The main manipulation is the ``fan'' of the person and place for each pair.
+The fan is defined as the number of different contexts that each item in the pair is presented in.
+For example, if items were presented to the participant where the ``hippie'' was both in the ``park'' and in the ``store,'' then ``hippie'' would have a fan of two.
+Recall accuracy decrease and time to recall increase as the sum total fan of the person and place increases.
+
+Both the ACT-R declarative memory theory and vector-based models produce the fan effect due to the effect that fan has on the co-occurrence matrix.
+As a particular word (e.g., ``hippie'') is seen in more and more contexts, the co-occurrence count of the word across all contexts is spread across multiple contexts.
+This means that when a retrieval for a context given the word occurs, multiple contexts have relatively high activation.
+This makes it more difficult to test if a signal (e.g., if a word appears in a specific context) is higher than the background noise (e.g., all other contexts that the word has appeared in),
+which makes the retrieval more uncertain.
+
+Both vector-based and Bayesian models produce the fan effect since they both are based on co-occurrences.
+However, vector-based models do further processing on that matrix, reduce its dimensionality, and use a correlation instead of a log odds value to compute the activation.
+Nonetheless, vector-based models still produce the fan effect because at their core they are still computing activations based on co-occurrences.
+
+\subsubsection{Base-Level Activation}
+
+Vector-based models and ACT-R's current Bayesian DM model are not identical however, and these differences need to be addressed in order to better evaluate the relative benefits of the two models. 
+In particular, the frequency and recency of retrievals for each chunk are not currently used for vector-based models when calculating activation.
+
+The frequency and recency of how content has been used in the past can be a strong predictor of the future importance of that information. 
+The recent content in tweets on a news site like Twitter should be more relevant, for example.
+\textcite{Efron2011} tested this claim by evaluating a set of query likelihood models on returning relevant Twitter tweets from search queries.
+They showed that a model incorporating recency information of the tweet produced more relevant results than models that did not pay attention to this information.
+
+ACT-R's Bayesian model has a strong theory with respect to recency and frequency information.
+It uses this information to calculate a chunk's prior activation (i.e., prior likelihood of being needed again, independent of current context).
+Vector-based models compute activation based entirely on context, so chunks that resonate with context will be retrieved, irrespective to the frequency and recency of use of that chunk.
+ACT-R's prior activation can also be computed for each user, so that hashtags that have been used frequently and recently for a particular user are rated with higher activation.
+Vector-based models have focused on computing the associative strength of a chunk and specific contextual elements.
+It is unexplored how accuracy changes for these models once the information about a user's prior behavior (e.g., ACT-R's base-level activation component) is added.
+
+\subsubsection{Word Order}
+
+One strength of a vector-based approach over ACT-R's Bayesian DM model is that word order can be naturally represented alongside unordered co-occurrence information.
+With the ACT-R model, for example, it is unclear how to represent that a particular word appeared just before a hashtag. 
+To represent word order in a Bayesian model, an additional dimension could be added to the co-occurrence matrix that represents word position.
+However, adding word-order information to ACT-R's default Bayesian declarative memory model is not common.
+Instead, when word order information is used to model reading for example, production rules are defined so that words are read from left to right (e.g., \textcite{Lewis2006}).
+
+\subsubsection{Activation Calculation}
+
+Vector-based and LSA retrieval models calculate chunk activation by correlating a representation of the current context with each memory item.
+Bayesian retrieval models like ACT-R calculate activation by computing each chunk's posterior odd adjustment likelihood, given the context.
+These two computations are certainly not equivalent, even though they are most likely correlated with one another.
+
+Using a correlation can be problematic due to range effects in observed co-occurrences.
+If there are particular words for a tag that co-occur much more often than all of the other words with that tag, that single large value diminishes the power of all other words to contribute to the correlation calculation.
+This does not happen with Bayesian retrieval models because each pair of word and tag values is normalized by the total number of words that appeared with that tag and total number of tags that appeared with that word
+(see the strength of association equation in Table \ref{tabACTRModel}).
+The high-frequency words are often removed from co-occurrence matrix for vector-based models to reduce this effect.
 
 \subsection{Hashtag Prediction}
 
@@ -359,7 +508,7 @@ Also, the general methods used to tokenize and stem the words in all of the data
 
 Two models were evaluated for hashtag prediction on both the Twitter and StackOverflow datasets:
 the random permutation vector-based model \parencite{Sahlgren2008} in Table \ref{tabRandPermModel} and 
-the modified ACT-R Bayesian model \parencite{Stanley2013} in Table \ref{tabModACTRModel}. 
+the modified ACT-R Bayesian model \parencite{Stanley2013} in Table \ref{tabModACTRModel}.
 The co-occurrence matrices used for the context component of each model were generated from a large subset of the Twitter and StackOverflow datasets.
 Each model was tested by evaluating the accuracy of model-chosen tags on a fresh test subset of the datasets.
 Accuracy was assessed by comparing model performance with the human data.
