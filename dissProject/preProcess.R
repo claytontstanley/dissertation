@@ -1829,10 +1829,11 @@ analyzePrior <- function(modelVsPredTbl) {
 	tbl2[d == .8, DVName := paste0(DVName, 'BestDStd')]
 	DVNames = c('topHashtagPostPriorStdDefaultD', 'topHashtagPostPriorOL2BestDOL', 'topHashtagPostPriorStdBestDStd')
 	resTbl = compareOptimalAcc(tbl2[DVName %in% DVNames & runNum == 2])
+	resTbl
 	resTbl[, dsetType := 'twitter']
 	resTbl
 	resTbl[grepl('^SO', dsetGroup), dsetType := 'stackoverflow']
-	resTbl[, mean(meanVal), by=list(DVName, dsetType)]
+	resTbl[, mean(meanVal), by=list(DVName)]
 	resTbl
 	tbl
 }
@@ -1968,6 +1969,20 @@ analyzeFB <- function() {
 	compareMeanDVDefault(tbl[dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='foo')
 }
 
+getWithinCI <- function(cTbl) {
+	dvTbl = cTbl[, .N, DVName][, data.table(t(combn(DVName, 2, simplify=T)))]
+	dvTbl
+	wTbl = cTbl[, dcast.data.table(.SD, datasetName + runNum + groupNum ~ DVName, value.var='acc')]
+	dvTbl[, rowID := 1:.N]
+	wTbl[, runNum]
+	dvTbl[, name := sprintf('%s - %s', V1, V2)]
+	dvTbl
+	dvTbl[, .(wTbl[, V1, with=F][[1]]), rowID]
+	dvTbl[, .(delta=wTbl[, V1, with=F][[1]] - wTbl[, V2, with=F][[1]]), name
+	      ][, as.list(c(CI(delta), N=.N)), name
+	      ]
+}
+
 analyzeContext <- function(modelVsPredTbl) {
 	#modelHashtagsTbls = Filter(x = modelHashtagsTbls, f = function(tbl) !grepl('-500', tbl[, datasetName[1]]))
 	#ppvTbl = rbindlist(lapply(modelHashtagsTbls, getPPVTblAll))
@@ -2017,22 +2032,50 @@ analyzeContext <- function(modelVsPredTbl) {
 				       'PriorStdTitleOrderlessFreqBodyOrderlessFreq',
 				       'PriorStdTitleOrderlessFrentropyBodyOrderlessFrentropy'
 				       ))
-	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='allWeightingsSOPerm')
+	resTbl = compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='allWeightingsSOPerm')
+	resTbl
+	tbl[sizeNum == 2 & dsetType == 'stackoverflow' & DVName %in% DVNames
+	    ][DVName %in% asTopHashtagAcross(c('PriorStdTitleOrderlessBodyOrderless', 'PriorStdTitleOrderlessStoplistBodyOrderlessStoplist',
+					       'PriorStdTitleOrderlessEntropyBodyOrderlessEntropy', 'PriorStdTitleOrderlessFreqBodyOrderlessFreq'))
+	    ][, getWithinCI(.SD)
+	    ][grepl('PriorStdTitleOrderlessBodyOrderless', name)
+	    ]
+
 	DVNames = asTopHashtagAcross(c('PriorStd', 'TweetOrderlessEntropy', 'TweetOrderless', 'TweetOrderlessStoplist', 'TweetOrderlessFreq', 'TweetOrderlessFrentropy',
 				       'PriorStdTweetOrderEntropyTweetOrderlessEntropy', 'PriorStdTweetOrderTweetOrderless',
 				       'PriorStdTweetOrderStoplistTweetOrderlessStoplist',
 				       'PriorStdTweetOrderFreqTweetOrderlessFreq',
 				       'PriorStdTweetOrderFrentropyTweetOrderlessFrentropy'
 				       ))
-	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='allWeightingsTPerm', groupCol='dsetGroup')
+	resTbl = compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='allWeightingsTPerm', groupCol='dsetGroup')
+	tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames
+	    ][DVName %in% asTopHashtagAcross(c('PriorStdTweetOrderTweetOrderless', 'PriorStdTweetOrderEntropyTweetOrderlessEntropy',
+					       'PriorStdTweetOrderFreqTweetOrderlessFreq', 'PriorStdTweetOrderStoplistTweetOrderlessStoplist'))
+	    ][, getWithinCI(.SD)
+	    ][grepl('PriorStdTweetOrderTweetOrderless', name)
+	    ]
+	resTbl
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleBody', 'PriorStdTitleFrentropyBodyFrentropy', 'Title',
 				       'TitleNentropy', 'TitleFreq', 'TitleFrentropy', 'PriorStdTitleNentropyBodyNentropy', 'PriorStdTitleFreqBodyFreq',
 				       'Body', 'BodyNentropy', 'BodyFreq', 'BodyFrentropy'))
-	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='allWeightingsSOSji')
+	resTbl = compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='allWeightingsSOSji')
+	tbl[sizeNum == 2 & dsetType == 'stackoverflow' & DVName %in% DVNames
+	    ][DVName %in% asTopHashtagAcross(c('PriorStdTitleBody', 'PriorStdTitleNentropyBodyNentropy',
+					       'PriorStdTitleFreqBodyFreq'))
+	    ][, getWithinCI(.SD)
+	    ][grepl('PriorStdTitleNentropyBodyNentropy', name)
+	    ]
+	resTbl
 	# T compare entropy to stoplist to freq to frentropy
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweet', 'PriorStdTweetFrentropy', 'Tweet',
 				       'TweetNentropy', 'TweetFreq', 'TweetFrentropy', 'PriorStdTweetNentropy', 'PriorStdTweetFreq'))
-	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='allWeightingsTSji', groupCol='dsetGroup')
+	resTbl = compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='allWeightingsTSji', groupCol='dsetGroup')
+	tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames
+	    ][DVName %in% asTopHashtagAcross(c('PriorStdTweet', 'PriorStdTweetFreq', 'PriorStdTweetNentropy'))
+	    ][, getWithinCI(.SD)
+	    ][grepl('PriorStdTweetNentropy', name)
+	    ]
+	resTbl
 	# RESULT: Bayes and RP with frequency cutoff scales; RP with entropy saturates for SO
 	# SO Entropy all sizes
 	DVNames = asTopHashtagAcross(c('PriorStdTitleBody', 
@@ -2065,12 +2108,20 @@ analyzeContext <- function(modelVsPredTbl) {
 				       'TitleOrderless', 'BodyOrderless',
 				       'TitleOrderlessNenthyman', 'BodyOrderlessNenthyman'))
 	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'stackoverflow' & DVName %in% DVNames], acc, figName='logoddsSO')
+	tbl[sizeNum == 2 & dsetType == 'stackoverflow' & DVName %in% DVNames
+	    ][DVName %in% asTopHashtagAcross(c('PriorStdTitleOrderlessBodyOrderless', 'PriorStdTitleOrderlessNenthymanBodyOrderlessNenthyman'))
+	    ][, getWithinCI(.SD)
+	    ]
 	# T compare entropy with loggodds to entropy
 	DVNames = asTopHashtagAcross(c('PriorStd',
 				       'PriorStdTweetOrderTweetOrderless',
 				       'PriorStdTweetOrderNenthymanTweetOrderlessNenthyman',
 				       'TweetOrderless', 'TweetOrderlessNenthyman'))
 	compareMeanDVDefault(tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames], acc, figName='logoddsT', groupCol='dsetGroup')
+	tbl[sizeNum == 2 & dsetType == 'twitter' & DVName %in% DVNames
+	    ][DVName %in% asTopHashtagAcross(c('PriorStdTweetOrderTweetOrderless', 'PriorStdTweetOrderNenthymanTweetOrderlessNenthyman'))
+	    ][, getWithinCI(.SD)
+	    ]
 	# RESULT: Not much information in order for RP
 	# T compare entropy with direction and entropy with window to entropy
 	DVNames = asTopHashtagAcross(c('PriorStd',

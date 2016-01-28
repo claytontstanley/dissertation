@@ -75,6 +75,8 @@
 \usepackage[group-separator={,}]{siunitx}
 \newcommand{\numNoZero}[1]{{\sisetup{add-integer-zero=false}\num{#1}}}
 
+\newcommand{\myCI}[4]{{95 \% CI (\num{#1}, \num{#2}, \num{#3}, N=\num{#4})}}
+
 \RequirePackage[l2tabu, orthodox]{nag}
 \graphicspath{{./figures/dissertation/}} % Specifies the directory where pictures are stored
 
@@ -952,13 +954,15 @@ As another example, ``RP only title with freq'' means that only the title contex
 \end{figure}
 
 The results show that model accuracy improves if stop words are handled in any of the three ways (predefined stoplist filtering, entropy weighting, and frequency filtering).
-Using a predefined stoplist makes the smallest improvement (\numNoZero{.45} to \numNoZero{.49}), while the entropy (\numNoZero{.60}) and frequency (\numNoZero{.63}) techniques improve performance the most,
+Using a predefined stoplist makes the smallest improvement (\numNoZero{.45} to \numNoZero{.49}, \myCI{.032}{.018}{.047}{5})
+while the entropy (\numNoZero{.45} to \numNoZero{.60}, \myCI{.143}{.123}{.163}{5}) and frequency (\numNoZero{.45} to \numNoZero{.63}, \myCI{.178}{.164}{.192}{5}) techniques improve performance the most,
 and frequency shows a slight edge over entropy.
 However, using the frequency-filtering technique produces more noise in accuracy measurements compared to the other techniques, at least when tested on words in the title of StackOverflow posts.
 
 The three stop word techniques were then tested for the random permutation model on the Twitter dataset, and the results are depicted in Figure \ref{figContextStopRPT}.
-For the random permutation model for Twitter, the entropy weighting technique is the best method for handling stop words (\numNoZero{.25} to \numNoZero{.26}).
-Removing stop-words based on a predetermined list actually decreases accuracy (\numNoZero{.25} to \numNoZero{.23}), and using data-driven frequency filtering has only a small to no effect (\numNoZero{.25} to \numNoZero{.25}).
+For the random permutation model for Twitter, the entropy weighting technique is the best method for handling stop words (\numNoZero{.25} to \numNoZero{.26}, \myCI{.013}{.011}{.015}{60}).
+Removing stop-words based on a predetermined list actually decreases accuracy (\numNoZero{.25} to \numNoZero{.23}, \myCI{-.017}{-.015}{-.019}{60}),
+and using data-driven frequency filtering has only a small to no effect (\numNoZero{.25} to \numNoZero{.25}, \myCI{.00}{-.003}{.002}{60}).
 
 \begin{figure}[!htbp]
   \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-allWeightingsTPerm-crop.pdf}}}
@@ -980,13 +984,13 @@ The results for the frequency and entropy techniques for the Bayesian model on t
   \label{figContextStopBSO}
 \end{figure}
 
-The results show that entropy weighting produces the most accurate results (\numNoZero{.61} to \numNoZero{.63}).
-Also, accuracy actually decreases when using frequency filtering (compared to no filtering) (\numNoZero{.61} to \numNoZero{.56}) for the Bayesian model.
+The results show that entropy weighting produces the most accurate results (\numNoZero{.61} to \numNoZero{.63}, \myCI{.024}{.011}{.037}{5}).
+Also, accuracy actually decreases when using frequency filtering compared to no filtering (\numNoZero{.61} to \numNoZero{.56}, \myCI{-.043}{-.030}{-.057}{5}) for the Bayesian model.
 So entropy weighting is the clear winner in this case.
 
 Similar results are found when the Bayesian model is tested on the Twitter dataset.
-Figure \ref{figContextStopBT} shows that entropy weighting is again the best performer (\numNoZero{.29} to \numNoZero{.32}),
-and frequency filtering decreases performance relative to no filtering (\numNoZero{.29} to \numNoZero{.28}).
+Figure \ref{figContextStopBT} shows that entropy weighting is again the best performer (\numNoZero{.29} to \numNoZero{.32}, \myCI{.028}{.024}{.031}{60}),
+and frequency filtering decreases performance relative to no filtering (\numNoZero{.29} to \numNoZero{.28}, \myCI{-.017}{-.015}{-.019}{60}).
 
 \begin{figure}[!htbp]
   \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-allWeightingsTSji-crop.pdf}}}
@@ -1119,7 +1123,8 @@ The log-odds transformation technique was tested for the random permutation mode
 \subsubsection{Results}
 
 Model accuracy results after using the log-odds transformation are depicted in Figures \ref{figContextLogoddsSO} and \ref{figContextLogoddsT}.
-Using the log-odds transformation technique has a small effect on model accuracy for StackOverflow (\numNoZero{.45} to \numNoZero{.47}) and minimal to no effect on Twitter (\numNoZero{.25} to \numNoZero{.25}).
+Using the log-odds transformation technique has a small effect on model accuracy for StackOverflow (\numNoZero{.45} to \numNoZero{.47}, \myCI{.015}{.009}{.021}{5})
+and minimal to no effect on Twitter (\numNoZero{.25} to \numNoZero{.25}, \myCI{-.002}{-.005}{.001}{60}).
 
 \begin{figure}[!htbp]
   \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-logoddsSO-crop.pdf}}}
@@ -1140,9 +1145,7 @@ When the prior component is included for the random permutation model, accuracy 
 However, it is somewhat surprising that it does not matter much how the context and prior terms are added for the random permutation model.
 Model performance is similar when the context component used for the model is based on a correlation compared to a log-odds value.
 
-There may be a slight edge in increased accuracy when a log-odds transformation is used for the StackOverflow dataset.
-However, that result is not statistically reliable for the sample size used in this analysis (confidence intervals overlap in Figure \ref{figContextLogoddsSO}),
-and even if present the overall change in accuracy is small (\numNoZero{.45} to \numNoZero{.47}).
+There is a slight edge in increased accuracy when a log-odds transformation is used for the StackOverflow dataset, although the magnitude of the improvement in accuracy is small (\numNoZero{.45} to \numNoZero{.47}).
 Nonetheless, it does seem appropriate to convert the context to a log-odds adjustment value when context is added as an additional term to the random permutation model.
 Since performance does not decrease when the transformation is made, may slightly increase,
 and leads to a more natural interpretation of each model term as a log-odds value, it is reasonable to include this step for the random permutation model.
