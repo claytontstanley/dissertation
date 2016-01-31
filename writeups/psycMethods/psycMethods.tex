@@ -517,9 +517,6 @@ Also, the general methods used to tokenize and stem the words in all of the data
 Two models were evaluated for hashtag prediction on both the Twitter and StackOverflow datasets:
 the random permutation vector-based model \parencite{Sahlgren2008} in Table \ref{tabRandPermModel} and 
 the modified ACT-R Bayesian model \parencite{Stanley2013} in Table \ref{tabModACTRModel}.
-The co-occurrence matrices used for the context component of each model were generated from a large subset of the Twitter and StackOverflow datasets.
-Each model was tested by evaluating the accuracy of model-chosen tags on a fresh test subset of the datasets.
-Accuracy was assessed by comparing model performance with the human data.
 
 \subsection{Datasets}
 
@@ -1261,14 +1258,24 @@ and both models were much more accurate when tested on StackOverflow compared to
   }
 \end{table}
 
+\subsection{Implications and Future Directions}
+
+\subsubsection{Tagging as a Declarative Memory Retrieval Process}
+
 Overall, both the random permutation and Bayesian declarative memory models fit the observed tagging behavior in StackOverflow and Twitter reasonably well.
 The fits for StackOverflow in particular are quite high, especially given the large tag space on the site.
+
 These results provide support for the idea that choosing a hashtag when composing a tweet and tagging a StackOverflow post is akin to a declarative memory retrieval process.
-However, both models were not 100 percent accurate, and the amount of variance left to predict was much larger than what would be observed if retrieval noise was included in the model.
+However, both models were not 100 percent accurate, and the amount of variance left to predict was is larger than what would be observed if retrieval noise is included in the model.
 One possibility that seems likely is that the tag selection process includes other processes besides just declarative memory retrieval
 (e.g., strategic processes, determining the number of tags to employ, attempts to add humor).
 
-\subsection{Implications and Future Directions}
+Another possibility is that this is not a declarative memory process at all.
+In particular, it is important to note that tagging on these sites is widely used as a method to communicate specific messages to specific groups of people in the community.
+It is unclear how much this environment overlaps with verbal communication between two people, and the declarative memory requests required to successfully communicate in this setting.
+Nonetheless, these models are reasonably accurate in this setting, particularly for StackOverflow.
+Given the results in this research, it at least seems worthwhile to use these publicly-available tagging environments as a resonable proxy and testbed to explore and validate modifications to the current theory.
+Any insights gained could be followed up with a more precisely controlled experimental design.
 
 \subsubsection{Representation}
 
@@ -1280,7 +1287,6 @@ These results pose an interesting and important fundamental question about decla
 How, precisely, is the neural system configured to represent co-occurrences for declarative memory?
 Since at the behavioral level both models perform similarly, it is possible that the neural system is using something similar to either representation to store co-occurrences.
 Vector-based models are simple enough that they can easily be implemented in a neural network.
-w
 Perhaps a form of vector-based compressed storage is being used at the neural level,
 since it can be implemented in neurons and is an efficient way for the machinery to generate predictions that closely match the statistical structure of the environment
 (i.e., that closely match the uncompressed Bayesian representation).
@@ -1384,6 +1390,27 @@ so that the effects of representation and activation calculation could be partia
 This would allow, for example, the method of compression for the random permutation vector-based model to be analyzed independent of activation calculation.
 The results would help determine the specific representation that the declarative memory system uses to represent co-occurrences,
 and also the specific activation calculation that is carried out by the system.
+
+\subsubsection{Observational vs. Experimental Design}
+
+All data used for this study were collected from publicly-available datasets and were not subject to an experimental design (i.e., observational data).
+There are advantages and disadvantes to both observational and experimental designs.
+One primary advantage with the observational approach here is size and availability: data for millions of posts and tweets are immediately available for analysis.
+However one disadvantage is that there is no way to probe a user at a particular point in time, which could be quite advantageous if possible.
+One hybrid approach worth considering for future research is to use the publicly available datasets to build up a representation of declarative memory for each user.
+Afterwards, bring a sample of these specific users into a laboratory setting and probe them with specific retrieval requests.
+Multiple users could be asked to tag the same message, and then models could be tested to see if they reliably predict differences in accuracy between the subjects.
+
+\subsubsection{Which Model is Better?}
+
+After including the prior and entropy components for both models, overall accuracy was similar for the Bayesian and random permutation models for this task.
+So it is unclear with this research precisely which model is more cognitively plausible.
+However, there were two areas in particular where model performance showed relatively large differences: accuracy change as a function of corpus size and reliance on entropy weighting.
+These areas could be used in future research to more directly challenge the models.
+For example, a domain could be picked where enough data is collected to build a custom co-occurrence matrix for each user.
+Then one could look at model accuracy over time for each user as the co-occurrence matrix is increased to see if the trajectory is more accurately modeled by a random permutation (more accurate with lower N) or Bayesian (more accurate with higher N) model.
+Further, if a large-scale domain is picked and it is shown that the Bayesian model does not require entropy weighting for the co-occurrence matrix after the representations are fully stabilized,
+then this would provide a case where the two models are dramatically different: the random permutation model would require explicitly weighting the stop words (entropy weighting) while the Bayesian model would not.
 
 \subsection{Summary}
 
