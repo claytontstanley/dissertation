@@ -160,7 +160,7 @@ A few researchers have started to use large-scale databases to evaluate how well
 for both ACT-R Bayesian models \parencites{Fu2007,Pirolli2003,Stanley2013,Douglass2010} and vector-based memory models \parencites{Jones2007,Rutledge2008,Recchia2010,Sahlgren2008}.
 
 This study expands on previous work that has tested retrieval models on large-scale datasets.
-It focuses specifically on how two state-of-the-art declarative memory retrieval models (ACT-R Bayesian and vector-based) can be improved by testing these models on two real-world tagging tasks.
+It focuses specifically on how two state-of-the-art declarative memory retrieval models (ACT-R Bayesian and random permutation vector-based) can be improved by testing these models on two real-world tagging tasks.
 One primary objective is to compare the random permutation vector-based model to ACT-R's Bayesian declarative memory theory when large datasets are used for each model. 
 Another objective is to improve each model, and measure how incorporating the strengths of each model into the other (i.e., modifying model components) influences accuracy.
 For example, it is currently unexplored how a vector-based model can be modified to retrieve results that are based not only on context, but also on the prior odds that a particular item in memory will be needed again.
@@ -305,7 +305,7 @@ This is somewhat similar to taking a column (i.e., a tag) on a word co-occurrenc
 However, vector-based memory systems represent information in a much more compact way than a full word co-occurrence matrix.
 
 For vector-based systems, each word is represented by an environment vector $e_{i}$ that is nearly orthogonal to all other words' environment vectors.
-The number of dimensions for these vectors is much less than the number of rows in a full word co-occurrence matrix, which is how vector-based systems represent information in a much more compact space.
+The number of dimensions for these vectors is much less than the number of rows in a full word co-occurrence matrix (typically around 2,000 - 4,000), which is how vector-based systems represent information in a much more compact space.
 Paired with each environment vector ($e_{i}$) is a memory vector ($m_{i}$) that contains the summed representation of all other environment vectors that have co-occurred with that $e_{i}$ environment vector.
 These memory vectors can contain environment vectors from position-independent word co-occurrence information ($c_{i}$) and word order information ($o_{i}$), which can be combined into a single representation ($m_{i}$).
 Over time, memory vectors accumulate a distributed representation of the most common environment vectors that co-occurred with them.
@@ -592,12 +592,12 @@ A custom tokenization algorithm created by \textcite{Owoputi2013} was used to ch
 This algorithm was specifically created for tokenizing Twitter content.
 However, during testing it was also found to be robust and well-suited for StackOverflow content.
 The initial model results with the new tokenizer were qualitatively similar to the model results found in \textcite{Stanley2013} where the Python Natural Language Processing (NLP) toolkit \parencite{Bird2009} was used.
-So the same tokenization algorithm from \textcite{Owoputi2013} was used for both StackOverflow and Twitter, since it seemed beneficial to use the same algorithm for both datasets to make comparisons across datasets more equitable.
+So the same tokenization algorithm from \textcite{Owoputi2013} was used for both StackOverflow and Twitter to make comparisons across datasets more equitable.
 
 \subsection{Stemming}
 
-\textcite{Owoputi2013}'s algorithm handles basic word stemming (e.g., removing ``ed'' and ``ing'' endings), but
-with the StackOverflow dataset, it is also possible to convert synonym tags to canonical base tags, since the community maintains a tag-synonym database.
+\textcite{Owoputi2013}'s algorithm handles basic word stemming (e.g., removing ``ed'' and ``ing'' endings).
+With the StackOverflow dataset however, it is also possible to convert synonym tags to canonical base tags, since the community maintains a tag-synonym database.
 This can be thought of as semantic stemming, where two words with identical meaning are converted to the same canonical word.
 So tags used for the post were converted to their root tag when possible.
 
@@ -660,6 +660,7 @@ The base-level ($B_{i}$) component in Table \ref{tabACTRBLLModel} is different t
 If a decay rate of 0 is used on the optimized learning form of $B_{i}$, then the equation collapses to $log \left ( n_{i} \right )$,
 which is a nonlinear transformation of the $B_{i}$ used by \citeauthor{Stanley2013} ($log \frac{p_{i}}{1-p_{i}}$).
 Both forms maintain the same rank ordering, so they should produce similar results.
+The $B_{i}$ component used by \citeauthor{Stanley2013} can be roughly thought of as the standard form of $B_{i}$ when the decay rate is 0 (i.e., a pure frequency model).
 
 \subsection{Method}
 
@@ -803,7 +804,8 @@ since the performance benefits seen in this study could simply be due to the fac
 Nonetheless, the only real reason not to use the standard form is due to computational resource limitations.
 Since this is becoming less of an issue as hardware speed increases, it may be time to reconsider the default form of base-level learning used in ACT-R.
 It may be the case that the optimized learning form of the equation is no longer computationally necessary.
-And if the standard form is used as the default (or simply tried in another experiment),
+That said, one may still run up against performance limitations when trying to run large-scale models in real-time settings.
+Nonetheless, if the standard form is used as the default (or simply tried in another experiment),
 the results from this study suggest that the optimal decay rate value should be set slightly higher (\num{0.8}) than the default when optimized learning is used (\num{0.5}).
 
 \section{Combining Predictors}
@@ -933,14 +935,13 @@ The ``no processing'' plot shows the size of the spikes when high-frequency word
 The entropy plot shows how the size decreases by more than an order of magnitude after the entropy weighting measure is used.
 The cutoff for the frequency plot was chosen such that the plot looks similar to the entropy plot, with spikes around the same size.
 The cutoff that produced the frequency plots in Figures \ref{figContextCutoffSO} and \ref{figContextCutoffT} is where a word represents more than \num{.04}\% of total occurrences in the dataset.
-This may or may not be equal to the value for \textcite{Sahlgren2008}, since that number was expressed in total observations (not as a percentage), and the total number of words in the dataset was not given.
 
 \subsubsection{Results for the Random Permutation Model}
 
 Plots for the three methods of handling stop words for the random permutation model on the StackOverflow dataset are shown in Figure \ref{figContextStopRPSO}.
 In the plot, if the model name includes ``full'' then all model components are included.
 When the model components are enumerated, then at least one of the components is left out.
-So, for example, the ``standard prior model relaxed across posts'' means that only the prior model component was used when determining activation. 
+For example, the ``standard prior model relaxed across posts'' means that only the prior model component was used when determining activation. 
 As another example, ``RP only title with freq'' means that only the title context component of the random permutation model was used, and that stop words were handled using the frequency filtering technique.
 
 \begin{figure}[!htbp]
@@ -949,6 +950,7 @@ As another example, ``RP only title with freq'' means that only the title contex
     Stop-word techniques for the random permutation model for StackOverflow.
     The five methods for handling stop words are shown both for the title model component in isolation and the full model.
     ``Stoplist'', ``freq'', ``entropy'' are the stoplist removal method, removal based on frequency count, and weighting based entropy metric.
+    All error bars are the 95\% bootstrapped confidence interval for the mean. 
 }
   \label{figContextStopRPSO}
 \end{figure}
@@ -969,6 +971,7 @@ and using data-driven frequency filtering has only a small to no effect (\numNoZ
   \caption{
   Stop-word techniques for the random permutation model for Twitter.
   The five methods for handling stop words are shown both for the context model component (i.e., no prior term) and the full model.
+  All error bars are the 95\% bootstrapped confidence interval for the mean. 
 }
   \label{figContextStopRPT}
 \end{figure}
@@ -980,7 +983,10 @@ The results for the frequency and entropy techniques for the Bayesian model on t
 
 \begin{figure}[!htbp]
   \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-allWeightingsSOSji-crop.pdf}}}
-  \caption{Stop-word techniques for the Bayesian model for StackOverflow}
+  \caption{
+  Stop-word techniques for the Bayesian model for StackOverflow
+  All error bars are the 95\% bootstrapped confidence interval for the mean. 
+}
   \label{figContextStopBSO}
 \end{figure}
 
@@ -994,7 +1000,10 @@ and frequency filtering decreases performance relative to no filtering (\numNoZe
 
 \begin{figure}[!htbp]
   \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-allWeightingsTSji-crop.pdf}}}
-  \caption{Stop-word techniques for the Bayesian model for Twitter}
+  \caption{
+  Stop-word techniques for the Bayesian model for Twitter
+  All error bars are the 95\% bootstrapped confidence interval for the mean. 
+}
   \label{figContextStopBT}
 \end{figure}
 
@@ -1023,7 +1032,7 @@ However, since the entropy-weighting technique is parameter-free and does not re
 
 \subsection{Corpus Size}
 
-The number of documents used to build the co-occurrence matrix has been shown to influence model accuracy \parencite{Sahlgren2008}, so this was the second architectural concern that was examined.
+The number of documents used to build the co-occurrence matrix has been shown to influence model accuracy \parencite{Sahlgren2008}.
 The default number of documents used to build the co-occurrence matrix was \num{1000000} for StackOverflow and \num{3000000} for Twitter.
 In order to see how accuracy changed as function of corpus size, 
 co-occurrence matrices for a range of smaller corpus sizes were built.
@@ -1128,13 +1137,19 @@ and minimal to no effect on Twitter (\numNoZero{.25} to \numNoZero{.25}, \myCI{-
 
 \begin{figure}[!htbp]
   \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-logoddsSO-crop.pdf}}}
-  \caption{Random permutation model accuracy when using log-odds transformation on context for StackOverflow}
+  \caption{
+    Random permutation model accuracy when using log-odds transformation on context for StackOverflow
+    All error bars are the 95\% bootstrapped confidence interval for the mean. 
+  }
   \label{figContextLogoddsSO}
 \end{figure}
 
 \begin{figure}[!htbp]
   \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-logoddsT-crop.pdf}}}
-  \caption{Random permutation model accuracy when using log-odds transformation on context for Twitter}
+  \caption{
+  Random permutation model accuracy when using log-odds transformation on context for Twitter
+  All error bars are the 95\% bootstrapped confidence interval for the mean. 
+}
   \label{figContextLogoddsT}
 \end{figure}
 
@@ -1185,7 +1200,10 @@ Base models that do not use entropy weighting were also included so that effect 
 
 \begin{figure}[!htbp]
   \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-orderT-crop.pdf}}}
-  \caption{Model accuracy for various word order methods for the random permutation model for Twitter}
+  \caption{
+    Model accuracy for various word order methods for the random permutation model for Twitter
+    All error bars are the 95\% bootstrapped confidence interval for the mean. 
+  }
   \label{figContextOrder}
 \end{figure}
 
@@ -1223,8 +1241,8 @@ which is why model accuracy is similar for the orderless component and direction
 \section{General Discussion}
 
 The general discussion is separated into two parts.
-The first section will describe the overall results, reemphasize key findings, and discuss the theoretical implications of each key finding.
-The final section will describe future directions for the research. 
+The first section will describe the overall results,
+and the final section will go through each key finding and discuss theoretical implications and future directions for research.
 
 \subsection{Overall Results}
 
@@ -1267,7 +1285,7 @@ Overall, both the random permutation and Bayesian declarative memory models fit 
 The fits for StackOverflow in particular are quite high, especially given the large tag space on the site.
 
 These results provide support for the idea that choosing a hashtag when composing a tweet and tagging a StackOverflow post is akin to a declarative memory retrieval process.
-However, both models were not 100 percent accurate, and the amount of variance left to predict was is larger than what would be observed if retrieval noise is included in the model.
+However, both models are not 100 percent accurate, and the amount of variance left to predict is larger than what would be observed if retrieval noise is included in the model.
 One possibility that seems likely is that the tag selection process includes other processes besides just declarative memory retrieval
 (e.g., strategic processes, determining the number of tags to employ, attempts to add humor).
 
@@ -1338,10 +1356,6 @@ Even with the large datasets used in this research, there was not enough data on
 That is, the context component of the declarative memory models used in this resaerch was formed as a collection of observed co-occurrences across all individuals.
 Nonetheless, the prior component for the models was customized for each individual (except in the Twitter popular hashtags dataset when it was not possible).
 Ideally, both components would be customized to the individual, and it remains an open question how much accuracy is influenced by using an aggregate or custom context component in the models.
-One practical approach that might be considered for future research:
-Use a large corpus to stand up an initial aggregate co-occurrence matrix (e.g., the Wikipedia corpus),
-then overlay the specific co-occurrences observed for each user on top of this base to create a customized matrix for each user,
-and then test model accuracy with and without the custom overlay.
 
 \subsubsection{Attentional Weight}
 
@@ -1358,9 +1372,9 @@ However, there may be other ways besides adjusting the attentional weight that t
 The entropy weighting term is likely solving a problem that resides only in contextual activation and not prior activation,
 since the activation for the prior component for each word is independent of the presentation of other words, so stop words have no way to interact with tag prior activation in this case.
 
-One alternative explanation is that the entropy weighting measure was needed because the contextual co-occurrence matrix for this research was not yet stable, even with these large dataset sizes.
+One alternative explanation is that the entropy weighting measure was needed for this research because the contextual co-occurrence matrix was not yet stable, even with these large dataset sizes.
 If the matrix was not yet stable, then by chance certain stop words would contribute more net activation to specific tags and introduce noise into the retrieval process for that tag.
-So further weighting the contribution of these stop words by leveraging the attentional weight term ensured that this noise was not introduced into the system.
+So further weighting the contribution of these stop words by leveraging the attentional weight term ensured that this noise was suppressed in the system.
 If this is the case, it would be intersting to see how large a dataset is required to not need to modify the attentional weight term.
 However even if this is the case, the random permutation model would not be fixed by larger dataset sizes,
 since this model simply adds environment vectors to produce the current context vector and has no mechanism (unlike Bayesian normalization) for weighting the contribution of an environment vector.
@@ -1368,6 +1382,13 @@ since this model simply adds environment vectors to produce the current context 
 Another explanation for the Bayesian model is that additional attential weighting was needed because the contextual matrix was derived only from word by tag co-occurrences and not (word or tag) by (word or tag) co-occurences.
 This was done for performance reasons as the computational complexity otherwise is simply too high for current hardware.
 It is possible that by adding all pairwise combinations of both words and tags in the posts may soften and stabilize the contribution of stop words when computing contextual activation for a tag, given current context.
+
+Nonetheless, it seems likely that the entropy method for computing the attentional weight term $W_{j}$ may be applicable to other declarative memory tasks.
+The entropy method is parameter-free (unlike the frequency-filtering method), completely data driven (much like the co-occurrence matrix), does not require tuning,
+and substantially increases model accuracy for these datasets.
+It is common to handle stop words in some manner when working with Natural Language Processing (NLP) and large text corpuses.
+So, if these large corpuses are used to test declarative memory,
+then the entropy method may be a more cognitively plausible way of dealing with stop words rather than filtering based on a predetermined list or the frequency count in the dataset.
 
 \subsubsection{Prior Component}
 
@@ -1405,13 +1426,13 @@ Multiple users could be asked to tag the same message, and then models could be 
 \subsubsection{Directly Comparing the Models}
 
 After including the prior and entropy components for both models, overall accuracy was similar for the Bayesian and random permutation models for this task.
-So it is unclear with this research precisely which model is more cognitively plausible.
+So it is unclear with this research precisely which model is more cognitively plausible (or if both are correct and simply working at different levels of abstraction).
 However, there were two areas in particular where model performance showed relatively large differences: accuracy change as a function of corpus size and reliance on entropy weighting.
 These areas could be used in future research to more directly challenge the models.
 For example, a domain could be picked where enough data is collected to build a custom co-occurrence matrix for each user.
 Then one could look at model accuracy over time for each user as the co-occurrence matrix is increased to see if the trajectory is more accurately modeled by a random permutation (more accurate with lower N) or Bayesian (more accurate with higher N) model.
 Further, if a large-scale domain is picked and it is shown that the Bayesian model does not require entropy weighting for the co-occurrence matrix after the representations are fully stabilized,
-then this would provide a case where the two models are dramatically different: the random permutation model would require explicitly weighting the stop words (entropy weighting) while the Bayesian model would not.
+then this would provide a case where the two models are dramatically different: The random permutation model would require explicitly weighting the stop words (entropy weighting) while the Bayesian model would not.
 
 \subsection{Summary}
 
