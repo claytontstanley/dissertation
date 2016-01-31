@@ -75,7 +75,7 @@
 \usepackage[group-separator={,}]{siunitx}
 \newcommand{\numNoZero}[1]{{\sisetup{add-integer-zero=false}\num{#1}}}
 
-\newcommand{\myCI}[4]{{95 \% CI (\num{#1}, \num{#2}, \num{#3}, N=\num{#4})}}
+\newcommand{\myCI}[4]{{mean difference = \num{#1}, 95\% CI [\num{#2}, \num{#3}]}}
 
 \RequirePackage[l2tabu, orthodox]{nag}
 \graphicspath{{./figures/dissertation/}} % Specifies the directory where pictures are stored
@@ -573,8 +573,8 @@ while models for StackOverflow were tested on the more challenging dataset where
 
 \subsubsection{StackOverflow}
 
-The entire StackOverflow dataset is packaged and released quarterly to the public.
-So the most recent packaged dataset was downloaded and the tables were imported into a relational database.
+The entire StackOverflow dataset is packaged and released quarterly to the public,
+so the most recent packaged dataset was downloaded and the tables were imported into a relational database.
 
 \subsubsection{Twitter}
 
@@ -606,14 +606,17 @@ So tags used for the post were converted to their root tag when possible.
 \subsection{Testing for Reliable Differences}
 
 Confidence intervals were used throughout for statistical inference instead of explicit p-values.
-This was done because it is the most straightforward way to visualize all of the mean differences in accuracy (i.e., bar and line plots with a visual indication of the error) for each of the models, which eases interpretation
+This was done because it is a more straightforward way to visualize all of the mean differences in accuracy (i.e., bar and line plots with a visual indication of the error) for each of the models, which eases interpretation
 (similar to the argument made by FIXME:textcite).
-It is also a conservative estimate of reliability, as using confidence intervals on the means essentially ignores the fact that this is a within-subjects design, where accuracy for each model is measured for each subject.
+It is also a conservative estimate of reliability, as using confidence intervals on the means essentially ignores the fact that this is a within-subjects design, where accuracy for each model is measured for each subject in each dataset.
 However, we would rather err on the side of making the results easier to interpret at the cost of using conservative estimates for reliability
-(i.e., use error bars overlaid on a visualization of the means instead of statistical tests on the difference scores).
+(i.e., use error bars overlaid on a visualization of the means instead of statistical tests on every combination of difference scores).
 In fact, using large datasets for analysis is what empowers us to do this:
 With this much data, we can use straightforward (although more conservative) inferentials and still see reliable results.
-This allows us to concentrate on proper data visualization of the main findings.
+This allows us to concentrate more on proper data visualization of the main findings.
+
+Nonetheless, when accuracy differences between two models are called out explicitly in the text, the confidence interval for the mean difference in accuracy is also included.
+Since this interval is drawn across the observed difference scores, it will be smaller than the intervals included in the plots, since these are drawn independently for each model's overall accuracy.
 
 \section{Past User Behavior}
 
@@ -659,7 +662,6 @@ The base-level ($B_{i}$) component in Table \ref{tabACTRBLLModel} is different t
 If a decay rate of 0 is used on the optimized learning form of $B_{i}$, then the equation collapses to $log \left ( n_{i} \right )$,
 which is a nonlinear transformation of the $B_{i}$ used by \citeauthor{Stanley2013} ($log \frac{p_{i}}{1-p_{i}}$).
 Both forms maintain the same rank ordering, so they should produce similar results.
-So the $B_{i}$ component used by \citeauthor{Stanley2013} can be roughly thought of as the standard form of $B_{i}$ when the decay rate is 0 (i.e., a pure frequency model).
 
 \subsection{Method}
 
@@ -765,7 +767,7 @@ Finally, model accuracy was analyzed across all dataset slices for StackOverflow
 This was done by examining model accuracy at a specific decay rate value for each model.
 Accuracy was assessed at each model's previously-determined best-fit values (\num{.43} and \num{.80} for the optimized learning and standard form) and the standard form's default value (\num{0.5}).
 Since decay rate values were explored at \num{0.1} increments between the 0 and 1 range, the decay rate values used to examine model accuracy were rounded to the nearest decay rate value that was included in the run.
-So a best-fit value of \num{.4} was used for the optimized learning model instead of the \num{.43} average found from the dataset slices.
+Consequently, a best-fit value of \num{.4} was used for the optimized learning model instead of the \num{.43} average found from the dataset slices.
 Aggregate accuracy was computed by taking the mean of every user's model accuracy across all users in all dataset slices.
 
 Accuracy for both sites is included in Figure \ref{figPriorAcc}. 
@@ -797,7 +799,7 @@ Further, for the optimized learning form there is not much difference between us
 This makes sense given that the optimized learning equation in Table \ref{tabACTRBLLModel} collapses to a pure frequency model as the amount of time since the presentation of the first recorded chunk instance increases,
 and also since the timespan of recorded tag use for StackOverflow and Twitter is large (years).
 
-So it may be worthwhile to use the standard form instead of the optimized learning form when declarative memory is modeled across a broader range of tasks.
+Given this, it may be worthwhile to use the standard form instead of the optimized learning form when declarative memory is modeled across a broader range of tasks.
 However, this should not be taken as a strong recommendation,
 since the performance benefits seen in this study could simply be due to the fact that the declarative memory retrievals span across a large period of time, which is not the case for all tasks.
 Nonetheless, the only real reason not to use the standard form is due to computational resource limitations.
@@ -868,7 +870,7 @@ For each randomly-sampled post for StackOverflow, the prior activation is based 
 This was done so that the prior component used for StackOverflow for both the popular-users and randomly-sampled datasets was the same.
 
 However, a custom user prior for the Twitter popular-hashtags dataset cannot be used, since the entire Twitter dataset cannot be downloaded, so the history of every user in the popular-hashtags dataset cannot be collected.
-So instead, the global prior tag history for all users in the Twitter popular-hashtags dataset was used to compute prior activation values for each tag.
+Instead, the global prior tag history for all users in the Twitter popular-hashtags dataset was used to compute prior activation values for each tag.
 
 \subsubsection{Co-occurrence Matrices}
 
@@ -1011,8 +1013,8 @@ Model accuracy most likely decreases for the Bayesian model because this model a
 When computing activation for the random permutation model, the correlation is calculated directly on a matrix of counts of co-occurrences for words and tags.
 For the Bayesian model this count matrix is converted to a log-odds ($S_{ji}$) matrix,
 where both the number of observations for the word and the tag are normalized when computing the value for each cell (see the $S_{ji}$ computation in Table \ref{tabModACTRModel}).
-So it is likely the case that a form of frequency attenuation is already built into the Bayesian model.
-Therefore, adding a frequency filter on top of this does nothing to improve accuracy and only removes predictive information.
+Therefore, it is likely the case that a form of frequency attenuation is already built into the Bayesian model,
+and adding a frequency filter on top of this does nothing to improve accuracy and only removes predictive information.
 
 \textcite{Stanley2013} found that the entropy-weighting technique to attenuate stop words for the Bayesian model significantly improved model accuracy.
 The same effect is found for the StackOverflow and Twitter datasets in this study.
@@ -1210,7 +1212,7 @@ In absolute terms, this model only improved by 2 percentage points in accuracy w
 \textcite{Sahlgren2008}'s results for word order for the random permutation model are similar.
 At a row size of around \num{2000}, model accuracy improves by less than a percentage point when order information is incorporated.
 
-So although incorporating word order into the random permutation model does seem to slightly improve performance,
+Although incorporating word order into the random permutation model does seem to slightly improve performance,
 the strength of the model is more likely to be in how efficiently it can represent the co-occurrence matrix rather than its ability to include word order in the representation.
 That is, the strength of the model is in its compressed unordered context component term and not the ordered component, at least for the Twitter dataset studied.
 
@@ -1266,6 +1268,8 @@ However, both models were not 100 percent accurate, and the amount of variance l
 One possibility that seems likely is that the tag selection process includes other processes besides just declarative memory retrieval
 (e.g., strategic processes, determining the number of tags to employ, attempts to add humor).
 
+\subsection{Implications and Future Directions}
+
 \subsubsection{Representation}
 
 Given that the storage space required to represent the co-occurrences for the random permutation model is dramatically smaller than the uncompressed Bayesian model,
@@ -1276,6 +1280,7 @@ These results pose an interesting and important fundamental question about decla
 How, precisely, is the neural system configured to represent co-occurrences for declarative memory?
 Since at the behavioral level both models perform similarly, it is possible that the neural system is using something similar to either representation to store co-occurrences.
 Vector-based models are simple enough that they can easily be implemented in a neural network.
+w
 Perhaps a form of vector-based compressed storage is being used at the neural level,
 since it can be implemented in neurons and is an efficient way for the machinery to generate predictions that closely match the statistical structure of the environment
 (i.e., that closely match the uncompressed Bayesian representation).
@@ -1320,6 +1325,17 @@ In that sense, one could argue that the models are undertrained on generic co-oc
 It may be interesting to test these memory models on a hybrid co-occurrence matrix,
 where the majority of the observations are taken from a generic domain (e.g., american literature) and a minority are domain-specific (e.g., StackOverflow word, tag pairs).
 
+\subsubsection{Individual vs. Group Representation of Memory}
+
+Even with the large datasets used in this research, there was not enough data on each individual user to build up separate co-occurrence matrices for them.
+That is, the context component of the declarative memory models used in this resaerch was formed as a collection of observed co-occurrences across all individuals.
+Nonetheless, the prior component for the models was customized for each individual (except in the Twitter popular hashtags dataset when it was not possible).
+Ideally, both components would be customized to the individual, and it remains an open question how much accuracy is influenced by using an aggregate or custom context component in the models.
+One practical approach that might be considered for future research:
+Use a large corpus to stand up an initial aggregate co-occurrence matrix (e.g., the Wikipedia corpus),
+then overlay the specific co-occurrences observed for each user on top of this base to create a customized matrix for each user,
+and then test model accuracy with and without the custom overlay.
+
 \subsubsection{Attentional Weight}
 
 The Bayesian declarative memory model for ACT-R has an attentional weight term $W_{j}$ that can be used to attenuate or remove stop words.
@@ -1331,16 +1347,22 @@ Since the ACT-R declarative memory theory already has a component for attentiona
 and this is reflected in the attentional weight term.
 That is, $W_{j}$ can be defined mathematically, has the same general form across tasks, and both the frequency-filtering and entropy-weighting methods for stop-word removal are possible first candidates for the definition.
 
-\subsection{Implications and Future Directions}
+However, there may be other ways besides adjusting the attentional weight that these models can be modified to achieve the same performance improvement.
+The entropy weighting term is likely solving a problem that resides only in contextual activation and not prior activation,
+since the activation for the prior component for each word is independent of the presentation of other words, so stop words have no way to interact with tag prior activation in this case.
 
-\subsubsection{Generalizing Results}
+One alternative explanation is that the entropy weighting measure was needed because the contextual co-occurrence matrix for this research was not yet stable, even with these large dataset sizes.
+If the matrix was not yet stable, then by chance certain stop words would contribute more net activation to specific tags and introduce noise into the retrieval process for that tag.
+So further weighting the contribution of these stop words by leveraging the attentional weight term ensured that this noise was not introduced into the system.
+If this is the case, it would be intersting to see how large a dataset is required to not need to modify the attentional weight term.
+However even if this is the case, the random permutation model would not be fixed by larger dataset sizes,
+since this model simply adds environment vectors to produce the current context vector and has no mechanism (unlike Bayesian normalization) for weighting the contribution of an environment vector.
 
-It seems likely that the entropy method for computing the attentional weight term $W_{j}$ may be applicable to other declarative memory tasks.
-The entropy method is parameter-free (unlike the frequency-filtering method), completely data driven (much like the co-occurrence matrix), does not require tuning,
-and substantially increases model accuracy for these datasets.
-It is common to handle stop words in some manner when working with Natural Language Processing (NLP) and large text corpuses.
-So, if these large corpuses are used to test declarative memory,
-then the entropy method may be a more cognitively plausible way of dealing with stop words rather than filtering based on a predetermined list or the frequency count in the dataset.
+Another explanation for the Bayesian model is that additional attential weighting was needed because the contextual matrix was derived only from word by tag co-occurrences and not (word or tag) by (word or tag) co-occurences.
+This was done for performance reasons as the computational complexity otherwise is simply too high for current hardware.
+It is possible that by adding all pairwise combinations of both words and tags in the posts may soften and stabilize the contribution of stop words when computing contextual activation for a tag, given current context.
+
+\subsubsection{Prior Component}
 
 Adding a prior component to the random permutation model also increased model accuracy for both StackOverflow and Twitter.
 It is unsurprising that this occurred.
@@ -1377,7 +1399,9 @@ Several different formalisms for ACT-R's attentional weighting term were also ex
 Finally, this work has helped raise the question about how co-occurrence observations are represented at the neural level, since two models with quite different representations performed similarly well.
 The results from the study and the new research questions raised will help to better understand how imposing specific architectural constraints on memory models influence what information is retrieved.
 
+\subsection{Support Code}
 
+All software code created for this research is publicly available on GitHub \parencite{StanleyRepo2014}.
 
 
 \clearpage
