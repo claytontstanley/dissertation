@@ -280,12 +280,14 @@ computeActPrior <- function(hashtags, dtP, cTime, d) {
 getModelHashtagsTbl <- function(partialRes) {
 	debugPrint(partialRes)
 	#myLog('setting key for partial table')
-	setkeyv(partialRes, c('user_screen_name','dt','hashtag','d'))
+	setkeyv(partialRes, c('user_screen_name','dt','hashtag','d', 'dtP'))
 	#myLog('computing activations across table')
+	#FIXME: Add hybrid model
 	res = partialRes[, list(N=.N,
 				actPriorStd=log(sum(partialAct)),
 				actPriorStdNoffset=log(sum(partialAct)),
-				actPriorOL2=if (is.na(d[1])) numeric(0) else if (d[1]>=1) NaN else log(.N/(1-d))-d*log(max(dtP))), keyby=list(user_screen_name, dt, hashtag, d)]
+				actPriorOL2=if (is.na(d[1])) numeric(0) else if (d[1]>=1) NaN else log(.N/(1-d))-d*log(max(dtP)),
+				actPriorHybrid=0), keyby=list(user_screen_name, dt, hashtag, d)]
 	with(res, myStopifnot(!is.infinite(actPriorStd)))
 	with(res, myStopifnot(!is.infinite(actPriorOL2)))
 	res
@@ -3856,7 +3858,8 @@ curWS <- function() {
 	logregTbl = buildTablesLogreg(file_path_sans_ext(Filter(function(r) isContextRun(r), list.files(path=getDirLogreg()))))
 	modelVsPredTbl = buildTables(file_path_sans_ext(Filter(isPUserRun, list.files(path=getDirModelVsPred()))))
 	modelHashtagsTbls = buildTablesModelHashtags(file_path_sans_ext(Filter(isContextRun, list.files(path=getDirModelHashtags()))))
-
+	runGenAndSaveCurWorkspaceg1s6()
+	runSO1k()
 	modelHashtagsTbl = modelHashtagsTbls[["TContextPerm-20g1s1r1"]]
 	modelVsPredTbl
 	sjiTblTOrderless
