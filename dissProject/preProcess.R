@@ -287,9 +287,29 @@ getModelHashtagsTbl <- function(partialRes) {
 				actPriorStd=log(sum(partialAct)),
 				actPriorStdNoffset=log(sum(partialAct)),
 				actPriorOL2=if (is.na(d[1])) numeric(0) else if (d[1]>=1) NaN else log(.N/(1-d))-d*log(max(dtP)),
-				actPriorHybrid=0), keyby=list(user_screen_name, dt, hashtag, d)]
+				actPriorHybrid1=getHybridAct(partialAct, dtP, k=1, d),
+				actPriorHybrid5=getHybridAct(partialAct, dtP, k=5, d),
+				actPriorHybrid10=getHybridAct(partialAct, dtP, k=10, d)), keyby=list(user_screen_name, dt, hashtag, d)]
 	with(res, myStopifnot(!is.infinite(actPriorStd)))
 	with(res, myStopifnot(!is.infinite(actPriorOL2)))
+	with(res, myStopifnot(!is.infinite(actPriorHybrid1)))
+	res
+}
+
+getHybridAct <- function(partialAct, dtP, k, d) {
+	if (length(partialAct) == 0) {
+		return(log(sum(partialAct)))
+	}
+	n = length(partialAct)
+	tn = dtP[n] 
+	tk = dtP[min(k, n)]
+	res = sum(partialAct[1:min(k, n)])
+	rest = 0
+	if (tn > tk) {
+		rest = (n - k) * (tn^(1-d) - tk^(1-d)) / ( (1-d) * (tn - tk) )
+	}
+	res = res + rest
+	res = log(res)
 	res
 }
 
@@ -923,7 +943,7 @@ defaultPConfig = list(makeSjiTblUser='makeSjiTblUserDefault',
 
 defaultSOSjiPConfig = modConfig(c(defaultSOConfig, defaultSjiConfig, defaultPConfig,
 				  list(runTbl=makeRunTbl(list()))),
-				list(actDVs = c('actPriorStd', 'actPriorOL2'),
+				list(actDVs = c('actPriorStd', 'actPriorOL2', 'actPriorHybrid1', 'actPriorHybrid5', 'actPriorHybrid10'),
 				     computeActFromContextTbl='computeActNullFromContextTbl',
 				     priorTbl = 'priorTblUserSubset',
 				     dStd = 'dFull',
@@ -932,7 +952,7 @@ defaultSOSjiPConfig = modConfig(c(defaultSOConfig, defaultSjiConfig, defaultPCon
 
 defaultTSjiPConfig = modConfig(c(defaultTConfig, defaultSjiConfig, defaultPConfig,
 				 list(runTbl=makeRunTbl(list()))),
-			       list(actDVs=c('actPriorStd', 'actPriorOL2'),
+			       list(actDVs=c('actPriorStd', 'actPriorOL2', 'actPriorHybrid1', 'actPriorHybrid5', 'actPriorHybrid10'),
 				    computeActFromContextTbl='computeActNullFromContextTbl',
 				    tokenizedTbl = 'tweets_tokenized',
 				    priorTbl = 'priorTblUserSubset',

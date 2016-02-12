@@ -19,7 +19,7 @@ computeActPriorByUser <- function(hashtagsTbl, ds) {
 
 test_that("testPriorActivations", {
 	  sortExpectedTbl <- function(tbl) {
-		  cols = c('user_screen_name', 'dt', 'hashtag', 'd', 'N', 'act', 'actOffset', 'actOL2', 'actHybrid')
+		  cols = c('user_screen_name', 'dt', 'hashtag', 'd', 'N', 'act', 'actOffset', 'actOL2', 'actHybrid1', 'actHybrid5', 'actHybrid10')
 		  setcolorder(tbl, cols) 
 		  setkeyv(tbl, cols) 
 		  tbl
@@ -30,7 +30,10 @@ test_that("testPriorActivations", {
 						      act=c(log(2^(-.5)), log(3^(-.5)), log(1), log(4^(-.5)+1), log(2^(-.5))),
 						      actOffset=c(log(2^(-.5)), log(3^(-.5)), log(1), log(4^(-.5)+1), log(2^(-.5))),
 						      actOL2=c(log(1/.5)-.5*log(2), log(1/.5)-.5*log(3), log(1/.5)-.5*log(1), log(2/.5)-.5*log(4), log(1/.5)-.5*log(2)),
-						      actHybrid=0))
+						      actHybrid1=c(log(2^(-.5)), log(3^(-.5)), log(1), log(1*(4^(.5)-1^(.5))/ ( (1-.5) * (4 - 1) ) + 1), log(2^(-.5))),
+						      actHybrid5=c(log(2^(-.5)), log(3^(-.5)), log(1), log(4^(-.5)+1), log(2^(-.5))),
+						      actHybrid10=c(log(2^(-.5)), log(3^(-.5)), log(1), log(4^(-.5)+1), log(2^(-.5)))
+						      ))
 	  actTbl = computeActPriorByUser(testHashtagsTbl, d=.5)
 	  expect_that(actTbl, is_equivalent_to(expectedActTbl))
 
@@ -39,21 +42,29 @@ test_that("testPriorActivations", {
 						      act=c(log(2^(-.5)), log(3^(-.5))),
 						      actOffset=c(log(2^(-.5)), log(3^(-.5))),
 						      actOL2=c(log(1/.5)-.5*log(2), log(1/.5)-.5*log(3)),
-						      actHybrid=0))
+						      actHybrid1=c(log(2^(-.5)), log(3^(-.5))),
+						      actHybrid5=c(log(2^(-.5)), log(3^(-.5))),
+						      actHybrid10=c(log(2^(-.5)), log(3^(-.5)))
+						      ))
 	  actTbl = computeActPriorByUser(testHashtagsTbl, d=.5)
 	  expect_that(actTbl, is_equivalent_to(expectedActTbl))
 
 	  testHashtagsTbl = data.table(user_screen_name=c(1,1), dt=c(0,2), hashtag=c('a','b'))
+	  testHashtagsTbl
 	  expectedActTbl = sortExpectedTbl(data.table(dt=c(2,2,2,2), hashtag=c('a','a','a','a'), d=c(.2,.3,.4,.5),
 						      user_screen_name=c(1,1,1,1), N=c(1,1,1,1),
 						      act=c(log(2^(-.2)), log(2^(-.3)), log(2^(-.4)), log(2^(-.5))),
 						      actOffset=c(log(2^(-.2)), log(2^(-.3)), log(2^(-.4)), log(2^(-.5))),
 						      actOL2=sapply(c(.2,.3,.4,.5), function(d) log(1/(1-d))-d*log(2)),
-						      actHybrid=0))
+						      actHybrid1=c(log(2^(-.2)), log(2^(-.3)), log(2^(-.4)), log(2^(-.5))),
+						      actHybrid5=c(log(2^(-.2)), log(2^(-.3)), log(2^(-.4)), log(2^(-.5))),
+						      actHybrid10=c(log(2^(-.2)), log(2^(-.3)), log(2^(-.4)), log(2^(-.5)))
+						      ))
 	  actTbl = computeActPriorByUser(testHashtagsTbl, d=c(.2,.3,.4,.5))
 	  expect_that(actTbl, is_equivalent_to(expectedActTbl))
 
 	  testHashtagsTbl = data.table(user_screen_name=c(1,1,1), dt=c(0,2,3), hashtag=c('a','b','c'))
+	  testHashtagsTbl
 	  expectedActTbl = sortExpectedTbl(data.table(dt=c(2,3,3,2,3,3), hashtag=c('a','a','b','a','a','b'), d=c(.5,.5,.5,.4,.4,.4),
 						      user_screen_name=c(1,1,1,1,1,1), N=c(1,1,1,1,1,1),
 						      act=c(log(2^(-.5)), log(3^(-.5)), log(1^(-.5)),
@@ -62,7 +73,13 @@ test_that("testPriorActivations", {
 								  log(2^(-.4)), log(3^(-.4)), log(1^(-.4))),
 						      actOL2=c(log(1/.5)-.5*log(2), log(1/.5)-.5*log(3), log(1/.5)-.5*log(1),
 							       log(1/(1-.4))-.4*log(2), log(1/(1-.4))-.4*log(3), log(1/(1-.4))-.4*log(1)),
-						      actHybrid=0))
+						      actHybrid1=c(log(2^(-.5)), log(3^(-.5)), log(1^(-.5)),
+								   log(2^(-.4)), log(3^(-.4)), log(1^(-.4))),
+						      actHybrid5=c(log(2^(-.5)), log(3^(-.5)), log(1^(-.5)),
+								   log(2^(-.4)), log(3^(-.4)), log(1^(-.4))),
+						      actHybrid10=c(log(2^(-.5)), log(3^(-.5)), log(1^(-.5)),
+								    log(2^(-.4)), log(3^(-.4)), log(1^(-.4)))
+						      ))
 	  actTbl = computeActPriorByUser(testHashtagsTbl, d=c(.5,.4))
 	  expect_that(actTbl, is_equivalent_to(expectedActTbl))
 
@@ -73,6 +90,32 @@ test_that("testPriorActivations", {
 	  testHashtagsTbl = data.table(user_screen_name=c(1,2,2), dt=c(0,0,2), hashtag=c('a','a','a'))
 	  expectedActTbl = data.table(dt=2,hashtag='a',d=.5,user_screen_name=2,N=1,act=log(2^(-.5)))
 	  expect_that(computeActPriorByUser(testHashtagsTbl, d=.5), throws_error())
+
+	  testHashtagsTbl = data.table(user_screen_name=c(1), dt=c(0,1,2,3,4,5,6,7), d=.5, hashtag='a')
+	  testHashtagsTbl
+	  sumAct = function(n) sum((1:n) ^(-.5))
+	  olN = function(n) log(n/(1-.5)) - .5*log(n)
+	  restAct = function(n, k) (n - k) * (n^(1-.5) - k^(1-.5)) / (1-.5) / (n - k)
+	  expectedActTbl = sortExpectedTbl(data.table(dt=c(1,2,3,4,5,6,7), hashtag='a', d=.5,
+						      user_screen_name=1, N=c(1,2,3,4,5,6,7),
+						      act=log(c(sumAct(1), sumAct(2), sumAct(3), sumAct(4), sumAct(5), sumAct(6), sumAct(7))),
+						      actOffset=log(c(sumAct(1), sumAct(2), sumAct(3), sumAct(4), sumAct(5), sumAct(6), sumAct(7))),
+						      actOL2=c(olN(1), olN(2), olN(3), olN(4), olN(5), olN(6), olN(7)),
+						      actHybrid1=log(c(sumAct(1),
+								       sumAct(1) + restAct(2, 1),
+								       sumAct(1) + restAct(3, 1),
+								       sumAct(1) + restAct(4, 1),
+								       sumAct(1) + restAct(5, 1),
+								       sumAct(1) + restAct(6, 1),
+								       sumAct(1) + restAct(7, 1))),
+						      actHybrid5=log(c(sumAct(1), sumAct(2), sumAct(3), sumAct(4), sumAct(5),
+								       sumAct(5) + restAct(6, 5),
+								       sumAct(5) + restAct(7, 5))),
+						      actHybrid10=log(c(sumAct(1), sumAct(2), sumAct(3), sumAct(4), sumAct(5), sumAct(6), sumAct(7)))))
+	  actTbl = computeActPriorByUser(testHashtagsTbl, d=c(.5))
+	  actTbl
+	  expect_that(actTbl, is_equivalent_to(expectedActTbl))
+
 })
 
 test_that("testGetTokenizedTbl", {
