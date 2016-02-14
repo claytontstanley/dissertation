@@ -592,7 +592,7 @@ A custom tokenization algorithm created by \textcite{Owoputi2013} was used to ch
 This algorithm was specifically created for tokenizing Twitter content.
 However, during testing it was also found to be robust and well-suited for StackOverflow content.
 The initial model results with the new tokenizer were qualitatively similar to the model results found in \textcite{Stanley2013} where the Python Natural Language Processing (NLP) toolkit \parencite{Bird2009} was used.
-So the same tokenization algorithm from \textcite{Owoputi2013} was used for both StackOverflow and Twitter to make comparisons across datasets more equitable.
+The same tokenization algorithm from \textcite{Owoputi2013} was used for both StackOverflow and Twitter to make comparisons across datasets more equitable.
 
 \subsection{Stemming}
 
@@ -600,6 +600,9 @@ So the same tokenization algorithm from \textcite{Owoputi2013} was used for both
 With the StackOverflow dataset however, it is also possible to convert synonym tags to canonical base tags, since the community maintains a tag-synonym database.
 This can be thought of as semantic stemming, where two words with identical meaning are converted to the same canonical word.
 So tags used for the post were converted to their root tag when possible.
+This does make the decision process easier for the StackOverflow dataset.
+However, we chose to include this to help ensure that model predictions would stabilize.
+This provided the best opportunity to reliably observe differences in accuracy when altering the models. 
 
 \subsection{Testing for Reliable Differences}
 
@@ -847,6 +850,7 @@ When a user creates a tag for a post, a retrieval request for the model is made.
 For each request, the model returns a set of tags (all tags that have been observed for that user in the past) and activations associated with each tag.
 An activation value is computed for each model component (e.g., prior tag use, context) for each tag.
 These values are recorded, and tag instances that match what the author actually tagged are marked as a 1, while all others are marked with a 0.
+When an author used multiple tags for a post, multiple 1s are marked for that post.
 This process is repeated across all posts where a user chooses a tag, and across all users in the dataset.
 Once all of the results are aggregated, a logistic regression is run where the optimal weights for each model component are found that maximize the model's ability to correctly label tags as 0 or 1 based on total activation.
 
@@ -1116,6 +1120,8 @@ it is difficult to make any specific recommendations as far as exact transition 
 Also, it is likely that the specific domain being studied interacts with the factors already mentioned to determine which model is better for that domain.
 Nevertheless, if a researcher is working in a domain with limited data (e.g., small corpus size, large tag space) that produces a sparse co-occurrence matrix,
 then it may be worthwhile to experiment with using a compressed random permutation model instead of the full Bayesian model.
+Also newer models of $S_{ji}$ have been introduced that have a more local impact when a new chunk is observed (\parencite{thomson2013constraining}).
+It would also be interesting to see how these local models of $S_{ji}$ perform while varying the number of observed associations.
 
 \subsection{Combining Prior and Context}
 
@@ -1375,30 +1381,33 @@ Ideally, both components would be customized to the individual, and it remains a
 The Bayesian declarative memory model for ACT-R has an attentional weight term $W_{j}$ that can be used to attenuate or remove stop words.
 The random permutation model was also easily modified to have an attentional weight term by attenuating each word's set of ones and negative ones values by that word's attentional weight.
 Both a method for stop-word removal (frequency filtering) and stop-word attenuating (entropy weighting) performed well for both models.
-Also, using a proper method for handling the low-predictor words produced some of the largest improvements in model accuracy compared to the other explorations
-(e.g., compared to word order or properly adding terms).
-Since the ACT-R declarative memory theory already has a component for attentional weight, it may be the case that the neural system performs some form of stop-word weighting when computing activations,
-and this is reflected in the attentional weight term.
-That is, $W_{j}$ can be defined mathematically, has the same general form across tasks, and both the frequency-filtering and entropy-weighting methods for stop-word removal are possible first candidates for the definition.
 
-However, there may be other ways besides adjusting the attentional weight that these models can be modified to achieve the same performance improvement.
+It is unclear at this point if this modification is cognitively plausible, even if the modification was cleanly added to the current ACT-R model.
+What can be said from this research is that using a proper method for handling the low-predictor words produced some of the largest improvements in model accuracy compared to the other explorations
+(e.g., compared to word order or properly adding terms).
+Consequently, it may be worthwhile to explore this area more thoroughly with further research.
+
+Also, there may be other ways besides adjusting the attentional weight that these models can be modified to achieve the same performance improvement.
 The entropy weighting term is likely solving a problem that resides only in contextual activation and not prior activation,
 since the activation for the prior component for each word is independent of the presentation of other words, so stop words have no way to interact with tag prior activation in this case.
 
-One alternative explanation is that the entropy weighting measure was needed for this research because the contextual co-occurrence matrix was not yet stable, even with these large dataset sizes.
+One alternative explanation is that the entropy weighting measure was needed because the contextual co-occurrence matrix was not yet stable, even with these large dataset sizes.
 If the matrix was not yet stable, then by chance certain stop words would contribute more net activation to specific tags and introduce noise into the retrieval process for that tag.
 So further weighting the contribution of these stop words by leveraging the attentional weight term ensured that this noise was suppressed in the system.
 If this is the case, it would be interesting to see how large a dataset is required to not need to modify the attentional weight term.
-However even if this is the case, the random permutation model would not be fixed by larger dataset sizes,
+However even if this is the case, the random permutation model would still require entropy weighting for larger dataset sizes,
 since this model simply adds environment vectors to produce the current context vector and has no mechanism (unlike Bayesian normalization) for weighting the contribution of an environment vector.
 
 Another explanation for the Bayesian model is that additional attentional weighting was needed because the contextual matrix was derived only from word by tag co-occurrences and not (word or tag) by (word or tag) co-occurrences.
 This was done for performance reasons as the computational complexity otherwise is simply too high for current hardware.
 It is possible that by adding all pairwise combinations of both words and tags in the posts may soften and stabilize the contribution of stop words when computing contextual activation for a tag, given current context.
 
+Also perhaps a different $S_{ji}$ model may not need entropy weighing at all (e.g., the Hebbian-inspired associative learning model described in \textcite{thomson2013constraining}).
+Further research could explore how entropy weighting interacts with other models of $S_{ji}$, and not just the random permutation and full Bayesian model.
+
 Nonetheless, it seems likely that the entropy method for computing the attentional weight term $W_{j}$ may be applicable to other declarative memory tasks.
 The entropy method is parameter-free (unlike the frequency-filtering method), completely data driven (much like the co-occurrence matrix), does not require tuning,
-and substantially increases model accuracy for these datasets.
+and increases model accuracy for these datasets.
 It is common to handle stop words in some manner when working with Natural Language Processing (NLP) and large text corpuses.
 So, if these large corpuses are used to test declarative memory,
 then the entropy method may be a more cognitively plausible way of dealing with stop words rather than filtering based on a predetermined list or the frequency count in the dataset.
