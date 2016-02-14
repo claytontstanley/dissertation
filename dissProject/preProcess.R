@@ -29,6 +29,8 @@ library(digest)
 library(parallel)
 library(heplots)
 
+wideScreen(350)
+
 PATH = getPathToThisFile()
 FILE = getNameOfThisFile()
 
@@ -1840,6 +1842,13 @@ analyzePrior <- function(modelVsPredTbl) {
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostPriorStd' & datasetName=='SOQgt500r2'])
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostPriorOL2' & datasetName=='TFollowgt10Mr2' & d < 1])
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostPriorOL2' & datasetName=='SOQgt500r2' & d < 1])
+	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostPriorHybrid1' & datasetName=='SOQgt500r2' & d < 1])
+	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostPriorHybrid5' & datasetName=='SOQgt500r2' & d < 1])
+	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostPriorHybrid10' & datasetName=='SOQgt500r2' & d < 1])
+	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostPriorHybrid1' & datasetName=='TFollowgt10Mr2' & d < 1])
+	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostPriorHybrid5' & datasetName=='TFollowgt10Mr2' & d < 1])
+	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostPriorHybrid10' & datasetName=='TFollowgt10Mr2' & d < 1])
+	modelVsPredTbl[, .N, DVName]
 	resTbl = compareOptimalDs(tbl[DVName %in% c(paste0('topHashtagPostPriorStd', c('')), paste0('topHashtagPostPriorOL2', c(''))) & runNum == 2 & predUsedBest == T])
 	resTbl[, mean(meanVal), DVName]
 	#tbl[d == 0.5 & !maxNP, DVName := paste0(DVName, 'DefaultD')]
