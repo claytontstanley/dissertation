@@ -603,9 +603,8 @@ So tags used for the post were converted to their root tag when possible.
 
 \subsection{Testing for Reliable Differences}
 
-Confidence intervals were used throughout for statistical inference instead of explicit p-values.
-This was done because it is a more straightforward way to visualize all of the mean differences in accuracy (i.e., bar and line plots with a visual indication of the error) for each of the models, which eases interpretation
-(similar to the argument made by FIXME:textcite).
+In similar spirit to \textcites{masson2003using, tryon2001evaluating}, confidence intervals were used throughout for statistical inference instead of explicit p-values.
+This was done because it is a more straightforward way to visualize all of the mean differences in accuracy (i.e., bar and line plots with a visual indication of the error) for each of the models, which eases interpretation.
 It is also a conservative estimate of reliability, as using confidence intervals on the means essentially ignores the fact that this is a within-subjects design, where accuracy for each model is measured for each subject in each dataset.
 However, we would rather err on the side of making the results easier to interpret at the cost of using conservative estimates for reliability
 (i.e., use error bars overlaid on a visualization of the means instead of statistical tests on every combination of difference scores).
@@ -758,7 +757,7 @@ The median was used since there were users in the popular-users dataset that did
 Using the median effectively trims these unstable values from the sample, without having to define a cut point for an outlier removal process.
 
 Aggregate best-fit decay rate values for each model are included in Figure \ref{figPriorDecay}.
-Decay rate values that produced the most accurate model performance are lower for the optimized learning form (\num{.43}) of $B_{i}$ compared to both the the standard form (\num{.80}) and hybrid form (\num{.80} for all $k$).
+Decay rate values that produced the most accurate model performance are lower for the optimized learning form (\num{.43}) of $B_{i}$ compared to both the standard form (\num{.80}) and hybrid form (\num{.80} for all $k$).
 The optimal values for optimized learning are near \num{0.5}, which lines up with default value used in ACT-R.
 
 \begin{figure}[!htbp]
@@ -796,11 +795,11 @@ The standard form of $B_{i}$ is able to more accurately account for these trends
 \end{figure}
 
 Accuracy for the hybrid form for the largest $k$ ($k=10$) is slightly higher than the smallest $k$ ($k=1$) (\numNoZero{.334} vs. \numNoZero{.329} \myCI{.0026}{.0023}{.0029}{3608}).
-However accuracy cannot be distinguished between the hybrid form with the largest $k$ and the standard form (\numNoZero{.334} vs. \numNoZer{.334} \myCI{.0000}{-.0000}{.0001}{3609}).
+However accuracy cannot be distinguished between the hybrid form with the largest $k$ and the standard form (\numNoZero{.334} vs. \numNoZero{.334} \myCI{.0000}{-.0000}{.0001}{3609}).
 This indicates that for the datasets analyzed in this study that the hybrid form with $k=10$ is a suitable replacement to the standard form (produces the same results) and uses less computational resources than the standard form. 
 
 ACT-R sets the default decay rate value to \num{0.5}, and the best-fit value for the standard form is higher (\num{0.8}) for these datasets.
-The figure shows that although model accuracy does slightly improve (\num{0.325} to \num{0.335} \myCi{.0029}{.0022}{.0036}{3609}) for the standard form when increasing the decay rate parameter from \num{0.5} to the optimal value,
+The figure shows that although model accuracy does slightly improve (\num{0.325} to \num{0.335} \myCI{.0029}{.0022}{.0036}{3609}) for the standard form when increasing the decay rate parameter from \num{0.5} to the optimal value,
 that percentage improvement is not as large (\num{0.28} to \num{0.33}) as the improvement gained from using the standard form compared to the optimized learning form.
 Nonetheless, model accuracy is highest when both the standard form is used and the decay rate value is increased. 
 
@@ -1307,7 +1306,7 @@ Another possibility is that this is not a declarative memory process at all.
 In particular, it is important to note that tagging on these sites is widely used as a method to communicate specific messages to specific groups of people in the community.
 It is unclear how much this environment overlaps with verbal communication between two people, and the declarative memory requests required to successfully communicate in this setting.
 Nonetheless, these models are reasonably accurate in this setting, particularly for StackOverflow.
-Given the results in this research, it at least seems worthwhile to use these publicly-available tagging environments as a resonable proxy and testbed to explore and validate modifications to the current theory.
+Given the results in this research, it at least seems worthwhile to use these publicly-available tagging environments as a reasonable proxy to explore and validate modifications to the current theory.
 Any insights gained could be followed up with a more precisely controlled experimental design.
 
 \subsubsection{Representation}
@@ -1367,7 +1366,7 @@ where the majority of the observations are taken from a generic domain (e.g., am
 \subsubsection{Individual vs. Group Representation of Memory}
 
 Even with the large datasets used in this research, there was not enough data on each individual user to build up separate co-occurrence matrices for them.
-That is, the context component of the declarative memory models used in this resaerch was formed as a collection of observed co-occurrences across all individuals.
+That is, the context component of the declarative memory models used in this research was formed as a collection of observed co-occurrences across all individuals.
 Nonetheless, the prior component for the models was customized for each individual (except in the Twitter popular hashtags dataset when it was not possible).
 Ideally, both components would be customized to the individual, and it remains an open question how much accuracy is influenced by using an aggregate or custom context component in the models.
 
@@ -1389,11 +1388,11 @@ since the activation for the prior component for each word is independent of the
 One alternative explanation is that the entropy weighting measure was needed for this research because the contextual co-occurrence matrix was not yet stable, even with these large dataset sizes.
 If the matrix was not yet stable, then by chance certain stop words would contribute more net activation to specific tags and introduce noise into the retrieval process for that tag.
 So further weighting the contribution of these stop words by leveraging the attentional weight term ensured that this noise was suppressed in the system.
-If this is the case, it would be intersting to see how large a dataset is required to not need to modify the attentional weight term.
+If this is the case, it would be interesting to see how large a dataset is required to not need to modify the attentional weight term.
 However even if this is the case, the random permutation model would not be fixed by larger dataset sizes,
 since this model simply adds environment vectors to produce the current context vector and has no mechanism (unlike Bayesian normalization) for weighting the contribution of an environment vector.
 
-Another explanation for the Bayesian model is that additional attential weighting was needed because the contextual matrix was derived only from word by tag co-occurrences and not (word or tag) by (word or tag) co-occurences.
+Another explanation for the Bayesian model is that additional attentional weighting was needed because the contextual matrix was derived only from word by tag co-occurrences and not (word or tag) by (word or tag) co-occurrences.
 This was done for performance reasons as the computational complexity otherwise is simply too high for current hardware.
 It is possible that by adding all pairwise combinations of both words and tags in the posts may soften and stabilize the contribution of stop words when computing contextual activation for a tag, given current context.
 
@@ -1430,7 +1429,7 @@ and also the specific activation calculation that is carried out by the system.
 \subsubsection{Observational vs. Experimental Design}
 
 All data used for this study were collected from publicly-available datasets and were not subject to an experimental design (i.e., observational data).
-There are advantages and disadvantes to both observational and experimental designs.
+There are advantages and disadvantages to both observational and experimental designs.
 One primary advantage with the observational approach here is size and availability: data for millions of posts and tweets are immediately available for analysis.
 However one disadvantage is that there is no way to probe a user at a particular point in time, which could be quite advantageous if possible.
 One hybrid approach worth considering for future research is to use the publicly available datasets to build up a representation of declarative memory for each user.
