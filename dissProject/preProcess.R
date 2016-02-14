@@ -1645,9 +1645,15 @@ renameColDVName <- function(tbl) {
 	setkey(tbl, DVName)
 	mapping = c('topHashtagAcrossPriorStd', 'Standard prior model relaxed across posts',
 		    'topHashtagPostPriorStd', 'Standard prior model',
+		    'topHashtagPostPriorHybrid1', 'Hybrid model with k=01',
+		    'topHashtagPostPriorHybrid5', 'Hybrid model with k=05',
+		    'topHashtagPostPriorHybrid10', 'Hybrid model with k=10',
 		    'topHashtagPostPriorStdDefaultD', 'Standard prior model at default d=0.5',
 		    'topHashtagPostPriorStdBestDStd', 'Standard prior model at best-fit d=0.8',
 		    'topHashtagPostPriorOL2BestDOL', 'Optimized learning model at best-fit d=0.4',
+		    'topHashtagPostPriorHybrid1BestDStd', 'Hybrid model at best-fit d=0.8 with k=01',
+		    'topHashtagPostPriorHybrid5BestDStd', 'Hybrid model at best-fit d=0.8 with k=05',
+		    'topHashtagPostPriorHybrid10BestDStd', 'Hybrid model at best-fit d=0.8 with k=10',
 		    'topHashtagPostPriorOL2', 'Optimized learning model',
 		    'topHashtagAcrossPriorStdNoffset', 'Standard prior model relaxed across posts without offset',
 		    makeLogregMapping(),
@@ -1849,7 +1855,8 @@ analyzePrior <- function(modelVsPredTbl) {
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostPriorHybrid5' & datasetName=='TFollowgt10Mr2' & d < 1])
 	visModelVsPredTbl(modelVsPredTbl[DVName=='topHashtagPostPriorHybrid10' & datasetName=='TFollowgt10Mr2' & d < 1])
 	modelVsPredTbl[, .N, DVName]
-	resTbl = compareOptimalDs(tbl[DVName %in% c(paste0('topHashtagPostPriorStd', c('')), paste0('topHashtagPostPriorOL2', c(''))) & runNum == 2 & predUsedBest == T])
+	resTbl = compareOptimalDs(tbl[DVName %in% c('topHashtagPostPriorStd', 'topHashtagPostPriorOL2',
+						    'topHashtagPostPriorHybrid1', 'topHashtagPostPriorHybrid5', 'topHashtagPostPriorHybrid10') & runNum == 2 & predUsedBest == T])
 	resTbl[, mean(meanVal), DVName]
 	#tbl[d == 0.5 & !maxNP, DVName := paste0(DVName, 'DefaultD')]
 	#tbl = rbind(tbl, tbl[d == 0.5 & maxNP][, DVName := paste0(DVName, 'DefaultD')])
@@ -1858,8 +1865,18 @@ analyzePrior <- function(modelVsPredTbl) {
 	tbl2[d == .5, DVName := paste0(DVName, 'DefaultD')]
 	tbl2[d == .4, DVName := paste0(DVName, 'BestDOL')]
 	tbl2[d == .8, DVName := paste0(DVName, 'BestDStd')]
-	DVNames = c('topHashtagPostPriorStdDefaultD', 'topHashtagPostPriorOL2BestDOL', 'topHashtagPostPriorStdBestDStd')
+	DVNames = c('topHashtagPostPriorStdDefaultD', 'topHashtagPostPriorOL2BestDOL', 'topHashtagPostPriorStdBestDStd',
+		    'topHashtagPostPriorHybrid1BestDStd', 'topHashtagPostPriorHybrid5BestDStd', 'topHashtagPostPriorHybrid10BestDStd')
 	resTbl = compareOptimalAcc(tbl2[DVName %in% DVNames & runNum == 2])
+	resTbl
+	tbl2
+
+	tbl2[DVName %in% DVNames & runNum == 2
+	     ][, groupNum := 'def'
+	     ][, getWithinCI(.SD)
+	     ][grepl('StdDefaultD.*StdBestD', name) | grepl('OL2BestD.*StdBestD', name) | grepl('1BestD.*10BestD', name) | grepl('10BestD.*StdBestD', name)
+	     ]
+
 	resTbl
 	resTbl[, dsetType := 'twitter']
 	resTbl
@@ -2003,13 +2020,16 @@ analyzeFB <- function() {
 getWithinCI <- function(cTbl) {
 	dvTbl = cTbl[, .N, DVName][, data.table(t(combn(DVName, 2, simplify=T)))]
 	dvTbl
-	wTbl = cTbl[, dcast.data.table(.SD, datasetName + runNum + groupNum ~ DVName, value.var='acc')]
+	cTbl
+	wTbl = cTbl[, dcast.data.table(.SD, datasetName + runNum + groupNum + user_screen_name ~ DVName, value.var='acc')]
+	wTbl
 	dvTbl[, rowID := 1:.N]
 	wTbl[, runNum]
 	dvTbl[, name := sprintf('%s - %s', V1, V2)]
 	dvTbl
 	dvTbl[, .(wTbl[, V1, with=F][[1]]), rowID]
 	dvTbl[, .(delta=wTbl[, V1, with=F][[1]] - wTbl[, V2, with=F][[1]]), name
+	      ][!is.na(delta)
 	      ][, as.list(c(CI(delta), N=.N)), name
 	      ]
 }
@@ -2054,7 +2074,8 @@ analyzeContext <- function(modelVsPredTbl) {
 	fit = aov(acc ~ DVName * groupNum, data=fooTbl)
 	summary(fit)
 	etasq(fit, anova=T, partial=F)
-	
+
+
 	# RESULT: Freq weighting is better than entropy weighting for RP, and standard stoplist doesn't work well at all
 	# SO compare entropy to stoplist to freq to frentropy
 	DVNames = asTopHashtagAcross(c('PriorStd', 'TitleOrderlessEntropy', 'TitleOrderless', 'TitleOrderlessStoplist', 'TitleOrderlessFreq', 'TitleOrderlessFrentropy',
@@ -2086,6 +2107,7 @@ analyzeContext <- function(modelVsPredTbl) {
 	    ][grepl('PriorStdTweetOrderTweetOrderless', name)
 	    ]
 	resTbl
+
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTitleBody', 'PriorStdTitleFrentropyBodyFrentropy', 'Title',
 				       'TitleNentropy', 'TitleFreq', 'TitleFrentropy', 'PriorStdTitleNentropyBodyNentropy', 'PriorStdTitleFreqBodyFreq',
 				       'Body', 'BodyNentropy', 'BodyFreq', 'BodyFrentropy'))
@@ -2097,6 +2119,7 @@ analyzeContext <- function(modelVsPredTbl) {
 	    ][grepl('PriorStdTitleNentropyBodyNentropy', name)
 	    ]
 	resTbl
+
 	# T compare entropy to stoplist to freq to frentropy
 	DVNames = asTopHashtagAcross(c('PriorStd', 'PriorStdTweet', 'PriorStdTweetFrentropy', 'Tweet',
 				       'TweetNentropy', 'TweetFreq', 'TweetFrentropy', 'PriorStdTweetNentropy', 'PriorStdTweetFreq'))
@@ -2107,6 +2130,7 @@ analyzeContext <- function(modelVsPredTbl) {
 	    ][grepl('PriorStdTweetNentropy', name)
 	    ]
 	resTbl
+
 	# RESULT: Bayes and RP with frequency cutoff scales; RP with entropy saturates for SO
 	# SO Entropy all sizes
 	DVNames = asTopHashtagAcross(c('PriorStdTitleBody', 

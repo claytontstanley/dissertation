@@ -636,20 +636,25 @@ The base-level activation component from the full ACT-R declarative memory model
       \hline
       Base-Level Activation &	$B_{i} = log \sum_{j=1}^{n} {t_{j}}^{-d}$ \\
       Optimized Learning &	$B_{i} = log \frac{n}{1-d} - d * log L$ \\
+      Hybrid &			$B_{i} = log \big[ \sum_{j=1}^{k} {t_{j}}^{-d} + \frac{(n-k)(t_{n}^{1-d}-t_{k}^{1-d})}{(1-d)(t_{n}-t_{k})} \big]$ \\
       \hline
     \end{tabu}
   }
 \end{table}
 
-Both terms are methods for computing the base-level activation ($B_{i}$) of a chunk in declarative memory.
+
+All three terms are methods for computing the base-level activation ($B_{i}$) of a chunk in declarative memory.
 The standard form has a time dependence and accounts for the fact that the rate of presentations for a given object (e.g., the word ``loop'') can change over time.
 The optimized learning form assumes that this rate is constant.
+The hybrid form is a blend of the standard and optimized form where activation for the most recent $k$ observations are computed using the standard form and the rest use the optimized form.
 
-For both equations, $i$ represents each chunk (e.g., the word ``loop''), $j$ is a specific observation for a chunk (e.g., the 2nd time that ``loop'' appears), and $n$ is the number of times each chunk has been observed.
+For all equations, $i$ represents each chunk (e.g., the word ``loop''), $j$ is a specific observation for a chunk (e.g., the 2nd time that ``loop'' appears), and $n$ is the number of times each chunk has been observed.
 Since the optimized learning form assumes a constant presentation rate for each chunk,
 it only has to keep track of the time since the first presentation of a chunk ($L$) and the total number of instances observed for that chunk ($n$). 
 It does not have to keep track of the time each specific chunk instance was observed.
-Consequently, the optimized learning form of $B_{i}$ is computationally much less expensive than the standard form, and is actually set to the default in the ACT-R Common Lisp implementation.
+Consequently, the optimized learning form of $B_{i}$ is computationally much less expensive than the standard form.
+The hybrid form only has to keep track of the most recent $k$ presentations of each chunk, so it only pays a small computational penalty over the optimized learning form.
+The optimized learning form is set to the default in the ACT-R Common Lisp implementation.
 
 The decay rate parameter ($d$) represents how fast the activation for an individual presentation of a chunk decays from declarative memory.
 Higher values mean that chunk activation decays faster, which means that the most recently presented chunks will have the highest activation, and the total number of times that a chunk has been presented matters less.
@@ -670,12 +675,12 @@ Each user's tag behavior from each site was analyzed.
 22 different values of the decay rate parameter were explored
 (0, .1, .2, .3, .4, .5, .6, .7, .8, .9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.8, 2, 5, 10, 20).
 The values were chosen to look at how performance changes from a pure frequency model ($d=0$), to a blend of frequency and recency ($d \approx .5$), to a pure recency model ($d=20$).
-The decay rate value was varied for both the standard form and optimized learning form of $B_{i}$. 
-Only values below 1 were examined for the optimized learning form, since values above 1 for this form are not mathematically defined. 
-They are not mathematically defined at a decay rate greater than 1 because for these values the first term to compute $B_{i}$ is the logarithm of a negative number (see Table \ref{tabACTRBLLModel}).
+The decay rate value was varied for the standard form, the optimized learning form, and the hybrid form of $B_{i}$. 
+Only values below 1 were examined for the optimized and hybrid forms, since values above 1 for these forms are not mathematically defined. 
+They are not mathematically defined at a decay rate greater than 1 because for these values the $(1-d)$ denominator flips the ratios to negative values (see Table \ref{tabACTRBLLModel}).
 At a decay rate equal to 1, every base-level activation $B_{i}$ is infinite, which is not psychologically interesting.
 
-Both the standard form and optimized learning form of $B_{i}$ were used to predict each user's specific tag history.
+All three forms of $B_{i}$ were used to predict each user's specific tag history.
 To do this, a user's entire tag history was collected, and then each tag instance from oldest to newest was examined.
 For each of these tagging instances, the model generated an activation value for each possible tag based on that tag's frequency and recency of past use. 
 
@@ -685,26 +690,29 @@ The model's chosen $N$ tags were compared to the user's chosen $N$ tags, and if 
 Otherwise, it was marked as incorrect.
 
 This process was performed across all users in each of the 12 dataset slices for both the Twitter and StackOverflow popular-users datasets.
-It was repeated for each of the decay rate values and the two different forms of $B_{i}$.
+It was repeated for each of the decay rate values and the three different forms of $B_{i}$.
+For the hybrid form, three different values of k were explored (1, 5, 10).
 
 \subsection{Results}
 
 \subsubsection{Model Performance Across Decay Rate Values}
 
-A plot of the results for one of the 12 slices, for both Twitter and StackOverflow, and for both forms of $B_{i}$ are included in Figures \ref{figPriorSOQSliceDsStd} and \ref{figPriorTwitterSliceDsStd} respectively.
+A plot of the results for one of the 12 slices, for both Twitter and StackOverflow, and for all three forms of $B_{i}$ are included in Figures \ref{figPriorSOQSliceDsStd} and \ref{figPriorTwitterSliceDsStd} respectively.
 
 \begin{figure}[!htbp]
   {%
     \setlength{\fboxsep}{0pt}%
     \setlength{\fboxrule}{1pt}%
     \hfill
-    \subfigure[][Standard form]{\includegraphics[width=8cm]{visNormMean-SOQgt500r2-topHashtagPostPriorStd-crop.pdf}}
+    \subfigure[][Standard form]{\includegraphics[width=5cm]{visNormMean-SOQgt500r2-topHashtagPostPriorStd-crop.pdf}}
     \hfill
-    \subfigure[][Optimized learning form]{\includegraphics[width=8cm]{visNormMean-SOQgt500r2-topHashtagPostPriorOL2-crop.pdf}}
+    \subfigure[][Optimized learning form]{\includegraphics[width=5cm]{visNormMean-SOQgt500r2-topHashtagPostPriorOL2-crop.pdf}}
+    \hfill
+    \subfigure[][Hybrid form]{\includegraphics[width=5cm]{visNormMean-SOQgt500r2-topHashtagPostPriorHybrid10-crop.pdf}}
     \caption{
     Model performance for a single dataset slice for StackOverflow.
     This includes model accuracy as a function of decay rate value for each user in the dataset slice.
-    Model accuracy is shown both when the standard from of base-level activation ($B_{i}$) and the optimized learning form of the equation are used. 
+    Model accuracy is shown for the standard form of base-level activation ($B_{i}$), the optimized learning form, and the hybrid form when k=10.
   }
     \label{figPriorSOQSliceDsStd}
   }%
@@ -716,9 +724,11 @@ A plot of the results for one of the 12 slices, for both Twitter and StackOverfl
     \setlength{\fboxsep}{0pt}%
     \setlength{\fboxrule}{1pt}%
     \hfill
-    \subfigure[][Standard form]{\includegraphics[width=8cm]{visNormMean-TFollowgt10Mr2-topHashtagPostPriorStd-crop.pdf}}
+    \subfigure[][Standard form]{\includegraphics[width=5cm]{visNormMean-TFollowgt10Mr2-topHashtagPostPriorStd-crop.pdf}}
     \hfill
-    \subfigure[][Optmized learning form]{\includegraphics[width=8cm]{visNormMean-TFollowgt10Mr2-topHashtagPostPriorOL2-crop.pdf}}
+    \subfigure[][Optmized learning form]{\includegraphics[width=5cm]{visNormMean-TFollowgt10Mr2-topHashtagPostPriorOL2-crop.pdf}}
+    \hfill
+    \subfigure[][Hybrid form]{\includegraphics[width=5cm]{visNormMean-TFollowgt10Mr2-topHashtagPostPriorHybrid10-crop.pdf}}
     \caption{
       Model performance for a single dataset slice for Twitter.
       This includes model accuracy as a function of decay rate value for each user in the dataset slice.
@@ -739,6 +749,7 @@ It makes sense that a pure recency model for Twitter is relatively more accurate
 When comparing the standard and optimized learning forms of the equation, it is apparent that a pure recency model does not work well for optimized learning.
 The best-fit decay rate value for the optimized learning form is also not as clear and pronounced as it is for the standard form (less of a peak).
 And the relative accuracy gained from using a pure frequency based model to a blend of frequency and recency is less for the optimized learning form than the standard form of $B_{i}$.
+Finally, for the range defined for the hybrid form ($d < 1$), the standard and hybrid forms are shaped similarly across the decay rate values.
 
 \subsubsection{Aggregate Model Performance}
 
@@ -747,7 +758,7 @@ The median was used since there were users in the popular-users dataset that did
 Using the median effectively trims these unstable values from the sample, without having to define a cut point for an outlier removal process.
 
 Aggregate best-fit decay rate values for each model are included in Figure \ref{figPriorDecay}.
-Decay rate values that produced the most accurate model performance are lower for the optimized learning form (\num{.43}) of $B_{i}$ compared to the standard form (\num{.80}).
+Decay rate values that produced the most accurate model performance are lower for the optimized learning form (\num{.43}) of $B_{i}$ compared to both the the standard form (\num{.80}) and hybrid form (\num{.80} for all $k$).
 The optimal values for optimized learning are near \num{0.5}, which lines up with default value used in ACT-R.
 
 \begin{figure}[!htbp]
@@ -764,13 +775,14 @@ The optimal values for optimized learning are near \num{0.5}, which lines up wit
 
 Finally, model accuracy was analyzed across all dataset slices for StackOverflow and Twitter.
 This was done by examining model accuracy at a specific decay rate value for each model.
-Accuracy was assessed at each model's previously-determined best-fit values (\num{.43} and \num{.80} for the optimized learning and standard form) and the standard form's default value (\num{0.5}).
+Accuracy was assessed at each model's previously-determined best-fit values (\num{.43} and \num{.80} and \num{.80} for the optimized learning, standard form, and hybrid form) and additionally the standard form's default value (\num{0.5}).
 Since decay rate values were explored at \num{0.1} increments between the 0 and 1 range, the decay rate values used to examine model accuracy were rounded to the nearest decay rate value that was included in the run.
 Consequently, a best-fit value of \num{.4} was used for the optimized learning model instead of the \num{.43} average found from the dataset slices.
 Aggregate accuracy was computed by taking the mean of every user's model accuracy across all users in all dataset slices.
 
+
 Accuracy for both sites is included in Figure \ref{figPriorAcc}. 
-Accuracy for the standard form (\numNoZero{.33}) is higher than the optimized learning form (\numNoZero{.28}).
+Accuracy for the standard form is higher than the optimized learning form (\numNoZero{.33} vs. \numNoZero{.28}, \myCI{.034}{.032}{.036}{3603}).
 This makes sense given that the standard form does not assume equal presentation rate for each chunk, and hashtags on Twitter in particular show trends of high rate of use and then shift to low rate of use. 
 The standard form of $B_{i}$ is able to more accurately account for these trends.
 
@@ -783,8 +795,12 @@ The standard form of $B_{i}$ is able to more accurately account for these trends
   \label{figPriorAcc}
 \end{figure}
 
+Accuracy for the hybrid form for the largest $k$ ($k=10$) is slightly higher than the smallest $k$ ($k=1$) (\numNoZero{.334} vs. \numNoZero{.329} \myCI{.0026}{.0023}{.0029}{3608}).
+However accuracy cannot be distinguished between the hybrid form with the largest $k$ and the standard form (\numNoZero{.334} vs. \numNoZer{.334} \myCI{.0000}{-.0000}{.0001}{3609}).
+This indicates that for the datasets analyzed in this study that the hybrid form with $k=10$ is a suitable replacement to the standard form (produces the same results) and uses less computational resources than the standard form. 
+
 ACT-R sets the default decay rate value to \num{0.5}, and the best-fit value for the standard form is higher (\num{0.8}) for these datasets.
-The figure shows that although model accuracy does slightly improve (\num{0.325} to \num{0.335}) for the standard form when increasing the decay rate parameter from \num{0.5} to the optimal value,
+The figure shows that although model accuracy does slightly improve (\num{0.325} to \num{0.335} \myCi{.0029}{.0022}{.0036}{3609}) for the standard form when increasing the decay rate parameter from \num{0.5} to the optimal value,
 that percentage improvement is not as large (\num{0.28} to \num{0.33}) as the improvement gained from using the standard form compared to the optimized learning form.
 Nonetheless, model accuracy is highest when both the standard form is used and the decay rate value is increased. 
 
@@ -798,15 +814,13 @@ Further, for the optimized learning form there is not much difference between us
 This makes sense given that the optimized learning equation in Table \ref{tabACTRBLLModel} collapses to a pure frequency model as the amount of time since the presentation of the first recorded chunk instance increases,
 and also since the timespan of recorded tag use for StackOverflow and Twitter is large (years).
 
-Given this, it may be worthwhile to use the standard form instead of the optimized learning form when declarative memory is modeled across a broader range of tasks.
-However, this should not be taken as a strong recommendation,
-since the performance benefits seen in this study could simply be due to the fact that the declarative memory retrievals span across a large period of time, which is not the case for all tasks.
-Nonetheless, the only real reason not to use the standard form is due to computational resource limitations.
-Since this is becoming less of an issue as hardware speed increases, it may be time to reconsider the default form of base-level learning used in ACT-R.
-It may be the case that the optimized learning form of the equation is no longer computationally necessary.
-That said, one may still run up against performance limitations when trying to run large-scale models in real-time settings.
-Nonetheless, if the standard form is used as the default (or simply tried in another experiment),
-the results from this study suggest that the optimal decay rate value should be set slightly higher (\num{0.8}) than the default when optimized learning is used (\num{0.5}).
+However the hybrid form with a reasonable $k$ is just as accurate as the standard form.
+This is due to the fact that the majority of change in activation for a chunk occurs in the short period of time after the presentation of the chunk (a property of a power law distribution).
+Once a chunk's presentations decay to the flat area of the power law distribution, not much change in activation for these presentations occurs, so they can be averaged and their presentation time can be discarded without much loss in fidelity.
+Therefore if computational speed is a concern, one may wish to leverage the hybrid form at instead of the standard form.
+Although qualitatively the standard form produces the cleanest and most natural effect of decay rate on accuracy, as shown in Figure \ref{figPriorSOQSliceDsStd}.
+It also does not have a bifurcation at $k=1$.
+So if one is a purest and computational speed is less of a concern, one may wish to use the standard form over the hybrid form.
 
 \section{Combining Predictors}
 
