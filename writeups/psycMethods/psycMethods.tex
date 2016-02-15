@@ -244,7 +244,6 @@ A formal description of the ACT-R Declarative Memory model is included in Table 
       Activation &	 	$A_{i} = B_{i} + \sum_{j \in c}^{} W_{j} S_{ji}$ \\
       Attentional Weight &	$W_{j} = \frac{W}{n}$ \\
       Base Level & 		$B_{i} = log \sum_{j=1}^{n} {t_{j}}^{-d}$ \\
-      Constant Base Level &	$B_{i} = \frac{p_{i}}{1-p_{i}}$ \\
       Strength of Association &	$S_{ji} = log \frac{p(i|j)}{p(i|\overline{j})} \approx log \frac{p(i|j)}{p(i)} = log \frac{NN_{ji}}{N_{Row}(j)N_{Col}(i)}$ \\
       Recall Probability &	$P_{i} = \left( 1 + e^{\frac{\tau - A_{i}}{s}} \right )^{-1}$ \\
       \hline
@@ -325,7 +324,6 @@ Since the cosine is high, the tag \emph{PHP} will most likely be returned as the
 
 The resonance and decoding processes are inversions of each other.
 Usually both resonance and decoding will return similar rank orderings of most likely chunks given context.
-\textcite{Jones2007} recommends averaging the cosine values returned from each process for each chunk, and then rank ordering those averages to determine the chunk to retrieve.
 
 \subsubsection{Word Order for Vector-Based Systems}
 
@@ -389,25 +387,6 @@ Each model computes an activation for each word to retrieve, given context and (
 Since both models produce activations for each chunk, one can be swapped out for another and used as the declarative memory component of the ACT-R infrastructure.
 For example, \textcite{Rutledge2007} used a variant of the BEAGLE vector-based model as the DM component of ACT-R.
 \citeauthor{Rutledge2008} showed that an ACT-R theory with a vector-based memory system can successfully model the fan effect.
-
-The fan effect describes a behavior of human memory where memory items are more difficult to retrieve if they have occurred in a larger number of different contexts.
-\textcite{Rutledge2008} used \textcite{Anderson1974}'s classic experimental paradigm to test the fan effect.
-In the task, participants are exposed to a set of person and place pairs (e.g., ``the hippie is in the park'').
-They are later asked to recall if a particular person and place pair was presented to them before.
-The main manipulation is the ``fan'' of the person and place for each pair.
-The fan is defined as the number of different contexts that each item in the pair is presented in.
-For example, if items were presented to the participant where the ``hippie'' was both in the ``park'' and in the ``store,'' then ``hippie'' would have a fan of two.
-Recall accuracy decrease and time to recall increase as the sum total fan of the person and place increases.
-
-Both the ACT-R declarative memory theory and vector-based models produce the fan effect due to the effect that fan has on the co-occurrence matrix.
-As a particular word (e.g., ``hippie'') is seen in more and more contexts, the co-occurrence count of the word across all contexts is spread across multiple contexts.
-This means that when a retrieval for a context given the word occurs, multiple contexts have relatively high activation.
-This makes it more difficult to test if a signal (e.g., if a word appears in a specific context) is higher than the background noise (e.g., all other contexts that the word has appeared in),
-which makes the retrieval more uncertain.
-
-Both vector-based and Bayesian models produce the fan effect since they both are based on co-occurrences.
-However, vector-based models do further processing on that matrix, reduce its dimensionality, and use a correlation instead of a log odds value to compute the activation.
-Nonetheless, vector-based models still produce the fan effect because at their core they are still computing activations based on co-occurrences.
 
 \subsubsection{Base-Level Activation}
 
@@ -693,7 +672,7 @@ Otherwise, it was marked as incorrect.
 
 This process was performed across all users in each of the 12 dataset slices for both the Twitter and StackOverflow popular-users datasets.
 It was repeated for each of the decay rate values and the three different forms of $B_{i}$.
-For the hybrid form, three different values of k were explored (1, 5, 10).
+For the hybrid form, three different values of $k$ were explored (1, 5, 10).
 
 \subsection{Results}
 
@@ -777,7 +756,7 @@ The optimal values for optimized learning are near \num{0.5}, which lines up wit
 
 Finally, model accuracy was analyzed across all dataset slices for StackOverflow and Twitter.
 This was done by examining model accuracy at a specific decay rate value for each model.
-Accuracy was assessed at each model's previously-determined best-fit values (\num{.43} and \num{.80} and \num{.80} for the optimized learning, standard form, and hybrid form) and additionally the standard form's default value (\num{0.5}).
+Accuracy was assessed at each model's previously-determined best-fit values (\num{.43}, \num{.80}, and \num{.80} for the optimized learning, standard form, and hybrid form) and additionally the standard form's default value (\num{0.5}).
 Since decay rate values were explored at \num{0.1} increments between the 0 and 1 range, the decay rate values used to examine model accuracy were rounded to the nearest decay rate value that was included in the run.
 Consequently, a best-fit value of \num{.4} was used for the optimized learning model instead of the \num{.43} average found from the dataset slices.
 Aggregate accuracy was computed by taking the mean of every user's model accuracy across all users in all dataset slices.
@@ -799,7 +778,7 @@ The standard form of $B_{i}$ is able to more accurately account for these trends
 
 Accuracy for the hybrid form for the largest $k$ ($k=10$) is slightly higher than the smallest $k$ ($k=1$) (\numNoZero{.334} vs. \numNoZero{.329} \myCI{.0026}{.0023}{.0029}{3608}).
 However accuracy cannot be distinguished between the hybrid form with the largest $k$ and the standard form (\numNoZero{.334} vs. \numNoZero{.334} \myCI{.0000}{-.0000}{.0001}{3609}).
-This indicates that for the datasets analyzed in this study that the hybrid form with $k=10$ is a suitable replacement to the standard form (produces the same results) and uses less computational resources than the standard form. 
+This indicates that for the datasets analyzed in this study the hybrid form with $k=10$ is a suitable replacement to the standard form (produces the same results) and uses less computational resources than the standard form. 
 
 ACT-R sets the default decay rate value to \num{0.5}, and the best-fit value for the standard form is higher (\num{0.8}) for these datasets.
 The figure shows that although model accuracy does slightly improve (\num{0.325} to \num{0.335} \myCI{.0029}{.0022}{.0036}{3609}) for the standard form when increasing the decay rate parameter from \num{0.5} to the optimal value,
@@ -819,10 +798,10 @@ and also since the timespan of recorded tag use for StackOverflow and Twitter is
 However the hybrid form with a reasonable $k$ is just as accurate as the standard form.
 This is due to the fact that the majority of change in activation for a chunk occurs in the short period of time after the presentation of the chunk (a property of a power law distribution).
 Once a chunk's presentations decay to the flat area of the power law distribution, not much change in activation for these presentations occurs, so they can be averaged and their presentation time can be discarded without much loss in fidelity.
-Therefore if computational speed is a concern, one may wish to leverage the hybrid form at instead of the standard form.
+Therefore if computational speed is a concern, one may wish to leverage the hybrid form instead of the standard form.
 Although qualitatively the standard form produces the cleanest and most natural effect of decay rate on accuracy, as shown in Figure \ref{figPriorSOQSliceDsStd}.
 It also does not have a bifurcation at $k=1$.
-So if one is a purest and computational speed is less of a concern, one may wish to use the standard form over the hybrid form.
+So if one is a purest and computational speed is less of a concern, one may still wish to use the standard form over the hybrid form.
 
 \section{Combining Predictors}
 
@@ -866,7 +845,7 @@ However, when the regression can not be constrained to label a specific number o
 The offset term keeps the activation for the small number of top tags for each post equal across posts.
 This ensures that the logistic regression only labels a few 1s for each post.
 
-A simplified version of \textcite{Stanley2013}'s method was used for the results for this research.
+A simplified version of \textcite{Stanley2013}'s method was used for this research.
 Instead of subtracting the mean total activation for the top 5 tags for each post, the process is done in isolation for each model component.
 So for the prior component, the activation value used in the logistic regression is the prior activation with the mean of the top 5 prior activations subtracted from this value.
 The same process is used for the context component.
@@ -1108,11 +1087,6 @@ However, corpus size is not the only factor that determines whether the Bayesian
 This is because the number of observations used to generate the co-occurrence matrix is a function of four components:
 corpus size, number of words in each document, total number of unique tags, and number of tags used per document.
 
-The transition point where accuracy for the Bayesian model outperformed the random permutation model was much higher for StackOverflow than Twitter.
-This is most likely because StackOverflow has almost \num{100} times more unique tags than the Twitter popular-hashtags dataset.
-The number of words in a StackOverflow post is also much higher than Twitter, which should have lowered the transition point.
-However, the effect of the number of words in a post must be less than the effect of number of unique tags, as the transition point was still much higher for StackOverflow given that it should have lowered due to post size.
-
 The compressed random permutation model should perform better with smaller corpus sizes, less words per document, more unique tags, and fewer number of tags per post.
 However, since there are so many factors that determine whether the Bayesian or random permutation model will perform better,
 and only two different datasets were examined in this research,
@@ -1120,7 +1094,7 @@ it is difficult to make any specific recommendations as far as exact transition 
 Also, it is likely that the specific domain being studied interacts with the factors already mentioned to determine which model is better for that domain.
 Nevertheless, if a researcher is working in a domain with limited data (e.g., small corpus size, large tag space) that produces a sparse co-occurrence matrix,
 then it may be worthwhile to experiment with using a compressed random permutation model instead of the full Bayesian model.
-Also newer models of $S_{ji}$ have been introduced that have a more local impact when a new chunk is observed (\parencite{thomson2013constraining}).
+Also newer models of $S_{ji}$ have been introduced that have a more local impact when a new chunk is observed \parencite{thomson2013constraining}.
 It would also be interesting to see how these local models of $S_{ji}$ perform while varying the number of observed associations.
 
 \subsection{Combining Prior and Context}
