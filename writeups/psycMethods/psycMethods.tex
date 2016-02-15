@@ -801,7 +801,7 @@ Once a chunk's presentations decay to the flat area of the power law distributio
 Therefore if computational speed is a concern, one may wish to leverage the hybrid form instead of the standard form.
 Although qualitatively the standard form produces the cleanest and most natural effect of decay rate on accuracy, as shown in Figure \ref{figPriorSOQSliceDsStd}.
 It also does not have a bifurcation at $k=1$.
-So if one is a purest and computational speed is less of a concern, one may still wish to use the standard form over the hybrid form.
+Consequently, if one is a purest and computational speed is less of a concern, one may still wish to use the standard form over the hybrid form.
 
 \section{Combining Predictors}
 
@@ -847,7 +847,7 @@ This ensures that the logistic regression only labels a few 1s for each post.
 
 A simplified version of \textcite{Stanley2013}'s method was used for this research.
 Instead of subtracting the mean total activation for the top 5 tags for each post, the process is done in isolation for each model component.
-So for the prior component, the activation value used in the logistic regression is the prior activation with the mean of the top 5 prior activations subtracted from this value.
+For the prior component for example, the activation value used in the logistic regression is the prior activation with the mean of the top 5 prior activations subtracted from this value.
 The same process is used for the context component.
 Decoupling the offset term and computing an offset for each model component in isolation means that an iterative approach is no longer necessary,
 since the optimal weights of the terms are no longer needed when computing the offset.
