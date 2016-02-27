@@ -16,26 +16,33 @@
 \definecolor{SolutionColor}{rgb}{0.9,0.9,1}
 \renewcommand{\solutiontitle}{}
 
+
+% http://tex.stackexchange.com/questions/36423/random-unwanted-space-between-paragraphs
+\raggedbottom
+
 \begin{document}
 
+To Lisa	Harlow and Fred	Oswald,	co-editors, \bigskip
 
-Dear Editor in Chief, \bigskip
+Please see below our responses to the reviewer comments.
+Along with pasting text from the revised document inline with the questions where applicable,
+I have also attached a version of the .pdf that contains markup for the differences between the original and revised submission. \bigskip 
 
-Please read below our answer about the \numquestions{}
-questions made by  both refereees. I hope that you agree
-with all our comments. \bigskip
+We hope that you and the reviewers find these changes sufficient and that you find the revised document well suited for this special issue. \bigskip
 
-Best regards,\bigskip
+Respectfully,
 
-The author
+-Clayton Stanley
 
+\bigskip
+\bigskip
 
 \begin{questions}
 
 \question This paper has great potential to serve as a meaningful contribution to the 'big data' special issue. Although there was clearly concern about the paper being a novel contribution to the field, it is reasonable to claim that the ties between clear explanation of a theory combined with clear and accessible approach to 'big data' predictive models would constitute a relatively novel contribution.
 
 \begin{solution}
-No need to comment.
+No need to comment directly.
 \end{solution}
 
 \question The main concern is for this paper to be highly accessible to an educated-but-untrained audience of psychological researchers -- providing clear and compelling explanation, streamlined language and accessible formulas for ease of reading, and programs and data for hands-on application. It's probably obvious that the more you can do this, the more impactful (visible, citation-worthy) your paper will be.
@@ -92,13 +99,13 @@ Was addressed in reviewer's comment.
 \question 3. Closer consideration of optimized learning vs. ACT-R learning is warranted, where a reviewer suggests a hybrid approach in the literature that might suggest an important and needed shift in the framing, analysis and implications of the current work (Reviewer 1, bullet 7 -- also be sure to download Rev 1's hand-written PDF, where time is taken to suggest specific edits to the work)
 
 \begin{solution}
-Was addressed in reviewer's comment and suggested edits will be looked at and incorporated.
+Was addressed in reviewer's comment and suggested edits were looked at and incorporated.
 \end{solution}
 
 \question Again, this paper has promise to reflect a novel and important contribution to the journal that brings together an introduction to modern ACT-R, and a strong example of tying theory to big-data models and analyses -- with accessible data sets and annotated code to readers. In doing so, we hope you will take on the challenges enumerated above and by reviewers to develop the paper further -- and in return, we will do our best in providing a more expeditious review process. Note that we reserve the right to bring in an additional expert reviewer as needed, who will have access to the other reviewers' comments.
 
 \begin{solution}
-No need to comment.
+No need to comment directly.
 \end{solution}
 
 
@@ -107,7 +114,7 @@ Reviewer 1:
 \question I would first like to commend the authors for an ambitious project. A high degree of scholarship is apparent in their work. Please see my attached review for in-line comments and suggestions. I would like to make some general points that I would like to see.
 
 \begin{solution}
-No need to comment
+No need to comment directly.
 \end{solution}
 
 \question - I found that the paper proceeded too quickly through the initial explanation of ACT-R and vector-based systems. This is especially important because the default version of ACT-R (6) was not described in detail (no Table or Figure was presented)
@@ -129,7 +136,7 @@ Added section that outlines the differences between ACT-R and vector-based syste
 \question - I found throughout the introduction and theory sections that the terminology seemed to waffle between discussion individual user's vs aggregate performance. It wasn't until the methods section that I realized it was due to the difference between how StackOverflow and Twitter information was obtained. I think some extra discussion on the psychological aspects of individual vs group psychology may make your argument stronger. 
 
 \begin{solution}
- Added a paragraph in discussion that addresses this and provides one future research idea.
+ Added a paragraph in discussion that addresses this.
 
  ``Individual vs. Group Representation of Memory. Even with the large datasets used in this research, there was not enough data on each individual user to build up separate co-occurrence matrices for them. That is, the context component of the declarative memory models used in this research was formed as a collection of observed co-occurrences across all individuals. Nonetheless, the prior component for the models was customized for each individual (except in the Twitter popular hashtags dataset when it was
 not possible). Ideally, both components would be customized to the individual, and it remains an open question how much accuracy is influenced by using an aggregate or custom context component in the models.''
@@ -199,7 +206,7 @@ Nonetheless, it seems likely that the entropy method for computing the attention
 \begin{solution}
 Ran the hybrid form with k=1,5,10 and incorporated the results into the past user behavior section.
 
-``However the hybrid form with a reasonable k is just as accurate as the standard form. This is due to the fact that the majority of change in activation for a chunk occurs in the short period of time after the presentation of the chunk (a property of a power law distribution). Once a chunk’s presentations decay to the flat area of the power law distribution, not much change in activation for these presentations occurs, so they can be averaged and their presentation time can be discarded without much loss in fidelity. Therefore if computational speed is a concern, one may wish to leverage the hybrid form instead of the standard form. Although qualitatively the standard form produces the cleanest and most natural effect of decay rate on accuracy, as shown in Figure 1. It also does not have a bifurcation at k = 1. Consequently, if one is a purist and computational speed is less of a concern, one may still wish to use the standard form over the hybrid form.''
+``However the hybrid form with a reasonable k is just as accurate as the standard form. This is due to the fact that the majority of change in activation for a chunk occurs in the short period of time after the presentation of the chunk (a property of a power law distribution). Once a chunk's presentations decay to the flat area of the power law distribution, not much change in activation for these presentations occurs, so they can be averaged and their presentation time can be discarded without much loss in fidelity. Therefore if computational speed is a concern, one may wish to leverage the hybrid form instead of the standard form. Although qualitatively the standard form produces the cleanest and most natural effect of decay rate on accuracy, as shown in Figure 1. It also does not have a bifurcation at k = 1. Consequently, if one is a purist and computational speed is less of a concern, one may still wish to use the standard form over the hybrid form.''
 
 \end{solution}
 
@@ -224,7 +231,7 @@ Removed most of them, particularly the ones that were used to start a new paragr
 - Set optimized learning to hybrid learning
 
 \begin{solution}
-All addressed in previous comments
+All addressed in previous comments.
 \end{solution}
 
 
@@ -235,7 +242,7 @@ Reviewer 2:
 This certainly did wet the present readers appetite, but unfortunately after reading the manuscript, still starving for clearly defined models, testable predictions, or clear conclusions. 
 
 \begin{solution}
-No need to comment
+  Specific issues were addressed in the following comments from the reviewer.
 \end{solution}
 
 \question Overall the topic: "declarative memory" and its role in message tagging should be of significant interest to the journal and its audience. However, the novelty in the present manuscript is limited. Neither the way data is used (basically the problem is framed as a supervised label assignment problem with different sub-populations of tagged messages in Twitter and StackOverflow). 
@@ -247,43 +254,64 @@ Not sure how to address this. I actually find the fact that it looks straightfor
 \question The review of the literature and the two model families (ACT-R and vector spaces) is unfortunately not self-contained, rather brief and qualitative. In case the manuscript is re-submitted I suggest that the authors use the opportunity to provide a clear account -from statistical principles to implementation- of the two sets of methods. The original papers are quite frustrating in their mixture of heuristics, arbitrary choice of details, and implementation. I haven't found a paper that gives a clear self-contained account of the relevant theories.
 
 \begin{solution}
-Mention the previous additions made (description of ACT-R proper, comparison between the two models, and  additional text describing the retrieval process for vector-based systems)
+Added table and description for default version of ACT-R 6.
+
+Expanded the section for the vector-based model and included a description of the retrieval process for that model.
+
+Added a section that directly compares the theory of the vector-based and ACT-R model (``Comparison of Vector-Based Models and ACT-R'').
 \end{solution}
 
 \question With respect to the data I think availability is a strong argument. However, there are strong limitations to observational data compared to active experiments (i.e. controlling for message differences by letting multiple users tag the same message)
 
 \begin{solution}
-Added a paragraph in the discussion section
+Added a paragraph in the discussion section.
+  
+``Observational vs. Experimental Design. All data used for this study were collected from publicly-available datasets and were not subject to an experimental design
+(i.e., observational data). There are advantages and disadvantages to both observational and experimental designs. One primary advantage with the observational approach here is size and availability: data for millions of posts and tweets are immediately available for analysis. However one disadvantage is that there is no way to probe a user at a particular point in time, which could be quite advantageous for answering certain questions. One hybrid approach worth considering for future research is to use the publicly available datasets to build up a representation of declarative memory for each user. Afterwards, bring a sample of these specific users into a laboratory setting and probe them with specific retrieval requests. Multiple users could be asked to tag the same message, and then models could be tested to see if they reliably predict differences in accuracy between the subjects.''
 \end{solution}
 
 \question The design description lacks crucial details: "Each model was tested by evaluating the accuracy of model-chosen tags on a fresh test subset of the datasets." How was it (sub-)sampled? what was the size?
 
 \begin{solution}
-Addressed in the equivalent comment to follow
+  Removed this text at this point, as it was leading the reader to think that I was about to provide more detail about how the sampling was done, and this detail is provided in line for each subsection. For example, much text to follow explicitly defines how each dataset was sampled, and then the methods section for combining prior and context defines how the test data are randomly sampled (including size) apart from the training data, and calls out that data in the test sets are not included to build the co-occurrence matrices.
 \end{solution}
 
 \question More importantly I am in serious doubt of the relevance of tagging for "declarative memory". Tagging can best be seen as social behavior/communication. Hence the communication network appears crucial for understanding tag behavior. Specifically, the behavior of the recipient appears crucial to me. In StackOverflow the aim is to get an answer, hence, the main purpose is to get attention from experts, which is more related to expected behavior of the recipient rather than a memory issue. Similarly for Twitter. This issue should at least be discussed.
 
 \begin{solution}
-Added a paragraph in the discussion section
+Added a paragraph in the discussion section.
+
+``Tagging as a Declarative Memory Retrieval Process. Overall, both the random permutation and Bayesian declarative memory models fit the observed tagging behavior in StackOverflow and Twitter reasonably well. The fits for StackOverflow in particular are quite high, especially given the large tag space on the site.
+
+These results provide support for the idea that choosing a hashtag when composing a tweet and tagging a StackOverflow post is akin to a declarative memory retrieval process. However, both models are not 100 percent accurate, and the amount of variance left to predict is larger than what would be observed if retrieval noise is included in the model. One possibility that seems likely is that the tag selection process includes other processes besides just declarative memory retrieval (e.g., strategic processes, determining the number of tags to employ, attempts to add humor).
+
+Another possibility is that this is not a declarative memory process at all. In particular, it is important to note that tagging on these sites is widely used as a method to communicate specific messages to specific groups of people in the community. It is unclear how much this environment overlaps with verbal communication between two people, and the declarative memory requests required to successfully communicate in this setting. Nonetheless, these models are reasonably accurate in this setting, particularly for StackOverflow. Given the results in this research, it at least seems worthwhile to use these publicly-available tagging environments as a reasonable proxy to explore and validate modifications to the current theory.''
+
 \end{solution}
 
 \question It is also not so clear what we have learned from the small differences in performance - can it be explained by differences in model complexity or does it reflect genuine differences in the models of declarative memory?
 
 \begin{solution}
-Added a paragraph in the discussion section
+Added a paragraph in the discussion section.
+
+``Directly Comparing the Models. After including the prior and entropy components for both models, overall accuracy was similar for the Bayesian and random permutation models for this task. So it is unclear precisely which model is more cognitively plausible (or if both are correct and simply working at different levels of abstraction). However, there were two areas in particular where model performance showed relatively large differences: accuracy change as a function of corpus size and reliance on entropy weighting. These areas could be used in future research to more directly challenge the models. For example, a domain could be picked where enough data is collected to build a custom co-occurrence matrix for each user. Then one could look at model accuracy over time for each user as the co-occurrence matrix is increased to see if the trajectory is more accurately modeled by a random permutation (more accurate with lower N) or Bayesian (more accurate with higher N) model. Further, if a large-scale domain is picked and it is shown that the Bayesian model does not require entropy weighting for the co-occurrence matrix after the representations are fully stabilized, then this would provide a case where the two models are dramatically different: The random permutation model would require explicitly weighting the stop words (entropy weighting) while the Bayesian model would not.''
+
 \end{solution}
 
 \question It is well known that tags follow heavy tailed (powerlaw) distributions. Hence, normalization and sampling are critical issues. Here we learn "Each model was tested by evaluating the accuracy of model-chosen tags on a fresh test subset of the datasets." How was the test data (sub-)sampled? what were their size and time ordering, how was the tag space controlled /stratified for the test sets?
 
 \begin{solution}
-Removed this text at this point, as it was leading the reader to think that I was about to provide more detail about how the sampling was done, and this detail is provided in line for each subsection. For example, much text to follow explicitly defines how each dataset was sampled, and then the methods section for combining prior and context defines how the test data are randomly sampled (including size) apart from the training data, and calls out that data in the test sets are not included to build the co-occurrence matrices
+Removed this text at this point, as it was leading the reader to think that I was about to provide more detail about how the sampling was done, and this detail is provided in line for each subsection. For example, much text to follow explicitly defines how each dataset was sampled, and then the methods section for combining prior and context defines how the test data are randomly sampled (including size) apart from the training data, and calls out that data in the test sets are not included to build the co-occurrence matrices.
+
 \end{solution}
 
 \question The English is excellent, however the writing could be made considerably more precise; e.g. by clearly defining central concepts, such as "chunk".
 
 \begin{solution}
-Added a definition of ‘chunk’ prior to its first use
+Added a definition of ‘chunk’ prior to its first use.
+
+``ACT-R (Anderson, 2007) is a cognitive architecture that formalizes how each cognitive process of the mind (e.g., memory, learning, visual and motor) interacts to produce behavior. The declarative memory system is a component of the architecture that models the timing, learning, and forgetting processes that make up declarative memory storage and retrieval. At the core of the system is the concept of a “chunk”: the representation of a piece of knowledge (e.g., a word).''
+
 \end{solution}
 
 \end{questions}
