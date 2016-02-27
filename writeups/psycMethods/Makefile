@@ -28,6 +28,7 @@ ${figPdfs}: %-crop.pdf: %.pdf
 static:
 	! grep 'NoZero.*0\.' ${outFile}.tex
 	! grep -i ' very ' ${outFile}.tex
+	! $$(cat ${outFile}.tex | grep myCI | grep -Pv '[,] \\myCI' | grep -v -q newcommand)
 
 showFigModDates:
 	git gp includegraphics ${outFile}.tex | egrep -o '{[^{]*}+$$' | sed 's/{//g' | sed 's/}//g' | perl -pe 's|^|figures/dissertation/|' | xargs ls -lt 

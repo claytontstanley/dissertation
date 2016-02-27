@@ -309,10 +309,13 @@ Most ACT-R models simply weight each contextual element equally (e.g., all words
 
 \subsection{Vector-Based Memory Systems}
 
-``Holographic'' memory systems \parencite{Plate1995} or vector-based memory systems represent a concept (i.e., a chunk) as a vector.
+``Holographic'' memory systems \parencite{Plate1995} or vector-based memory systems are an alternative representation of declarative memory.
+They have been successfully used to predict memory retrievals that leverage word order information \parencite{Jones2007}.
+They also have similar structure to memory models that use Latent Semantic Analysis \parencite{Landauer1997} (LSA).
+
+Vector-based models represent a concept (i.e., a chunk) as a vector.
 The representation of the concept is distributed across all elements of the vector.
 This is somewhat similar to taking a column (i.e., a tag) on a word co-occurrence matrix and viewing the distribution of co-occurrence counts across the rows in the column as the representation of that concept.
-However, vector-based memory systems represent information in a much more compact way than a full word co-occurrence matrix.
 
 For vector-based systems, each word is represented by an environment vector $e_{i}$ that is nearly orthogonal to all other words' environment vectors.
 The number of dimensions for these vectors is much less than the number of rows in a full word co-occurrence matrix (typically around 2,000 - 4,000), which is how vector-based systems represent information in a much more compact space.
@@ -375,11 +378,9 @@ This produces a new environment vector ($e_{i^{-1}}$) for the combination of the
 
 \subsubsection{Connection to LSA}
 
-Latent Semantic Analysis \parencite{Landauer1997} (LSA) is an alternative representation of declarative memory.
-Both vector-based models and LSA calculate word similarity on a reduced matrix.
+Both vector-based models and LSA calculate word similarity on a reduced co-occurrence matrix.
 For LSA, the original word by document matrix is compressed to a factor by document matrix and the number of factors is much less than the number of words.
 LSA uses Singular Value Decomposition (SVD) to find words that have highly correlated document occurrence distributions (i.e., latent concepts), and then pools those co-occurrence counts into a single dimension.
-
 For vector-based models, each tag (document) is represented by a compressed vector with a length much less than the number of words.
 A vector-based approach like random permutations essentially randomizes the mapping of the words on the reduced set of dimensions, and does not take into account word similarity when generating the mapping.
 Nonetheless, vector-based models have been shown to perform similar to if not better than LSA \parencites{Sahlgren2008,Jones2007}.
@@ -781,12 +782,12 @@ The standard form of $B_{i}$ is able to more accurately account for these dynami
   \label{figPriorAcc}
 \end{figure}
 
-Accuracy for the hybrid form for the largest $k$ ($k=10$) is slightly higher than the smallest $k$ ($k=1$) (\numNoZero{.334} vs. \numNoZero{.329} \myCI{.0026}{.0023}{.0029}{3608}).
-However accuracy cannot be distinguished between the hybrid form with the largest $k$ and the standard form (\numNoZero{.334} vs. \numNoZero{.334} \myCI{.0000}{-.0000}{.0001}{3609}).
+Accuracy for the hybrid form for the largest $k$ ($k=10$) is slightly higher than the smallest $k$ ($k=1$) (\numNoZero{.334} vs. \numNoZero{.329}, \myCI{.0026}{.0023}{.0029}{3608}).
+However accuracy cannot be distinguished between the hybrid form with the largest $k$ and the standard form (\numNoZero{.334} vs. \numNoZero{.334}, \myCI{.0000}{-.0000}{.0001}{3609}).
 This indicates that for the datasets analyzed in this study the hybrid form with $k=10$ is a suitable replacement to the standard form (produces the same results) and uses less computational resources than the standard form. 
 
 ACT-R sets the default decay rate value to \num{0.5}, and the best-fit value for the standard form is higher (\num{0.8}) for these datasets.
-The figure shows that although model accuracy does slightly improve (\num{0.325} to \num{0.335} \myCI{.0029}{.0022}{.0036}{3609}) for the standard form when increasing the decay rate parameter from \num{0.5} to the optimal value,
+The figure shows that although model accuracy does slightly improve (\num{0.325} to \num{0.335}, \myCI{.0029}{.0022}{.0036}{3609}) for the standard form when increasing the decay rate parameter from \num{0.5} to the optimal value,
 that percentage improvement is not as large (\num{0.28} to \num{0.33}) as the improvement gained from using the standard form compared to the optimized learning form.
 Nonetheless, model accuracy is highest when both the standard form is used and the decay rate value is increased. 
 
