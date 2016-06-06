@@ -52,7 +52,7 @@ This work was already done but was not yet included in the submission.
 I have added it to the paper and the text is included below for convenience.
 
 
-
+FIXME: Add text
 
 
 \end{solution}
@@ -66,7 +66,8 @@ No need to comment directly.
 \question If you have not already done so as part of your Author Note, please provide the details (2-4 sentences) of prior dissemination of the ideas and data appearing in the manuscript (e.g., if some or all of the data and ideas in the manuscript were presented at a conference or meeting posted on a listserv, shared on a website, etc.).
 
 \begin{solution}
-No need to comment directly.
+The work presented in this paper was done for my dissertation.
+The dissertation paper is available from Rice University's digital archive (https://scholarship.rice.edu/handle/1911/88165).
 \end{solution}
 
 Reviewer 3: 
@@ -93,6 +94,15 @@ The text for the section has been previously included in this document.
 \question That said, declarative memory retrieval is still likely to be a critical part of this process and worth exploration on its own. As such, the paper can still work even without incorporating any of those additional features. Many papers in this area report whether not just whether the tag from the model was predicted, but also whether it was in the top n (10, 25, etc) most likely predictions returned by the model (for one example of this, see ``\#TAGSPACE: Semantic Embeddings from Hashtags'', 2014). One possibility would be to treat the declarative memory portion (modeled here) as generating candidates which other processes consider.
 
 \begin{solution}
+
+There was some text in the beginning of the discussion section that mentioned this possibility.
+However it was embedded within parentheses and the other alternatives listed were not as important as this suggestion.
+So I broke this specific possibility out of parentheses and mentioned it directly:
+
+``These results provide support for the idea that choosing a hashtag when composing a tweet and tagging a StackOverflow post is akin to a declarative memory retrieval process.
+However, both models are not 100 percent accurate, and the amount of variance left to predict is larger than what would be observed if retrieval noise is included in the model.
+One possibility that seems likely is that the tag selection process includes other processes besides just declarative memory retrieval.
+For example, it may be the case that the declarative system is used to provide a set of likely tag candidates to higher-level processes to consider for selection.''
 
 \end{solution}
 
