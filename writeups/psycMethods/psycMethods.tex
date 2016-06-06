@@ -815,12 +815,14 @@ The declarative memory models analyzed for this research consist of two main com
 Past tag use was isolated in the first section to see how well ACT-R's prior component of declarative memory (i.e., base-level learning) fits each user's tag use over time.
 For the next section the past behavior and context declarative memory components were combined as well as looked at in isolation.
 
-This section will examine how model accuracy is influenced by four architectural concerns:
-method of handling stop words, influence of dataset size, method of combining prior and context, and word order.
+This section will examine how model accuracy is influenced by five architectural concerns:
+method of handling stop words, influence of dataset size, influence of compression for the random permutation model, method of combining prior and context, and word order.
 These particular architectural concerns were examined for the following reasons:
 During exploratory evaluation, model accuracy seemed to be highly sensitive to the method of dealing with the commonly-used stop words, so several different methods were examined in more detail.
 Due to research from \textcite{Budiu2007} and \textcite{Recchia2010}, model accuracy for the Bayesian and vector-based models is influenced by the number of documents in the dataset,
 so the effect of dataset size on accuracy was examined in more detail.
+\textcite{Sahlgren2008} showed how different levels of compression in the random permutation model influence accuracy, so this was examined for three reasons:
+to replicate the findings, as an additional check to ensure that the random permutation model was implemented correctly, and also to see if the same levels of compression are valid for the much larger datasets used in this research.
 One of the primary goals of this research is to identify the best method to combine the model term for past user behavior with the context term for the random permutation model,
 so two different ways to add the model terms were tested.
 Finally, previous research has shown that including word order in the vector-based models improves performance \parencites{Jones2007, Sahlgren2008},
@@ -1110,7 +1112,7 @@ Each word's environment vector is represented by two randomly placed ones and tw
 All that is required is that the four positions and signs of each of these environment vectors is unique.
 But this means multiple environment vectors can overlap when looking at a single row.
 This is a lossy form of compression, and allows the number of rows to represent the words to be much less than the total number of words.
-As the number of rows decreases, the amount of cross talk between the environment vectors increases, compression increases, and the amount of information stored decreases.
+As the number of rows decreases, the amount of crosstalk between the environment vectors increases, compression increases, and the amount of information stored decreases.
 As a third architectural concern, the effect of compression for the random permutation model was examined for Twitter and StackOverflow.
 
 \subsubsection{Method}
@@ -1158,11 +1160,11 @@ These results are consistent across all corpus sizes used to build the co-occurr
 The fact that the random permutation model only needs around \num{2048} rows to represent all of the words in the Twitter and StackOverflow datasets is impressive.
 Twitter has around \num{2383000} unique words for the \num{3000000} tweets in each of the popular-users datasets.
 StackOverflow has \num{5848000} unique words for the \num{1000000} posts used to generate the co-occurrence matrix.
-So it is impressive that only \num{2048} rows are needed to represent most of the variance from all of the words in these co-occurrence matrices.
+This means that only \num{2048} rows are needed to represent most of the variance from all of the words in these co-occurrence matrices.
 This is likely because word use frequency for StackOverflow and Twitter approximately follows Zipf's law.
 \textcite{Stanley2013} showed that frequency of tag use for StackOverflow approximately follows a Zipf's law distribution.
-This means that if the words are rank sorted by number of times they are used, the frequency of word use drops off sharply when moving to words that are used fewer times.
-Since these words have little to no ability to influence predictions, it makes sense that they can be safely removed from the dataset.
+This means that if the words are rank sorted by number of times they are used, the frequency of word use drops off sharply.
+Since these low-use words have little to no ability to influence predictions, it makes sense that accuracy does not substantially improve by providing additional dimensions for them.
 
 \subsection{Combining Prior and Context}
 
@@ -1170,7 +1172,7 @@ The activation value for the context component of the vector-based model is a co
 This is not a log-odds value.
 For the previous results, prior and context for the random permutation model were combined by simply adding the terms.
 However, this means that ACT-R's prior base-level learning component (which is a log-odds value) is added to a correlation value, which may not be mathematically appropriate.
-As a third architectural concern, another method to combine the prior and context components for the random permutation model was explored.
+As a fourth architectural concern, another method to combine the prior and context components for the random permutation model was explored.
 
 \subsubsection{Method}
 
