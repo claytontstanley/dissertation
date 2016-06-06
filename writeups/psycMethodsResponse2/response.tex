@@ -1,0 +1,98 @@
+\documentclass[answers,12pt]{exam}
+\usepackage{xcolor}
+\definecolor{SolutionColor}{rgb}{0.1,0.3,1}
+\usepackage{lipsum}
+\usepackage{enumerate}
+\usepackage{alphalph}
+
+\renewcommand{\theenumi}{\AlphAlph{\value{enumi}}}
+\renewcommand{\thequestion}{\AlphAlph{\value{question}}}
+\renewcommand\questionlabel{\llap{\thequestion)}}
+
+%\pointsinrightmargin
+%\boxedpoints
+\unframedsolutions
+\shadedsolutions
+\definecolor{SolutionColor}{rgb}{0.9,0.9,1}
+\renewcommand{\solutiontitle}{}
+
+
+% http://tex.stackexchange.com/questions/36423/random-unwanted-space-between-paragraphs
+\raggedbottom
+
+\begin{document}
+
+To Lisa	Harlow and Fred	Oswald,	co-editors, \bigskip
+
+Please see below our responses to the reviewer comments.
+Along with pasting text from the revised document inline with the questions where applicable,
+I have also attached a version of the .pdf that contains markup for the differences between the original and revised submission. \bigskip 
+
+We hope that you and the reviewers find these changes sufficient and that you find the revised document well suited for this special issue. \bigskip
+
+Respectfully,
+
+-Clayton Stanley
+
+\bigskip
+\bigskip
+
+\begin{questions}
+
+\question Primary concern: Papers on predictive modeling typically avoid confidence intervals and instead seek to optimize out-of-sample RMSE or R2 based on training vs. test samples (e.g., k-fold cross-validation) or sometimes by resampling (bootstrapping); see overviews of predictive modeling such as http://www-bcf.usc.edu/~gareth/ISL/ and http://appliedpredictivemodeling.com/.  The general concern here is that people reading your paper alongside other 'big data' papers may view your confidence interval approach unusual or outdated; the more specific concern here is overfitting the model to the data (making confidence intervals too confident).
+
+\begin{solution}
+No need to comment directly.
+\end{solution}
+
+\question Lesser concern: Per Rev 3 para 3, consider how prediction might increase when methods dynamically afford an increase in model dimensionality whenever the size of a corpus increases (this could be considered in terms of differences in sizes across corpora and/or across users). It is fine if you simply point this out as future research in your concluding statements, although an example could be incorporated if you so desired. Your choice.
+
+\begin{solution}
+No need to comment directly.
+\end{solution}
+
+\question Lesser concern: Per Rev 3, para 5 and 7, please incorporate any additional relevant literature (but do not limit yourself to Rev 3 citations; check out what is current and relevant given this quickly changing phenomenon and research area).
+
+\begin{solution}
+No need to comment directly.
+\end{solution}
+
+\question If you have not already done so as part of your Author Note, please provide the details (2-4 sentences) of prior dissemination of the ideas and data appearing in the manuscript (e.g., if some or all of the data and ideas in the manuscript were presented at a conference or meeting posted on a listserv, shared on a website, etc.).
+
+\begin{solution}
+No need to comment directly.
+\end{solution}
+
+Reviewer 3: 
+
+\question The counterintuitive results are also intriguing (such as the finding that larger training corpora lowered performance for the random permutations models). However, one factor to consider is that RP models depend on the approximate orthogonality of the random projections (the environment vectors for Beagle). As the number of words increases, this will tend to oversaturate the space, and commonly leads to decreased performance. One standard approach here is to scale the dimensionality of the representations as the training set and vocabulary sizes increase. It would be interesting to see if the performance still leveled off if you increased the dimensionality with the corpus size.
+
+\begin{solution}
+\end{solution}
+
+\question A number of works have considered the large scale dynamics of hashtag use (e.g. ``\#Bigbirds Never Die: Understanding Social Dynamics of Emergent Hashtags'', 2013), while other work has looked specifically at the impact of tags used by a user's local network connections (``We know what @you \#tag: does the dual role affect hashtag adoption?'', 2012). There is an extensive literature exploring how user features including demographics (e.g. ``User Conditional Hashtag Prediction for Images'', 2015), prior posts, time of day, mood, etc. The relationship between this literature and the work presented in the paper needs to be discussed thoroughly.
+
+\begin{solution}
+\end{solution}
+
+\question While the authors discuss that declarative memory might not be the correct model for this task (p 51-52), this seems to be almost an afterthought. Given that there is a flourishing literature which goes beyond this narrow focus, it seems important to acknowledge that upfront in the paper.
+
+\begin{solution}
+
+\end{solution}
+
+
+\question That said, declarative memory retrieval is still likely to be a critical part of this process and worth exploration on its own. As such, the paper can still work even without incorporating any of those additional features. Many papers in this area report whether not just whether the tag from the model was predicted, but also whether it was in the top n (10, 25, etc) most likely predictions returned by the model (for one example of this, see ``\#TAGSPACE: Semantic Embeddings from Hashtags'', 2014). One possibility would be to treat the declarative memory portion (modeled here) as generating candidates which other processes consider.
+
+\begin{solution}
+
+\end{solution}
+
+\question Questions of cognitive plausibility were also present in the structure of some of the pre-processing techniques used. While the authors acknowledge this, it would have been helpful to see more about how they felt that non-cognitive modeling or standard NLP techniques can help us to better understand and refine the underlying cognitive models. At very least acknowledging this intersection would have helped to eliminate some of the sense that the paper occasionally veered between claims of cognitive plausibility and more conventional computational modeling.
+
+\begin{solution}
+\end{solution}
+
+\end{questions}
+
+\end{document}
