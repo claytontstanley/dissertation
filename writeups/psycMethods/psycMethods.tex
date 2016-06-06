@@ -1103,6 +1103,67 @@ then it may be worthwhile to experiment with using a compressed random permutati
 Also, newer models of $S_{ji}$ have been introduced that have a more local impact when a new chunk is observed \parencite{thomson2013constraining}.
 It would also be interesting to see how these local models of $S_{ji}$ perform while varying the number of observed associations.
 
+\subsection{Compression Level for Random Permutation}
+
+Another parameter in the random permutation model is the number of rows used to represent all of the different words.
+Each word's environment vector is represented by two randomly placed ones and two negative ones across the rows.
+All that is required is that the four positions and signs of each of these environment vectors is unique.
+But this means multiple environment vectors can overlap when looking at a single row.
+This is a lossy form of compression, and allows the number of rows to represent the words to be much less than the total number of words.
+As the number of rows decreases, the amount of cross talk between the environment vectors increases, compression increases, and the amount of information stored decreases.
+As a third architectural concern, the effect of compression for the random permutation model was examined for Twitter and StackOverflow.
+
+\subsubsection{Method}
+
+Three different row-size values were tested for the random permutation model to see how accuracy changed as a function of space required to represent the co-occurrence matrix.
+A low value (\num{100}), a more standard value (\num{2048}), and a high value (\num{10000}) of rows were tested.
+A separate co-occurrence representation was built for each of these row values.
+Each representation was tested on the four Twitter popular-hashtags datasets and the StackOverflow randomly-sampled dataset.
+Accuracy measurements were the same as were used for previous runs of these datasets: mean accuracy for each of the 5 StackOverflow and 15 Twitter runs.
+
+\subsubsection{Results}
+
+Results for using different levels of compression for the random permutation model for the StackOverflow dataset are depicted in Figure \ref{figContextDimSO}.
+In the figure, the model name that does not have the number of rows in the matrix specified is the \num{2048}-row matrix.
+This was done so that names in all of the plots would remain consistent across all plots, and the \num{2048}-row matrix is the size used for the random permutation model for all other results.
+The plot is also broken out for different size datasets used to build the co-occurrence matrix.
+
+\begin{figure}[!htbp]
+  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-dimBySizeSO-crop.pdf}}}
+  \caption{
+    Effect of compression on random permutation model for StackOverflow.
+    Error bars represent the 95\% bootstrapped confidence interval for the mean.
+  }
+  \label{figContextDimSO}
+\end{figure}
+
+Reducing compression to only 100 rows in the representation has a strong negative effect on accuracy, which shows that compression can influence model accuracy.
+However, \num{2048} rows is sufficient for these datasets, as increasing the number of rows to almost an order of magnitude higher (\num{10000}) has little to no positive impact on accuracy, even for the highest corpus sizes.
+
+Results are similar for Twitter.
+Figure \ref{figContextDimT} shows the same negative impact when reducing from \num{2048} to \num{100}, and little to no impact when increasing from \num{2048} to \num{10000}. 
+These results are consistent across all corpus sizes used to build the co-occurrence matrix.
+
+\begin{figure}[!htbp]
+  \scalebox{.8}{\resizebox{\linewidth}{!}{\includegraphics{compareMeanDV-acc-dimBySizeT-crop.pdf}}}
+  \caption{
+    Effect of compression on random permutation model for Twitter.
+    Error bars represent the 95\% bootstrapped confidence interval for the mean.
+  }
+  \label{figContextDimT}
+\end{figure}
+
+\subsubsection{Discussion}
+
+The fact that the random permutation model only needs around \num{2048} rows to represent all of the words in the Twitter and StackOverflow datasets is impressive.
+Twitter has around \num{2383000} unique words for the \num{3000000} tweets in each of the popular-users datasets.
+StackOverflow has \num{5848000} unique words for the \num{1000000} posts used to generate the co-occurrence matrix.
+So it is impressive that only \num{2048} rows are needed to represent most of the variance from all of the words in these co-occurrence matrices.
+This is likely because word use frequency for StackOverflow and Twitter approximately follows Zipf's law.
+\textcite{Stanley2013} showed that frequency of tag use for StackOverflow approximately follows a Zipf's law distribution.
+This means that if the words are rank sorted by number of times they are used, the frequency of word use drops off sharply when moving to words that are used fewer times.
+Since these words have little to no ability to influence predictions, it makes sense that they can be safely removed from the dataset.
+
 \subsection{Combining Prior and Context}
 
 The activation value for the context component of the vector-based model is a correlation, ranging from zero to one.
