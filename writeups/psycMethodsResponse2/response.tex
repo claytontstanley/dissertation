@@ -48,8 +48,9 @@ No need to comment directly.
 \question Lesser concern: Per Rev 3 para 3, consider how prediction might increase when methods dynamically afford an increase in model dimensionality whenever the size of a corpus increases (this could be considered in terms of differences in sizes across corpora and/or across users). It is fine if you simply point this out as future research in your concluding statements, although an example could be incorporated if you so desired. Your choice.
 
 \begin{solution}
-This work was done but was not included in the previous revision.
-I have added it and the text is included below for convenience.
+This work was already done but was not yet included in the submission.
+I have added it to the paper and the text is included below for convenience.
+
 
 
 
@@ -73,6 +74,8 @@ Reviewer 3:
 \question The counterintuitive results are also intriguing (such as the finding that larger training corpora lowered performance for the random permutations models). However, one factor to consider is that RP models depend on the approximate orthogonality of the random projections (the environment vectors for Beagle). As the number of words increases, this will tend to oversaturate the space, and commonly leads to decreased performance. One standard approach here is to scale the dimensionality of the representations as the training set and vocabulary sizes increase. It would be interesting to see if the performance still leveled off if you increased the dimensionality with the corpus size.
 
 \begin{solution}
+Addressed this by including in the paper the work that looked at model accuracy vs. corpus size and number of rows in the random permutation model.
+The text for the section has been previously included in this document.
 \end{solution}
 
 \question A number of works have considered the large scale dynamics of hashtag use (e.g. ``\#Bigbirds Never Die: Understanding Social Dynamics of Emergent Hashtags'', 2013), while other work has looked specifically at the impact of tags used by a user's local network connections (``We know what @you \#tag: does the dual role affect hashtag adoption?'', 2012). There is an extensive literature exploring how user features including demographics (e.g. ``User Conditional Hashtag Prediction for Images'', 2015), prior posts, time of day, mood, etc. The relationship between this literature and the work presented in the paper needs to be discussed thoroughly.
