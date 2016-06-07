@@ -2262,7 +2262,11 @@ bestFitNameToDVName <- function(vect, pre) {
 }
 
 analyzeLogreg <- function(logregTbl, modelVsPredTbl) {
+	modelVsPredTbl[sizeNum == 2][, .N, d]
+	modelVsPredTbl[predUsedBest == T]
+	logregTbl
 	dTbl = modelVsPredTbl[predUsedBest == T][, list(d,  runNum, groupNum, sizeNum, DVName)][grepl('^topHashtagAcross', DVName)]
+	dTbl
 	setkey(dTbl, DVName, runNum, groupNum, sizeNum, d)
 	logregTbl
 	dTbl
@@ -2276,6 +2280,30 @@ analyzeLogreg <- function(logregTbl, modelVsPredTbl) {
 	compareMeanDVLogreg(logregTbl[predUsedBest & (sizeNum == 2) & dsetType == 'stackoverflow' & DVName != '(Intercept)' & bestFitName %in% bestFitNames], coeffStd, figName='coeffSO')
 	bestFitNames = c('actPriorStd_actTweet', 'actPriorStd_actTweetUsercontext', 'actPriorStd_actTweetOrderlessEnthyman', 'actPriorStd_actTweetOrderlessEnthyser')
 	compareMeanDVLogreg(logregTbl[predUsedBest & (sizeNum == 2) & dsetType == 'twitter' & predName != '(Intercept)' & bestFitName %in% bestFitNames], coeffStd, figName='coeffT')
+}
+
+analyzeOverfitting <- function(logregTbl, modelVsPredTbl) {
+	modelVsPredTbl[predUsedBest == T]
+	bdTbl = modelVsPredTbl[!is.na(topHashtag) & predUsedBest == T, .N, .(datasetName, runNum, groupNum, sizeNum, DVName, d)]
+	bdTbl
+	aTbl = modelVsPredTbl[bdTbl, nomatch=0, on=c('datasetName', 'runNum', 'groupNum', 'sizeNum', 'DVName', 'd')]
+	aTbl[, .N, .(dsetType, dsetGroup, modelType)]
+	aTbl[sizeNum == 2][, .N, .(datasetName, dsetSize)]
+	aTbl[dsetType == 'twitter' & sizeNum == 2]
+	aTbl
+
+	aTbl[, .SD
+	     ][!is.na(topHashtag)
+	     ][, .N, .(NCell, totN, runNum, groupNum, sizeNum, topHashtag, hashtagUsedP, DVName, dsetType, modelType)
+	     ][sizeNum == 2
+	     ][, .(totN=mean(totN), NCell=as.numeric(mean(NCell))), .(hashtagUsedP, topHashtag, modelType, dsetType)
+	     ][, totN := sum(NCell), .(modelType, dsetType)
+	     ][, topHashtagN := sum(NCell), .(modelType, topHashtag, dsetType)
+	     ][, mean(topHashtagN), .(hashtagUsedP, topHashtag, dsetType)
+	     ]
+
+
+
 }
 
 getDWideTbl <- function(tbl) {

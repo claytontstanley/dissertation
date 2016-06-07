@@ -183,7 +183,6 @@ Since we worked with large-scale datasets, we had enough data to explore many di
 However, we were not interested in bringing to bear the entire collection of machine learning algorithms to this prediction task in order to completely optimize a model.
 Rather, we were interested in evaluating how well two cognitive models could explain the results, and then making selective modifications to them to see how performance changes.
 The modifications that we explored were selected such that they influenced model accuracy, could be easily added to (or removed from) the cognitive models without massive modifications, and could be considered cognitively plausible.
-That said, we were FIXME.
 
 \subsection{Research Questions}
 
@@ -865,7 +864,7 @@ since the optimal weights of the terms are no longer needed when computing the o
 
 Model accuracy was tested on the popular-hashtags dataset for Twitter and a random sample of posts across the entire StackOverflow dataset.
 For each of the four Twitter popular-hashtags datasets, model retrievals were done across 15 runs and 500 posts within each run.
-For the StackOverflow randomly-sampled dataset, 5 runs of 100 posts were used,
+For the StackOverflow randomly-sampled dataset, 5 runs of 500 posts were used,
 since the results for StackOverflow were more stable and retrievals took more wall-clock time for this dataset due to the size of the co-occurrence matrix.
 All runs contained different posts, and all posts used for runs were not used to generate the co-occurrence matrix for the two retrieval models.
 
