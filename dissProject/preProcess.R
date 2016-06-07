@@ -2303,6 +2303,16 @@ analyzeOverfitting <- function(logregTbl, modelVsPredTbl) {
 	     ]
 
 
+	bTbl = logregTbl[, !'Pr(>|z|)', with=F]
+	bTbl = bTbl[bdTbl, nomatch=0, on=c(datasetName='datasetName', runNum='runNum', groupNum='groupNum', sizeNum='sizeNum', bestFitNameAsDVName='DVName', d='d')]
+	bTbl
+	bestFitNames = c('actPriorStd_actTitle_actBody', 'actPriorStd_actTitleOrderlessEnthyman_actBodyOrderlessEnthyman',
+			 'actPriorStd_actTweet', 'actPriorStd_actTweetUsercontext', 'actPriorStd_actTweetOrderlessEnthyman', 'actPriorStd_actTweetOrderlessEnthyser')
+	bTbl[predUsedBest & (sizeNum == 2) & predName != '(Intercept)' & bestFitName %in% bestFitNames
+	     ][, ggplot(.SD, aes(DVName, coeffStd))
+	     + geom_point()
+	     ]
+
 
 }
 
