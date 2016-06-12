@@ -2284,7 +2284,7 @@ analyzeLogreg <- function(logregTbl, modelVsPredTbl) {
 
 analyzeOverfitting <- function(logregTbl, modelVsPredTbl) {
 	modelVsPredTbl[predUsedBest == T]
-	bdTbl = modelVsPredTbl[!is.na(topHashtag) & predUsedBest == T, .N, .(datasetName, runNum, groupNum, sizeNum, DVName, d)]
+	bdTbl = modelVsPredTbl[!is.na(topHashtag) & predUsedBest == T, .N, .(datasetName, runNum, groupNum, sizeNum, DVName, d, predUsedBest)]
 	bdTbl
 	aTbl = modelVsPredTbl[bdTbl, nomatch=0, on=c('datasetName', 'runNum', 'groupNum', 'sizeNum', 'DVName', 'd')]
 	aTbl[, .N, .(dsetType, dsetGroup, modelType)]
@@ -2303,15 +2303,37 @@ analyzeOverfitting <- function(logregTbl, modelVsPredTbl) {
 	     ]
 
 
+	logregTbl[, bestFitNameAsDVName := bestFitNameToDVName(bestFitName, 'topHashtagAcross')]
+	logregTbl[modelType == 'perm' & DVName == 'actPriorStd', DVName := 'actPriorStdRP']
+	logregTbl[modelType == 'sji' & DVName == 'actPriorStd', DVName := 'actPriorStdBayes']
 	bTbl = logregTbl[, !'Pr(>|z|)', with=F]
+	bdTbl
 	bTbl = bTbl[bdTbl, nomatch=0, on=c(datasetName='datasetName', runNum='runNum', groupNum='groupNum', sizeNum='sizeNum', bestFitNameAsDVName='DVName', d='d')]
 	bTbl
 	bestFitNames = c('actPriorStd_actTitle_actBody', 'actPriorStd_actTitleOrderlessEnthyman_actBodyOrderlessEnthyman',
 			 'actPriorStd_actTweet', 'actPriorStd_actTweetUsercontext', 'actPriorStd_actTweetOrderlessEnthyman', 'actPriorStd_actTweetOrderlessEnthyser')
+
+	bTbl
 	bTbl[predUsedBest & (sizeNum == 2) & predName != '(Intercept)' & bestFitName %in% bestFitNames
-	     ][, ggplot(.SD, aes(DVName, coeffStd))
+	     ][, label := DVName
+	     ][, label := sprintf('%s-%s', label, dsetType)
+	     ][, {cTbl <<- copy(.SD); .SD}
+	     ][, ggplot(.SD, aes(label, coeffStd))
+	     + geom_jitter(aes(color=modelType))
+	     ]
+
+	m1 = aov(coeffStd ~ label, data=cTbl)
+	summary(m1)
+
+	bTbl[predUsedBest & (sizeNum == 2) & predName != '(Intercept)' & bestFitName %in% bestFitNames
+	     ][modelType == 'sji'
+	     ][dsetType == 'stackoverflow'
+	     ][, dcast.data.table(.SD, runNum + groupNum + sizeNum ~ predName, value.var='coeffStd')
+	     ][, groupNum := factor(groupNum)
+	     ][, ggplot(.SD, aes(actPriorStd, actTitle, color=groupNum))
 	     + geom_point()
 	     ]
+	
 
 
 }
