@@ -893,6 +893,20 @@ Different size matrices were analyzed, ranging from \num{1000}, \num{10000}, \nu
 The matrix for \num{3000000} posts was only used for Twitter, since the number of words in a StackOverflow post is much higher than Twitter on average,
 and the space and computational time required when using a co-occurrence matrix of \num{3000000} posts for StackOverflow was too large. 
 
+\subsubsection{Sampling and Overfitting}
+
+This research centers around evaluating the differences in model accuracy when various components are added, removed, or altered.
+When evaluating the models, overall model accuracy for a specific model and specific dataset is less important than how that accuracy deviates from a comparative model on the same dataset.
+Therefore, model overfitting is less of a concern in this case as long as all candidate models have equal opportunity to be slightly overfit.
+Nonetheless, we did ensure that the models would not be substantially overfit in two ways:
+The posts used to build the co-occurrence matrices were never included as posts to calibrate weights of model terms.
+This is particularly important since the context term can easily latch on to a post with exactly the same co-occurrence structure as a post that was used to build the underlying matrix.
+Second, for each dataset sample, the logistic regression model that calibrated the model terms was fed with a large number of posts (500).
+Each model only had a few terms to calibrate (e.g., prior, context component), and there were on average 1,300 tags per sample that could be used by the logistic regression model for calibration, so the risk of overfitting was low.
+Further, \textcite{Stanley2013} showed that the out-of-sample model and within-sample model accuracy difference for a similar model on a similarly sized dataset for StackOverflow is small (2\% accuracy difference).
+We were therefore more concerned with the risk of model overfitting by using fewer and more similar dataset samples than from optimizing the weights of a few model terms when those weights were calibrated from thousands of data points.
+This is why the available computational resources were channeled to evaluate the models on multiple dataset samples (particularly the 60 different dataset samples used for Twitter) rather than to perform a k-fold cross validation technique for the weights from the logistic regression.
+
 \subsection{Stop Words}
 
 The method of handling stop words has been shown to influence model accuracy \parencite{Sahlgren2008,Stanley2013,Jones2007}, so this was the first architectural concern that was examined.
