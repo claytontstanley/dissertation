@@ -905,7 +905,7 @@ Second, for each dataset sample, the logistic regression model that calibrated t
 Each model only had a few terms to calibrate (e.g., prior, context component), and there were on average 1,300 tags per sample that could be used by the logistic regression model for calibration, so the risk of overfitting was low.
 Further, \textcite{Stanley2013} showed that the out-of-sample model and within-sample model accuracy difference for a similar model on a similarly sized dataset for StackOverflow is small (2\% accuracy difference).
 We were therefore more concerned with the risk of model overfitting by using fewer and more similar dataset samples than from optimizing the weights of a few model terms when those weights were calibrated from thousands of data points.
-This is why the available computational resources were channeled to evaluate the models on multiple dataset samples (particularly the 60 different dataset samples used for Twitter) rather than to perform a k-fold cross validation technique for the weights from the logistic regression.
+This is why the available computational resources were channeled to evaluate the models on multiple dataset samples (particularly the 60 different dataset samples used for Twitter) rather than to perform a k-fold cross validation or out-of-sample validation technique for the weights from the logistic regression.
 
 \subsection{Stop Words}
 
