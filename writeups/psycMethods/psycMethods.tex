@@ -1143,6 +1143,7 @@ As a third architectural concern, the effect of compression for the random permu
 
 Three different row-size values were tested for the random permutation model to see how accuracy changed as a function of space required to represent the co-occurrence matrix.
 A low value (\num{100}), a more standard value (\num{2048}), and a high value (\num{10000}) of rows were tested.
+The \num{2048}-row matrix was the default size used for the random permutation model for all other results.
 A separate co-occurrence representation was built for each of these row values.
 Each representation was tested on the four Twitter popular-hashtags datasets and the StackOverflow randomly-sampled dataset.
 Accuracy measurements were the same as were used for previous runs of these datasets: mean accuracy for each of the 5 StackOverflow and 15 Twitter runs.
@@ -1150,8 +1151,6 @@ Accuracy measurements were the same as were used for previous runs of these data
 \subsubsection{Results}
 
 Results for using different levels of compression for the random permutation model for the StackOverflow dataset are depicted in Figure \ref{figContextDimSO}.
-In the figure, the model name that does not have the number of rows in the matrix specified is the \num{2048}-row matrix.
-This was done so that names in all of the plots would remain consistent across all plots, and the \num{2048}-row matrix is the size used for the random permutation model for all other results.
 The plot is also broken out for different size datasets used to build the co-occurrence matrix.
 
 \begin{figure}[!htbp]
