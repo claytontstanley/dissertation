@@ -42,10 +42,10 @@ Respectfully,
 \question Primary concern: Papers on predictive modeling typically avoid confidence intervals and instead seek to optimize out-of-sample RMSE or R2 based on training versus test samples (e.g., k-fold cross-validation) or sometimes by resampling (bootstrapping); see overviews of predictive modeling such as http://www-bcf.usc.edu/~gareth/ISL/ and http://appliedpredictivemodeling.com/.  The general concern here is that people reading your paper alongside other 'big data' papers may view your confidence interval approach unusual or outdated; the more specific concern here is overfitting the model to the data (making confidence intervals too confident).
 
 \begin{solution}
-Added a paragraph in the Overall Method section to address this concern.
+Added a paragraph in the overall method section to address this concern.
 The text is included below:
 
-FIXME: add text
+``This research centers around evaluating the differences in model accuracy when various components are added, removed, or altered. When evaluating the models, overall model accuracy for a specific model and specific dataset is less important than how that accuracy deviates from a comparative model on the same dataset. Therefore, model overfitting is less of a concern in this case as long as all candidate models have equal opportunity to be slightly overfit. Nonetheless, we did ensure that the models would not be substantially overfit in two ways: The posts used to build the co-occurrence matrices were never included as posts to calibrate weights of model terms. This is particularly important since the context term can easily latch on to a post with exactly the same co-occurrence structure as a post that was used to build the underlying matrix. Second, for each dataset sample, the logistic regression model that calibrated the model terms was fed with a large number of posts (500). Each model only had a few terms to calibrate (e.g., prior, context component), and there were on average 1,300 tags per sample that could be used by the logistic regression model for calibration, so the risk of overfitting was low. Further, Stanley and Byrne (2013) showed that the out-of-sample model and within-sample model accuracy difference for a similar model on a similarly sized dataset for StackOverflow is small (2\% accuracy difference). We were therefore more concerned with the risk of model overfitting by using fewer and more similar dataset samples than from optimizing the weights of a few model terms when those weights were calibrated from thousands of data points. This is why we focused on evaluating the models on multiple dataset samples (particularly the 60 different dataset samples used for Twitter) rather than to perform a k-fold cross validation or out-of-sample validation technique for the weights from the logistic regression.''
 
 \end{solution}
 
@@ -55,8 +55,17 @@ FIXME: add text
 This work was already done but was not yet included in the submission.
 I have added it to the paper and the text is included below for convenience.
 
+``Another parameter in the random permutation model is the number of rows used to represent all of the different words. Each word’s environment vector is represented by two randomly placed ones and two negative ones across the rows. All that is required is that the four positions and signs of each of these environment vectors is unique. But this means multiple environment vectors can overlap when looking at a single row. This is a lossy form of compression, and allows the number of rows to represent the words to be much less than the total number of words. As the number of rows decreases, the amount of crosstalk between the environment vectors increases, compression increases, and the amount of information stored decreases. As a third architectural concern, the effect of compression for the random permutation model was examined for Twitter and StackOverflow.
 
-FIXME: Add text
+Method. Three different row-size values were tested for the random permutation model to see how accuracy changed as a function of space required to represent the co-occurrence matrix. A low value (100), a more standard value (2048), and a high value (10,000) of rows were tested. The 2048-row matrix was the default size used for the random permutation model for all other results. A separate co-occurrence representation was built for each of these row values. Each representation was tested on the four Twitter popular-hashtags datasets and the StackOverflow randomly-sampled dataset. Accuracy measurements were the same as were used for previous runs of these datasets: mean accuracy for each of the 5 StackOverflow and 15 Twitter runs.
+
+Results. Results for using different levels of compression for the random permutation model for the StackOverflow dataset are depicted in Figure 13. The plot is also broken out for different size datasets used to build the co-occurrence matrix.
+
+Reducing compression to only 100 rows in the representation has a strong negative effect on accuracy, which shows that compression can influence model accuracy. However, 2048 rows is sufficient for these datasets, as increasing the number of rows to almost an order of magnitude higher (10,000) has little to no positive impact on accuracy, even for the highest corpus sizes.
+
+Results are similar for Twitter. Figure 14 shows the same negative impact when reducing from 2048 to 100, and little to no impact when increasing from 2048 to 10,000. These results are consistent across all corpus sizes used to build the co-occurrence matrix.
+
+Discussion. The fact that the random permutation model only needs around 2048 rows to represent all of the words in the Twitter and StackOverflow datasets is impressive. Twitter has around 2,383,000 unique words for the 3,000,000 tweets in each of the popular-users datasets. StackOverflow has 5,848,000 unique words for the 1,000,000 posts used to generate the co-occurrence matrix. This means that only 2048 rows are needed to represent most of the variance from all of the words in these co-occurrence matrices. This is likely because word use frequency for StackOverflow and Twitter approximately follows Zipf’s law. Stanley and Byrne (2013) showed that frequency of tag use for StackOverflow approximately follows a Zipf’s law distribution. This means that if the words are rank sorted by number of times they are used, the frequency of word use drops off sharply. Since these low-use words have little to no ability to influence predictions, it makes sense that accuracy does not substantially improve by providing additional dimensions for them.``
 
 \end{solution}
 
@@ -65,7 +74,7 @@ FIXME: Add text
 \begin{solution}
 Added a paragraph in the background section to discuss the types of hashtag-prediction models that were mentioned by Rev 3:
 
-FIXME: add text
+``Other successful models have shown that higher-level processes such as a user’s goals for picking a hashtag, demographics, and specifics about how a hashtag has been used in the past can also influence hashtag use. Lin, Margolin, Keegan, Baronchelli, and Lazer (2013) showed that there are at least two distinct use cases for hashtags on Twitter: to mark the content (traditional tagging) and to contribute to a specific community that has created a hashtag. Yang, Sun, Zhang, and Mei (2012) found that demographics such as gender, age, and location can influence a user’s selected hashtag. Denton, Weston, Paluri, Bourdev, and Fergus (2015) found that the growth and lifetime of a hashtag can be influenced by factors such as how often the hashtag was retweeted and the number of followers for a user that used a particular hashtag. These types of goal-related features, demographic information, and higher-level attributes of previous hashtag use were not directly included in the declarative memory models that were tested for this research. They were not included because it would be difficult to fit these features into a modeling framework that is constrained to use only declarative memory processes, and this research focused on measuring differences in model accuracy for two declarative memory models. Nonetheless, many of these higher-level features may indirectly influence a declarative memory model by influencing the specific tags that a user has chosen in the past, which in turn boosts base-level activation for these previously-chosen tags, which in turn makes it more likely that they are chosen in the future.''
 
 \end{solution}
 
@@ -100,7 +109,7 @@ There was some text in the beginning of the discussion section that mentioned th
 However it was embedded within parentheses and the other alternatives listed were not as important as this suggestion.
 So I broke this specific possibility out of parentheses and mentioned it directly:
 
-FIXME: add text
+``These results provide support for the idea that choosing a hashtag when composing a tweet and tagging a StackOverflow post is akin to a declarative memory retrieval process. However, both models are not 100 percent accurate, and the amount of variance left to predict is larger than what would be observed if retrieval noise is included in the model. One possibility that seems likely is that the tag selection process includes other processes besides just declarative memory retrieval. For example, it may be the case that the declarative system is used to provide a set of likely tag candidates to higher-level processes to consider for selection.''
 
 \end{solution}
 
