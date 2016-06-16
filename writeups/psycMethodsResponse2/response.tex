@@ -24,11 +24,11 @@
 
 To Lisa	Harlow and Fred	Oswald,	co-editors, \bigskip
 
-Please see below our responses to the reviewer comments.
+Please see below our responses to the comments.
 Along with pasting text from the revised document inline with the questions where applicable,
 I have also attached a version of the .pdf that contains markup for the differences between the original and revised submission. \bigskip 
 
-We hope that you and the reviewers find these changes sufficient and that you find the revised document well suited for this special issue. \bigskip
+We hope that you find these changes sufficient and that you find the revised document well suited for this special issue. \bigskip
 
 Respectfully,
 
@@ -39,10 +39,14 @@ Respectfully,
 
 \begin{questions}
 
-\question Primary concern: Papers on predictive modeling typically avoid confidence intervals and instead seek to optimize out-of-sample RMSE or R2 based on training vs. test samples (e.g., k-fold cross-validation) or sometimes by resampling (bootstrapping); see overviews of predictive modeling such as http://www-bcf.usc.edu/~gareth/ISL/ and http://appliedpredictivemodeling.com/.  The general concern here is that people reading your paper alongside other 'big data' papers may view your confidence interval approach unusual or outdated; the more specific concern here is overfitting the model to the data (making confidence intervals too confident).
+\question Primary concern: Papers on predictive modeling typically avoid confidence intervals and instead seek to optimize out-of-sample RMSE or R2 based on training versus test samples (e.g., k-fold cross-validation) or sometimes by resampling (bootstrapping); see overviews of predictive modeling such as http://www-bcf.usc.edu/~gareth/ISL/ and http://appliedpredictivemodeling.com/.  The general concern here is that people reading your paper alongside other 'big data' papers may view your confidence interval approach unusual or outdated; the more specific concern here is overfitting the model to the data (making confidence intervals too confident).
 
 \begin{solution}
-No need to comment directly.
+Added a paragraph in the Overall Method section to address this concern.
+The text is included below:
+
+FIXME: add text
+
 \end{solution}
 
 \question Lesser concern: Per Rev 3 para 3, consider how prediction might increase when methods dynamically afford an increase in model dimensionality whenever the size of a corpus increases (this could be considered in terms of differences in sizes across corpora and/or across users). It is fine if you simply point this out as future research in your concluding statements, although an example could be incorporated if you so desired. Your choice.
@@ -54,7 +58,6 @@ I have added it to the paper and the text is included below for convenience.
 
 FIXME: Add text
 
-
 \end{solution}
 
 \question Lesser concern: Per Rev 3, para 5 and 7, please incorporate any additional relevant literature (but do not limit yourself to Rev 3 citations; check out what is current and relevant given this quickly changing phenomenon and research area).
@@ -62,7 +65,8 @@ FIXME: Add text
 \begin{solution}
 Added a paragraph in the background section to discuss the types of hashtag-prediction models that were mentioned by Rev 3:
 
-fixme: add text
+FIXME: add text
+
 \end{solution}
 
 \question If you have not already done so as part of your Author Note, please provide the details (2-4 sentences) of prior dissemination of the ideas and data appearing in the manuscript (e.g., if some or all of the data and ideas in the manuscript were presented at a conference or meeting posted on a listserv, shared on a website, etc.).
@@ -77,7 +81,7 @@ Reviewer 3:
 \question The counterintuitive results are also intriguing (such as the finding that larger training corpora lowered performance for the random permutations models). However, one factor to consider is that RP models depend on the approximate orthogonality of the random projections (the environment vectors for Beagle). As the number of words increases, this will tend to oversaturate the space, and commonly leads to decreased performance. One standard approach here is to scale the dimensionality of the representations as the training set and vocabulary sizes increase. It would be interesting to see if the performance still leveled off if you increased the dimensionality with the corpus size.
 
 \begin{solution}
-Addressed this by including in the paper the work that looked at model accuracy vs. corpus size and number of rows in the random permutation model.
+Addressed this by including in the paper the work that looked at model accuracy versus corpus size and number of rows in the random permutation model.
 The text for the section has been previously included in this document.
 \end{solution}
 
@@ -96,10 +100,7 @@ There was some text in the beginning of the discussion section that mentioned th
 However it was embedded within parentheses and the other alternatives listed were not as important as this suggestion.
 So I broke this specific possibility out of parentheses and mentioned it directly:
 
-``These results provide support for the idea that choosing a hashtag when composing a tweet and tagging a StackOverflow post is akin to a declarative memory retrieval process.
-However, both models are not 100 percent accurate, and the amount of variance left to predict is larger than what would be observed if retrieval noise is included in the model.
-One possibility that seems likely is that the tag selection process includes other processes besides just declarative memory retrieval.
-For example, it may be the case that the declarative system is used to provide a set of likely tag candidates to higher-level processes to consider for selection.''
+FIXME: add text
 
 \end{solution}
 
