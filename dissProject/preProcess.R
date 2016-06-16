@@ -1510,7 +1510,7 @@ plotBarSumTbl <- function(sumTbl, fillCol, figName, extras=NULL, groupCol='dsetG
 	sumTbl
 }
 
-plotLineSumTbl <- function(sumTbl, fillCol, figName, extras=NULL, groupCol, title='Model Name') {
+plotLineSumTbl <- function(sumTbl, fillCol, figName, extras=NULL, groupCol, title='Model Name', remapSumTbl) {
 	groupCol = as.symbol(groupCol)
 	fillCol = substitute(fillCol)
 	renameCols(sumTbl)
@@ -1522,6 +1522,7 @@ plotLineSumTbl <- function(sumTbl, fillCol, figName, extras=NULL, groupCol, titl
 	lineTypes
 	shapeTypes = c(15, 16, 17, 18, 12)
 	shapeTypes = shapeTypes[1:length(sumTbl[, unique(DVName)])]
+	sumTbl = remapSumTbl(sumTbl)
 	expr = bquote(ggplot(sumTbl, aes(x=factor(.(groupCol)), y=meanVal)) +
 		      geom_line(aes(group=.(fillCol), linetype=.(fillCol), colour=.(fillCol)), size=.6) + 
 		      geom_point(aes(shape=.(fillCol)), size=3) +
@@ -1553,7 +1554,7 @@ compareMeanDV <- function(modelVsPredTbl, DV, extras=NULL, figName='', groupCol=
 				    ), extras))
 }
 
-compareMeanDVBySize <- function(modelVsPredTbl, DV, extras=NULL, figName='', groupCol, CIFun=CIMean) {
+compareMeanDVBySize <- function(modelVsPredTbl, DV, extras=NULL, figName='', groupCol, CIFun=CIMean, remapSumTbl=identity) {
 	DV = substitute(DV)
 	expr = bquote(modelVsPredTbl[, withCI(.(DV), CIFun=CIFun), keyby=list(DVName, .(as.symbol(groupCol)))])
 	sumTbl = eval(expr)
@@ -1562,7 +1563,8 @@ compareMeanDVBySize <- function(modelVsPredTbl, DV, extras=NULL, figName='', gro
 		       extras=c(list(theme(legend.position='top', legend.direction='vertical'),
 				     ylab('Proportion Correct'),
 				     xlab('Corpus Size')),
-				extras))
+				extras),
+		       remapSumTbl=remapSumTbl)
 }
 
 plotDatasetDescriptives <- function(modelVsPredTbl) {
@@ -2149,12 +2151,21 @@ analyzeContext <- function(modelVsPredTbl) {
 	DVNames = asTopHashtagAcross(c('PriorStdTitleOrderlessEntropyBodyOrderlessEntropy', 
 				       'PriorStdTitleOrderlessSmdimBodyOrderlessSmdim',
 				       'PriorStdTitleOrderlessLgdimBodyOrderlessLgdim'))
-	compareMeanDVBySize(tbl[dsetType == 'stackoverflow' & DVName %in% DVNames & sizeNum != 2], acc, figName='dimBySizeSO', groupCol='sizeNum')
+	remapSumTbl = function(sumTbl) {
+		sumTbl[DVName == 'RP combined full with entropy', DVName := sprintf('%s and 2048-row-matrix', DVName)]
+		sumTbl[, rows := as.numeric(str_extract(DVName, '(?<= and )[0-9]+'))]
+		sumTbl[, order := ifelse(rows == 2048, 1, 2)]
+		setorder(sumTbl, order, rows)
+		sumTbl[, DVName := factor(DVName, levels=unique(DVName))]
+		sumTbl
+	}
+	compareMeanDVBySize(tbl[dsetType == 'stackoverflow' & DVName %in% DVNames & sizeNum != 2], acc, figName='dimBySizeSO', groupCol='sizeNum', remapSumTbl=remapSumTbl)
 	# T Entropy all sizes
 	DVNames = asTopHashtagAcross(c('PriorStdTweetOrderEntropyTweetOrderlessEntropy',
 				       'PriorStdTweetOrderSmdimTweetOrderlessSmdim',
 				       'PriorStdTweetOrderLgdimTweetOrderlessLgdim'))
-	compareMeanDVBySize(tbl[dsetType == 'twitter' & DVName %in% DVNames], acc, figName='dimBySizeT', groupCol='sizeNum')
+	remapSumTbl = remapSumTbl 
+	compareMeanDVBySize(tbl[dsetType == 'twitter' & DVName %in% DVNames], acc, figName='dimBySizeT', groupCol='sizeNum', remapSumTbl=remapSumTbl)
 	# RESULT: Logodds technique works
 	# SO compare entropy with logodds to entropy
 	DVNames = asTopHashtagAcross(c('PriorStd',
