@@ -1,3 +1,6 @@
+pkgFiles = psycMethods.tex Makefile bibliography.bib $(shell cat psycMethods.tex | grep '.pdf' | perl -pe 's/}+$$//' | awk -F '{' '{print $$NF}' | perl -pe 's|^|figures/dissertation/|' )
+
+
 outFile = psycMethods
 mendeleyDB = Library/Application Support/Mendeley Desktop/clayton.stanley@rice.edu@www.mendeley.com.sqlite
 figPdfs = $(shell cat ${outFile}.tex | grep '\.pdf' | perl -pe 's/^.*{(.*)([^}]+)}+$$/$$1$$2/' | perl -pe 's|^|figures/dissertation/|')
@@ -32,3 +35,6 @@ static:
 
 showFigModDates:
 	git gp includegraphics ${outFile}.tex | egrep -o '{[^{]*}+$$' | sed 's/{//g' | sed 's/}//g' | perl -pe 's|^|figures/dissertation/|' | xargs ls -lt 
+
+build:
+	rsync -R -L -avz ${pkgFiles} ~/tmp/tmpBuild/
