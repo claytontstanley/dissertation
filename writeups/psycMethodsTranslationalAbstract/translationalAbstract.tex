@@ -1,0 +1,62 @@
+\documentclass[answers,12pt]{exam}
+\usepackage{xcolor}
+\definecolor{SolutionColor}{rgb}{0.1,0.3,1}
+\usepackage{lipsum}
+\usepackage{enumerate}
+\usepackage{alphalph}
+
+\renewcommand{\theenumi}{\AlphAlph{\value{enumi}}}
+\renewcommand{\thequestion}{\AlphAlph{\value{question}}}
+\renewcommand\questionlabel{\llap{\thequestion)}}
+
+%\pointsinrightmargin
+%\boxedpoints
+\unframedsolutions
+\shadedsolutions
+\definecolor{SolutionColor}{rgb}{0.9,0.9,1}
+\renewcommand{\solutiontitle}{}
+
+
+% http://tex.stackexchange.com/questions/36423/random-unwanted-space-between-paragraphs
+\raggedbottom
+
+\begin{document}
+
+\begin{questions}
+
+\question 
+
+ The growth of social media and user-created content on online sites provides unique opportunities to study models of human declarative memory.
+  By framing the task of choosing a hashtag for a tweet and tagging a post on StackOverflow as a declarative memory retrieval problem,
+  two cognitively-plausible declarative memory models were applied to millions of posts and tweets and evaluated on how accurately they predict a user's chosen tags.
+  An ACT-R based Bayesian model and a random permutation vector-based model were tested on the large datasets.
+  The results show that past user behavior of tag use is a strong predictor of future behavior.
+  Furthermore, past behavior was successfully incorporated into the random permutation model that previously used only context.
+  Also, ACT-R's attentional weight term was linked to an entropy-weighting natural language processing method used to attenuate high-frequency words (e.g., articles and prepositions).
+  Word order was not found to be a strong predictor of tag use, and the random permutation model performed comparably to the Bayesian model without including word order.
+  This shows that the strength of the random permutation model is not in the ability to represent word order, but rather in the way in which context information is successfully compressed.
+  The results of the large-scale exploration show how the architecture of the two memory models can be modified to significantly improve accuracy,
+  and may suggest task-independent general modifications that can help improve model fit to human data in a much wider range of domains.
+
+
+\begin{solution}
+
+The growth of social media and user-created content on online sites provides unique opportunities to study models of long-term memory.
+By framing the task of choosing a hashtag for a tweet and tagging a post on StackOverflow as a long-term memory retrieval problem,
+two long-term memory models were tested on millions of posts and tweets and evaluated on how accurately they predict a user's chosen tags.
+An uncompressed and compressed model (in terms of storage of information in long-term memory) were tested on the large datasets.
+The results show that past user behavior of tag use is a strong predictor of future behavior.
+Furthermore, past behavior was successfully incorporated into the compressed model that previously used only context.
+Also, an attentional weight term in the uncompressed model was linked to a natural language processing method used to attenuate common words (e.g., articles and prepositions).
+Word order was not found to be a strong predictor of tag use, and the compressed model performed comparably to the uncompressed model without including word order.
+This shows that the strength of the compressed model is not in the ability to represent word order, but rather in the way in which information is efficiently compressed.
+The results of the large-scale exploration show how the architecture of the two memory models can be modified to significantly improve accuracy,
+and may suggest task-independent general modifications that can help improve model fit to human data in a much wider range of domains.
+
+
+
+\end{solution}
+
+\end{questions}
+
+\end{document}
